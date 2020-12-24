@@ -14,12 +14,18 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    TextView sets;
+    CircularProgressBar circle;
+    int timerDuration = 5000;
+    int actualTimer = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         List<Long> spinList2 = new ArrayList<>();
         List<Long> spinList3 = new ArrayList<>();
 
-        CircularProgressBar circle = findViewById(R.id.circle2);
+        circle = findViewById(R.id.circle2);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -61,7 +67,10 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                circle.setTitle(String.valueOf(parent.getItemAtPosition(position)));
+                Long temp = (Long) parent.getItemAtPosition(position) * 1000;
+                timerDuration = temp.intValue();
+                actualTimer = timerDuration / 1000;
+                circle.setTitle(String.valueOf(actualTimer));
             }
 
             @Override
@@ -76,15 +85,14 @@ public class MainActivity extends AppCompatActivity {
         circle.setSubTitle("Really, nothing.");
 
         circle.setOnClickListener(v -> {
-            circle.animateProgressTo(0, 100, 5000, new CircularProgressBar.ProgressAnimationListener() {
+            circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
                 @Override
                 public void onAnimationStart() {
-
+                    setTimer();
                 }
 
                 @Override
                 public void onAnimationProgress(int progress) {
-                    circle.setTitle("Moving" + progress);
                 }
                 @Override
                 public void onAnimationFinish() {
@@ -93,19 +101,21 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
-        new CountDownTimer(timer1, 1000) {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+    }
+
+    public void setTimer() {
+        new CountDownTimer(5000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-
+                circle.setTitle(String.valueOf(millisUntilFinished / 1000));
             }
 
             @Override
             public void onFinish() {
 
             }
-        };
-
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
+        }.start();
     }
 }
