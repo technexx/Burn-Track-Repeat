@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/s1"
+        android:text="Rest Time:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:textSize="26sp"/>
+
+    <TextView
+        android:id="@+id/s2"
+        android:text="Set Duration:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/s1"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:textSize="26sp"/>
+
+    <TextView
+        android:id="@+id/s3"
+        android:text="Number of Sets:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/s2"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp"
+        android:textSize="26sp"/>
+
+    <Spinner
+        android:id="@+id/spin1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="220dp">
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/spin2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/s1"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="220dp">
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/spin3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/s2"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="220dp">
+    </Spinner>
+
+<!--    <com.example.tragic.irate.simple.stopwatch.CircularCounter-->
+<!--        xmlns:counter="http://schemas.android.com/apk/res-auto"-->
+<!--        android:id="@+id/circle1"-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="300dp"-->
+<!--        counter:range="60"-->
+<!--        counter:textSize="100sp"-->
+<!--        counter:textColor="#ffffff"-->
+<!--        counter:metricSize="20sp"-->
+<!--        counter:metricText="metric"-->
+<!--        counter:layout_constraintBottom_toBottomOf="parent"-->
+<!--        counter:layout_constraintStart_toStartOf="parent"-->
+<!--        counter:layout_constraintEnd_toEndOf="parent"-->
+<!--        />-->
+
+    <com.example.tragic.irate.simple.stopwatch.CircularProgressBar
+        xmlns:circular="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/circle2"
+        style="@style/Widget.ProgressBar.Holo.CircularProgressBar"
+        android:layout_width="120dip"
+        android:layout_height="120dip"
+        android:layout_marginTop="10dip"
+        circular:subtitle="subtitle"
+        circular:title="Title"
+        circular:layout_constraintBottom_toBottomOf="parent"
+        circular:layout_constraintStart_toStartOf="parent"
+        circular:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
