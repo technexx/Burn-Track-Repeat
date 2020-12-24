@@ -120,13 +120,13 @@ public class CircularProgressBar extends ProgressBar{
         mBackgroundColorPaint.setStyle(Paint.Style.STROKE);
         mBackgroundColorPaint.setStrokeWidth(mStrokeWidth);
 
-        mTitlePaint.setTextSize(60);
+        mTitlePaint.setTextSize(100);
         mTitlePaint.setStyle(Style.FILL);
         mTitlePaint.setAntiAlias(true);
         mTitlePaint.setTypeface(Typeface.create("Roboto-Thin", Typeface.NORMAL));
         mTitlePaint.setShadowLayer(0.1f, 0, 1, Color.GRAY);
 
-        mSubtitlePaint.setTextSize(20);
+        mSubtitlePaint.setTextSize(60);
         mSubtitlePaint.setStyle(Style.FILL);
         mSubtitlePaint.setAntiAlias(true);
         mSubtitlePaint.setTypeface(Typeface.create("Roboto-Thin", Typeface.BOLD));
@@ -153,12 +153,12 @@ public class CircularProgressBar extends ProgressBar{
             if(TextUtils.isEmpty(mSubTitle)){
                 yPos += titleHeight/2;
             }
-            canvas.drawText(mTitle, xPos, yPos, mTitlePaint);
+            canvas.drawText(mTitle, xPos, yPos - 25, mTitlePaint);
 
             yPos += titleHeight;
             xPos = (int)(getMeasuredWidth()/2 - mSubtitlePaint.measureText(mSubTitle) / 2);
 
-            canvas.drawText(mSubTitle, xPos, yPos, mSubtitlePaint);
+            canvas.drawText(mSubTitle, xPos, yPos + 25, mSubtitlePaint);
         }
 
         super.onDraw(canvas);
@@ -183,12 +183,12 @@ public class CircularProgressBar extends ProgressBar{
         invalidate();
     }
 
-    public void animateProgressTo(final int start, final int end, final ProgressAnimationListener listener){
+    public void animateProgressTo(final int start, final int end, int duration, final ProgressAnimationListener listener){
         if(start!=0)
             setProgress(start);
 
-        @SuppressLint("ObjectAnimatorBinding") final ObjectAnimator progressBarAnimator = ObjectAnimator.ofFloat(this, "animateProgress", start, end);
-        progressBarAnimator.setDuration(1500);
+        @SuppressLint("ObjectAnimatorBinding") final ObjectAnimator progressBarAnimator = ObjectAnimator.ofFloat(this, "animateProgressTo", start, end);
+        progressBarAnimator.setDuration(duration);
         //		progressBarAnimator.setInterpolator(new AnticipateOvershootInterpolator(2f, 1.5f));
         progressBarAnimator.setInterpolator(new LinearInterpolator());
 
