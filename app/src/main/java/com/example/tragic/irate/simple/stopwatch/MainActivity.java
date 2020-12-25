@@ -22,10 +22,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView sets;
     CircularProgressBar circle;
+    CountDownTimer timer;
+    boolean timerActive;
     int timerDuration = 5000;
     int actualTimer = 5;
+    int progressStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,28 +87,47 @@ public class MainActivity extends AppCompatActivity {
         circle.setSubTitle("Really, nothing.");
 
         circle.setOnClickListener(v -> {
-            circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
-                @Override
-                public void onAnimationStart() {
-                    setTimer();
-                }
+            if (!timerActive){
+                timerActive = true;
+                circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
+                    @Override
+                    public void onAnimationStart() {
+                        setTimer();
+                    }
 
-                @Override
-                public void onAnimationProgress(int progress) {
-                }
-                @Override
-                public void onAnimationFinish() {
-                    circle.setSubTitle("Done");
-                }
-            });
+                    @Override
+                    public void onAnimationProgress(int progress) {
+                    }
+
+                    @Override
+                    public void onAnimationFinish() {
+                        circle.setSubTitle("Done");
+                    }
+                });
+            } else {
+                timerActive = false;
+                circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
+                    @Override
+                    public void onAnimationStart() {
+                    }
+
+                    @Override
+                    public void onAnimationProgress(int progress) {
+                        circle.setProgress(10);
+                    }
+
+                    @Override
+                    public void onAnimationFinish() {
+                        circle.setSubTitle("Paused");
+                    }
+                });
+            }
         });
-
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
     }
 
     public void setTimer() {
-        new CountDownTimer(5000, 1000) {
+        timer = new CountDownTimer(timerDuration, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 circle.setTitle(String.valueOf(millisUntilFinished / 1000));
@@ -117,5 +138,11 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }.start();
+    }
+
+    public void pauseTimer() {
+        if (timer!=null) {
+            timer.cancel();
+        }
     }
 }
