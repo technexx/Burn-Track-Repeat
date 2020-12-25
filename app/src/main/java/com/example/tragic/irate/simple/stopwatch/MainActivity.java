@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
     boolean timerActive;
     int timerDuration = 5000;
     int actualTimer = 5;
-    int progressStart;
+    int currentTime = 0;
+    double remainingTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         long timer2 = (long) spinner2.getSelectedItem();
         long timer3 = (long) spinner3.getSelectedItem();
 
+        DecimalFormat df = new DecimalFormat("");
+
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
                     @Override
                     public void onAnimationStart() {
-                        setTimer();
+                        setTimer(false);
                     }
 
                     @Override
@@ -109,16 +113,20 @@ public class MainActivity extends AppCompatActivity {
                 circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
                     @Override
                     public void onAnimationStart() {
+                        setTimer(true);
                     }
 
                     @Override
                     public void onAnimationProgress(int progress) {
-                        circle.setProgress(10);
+                        double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
+                        remainingTime = Double.parseDouble(df.format(temp));
+                        circle.setProgress((int) remainingTime);
+                        circle.setSubTitle("Paused");
                     }
 
                     @Override
                     public void onAnimationFinish() {
-                        circle.setSubTitle("Paused");
+                        circle.setProgress((int) remainingTime);
                     }
                 });
             }
@@ -126,23 +134,26 @@ public class MainActivity extends AppCompatActivity {
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
-    public void setTimer() {
-        timer = new CountDownTimer(timerDuration, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                circle.setTitle(String.valueOf(millisUntilFinished / 1000));
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-        }.start();
+    public void setTimer(boolean paused) {
+        if (!paused) {
+            timer = new CountDownTimer(timerDuration, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    currentTime = (int) millisUntilFinished /1000;
+                    circle.setTitle(String.valueOf(currentTime));
+                }
+                @Override
+                public void onFinish() {
+                }
+            }.start();
+        } else {
+            timer.cancel();
+            circle.setTitle(String.valueOf(currentTime));
+        }
     }
 
     public void pauseTimer() {
-        if (timer!=null) {
-            timer.cancel();
-        }
+        timer.cancel();
+        circle.setTitle(String.valueOf(currentTime));
     }
 }
