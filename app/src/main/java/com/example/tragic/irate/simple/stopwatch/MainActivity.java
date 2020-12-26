@@ -92,11 +92,11 @@ public class MainActivity extends AppCompatActivity {
 
         circle.setOnClickListener(v -> {
             if (!timerActive){
-                timerActive = true;
                 circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
                     @Override
                     public void onAnimationStart() {
-                        setTimer(false);
+                        setTimer();
+                        circle.setSubTitle("Seconds");
                     }
 
                     @Override
@@ -108,20 +108,20 @@ public class MainActivity extends AppCompatActivity {
                         circle.setSubTitle("Done");
                     }
                 });
+                timerActive = true;
             } else {
-                timerActive = false;
                 circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
                     @Override
                     public void onAnimationStart() {
-                        setTimer(true);
+                        setTimer();
+                        double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
+                        remainingTime = Double.parseDouble(df.format(temp));
+                        circle.setSubTitle("Stopped");
                     }
 
                     @Override
                     public void onAnimationProgress(int progress) {
-                        double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
-                        remainingTime = Double.parseDouble(df.format(temp));
-                        circle.setProgress((int) remainingTime) ;
-                        circle.setSubTitle("Stopped");
+                        circle.setProgress((int) remainingTime);
                     }
 
                     @Override
@@ -129,13 +129,14 @@ public class MainActivity extends AppCompatActivity {
                         circle.setProgress((int) remainingTime);
                     }
                 });
+                timerActive = false;
             }
         });
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
-    public void setTimer(boolean paused) {
-        if (!paused) {
+    public void setTimer() {
+        if (!timerActive) {
             timer = new CountDownTimer(timerDuration + 1000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -147,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onFinish() {
-//                    timerActive = false;
                 }
             }.start();
         } else {
