@@ -85,10 +85,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        circle.setTitleColor(R.color.black);
-        circle.setSubTitleColor(R.color.black);
-        circle.setShadow(R.color.black);
-        circle.setSubTitle("Really, nothing.");
+//        circle.setTitleColor(R.color.white);
+//        circle.setSubTitleColor(R.color.white);
+//        circle.setShadow(R.color.black);
+        circle.setSubTitle("Seconds");
 
         circle.setOnClickListener(v -> {
             if (!timerActive){
@@ -120,8 +120,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onAnimationProgress(int progress) {
                         double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
                         remainingTime = Double.parseDouble(df.format(temp));
-                        circle.setProgress((int) remainingTime);
-                        circle.setSubTitle("Paused");
+                        circle.setProgress((int) remainingTime) ;
+                        circle.setSubTitle("Stopped");
                     }
 
                     @Override
@@ -136,24 +136,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void setTimer(boolean paused) {
         if (!paused) {
-            timer = new CountDownTimer(timerDuration, 1000) {
+            timer = new CountDownTimer(timerDuration + 1000, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     currentTime = (int) millisUntilFinished /1000;
                     circle.setTitle(String.valueOf(currentTime));
+                    if (millisUntilFinished <1000) {
+                        timerActive = false;
+                    }
                 }
                 @Override
                 public void onFinish() {
+//                    timerActive = false;
                 }
             }.start();
         } else {
             timer.cancel();
             circle.setTitle(String.valueOf(currentTime));
         }
-    }
-
-    public void pauseTimer() {
-        timer.cancel();
-        circle.setTitle(String.valueOf(currentTime));
     }
 }
