@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.KeyEvent;
 import android.view.View;
@@ -70,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
         DecimalFormat df = new DecimalFormat("");
 
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -105,7 +109,15 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onAnimationFinish() {
-                        circle.setSubTitle("Done");
+                        if (timerActive) {
+                            circle.setSubTitle("Done");
+                            long[] pattern = {0, 1000, 0, 1000, 0, 1000};
+                            if (Build.VERSION.SDK_INT >= 26) {
+                                vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
+                            } else {
+                                vibrator.vibrate(pattern, 0);
+                            }
+                        }
                     }
                 });
                 timerActive = true;
@@ -121,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onAnimationProgress(int progress) {
+                        //Continuously setting (each draw tick) time to stationary value (hacky workaround for progressbar class).
                         circle.setProgress((int) remainingTime);
                     }
 
@@ -132,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
                 timerActive = false;
             }
         });
-        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     public void setTimer() {
