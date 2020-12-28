@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,12 +28,15 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     CircularProgressBar circle;
+    CircularProgressBar circlePause;
     CountDownTimer timer;
-    boolean timerActive;
+    boolean timerStarted;
+    boolean timerPaused;
     int timerDuration = 5000;
     int actualTimer = 5;
     int currentTime = 0;
     double remainingTime = 0;
+    long pausedMillis = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,11 @@ public class MainActivity extends AppCompatActivity {
         List<Long> spinList2 = new ArrayList<>();
         List<Long> spinList3 = new ArrayList<>();
 
+        Button reset = findViewById(R.id.reset);
+
         circle = findViewById(R.id.circle2);
+        circlePause = findViewById(R.id.circle_pause);
+        circlePause.setVisibility(View.INVISIBLE);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -81,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
                 timerDuration = temp.intValue();
                 actualTimer = timerDuration / 1000;
                 circle.setTitle(String.valueOf(actualTimer));
+                circlePause.setTitle(String.valueOf(actualTimer));
+                pausedMillis = temp;
             }
 
             @Override
@@ -89,18 +100,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        circle.setProgress(100);
 //        circle.setTitleColor(R.color.white);
 //        circle.setSubTitleColor(R.color.white);
 //        circle.setShadow(R.color.black);
-        circle.setSubTitle("Seconds");
+//        circlePause.setSubTitle("Seconds");
 
         circle.setOnClickListener(v -> {
-            if (!timerActive){
+            if (!timerStarted){
                 circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
                     @Override
                     public void onAnimationStart() {
                         setTimer();
-                        circle.setSubTitle("Seconds");
                     }
 
                     @Override
@@ -109,54 +120,74 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onAnimationFinish() {
-                        if (timerActive) {
+                        if (timerStarted) {
                             circle.setSubTitle("Done");
                             long[] pattern = {0, 1000, 0, 1000, 0, 1000};
-                            if (Build.VERSION.SDK_INT >= 26) {
-                                vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
-                            } else {
-                                vibrator.vibrate(pattern, 0);
-                            }
+//                            if (Build.VERSION.SDK_INT >= 26) {
+//                                vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
+//                            } else {
+//                                vibrator.vibrate(pattern, 0);
+//                            }
                         }
                     }
                 });
-                timerActive = true;
+                timerStarted = true;
             } else {
-                circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
-                    @Override
-                    public void onAnimationStart() {
-                        setTimer();
-                        double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
-                        remainingTime = Double.parseDouble(df.format(temp));
-                        circle.setSubTitle("Stopped");
-                    }
+                //Pausing
+                //remainingTime is percentage value left.
+                double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
+                remainingTime = Double.parseDouble(df.format(temp));
+                circlePause.setSubTitle("Paused");
 
-                    @Override
-                    public void onAnimationProgress(int progress) {
-                        //Continuously setting (each draw tick) time to stationary value (hacky workaround for progressbar class).
-                        circle.setProgress((int) remainingTime);
-                    }
-
-                    @Override
-                    public void onAnimationFinish() {
-                        circle.setProgress((int) remainingTime);
-                    }
-                });
-                timerActive = false;
+                circle.setVisibility(View.INVISIBLE);
+                circlePause.setVisibility(View.VISIBLE);
+                circlePause.setProgress((int) remainingTime);
+                timerPaused = true;
+                setTimer();
             }
+        });
+
+        circlePause.setOnClickListener(v-> {
+            //Resuming
+            circlePause.setVisibility(View.INVISIBLE);
+            circle.setVisibility(View.VISIBLE);
+            circle.setProgress((int) remainingTime);
+            circle.animateProgressTo((int) remainingTime, 0, (int) pausedMillis, new CircularProgressBar.ProgressAnimationListener() {
+                @Override
+                public void onAnimationStart() {
+                    double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
+                    remainingTime = Double.parseDouble(df.format(temp));
+                }
+
+                @Override
+                public void onAnimationProgress(int progress) {
+                    //Continuously setting (each draw tick) time to stationary value (hacky workaround for progressbar class).
+//                            circle.setProgress((int) remainingTime);
+                }
+
+                @Override
+                public void onAnimationFinish() {
+//                            circle.setProgress((int) remainingTime);
+                }
+            });
+            timerPaused = false;
+            setTimer();
+        });
+
+        reset.setOnClickListener(v -> {
+            resetTimer();
         });
     }
 
     public void setTimer() {
-        if (!timerActive) {
-            timer = new CountDownTimer(timerDuration + 1000, 1000) {
+        if (!timerPaused) {
+            timer = new CountDownTimer(pausedMillis, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
+                    pausedMillis = millisUntilFinished;
                     currentTime = (int) millisUntilFinished /1000;
                     circle.setTitle(String.valueOf(currentTime));
-                    if (millisUntilFinished <1000) {
-                        timerActive = false;
-                    }
+                    circlePause.setTitle(String.valueOf(currentTime));
                 }
                 @Override
                 public void onFinish() {
@@ -164,7 +195,12 @@ public class MainActivity extends AppCompatActivity {
             }.start();
         } else {
             timer.cancel();
-            circle.setTitle(String.valueOf(currentTime));
         }
+    }
+
+    public void resetTimer() {
+        actualTimer = timerDuration / 1000;
+        circle.setTitle(String.valueOf(actualTimer));
+        circle.setProgress(100);
     }
 }

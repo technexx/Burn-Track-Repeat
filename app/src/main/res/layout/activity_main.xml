@@ -85,14 +85,45 @@
         xmlns:circular="http://schemas.android.com/apk/res-auto"
         android:id="@+id/circle2"
         style="@style/Widget.ProgressBar.CircularProgressBar"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_marginTop="10dip"
         circular:subtitle="subtitle"
         circular:title="Title"
         circular:layout_constraintBottom_toBottomOf="parent"
         circular:layout_constraintStart_toStartOf="parent"
         circular:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="64dp"/>
+
+    <com.example.tragic.irate.simple.stopwatch.CircularProgressBar
+        xmlns:circular="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/circle_pause"
+        style="@style/Widget.ProgressBar.CircularProgressBar"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="10dip"
+        circular:subtitle="subtitle"
+        circular:title="Title"
+        circular:layout_constraintBottom_toBottomOf="parent"
+        circular:layout_constraintStart_toStartOf="parent"
+        circular:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="64dp"/>
+
+    <Button
+        android:id="@+id/reset"
+        android:text="Reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/circle2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white"
+        app:cornerRadius="0dp"
+        app:rippleColor="@color/black"
+        app:strokeColor="@color/black"
+        android:textSize="15sp"
+        app:strokeWidth="0dp">
+    </Button>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
