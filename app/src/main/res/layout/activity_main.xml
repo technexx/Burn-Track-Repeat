@@ -121,7 +121,7 @@
         circular:layout_constraintBottom_toBottomOf="parent"
         circular:layout_constraintStart_toStartOf="parent"
         circular:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="64dp"/>
+        android:layout_marginBottom="64dp" />
 
     <Button
         android:id="@+id/reset"

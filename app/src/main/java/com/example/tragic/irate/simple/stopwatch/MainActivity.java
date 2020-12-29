@@ -40,13 +40,14 @@ public class MainActivity extends AppCompatActivity {
 
     boolean timerStarted;
     boolean timerPaused;
+    boolean timerEnded;
+    boolean stopAnim;
     int timerDuration = 5000;
     int actualTimer = 5;
     int currentTime = 0;
+    int defaultSpinner = 5;
     double remainingTime = 0;
     long pausedMillis = 5000;
-    boolean timerEnded;
-    int defaultSpinner = 5;
 
     Animation anim;
 
@@ -226,6 +227,11 @@ public class MainActivity extends AppCompatActivity {
                     anim.setRepeatMode(Animation.REVERSE);
                     anim.setRepeatCount(Animation.INFINITE);
 
+                    if (!stopAnim) {
+                        anim.cancel();
+                        stopAnim = false;
+                    }
+
                     circle.startAnimation(anim);
                     timerEnded = true;
 
@@ -252,6 +258,6 @@ public class MainActivity extends AppCompatActivity {
         timerStarted = false;
         timerEnded = false;
         timerPaused = false;
-        anim.cancel();
+        stopAnim = true;
     }
 }

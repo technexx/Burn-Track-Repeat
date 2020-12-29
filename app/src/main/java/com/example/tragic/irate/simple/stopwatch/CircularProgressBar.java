@@ -147,6 +147,7 @@ public class CircularProgressBar extends ProgressBar{
 
         if(mHasShadow)
             mProgressColorPaint.setShadowLayer(	3, 0, 1, mShadowColor);
+        ///
         canvas.drawArc(mCircleBounds, 270, scale , false, mProgressColorPaint);
 
 
