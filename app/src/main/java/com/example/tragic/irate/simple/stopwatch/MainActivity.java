@@ -21,6 +21,7 @@ import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     CountDownTimer timer;
     Button reset;
     DecimalFormat df;
+    ProgressBar progressBar;
 
     boolean timerStarted;
     boolean timerPaused;
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         circlePause.setVisibility(View.INVISIBLE);
         circleRestart.setVisibility(View.INVISIBLE);
         reset.setVisibility(View.INVISIBLE);
+//        circle.setVisibility(View.INVISIBLE);
+//        progressBar = findViewById(R.id.progress_circle);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -130,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
             //Resuming
             circlePause.setVisibility(View.INVISIBLE);
             circle.setVisibility(View.VISIBLE);
+            //Todo: remainingTime just needs to be divided and rounded by nearest 1000ms.
             circle.setProgress((int) remainingTime);
             circle.animateProgressTo((int) remainingTime, 0, (int) pausedMillis, new CircularProgressBar.ProgressAnimationListener() {
                 @Override
@@ -156,48 +161,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startTimer() {
-        if (!timerStarted){
-            circle.setVisibility(View.VISIBLE);
-            circlePause.setVisibility(View.INVISIBLE);
-            circleRestart.setVisibility(View.INVISIBLE);
-
-            circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
-                @Override
-                public void onAnimationStart() {
-                    circle.setProgress(100);
-                    circle.setTitle(String.valueOf(actualTimer));
-                    setTimer();
-                }
-
-                @Override
-                public void onAnimationProgress(int progress) {
-                }
-
-                @Override
-                public void onAnimationFinish() {
-                    if (timerStarted) {
-                        circle.setSubTitle("Done");
-                    }
-                }
-            });
-            timerStarted = true;
-        } else if (timerEnded) {
-            resetTimer();
-            anim.cancel();
-            timerEnded = false;
-            timerStarted = false;
-        } else {
-            //Pausing
-            //remainingTime is percentage value left.
-            double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
-            remainingTime = Double.parseDouble(df.format(temp));
-
-            reset.setVisibility(View.VISIBLE);
-            circle.setVisibility(View.INVISIBLE);
-            circlePause.setVisibility(View.VISIBLE);
-            circlePause.setProgress((int) remainingTime);
-            circlePause.setSubTitle("Paused");
-            timerPaused = true;
+        if (!timerStarted) {
+//            circle.setVisibility(View.VISIBLE);
+//            circlePause.setVisibility(View.INVISIBLE);
+//            circleRestart.setVisibility(View.INVISIBLE);
+//
+//            circle.animateProgressTo(100, 0, timerDuration, new CircularProgressBar.ProgressAnimationListener() {
+//                @Override
+//                public void onAnimationStart() {
+//                    circle.setProgress(100);
+//                    circle.setTitle(String.valueOf(actualTimer));
+//                    setTimer();
+//                }
+//
+//                @Override
+//                public void onAnimationProgress(int progress) {
+//                }
+//
+//                @Override
+//                public void onAnimationFinish() {
+//                    if (timerStarted) {
+//                        circle.setSubTitle("Done");
+//                    }
+//                }
+//            });
+//            timerStarted = true;
+//        } else if (timerEnded) {
+//            resetTimer();
+//            anim.cancel();
+//            timerEnded = false;
+//            timerStarted = false;
+//        } else {
+//            //Pausing
+//            //remainingTime is percentage value left.
+//            double temp = ( (double) (currentTime*1000)/ timerDuration) * 100;
+//            remainingTime = Double.parseDouble(df.format(temp));
+//
+//            reset.setVisibility(View.VISIBLE);
+//            circle.setVisibility(View.INVISIBLE);
+//            circlePause.setVisibility(View.VISIBLE);
+//            circlePause.setProgress((int) remainingTime);
+//            circlePause.setSubTitle("Paused");
+//            timerPaused = true;
             setTimer();
         }
     }
@@ -210,19 +215,29 @@ public class MainActivity extends AppCompatActivity {
             pausedMillis = defaultSpinner;
         }
 
+        long duration = pausedMillis/100;
+        long tempMillis = pausedMillis;
+
         if (!timerPaused) {
-            timer = new CountDownTimer(pausedMillis, 1000) {
+            timer = new CountDownTimer(pausedMillis, duration) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     pausedMillis = millisUntilFinished;
                     currentTime = (int) millisUntilFinished /1000;
-                    circle.setTitle(String.valueOf(currentTime));
-                    circlePause.setTitle(String.valueOf(currentTime));
+
+                    circle.setProgress((int) (millisUntilFinished/ (duration)));
+                    circle.setTitle(String.valueOf((int) ( (millisUntilFinished+1000) / 1000)));
+//
+                    if (circle.getProgress() == 0) {
+                        circle.setTitle(String.valueOf(0));
+                    }
+                    Log.i("timeLeft", String.valueOf(millisUntilFinished));
+
                 }
                 @Override
                 public void onFinish() {
                     anim = new AlphaAnimation(1.0f, 0.0f);
-                    anim.setDuration(300); //You can manage the blinking time with this parameter
+                    anim.setDuration(300);
                     anim.setStartOffset(20);
                     anim.setRepeatMode(Animation.REVERSE);
                     anim.setRepeatCount(Animation.INFINITE);
