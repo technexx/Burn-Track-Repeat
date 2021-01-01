@@ -130,12 +130,16 @@ public class MainActivity extends AppCompatActivity {
         circle.setOnClickListener(v -> {
              timerBegun++;
             if (!paused) {
+                reset.setVisibility(View.INVISIBLE);
                 setTimer();
                 paused = true;
-            } else {
+            } else if (!timerEnded) {
                 progressPause = progressStart;
+                reset.setVisibility(View.VISIBLE);
                 timer.cancel();
                 paused = false;
+            } else {
+                resetTimer();
             }
 
         });
@@ -179,10 +183,6 @@ public class MainActivity extends AppCompatActivity {
                     anim.setRepeatMode(Animation.REVERSE);
                     anim.setRepeatCount(Animation.INFINITE);
 
-                    if (!stopAnim) {
-                        anim.cancel();
-                        stopAnim = false;
-                    }
                     circle.startAnimation(anim);
 
                     timerEnded = true;
@@ -200,13 +200,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetTimer() {
-        circle.setVisibility(View.INVISIBLE);
-        circlePause.setVisibility(View.INVISIBLE);
-        circleRestart.setVisibility(View.VISIBLE);
-
-        circleRestart.setTitle(String.valueOf(defaultSpinner/1000));
-        circleRestart.setProgress(100);
-        stopAnim = true;
+        timer.cancel();
         timerBegun = 0;
+        paused = false;
+        timerEnded = false;
+        anim.cancel();
+
+        selectedMillis = defaultSpinner;
+        circle.setTitle(String.valueOf(defaultSpinner/1000));
+        circle.setProgress(100);
     }
 }
