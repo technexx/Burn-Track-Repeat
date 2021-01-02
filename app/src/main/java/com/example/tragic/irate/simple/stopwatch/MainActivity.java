@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     boolean paused;
 
     int timerDuration;
-    int defaultSpinner = 60;
     long selectedMillis;
     double pausedMillis;
     int maxProgress = 10000;
@@ -70,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
         df = new DecimalFormat(".######");
         anim = new AlphaAnimation(1.0f, 0.0f);
 
-        timeLeft.setText(String.valueOf(defaultSpinner));
-
         List<Long> spinList1 = new ArrayList<>();
         List<Long> spinList2 = new ArrayList<>();
         List<Long> spinList3 = new ArrayList<>();
@@ -103,12 +100,11 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Long temp = (Long) parent.getItemAtPosition(position) * 1000;
                 timerDuration = temp.intValue();
-                defaultSpinner = temp.intValue();
 
                 selectedMillis = temp;
                 progressStart = temp;
 
-                timeLeft.setText(String.valueOf(timerStart/1000));
+                timeLeft.setText(String.valueOf(timerDuration/1000));
                 progressBar.setProgress(10000);
                 pausedMillis = selectedMillis;
             }
@@ -231,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
         timerEnded = false;
         anim.cancel();
 
+        selectedMillis = timerDuration;
         timeLeft.setText(String.valueOf(timerDuration/1000));
         progressBar.setProgress(10000);
-        selectedMillis = defaultSpinner;
     }
 }
