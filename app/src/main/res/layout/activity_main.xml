@@ -82,13 +82,13 @@
     </Spinner>
 
     <ProgressBar
-        android:id="@+id/testBar"
+        android:id="@+id/progressBar"
         android:layout_width="230dp"
         android:layout_height="230dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         style="?android:attr/progressBarStyleHorizontal"
         android:max="10000"
         android:progressDrawable="@drawable/circle_progress"
@@ -102,10 +102,10 @@
         android:textSize="80sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/testBar"
-        app:layout_constraintBottom_toBottomOf="@id/testBar"
-        app:layout_constraintStart_toStartOf="@id/testBar"
-        app:layout_constraintEnd_toEndOf="@id/testBar">
+        app:layout_constraintTop_toTopOf="@id/progressBar"
+        app:layout_constraintBottom_toBottomOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="@id/progressBar"
+        app:layout_constraintEnd_toEndOf="@id/progressBar">
     </TextView>
 
     <Button
@@ -113,7 +113,7 @@
         android:text="Reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/testTime"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="@color/black"
@@ -121,7 +121,7 @@
         app:cornerRadius="0dp"
         app:rippleColor="@color/black"
         app:strokeColor="@color/black"
-        android:textSize="15sp"
+        android:textSize="14sp"
         app:strokeWidth="0dp">
     </Button>
 

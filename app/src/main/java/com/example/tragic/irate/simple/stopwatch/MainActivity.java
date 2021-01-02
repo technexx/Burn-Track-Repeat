@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     boolean paused;
 
     int timerDuration;
-    int actualTimer = 5;
     int defaultSpinner = 60;
     long selectedMillis;
     double pausedMillis;
@@ -46,8 +45,7 @@ public class MainActivity extends AppCompatActivity {
     Animation anim;
 
     long progressStart = 60000;
-    long timerStart;
-    long progressPause;
+    long timerStart = 60000;
 
     long setDuration;
     long numberOfSets;
@@ -66,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         reset = findViewById(R.id.reset);
         reset.setVisibility(View.INVISIBLE);
 
-        progressBar = findViewById(R.id.testBar);
+        progressBar = findViewById(R.id.progressBar);
         timeLeft = findViewById(R.id.testTime);
 
         df = new DecimalFormat(".######");
@@ -107,10 +105,11 @@ public class MainActivity extends AppCompatActivity {
                 timerDuration = temp.intValue();
                 defaultSpinner = temp.intValue();
 
-                actualTimer = timerDuration / 1000;
                 selectedMillis = temp;
                 progressStart = temp;
 
+                timeLeft.setText(String.valueOf(timerStart/1000));
+                progressBar.setProgress(10000);
                 pausedMillis = selectedMillis;
             }
 
@@ -151,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
                 restTimer();
                 paused = true;
             } else if (!timerEnded) {
-                progressPause = progressStart;
                 reset.setVisibility(View.VISIBLE);
                 timer.cancel();
                 objectAnimator.cancel();
@@ -168,7 +166,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void restTimer() {
-//        pausedMillis = Double.parseDouble(df.format((double) selectedMillis/progressStart));
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
@@ -201,13 +198,11 @@ public class MainActivity extends AppCompatActivity {
                     anim.setStartOffset(20);
                     anim.setRepeatMode(Animation.REVERSE);
                     anim.setRepeatCount(Animation.INFINITE);
-
                     timerEnded = true;
 
                     //Todo: Replace rest timer reset w/ set timer, then finish w/ reset. Also: Add counter for set/rest times.
                     numberOfSets--;
                     if (numberOfSets >0) {
-                        resetTimer();
                         resetTimer();
                     } else {
                         numberOfSets = 0;
@@ -236,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
         timerEnded = false;
         anim.cancel();
 
+        timeLeft.setText(String.valueOf(timerDuration/1000));
+        progressBar.setProgress(10000);
         selectedMillis = defaultSpinner;
     }
 }
