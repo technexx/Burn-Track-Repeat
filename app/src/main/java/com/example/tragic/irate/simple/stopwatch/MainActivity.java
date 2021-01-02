@@ -2,22 +2,17 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.usage.UsageEvents;
+import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
+import android.os.Vibrator;;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,29 +27,33 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    CircularProgressBar circle;
-    CircularProgressBar circlePause;
-    CircularProgressBar circleRestart;
+    ObjectAnimator objectAnimator;
     CountDownTimer timer;
     Button reset;
     DecimalFormat df;
 
     int timerBegun;
     boolean timerEnded;
-    boolean stopAnim;
     boolean paused;
 
-    int timerDuration = 5000;
+    int timerDuration;
     int actualTimer = 5;
-    int defaultSpinner = 5;
-    long selectedMillis = 5000;
-    long pausedMillis = 5000;
+    int defaultSpinner = 60;
+    long selectedMillis;
+    double pausedMillis;
+    int maxProgress = 10000;
 
     Animation anim;
 
-    long progressStart;
+    long progressStart = 60000;
     long timerStart;
     long progressPause;
+
+    long setDuration;
+    long numberOfSets;
+
+    ProgressBar progressBar;
+    TextView timeLeft;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,21 +63,20 @@ public class MainActivity extends AppCompatActivity {
         Spinner spinner1 = findViewById(R.id.spin1);
         Spinner spinner2 = findViewById(R.id.spin2);
         Spinner spinner3 = findViewById(R.id.spin3);
+        reset = findViewById(R.id.reset);
+        reset.setVisibility(View.INVISIBLE);
+
+        progressBar = findViewById(R.id.testBar);
+        timeLeft = findViewById(R.id.testTime);
+
+        df = new DecimalFormat(".######");
+        anim = new AlphaAnimation(1.0f, 0.0f);
+
+        timeLeft.setText(String.valueOf(defaultSpinner));
 
         List<Long> spinList1 = new ArrayList<>();
         List<Long> spinList2 = new ArrayList<>();
         List<Long> spinList3 = new ArrayList<>();
-
-        reset = findViewById(R.id.reset);
-
-        circle = findViewById(R.id.circle2);
-        circlePause = findViewById(R.id.circle_pause);
-        circleRestart = findViewById(R.id.circle_restart);
-        circlePause.setVisibility(View.INVISIBLE);
-        circleRestart.setVisibility(View.INVISIBLE);
-        reset.setVisibility(View.INVISIBLE);
-//        circle.setVisibility(View.INVISIBLE);
-//        progressBar = findViewById(R.id.progress_circle);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -98,13 +96,9 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setAdapter(spinAdapter2);
         spinner3.setAdapter(spinAdapter3);
 
-        long timer1 = (long) spinner1.getSelectedItem();
-        long timer2 = (long) spinner2.getSelectedItem();
-        long timer3 = (long) spinner3.getSelectedItem();
-
-        df = new DecimalFormat("");
-        anim = new AlphaAnimation(1.0f, 0.0f);
-        circle.setProgress(100);
+        spinner1.setSelection(11);
+        spinner2.setSelection(5);
+        spinner3.setSelection(2);
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -114,9 +108,8 @@ public class MainActivity extends AppCompatActivity {
                 defaultSpinner = temp.intValue();
 
                 actualTimer = timerDuration / 1000;
-                circle.setTitle(String.valueOf(actualTimer));
-                circlePause.setTitle(String.valueOf(actualTimer));
                 selectedMillis = temp;
+                progressStart = temp;
 
                 pausedMillis = selectedMillis;
             }
@@ -127,21 +120,46 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        circle.setOnClickListener(v -> {
-             timerBegun++;
+        spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                setDuration = (Long) parent.getItemAtPosition(position) * 1000;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                numberOfSets = (long) parent.getItemAtPosition(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        progressBar.setOnClickListener(v-> {
+            timerBegun++;
             if (!paused) {
                 reset.setVisibility(View.INVISIBLE);
-                setTimer();
+                restTimer();
                 paused = true;
             } else if (!timerEnded) {
                 progressPause = progressStart;
                 reset.setVisibility(View.VISIBLE);
                 timer.cancel();
+                objectAnimator.cancel();
                 paused = false;
             } else {
+                objectAnimator.cancel();
                 resetTimer();
             }
-
         });
 
         reset.setOnClickListener(v -> {
@@ -149,32 +167,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void setTimer() {
-        long duration = selectedMillis/100;
-        long pausedDuration = pausedMillis/100;
+    public void restTimer() {
+//        pausedMillis = Double.parseDouble(df.format((double) selectedMillis/progressStart));
+        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
+        objectAnimator.setInterpolator(new LinearInterpolator());
 
-            timer = new CountDownTimer(selectedMillis, duration) {
+        if (timerBegun <=2) {
+            objectAnimator.setDuration(selectedMillis);
+            objectAnimator.start();
+        } else {
+            objectAnimator.cancel();
+            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (pausedMillis), 0);
+            objectAnimator.setInterpolator(new LinearInterpolator());
+            objectAnimator.setDuration(selectedMillis);
+            objectAnimator.start();
+        }
+
+            timer = new CountDownTimer(selectedMillis, 50) {
                 @Override
                 public void onTick(long millisUntilFinished) {
+                    pausedMillis = (long) ((int) objectAnimator.getAnimatedValue());
+
                     selectedMillis = millisUntilFinished;
-
-                    progressStart = millisUntilFinished/ (duration);
                     timerStart =  ((millisUntilFinished+1000) / 1000);
-
-                    if (timerBegun <=2) {
-                        circle.setProgress((int) progressStart);
-                    } else {
-                        progressPause = selectedMillis/ (pausedDuration);
-                        circle.setProgress((int) progressPause);
-                    }
-                    circle.setTitle(String.valueOf((int) (timerStart)));
-
-                    if (circle.getProgress() == 0) {
-                        circle.setTitle(String.valueOf(0));
-                    }
-                    Log.i("timeLeft","millis" +  String.valueOf(selectedMillis) + "duration" + duration);
-
+                    timeLeft.setText(String.valueOf(timerStart));
+                    Log.i("value", String.valueOf(objectAnimator.getAnimatedValue()) + "+" + objectAnimator.getAnimatedFraction());
                 }
+
                 @Override
                 public void onFinish() {
                     anim = new AlphaAnimation(1.0f, 0.0f);
@@ -183,9 +202,16 @@ public class MainActivity extends AppCompatActivity {
                     anim.setRepeatMode(Animation.REVERSE);
                     anim.setRepeatCount(Animation.INFINITE);
 
-                    circle.startAnimation(anim);
-
                     timerEnded = true;
+
+                    //Todo: Replace rest timer reset w/ set timer, then finish w/ reset. Also: Add counter for set/rest times.
+                    numberOfSets--;
+                    if (numberOfSets >0) {
+                        resetTimer();
+                        resetTimer();
+                    } else {
+                        numberOfSets = 0;
+                    }
 
                     Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     long[] pattern = {0, 1000, 0, 1000, 0, 1000};
@@ -199,6 +225,10 @@ public class MainActivity extends AppCompatActivity {
             }.start();
     }
 
+    public void setTimer() {
+
+    }
+
     public void resetTimer() {
         timer.cancel();
         timerBegun = 0;
@@ -207,7 +237,5 @@ public class MainActivity extends AppCompatActivity {
         anim.cancel();
 
         selectedMillis = defaultSpinner;
-        circle.setTitle(String.valueOf(defaultSpinner/1000));
-        circle.setProgress(100);
     }
 }
