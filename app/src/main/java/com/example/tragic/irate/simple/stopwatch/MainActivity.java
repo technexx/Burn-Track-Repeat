@@ -36,12 +36,12 @@ public class MainActivity extends AppCompatActivity {
     boolean timerEnded;
     boolean paused;
 
-    int timerDuration;
+    int timerSetting;
     long selectedMillis;
     double pausedMillis;
     int maxProgress = 10000;
 
-    Animation anim;
+    Animation endAnimation;
 
     long progressStart = 60000;
     long timerStart = 60000;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         timeLeft = findViewById(R.id.testTime);
 
         df = new DecimalFormat(".######");
-        anim = new AlphaAnimation(1.0f, 0.0f);
+        endAnimation = new AlphaAnimation(1.0f, 0.0f);
 
         List<Long> spinList1 = new ArrayList<>();
         List<Long> spinList2 = new ArrayList<>();
@@ -99,14 +99,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Long temp = (Long) parent.getItemAtPosition(position) * 1000;
-                timerDuration = temp.intValue();
+                timerSetting = temp.intValue();
 
                 selectedMillis = temp;
                 progressStart = temp;
-
-                timeLeft.setText(String.valueOf(timerDuration/1000));
-                progressBar.setProgress(10000);
                 pausedMillis = selectedMillis;
+                resetTimer();
             }
 
             @Override
@@ -119,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 setDuration = (Long) parent.getItemAtPosition(position) * 1000;
+                resetTimer();
             }
 
             @Override
@@ -189,17 +188,18 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFinish() {
-                    anim = new AlphaAnimation(1.0f, 0.0f);
-                    anim.setDuration(300);
-                    anim.setStartOffset(20);
-                    anim.setRepeatMode(Animation.REVERSE);
-                    anim.setRepeatCount(Animation.INFINITE);
+                    endAnimation = new AlphaAnimation(1.0f, 0.0f);
+                    endAnimation.setDuration(300);
+                    endAnimation.setStartOffset(20);
+                    endAnimation.setRepeatMode(Animation.REVERSE);
+                    endAnimation.setRepeatCount(Animation.INFINITE);
                     timerEnded = true;
+                    timeLeft.setText("0");
 
-                    //Todo: Replace rest timer reset w/ set timer, then finish w/ reset. Also: Add counter for set/rest times.
                     numberOfSets--;
                     if (numberOfSets >0) {
                         resetTimer();
+                        restTimer();
                     } else {
                         numberOfSets = 0;
                     }
@@ -221,14 +221,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetTimer() {
-        timer.cancel();
+        //Todo: When called in spinners, does not reset progressBar.
+        if (timer != null) {
+            timer.cancel();
+        }
+        if (objectAnimator != null) {
+            objectAnimator.cancel();
+        }
         timerBegun = 0;
         paused = false;
         timerEnded = false;
-        anim.cancel();
 
-        selectedMillis = timerDuration;
-        timeLeft.setText(String.valueOf(timerDuration/1000));
+        selectedMillis = timerSetting;
+        timeLeft.setText(String.valueOf(timerSetting/1000));
         progressBar.setProgress(10000);
     }
 }
