@@ -27,7 +27,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    ProgressBar progressBar;
+    TextView timeLeft;
     ObjectAnimator objectAnimator;
+    Animation endAnimation;
     CountDownTimer timer;
     Button reset;
     DecimalFormat df;
@@ -35,22 +38,20 @@ public class MainActivity extends AppCompatActivity {
     int timerBegun;
     boolean timerEnded;
     boolean paused;
-
-    int timerSetting;
-    long selectedMillis;
-    double pausedMillis;
     int maxProgress = 10000;
 
-    Animation endAnimation;
+    long breakMillis;
+    int breakStart;
+    double breakPause;
 
-    long progressStart = 60000;
+    long setMillis;
+    int setStart;
+    double setPause;
+
     long timerStart = 60000;
 
-    long setDuration;
     long numberOfSets;
-
-    ProgressBar progressBar;
-    TextView timeLeft;
+    boolean onBreak = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,12 +99,12 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Long temp = (Long) parent.getItemAtPosition(position) * 1000;
-                timerSetting = temp.intValue();
-
-                selectedMillis = temp;
-                progressStart = temp;
-                pausedMillis = selectedMillis;
+                //Used as a global changing variable for break time.
+                breakMillis = (Long) parent.getItemAtPosition(position) * 1000;
+                //Retains default spinner value for break time.
+                breakStart = (int) breakMillis;
+                //Retains remaining value after every break timer pause.
+                breakPause = breakMillis;
                 resetTimer();
             }
 
@@ -116,7 +117,12 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                setDuration = (Long) parent.getItemAtPosition(position) * 1000;
+                //Used as a global changing variable for set time.
+                setMillis = (Long) parent.getItemAtPosition(position) * 1000;
+                //Retains default spinner value for set time.
+                setStart = (int) setMillis;
+                //Retains remaining value after every set timer pause.
+                setPause = setMillis;
                 resetTimer();
             }
 
@@ -142,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             timerBegun++;
             if (!paused) {
                 reset.setVisibility(View.INVISIBLE);
-                restTimer();
+                breakStart();
                 paused = true;
             } else if (!timerEnded) {
                 reset.setVisibility(View.VISIBLE);
@@ -160,30 +166,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void restTimer() {
+    //Todo: Create method w/ millis/pause inputs to use on this and setStart.
+    public void breakStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
         if (timerBegun <=2) {
-            objectAnimator.setDuration(selectedMillis);
+            objectAnimator.setDuration(breakMillis);
             objectAnimator.start();
         } else {
             objectAnimator.cancel();
-            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (pausedMillis), 0);
+            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.setDuration(selectedMillis);
+            objectAnimator.setDuration(breakMillis);
             objectAnimator.start();
         }
 
-            timer = new CountDownTimer(selectedMillis, 50) {
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        long[] pattern1 = {0, 1000, 0, 1000, 0, 1000};
+
+            timer = new CountDownTimer(breakMillis, 50) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    pausedMillis = (long) ((int) objectAnimator.getAnimatedValue());
+                    breakPause = (long) ((int) objectAnimator.getAnimatedValue());
+                    breakMillis = millisUntilFinished;
 
-                    selectedMillis = millisUntilFinished;
                     timerStart =  ((millisUntilFinished+1000) / 1000);
                     timeLeft.setText(String.valueOf(timerStart));
-                    Log.i("value", String.valueOf(objectAnimator.getAnimatedValue()) + "+" + objectAnimator.getAnimatedFraction());
                 }
 
                 @Override
@@ -196,32 +205,79 @@ public class MainActivity extends AppCompatActivity {
                     timerEnded = true;
                     timeLeft.setText("0");
 
-                    numberOfSets--;
                     if (numberOfSets >0) {
                         resetTimer();
-                        restTimer();
+                        setStart();
+                        onBreak = false;
                     } else {
                         numberOfSets = 0;
                     }
 
-                    Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    long[] pattern = {0, 1000, 0, 1000, 0, 1000};
-
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
 //                    } else {
-//                        vibrator.vibrate(pattern, 0);
+//                        vibrator.vibrate(pattern1, 0);
 //                    }
                 }
             }.start();
     }
 
-    public void setTimer() {
+    public void setStart() {
+        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
+        objectAnimator.setInterpolator(new LinearInterpolator());
 
+        if (timerBegun <=2) {
+            objectAnimator.setDuration(setMillis);
+            objectAnimator.start();
+        } else {
+            objectAnimator.cancel();
+            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
+            objectAnimator.setInterpolator(new LinearInterpolator());
+            objectAnimator.setDuration(breakMillis);
+            objectAnimator.start();
+        }
+
+        timer = new CountDownTimer(setMillis, 50) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                setPause = (long) ((int) objectAnimator.getAnimatedValue());
+                setMillis = millisUntilFinished;
+
+                timerStart =  ((millisUntilFinished+1000) / 1000);
+                timeLeft.setText(String.valueOf(timerStart));
+            }
+
+            @Override
+            public void onFinish() {
+                endAnimation = new AlphaAnimation(1.0f, 0.0f);
+                endAnimation.setDuration(300);
+                endAnimation.setStartOffset(20);
+                endAnimation.setRepeatMode(Animation.REVERSE);
+                endAnimation.setRepeatCount(Animation.INFINITE);
+                timerEnded = true;
+                timeLeft.setText("0");
+
+                //Used ONLY on number of sets.
+                numberOfSets--;
+                if (numberOfSets >0) {
+                    resetTimer();
+                    breakStart();
+                    onBreak = true;
+                } else {
+                    numberOfSets = 0;
+                }
+
+//                    if (Build.VERSION.SDK_INT >= 26) {
+//                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
+//                    } else {
+//                        vibrator.vibrate(pattern1, 0);
+//                    }
+            }
+        }.start();
     }
 
     public void resetTimer() {
-        //Todo: When called in spinners, does not reset progressBar.
+        //Todo: Reset for set timer.
         if (timer != null) {
             timer.cancel();
         }
@@ -231,9 +287,14 @@ public class MainActivity extends AppCompatActivity {
         timerBegun = 0;
         paused = false;
         timerEnded = false;
-
-        selectedMillis = timerSetting;
-        timeLeft.setText(String.valueOf(timerSetting/1000));
         progressBar.setProgress(10000);
+
+        if (onBreak) {
+            breakMillis = breakStart;
+            timeLeft.setText(String.valueOf(breakStart/1000));
+        } else {
+            setMillis = setStart;
+            timeLeft.setText(String.valueOf(setStart/1000));
+        }
     }
 }
