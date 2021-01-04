@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
     Button reset;
     DecimalFormat df;
 
-    int timerBegun;
+    int breakCounter;
+    int setCounter;
     boolean timerEnded;
     boolean paused;
     int maxProgress = 10000;
@@ -145,10 +146,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar.setOnClickListener(v-> {
-            timerBegun++;
+            if (onBreak) {
+                breakCounter++;
+            } else {
+                setCounter++;
+            }
             if (!paused) {
+                if (onBreak) {
+                    breakStart();
+                } else {
+                    setStart();
+                }
                 reset.setVisibility(View.INVISIBLE);
-                breakStart();
                 paused = true;
             } else if (!timerEnded) {
                 reset.setVisibility(View.VISIBLE);
@@ -166,21 +175,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //Todo: Create method w/ millis/pause inputs to use on this and setStart.
     public void breakStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-        if (timerBegun <=2) {
-            objectAnimator.setDuration(breakMillis);
-            objectAnimator.start();
-        } else {
+        if (breakCounter > 2) {
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.setDuration(breakMillis);
-            objectAnimator.start();
         }
+        objectAnimator.setDuration(breakMillis);
+        objectAnimator.start();
 
         Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         long[] pattern1 = {0, 1000, 0, 1000, 0, 1000};
@@ -209,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
                         resetTimer();
                         setStart();
                         onBreak = false;
+                        paused = true;
                     } else {
                         numberOfSets = 0;
                     }
@@ -226,16 +232,13 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-        if (timerBegun <=2) {
-            objectAnimator.setDuration(setMillis);
-            objectAnimator.start();
-        } else {
+        if (setCounter >= 1) {
             objectAnimator.cancel();
-            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
+            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (setPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.setDuration(breakMillis);
-            objectAnimator.start();
         }
+        objectAnimator.setDuration(setMillis);
+        objectAnimator.start();
 
         timer = new CountDownTimer(setMillis, 50) {
             @Override
@@ -284,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         if (objectAnimator != null) {
             objectAnimator.cancel();
         }
-        timerBegun = 0;
+
         paused = false;
         timerEnded = false;
         progressBar.setProgress(10000);
@@ -292,9 +295,11 @@ public class MainActivity extends AppCompatActivity {
         if (onBreak) {
             breakMillis = breakStart;
             timeLeft.setText(String.valueOf(breakStart/1000));
+            breakCounter = 0;
         } else {
             setMillis = setStart;
             timeLeft.setText(String.valueOf(setStart/1000));
+            setCounter = 0;
         }
     }
 }
