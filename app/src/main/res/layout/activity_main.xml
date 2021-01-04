@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/s1"
-        android:text="Rest Time:"
+        android:text="Set Time:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/s2"
-        android:text="Set Duration:"
+        android:text="Rest Duration:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
