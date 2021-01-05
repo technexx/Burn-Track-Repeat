@@ -10,10 +10,14 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 public class DotDraws extends View {
-    private Paint mPaint;
+    Paint mPaint;
     float mX;
+    float mX2;
     float mY;
-    Canvas mCanvas;
+    float mY2;
+    int mColor;
+    int mSetCount;
+    int mBreakCount;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -23,7 +27,6 @@ public class DotDraws extends View {
 
     private void setupPaint(){
         mPaint = new Paint();
-        mPaint.setColor(Color.WHITE);
         mPaint.setAntiAlias(true);
         mPaint.setStrokeWidth(5);
         mPaint.setStyle(Paint.Style.FILL);
@@ -31,16 +34,25 @@ public class DotDraws extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
-    public void newDraw(float x, float y) {
-        this.mX = x; this.mY = y;
+    public void newDraw(float x, float y, int setCount, int breakCount) {
+        this.mX = x; this.mY = y; this.mSetCount = setCount; this.mBreakCount = breakCount;
+        setupPaint();
         invalidate();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        mCanvas = canvas;
-        super.onDraw(mCanvas);
-        setupPaint();
-        mCanvas.drawCircle(mX, mY, 35, mPaint);
+//        super.onDraw(canvas);
+        mX = 80; mY = 600; mX2 = 80; mY2 = 710;
+        for (int i=0; i<mSetCount; i++) {
+            mPaint.setColor(Color.GREEN);
+            canvas.drawCircle(mX, mY, 30, mPaint);
+            mX+=85;
+        }
+        for (int i=0; i<mBreakCount; i++) {
+            mPaint.setColor(Color.RED);
+            canvas.drawCircle(mX2, mY2, 30, mPaint);
+            mX2 +=85;
+        }
     }
 }

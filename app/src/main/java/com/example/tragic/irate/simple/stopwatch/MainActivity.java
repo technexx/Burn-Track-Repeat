@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         spinner3.setSelection(2);
 
         DotDraws draws = findViewById(R.id.dotdraws);
+        draws.newDraw(80, 590, 3, 3);
+
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -172,8 +174,6 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar.setOnClickListener(v-> {
             //Todo: Add color input to constructor. Move this to onFinish() for both Breaks and Sets. Change x/y.
-            //Calling custom dot view.
-            draws.newDraw(100, 250);
             if (onBreak) {
                 breakCounter++;
             } else {
