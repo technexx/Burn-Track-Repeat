@@ -1,13 +1,19 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -16,6 +22,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -53,8 +60,10 @@ public class MainActivity extends AppCompatActivity {
     boolean onBreak;
     int spinnerLaunch;
 
-    //Todo: BUG: progressBar not kicked back to launching Sets after reset().
-    //Todo: Overlapping timer text from Rest->Set transition.
+    Paint mPaint;
+    Canvas mCanvas;
+
+    //Todo: Click range of progress bar extends outside circle.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setSelection(0);
         spinner2.setSelection(1);
         spinner3.setSelection(2);
+
+        DotDraws draws = findViewById(R.id.dotdraws);
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -160,6 +171,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar.setOnClickListener(v-> {
+            //Todo: Add color input to constructor. Move this to onFinish() for both Breaks and Sets. Change x/y.
+            //Calling custom dot view.
+            draws.newDraw(100, 250);
             if (onBreak) {
                 breakCounter++;
             } else {

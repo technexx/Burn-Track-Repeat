@@ -95,6 +95,14 @@
         android:background="@drawable/circle_shape">
     </ProgressBar>
 
+    <com.example.tragic.irate.simple.stopwatch.DotDraws
+        android:id="@+id/dotdraws"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+    </com.example.tragic.irate.simple.stopwatch.DotDraws>
+
     <TextView
         android:id="@+id/testTime"
         android:text="5"
@@ -124,5 +132,7 @@
         android:textSize="14sp"
         app:strokeWidth="0dp">
     </Button>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
