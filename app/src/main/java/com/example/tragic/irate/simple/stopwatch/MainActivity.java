@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     DotDraws dotDraws;
 
+    //Todo: Last Break doesn't execute.
     //Todo: Click range of progress bar extends outside circle.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,15 +238,12 @@ public class MainActivity extends AppCompatActivity {
                 timeLeft.setText("0");
 
                 numberOfSets--;
-                if (numberOfSets >0) {
-                    resetTimer(false);
-                    breakStart();
-                    onBreak = true;
-                    //Ensures first click triggers pause.
-                    paused = true;
-                } else {
-                    numberOfSets = 0;
-                }
+                breakStart();
+                resetTimer(false);
+                //Used to switch between break and set methods.
+                onBreak = true;
+                //Ensures first click triggers pause.
+                paused = true;
                 dotDraws.newDraw(numberOfSets, numberOfBreaks);
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
@@ -292,9 +290,11 @@ public class MainActivity extends AppCompatActivity {
                     if (numberOfSets >0) {
                         resetTimer(false);
                         setStart();
+                        //Used to switch between break and set methods.
                         onBreak = false;
                     } else {
-                        numberOfSets = 0;
+                        progressBar.setAnimation(endAnimation);
+                        timeLeft.setAnimation(endAnimation);
                     }
                     dotDraws.newDraw(numberOfSets, numberOfBreaks);
 

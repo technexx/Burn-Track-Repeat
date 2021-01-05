@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 
 public class DotDraws extends View {
     Paint mPaint;
+    Animation anim;
     float mX;
     float mX2;
     float mY;
@@ -39,7 +40,12 @@ public class DotDraws extends View {
         this.mSetCount = setCount; this.mBreakCount = breakCount;
         setupPaint();
         invalidate();
+
+        anim = new AlphaAnimation(1.0f, 0.0f);
+        anim.setDuration(300);
+        anim.setStartOffset(20);
     }
+
 
     @Override
     public void onDraw(Canvas canvas) {
