@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 import androidx.annotation.Nullable;
 
@@ -15,9 +17,8 @@ public class DotDraws extends View {
     float mX2;
     float mY;
     float mY2;
-    int mColor;
-    int mSetCount;
-    int mBreakCount;
+    long mSetCount;
+    long mBreakCount;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -34,8 +35,8 @@ public class DotDraws extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
-    public void newDraw(float x, float y, int setCount, int breakCount) {
-        this.mX = x; this.mY = y; this.mSetCount = setCount; this.mBreakCount = breakCount;
+    public void newDraw(long setCount, long breakCount) {
+        this.mSetCount = setCount; this.mBreakCount = breakCount;
         setupPaint();
         invalidate();
     }

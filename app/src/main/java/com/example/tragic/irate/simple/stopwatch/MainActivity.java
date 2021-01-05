@@ -54,14 +54,14 @@ public class MainActivity extends AppCompatActivity {
     int setStart;
     double setPause;
     long numberOfSets;
+    long numberOfBreaks;
 
     boolean timerEnded;
     boolean paused;
     boolean onBreak;
     int spinnerLaunch;
 
-    Paint mPaint;
-    Canvas mCanvas;
+    DotDraws dotDraws;
 
     //Todo: Click range of progress bar extends outside circle.
     @Override
@@ -107,9 +107,7 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setSelection(1);
         spinner3.setSelection(2);
 
-        DotDraws draws = findViewById(R.id.dotdraws);
-        draws.newDraw(80, 590, 3, 3);
-
+        dotDraws = findViewById(R.id.dotdraws);
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -159,11 +157,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 numberOfSets = (long) parent.getItemAtPosition(position);
+                numberOfBreaks = numberOfSets;
                 if (spinnerLaunch>2) {
                     resetTimer(true);
                 } else {
                     resetTimer(false);
                 }
+                dotDraws.newDraw( numberOfSets, numberOfSets);
             }
 
             @Override
@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar.setOnClickListener(v-> {
-            //Todo: Add color input to constructor. Move this to onFinish() for both Breaks and Sets. Change x/y.
             if (onBreak) {
                 breakCounter++;
             } else {
@@ -237,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
                 timerEnded = true;
                 timeLeft.setText("0");
 
-                //Used ONLY on number of sets.
                 numberOfSets--;
                 if (numberOfSets >0) {
                     resetTimer(false);
@@ -248,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     numberOfSets = 0;
                 }
+                dotDraws.newDraw(numberOfSets, numberOfBreaks);
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
@@ -289,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
                     timerEnded = true;
                     timeLeft.setText("0");
 
+                    numberOfBreaks--;
                     if (numberOfSets >0) {
                         resetTimer(false);
                         setStart();
@@ -296,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         numberOfSets = 0;
                     }
+                    dotDraws.newDraw(numberOfSets, numberOfBreaks);
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
