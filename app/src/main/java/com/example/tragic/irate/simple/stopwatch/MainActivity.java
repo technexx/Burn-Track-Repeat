@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.Vibrator;;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     int spinnerLaunch;
 
     DotDraws dotDraws;
+    long savedBreaks;
+    long savedSets;
 
     //Todo: Last Break doesn't execute.
     //Todo: Click range of progress bar extends outside circle.
@@ -164,7 +167,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     resetTimer(false);
                 }
-                dotDraws.newDraw( numberOfSets, numberOfSets);
+                savedSets = numberOfSets; savedBreaks = numberOfBreaks;
+                dotDraws.newDraw(savedSets, savedBreaks, 0, 0);
             }
 
             @Override
@@ -244,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 onBreak = true;
                 //Ensures first click triggers pause.
                 paused = true;
-                dotDraws.newDraw(numberOfSets, numberOfBreaks);
+                dotDraws.newDraw(savedSets, savedBreaks, savedBreaks-numberOfSets, savedBreaks-numberOfBreaks);
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
@@ -296,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setAnimation(endAnimation);
                         timeLeft.setAnimation(endAnimation);
                     }
-                    dotDraws.newDraw(numberOfSets, numberOfBreaks);
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets-numberOfSets, savedBreaks-numberOfBreaks);
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));

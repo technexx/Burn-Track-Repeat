@@ -4,10 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PathDashPathEffect;
+import android.graphics.PathEffect;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -20,6 +25,9 @@ public class DotDraws extends View {
     float mY2;
     long mSetCount;
     long mBreakCount;
+    boolean mReducing;
+    long mSetReduce;
+    long mBreakReduce;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -36,8 +44,8 @@ public class DotDraws extends View {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
-    public void newDraw(long setCount, long breakCount) {
-        this.mSetCount = setCount; this.mBreakCount = breakCount;
+    public void newDraw(long setCount, long breakCount, long setReduce, long breakReduce) {
+        this.mSetCount = setCount; this.mBreakCount = breakCount; this.mSetReduce = setReduce; this.mBreakReduce = breakReduce;
         setupPaint();
         invalidate();
 
@@ -51,13 +59,25 @@ public class DotDraws extends View {
     public void onDraw(Canvas canvas) {
 //        super.onDraw(canvas);
         mX = 80; mY = 600; mX2 = 80; mY2 = 710;
-        for (int i=0; i<mSetCount; i++) {
+
+        for (int i=0; i < mSetCount-mSetReduce; i++) {
             mPaint.setColor(Color.GREEN);
             canvas.drawCircle(mX, mY, 30, mPaint);
-            mX+=85;
+            mX += 85;
         }
-        for (int i=0; i<mBreakCount; i++) {
+        for (int i=0; i < mSetReduce; i++) {
+            mPaint.setAlpha(50);
+            canvas.drawCircle(mX, mY, 30, mPaint);
+            mX += 85;
+        }
+
+        for (int i=0; i<mBreakCount-mBreakReduce; i++) {
             mPaint.setColor(Color.RED);
+            canvas.drawCircle(mX2, mY2, 30, mPaint);
+            mX2 +=85;
+        }
+        for (int i=0; i<mBreakReduce; i++) {
+            mPaint.setAlpha(50);
             canvas.drawCircle(mX2, mY2, 30, mPaint);
             mX2 +=85;
         }
