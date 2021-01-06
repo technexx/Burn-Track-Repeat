@@ -41,11 +41,10 @@ public class MainActivity extends AppCompatActivity {
     Animation endAnimation;
     CountDownTimer timer;
     Button reset;
-    DecimalFormat df;
 
     int breakCounter;
     int setCounter;
-    long timerStart = 30000;
+    long timerStart;
     int maxProgress = 10000;
 
     long breakMillis;
@@ -60,14 +59,10 @@ public class MainActivity extends AppCompatActivity {
     boolean timerEnded;
     boolean paused;
     boolean onBreak;
-    int spinnerLaunch;
 
     DotDraws dotDraws;
     long savedBreaks;
     long savedSets;
-
-    int hour;
-    int minute;
 
     //Todo: Click range of progress bar extends outside circle.
     @Override
@@ -82,9 +77,8 @@ public class MainActivity extends AppCompatActivity {
         reset.setVisibility(View.INVISIBLE);
 
         progressBar = findViewById(R.id.progressBar);
-        timeLeft = findViewById(R.id.testTime);
+        timeLeft = findViewById(R.id.timeLeft);
 
-        df = new DecimalFormat(".######");
         endAnimation = new AlphaAnimation(1.0f, 0.0f);
 
         List<Long> spinList1 = new ArrayList<>();
@@ -218,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 setMillis = millisUntilFinished;
 
                 timerStart =  ((millisUntilFinished+1000) / 1000);
-                timeLeft.setText(String.valueOf(timerStart));
+                timeLeft.setText(convertSeconds(timerStart));
             }
 
             @Override
@@ -262,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
                     breakMillis = millisUntilFinished;
 
                     timerStart =  ((millisUntilFinished+1000) / 1000);
-                    timeLeft.setText(String.valueOf(timerStart));
+                    timeLeft.setText(convertSeconds(timerStart));
                 }
 
                 @Override
@@ -304,15 +298,15 @@ public class MainActivity extends AppCompatActivity {
         if (!complete) {
             if (onBreak) {
                 breakMillis = breakStart;
-                timeLeft.setText(String.valueOf(breakStart/1000));
+                timeLeft.setText(convertSeconds(breakStart/1000));
                 breakCounter = 0;
             } else {
                 setMillis = setStart;
-                timeLeft.setText(String.valueOf(setStart/1000));
+                timeLeft.setText(convertSeconds(setStart/1000));
                 setCounter = 0;
             }
         } else {
-            timeLeft.setText(String.valueOf(setStart/1000));
+            timeLeft.setText(convertSeconds(setStart/1000));
 
             breakCounter = 0;
             setCounter = 0;
@@ -332,5 +326,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public String convertSeconds(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
 
+        long minutes = 0;
+        long remainingSeconds = 0;
+        if (totalSeconds >=60) {
+            minutes = totalSeconds/60;
+            remainingSeconds = totalSeconds % 60;
+            return (minutes + ":" + df.format(remainingSeconds));
+        } else {
+            return String.valueOf(totalSeconds);
+        }
+    }
 }

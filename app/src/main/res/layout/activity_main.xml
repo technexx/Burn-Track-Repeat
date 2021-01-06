@@ -104,7 +104,7 @@
     </com.example.tragic.irate.simple.stopwatch.DotDraws>
 
     <TextView
-        android:id="@+id/testTime"
+        android:id="@+id/timeLeft"
         android:text="5"
         android:textColor="@color/white"
         android:textSize="80sp"
