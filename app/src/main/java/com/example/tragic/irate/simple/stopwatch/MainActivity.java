@@ -66,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
     long savedBreaks;
     long savedSets;
 
-    //Todo: Last Break doesn't execute.
+    int hour;
+    int minute;
+
     //Todo: Click range of progress bar extends outside circle.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 setStart = (int) setMillis;
                 //Retains remaining value after every set timer pause.
                 setPause = setMillis;
-                if (spinnerLaunch>2) {
-                    resetTimer(true);
-                } else {
-                    resetTimer(false);
-                }
+                resetTimer(true);
             }
 
             @Override
@@ -144,11 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 breakStart = (int) breakMillis;
                 //Retains remaining value after every break timer pause.
                 breakPause = breakMillis;
-                if (spinnerLaunch>2) {
-                    resetTimer(true);
-                } else {
-                    resetTimer(false);
-                }
+                resetTimer(true);
             }
 
             @Override
@@ -162,11 +156,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 numberOfSets = (long) parent.getItemAtPosition(position);
                 numberOfBreaks = numberOfSets;
-                if (spinnerLaunch>2) {
-                    resetTimer(true);
-                } else {
-                    resetTimer(false);
-                }
+                resetTimer(true);
                 savedSets = numberOfSets; savedBreaks = numberOfBreaks;
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0);
             }
@@ -233,11 +223,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                endAnimation = new AlphaAnimation(1.0f, 0.0f);
-                endAnimation.setDuration(300);
-                endAnimation.setStartOffset(20);
-                endAnimation.setRepeatMode(Animation.REVERSE);
-                endAnimation.setRepeatCount(Animation.INFINITE);
                 timerEnded = true;
                 timeLeft.setText("0");
 
@@ -282,13 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFinish() {
-                    endAnimation = new AlphaAnimation(1.0f, 0.0f);
-                    endAnimation.setDuration(300);
-                    endAnimation.setStartOffset(20);
-                    endAnimation.setRepeatMode(Animation.REVERSE);
-                    endAnimation.setRepeatCount(Animation.INFINITE);
                     timerEnded = true;
-                    timeLeft.setText("0");
 
                     numberOfBreaks--;
                     if (numberOfSets >0) {
@@ -299,6 +278,13 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         progressBar.setAnimation(endAnimation);
                         timeLeft.setAnimation(endAnimation);
+
+                        endAnimation = new AlphaAnimation(1.0f, 0.0f);
+                        endAnimation.setDuration(300);
+                        endAnimation.setStartOffset(20);
+                        endAnimation.setRepeatMode(Animation.REVERSE);
+                        endAnimation.setRepeatCount(Animation.INFINITE);
+                        timeLeft.setText("0");
                     }
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets-numberOfSets, savedBreaks-numberOfBreaks);
 
@@ -340,6 +326,11 @@ public class MainActivity extends AppCompatActivity {
             if (objectAnimator != null) {
                 objectAnimator.cancel();
             }
+            if (endAnimation != null) {
+                endAnimation.cancel();
+            }
         }
     }
+
+
 }

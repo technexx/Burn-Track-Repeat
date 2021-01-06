@@ -18,14 +18,12 @@ import androidx.annotation.Nullable;
 
 public class DotDraws extends View {
     Paint mPaint;
-    Animation anim;
     float mX;
     float mX2;
     float mY;
     float mY2;
     long mSetCount;
     long mBreakCount;
-    boolean mReducing;
     long mSetReduce;
     long mBreakReduce;
 
@@ -48,12 +46,7 @@ public class DotDraws extends View {
         this.mSetCount = setCount; this.mBreakCount = breakCount; this.mSetReduce = setReduce; this.mBreakReduce = breakReduce;
         setupPaint();
         invalidate();
-
-        anim = new AlphaAnimation(1.0f, 0.0f);
-        anim.setDuration(300);
-        anim.setStartOffset(20);
     }
-
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -66,7 +59,7 @@ public class DotDraws extends View {
             mX += 85;
         }
         for (int i=0; i < mSetReduce; i++) {
-            mPaint.setAlpha(50);
+            mPaint.setAlpha(100);
             canvas.drawCircle(mX, mY, 30, mPaint);
             mX += 85;
         }
@@ -77,7 +70,7 @@ public class DotDraws extends View {
             mX2 +=85;
         }
         for (int i=0; i<mBreakReduce; i++) {
-            mPaint.setAlpha(50);
+            mPaint.setAlpha(100);
             canvas.drawCircle(mX2, mY2, 30, mPaint);
             mX2 +=85;
         }
