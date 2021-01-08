@@ -53,17 +53,24 @@ public class MainActivity extends AppCompatActivity {
     long setMillis;
     int setStart;
     double setPause;
+
     long numberOfSets;
     long numberOfBreaks;
+    long savedBreaks;
+    long savedSets;
 
     boolean timerEnded;
     boolean paused;
     boolean onBreak;
 
     DotDraws dotDraws;
-    long savedBreaks;
-    long savedSets;
+    int fadeDone;
 
+    //Todo: Add "Set/Break" indicator.
+    //Todo: Add option for varying set/break combos.
+    //Todo: Add second "controllable" mode.
+    //Todo: Add "variable" mode for work/break w/ presets.
+    //Todo: Add "Pomodoro Technique" w/ variations.
     //Todo: Click range of progress bar extends outside circle.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         timeLeft = findViewById(R.id.timeLeft);
-
-        endAnimation = new AlphaAnimation(1.0f, 0.0f);
+        dotDraws = findViewById(R.id.dotdraws);
 
         List<Long> spinList1 = new ArrayList<>();
         List<Long> spinList2 = new ArrayList<>();
@@ -106,8 +112,6 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setSelection(0);
         spinner2.setSelection(1);
         spinner3.setSelection(2);
-
-        dotDraws = findViewById(R.id.dotdraws);
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 numberOfBreaks = numberOfSets;
                 resetTimer(true);
                 savedSets = numberOfSets; savedBreaks = numberOfBreaks;
-                dotDraws.newDraw(savedSets, savedBreaks, 0, 0);
+                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
             }
 
             @Override
@@ -182,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 objectAnimator.cancel();
                 paused = false;
             } else {
-                //A cycle of either Set or Break has completed.
+                //A complete cycle of sets and breaks have been completed.
                 objectAnimator.cancel();
                 resetTimer(true);
             }
@@ -205,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator.setDuration(setMillis);
         objectAnimator.start();
 
+        fadeDone = 1;
         timer = new CountDownTimer(setMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -213,13 +218,26 @@ public class MainActivity extends AppCompatActivity {
 
                 timerStart =  ((millisUntilFinished+1000) / 1000);
                 timeLeft.setText(convertSeconds(timerStart));
+
+                boolean fadePaused = false;
+                if (fadeDone == 1) {
+                    if (!fadePaused) {
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets-1), savedBreaks-numberOfBreaks, 1); fadePaused = true;
+                    } else {
+                        //fadeDone value does not matter here.
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1);
+                        fadePaused = false;
+                    }
+                }
             }
 
             @Override
             public void onFinish() {
+                fadeDone = 2;
                 timerEnded = true;
                 timeLeft.setText("0");
 
+                //Todo: This triggers a single draw instance once after above timer completes, thus causing the ghosting after set.
                 numberOfSets--;
                 breakStart();
                 resetTimer(false);
@@ -227,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                 onBreak = true;
                 //Ensures first click triggers pause.
                 paused = true;
-                dotDraws.newDraw(savedSets, savedBreaks, savedBreaks-numberOfSets, savedBreaks-numberOfBreaks);
+                timeLeft.setText("0");
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
@@ -237,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }.start();
     }
+
     public void breakStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
@@ -249,46 +268,58 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator.setDuration(breakMillis);
         objectAnimator.start();
 
-            timer = new CountDownTimer(breakMillis, 50) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    breakPause = (long) ((int) objectAnimator.getAnimatedValue());
-                    breakMillis = millisUntilFinished;
+        fadeDone = 3;
+        timer = new CountDownTimer(breakMillis, 50) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                breakPause = (long) ((int) objectAnimator.getAnimatedValue());
+                breakMillis = millisUntilFinished;
 
-                    timerStart =  ((millisUntilFinished+1000) / 1000);
-                    timeLeft.setText(convertSeconds(timerStart));
-                }
+                timerStart =  ((millisUntilFinished+1000) / 1000);
+                timeLeft.setText(convertSeconds(timerStart));
 
-                @Override
-                public void onFinish() {
-                    timerEnded = true;
-
-                    numberOfBreaks--;
-                    if (numberOfSets >0) {
-                        resetTimer(false);
-                        setStart();
-                        //Used to switch between break and set methods.
-                        onBreak = false;
+                boolean fadePaused = false;
+                if (fadeDone == 3) {
+                    if (!fadePaused) {
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks- (numberOfBreaks-1), fadeDone); fadePaused = true;
                     } else {
-                        progressBar.setAnimation(endAnimation);
-                        timeLeft.setAnimation(endAnimation);
-
-                        endAnimation = new AlphaAnimation(1.0f, 0.0f);
-                        endAnimation.setDuration(300);
-                        endAnimation.setStartOffset(20);
-                        endAnimation.setRepeatMode(Animation.REVERSE);
-                        endAnimation.setRepeatCount(Animation.INFINITE);
-                        timeLeft.setText("0");
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
+                        fadePaused = false;
                     }
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets-numberOfSets, savedBreaks-numberOfBreaks);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                fadeDone = 4;
+                timerEnded = true;
+
+                numberOfBreaks--;
+                Log.i("number", String.valueOf(numberOfSets));
+                if (numberOfSets >0) {
+                    resetTimer(false);
+                    setStart();
+                    //Used to switch between break and set methods.
+                    onBreak = false;
+                } else {
+                    progressBar.setAnimation(endAnimation);
+                    timeLeft.setAnimation(endAnimation);
+
+                    endAnimation = new AlphaAnimation(1.0f, 0.0f);
+                    endAnimation.setDuration(300);
+                    endAnimation.setStartOffset(20);
+                    endAnimation.setRepeatMode(Animation.REVERSE);
+                    endAnimation.setRepeatCount(Animation.INFINITE);
+                    timeLeft.setText("0");
+                }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
 //                    } else {
 //                        vibrator.vibrate(pattern1, 0);
 //                    }
-                }
-            }.start();
+            }
+        }.start();
     }
 
     public void resetTimer(boolean complete) {
@@ -328,9 +359,9 @@ public class MainActivity extends AppCompatActivity {
 
     public String convertSeconds(long totalSeconds) {
         DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
 
-        long minutes = 0;
-        long remainingSeconds = 0;
         if (totalSeconds >=60) {
             minutes = totalSeconds/60;
             remainingSeconds = totalSeconds % 60;
