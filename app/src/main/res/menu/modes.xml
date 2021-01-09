@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/strict"
         android:title="Strict" />
+    <item android:id="@+id/relaxed"
+        android:title="Relaxed">
+    </item>
     <item android:id="@+id/variable"
         android:title="Variable">
     </item>

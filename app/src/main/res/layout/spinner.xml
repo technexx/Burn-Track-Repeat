@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView android:layout_width="50dp"
-    android:layout_height="wrap_content"
+
+<TextView
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="50dp"
+    android:layout_height="wrap_content"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
-    android:textSize="26sp"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:textSize="24sp"
     android:background="@color/black"
     android:textColor="@color/white"
     />

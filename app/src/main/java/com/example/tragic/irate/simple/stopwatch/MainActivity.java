@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,23 +29,26 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListPopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    TextView heading;
     ProgressBar progressBar;
     TextView timeLeft;
-    ObjectAnimator objectAnimator;
-    Animation endAnimation;
     CountDownTimer timer;
     TextView reset;
+    ObjectAnimator objectAnimator;
+    Animation endAnimation;
 
     int breakCounter;
     int setCounter;
@@ -69,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
 
     DotDraws dotDraws;
     int fadeDone;
+    int mode;
 
-    //Todo: Pause not working after first set/break.
     //Todo: Add option for varying set/break combos.
     //Todo: Add second "controllable" mode.
     //Todo: Add "variable" mode for work/break w/ presets.
@@ -84,11 +88,21 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.strict:
-
+                heading.setText(R.string.strict);
+                mode=1;
+                break;
+            case R.id.relaxed:
+                heading.setText(R.string.relaxed);
+                mode=2;
+                break;
+            case R.id.variable:
+                heading.setText(R.string.variable);
+                mode=3;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -97,9 +111,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
         Spinner spinner1 = findViewById(R.id.spin1);
         Spinner spinner2 = findViewById(R.id.spin2);
@@ -110,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         timeLeft = findViewById(R.id.timeLeft);
         dotDraws = findViewById(R.id.dotdraws);
+        heading = findViewById(R.id.heading);
+        heading.setText(R.string.strict);
 
         List<Long> spinList1 = new ArrayList<>();
         List<Long> spinList2 = new ArrayList<>();

@@ -58,7 +58,7 @@ public class DotDraws extends View {
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
-        mX = 80; mY = 600; mX2 = 80; mY2 = 710;
+        mX = 60; mY = 655; mX2 = 60; mY2 = 765;
 
         for (int i=0; i<mSetCount-mSetReduce; i++) {
             mPaint.setColor(Color.GREEN);
