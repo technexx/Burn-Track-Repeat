@@ -7,8 +7,6 @@
     tools:context=".MainActivity"
     android:background="@color/black">
 
-
-
     <TextView
         android:id="@+id/s1"
         android:text="Set Time:"
@@ -18,20 +16,20 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:textSize="26sp"
+        android:textSize="22sp"
         android:textColor="@color/white"
         />
 
     <TextView
         android:id="@+id/s2"
-        android:text="Rest Duration:"
+        android:text="Break Duration:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s1"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
-        android:textSize="26sp"
+        android:textSize="22sp"
         android:textColor="@color/white"
         />
 
@@ -44,7 +42,7 @@
         app:layout_constraintTop_toBottomOf="@id/s2"
         android:layout_marginTop="24dp"
         android:layout_marginStart="8dp"
-        android:textSize="26sp"
+        android:textSize="22sp"
         android:textColor="@color/white"/>
 
     <Spinner
@@ -83,20 +81,6 @@
         >
     </Spinner>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="230dp"
-        android:layout_height="230dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="30dp"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:max="10000"
-        android:progressDrawable="@drawable/circle_progress"
-        android:background="@drawable/circle_shape">
-    </ProgressBar>
-
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="wrap_content"
@@ -118,7 +102,21 @@
         app:layout_constraintEnd_toEndOf="@id/progressBar">
     </TextView>
 
-    <Button
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="12dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="10000"
+        android:progressDrawable="@drawable/circle_progress"
+        android:background="@drawable/circle_shape">
+    </ProgressBar>
+
+    <TextView
         android:id="@+id/reset"
         android:text="Reset"
         android:layout_width="wrap_content"
@@ -128,12 +126,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="@color/black"
         android:textColor="@color/white"
-        app:cornerRadius="0dp"
-        app:rippleColor="@color/black"
-        app:strokeColor="@color/black"
-        android:textSize="14sp"
-        app:strokeWidth="0dp">
-    </Button>
+        android:layout_marginBottom="5sp"
+        android:textSize="16sp">
+    </TextView>
 
 
 

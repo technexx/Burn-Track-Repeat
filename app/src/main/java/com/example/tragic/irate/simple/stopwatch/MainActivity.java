@@ -19,6 +19,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator objectAnimator;
     Animation endAnimation;
     CountDownTimer timer;
-    Button reset;
+    TextView reset;
 
     int breakCounter;
     int setCounter;
@@ -68,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
     DotDraws dotDraws;
     int fadeDone;
-    Toolbar toolbar;
 
+    //Todo: Pause not working after first set/break.
     //Todo: Add option for varying set/break combos.
     //Todo: Add second "controllable" mode.
     //Todo: Add "variable" mode for work/break w/ presets.
@@ -79,9 +80,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.modes, menu);
         inflater.inflate(R.menu.modes, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.strict:
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -184,11 +193,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar.setOnClickListener(v-> {
+            //Counts up to 2, moving to saved time instead of start time.
             if (onBreak) {
                 breakCounter++;
             } else {
                 setCounter++;
             }
+            //Resuming from a pause.
             if (!paused) {
                 if (onBreak) {
                     breakStart();
@@ -197,8 +208,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 reset.setVisibility(View.INVISIBLE);
                 paused = true;
+                //Pausing
             } else if (!timerEnded) {
-                //In the middle of either a Set or Break countdown.
                 reset.setVisibility(View.VISIBLE);
                 timer.cancel();
                 objectAnimator.cancel();
@@ -219,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-        if (setCounter > 2) {
+        if (setCounter > 1) {
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (setPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
@@ -253,15 +264,13 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 fadeDone = 2;
                 timerEnded = true;
+                numberOfSets--;
                 timeLeft.setText("0");
 
-                //Todo: This triggers a single draw instance once after above timer completes, thus causing the ghosting after set.
-                numberOfSets--;
-                breakStart();
                 resetTimer(false);
-                //Used to switch between break and set methods.
+                breakStart();
                 onBreak = true;
-                //Ensures first click triggers pause.
+                //Ensures first click of next break triggers pause.
                 paused = true;
                 timeLeft.setText("0");
 
@@ -311,13 +320,15 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 fadeDone = 4;
                 timerEnded = true;
-
                 numberOfBreaks--;
+                timeLeft.setText("0");
+                //Ensures first click of next break triggers pause.
+                paused = true;
+
                 Log.i("number", String.valueOf(numberOfSets));
                 if (numberOfSets >0) {
                     resetTimer(false);
                     setStart();
-                    //Used to switch between break and set methods.
                     onBreak = false;
                 } else {
                     progressBar.setAnimation(endAnimation);
@@ -328,7 +339,6 @@ public class MainActivity extends AppCompatActivity {
                     endAnimation.setStartOffset(20);
                     endAnimation.setRepeatMode(Animation.REVERSE);
                     endAnimation.setRepeatCount(Animation.INFINITE);
-                    timeLeft.setText("0");
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                 }
 
@@ -344,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
     public void resetTimer(boolean complete) {
         progressBar.setProgress(10000);
         timerEnded = false;
-        paused = false;
+        //Executes when a single SET or BREAK is done.
         if (!complete) {
             if (onBreak) {
                 breakMillis = breakStart;
@@ -356,6 +366,7 @@ public class MainActivity extends AppCompatActivity {
                 setCounter = 0;
             }
         } else {
+            //Executes when manual RESET is done.
             timeLeft.setText(convertSeconds(setStart/1000));
 
             breakCounter = 0;
@@ -366,6 +377,7 @@ public class MainActivity extends AppCompatActivity {
             numberOfBreaks = savedBreaks;
             dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
             onBreak = false;
+            paused = false;
 
             if (timer != null) {
                 timer.cancel();
