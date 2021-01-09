@@ -58,7 +58,7 @@ public class DotDraws extends View {
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
-        mX = 80; mY = 600; mX2 = 80; mY2 = 710;
+        mX = 80; mY = 760; mX2 = 80; mY2 = 870;
 
         for (int i=0; i<mSetCount-mSetReduce; i++) {
             mPaint.setColor(Color.GREEN);
@@ -73,7 +73,7 @@ public class DotDraws extends View {
             if (mFadeDone == 1 && i==0) {
                 fadeDot(mX, mY);
             } else {
-                mPaint.setAlpha(50);
+                mPaint.setAlpha(100);
             }
             mCanvas.drawCircle(mX, mY, 30, mPaint);
             mX += 85;
@@ -88,13 +88,12 @@ public class DotDraws extends View {
 
         for (int i=0; i<mBreakReduce; i++) {
             mPaint.setColor(Color.RED);
-            if (mFadeDone == 3 && i == (mBreakReduce -1)) {
+            if (mFadeDone == 3 && i == 0) {
                 fadeDot(mX2, mY2);
             } else {
-                mPaint.setAlpha(50);
+                mPaint.setAlpha(100);
             }
             mCanvas.drawCircle(mX2, mY2, 30, mPaint);
-            //Leave this here.
             mX2+=85;
         }
     }

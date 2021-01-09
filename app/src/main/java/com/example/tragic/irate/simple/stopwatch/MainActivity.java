@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
@@ -16,6 +17,8 @@ import android.os.Handler;
 import android.os.Vibrator;;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -65,17 +68,29 @@ public class MainActivity extends AppCompatActivity {
 
     DotDraws dotDraws;
     int fadeDone;
+    Toolbar toolbar;
 
-    //Todo: Add "Set/Break" indicator.
     //Todo: Add option for varying set/break combos.
     //Todo: Add second "controllable" mode.
     //Todo: Add "variable" mode for work/break w/ presets.
     //Todo: Add "Pomodoro Technique" w/ variations.
     //Todo: Click range of progress bar extends outside circle.
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.modes, menu);
+        inflater.inflate(R.menu.modes, menu);
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         Spinner spinner1 = findViewById(R.id.spin1);
         Spinner spinner2 = findViewById(R.id.spin2);
@@ -153,9 +168,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 numberOfSets = (long) parent.getItemAtPosition(position);
+                //These will always start equal.
                 numberOfBreaks = numberOfSets;
-                resetTimer(true);
+                //(saved) vars for static reference.
                 savedSets = numberOfSets; savedBreaks = numberOfBreaks;
+                resetTimer(true);
+                //Default draw based on break/set count.
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
             }
 
@@ -311,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
                     endAnimation.setRepeatMode(Animation.REVERSE);
                     endAnimation.setRepeatCount(Animation.INFINITE);
                     timeLeft.setText("0");
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                 }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
@@ -343,6 +362,9 @@ public class MainActivity extends AppCompatActivity {
             setCounter = 0;
             setMillis = setStart;
             breakMillis = breakStart;
+            numberOfSets = savedSets;
+            numberOfBreaks = savedBreaks;
+            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
             onBreak = false;
 
             if (timer != null) {
