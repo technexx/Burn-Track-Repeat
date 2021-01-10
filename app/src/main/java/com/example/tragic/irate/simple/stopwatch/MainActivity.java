@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -50,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator objectAnimator;
     Animation endAnimation;
 
+    TextView s1;
+    Spinner spinner1;
+    TextView blank_spinner;
+
     int breakCounter;
     int setCounter;
     long timerStart;
@@ -75,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
     int fadeDone;
     int mode;
 
+    //Todo: Progress bar does not start at 100 if switching durations mid-set.
     //Todo: Add option for varying set/break combos.
-    //Todo: Add second "controllable" mode.
     //Todo: Add "variable" mode for work/break w/ presets.
     //Todo: Add "Pomodoro Technique" w/ variations.
     //Todo: Click range of progress bar extends outside circle.
@@ -93,16 +98,28 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.strict:
-                heading.setText(R.string.strict);
                 mode=1;
+                heading.setText(R.string.strict);
+                spinner1.setVisibility(View.VISIBLE);
+                s1.setVisibility(View.VISIBLE);
+                blank_spinner.setVisibility(View.GONE);
+                dotDraws.setMode(1);
+                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                resetTimer(true);
                 break;
             case R.id.relaxed:
+                mode = 2;
                 heading.setText(R.string.relaxed);
-                mode=2;
+                spinner1.setVisibility(View.GONE);
+                blank_spinner.setVisibility(View.VISIBLE);
+                dotDraws.setMode(2);
+                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                resetTimer(true);
                 break;
             case R.id.variable:
                 heading.setText(R.string.variable);
                 mode=3;
+                resetTimer(true);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -112,11 +129,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Spinner spinner1 = findViewById(R.id.spin1);
+        spinner1 = findViewById(R.id.spin1);
+        s1 = findViewById(R.id.s1);
+        blank_spinner = findViewById(R.id.blank_spinner);
         Spinner spinner2 = findViewById(R.id.spin2);
         Spinner spinner3 = findViewById(R.id.spin3);
         reset = findViewById(R.id.reset);
         reset.setVisibility(View.INVISIBLE);
+        blank_spinner.setVisibility(View.GONE);
 
         progressBar = findViewById(R.id.progressBar);
         timeLeft = findViewById(R.id.timeLeft);
@@ -195,8 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 //(saved) vars for static reference.
                 savedSets = numberOfSets; savedBreaks = numberOfBreaks;
                 resetTimer(true);
-                //Default draw based on break/set count.
-                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+
             }
 
             @Override
@@ -206,6 +225,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar.setOnClickListener(v-> {
+            if (mode == 2) {
+                onBreak = true;
+            }
             //Counts up to 2, moving to saved time instead of start time.
             if (onBreak) {
                 breakCounter++;
@@ -267,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets-1), savedBreaks-numberOfBreaks, 1); fadePaused = true;
                     } else {
                         //fadeDone value does not matter here.
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1);
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1 );
                         fadePaused = false;
                     }
                 }
@@ -339,10 +361,14 @@ public class MainActivity extends AppCompatActivity {
                 paused = true;
 
                 Log.i("number", String.valueOf(numberOfSets));
-                if (numberOfSets >0) {
+                if (numberOfBreaks >0) {
                     resetTimer(false);
-                    setStart();
-                    onBreak = false;
+                    if (mode !=2) {
+                        setStart();
+                        onBreak = false;
+                    } else {
+                        breakStart();
+                    }
                 } else {
                     progressBar.setAnimation(endAnimation);
                     timeLeft.setAnimation(endAnimation);
@@ -352,6 +378,9 @@ public class MainActivity extends AppCompatActivity {
                     endAnimation.setStartOffset(20);
                     endAnimation.setRepeatMode(Animation.REVERSE);
                     endAnimation.setRepeatCount(Animation.INFINITE);
+                    if (mode == 2) {
+                        dotDraws.setMode(2);
+                    }
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                 }
 
@@ -379,8 +408,9 @@ public class MainActivity extends AppCompatActivity {
                 setCounter = 0;
             }
         } else {
-            //Executes when manual RESET is done.
+            //Executes whenever we need to reset our timers.
             timeLeft.setText(convertSeconds(setStart/1000));
+            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
             breakCounter = 0;
             setCounter = 0;
@@ -388,9 +418,17 @@ public class MainActivity extends AppCompatActivity {
             breakMillis = breakStart;
             numberOfSets = savedSets;
             numberOfBreaks = savedBreaks;
-            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-            onBreak = false;
             paused = false;
+
+            if (mode != 2) {
+                dotDraws.setMode(1);
+                onBreak = false;
+            } else {
+                timeLeft.setText(convertSeconds(breakStart/1000));
+                dotDraws.setMode(2);
+                breakCounter = -1;
+                onBreak = true;
+            }
 
             if (timer != null) {
                 timer.cancel();
