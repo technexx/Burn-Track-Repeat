@@ -9,4 +9,7 @@
     <item android:id="@+id/variable"
         android:title="Variable">
     </item>
+    <item android:id="@+id/pomodoro"
+        android:title="Pomodoro">
+    </item>
 </menu>

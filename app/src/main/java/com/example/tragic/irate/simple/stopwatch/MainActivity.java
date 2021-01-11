@@ -52,12 +52,27 @@ public class MainActivity extends AppCompatActivity {
     Animation endAnimation;
 
     TextView s1;
+    TextView s2;
+    TextView s3;
     Spinner spinner1;
+    Spinner spinner2;
+    Spinner spinner3;
     TextView blank_spinner;
+
+    ArrayAdapter<String> spinAdapter1;
+    ArrayAdapter<String> spinAdapter2;
+    ArrayAdapter<String> spinAdapter3;
+    ArrayAdapter<String> pomAdapter1;
+    ArrayAdapter<String> pomAdapter2;
+    ArrayAdapter<String> pomAdapter3;
+
+    List<String> spinListString1;
+    List<String> spinListString2;
+    List<String> spinListString3;
 
     int breakCounter;
     int setCounter;
-    long timerStart;
+    long timerValue;
     int maxProgress = 10000;
 
     long breakMillis;
@@ -66,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
     long setMillis;
     int setStart;
     double setPause;
+    long pomMillis1;
+    long pomMillis2;
+    long pomMillis3;
 
     long numberOfSets;
     long numberOfBreaks;
@@ -78,9 +96,10 @@ public class MainActivity extends AppCompatActivity {
 
     DotDraws dotDraws;
     int fadeDone;
-    int mode;
+    int mode=1;
 
-    //Todo: Progress bar does not start at 100 if switching durations mid-set.
+    //Todo: Tab layout at bottom instead of menu bar?
+    //Todo: Add taskbar notification for timers.
     //Todo: Add option for varying set/break combos.
     //Todo: Add "variable" mode for work/break w/ presets.
     //Todo: Add "Pomodoro Technique" w/ variations.
@@ -103,24 +122,44 @@ public class MainActivity extends AppCompatActivity {
                 spinner1.setVisibility(View.VISIBLE);
                 s1.setVisibility(View.VISIBLE);
                 blank_spinner.setVisibility(View.GONE);
+
+                spinner1.setAdapter(spinAdapter1);
+                spinner2.setAdapter(spinAdapter2);
+                spinner3.setAdapter(spinAdapter3);
+
                 dotDraws.setMode(1);
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                resetTimer(true);
                 break;
             case R.id.relaxed:
                 mode = 2;
                 heading.setText(R.string.relaxed);
                 spinner1.setVisibility(View.GONE);
                 blank_spinner.setVisibility(View.VISIBLE);
+
+                spinner1.setAdapter(spinAdapter1);
+                spinner2.setAdapter(spinAdapter2);
+                spinner3.setAdapter(spinAdapter3);
+
                 dotDraws.setMode(2);
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                resetTimer(true);
                 break;
             case R.id.variable:
-                heading.setText(R.string.variable);
                 mode=3;
-                resetTimer(true);
+                heading.setText(R.string.variable);
+
+                spinner1.setAdapter(spinAdapter1);
+                spinner2.setAdapter(spinAdapter2);
+                spinner3.setAdapter(spinAdapter3);
+                break;
+            case R.id.pomodoro:
+                mode=4;
+                heading.setText(R.string.pomodoro);
+
+                spinner1.setAdapter(pomAdapter1);
+                spinner2.setAdapter(pomAdapter2);
+                spinner3.setAdapter(pomAdapter3);
         }
+        resetTimer(true);
         return super.onOptionsItemSelected(item);
     }
 
@@ -129,11 +168,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        spinner1 = findViewById(R.id.spin1);
         s1 = findViewById(R.id.s1);
+        s2 = findViewById(R.id.s2);
+        s3 = findViewById(R.id.s3);
+        spinner1 = findViewById(R.id.spin1);
+        spinner2 = findViewById(R.id.spin2);
+        spinner3 = findViewById(R.id.spin3);
         blank_spinner = findViewById(R.id.blank_spinner);
-        Spinner spinner2 = findViewById(R.id.spin2);
-        Spinner spinner3 = findViewById(R.id.spin3);
         reset = findViewById(R.id.reset);
         reset.setVisibility(View.INVISIBLE);
         blank_spinner.setVisibility(View.GONE);
@@ -147,38 +188,73 @@ public class MainActivity extends AppCompatActivity {
         List<Long> spinList1 = new ArrayList<>();
         List<Long> spinList2 = new ArrayList<>();
         List<Long> spinList3 = new ArrayList<>();
+        spinListString1 = new ArrayList<>();
+        spinListString2 = new ArrayList<>();
+        spinListString3 = new ArrayList<>();
+        List<Long> pomList1 = new ArrayList<>();
+        List<Long> pomList2 = new ArrayList<>();
+        List<Long> pomList3 = new ArrayList<>();
+        List<String> pomString1 = new ArrayList<>();
+        List<String> pomString2 = new ArrayList<>();
+        List<String> pomString3 = new ArrayList<>();
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
+            spinListString1.add(convertSeconds(i+5));
         }
-        for (long i=0; i<120; i+=5) {
+        for (long i=0; i<180; i+=5) {
             spinList2.add(i+5);
+            spinListString2.add(convertSeconds(i+5));
         }
         for (long i=0; i<10; i++) {
             spinList3.add(i+1);
+            spinListString3.add(convertSeconds(i+5));
+        }
+        //15-90 minute work time.
+        for (long i=10; i<90; i+=5) {
+            pomList1.add(i+5);
+            pomString1.add(i+5 + " min");
+        }
+        for (long i=3; i<6; i++) {
+            pomList2.add(i);
+            pomString2.add(i + " min");
+        }
+        //15-30 minute break time.
+        for (long i=10; i<30; i+=5) {
+            pomList3.add(i+5);
+            pomString3.add(i+5 + " min");
         }
 
-        ArrayAdapter<Long> spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinList1);
-        ArrayAdapter<Long> spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinList2);
-        ArrayAdapter<Long> spinAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinList3);
-
-        spinner1.setAdapter(spinAdapter1);
-        spinner2.setAdapter(spinAdapter2);
-        spinner3.setAdapter(spinAdapter3);
+        spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
+        spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
+        spinAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString3);
+        pomAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomString1);
+        pomAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomString2);
+        pomAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomString3);
 
         spinner1.setSelection(0);
         spinner2.setSelection(1);
         spinner3.setSelection(2);
 
+        spinner1.setAdapter(spinAdapter1);
+        spinner2.setAdapter(spinAdapter2);
+        spinner3.setAdapter(spinAdapter3);
+
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //Used as a global changing variable for set time.
-                setMillis = (Long) parent.getItemAtPosition(position) * 1000;
+                long pos = spinList1.get(position);
+                setMillis = pos*1000;
                 //Retains default spinner value for set time.
                 setStart = (int) setMillis;
                 //Retains remaining value after every set timer pause.
                 setPause = setMillis;
+
+                if (mode == 4) {
+                    long pos2 = pomList1.get(position);
+                    pomMillis1 = pos2*1000;
+                }
                 resetTimer(true);
             }
 
@@ -192,11 +268,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //Used as a global changing variable for break time.
-                breakMillis = (Long) parent.getItemAtPosition(position) * 1000;
+                long pos = spinList2.get(position);
+                breakMillis = pos*1000;
                 //Retains default spinner value for break time.
                 breakStart = (int) breakMillis;
                 //Retains remaining value after every break timer pause.
                 breakPause = breakMillis;
+
+                if (mode == 4) {
+                    long pos2 = pomList2.get(position);
+                    pomMillis2 = pos2*1000;
+                }
                 resetTimer(true);
             }
 
@@ -209,11 +291,17 @@ public class MainActivity extends AppCompatActivity {
         spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                numberOfSets = (long) parent.getItemAtPosition(position);
+                long pos = spinList3.get(position);
+                numberOfSets = spinList3.get(position);
                 //These will always start equal.
                 numberOfBreaks = numberOfSets;
                 //(saved) vars for static reference.
                 savedSets = numberOfSets; savedBreaks = numberOfBreaks;
+
+                if (mode == 4) {
+                    long pos2 = pomList3.get(position);
+                    pomMillis3 = pos2*1000;
+                }
                 resetTimer(true);
 
             }
@@ -280,8 +368,8 @@ public class MainActivity extends AppCompatActivity {
                 setPause = (long) ((int) objectAnimator.getAnimatedValue());
                 setMillis = millisUntilFinished;
 
-                timerStart =  ((millisUntilFinished+1000) / 1000);
-                timeLeft.setText(convertSeconds(timerStart));
+                timerValue =  ((millisUntilFinished+1000) / 1000);
+                timeLeft.setText(convertSeconds(timerValue));
 
                 boolean fadePaused = false;
                 if (fadeDone == 1) {
@@ -337,8 +425,8 @@ public class MainActivity extends AppCompatActivity {
                 breakPause = (long) ((int) objectAnimator.getAnimatedValue());
                 breakMillis = millisUntilFinished;
 
-                timerStart =  ((millisUntilFinished+1000) / 1000);
-                timeLeft.setText(convertSeconds(timerStart));
+                timerValue =  ((millisUntilFinished+1000) / 1000);
+                timeLeft.setText(convertSeconds(timerValue));
 
                 boolean fadePaused = false;
                 if (fadeDone == 3) {
@@ -430,6 +518,16 @@ public class MainActivity extends AppCompatActivity {
                 onBreak = true;
             }
 
+            if (mode !=4) {
+                s1.setText(R.string.set_time);
+                s2.setText(R.string.break_time);
+                s3.setText(R.string.set_number);
+            } else {
+                s1.setText(R.string.work_time);
+                s2.setText(R.string.small_break);
+                s3.setText(R.string.long_break);
+            }
+
             if (timer != null) {
                 timer.cancel();
             }
@@ -455,4 +553,5 @@ public class MainActivity extends AppCompatActivity {
             return String.valueOf(totalSeconds);
         }
     }
+
 }

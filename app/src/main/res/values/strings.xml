@@ -3,4 +3,12 @@
     <string name="strict">Strict Mode</string>
     <string name="relaxed">Relaxed Mode</string>
     <string name="variable">Variable Mode</string>
+    <string name="pomodoro">Pomodoro</string>
+
+    <string name="set_time">Set Time:</string>
+    <string name="break_time">Break Duration:</string>
+    <string name="set_number">Number of Sets:</string>
+    <string name="work_time">Work Time:</string>
+    <string name="small_break">Mini Break:</string>
+    <string name="long_break">Standard Break</string>
 </resources>

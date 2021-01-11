@@ -68,7 +68,7 @@ public class DotDraws extends View {
             mY2 = 695;
         }
 
-        if (mMode != 2) {
+        if (mMode != 2 && mMode !=4) {
             for (int i=0; i<mSetCount-mSetReduce; i++) {
                 mPaint.setColor(Color.GREEN);
                 mPaint.setAlpha(255);
@@ -80,7 +80,7 @@ public class DotDraws extends View {
                 //Paint MUST be set here as well, since first loop does not execute w/ 1 set left.
                 mPaint.setColor(Color.GREEN);
                 if (mFadeDone == 1 && i==0) {
-                    fadeDot(mX, mY);
+                    fadeDot();
                 } else {
                     mPaint.setAlpha(100);
                 }
@@ -89,41 +89,47 @@ public class DotDraws extends View {
             }
         }
 
-        for (int i=0; i<mBreakCount-mBreakReduce; i++) {
-            mPaint.setColor(Color.RED);
-            mPaint.setAlpha(255);
-            if (mMode !=2) {
-                mCanvas.drawCircle(mX2, mY2, 30, mPaint);
-                mX2 +=85;
-            } else {
-                mPaint.setColor(Color.GREEN);
-                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                mX2 +=120;
+        if (mMode !=4) {
+            for (int i=0; i<mBreakCount-mBreakReduce; i++) {
+                mPaint.setColor(Color.RED);
+                mPaint.setAlpha(255);
+                if (mMode !=2) {
+                    mCanvas.drawCircle(mX2, mY2, 30, mPaint);
+                    mX2 +=85;
+                } else {
+                    mPaint.setColor(Color.GREEN);
+                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                    mX2 +=120;
+                }
+            }
+
+            for (int i=0; i<mBreakReduce; i++) {
+                if (mMode == 2) {
+                    mPaint.setColor(Color.GREEN);
+                } else {
+                    mPaint.setColor(Color.RED);
+                }
+                if (mFadeDone == 3 && i == 0) {
+                    fadeDot();
+                } else {
+                    mPaint.setAlpha(100);
+                }
+                if (mMode !=2) {
+                    mCanvas.drawCircle(mX2, mY2, 30, mPaint);
+                    mX2 +=85;
+                } else {
+                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                    mX2 +=120;
+                }
             }
         }
 
-        for (int i=0; i<mBreakReduce; i++) {
-            if (mMode == 2) {
-                mPaint.setColor(Color.GREEN);
-            } else {
-                mPaint.setColor(Color.RED);
-            }
-            if (mFadeDone == 3 && i == 0) {
-                fadeDot(mX2, mY2);
-            } else {
-                mPaint.setAlpha(100);
-            }
-            if (mMode !=2) {
-                mCanvas.drawCircle(mX2, mY2, 30, mPaint);
-                mX2 +=85;
-            } else {
-                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                mX2 +=120;
-            }
+        if (mMode == 4) {
+
         }
     }
 
-    public void fadeDot(float x, float y) {
+    public void fadeDot() {
         if (alpha >255) {
             alpha = 255;
         }
