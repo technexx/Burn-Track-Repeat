@@ -81,9 +81,11 @@ public class MainActivity extends AppCompatActivity {
     long setMillis;
     int setStart;
     double setPause;
+
     long pomMillis1;
     long pomMillis2;
     long pomMillis3;
+    int pomStage=1;
 
     long numberOfSets;
     long numberOfBreaks;
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     int fadeDone;
     int mode=1;
 
+    //Todo: Reset option instead of resetting each time a spinner is changed.`
     //Todo: Tab layout at bottom instead of menu bar?
     //Todo: Add taskbar notification for timers.
     //Todo: Add option for varying set/break combos.
@@ -208,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
         }
         for (long i=0; i<10; i++) {
             spinList3.add(i+1);
-            spinListString3.add(convertSeconds(i+5));
+            spinListString3.add(convertSeconds(i+1));
         }
         //15-90 minute work time.
         for (long i=10; i<90; i+=5) {
@@ -243,17 +246,19 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //Used as a global changing variable for set time.
-                long pos = spinList1.get(position);
-                setMillis = pos*1000;
-                //Retains default spinner value for set time.
-                setStart = (int) setMillis;
-                //Retains remaining value after every set timer pause.
-                setPause = setMillis;
-
                 if (mode == 4) {
                     long pos2 = pomList1.get(position);
-                    pomMillis1 = pos2*1000;
+                    pomMillis1 = pos2*60000;
+                    setStart = (int) pomMillis1;
+                    setPause = pomMillis1;
+                } else {
+                    //Used as a global changing variable for set time.
+                    long pos = spinList1.get(position);
+                    setMillis = pos*1000;
+                    //Retains default spinner value for set time.
+                    setStart = (int) setMillis;
+                    //Retains remaining value a`fter every set timer pause.
+                    setPause = setMillis;
                 }
                 resetTimer(true);
             }
@@ -277,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (mode == 4) {
                     long pos2 = pomList2.get(position);
-                    pomMillis2 = pos2*1000;
+                    pomMillis2 = pos2*60000;
                 }
                 resetTimer(true);
             }
@@ -300,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (mode == 4) {
                     long pos2 = pomList3.get(position);
-                    pomMillis3 = pos2*1000;
+                    pomMillis3 = pos2*60000;
                 }
                 resetTimer(true);
 
@@ -316,7 +321,10 @@ public class MainActivity extends AppCompatActivity {
             if (mode == 2) {
                 onBreak = true;
             }
-            //Counts up to 2, moving to saved time instead of start time.
+            if (mode == 4) {
+                onBreak = false;
+            }
+            //Switches to saved time from start time after initial clicks.
             if (onBreak) {
                 breakCounter++;
             } else {
@@ -353,6 +361,23 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
+        //Using setMillis as countdown var for all stages of Pomodorro.
+        if (mode==4 && setCounter <1) {
+            switch (pomStage) {
+                //if (!paused)
+                case 1:
+                    setMillis = pomMillis1;
+                    objectAnimator.setDuration(pomMillis1);
+                    break;
+                case 2:
+                    setMillis = pomMillis2;
+                    objectAnimator.setDuration(pomMillis2);
+                    break;
+                case 3:
+                    setMillis = pomMillis3;
+                    objectAnimator.setDuration(pomMillis3);
+            }
+        }
         if (setCounter > 1) {
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (setPause), 0);
@@ -511,11 +536,15 @@ public class MainActivity extends AppCompatActivity {
             if (mode != 2) {
                 dotDraws.setMode(1);
                 onBreak = false;
-            } else {
+            } else if (mode != 4) {
                 timeLeft.setText(convertSeconds(breakStart/1000));
                 dotDraws.setMode(2);
                 breakCounter = -1;
                 onBreak = true;
+            } else {
+                setCounter = -1;
+                onBreak = false;
+                //new dotDraws.
             }
 
             if (mode !=4) {
