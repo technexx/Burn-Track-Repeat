@@ -62,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> spinAdapter1;
     ArrayAdapter<String> spinAdapter2;
     ArrayAdapter<String> spinAdapter3;
-    ArrayAdapter<String> pomAdapter1;
-    ArrayAdapter<String> pomAdapter2;
-    ArrayAdapter<String> pomAdapter3;
+    ArrayAdapter<Long> pomAdapter1;
+    ArrayAdapter<Long> pomAdapter2;
+    ArrayAdapter<Long> pomAdapter3;
 
     List<String> spinListString1;
     List<String> spinListString2;
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     long pomMillis2;
     long pomMillis3;
     int pomStage=1;
+    int pomDotCounter = 1;
 
     long numberOfSets;
     long numberOfBreaks;
@@ -161,6 +162,9 @@ public class MainActivity extends AppCompatActivity {
                 spinner1.setAdapter(pomAdapter1);
                 spinner2.setAdapter(pomAdapter2);
                 spinner3.setAdapter(pomAdapter3);
+
+                dotDraws.setMode(4);
+                dotDraws.pomDraw(1);
         }
         resetTimer(true);
         return super.onOptionsItemSelected(item);
@@ -216,24 +220,21 @@ public class MainActivity extends AppCompatActivity {
         //15-90 minute work time.
         for (long i=10; i<90; i+=5) {
             pomList1.add(i+5);
-            pomString1.add(i+5 + " min");
         }
         for (long i=3; i<6; i++) {
             pomList2.add(i);
-            pomString2.add(i + " min");
         }
         //15-30 minute break time.
         for (long i=10; i<30; i+=5) {
             pomList3.add(i+5);
-            pomString3.add(i+5 + " min");
         }
 
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
         spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
         spinAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString3);
-        pomAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomString1);
-        pomAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomString2);
-        pomAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomString3);
+        pomAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList1);
+        pomAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList2);
+        pomAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList3);
 
         spinner1.setSelection(0);
         spinner2.setSelection(1);
@@ -361,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-        //Using setMillis as countdown var for all stages of Pomodorro.
+        //Using setMillis as countdown var for all stages of Pomodoro.
         if (mode==4 && setCounter <1) {
             switch (pomStage) {
                 //if (!paused)
@@ -397,16 +398,44 @@ public class MainActivity extends AppCompatActivity {
                 timeLeft.setText(convertSeconds(timerValue));
 
                 boolean fadePaused = false;
-                if (fadeDone == 1) {
-                    if (!fadePaused) {
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets-1), savedBreaks-numberOfBreaks, 1); fadePaused = true;
-                    } else {
-                        //fadeDone value does not matter here.
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1 );
-                        fadePaused = false;
+
+                if (mode !=4) {
+                    if (fadeDone == 1) {
+                        if (!fadePaused) {
+                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets-1), savedBreaks-numberOfBreaks, 1); fadePaused = true;
+                        } else {
+                            //fadeDone value does not matter here.
+                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1 );
+                            fadePaused = false;
+                        }
                     }
+                } else {
+                    //For Pomodoro.
+                    dotDraws.pomDraw(pomDotCounter);
                 }
             }
+
+//                    if (mMode == 4) {
+//                mX = 115; mX2 = mX+200;
+//
+//                for (int i=0; i<3; i++) {
+//                    mPaint.setColor(Color.GREEN);
+//                    mCanvas.drawCircle(mX, 710, 60, mPaint);
+//                    mX+=230;
+//                    if (i==2) {
+//                        mCanvas.drawCircle(mX, 710, 60, mPaint);
+//                    }
+//                }
+//
+//                for (int i=0; i<3; i++) {
+//                    mPaint.setColor(Color.RED);
+//                    mCanvas.drawCircle(mX2+115, 710, 30, mPaint);
+//                    mX2 +=230;
+//                    if (i==2) {
+//                        mCanvas.drawRect(mX2+110, 655, mX+220, 765, mPaint);
+//                    }
+//                }
+//            }
 
             @Override
             public void onFinish() {
@@ -416,11 +445,25 @@ public class MainActivity extends AppCompatActivity {
                 timeLeft.setText("0");
 
                 resetTimer(false);
-                breakStart();
-                onBreak = true;
                 //Ensures first click of next break triggers pause.
                 paused = true;
-                timeLeft.setText("0");
+
+                if (mode !=4) {
+                    breakStart();
+                    onBreak = true;
+                } else {
+                    if (pomDotCounter <7) {
+                        if (pomStage == 1) {
+                            pomStage = 2;
+                        } else {
+                            pomStage = 1;
+                        }
+                    } else {
+                        pomStage = 3;
+                    }
+                    pomDotCounter++;
+                    setStart();
+                }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
@@ -491,9 +534,7 @@ public class MainActivity extends AppCompatActivity {
                     endAnimation.setStartOffset(20);
                     endAnimation.setRepeatMode(Animation.REVERSE);
                     endAnimation.setRepeatCount(Animation.INFINITE);
-                    if (mode == 2) {
-                        dotDraws.setMode(2);
-                    }
+
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                 }
 
@@ -533,18 +574,23 @@ public class MainActivity extends AppCompatActivity {
             numberOfBreaks = savedBreaks;
             paused = false;
 
-            if (mode != 2) {
-                dotDraws.setMode(1);
-                onBreak = false;
-            } else if (mode != 4) {
-                timeLeft.setText(convertSeconds(breakStart/1000));
-                dotDraws.setMode(2);
-                breakCounter = -1;
-                onBreak = true;
-            } else {
-                setCounter = -1;
-                onBreak = false;
-                //new dotDraws.
+            switch (mode) {
+                case 1:
+                    dotDraws.setMode(1);
+                    onBreak = false;
+                    break;
+                case 2:
+                    timeLeft.setText(convertSeconds(breakStart/1000));
+                    dotDraws.setMode(2);
+                    breakCounter = -1;
+                    onBreak = true;
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    dotDraws.setMode(4);
+                    setCounter = -1;
+                    onBreak = false;
             }
 
             if (mode !=4) {

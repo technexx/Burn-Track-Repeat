@@ -34,6 +34,7 @@ public class DotDraws extends View {
     int cycle;
     int mFadeDone;
     int mMode;
+    int mPomDot;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -58,6 +59,12 @@ public class DotDraws extends View {
 
     public void setMode(int mode) {
         mMode = mode;
+    }
+
+    public void pomDraw(int pomDot) {
+        this.mPomDot = pomDot;
+        setupPaint();
+        invalidate();
     }
 
     @Override
@@ -124,8 +131,26 @@ public class DotDraws extends View {
             }
         }
 
+        //Todo: Setting paint color overwrites alpha value.
+        //Todo: Use counter value to fade each dot.
         if (mMode == 4) {
-
+            mX = 115; mX2 = mX+200;
+            for (int i=0; i<3; i++) {
+                switch (i) {
+                    case 0:
+                }
+                mPaint.setColor(Color.GREEN);
+                mCanvas.drawCircle(mX, 710, 60, mPaint);
+                mPaint.setColor(Color.RED);
+                mCanvas.drawCircle(mX+115, 710, 30, mPaint);
+                mX+=230;
+                if (i==2) {
+                    mPaint.setColor(Color.GREEN);
+                    mCanvas.drawCircle(mX, 710, 60, mPaint);
+                    mPaint.setColor(Color.RED);
+                    mCanvas.drawRect(mX+110, 655, mX+220, 765, mPaint);
+                }
+            }
         }
     }
 
