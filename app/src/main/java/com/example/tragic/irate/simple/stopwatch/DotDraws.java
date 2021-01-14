@@ -61,8 +61,8 @@ public class DotDraws extends View {
         mMode = mode;
     }
 
-    public void pomDraw(int pomDot) {
-        this.mPomDot = pomDot;
+    public void pomDraw(int pomDot, int fadeDone) {
+        this.mPomDot = pomDot; this.mFadeDone = fadeDone;
         setupPaint();
         invalidate();
     }
@@ -131,26 +131,32 @@ public class DotDraws extends View {
             }
         }
 
-        //Todo: Setting paint color overwrites alpha value.
-        //Todo: Use counter value to fade each dot.
         if (mMode == 4) {
-            mX = 115; mX2 = mX+200;
-            for (int i=0; i<3; i++) {
-                switch (i) {
-                    case 0:
+            mX = 115; mX2=mX+115;
+//            mX = 115; mX2 = mX+200;
+
+            //Fading last object drawn. Setting previous ones to "greyed out"
+            for (int i=0; i<mPomDot; i++) {
+                if (i == mPomDot-1) {
+                    pomColor(i, true);
+                } else {
+                    mPaint.setAlpha(100);
+                    pomColor(i, false);
                 }
-                mPaint.setColor(Color.GREEN);
-                mCanvas.drawCircle(mX, 710, 60, mPaint);
-                mPaint.setColor(Color.RED);
-                mCanvas.drawCircle(mX+115, 710, 30, mPaint);
-                mX+=230;
-                if (i==2) {
-                    mPaint.setColor(Color.GREEN);
-                    mCanvas.drawCircle(mX, 710, 60, mPaint);
-                    mPaint.setColor(Color.RED);
-                    mCanvas.drawRect(mX+110, 655, mX+220, 765, mPaint);
+                if (i+1 == mPomDot) {
+                    //Drawing all non-greyed objects.
+                    for (int j=mPomDot; j<8; j++) {
+                        mPaint.setAlpha(255);
+                        pomColor(j, false);
+                    }
                 }
             }
+
+//            //Drawing all non-greyed objects.
+//            for (int i=0; i<8-mPomDot+1; i++) {
+//                mPaint.setAlpha(255);
+//                pomColor(i, true);
+//            }
         }
     }
 
@@ -168,5 +174,31 @@ public class DotDraws extends View {
                 cycle = 0;
             }
         }
+    }
+
+    public void pomColor(int i, boolean fade) {
+        switch (i+1) {
+            case 1: case 3: case 5: case 7:
+                mPaint.setColor(Color.GREEN);
+                if (fade && mFadeDone == 1) {
+                    fadeDot();
+                }
+                mCanvas.drawCircle(mX, 710, 60, mPaint);
+                break;
+            case 2: case 4: case 6:
+                mPaint.setColor(Color.RED);
+                if (fade && mFadeDone == 1) {
+                    fadeDot();
+                }
+                mCanvas.drawCircle(mX2, 710, 30, mPaint);
+                mX+=230;
+                mX2=mX+115;
+                break;
+            case 8:
+                mPaint.setColor(Color.RED);
+                mCanvas.drawRect(mX+110, 655, mX+220, 765, mPaint);
+        }
+        Log.i("mxLog", "mX is " + mX);
+        Log.i("mxLog", "mX2 is " + mX2);
     }
 }

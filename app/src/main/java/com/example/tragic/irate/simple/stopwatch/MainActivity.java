@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     long pomMillis2;
     long pomMillis3;
     int pomStage=1;
-    int pomDotCounter = 1;
+    int pomDotCounter;
 
     long numberOfSets;
     long numberOfBreaks;
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 spinner3.setAdapter(pomAdapter3);
 
                 dotDraws.setMode(4);
-                dotDraws.pomDraw(1);
+                dotDraws.pomDraw(1, 0);
         }
         resetTimer(true);
         return super.onOptionsItemSelected(item);
@@ -411,31 +411,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     //For Pomodoro.
-                    dotDraws.pomDraw(pomDotCounter);
+                    dotDraws.pomDraw(pomDotCounter+1, 1);
                 }
             }
-
-//                    if (mMode == 4) {
-//                mX = 115; mX2 = mX+200;
-//
-//                for (int i=0; i<3; i++) {
-//                    mPaint.setColor(Color.GREEN);
-//                    mCanvas.drawCircle(mX, 710, 60, mPaint);
-//                    mX+=230;
-//                    if (i==2) {
-//                        mCanvas.drawCircle(mX, 710, 60, mPaint);
-//                    }
-//                }
-//
-//                for (int i=0; i<3; i++) {
-//                    mPaint.setColor(Color.RED);
-//                    mCanvas.drawCircle(mX2+115, 710, 30, mPaint);
-//                    mX2 +=230;
-//                    if (i==2) {
-//                        mCanvas.drawRect(mX2+110, 655, mX+220, 765, mPaint);
-//                    }
-//                }
-//            }
 
             @Override
             public void onFinish() {
