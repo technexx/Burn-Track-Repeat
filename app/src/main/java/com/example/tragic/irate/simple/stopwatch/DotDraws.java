@@ -149,11 +149,6 @@ public class DotDraws extends View {
                     }
                 }
             }
-
-//            for (int i=0; i<8-mPomDot+1; i++) {
-//                mPaint.setAlpha(255);
-//                pomColor(i, true);
-//            }
         }
     }
 

@@ -36,6 +36,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.tabs.TabLayout;
+
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -101,74 +103,11 @@ public class MainActivity extends AppCompatActivity {
     int fadeDone;
     int mode=1;
 
-    //Todo: Reset option instead of resetting each time a spinner is changed.`
-    //Todo: Tab layout at bottom instead of menu bar?
     //Todo: Add taskbar notification for timers.
     //Todo: Add option for varying set/break combos.
     //Todo: Add "variable" mode for work/break w/ presets.
     //Todo: Add "Pomodoro Technique" w/ variations.
     //Todo: Click range of progress bar extends outside circle.
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.modes, menu);
-        return true;
-    }
-
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.strict:
-                mode=1;
-                heading.setText(R.string.strict);
-                spinner1.setVisibility(View.VISIBLE);
-                s1.setVisibility(View.VISIBLE);
-                blank_spinner.setVisibility(View.GONE);
-
-                spinner1.setAdapter(spinAdapter1);
-                spinner2.setAdapter(spinAdapter2);
-                spinner3.setAdapter(spinAdapter3);
-
-                dotDraws.setMode(1);
-                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                break;
-            case R.id.relaxed:
-                mode = 2;
-                heading.setText(R.string.relaxed);
-                spinner1.setVisibility(View.GONE);
-                blank_spinner.setVisibility(View.VISIBLE);
-
-                spinner1.setAdapter(spinAdapter1);
-                spinner2.setAdapter(spinAdapter2);
-                spinner3.setAdapter(spinAdapter3);
-
-                dotDraws.setMode(2);
-                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                break;
-            case R.id.variable:
-                mode=3;
-                heading.setText(R.string.variable);
-
-                spinner1.setAdapter(spinAdapter1);
-                spinner2.setAdapter(spinAdapter2);
-                spinner3.setAdapter(spinAdapter3);
-                break;
-            case R.id.pomodoro:
-                mode=4;
-                heading.setText(R.string.pomodoro);
-
-                spinner1.setAdapter(pomAdapter1);
-                spinner2.setAdapter(pomAdapter2);
-                spinner3.setAdapter(pomAdapter3);
-
-                dotDraws.setMode(4);
-                dotDraws.pomDraw(1, 0);
-        }
-        resetTimer(true);
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +131,12 @@ public class MainActivity extends AppCompatActivity {
         heading = findViewById(R.id.heading);
         heading.setText(R.string.strict);
 
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        tabLayout.addTab(tabLayout.newTab().setText("Strict"));
+        tabLayout.addTab(tabLayout.newTab().setText("Relaxed"));
+        tabLayout.addTab(tabLayout.newTab().setText("Custom"));
+        tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+
         List<Long> spinList1 = new ArrayList<>();
         List<Long> spinList2 = new ArrayList<>();
         List<Long> spinList3 = new ArrayList<>();
@@ -201,9 +146,70 @@ public class MainActivity extends AppCompatActivity {
         List<Long> pomList1 = new ArrayList<>();
         List<Long> pomList2 = new ArrayList<>();
         List<Long> pomList3 = new ArrayList<>();
-        List<String> pomString1 = new ArrayList<>();
-        List<String> pomString2 = new ArrayList<>();
-        List<String> pomString3 = new ArrayList<>();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        mode=1;
+                        heading.setText(R.string.strict);
+                        spinner1.setVisibility(View.VISIBLE);
+                        s1.setVisibility(View.VISIBLE);
+                        blank_spinner.setVisibility(View.GONE);
+
+                        spinner1.setAdapter(spinAdapter1);
+                        spinner2.setAdapter(spinAdapter2);
+                        spinner3.setAdapter(spinAdapter3);
+
+                        dotDraws.setMode(1);
+                        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        break;
+                    case 1:
+                        mode = 2;
+                        heading.setText(R.string.relaxed);
+                        spinner1.setVisibility(View.GONE);
+                        blank_spinner.setVisibility(View.VISIBLE);
+
+                        spinner1.setAdapter(spinAdapter1);
+                        spinner2.setAdapter(spinAdapter2);
+                        spinner3.setAdapter(spinAdapter3);
+
+                        dotDraws.setMode(2);
+                        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        break;
+                    case 2:
+                        mode=3;
+                        heading.setText(R.string.variable);
+
+                        spinner1.setAdapter(spinAdapter1);
+                        spinner2.setAdapter(spinAdapter2);
+                        spinner3.setAdapter(spinAdapter3);
+                        break;
+                    case 3:
+                        mode=4;
+                        heading.setText(R.string.pomodoro);
+
+                        spinner1.setAdapter(pomAdapter1);
+                        spinner2.setAdapter(pomAdapter2);
+                        spinner3.setAdapter(pomAdapter3);
+
+                        dotDraws.setMode(4);
+                        dotDraws.pomDraw(1, 0);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                resetTimer(true);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -361,10 +367,11 @@ public class MainActivity extends AppCompatActivity {
     public void setStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
-        setMillis = 2000;
-        pomMillis1 = 2000;
-        pomMillis2 = 3000;
-        pomMillis3 = 4000;
+
+//        setMillis = 2000;
+//        pomMillis1 = 2000;
+//        pomMillis2 = 3000;
+//        pomMillis3 = 4000;
 
         //Using setMillis as countdown var for all stages of Pomodoro.
         if (mode==4 && setCounter <1) {
@@ -571,6 +578,7 @@ public class MainActivity extends AppCompatActivity {
                 case 3:
                     break;
                 case 4:
+                    timeLeft.setText(convertSeconds(pomMillis1/1000));
                     dotDraws.setMode(4);
                     setCounter = -1;
                     onBreak = false;

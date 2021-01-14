@@ -18,6 +18,18 @@
         android:textSize="24sp">
     </TextView>
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/Gray"
+        app:tabTextColor="@color/white"
+        app:tabIndicatorColor="@color/white"
+        app:tabTextAppearance="@style/tabText">
+    </com.google.android.material.tabs.TabLayout>
+
     <TextView
         android:id="@+id/s1"
         android:text="Set Time:"
