@@ -104,10 +104,10 @@ public class MainActivity extends AppCompatActivity {
     int mode=1;
 
     //Todo: Add taskbar notification for timers.
-    //Todo: Add option for varying set/break combos.
     //Todo: Add "variable" mode for work/break w/ presets.
-    //Todo: Add "Pomodoro Technique" w/ variations.
+    //Todo: Smooth out timer textView transitions from resets/mode switches.
     //Todo: Click range of progress bar extends outside circle.
+    //Todo: Might be too easy to reset timers, esp. w/ tabs.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -555,6 +555,8 @@ public class MainActivity extends AppCompatActivity {
             //Executes whenever we need to reset our timers.
             timeLeft.setText(convertSeconds(setStart/1000));
             dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+            spinner1.setVisibility(View.VISIBLE);
+            blank_spinner.setVisibility(View.GONE);
 
             breakCounter = 0;
             setCounter = 0;
@@ -574,6 +576,8 @@ public class MainActivity extends AppCompatActivity {
                     dotDraws.setMode(2);
                     breakCounter = -1;
                     onBreak = true;
+                    spinner1.setVisibility(View.GONE);
+                    blank_spinner.setVisibility(View.VISIBLE);
                     break;
                 case 3:
                     break;
