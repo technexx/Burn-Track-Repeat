@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     long pomMillis2;
     long pomMillis3;
     int pomStage=1;
-    int pomDotCounter;
+    int pomDotCounter=1;
 
     long numberOfSets;
     long numberOfBreaks;
@@ -361,6 +361,10 @@ public class MainActivity extends AppCompatActivity {
     public void setStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
+        setMillis = 2000;
+        pomMillis1 = 2000;
+        pomMillis2 = 3000;
+        pomMillis3 = 4000;
 
         //Using setMillis as countdown var for all stages of Pomodoro.
         if (mode==4 && setCounter <1) {
@@ -411,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     //For Pomodoro.
-                    dotDraws.pomDraw(pomDotCounter+1, 1);
+                    dotDraws.pomDraw(pomDotCounter, 1);
                 }
             }
 
@@ -426,6 +430,7 @@ public class MainActivity extends AppCompatActivity {
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
+                Log.i("counter", "pomCounter is " + pomDotCounter);
                 if (mode !=4) {
                     breakStart();
                     onBreak = true;

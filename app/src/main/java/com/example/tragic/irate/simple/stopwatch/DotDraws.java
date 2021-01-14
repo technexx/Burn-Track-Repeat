@@ -133,8 +133,6 @@ public class DotDraws extends View {
 
         if (mMode == 4) {
             mX = 115; mX2=mX+115;
-//            mX = 115; mX2 = mX+200;
-
             //Fading last object drawn. Setting previous ones to "greyed out"
             for (int i=0; i<mPomDot; i++) {
                 if (i == mPomDot-1) {
@@ -152,7 +150,6 @@ public class DotDraws extends View {
                 }
             }
 
-//            //Drawing all non-greyed objects.
 //            for (int i=0; i<8-mPomDot+1; i++) {
 //                mPaint.setAlpha(255);
 //                pomColor(i, true);
@@ -196,6 +193,9 @@ public class DotDraws extends View {
                 break;
             case 8:
                 mPaint.setColor(Color.RED);
+                if (fade && mFadeDone == 1) {
+                    fadeDot();
+                }
                 mCanvas.drawRect(mX+110, 655, mX+220, 765, mPaint);
         }
         Log.i("mxLog", "mX is " + mX);
