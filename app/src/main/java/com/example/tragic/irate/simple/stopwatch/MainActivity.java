@@ -72,6 +72,15 @@ public class MainActivity extends AppCompatActivity {
     List<String> spinListString2;
     List<String> spinListString3;
 
+    int lastSpin1;
+    int lastSpin2;
+    int lastSpin3;
+
+    List<Integer> modeOneSpins;
+    List<Integer> modeTwoSpins;
+    List<Integer> modeThreeSpins;
+    List<Integer> modeFourSpins;
+
     int breakCounter;
     int setCounter;
     long timerValue;
@@ -104,10 +113,18 @@ public class MainActivity extends AppCompatActivity {
     int mode=1;
 
     //Todo: Add taskbar notification for timers.
+    //Todo: Stop timer @ 0 for "Relaxed" mode.
     //Todo: Add "variable" mode for work/break w/ presets.
-    //Todo: Smooth out timer textView transitions from resets/mode switches.
+    //Todo: Retain or reset spinner values on tab switch.
+    //Todo: Add number of pom cycles completed to UI + restart after completed.
+    //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
     //Todo: Click range of progress bar extends outside circle.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
+    //Todo: Rename app, of course.
+    //Todo: Possible sqlite db for saved presets.
+    //Todo: Add onOptionsSelected dots for About, etc.
+
+    //Todo: Text inside bubbles for custom, add/sub buttons near spinners?
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
         List<Long> pomList1 = new ArrayList<>();
         List<Long> pomList2 = new ArrayList<>();
         List<Long> pomList3 = new ArrayList<>();
+        modeOneSpins = new ArrayList<>();
+        modeTwoSpins = new ArrayList<>();
+        modeThreeSpins = new ArrayList<>();
+        modeFourSpins = new ArrayList<>();
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -164,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
 
                         dotDraws.setMode(1);
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+
+                        retrieveSpins(modeOneSpins);
                         break;
                     case 1:
                         mode = 2;
@@ -177,6 +200,8 @@ public class MainActivity extends AppCompatActivity {
 
                         dotDraws.setMode(2);
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+
+                        retrieveSpins(modeTwoSpins);
                         break;
                     case 2:
                         mode=3;
@@ -185,6 +210,8 @@ public class MainActivity extends AppCompatActivity {
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
                         spinner3.setAdapter(spinAdapter3);
+
+                        retrieveSpins(modeThreeSpins);
                         break;
                     case 3:
                         mode=4;
@@ -196,6 +223,8 @@ public class MainActivity extends AppCompatActivity {
 
                         dotDraws.setMode(4);
                         dotDraws.pomDraw(1, 0);
+
+                        retrieveSpins(modeFourSpins);
                         break;
                 }
             }
@@ -214,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
             spinListString1.add(convertSeconds(i+5));
-        }
-        for (long i=0; i<180; i+=5) {
             spinList2.add(i+5);
             spinListString2.add(convertSeconds(i+5));
         }
@@ -242,13 +269,13 @@ public class MainActivity extends AppCompatActivity {
         pomAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList2);
         pomAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList3);
 
-        spinner1.setSelection(0);
-        spinner2.setSelection(1);
-        spinner3.setSelection(2);
-
         spinner1.setAdapter(spinAdapter1);
         spinner2.setAdapter(spinAdapter2);
         spinner3.setAdapter(spinAdapter3);
+
+        spinner1.setSelection(3);
+        spinner2.setSelection(1);
+        spinner3.setSelection(2);
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -264,9 +291,10 @@ public class MainActivity extends AppCompatActivity {
                     setMillis = pos*1000;
                     //Retains default spinner value for set time.
                     setStart = (int) setMillis;
-                    //Retains remaining value a`fter every set timer pause.
+                    //Retains remaining value after every set timer pause.
                     setPause = setMillis;
                 }
+                saveSpins();
                 resetTimer(true);
             }
 
@@ -291,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
                     long pos2 = pomList2.get(position);
                     pomMillis2 = pos2*60000;
                 }
+                saveSpins();
                 resetTimer(true);
             }
 
@@ -314,6 +343,7 @@ public class MainActivity extends AppCompatActivity {
                     long pos2 = pomList3.get(position);
                     pomMillis3 = pos2*60000;
                 }
+                saveSpins();
                 resetTimer(true);
 
             }
@@ -420,6 +450,7 @@ public class MainActivity extends AppCompatActivity {
                             fadePaused = false;
                         }
                     }
+                    dotDraws.setTime(String.valueOf(timerValue));
                 } else {
                     //For Pomodoro.
                     dotDraws.pomDraw(pomDotCounter, 1);
@@ -580,6 +611,9 @@ public class MainActivity extends AppCompatActivity {
                     blank_spinner.setVisibility(View.VISIBLE);
                     break;
                 case 3:
+                    //Use decimalFormat for blank spaces to keep centered.
+                    dotDraws.setTime((" 5"));
+                    dotDraws.setMode(3);
                     break;
                 case 4:
                     timeLeft.setText(convertSeconds(pomMillis1/1000));
@@ -624,4 +658,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void saveSpins() {
+        switch (mode) {
+            case 1:
+                modeOneSpins.add(0, spinner1.getSelectedItemPosition());
+                modeOneSpins.add(1, spinner2.getSelectedItemPosition());
+                modeOneSpins.add(2, spinner3.getSelectedItemPosition());
+                break;
+            case 2:
+                modeTwoSpins.add(0, spinner1.getSelectedItemPosition());
+                modeTwoSpins.add(1, spinner2.getSelectedItemPosition());
+                modeTwoSpins.add(2, spinner3.getSelectedItemPosition());
+                break;
+            case 3:
+                modeThreeSpins.add(0, spinner1.getSelectedItemPosition());
+                modeThreeSpins.add(1, spinner2.getSelectedItemPosition());
+                modeThreeSpins.add(2, spinner3.getSelectedItemPosition());
+                break;
+            case 4:
+                modeFourSpins.add(0, spinner1.getSelectedItemPosition());
+                modeFourSpins.add(1, spinner2.getSelectedItemPosition());
+                modeFourSpins.add(2, spinner3.getSelectedItemPosition());
+        }
+    }
+    public void retrieveSpins(List<Integer> spinList) {
+        if (spinList.size() != 0) {
+            spinner1.setSelection(spinList.get(0));
+            spinner2.setSelection(spinList.get(1));
+            spinner3.setSelection(spinList.get(3));
+        }
+    }
 }

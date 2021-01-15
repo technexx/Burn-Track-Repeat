@@ -27,7 +27,8 @@
         android:background="@color/Gray"
         app:tabTextColor="@color/white"
         app:tabIndicatorColor="@color/white"
-        app:tabTextAppearance="@style/tabText">
+        app:tabTextAppearance="@style/tabText"
+        app:tabIndicatorFullWidth="true">
     </com.google.android.material.tabs.TabLayout>
 
     <TextView

@@ -35,6 +35,8 @@ public class DotDraws extends View {
     int mFadeDone;
     int mMode;
     int mPomDot;
+    String mSetTime;
+    String mBreakTime;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -61,6 +63,14 @@ public class DotDraws extends View {
         mMode = mode;
     }
 
+    public void setTime(String setTime) {
+        mSetTime = setTime;
+    }
+
+    public void breakTime(String breakTime) {
+        mBreakTime = breakTime;
+    }
+
     public void pomDraw(int pomDot, int fadeDone) {
         this.mPomDot = pomDot; this.mFadeDone = fadeDone;
         setupPaint();
@@ -70,7 +80,7 @@ public class DotDraws extends View {
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
-        mX = 60; mY = 655; mX2 = 60; mY2 = 765;
+        mX = 60; mY = 640; mX2 = 60; mY2 = 770;
         if (mMode == 2) {
             mY2 = 695;
         }
@@ -79,8 +89,15 @@ public class DotDraws extends View {
             for (int i=0; i<mSetCount-mSetReduce; i++) {
                 mPaint.setColor(Color.GREEN);
                 mPaint.setAlpha(255);
-                mCanvas.drawCircle(mX, mY, 30, mPaint);
-                mX += 85;
+                mCanvas.drawCircle(mX, mY, 42, mPaint);
+
+                if (mMode == 3) {
+                    mPaint.setTextSize(55f);
+                    mPaint.setColor(Color.BLACK);
+                    mCanvas.drawText(mSetTime, mX-30, mY+20, mPaint);
+                }
+
+                mX += 108;
             }
 
             for (int i=0; i<mSetReduce; i++) {
@@ -91,8 +108,15 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setAlpha(100);
                 }
-                mCanvas.drawCircle(mX, mY, 30, mPaint);
-                mX += 85;
+                mCanvas.drawCircle(mX, mY, 42, mPaint);
+
+                if (mMode == 3) {
+                    mPaint.setTextSize(55f);
+                    mPaint.setColor(Color.BLACK);
+                    mCanvas.drawText(mSetTime, mX-30, mY+20, mPaint);
+                }
+
+                mX += 108;
             }
         }
 
@@ -101,8 +125,8 @@ public class DotDraws extends View {
                 mPaint.setColor(Color.RED);
                 mPaint.setAlpha(255);
                 if (mMode !=2) {
-                    mCanvas.drawCircle(mX2, mY2, 30, mPaint);
-                    mX2 +=85;
+                    mCanvas.drawCircle(mX2, mY2, 42, mPaint);
+                    mX2 +=108;
                 } else {
                     mPaint.setColor(Color.GREEN);
                     mCanvas.drawCircle(mX2, mY2, 45, mPaint);
