@@ -168,6 +168,19 @@ public class MainActivity extends AppCompatActivity {
         modeThreeSpins = new ArrayList<>();
         modeFourSpins = new ArrayList<>();
 
+        modeOneSpins.add(0, spinner1.getSelectedItemPosition());
+        modeOneSpins.add(1, spinner2.getSelectedItemPosition());
+        modeOneSpins.add(2, spinner3.getSelectedItemPosition());
+        modeTwoSpins.add(0, spinner1.getSelectedItemPosition());
+        modeTwoSpins.add(1, spinner2.getSelectedItemPosition());
+        modeTwoSpins.add(2, spinner3.getSelectedItemPosition());
+        modeThreeSpins.add(0, spinner1.getSelectedItemPosition());
+        modeThreeSpins.add(1, spinner2.getSelectedItemPosition());
+        modeThreeSpins.add(2, spinner3.getSelectedItemPosition());
+        modeFourSpins.add(0, spinner1.getSelectedItemPosition());
+        modeFourSpins.add(1, spinner2.getSelectedItemPosition());
+        modeFourSpins.add(2, spinner3.getSelectedItemPosition());
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -178,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
                         spinner1.setVisibility(View.VISIBLE);
                         s1.setVisibility(View.VISIBLE);
                         blank_spinner.setVisibility(View.GONE);
-
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
                         spinner3.setAdapter(spinAdapter3);
@@ -450,7 +462,7 @@ public class MainActivity extends AppCompatActivity {
                             fadePaused = false;
                         }
                     }
-                    dotDraws.setTime(String.valueOf(timerValue));
+//                    dotDraws.setTime(String.valueOf(timerValue));
                 } else {
                     //For Pomodoro.
                     dotDraws.pomDraw(pomDotCounter, 1);
@@ -611,8 +623,13 @@ public class MainActivity extends AppCompatActivity {
                     blank_spinner.setVisibility(View.VISIBLE);
                     break;
                 case 3:
-                    //Use decimalFormat for blank spaces to keep centered.
-                    dotDraws.setTime((" 5"));
+                    String setTimer = convertSeconds(setStart/1000);
+                    String breakTimer = convertSeconds(breakStart/1000);
+                    if (setTimer.length() == 1) {
+                        setTimer = "05";
+                    }
+                    dotDraws.setTime(setTimer, setTimer.length() <= 2);
+                    dotDraws.breakTime(breakTimer, breakTimer.length() <= 2);
                     dotDraws.setMode(3);
                     break;
                 case 4:
@@ -661,31 +678,32 @@ public class MainActivity extends AppCompatActivity {
     public void saveSpins() {
         switch (mode) {
             case 1:
-                modeOneSpins.add(0, spinner1.getSelectedItemPosition());
-                modeOneSpins.add(1, spinner2.getSelectedItemPosition());
-                modeOneSpins.add(2, spinner3.getSelectedItemPosition());
+                modeOneSpins.set(0, spinner1.getSelectedItemPosition());
+                modeOneSpins.set(1, spinner2.getSelectedItemPosition());
+                modeOneSpins.set(2, spinner3.getSelectedItemPosition());
                 break;
             case 2:
-                modeTwoSpins.add(0, spinner1.getSelectedItemPosition());
-                modeTwoSpins.add(1, spinner2.getSelectedItemPosition());
-                modeTwoSpins.add(2, spinner3.getSelectedItemPosition());
+                modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
+                modeTwoSpins.set(1, spinner2.getSelectedItemPosition());
+                modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
                 break;
             case 3:
-                modeThreeSpins.add(0, spinner1.getSelectedItemPosition());
-                modeThreeSpins.add(1, spinner2.getSelectedItemPosition());
-                modeThreeSpins.add(2, spinner3.getSelectedItemPosition());
+                modeThreeSpins.set(0, spinner1.getSelectedItemPosition());
+                modeThreeSpins.set(1, spinner2.getSelectedItemPosition());
+                modeThreeSpins.set(2, spinner3.getSelectedItemPosition());
                 break;
             case 4:
-                modeFourSpins.add(0, spinner1.getSelectedItemPosition());
-                modeFourSpins.add(1, spinner2.getSelectedItemPosition());
-                modeFourSpins.add(2, spinner3.getSelectedItemPosition());
+                modeFourSpins.set(0, spinner1.getSelectedItemPosition());
+                modeFourSpins.set(1, spinner2.getSelectedItemPosition());
+                modeFourSpins.set(2, spinner3.getSelectedItemPosition());
         }
+        Log.i("sizes", "Saved spin array sizes are: " + modeOneSpins.size() + " " + modeTwoSpins.size() + " " + modeThreeSpins.size() + " " + modeFourSpins.size());
     }
     public void retrieveSpins(List<Integer> spinList) {
         if (spinList.size() != 0) {
             spinner1.setSelection(spinList.get(0));
             spinner2.setSelection(spinList.get(1));
-            spinner3.setSelection(spinList.get(3));
+            spinner3.setSelection(spinList.get(2));
         }
     }
 }

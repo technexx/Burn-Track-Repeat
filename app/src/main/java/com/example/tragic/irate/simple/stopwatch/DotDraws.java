@@ -37,6 +37,8 @@ public class DotDraws extends View {
     int mPomDot;
     String mSetTime;
     String mBreakTime;
+    boolean mBigSetText;
+    boolean mBigBreakText;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -63,12 +65,12 @@ public class DotDraws extends View {
         mMode = mode;
     }
 
-    public void setTime(String setTime) {
-        mSetTime = setTime;
+    public void setTime(String setTime, boolean bigSetText) {
+        mSetTime = setTime; mBigSetText = bigSetText;
     }
 
-    public void breakTime(String breakTime) {
-        mBreakTime = breakTime;
+    public void breakTime(String breakTime, boolean bigBreakText) {
+        mBreakTime = breakTime; mBigBreakText = bigBreakText;
     }
 
     public void pomDraw(int pomDot, int fadeDone) {
@@ -89,15 +91,20 @@ public class DotDraws extends View {
             for (int i=0; i<mSetCount-mSetReduce; i++) {
                 mPaint.setColor(Color.GREEN);
                 mPaint.setAlpha(255);
-                mCanvas.drawCircle(mX, mY, 42, mPaint);
+                mCanvas.drawCircle(mX, mY, 50, mPaint);
 
                 if (mMode == 3) {
-                    mPaint.setTextSize(55f);
                     mPaint.setColor(Color.BLACK);
-                    mCanvas.drawText(mSetTime, mX-30, mY+20, mPaint);
+                    if (mBigSetText) {
+                        mPaint.setTextSize(70f);
+                        mCanvas.drawText(mSetTime, mX-42, mY+23, mPaint);
+                    } else {
+                        mPaint.setTextSize(50f);
+                        mCanvas.drawText(mSetTime, mX-47, mY+17, mPaint);
+                    }
                 }
 
-                mX += 108;
+                mX += 107;
             }
 
             for (int i=0; i<mSetReduce; i++) {
