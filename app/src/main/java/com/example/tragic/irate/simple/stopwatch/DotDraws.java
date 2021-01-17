@@ -91,20 +91,19 @@ public class DotDraws extends View {
             for (int i=0; i<mSetCount-mSetReduce; i++) {
                 mPaint.setColor(Color.GREEN);
                 mPaint.setAlpha(255);
-                mCanvas.drawCircle(mX, mY, 50, mPaint);
+                mCanvas.drawCircle(mX, mY, 45, mPaint);
 
                 if (mMode == 3) {
                     mPaint.setColor(Color.BLACK);
                     if (mBigSetText) {
-                        mPaint.setTextSize(70f);
-                        mCanvas.drawText(mSetTime, mX-42, mY+23, mPaint);
+                        mPaint.setTextSize(60f);
+                        mCanvas.drawText(mSetTime, mX-37, mY+22, mPaint);
                     } else {
-                        mPaint.setTextSize(50f);
-                        mCanvas.drawText(mSetTime, mX-47, mY+17, mPaint);
+                        mPaint.setTextSize(45f);
+                        mCanvas.drawText(mSetTime, mX-44, mY+17, mPaint);
                     }
                 }
-
-                mX += 107;
+                mX += 108;
             }
 
             for (int i=0; i<mSetReduce; i++) {
@@ -118,11 +117,15 @@ public class DotDraws extends View {
                 mCanvas.drawCircle(mX, mY, 42, mPaint);
 
                 if (mMode == 3) {
-                    mPaint.setTextSize(55f);
                     mPaint.setColor(Color.BLACK);
-                    mCanvas.drawText(mSetTime, mX-30, mY+20, mPaint);
+                    if (mBigSetText) {
+                        mPaint.setTextSize(60f);
+                        mCanvas.drawText(mSetTime, mX-37, mY+22, mPaint);
+                    } else {
+                        mPaint.setTextSize(45f);
+                        mCanvas.drawText(mSetTime, mX-44, mY+17, mPaint);
+                    }
                 }
-
                 mX += 108;
             }
         }
@@ -131,14 +134,25 @@ public class DotDraws extends View {
             for (int i=0; i<mBreakCount-mBreakReduce; i++) {
                 mPaint.setColor(Color.RED);
                 mPaint.setAlpha(255);
+
                 if (mMode !=2) {
                     mCanvas.drawCircle(mX2, mY2, 42, mPaint);
-                    mX2 +=108;
                 } else {
                     mPaint.setColor(Color.GREEN);
                     mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                    mX2 +=120;
                 }
+
+                if (mMode == 3) {
+                    mPaint.setColor(Color.BLACK);
+                    if (mBigBreakText) {
+                        mPaint.setTextSize(60f);
+                        mCanvas.drawText(mBreakTime, mX2-37, mY2+22, mPaint);
+                    } else {
+                        mPaint.setTextSize(45f);
+                        mCanvas.drawText(mBreakTime, mX2-44, mY2+17, mPaint);
+                    }
+                }
+                mX2 += 108;
             }
 
             for (int i=0; i<mBreakReduce; i++) {

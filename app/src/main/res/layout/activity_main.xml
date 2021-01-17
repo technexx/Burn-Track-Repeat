@@ -82,7 +82,7 @@
 
     <TextView
         android:text="None"
-        android:id="@+id/blank_spinner"
+        android:id="@+id/blank_spinner1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -100,8 +100,7 @@
         app:layout_constraintTop_toBottomOf="@id/s1"
         android:layout_marginTop="16dp"
         android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white"
-        >
+        android:backgroundTint="@color/white">
     </Spinner>
 
     <Spinner
@@ -112,9 +111,32 @@
         app:layout_constraintTop_toBottomOf="@id/s2"
         android:layout_marginTop="16dp"
         android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white"
-        >
+        android:backgroundTint="@color/white">
     </Spinner>
+
+    <ImageButton
+        android:id="@+id/plus_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/plus_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/s2"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="203dp"
+        android:backgroundTint="@color/black">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/minus_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/minus_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/s2"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="265dp"
+        android:backgroundTint="@color/black">
+    </ImageButton>
 
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"

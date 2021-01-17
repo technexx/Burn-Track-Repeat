@@ -29,6 +29,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListPopupWindow;
 import android.widget.ProgressBar;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     Spinner spinner2;
     Spinner spinner3;
     TextView blank_spinner;
+    ImageButton plus_sign;
+    ImageButton minus_sign;
 
     ArrayAdapter<String> spinAdapter1;
     ArrayAdapter<String> spinAdapter2;
@@ -71,10 +74,6 @@ public class MainActivity extends AppCompatActivity {
     List<String> spinListString1;
     List<String> spinListString2;
     List<String> spinListString3;
-
-    int lastSpin1;
-    int lastSpin2;
-    int lastSpin3;
 
     List<Integer> modeOneSpins;
     List<Integer> modeTwoSpins;
@@ -112,6 +111,9 @@ public class MainActivity extends AppCompatActivity {
     int fadeDone;
     int mode=1;
 
+    ArrayList<Long> customSets;
+    ArrayList<Long> customBreaks;
+
     //Todo: Add taskbar notification for timers.
     //Todo: Stop timer @ 0 for "Relaxed" mode.
     //Todo: Add "variable" mode for work/break w/ presets.
@@ -123,8 +125,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
-
-    //Todo: Text inside bubbles for custom, add/sub buttons near spinners?
+    //Todo: Add actual stop watch!
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,10 +138,15 @@ public class MainActivity extends AppCompatActivity {
         spinner1 = findViewById(R.id.spin1);
         spinner2 = findViewById(R.id.spin2);
         spinner3 = findViewById(R.id.spin3);
-        blank_spinner = findViewById(R.id.blank_spinner);
+        blank_spinner = findViewById(R.id.blank_spinner1);
         reset = findViewById(R.id.reset);
+        plus_sign = findViewById(R.id.plus_sign);
+        minus_sign = findViewById(R.id.minus_sign);
+
         reset.setVisibility(View.INVISIBLE);
         blank_spinner.setVisibility(View.GONE);
+        plus_sign.setVisibility(View.GONE);
+        minus_sign.setVisibility(View.GONE);
 
         progressBar = findViewById(R.id.progressBar);
         timeLeft = findViewById(R.id.timeLeft);
@@ -167,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
         modeTwoSpins = new ArrayList<>();
         modeThreeSpins = new ArrayList<>();
         modeFourSpins = new ArrayList<>();
+        customSets = new ArrayList<>();
+        customBreaks = new ArrayList<>();
 
         modeOneSpins.add(0, spinner1.getSelectedItemPosition());
         modeOneSpins.add(1, spinner2.getSelectedItemPosition());
@@ -404,6 +412,33 @@ public class MainActivity extends AppCompatActivity {
         reset.setOnClickListener(v -> {
             resetTimer(true);
         });
+
+        plus_sign.setOnClickListener(v -> {
+            if (customSets.size() <10) {
+                customSets.add(spinList1.get(spinner1.getSelectedItemPosition()));
+            }
+            if (customBreaks.size() <10) {
+                customBreaks.add(spinList2.get(spinner2.getSelectedItemPosition()));
+            }
+            savedSets = customSets.size();
+            savedBreaks = customBreaks.size();
+
+            resetTimer(true);
+            Log.i("custom", customSets + ", " +customBreaks);
+        });
+
+        minus_sign.setOnClickListener(v -> {
+            if (customSets.size() > 0) {
+                customSets.remove(customSets.size() -1);
+            }
+            if (customBreaks.size() >0) {
+                customBreaks.remove(customBreaks.size() -1);
+            }
+            savedSets = customSets.size();
+            savedBreaks = customBreaks.size();
+            resetTimer(true);
+            Log.i("custom", customSets + ", " +customBreaks);
+        });
     }
 
     public void setStart() {
@@ -599,7 +634,10 @@ public class MainActivity extends AppCompatActivity {
             timeLeft.setText(convertSeconds(setStart/1000));
             dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
             spinner1.setVisibility(View.VISIBLE);
+            spinner3.setVisibility(View.VISIBLE);
             blank_spinner.setVisibility(View.GONE);
+            plus_sign.setVisibility(View.GONE);
+            minus_sign.setVisibility(View.GONE);
 
             breakCounter = 0;
             setCounter = 0;
@@ -618,19 +656,27 @@ public class MainActivity extends AppCompatActivity {
                     timeLeft.setText(convertSeconds(breakStart/1000));
                     dotDraws.setMode(2);
                     breakCounter = -1;
-                    onBreak = true;
                     spinner1.setVisibility(View.GONE);
                     blank_spinner.setVisibility(View.VISIBLE);
+                    onBreak = true;
                     break;
                 case 3:
-                    String setTimer = convertSeconds(setStart/1000);
-                    String breakTimer = convertSeconds(breakStart/1000);
-                    if (setTimer.length() == 1) {
-                        setTimer = "05";
-                    }
-                    dotDraws.setTime(setTimer, setTimer.length() <= 2);
-                    dotDraws.breakTime(breakTimer, breakTimer.length() <= 2);
+//                    String setTimer = convertSeconds(setStart/1000);
+//                    String breakTimer = convertSeconds(breakStart/1000);
+//                    if (setTimer.length() == 1) {
+//                        setTimer = "05";
+//                    }
+//                    if (breakTimer.length() == 1) {
+//                        breakTimer = "05";
+//                    }
+//                    dotDraws.setTime(setTimer, setTimer.length() <= 2);
+//                    dotDraws.breakTime(breakTimer, breakTimer.length() <= 2);
                     dotDraws.setMode(3);
+
+                    spinner3.setVisibility(View.GONE);
+                    plus_sign.setVisibility(View.VISIBLE);
+                    minus_sign.setVisibility(View.VISIBLE);
+                    onBreak = false;
                     break;
                 case 4:
                     timeLeft.setText(convertSeconds(pomMillis1/1000));
@@ -705,5 +751,18 @@ public class MainActivity extends AppCompatActivity {
             spinner2.setSelection(spinList.get(1));
             spinner3.setSelection(spinList.get(2));
         }
+    }
+
+    public void addCustom() {
+        String setTimer = convertSeconds(setStart/1000);
+        String breakTimer = convertSeconds(breakStart/1000);
+        if (setTimer.length() == 1) {
+            setTimer = "05";
+        }
+        if (breakTimer.length() == 1) {
+            breakTimer = "05";
+        }
+        dotDraws.setTime(setTimer, setTimer.length() <= 2);
+        dotDraws.breakTime(breakTimer, breakTimer.length() <= 2);
     }
 }
