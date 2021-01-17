@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
+    //Todo: Strict -> Relaxed transition seems to tear a bit w/ green dots.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,7 +215,6 @@ public class MainActivity extends AppCompatActivity {
                         spinner1.setVisibility(View.GONE);
                         blank_spinner.setVisibility(View.VISIBLE);
 
-                        spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
                         spinner3.setAdapter(spinAdapter3);
 
@@ -226,12 +226,21 @@ public class MainActivity extends AppCompatActivity {
                     case 2:
                         mode=3;
                         heading.setText(R.string.variable);
-
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
-                        spinner3.setAdapter(spinAdapter3);
 
                         retrieveSpins(modeThreeSpins);
+
+                        numberOfSets = customSets.size();
+                        numberOfBreaks = customBreaks.size();
+                        savedSets = numberOfSets;
+                        savedBreaks = numberOfBreaks;
+
+                        dotDraws.setTime(customSets);
+                        dotDraws.breakTime(customBreaks);
+                        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        Log.i("sets", "savedSets are " +savedSets);
+
                         break;
                     case 3:
                         mode=4;
@@ -270,6 +279,10 @@ public class MainActivity extends AppCompatActivity {
             spinList3.add(i+1);
             spinListString3.add(convertSeconds(i+1));
         }
+
+//        for (int i=0; i<3; i++) {
+//            customSets.add()
+//        }
         //15-90 minute work time.
         for (long i=10; i<90; i+=5) {
             pomList1.add(i+5);
@@ -296,6 +309,11 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setSelection(3);
         spinner2.setSelection(1);
         spinner3.setSelection(2);
+
+        for (int i=0; i<3; i++) {
+            customSets.add(spinListString1.get(5));
+            customBreaks.add(spinListString2.get(8));
+        }
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -353,11 +371,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 long pos = spinList3.get(position);
-                numberOfSets = spinList3.get(position);
+                if (mode !=3) {
+                    numberOfSets = spinList3.get(position);
+                }
                 //These will always start equal.
                 numberOfBreaks = numberOfSets;
                 //(saved) vars for static reference.
-                savedSets = numberOfSets; savedBreaks = numberOfBreaks;
+                savedSets = numberOfSets;
+                savedBreaks = numberOfBreaks;
 
                 if (mode == 4) {
                     long pos2 = pomList3.get(position);
@@ -414,29 +435,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         plus_sign.setOnClickListener(v -> {
-            if (customSets.size() <10) {
-                customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
-            }
-            if (customBreaks.size() <10) {
-                customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
-            }
-            savedSets = customSets.size();
-            savedBreaks = customBreaks.size();
-
-            dotDraws.setTime(customSets);
-            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+            addCustom(true);
         });
 
         minus_sign.setOnClickListener(v -> {
-            if (customSets.size() > 0) {
-                customSets.remove(customSets.size() -1);
-            }
-            if (customBreaks.size() >0) {
-                customBreaks.remove(customBreaks.size() -1);
-            }
-            savedSets = customSets.size();
-            savedBreaks = customBreaks.size();
-            Log.i("custom", customSets + ", " +customBreaks);
+            addCustom(false);
         });
     }
 
@@ -660,16 +663,6 @@ public class MainActivity extends AppCompatActivity {
                     onBreak = true;
                     break;
                 case 3:
-//                    String setTimer = convertSeconds(setStart/1000);
-//                    String breakTimer = convertSeconds(breakStart/1000);
-//                    if (setTimer.length() == 1) {
-//                        setTimer = "05";
-//                    }
-//                    if (breakTimer.length() == 1) {
-//                        breakTimer = "05";
-//                    }
-//                    dotDraws.setTime(setTimer, setTimer.length() <= 2);
-//                    dotDraws.breakTime(breakTimer, breakTimer.length() <= 2);
                     dotDraws.setMode(3);
 
                     spinner3.setVisibility(View.GONE);
@@ -735,32 +728,54 @@ public class MainActivity extends AppCompatActivity {
             case 3:
                 modeThreeSpins.set(0, spinner1.getSelectedItemPosition());
                 modeThreeSpins.set(1, spinner2.getSelectedItemPosition());
-                modeThreeSpins.set(2, spinner3.getSelectedItemPosition());
+                modeThreeSpins.set(2, (int) customSets.size());
                 break;
             case 4:
                 modeFourSpins.set(0, spinner1.getSelectedItemPosition());
                 modeFourSpins.set(1, spinner2.getSelectedItemPosition());
                 modeFourSpins.set(2, spinner3.getSelectedItemPosition());
         }
-        Log.i("sizes", "Saved spin array sizes are: " + modeOneSpins.size() + " " + modeTwoSpins.size() + " " + modeThreeSpins.size() + " " + modeFourSpins.size());
     }
+
     public void retrieveSpins(List<Integer> spinList) {
         if (spinList.size() != 0) {
             spinner1.setSelection(spinList.get(0));
             spinner2.setSelection(spinList.get(1));
-            spinner3.setSelection(spinList.get(2));
+            if (mode != 2) {
+                spinner3.setSelection(spinList.get(2));
+            } else {
+                savedSets = modeThreeSpins.get(2);
+            }
         }
     }
 
-    public void addCustom() {
-//        String breakTimer = convertSeconds(breakStart/1000);
-//        if (setTimer.length() == 1) {
-//            setTimer = "05";
-//        }
-//        if (breakTimer.length() == 1) {
-//            breakTimer = "05";
-//        }
+    public void addCustom(boolean adding) {
+        if (adding) {
+            if (customSets.size() <10) {
+                customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
+            }
+            if (customBreaks.size() <10) {
+                customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
+            }
+        } else {
+            if (customSets.size() > 0) {
+                customSets.remove(customSets.size() -1);
+            }
+            if (customBreaks.size() >0) {
+                customBreaks.remove(customBreaks.size() -1);
+            }
+        }
+
+        numberOfSets = customSets.size();
+        numberOfBreaks = customBreaks.size();
+        savedSets = numberOfSets;
+        savedBreaks = numberOfBreaks;
         dotDraws.setTime(customSets);
         dotDraws.breakTime(customBreaks);
+
+        saveSpins();
+
+        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+
     }
 }

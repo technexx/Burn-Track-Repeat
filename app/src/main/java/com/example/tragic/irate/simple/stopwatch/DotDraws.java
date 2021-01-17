@@ -94,15 +94,17 @@ public class DotDraws extends View {
             mY2 = 695;
         }
 
-
         if (mMode != 2 && mMode !=4) {
-
             for (int i=0; i<mSetCount-mSetReduce; i++) {
                 mPaint.setColor(Color.GREEN);
                 mPaint.setAlpha(255);
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
-                drawText(i);
+
+                //Todo: list is 1 less than setCount?
+                drawText(mSetTime, mX, mY, i);
                 mX += 108;
+                Log.i("sets", "count is " +mSetCount);
+                Log.i("sets", "timeCount is " +mSetTime.size());
             }
 
             for (int i=0; i<mSetReduce; i++) {
@@ -114,6 +116,7 @@ public class DotDraws extends View {
                     mPaint.setAlpha(100);
                 }
                 mCanvas.drawCircle(mX, mY, 42, mPaint);
+                drawText(mSetTime, mX, mY, i);
                 mX += 108;
             }
         }
@@ -129,6 +132,7 @@ public class DotDraws extends View {
                     mPaint.setColor(Color.GREEN);
                     mCanvas.drawCircle(mX2, mY2, 45, mPaint);
                 }
+                drawText(mBreakTime, mX2, mY2, i);
                 mX2 += 108;
             }
 
@@ -143,6 +147,7 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setAlpha(100);
                 }
+                drawText(mBreakTime, mX2, mY2, i);
                 if (mMode !=2) {
                     mCanvas.drawCircle(mX2, mY2, 30, mPaint);
                     mX2 +=85;
@@ -219,21 +224,23 @@ public class DotDraws extends View {
         Log.i("mxLog", "mX2 is " + mX2);
     }
 
-    private void drawText(int i) {
+    private void drawText(ArrayList<String> list, float x, float y, int i) {
         if (mMode == 3) {
             mPaintText.setColor(Color.BLACK);
-            if (mSetTime.size() >0) {
-                if (mSetTime.get(i).length() <= 2) {
-                    if (mSetTime.get(0).length() == 1) {
-                        mSetTime.set(i, "05");
+            if (list.size() >0) {
+                if (list.get(i).length() <= 2) {
+                    if (list.get(i).length() == 1) {
+                        list.set(i, "05");
                     }
                     mPaintText.setTextSize(60f);
-                    mCanvas.drawText(mSetTime.get(i), mX-37, mY+22, mPaintText);
+                    mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
                 } else {
                     mPaintText.setTextSize(45f);
-                    mCanvas.drawText(mSetTime.get(i), mX-44, mY+17, mPaintText);
+                    mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
                 }
             }
+//            for (int i=0; i<loops; i++) {
+//            }
         }
     }
 }
