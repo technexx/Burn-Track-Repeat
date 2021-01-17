@@ -111,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
     int fadeDone;
     int mode=1;
 
-    ArrayList<Long> customSets;
-    ArrayList<Long> customBreaks;
+    ArrayList<String> customSets;
+    ArrayList<String> customBreaks;
 
     //Todo: Add taskbar notification for timers.
     //Todo: Stop timer @ 0 for "Relaxed" mode.
@@ -415,16 +415,16 @@ public class MainActivity extends AppCompatActivity {
 
         plus_sign.setOnClickListener(v -> {
             if (customSets.size() <10) {
-                customSets.add(spinList1.get(spinner1.getSelectedItemPosition()));
+                customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
             }
             if (customBreaks.size() <10) {
-                customBreaks.add(spinList2.get(spinner2.getSelectedItemPosition()));
+                customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
             }
             savedSets = customSets.size();
             savedBreaks = customBreaks.size();
 
-            resetTimer(true);
-            Log.i("custom", customSets + ", " +customBreaks);
+            dotDraws.setTime(customSets);
+            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
         });
 
         minus_sign.setOnClickListener(v -> {
@@ -436,7 +436,6 @@ public class MainActivity extends AppCompatActivity {
             }
             savedSets = customSets.size();
             savedBreaks = customBreaks.size();
-            resetTimer(true);
             Log.i("custom", customSets + ", " +customBreaks);
         });
     }
@@ -754,15 +753,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addCustom() {
-        String setTimer = convertSeconds(setStart/1000);
-        String breakTimer = convertSeconds(breakStart/1000);
-        if (setTimer.length() == 1) {
-            setTimer = "05";
-        }
-        if (breakTimer.length() == 1) {
-            breakTimer = "05";
-        }
-        dotDraws.setTime(setTimer, setTimer.length() <= 2);
-        dotDraws.breakTime(breakTimer, breakTimer.length() <= 2);
+//        String breakTimer = convertSeconds(breakStart/1000);
+//        if (setTimer.length() == 1) {
+//            setTimer = "05";
+//        }
+//        if (breakTimer.length() == 1) {
+//            breakTimer = "05";
+//        }
+        dotDraws.setTime(customSets);
+        dotDraws.breakTime(customBreaks);
     }
 }

@@ -18,9 +18,12 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+
 public class DotDraws extends View {
     Canvas mCanvas;
     Paint mPaint;
+    Paint mPaintText;
     float mX;
     float mX2;
     float mY;
@@ -35,8 +38,8 @@ public class DotDraws extends View {
     int mFadeDone;
     int mMode;
     int mPomDot;
-    String mSetTime;
-    String mBreakTime;
+    ArrayList<String> mSetTime = new ArrayList<>();
+    ArrayList<String> mBreakTime = new ArrayList<>();
     boolean mBigSetText;
     boolean mBigBreakText;
 
@@ -53,6 +56,9 @@ public class DotDraws extends View {
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaintText = new Paint();
+        mPaintText.setAntiAlias(true);
+        mPaintText.setStrokeWidth(5);
     }
 
     public void newDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
@@ -65,12 +71,12 @@ public class DotDraws extends View {
         mMode = mode;
     }
 
-    public void setTime(String setTime, boolean bigSetText) {
-        mSetTime = setTime; mBigSetText = bigSetText;
+    public void setTime(ArrayList<String> setTime) {
+        mSetTime = setTime;;
     }
 
-    public void breakTime(String breakTime, boolean bigBreakText) {
-        mBreakTime = breakTime; mBigBreakText = bigBreakText;
+    public void breakTime(ArrayList<String> breakTime) {
+        mBreakTime = breakTime;
     }
 
     public void pomDraw(int pomDot, int fadeDone) {
@@ -82,27 +88,20 @@ public class DotDraws extends View {
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
+
         mX = 60; mY = 640; mX2 = 60; mY2 = 770;
         if (mMode == 2) {
             mY2 = 695;
         }
 
+
         if (mMode != 2 && mMode !=4) {
+
             for (int i=0; i<mSetCount-mSetReduce; i++) {
                 mPaint.setColor(Color.GREEN);
                 mPaint.setAlpha(255);
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
-
-                if (mMode == 3) {
-                    mPaint.setColor(Color.BLACK);
-                    if (mBigSetText) {
-                        mPaint.setTextSize(60f);
-                        mCanvas.drawText(mSetTime, mX-37, mY+22, mPaint);
-                    } else {
-                        mPaint.setTextSize(45f);
-                        mCanvas.drawText(mSetTime, mX-44, mY+17, mPaint);
-                    }
-                }
+                drawText(i);
                 mX += 108;
             }
 
@@ -115,17 +114,6 @@ public class DotDraws extends View {
                     mPaint.setAlpha(100);
                 }
                 mCanvas.drawCircle(mX, mY, 42, mPaint);
-
-                if (mMode == 3) {
-                    mPaint.setColor(Color.BLACK);
-                    if (mBigSetText) {
-                        mPaint.setTextSize(60f);
-                        mCanvas.drawText(mSetTime, mX-37, mY+22, mPaint);
-                    } else {
-                        mPaint.setTextSize(45f);
-                        mCanvas.drawText(mSetTime, mX-44, mY+17, mPaint);
-                    }
-                }
                 mX += 108;
             }
         }
@@ -140,17 +128,6 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setColor(Color.GREEN);
                     mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                }
-
-                if (mMode == 3) {
-                    mPaint.setColor(Color.BLACK);
-                    if (mBigBreakText) {
-                        mPaint.setTextSize(60f);
-                        mCanvas.drawText(mBreakTime, mX2-37, mY2+22, mPaint);
-                    } else {
-                        mPaint.setTextSize(45f);
-                        mCanvas.drawText(mBreakTime, mX2-44, mY2+17, mPaint);
-                    }
                 }
                 mX2 += 108;
             }
@@ -240,5 +217,23 @@ public class DotDraws extends View {
         }
         Log.i("mxLog", "mX is " + mX);
         Log.i("mxLog", "mX2 is " + mX2);
+    }
+
+    private void drawText(int i) {
+        if (mMode == 3) {
+            mPaintText.setColor(Color.BLACK);
+            if (mSetTime.size() >0) {
+                if (mSetTime.get(i).length() <= 2) {
+                    if (mSetTime.get(0).length() == 1) {
+                        mSetTime.set(i, "05");
+                    }
+                    mPaintText.setTextSize(60f);
+                    mCanvas.drawText(mSetTime.get(i), mX-37, mY+22, mPaintText);
+                } else {
+                    mPaintText.setTextSize(45f);
+                    mCanvas.drawText(mSetTime.get(i), mX-44, mY+17, mPaintText);
+                }
+            }
+        }
     }
 }
