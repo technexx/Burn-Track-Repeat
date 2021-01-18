@@ -102,7 +102,6 @@ public class DotDraws extends View {
 
                 drawText(mSetTime, mX, mY, i);
                 mX += 108;
-//                Log.i("sets", "timeValue is " +mSetTime);
             }
 
             for (int i=0; i<mSetReduce; i++) {
@@ -123,13 +122,12 @@ public class DotDraws extends View {
             for (int i=0; i<mBreakCount-mBreakReduce; i++) {
                 mPaint.setColor(Color.RED);
                 mPaint.setAlpha(255);
-                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-
                 if (mMode ==2) {
                     mPaint.setColor(Color.GREEN);
                 } else {
                     mPaint.setColor(Color.RED);
                 }
+                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
                 drawText(mBreakTime, mX2, mY2, i);
                 mX2 += 108;
             }

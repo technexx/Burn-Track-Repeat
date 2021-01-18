@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     boolean timerEnded;
     boolean paused;
     boolean onBreak;
+    boolean relaxedEnded;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -116,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
 
     //Todo: Add taskbar notification for timers.
     //Todo: Stop timer @ 0 for "Relaxed" mode.
-    //Todo: Add "variable" mode for work/break w/ presets.
     //Todo: Retain or reset spinner values on tab switch.
     //Todo: Add number of pom cycles completed to UI + restart after completed.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
-    //Todo: Strict -> Relaxed transition seems to tear a bit w/ green dots.
+    //Todo: Strict -> Relaxed transition seems to tear a bit w/ green dots - de-pop canvas first?
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -416,6 +416,14 @@ public class MainActivity extends AppCompatActivity {
                 paused = true;
                 //Pausing
             } else if (!timerEnded) {
+                //Todo: Reload progress to 10k.
+                if (relaxedEnded) {
+                    timeLeft.setText(convertSeconds(spinList2.get(modeTwoSpins.get(1))));
+                    progressBar.setProgress(10000);
+                    endAnimation.cancel();
+                    relaxedEnded = false;
+                    breakPause = maxProgress;
+                }
                 reset.setVisibility(View.VISIBLE);
                 timer.cancel();
                 objectAnimator.cancel();
@@ -543,6 +551,8 @@ public class MainActivity extends AppCompatActivity {
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
+            Log.i("progress", "breakPause value is " + breakPause);
+
         }
         objectAnimator.setDuration(breakMillis);
         objectAnimator.start();
@@ -573,30 +583,29 @@ public class MainActivity extends AppCompatActivity {
                 fadeDone = 4;
                 timerEnded = true;
                 numberOfBreaks--;
-                timeLeft.setText("0");
+                Log.i("time", "time is " + timeLeft);
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-                Log.i("number", String.valueOf(numberOfSets));
                 if (numberOfBreaks >0) {
                     resetTimer(false);
                     if (mode !=2) {
                         setStart();
                         onBreak = false;
                     } else {
-                        breakStart();
+                        relaxedEnded = true;
+                        timeLeft.setText("0");
+                        endAnimation = new AlphaAnimation(1.0f, 0.0f);
+                        endAnimation.setDuration(300);
+                        endAnimation.setStartOffset(20);
+                        endAnimation.setRepeatMode(Animation.REVERSE);
+                        endAnimation.setRepeatCount(Animation.INFINITE);
+
+                        progressBar.setAnimation(endAnimation);
+                        timeLeft.setAnimation(endAnimation);
+
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                     }
-                } else {
-                    progressBar.setAnimation(endAnimation);
-                    timeLeft.setAnimation(endAnimation);
-
-                    endAnimation = new AlphaAnimation(1.0f, 0.0f);
-                    endAnimation.setDuration(300);
-                    endAnimation.setStartOffset(20);
-                    endAnimation.setRepeatMode(Animation.REVERSE);
-                    endAnimation.setRepeatCount(Animation.INFINITE);
-
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                 }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
