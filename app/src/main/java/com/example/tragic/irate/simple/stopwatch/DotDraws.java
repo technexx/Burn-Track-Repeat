@@ -100,11 +100,9 @@ public class DotDraws extends View {
                 mPaint.setAlpha(255);
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
 
-                //Todo: list is 1 less than setCount?
                 drawText(mSetTime, mX, mY, i);
                 mX += 108;
-                Log.i("sets", "count is " +mSetCount);
-                Log.i("sets", "timeCount is " +mSetTime.size());
+//                Log.i("sets", "timeValue is " +mSetTime);
             }
 
             for (int i=0; i<mSetReduce; i++) {
@@ -115,8 +113,8 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setAlpha(100);
                 }
-                mCanvas.drawCircle(mX, mY, 42, mPaint);
-                drawText(mSetTime, mX, mY, i);
+                mCanvas.drawCircle(mX, mY, 45, mPaint);
+                drawText(mSetTime, mX, mY, mSetTime.size() -1);
                 mX += 108;
             }
         }
@@ -125,12 +123,12 @@ public class DotDraws extends View {
             for (int i=0; i<mBreakCount-mBreakReduce; i++) {
                 mPaint.setColor(Color.RED);
                 mPaint.setAlpha(255);
+                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
 
-                if (mMode !=2) {
-                    mCanvas.drawCircle(mX2, mY2, 42, mPaint);
-                } else {
+                if (mMode ==2) {
                     mPaint.setColor(Color.GREEN);
-                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                } else {
+                    mPaint.setColor(Color.RED);
                 }
                 drawText(mBreakTime, mX2, mY2, i);
                 mX2 += 108;
@@ -147,14 +145,9 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setAlpha(100);
                 }
-                drawText(mBreakTime, mX2, mY2, i);
-                if (mMode !=2) {
-                    mCanvas.drawCircle(mX2, mY2, 30, mPaint);
-                    mX2 +=85;
-                } else {
-                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                    mX2 +=120;
-                }
+                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                drawText(mBreakTime, mX2, mY2, mBreakTime.size()-1);
+                mX2+=108;
             }
         }
 
@@ -239,8 +232,6 @@ public class DotDraws extends View {
                     mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
                 }
             }
-//            for (int i=0; i<loops; i++) {
-//            }
         }
     }
 }

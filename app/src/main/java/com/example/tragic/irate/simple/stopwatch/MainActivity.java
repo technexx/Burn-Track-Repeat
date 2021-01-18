@@ -280,9 +280,6 @@ public class MainActivity extends AppCompatActivity {
             spinListString3.add(convertSeconds(i+1));
         }
 
-//        for (int i=0; i<3; i++) {
-//            customSets.add()
-//        }
         //15-90 minute work time.
         for (long i=10; i<90; i+=5) {
             pomList1.add(i+5);
@@ -447,11 +444,6 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-//        setMillis = 2000;
-//        pomMillis1 = 2000;
-//        pomMillis2 = 3000;
-//        pomMillis3 = 4000;
-
         //Using setMillis as countdown var for all stages of Pomodoro.
         if (mode==4 && setCounter <1) {
             switch (pomStage) {
@@ -499,7 +491,7 @@ public class MainActivity extends AppCompatActivity {
                             fadePaused = false;
                         }
                     }
-//                    dotDraws.setTime(String.valueOf(timerValue));
+//                    Log.i("sets", "CustomTimer sets are: " + customSets);
                 } else {
                     //For Pomodoro.
                     dotDraws.pomDraw(pomDotCounter, 1);
@@ -517,7 +509,6 @@ public class MainActivity extends AppCompatActivity {
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-                Log.i("counter", "pomCounter is " + pomDotCounter);
                 if (mode !=4) {
                     breakStart();
                     onBreak = true;
@@ -753,6 +744,8 @@ public class MainActivity extends AppCompatActivity {
         if (adding) {
             if (customSets.size() <10) {
                 customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
+            } else {
+                Toast.makeText(getApplicationContext(), "Max reached!", Toast.LENGTH_SHORT).show();
             }
             if (customBreaks.size() <10) {
                 customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
@@ -774,7 +767,6 @@ public class MainActivity extends AppCompatActivity {
         dotDraws.breakTime(customBreaks);
 
         saveSpins();
-
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
     }
