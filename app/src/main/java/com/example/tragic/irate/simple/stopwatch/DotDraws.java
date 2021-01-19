@@ -89,7 +89,7 @@ public class DotDraws extends View {
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
 
-        mX = 60; mY = 640; mX2 = 60; mY2 = 770;
+        mX = 60; mY = 625; mX2 = 60; mY2 = 755;
         if (mMode == 2) {
             mY2 = 695;
         }
@@ -154,16 +154,16 @@ public class DotDraws extends View {
             //Fading last object drawn. Setting previous ones to "greyed out"
             for (int i=0; i<mPomDot; i++) {
                 if (i == mPomDot-1) {
-                    pomColor(i, true);
+                    pomDraw(i, true);
                 } else {
                     mPaint.setAlpha(100);
-                    pomColor(i, false);
+                    pomDraw(i, false);
                 }
                 if (i+1 == mPomDot) {
                     //Drawing all non-greyed objects.
                     for (int j=mPomDot; j<8; j++) {
                         mPaint.setAlpha(255);
-                        pomColor(j, false);
+                        pomDraw(j, false);
                     }
                 }
             }
@@ -186,21 +186,21 @@ public class DotDraws extends View {
         }
     }
 
-    public void pomColor(int i, boolean fade) {
+    public void pomDraw(int i, boolean fade) {
         switch (i+1) {
             case 1: case 3: case 5: case 7:
                 mPaint.setColor(Color.GREEN);
                 if (fade && mFadeDone == 1) {
                     fadeDot();
                 }
-                mCanvas.drawCircle(mX, 710, 60, mPaint);
+                mCanvas.drawCircle(mX, 685, 60, mPaint);
                 break;
             case 2: case 4: case 6:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) {
                     fadeDot();
                 }
-                mCanvas.drawCircle(mX2, 710, 30, mPaint);
+                mCanvas.drawCircle(mX2, 685, 30, mPaint);
                 mX+=230;
                 mX2=mX+115;
                 break;
@@ -209,7 +209,7 @@ public class DotDraws extends View {
                 if (fade && mFadeDone == 1) {
                     fadeDot();
                 }
-                mCanvas.drawRect(mX+110, 655, mX+220, 765, mPaint);
+                mCanvas.drawRect(mX+110, 630, mX+220, 740, mPaint);
         }
         Log.i("mxLog", "mX is " + mX);
         Log.i("mxLog", "mX2 is " + mX2);

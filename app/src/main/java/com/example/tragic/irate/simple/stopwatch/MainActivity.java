@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     TextView blank_spinner;
     ImageButton plus_sign;
     ImageButton minus_sign;
+    TextView cycles_completed;
 
     ArrayAdapter<String> spinAdapter1;
     ArrayAdapter<String> spinAdapter2;
@@ -98,6 +99,11 @@ public class MainActivity extends AppCompatActivity {
     int pomStage=1;
     int pomDotCounter=1;
 
+    int strictCyclesDone;
+    int relaxedCyclesDone;
+    int customCyclesDone;
+    int pomCyclesDone;
+
     long numberOfSets;
     long numberOfBreaks;
     long savedBreaks;
@@ -107,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
     boolean paused;
     boolean onBreak;
     boolean relaxedEnded;
+    boolean pomEnded;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -115,18 +122,17 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> customSets;
     ArrayList<String> customBreaks;
 
+    //Todo: Add option to end set or break early (e.g. if finished early).
+    //Todo: Count up cycles for each mode.
+    //Todo: BUG: Initial prog timer+text out of sync w/ textdraws in Custom mode.
     //Todo: Add taskbar notification for timers.
-    //Todo: Stop timer @ 0 for "Relaxed" mode.
-    //Todo: Retain or reset spinner values on tab switch.
     //Todo: Add number of pom cycles completed to UI + restart after completed.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
-    //Todo: Click range of progress bar extends outside circle.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
-    //Todo: Strict -> Relaxed transition seems to tear a bit w/ green dots - de-pop canvas first?
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
         reset = findViewById(R.id.reset);
         plus_sign = findViewById(R.id.plus_sign);
         minus_sign = findViewById(R.id.minus_sign);
+        cycles_completed = findViewById(R.id.cycles_completed);
 
         reset.setVisibility(View.INVISIBLE);
         blank_spinner.setVisibility(View.GONE);
@@ -208,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
                         retrieveSpins(modeOneSpins);
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
                         break;
                     case 1:
                         mode = 2;
@@ -222,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
                         retrieveSpins(modeTwoSpins);
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
                         break;
                     case 2:
                         mode=3;
@@ -239,8 +248,7 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.setTime(customSets);
                         dotDraws.breakTime(customBreaks);
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                        Log.i("sets", "savedSets are " +savedSets);
-
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         break;
                     case 3:
                         mode=4;
@@ -254,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.pomDraw(1, 0);
 
                         retrieveSpins(modeFourSpins);
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                         break;
                 }
             }
@@ -311,6 +320,8 @@ public class MainActivity extends AppCompatActivity {
             customSets.add(spinListString1.get(5));
             customBreaks.add(spinListString2.get(8));
         }
+
+        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -416,7 +427,6 @@ public class MainActivity extends AppCompatActivity {
                 paused = true;
                 //Pausing
             } else if (!timerEnded) {
-                //Todo: Reload progress to 10k.
                 if (relaxedEnded) {
                     timeLeft.setText(convertSeconds(spinList2.get(modeTwoSpins.get(1))));
                     progressBar.setProgress(10000);
@@ -424,12 +434,17 @@ public class MainActivity extends AppCompatActivity {
                     relaxedEnded = false;
                     breakPause = maxProgress;
                 }
-                reset.setVisibility(View.VISIBLE);
+                if (pomEnded) {
+                    timeLeft.setText(convertSeconds(spinList1.get(modeFourSpins.get(1))));
+                    progressBar.setProgress(10000);
+                    endAnimation.cancel();
+                    pomEnded = false;
+                }
                 timer.cancel();
                 objectAnimator.cancel();
+                reset.setVisibility(View.VISIBLE);
                 paused = false;
-            } else {
-                //A complete cycle of sets and breaks have been completed.
+            }  else {
                 objectAnimator.cancel();
                 resetTimer(true);
             }
@@ -531,7 +546,15 @@ public class MainActivity extends AppCompatActivity {
                         pomStage = 3;
                     }
                     pomDotCounter++;
-                    setStart();
+                    if (pomDotCounter <8) {
+                        setStart();
+                    } else {
+                        pomEnded = true;
+                        pomDotCounter = 1;
+                        pomCyclesDone +=1;
+                        endAnimation();
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
+                    }
                 }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
@@ -595,17 +618,27 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         relaxedEnded = true;
                         timeLeft.setText("0");
-                        endAnimation = new AlphaAnimation(1.0f, 0.0f);
-                        endAnimation.setDuration(300);
-                        endAnimation.setStartOffset(20);
-                        endAnimation.setRepeatMode(Animation.REVERSE);
-                        endAnimation.setRepeatCount(Animation.INFINITE);
-
-                        progressBar.setAnimation(endAnimation);
-                        timeLeft.setAnimation(endAnimation);
-
+                        endAnimation();
                         dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                     }
+                } else {
+                    switch (mode) {
+                        case 1:
+                            strictCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
+                            break;
+                        case 2:
+                            relaxedCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
+                            break;
+                        case 3:
+                            customCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+
+                    }
+                    endAnimation();
+                    timeLeft.setText("0");
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                 }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
@@ -778,5 +811,16 @@ public class MainActivity extends AppCompatActivity {
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
+    }
+
+    private void endAnimation() {
+        endAnimation = new AlphaAnimation(1.0f, 0.0f);
+        endAnimation.setDuration(300);
+        endAnimation.setStartOffset(20);
+        endAnimation.setRepeatMode(Animation.REVERSE);
+        endAnimation.setRepeatCount(Animation.INFINITE);
+
+        progressBar.setAnimation(endAnimation);
+        timeLeft.setAnimation(endAnimation);
     }
 }
