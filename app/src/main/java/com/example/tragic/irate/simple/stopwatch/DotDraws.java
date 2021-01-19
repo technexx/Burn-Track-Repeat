@@ -90,9 +90,7 @@ public class DotDraws extends View {
         this.mCanvas = canvas;
 
         mX = 60; mY = 625; mX2 = 60; mY2 = 755;
-        if (mMode == 2) {
-            mY2 = 695;
-        }
+        if (mMode == 2) mY2 = 695;
 
         if (mMode != 2 && mMode !=4) {
             for (int i=0; i<mSetCount-mSetReduce; i++) {
@@ -171,18 +169,14 @@ public class DotDraws extends View {
     }
 
     public void fadeDot() {
-        if (alpha >255) {
-            alpha = 255;
-        }
+        if (alpha >255) alpha = 255;
         mPaint.setAlpha(alpha);
         cycle++;
         if (cycle <10) {
             alpha -=25;
         } else {
             alpha +=25;
-            if (cycle >19) {
-                cycle = 0;
-            }
+            if (cycle >19) cycle = 0;
         }
     }
 

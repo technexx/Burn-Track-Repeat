@@ -159,6 +159,33 @@
     </TextView>
 
     <TextView
+        android:id="@+id/skip"
+        android:text="Skip Round"
+        android:textColor="@color/white"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="380dp"
+        android:layout_marginStart="30dp"
+        android:textSize="14sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/cycle_reset"
+        android:text="Clear Cycles"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="380dp"
+        android:layout_marginEnd="12dp"
+        android:textSize="14sp">
+    </TextView>
+
+    <TextView
         android:id="@+id/timeLeft"
         android:text="5"
         android:textColor="@color/white"

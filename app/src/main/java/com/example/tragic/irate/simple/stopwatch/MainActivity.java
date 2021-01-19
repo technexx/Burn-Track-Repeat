@@ -57,13 +57,15 @@ public class MainActivity extends AppCompatActivity {
     TextView s1;
     TextView s2;
     TextView s3;
+    TextView blank_spinner;
+    TextView cycles_completed;
+    TextView cycle_reset;
+    TextView skip;
     Spinner spinner1;
     Spinner spinner2;
     Spinner spinner3;
-    TextView blank_spinner;
     ImageButton plus_sign;
     ImageButton minus_sign;
-    TextView cycles_completed;
 
     ArrayAdapter<String> spinAdapter1;
     ArrayAdapter<String> spinAdapter2;
@@ -122,11 +124,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> customSets;
     ArrayList<String> customBreaks;
 
-    //Todo: Add option to end set or break early (e.g. if finished early).
-    //Todo: Count up cycles for each mode.
+    //Todo: Add functions to skip and clear.
     //Todo: BUG: Initial prog timer+text out of sync w/ textdraws in Custom mode.
     //Todo: Add taskbar notification for timers.
-    //Todo: Add number of pom cycles completed to UI + restart after completed.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
     //Todo: Rename app, of course.
@@ -150,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
         plus_sign = findViewById(R.id.plus_sign);
         minus_sign = findViewById(R.id.minus_sign);
         cycles_completed = findViewById(R.id.cycles_completed);
+        cycle_reset = findViewById(R.id.cycle_reset);
+        skip = findViewById(R.id.skip);
 
         reset.setVisibility(View.INVISIBLE);
         blank_spinner.setVisibility(View.GONE);
@@ -445,8 +447,71 @@ public class MainActivity extends AppCompatActivity {
                 reset.setVisibility(View.VISIBLE);
                 paused = false;
             }  else {
-                objectAnimator.cancel();
                 resetTimer(true);
+            }
+            if (endAnimation != null) endAnimation.cancel();
+        });
+
+        cycle_reset.setOnClickListener(v -> {
+            switch (mode) {
+                case 1:
+                    strictCyclesDone = 0; break;
+                case 2:
+                    relaxedCyclesDone = 0; break;
+                case 3:
+                    customCyclesDone = 0; break;
+                case 4:
+                    pomCyclesDone = 0;
+            }
+            cycles_completed.setText(getString(R.string.cycles_done, "0"));
+        });
+
+        skip.setOnClickListener(v -> {
+            if (mode !=4) {
+                numberOfSets--;
+                numberOfBreaks--;
+                if (numberOfSets >0 && numberOfBreaks >0) {
+                    setCounter = 0;
+                    breakCounter = 0;
+                    setMillis = setStart;
+                    breakMillis = breakStart;
+                    paused = false;
+                    progressBar.setProgress(10000);
+
+                    if (timer != null) {
+                        timer.cancel();
+                    }
+                    if (objectAnimator != null) {
+                        objectAnimator.cancel();
+                    }
+                    if (mode !=2) {
+                        timeLeft.setText(convertSeconds(setStart/1000));
+                    } else {
+                        timeLeft.setText(convertSeconds(breakStart/1000));
+                    }
+                } else {
+                    switch (mode) {
+                        case 1:
+                            strictCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
+                            break;
+                        case 2:
+                            relaxedCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
+                            break;
+                        case 3:
+                            customCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+
+                    }
+                    endAnimation();
+                    timeLeft.setText("0");
+                }
+                dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0 );
+                timerEnded = true;
+                paused = true;
+            } else {
+                Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -462,6 +527,7 @@ public class MainActivity extends AppCompatActivity {
             addCustom(false);
         });
     }
+
 
     public void setStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
@@ -720,15 +786,9 @@ public class MainActivity extends AppCompatActivity {
                 s3.setText(R.string.long_break);
             }
 
-            if (timer != null) {
-                timer.cancel();
-            }
-            if (objectAnimator != null) {
-                objectAnimator.cancel();
-            }
-            if (endAnimation != null) {
-                endAnimation.cancel();
-            }
+            if (timer != null) timer.cancel();
+            if (objectAnimator != null) objectAnimator.cancel();
+            if (endAnimation != null) endAnimation.cancel();
         }
     }
 
