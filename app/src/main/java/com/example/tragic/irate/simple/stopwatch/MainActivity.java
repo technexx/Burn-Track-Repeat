@@ -74,6 +74,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<Long> pomAdapter2;
     ArrayAdapter<Long> pomAdapter3;
 
+    List<Long> spinList1;
+    List<Long> spinList2;
+    List<Long> spinList3;
     List<String> spinListString1;
     List<String> spinListString2;
     List<String> spinListString3;
@@ -123,9 +126,11 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<String> customSets;
     ArrayList<String> customBreaks;
+    ArrayList<Long> customSetTime;
+    ArrayList<Long> customBreakTime;
 
-    //Todo: Add functions to skip and clear.
-    //Todo: BUG: Initial prog timer+text out of sync w/ textdraws in Custom mode.
+    //Todo: Custom not resetting and/or updating properly.
+    //Todo: Skip round will have to be edited for Custom mode.
     //Todo: Add taskbar notification for timers.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
@@ -170,9 +175,9 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("Custom"));
         tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
-        List<Long> spinList1 = new ArrayList<>();
-        List<Long> spinList2 = new ArrayList<>();
-        List<Long> spinList3 = new ArrayList<>();
+        spinList1 = new ArrayList<>();
+        spinList2 = new ArrayList<>();
+        spinList3 = new ArrayList<>();
         spinListString1 = new ArrayList<>();
         spinListString2 = new ArrayList<>();
         spinListString3 = new ArrayList<>();
@@ -185,6 +190,8 @@ public class MainActivity extends AppCompatActivity {
         modeFourSpins = new ArrayList<>();
         customSets = new ArrayList<>();
         customBreaks = new ArrayList<>();
+        customSetTime = new ArrayList<>();
+        customBreakTime = new ArrayList<>();
 
         modeOneSpins.add(0, spinner1.getSelectedItemPosition());
         modeOneSpins.add(1, spinner2.getSelectedItemPosition());
@@ -240,6 +247,13 @@ public class MainActivity extends AppCompatActivity {
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
 
+//                        if (customSetTime.size() >0 && customBreakTime.size() >0) {
+//                            long setConv = customSetTime.get(customSetTime.size() - 1);
+//                            long breakConv = customBreakTime.get(customBreakTime.size() -1);
+//                            spinner1.setSelection((int) setConv);
+//                            spinner2.setSelection((int) breakConv);
+//                        }
+
                         retrieveSpins(modeThreeSpins);
 
                         numberOfSets = customSets.size();
@@ -251,6 +265,10 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.breakTime(customBreaks);
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+
+                        Log.i("customCount", "Switching tab gets" + " " + numberOfSets + " sets and " + numberOfBreaks + " breaks");
+                        Log.i("customTime", "Times are " + customSets + " and " + customBreaks);
+
                         break;
                     case 3:
                         mode=4;
@@ -321,6 +339,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0; i<3; i++) {
             customSets.add(spinListString1.get(5));
             customBreaks.add(spinListString2.get(8));
+            customSetTime.add(spinList1.get(5) * 1000);
+            customBreakTime.add(spinList2.get(8) *1000);
         }
 
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
@@ -508,8 +528,7 @@ public class MainActivity extends AppCompatActivity {
                     timeLeft.setText("0");
                 }
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0 );
-                timerEnded = true;
-                paused = true;
+                paused = false;
             } else {
                 Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
             }
@@ -550,6 +569,11 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator.setDuration(pomMillis3);
             }
         }
+
+        if (setCounter <=1) {
+            if (mode == 3) setMillis = customSetTime.get(customSets.size()-1);
+        }
+
         if (setCounter > 1) {
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (setPause), 0);
@@ -601,6 +625,9 @@ public class MainActivity extends AppCompatActivity {
                 if (mode !=4) {
                     breakStart();
                     onBreak = true;
+                    if (mode == 3) {
+                        if (customSets.size() > 0) customSets.remove(customSets.size() -1);
+                    }
                 } else {
                     if (pomDotCounter <7) {
                         if (pomStage == 1) {
@@ -643,6 +670,9 @@ public class MainActivity extends AppCompatActivity {
             Log.i("progress", "breakPause value is " + breakPause);
 
         }
+
+        if (mode == 3) breakMillis = customBreakTime.get(customBreaks.size()-1);
+
         objectAnimator.setDuration(breakMillis);
         objectAnimator.start();
 
@@ -675,6 +705,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("time", "time is " + timeLeft);
                 //Ensures first click of next break triggers pause.
                 paused = true;
+
+                if (customBreaks.size() >0) customBreaks.remove(customBreaks.size() -1);
 
                 if (numberOfBreaks >0) {
                     resetTimer(false);
@@ -762,12 +794,24 @@ public class MainActivity extends AppCompatActivity {
                     onBreak = true;
                     break;
                 case 3:
-                    dotDraws.setMode(3);
+                    timeLeft.setText(convertSeconds(customSetTime.get((customSetTime.size()-1))/1000));
+                    setMillis = customSetTime.get(customSetTime.size()-1);
+                    breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                    Log.i("resetTime", "set list is: " + customSetTime);
+                    Log.i("resetTime", "reset custom setMillis is " + setMillis);
 
+                    dotDraws.setMode(3);
                     spinner3.setVisibility(View.GONE);
                     plus_sign.setVisibility(View.VISIBLE);
                     minus_sign.setVisibility(View.VISIBLE);
                     onBreak = false;
+
+                    numberOfSets = customSets.size();
+                    numberOfBreaks = customBreaks.size();
+                    savedSets = numberOfSets;
+                    savedBreaks = numberOfBreaks;
+                    dotDraws.setTime(customSets);
+                    dotDraws.breakTime(customBreaks);
                     break;
                 case 4:
                     timeLeft.setText(convertSeconds(pomMillis1/1000));
@@ -846,18 +890,24 @@ public class MainActivity extends AppCompatActivity {
         if (adding) {
             if (customSets.size() <10) {
                 customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
+                customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
+                timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
             } else {
-                Toast.makeText(getApplicationContext(), "Max reached!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Limit reached!", Toast.LENGTH_SHORT).show();
             }
             if (customBreaks.size() <10) {
                 customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
+                customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
             }
         } else {
             if (customSets.size() > 0) {
                 customSets.remove(customSets.size() -1);
+                customSetTime.remove(customSetTime.size()-1);
+                timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
             }
             if (customBreaks.size() >0) {
                 customBreaks.remove(customBreaks.size() -1);
+                customBreakTime.remove(customBreakTime.size() -1);
             }
         }
 
