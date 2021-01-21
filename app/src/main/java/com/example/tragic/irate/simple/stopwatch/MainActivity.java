@@ -129,8 +129,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
 
-    //Todo: Custom not resetting and/or updating properly.
-    //Todo: Skip round will have to be edited for Custom mode.
+    //Todo: Have min. of 1 set/break in custom mode.
     //Todo: Add taskbar notification for timers.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
@@ -309,7 +308,6 @@ public class MainActivity extends AppCompatActivity {
             spinListString3.add(convertSeconds(i+1));
         }
 
-        //15-90 minute work time.
         for (long i=10; i<90; i+=5) {
             pomList1.add(i+5);
         }
@@ -340,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
             customSets.add(spinListString1.get(5));
             customBreaks.add(spinListString2.get(8));
             customSetTime.add(spinList1.get(5) * 1000);
-            customBreakTime.add(spinList2.get(8) *1000);
+            customBreakTime.add(spinList2.get(8) * 1000);
         }
 
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
@@ -349,8 +347,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (mode == 4) {
-                    long pos2 = pomList1.get(position);
-                    pomMillis1 = pos2*60000;
+                    long pos = pomList1.get(position);
+                    pomMillis1 = pos*60000;
                     setStart = (int) pomMillis1;
                     setPause = pomMillis1;
                 } else {
@@ -509,7 +507,12 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         timeLeft.setText(convertSeconds(breakStart/1000));
                     }
-                } else {
+                    if (mode == 3) {
+                        adjustCustom(false);
+                    }
+                    paused = false;
+                    resetTimer(false);
+                } else if (numberOfSets == 0 && numberOfBreaks == 0){
                     switch (mode) {
                         case 1:
                             strictCyclesDone++;
@@ -522,13 +525,15 @@ public class MainActivity extends AppCompatActivity {
                         case 3:
                             customCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-
                     }
                     endAnimation();
                     timeLeft.setText("0");
+                    timerEnded = true;
+                    paused = true;
                 }
-                dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0 );
-                paused = false;
+                if (numberOfSets >=0 && numberOfBreaks >=0) {
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0 );
+                }
             } else {
                 Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
             }
@@ -539,11 +544,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         plus_sign.setOnClickListener(v -> {
-            addCustom(true);
+            adjustCustom(true);
         });
 
         minus_sign.setOnClickListener(v -> {
-            addCustom(false);
+            adjustCustom(false);
         });
     }
 
@@ -886,7 +891,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addCustom(boolean adding) {
+    public void adjustCustom(boolean adding) {
         if (adding) {
             if (customSets.size() <10) {
                 customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
