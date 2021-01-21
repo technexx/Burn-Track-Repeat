@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
 
-    //Todo: Have min. of 1 set/break in custom mode.
+    //Todo: Have min. of 1 set/break in custom mode. Crashes if <1 atm.
     //Todo: Add taskbar notification for timers.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
@@ -265,8 +265,8 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
-                        Log.i("customCount", "Switching tab gets" + " " + numberOfSets + " sets and " + numberOfBreaks + " breaks");
-                        Log.i("customTime", "Times are " + customSets + " and " + customBreaks);
+//                        Log.i("customCount", "Switching tab gets" + " " + numberOfSets + " sets and " + numberOfBreaks + " breaks");
+//                        Log.i("customTime", "Times are " + customSets + " and " + customBreaks);
 
                         break;
                     case 3:
@@ -802,8 +802,8 @@ public class MainActivity extends AppCompatActivity {
                     timeLeft.setText(convertSeconds(customSetTime.get((customSetTime.size()-1))/1000));
                     setMillis = customSetTime.get(customSetTime.size()-1);
                     breakMillis = customBreakTime.get(customBreakTime.size()-1);
-                    Log.i("resetTime", "set list is: " + customSetTime);
-                    Log.i("resetTime", "reset custom setMillis is " + setMillis);
+//                    Log.i("resetTime", "set list is: " + customSetTime);
+//                    Log.i("resetTime", "reset custom setMillis is " + setMillis);
 
                     dotDraws.setMode(3);
                     spinner3.setVisibility(View.GONE);
@@ -893,24 +893,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void adjustCustom(boolean adding) {
         if (adding) {
-            if (customSets.size() <10) {
+            if (customSets.size() <10 && customSetTime.size() >0) {
                 customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
                 customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
                 timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
             } else {
-                Toast.makeText(getApplicationContext(), "Limit reached!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Max sets reached!", Toast.LENGTH_SHORT).show();
             }
-            if (customBreaks.size() <10) {
+            if (customBreaks.size() <10 && customBreakTime.size() >0) {
                 customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
                 customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
             }
         } else {
-            if (customSets.size() > 0) {
+            if (customSets.size() >1 && customSetTime.size() >1) {
                 customSets.remove(customSets.size() -1);
                 customSetTime.remove(customSetTime.size()-1);
                 timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
+                Log.i("custom", "list sizes are " + customSets.size() + " and " + customSetTime.size());
+            } else {
+                Toast.makeText(getApplicationContext(), "Can't have 0 sets!", Toast.LENGTH_SHORT).show();
             }
-            if (customBreaks.size() >0) {
+            if (customBreaks.size() >1  && customBreakTime.size() >1) {
                 customBreaks.remove(customBreaks.size() -1);
                 customBreakTime.remove(customBreakTime.size() -1);
             }
