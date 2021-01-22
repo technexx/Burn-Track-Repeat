@@ -129,7 +129,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
 
-
+    //Todo: Increase/center relaxed mode dots.
+    //Todo: Custom skip round fades to 0 alpha instead of greyed out.
+    //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
+    //Expand progressBar or make text small for Pomodoro.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
 
+        Handler handler = new Handler();
+
         modeOneSpins.add(0, spinner1.getSelectedItemPosition());
         modeOneSpins.add(1, spinner2.getSelectedItemPosition());
         modeOneSpins.add(2, spinner3.getSelectedItemPosition());
@@ -215,14 +220,17 @@ public class MainActivity extends AppCompatActivity {
                         spinner1.setVisibility(View.VISIBLE);
                         s1.setVisibility(View.VISIBLE);
                         blank_spinner.setVisibility(View.GONE);
+
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
                         spinner3.setAdapter(spinAdapter3);
 
                         dotDraws.setMode(1);
-                        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-
                         retrieveSpins(modeOneSpins);
+                        handler.postDelayed(() -> {
+                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        }, 50);
+
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
                         break;
                     case 1:
@@ -235,9 +243,12 @@ public class MainActivity extends AppCompatActivity {
                         spinner3.setAdapter(spinAdapter3);
 
                         dotDraws.setMode(2);
-                        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-
                         retrieveSpins(modeTwoSpins);
+
+                        handler.postDelayed(() -> {
+                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        }, 50);
+
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
                         break;
                     case 2:
@@ -247,14 +258,14 @@ public class MainActivity extends AppCompatActivity {
                         spinner2.setAdapter(spinAdapter2);
                         retrieveSpins(modeThreeSpins);
 
-                        numberOfSets = customSets.size();
-                        numberOfBreaks = customBreaks.size();
-                        savedSets = numberOfSets;
-                        savedBreaks = numberOfBreaks;
-
+                        dotDraws.setMode(3);
                         dotDraws.setTime(customSets);
                         dotDraws.breakTime(customBreaks);
-                        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+
+                        handler.postDelayed(() -> {
+                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        }, 50);
+
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         break;
                     case 3:
@@ -276,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                resetTimer(true);
+//                resetTimer(true);
             }
 
             @Override
@@ -742,6 +753,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetTimer(boolean complete) {
+        Handler handler = new Handler();
         progressBar.setProgress(10000);
         timerEnded = false;
         //Executes when a single SET or BREAK is done.
@@ -758,7 +770,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             //Executes whenever we need to reset our timers.
             timeLeft.setText(convertSeconds(setStart/1000));
-            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+
+            handler.postDelayed((Runnable) () -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
             spinner1.setVisibility(View.VISIBLE);
             spinner3.setVisibility(View.VISIBLE);
             blank_spinner.setVisibility(View.GONE);
@@ -775,12 +788,10 @@ public class MainActivity extends AppCompatActivity {
 
             switch (mode) {
                 case 1:
-                    dotDraws.setMode(1);
                     onBreak = false;
                     break;
                 case 2:
                     timeLeft.setText(convertSeconds(breakStart/1000));
-                    dotDraws.setMode(2);
                     breakCounter = -1;
                     spinner1.setVisibility(View.GONE);
                     blank_spinner.setVisibility(View.VISIBLE);
@@ -790,10 +801,7 @@ public class MainActivity extends AppCompatActivity {
                     timeLeft.setText(convertSeconds(customSetTime.get((customSetTime.size()-1))/1000));
                     setMillis = customSetTime.get(customSetTime.size()-1);
                     breakMillis = customBreakTime.get(customBreakTime.size()-1);
-//                    Log.i("resetTime", "set list is: " + customSetTime);
-//                    Log.i("resetTime", "reset custom setMillis is " + setMillis);
 
-                    dotDraws.setMode(3);
                     spinner3.setVisibility(View.GONE);
                     plus_sign.setVisibility(View.VISIBLE);
                     minus_sign.setVisibility(View.VISIBLE);
@@ -808,7 +816,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 4:
                     timeLeft.setText(convertSeconds(pomMillis1/1000));
-                    dotDraws.setMode(4);
                     setCounter = -1;
                     onBreak = false;
             }
