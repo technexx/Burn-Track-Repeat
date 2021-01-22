@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
 
-    //Todo: Have min. of 1 set/break in custom mode. Crashes if <1 atm.
+
     //Todo: Add taskbar notification for timers.
     //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
     //Todo: Might be too easy to reset timers, esp. w/ tabs.
@@ -245,14 +245,6 @@ public class MainActivity extends AppCompatActivity {
                         heading.setText(R.string.variable);
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
-
-//                        if (customSetTime.size() >0 && customBreakTime.size() >0) {
-//                            long setConv = customSetTime.get(customSetTime.size() - 1);
-//                            long breakConv = customBreakTime.get(customBreakTime.size() -1);
-//                            spinner1.setSelection((int) setConv);
-//                            spinner2.setSelection((int) breakConv);
-//                        }
-
                         retrieveSpins(modeThreeSpins);
 
                         numberOfSets = customSets.size();
@@ -264,10 +256,6 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.breakTime(customBreaks);
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-
-//                        Log.i("customCount", "Switching tab gets" + " " + numberOfSets + " sets and " + numberOfBreaks + " breaks");
-//                        Log.i("customTime", "Times are " + customSets + " and " + customBreaks);
-
                         break;
                     case 3:
                         mode=4;
@@ -883,7 +871,7 @@ public class MainActivity extends AppCompatActivity {
         if (spinList.size() != 0) {
             spinner1.setSelection(spinList.get(0));
             spinner2.setSelection(spinList.get(1));
-            if (mode != 2) {
+            if (mode != 3) {
                 spinner3.setSelection(spinList.get(2));
             } else {
                 savedSets = modeThreeSpins.get(2);
