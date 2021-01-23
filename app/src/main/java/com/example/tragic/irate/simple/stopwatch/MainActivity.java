@@ -129,6 +129,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
 
+    //Todo: Round skip on custom not showing most recent entry, tho does have proper value.
+    //Todo: Custom index oob crashing?
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
     //Todo: Rename app, of course.
@@ -325,10 +327,16 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setAdapter(spinAdapter2);
         spinner3.setAdapter(spinAdapter3);
 
+        //Default for Strict, since this mode begins at app launch.
         spinner1.setSelection(3);
         spinner2.setSelection(1);
         spinner3.setSelection(2);
 
+        //Default for Relaxed.
+        modeTwoSpins.set(1, 5);
+        modeTwoSpins.set(2, 2);
+
+        //Default for Custom.
         for (int i=0; i<3; i++) {
             customSets.add(spinListString1.get(5));
             customBreaks.add(spinListString2.get(8));
@@ -913,9 +921,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         resetTimer(true);
-
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+        timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
     }
 
     private void endAnimation() {
