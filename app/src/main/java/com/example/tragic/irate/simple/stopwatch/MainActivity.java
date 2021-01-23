@@ -129,17 +129,13 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
 
-    //Todo: Increase/center relaxed mode dots.
-    //Todo: Custom skip round fades to 0 alpha instead of greyed out.
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
-    //Todo: Smooth out timer textView transitions from resets/mode switches, and start/stop.
-    //Todo: Might be too easy to reset timers, esp. w/ tabs.
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
-    //Expand progressBar or make text small for Pomodoro.
+    //Todo: Expand progressBar or make text small for Pomodoro.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -526,6 +522,7 @@ public class MainActivity extends AppCompatActivity {
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     }
                     endAnimation();
+                    progressBar.setProgress(0);
                     timeLeft.setText("0");
                     timerEnded = true;
                     paused = true;
@@ -915,16 +912,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        numberOfSets = customSets.size();
-        numberOfBreaks = customBreaks.size();
-        savedSets = numberOfSets;
-        savedBreaks = numberOfBreaks;
-        dotDraws.setTime(customSets);
-        dotDraws.breakTime(customBreaks);
+        resetTimer(true);
 
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-
     }
 
     private void endAnimation() {
