@@ -129,7 +129,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
 
-    //Todo: Round skip on custom not showing most recent entry, tho does have proper value.
+    //Todo: Break and Set list sizes different - due to pause and reset leaving break w/ one more since set was subtracted?
+    //Todo: Custom text changes incorrectly after onFinish()
+    //Todo: Custom round skips fade to 0 opacity, since they are removed rather than repurposed.
     //Todo: Custom index oob crashing?
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
@@ -137,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
-    //Todo: Expand progressBar or make text small for Pomodoro.
+    //Todo: Expand progressBar or make text smaller for Pomodoro.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -635,7 +637,10 @@ public class MainActivity extends AppCompatActivity {
                     breakStart();
                     onBreak = true;
                     if (mode == 3) {
-                        if (customSets.size() > 0) customSets.remove(customSets.size() -1);
+                        if (customSets.size() > 0) {
+                            customSets.remove(customSets.size() -1);
+                            customSetTime.remove(customSetTime.size()-1);
+                        }
                     }
                 } else {
                     if (pomDotCounter <7) {
@@ -716,7 +721,11 @@ public class MainActivity extends AppCompatActivity {
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-                if (customBreaks.size() >0) customBreaks.remove(customBreaks.size() -1);
+
+                if (customBreaks.size() >0) {
+                    customBreaks.remove(customBreaks.size() -1);
+                    customBreakTime.remove(customBreakTime.size()-1);
+                }
 
                 if (numberOfBreaks >0) {
                     resetTimer(false);
@@ -819,6 +828,7 @@ public class MainActivity extends AppCompatActivity {
                     savedBreaks = numberOfBreaks;
                     dotDraws.setTime(customSets);
                     dotDraws.breakTime(customBreaks);
+
                     break;
                 case 4:
                     timeLeft.setText(convertSeconds(pomMillis1/1000));
@@ -910,13 +920,15 @@ public class MainActivity extends AppCompatActivity {
                 customSets.remove(customSets.size() -1);
                 customSetTime.remove(customSetTime.size()-1);
                 timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
-                Log.i("custom", "list sizes are " + customSets.size() + " and " + customSetTime.size());
+                Log.i("custom", "set sizes are " + customSets.size() + " and " + customSetTime.size());
             } else {
                 Toast.makeText(getApplicationContext(), "Can't have 0 sets!", Toast.LENGTH_SHORT).show();
             }
             if (customBreaks.size() >1  && customBreakTime.size() >1) {
                 customBreaks.remove(customBreaks.size() -1);
                 customBreakTime.remove(customBreakTime.size() -1);
+                Log.i("custom", "break sizes are " + customBreaks.size() + " and " + customBreakTime.size());
+
             }
         }
 
