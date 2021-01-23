@@ -487,6 +487,12 @@ public class MainActivity extends AppCompatActivity {
             if (mode !=4) {
                 numberOfSets--;
                 numberOfBreaks--;
+                if (timer != null) {
+                    timer.cancel();
+                }
+                if (objectAnimator != null) {
+                    objectAnimator.cancel();
+                }
                 if (numberOfSets >0 && numberOfBreaks >0) {
                     setCounter = 0;
                     breakCounter = 0;
@@ -495,12 +501,6 @@ public class MainActivity extends AppCompatActivity {
                     paused = false;
                     progressBar.setProgress(10000);
 
-                    if (timer != null) {
-                        timer.cancel();
-                    }
-                    if (objectAnimator != null) {
-                        objectAnimator.cancel();
-                    }
                     if (mode !=2) {
                         timeLeft.setText(convertSeconds(setStart/1000));
                     } else {
@@ -667,12 +667,13 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
+        if (mode == 2) breakCounter = -1;
+
         if (breakCounter >= 1) {
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
             Log.i("progress", "breakPause value is " + breakPause);
-
         }
 
         if (mode == 3) breakMillis = customBreakTime.get(customBreaks.size()-1);

@@ -90,7 +90,7 @@ public class DotDraws extends View {
         this.mCanvas = canvas;
 
         mX = 60; mY = 625; mX2 = 60; mY2 = 755;
-        if (mMode == 2) mY2 = 695;
+        if (mMode == 2) mY2 = 670;
 
         if (mMode != 2 && mMode !=4) {
             for (int i=0; i<mSetCount-mSetReduce; i++) {
