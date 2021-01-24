@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
     boolean onBreak;
     boolean relaxedEnded;
     boolean pomEnded;
+    boolean timerDisabled;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -133,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Need to be able to change first set on Custom.
     //Todo: Spinner arrow sometimes changes position.
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
@@ -425,7 +425,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 saveSpins();
                 resetTimer(true);
-
             }
 
             @Override
@@ -435,50 +434,55 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar.setOnClickListener(v-> {
-            if (mode == 2) {
-                onBreak = true;
-            }
-            if (mode == 4) {
-                onBreak = false;
-            }
-            //Switches to saved time from start time after initial clicks.
-            if (onBreak) {
-                breakCounter++;
-            } else {
-                setCounter++;
-            }
-            //Resuming from a pause.
-            if (!paused) {
+            if (!timerDisabled) {
+                if (mode == 2) {
+                    onBreak = true;
+                }
+                if (mode == 4) {
+                    onBreak = false;
+                }
+                //Switches to saved time from start time after initial clicks.
                 if (onBreak) {
-                    breakStart();
+                    breakCounter++;
                 } else {
-                    setStart();
+                    setCounter++;
                 }
-                reset.setVisibility(View.INVISIBLE);
-                paused = true;
-                //Pausing
-            } else if (!timerEnded) {
-                if (relaxedEnded) {
-                    timeLeft.setText(convertSeconds(spinList2.get(modeTwoSpins.get(1))));
-                    progressBar.setProgress(10000);
-                    endAnimation.cancel();
-                    relaxedEnded = false;
-                    breakPause = maxProgress;
+                //Resuming from a pause.
+                if (!paused) {
+                    if (onBreak) {
+                        breakStart();
+                    } else {
+                        setStart();
+                    }
+                    reset.setVisibility(View.INVISIBLE);
+                    paused = true;
+                    //Pausing
+                } else if (!timerEnded) {
+                    if (relaxedEnded) {
+                        timeLeft.setText(convertSeconds(spinList2.get(modeTwoSpins.get(1))));
+                        progressBar.setProgress(10000);
+                        endAnimation.cancel();
+                        relaxedEnded = false;
+                        breakPause = maxProgress;
+                    }
+                    if (pomEnded ) {
+                        timeLeft.setText(convertSeconds(spinList1.get(modeFourSpins.get(1))));
+                        progressBar.setProgress(10000);
+                        endAnimation.cancel();
+                        pomEnded = false;
+                    }
+                    timer.cancel();
+                    objectAnimator.cancel();
+                    reset.setVisibility(View.VISIBLE);
+                    paused = false;
+                }  else {
+                    resetTimer(true);
                 }
-                if (pomEnded ) {
-                    timeLeft.setText(convertSeconds(spinList1.get(modeFourSpins.get(1))));
-                    progressBar.setProgress(10000);
-                    endAnimation.cancel();
-                    pomEnded = false;
-                }
-                timer.cancel();
-                objectAnimator.cancel();
-                reset.setVisibility(View.VISIBLE);
-                paused = false;
-            }  else {
-                resetTimer(true);
+                if (endAnimation != null) endAnimation.cancel();
+            } else {
+                Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             }
-            if (endAnimation != null) endAnimation.cancel();
+
         });
 
         cycle_reset.setOnClickListener(v -> {
@@ -821,9 +825,12 @@ public class MainActivity extends AppCompatActivity {
                     onBreak = true;
                     break;
                 case 3:
-                    timeLeft.setText(convertSeconds(customSetTime.get((customSetTime.size()-1))/1000));
-                    setMillis = customSetTime.get(customSetTime.size()-1);
-                    breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                    if (customSetTime.size() > 0 && customBreakTime.size() >0) {
+                        setMillis = customSetTime.get(customSetTime.size()-1);
+                        breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                        timeLeft.setText(convertSeconds(setMillis/1000));
+
+                    }
 
                     spinner3.setVisibility(View.GONE);
                     plus_sign.setVisibility(View.VISIBLE);
@@ -839,11 +846,17 @@ public class MainActivity extends AppCompatActivity {
                     customBreaks = new ArrayList<>();
                     customSetTime = new ArrayList<>();
                     customBreakTime = new ArrayList<>();
-                    for (int i=0; i<startCustomSets.size(); i++) {
-                        customSets.add(startCustomSets.get(i));
-                        customBreaks.add(startCustomBreaks.get(i));
-                        customSetTime.add(startCustomSetTime.get(i));
-                        customBreakTime.add(startCustomBreakTime.get(i));
+                    if (startCustomSets.size() >0) {
+                        for (int i=0; i<startCustomSets.size(); i++) {
+                            customSets.add(startCustomSets.get(i));
+                            customSetTime.add(startCustomSetTime.get(i));
+                            customBreaks.add(startCustomBreaks.get(i));
+                            customBreakTime.add(startCustomBreakTime.get(i));
+                        }
+                        timerDisabled = false;
+                    } else {
+                        timerDisabled = true;
+                        reset.setVisibility(View.GONE);
                     }
 
                     Log.i("resetCustom", "sets are " + customSets + " and " + startCustomSets);
@@ -927,52 +940,51 @@ public class MainActivity extends AppCompatActivity {
 
     public void adjustCustom(boolean adding) {
         if (adding) {
-            if (customSets.size() <10 && customSetTime.size() >0) {
+            if (customSets.size() < 10 && customSetTime.size() >= 0) {
                 customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
-                customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
+                customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
                 startCustomSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
-                startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
+                startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
 
-                timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
+                timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() - 1) / 1000));
             } else {
                 Toast.makeText(getApplicationContext(), "Max sets reached!", Toast.LENGTH_SHORT).show();
             }
-            if (customBreaks.size() <10 && customBreakTime.size() >0) {
+            if (customBreaks.size() < 10 && customBreakTime.size() >= 0) {
                 customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
-                customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
+                customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
                 startCustomBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
-                startCustomBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
+                startCustomBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
             }
         } else {
-            if (customSets.size() >1 && customSetTime.size() >1) {
-                customSets.remove(customSets.size() -1);
-                customSetTime.remove(customSetTime.size()-1);
-                startCustomSets.remove(startCustomSets.size() -1);
-                startCustomSetTime.remove(customSetTime.size()-1);
-
-                timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
+            if (customSets.size() > 0 && customSetTime.size() > 0) {
+                customSets.remove(customSets.size() - 1);
+                customSetTime.remove(customSetTime.size() - 1);
+                startCustomSets.remove(startCustomSets.size() - 1);
+                startCustomSetTime.remove(startCustomSetTime.size() - 1);
             } else {
-                Toast.makeText(getApplicationContext(), "Can't have 0 sets!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
             }
-            if (customBreaks.size() >1  && customBreakTime.size() >1) {
-                customBreaks.remove(customBreaks.size() -1);
-                customBreakTime.remove(customBreakTime.size() -1);
-                startCustomBreaks.remove(startCustomBreaks.size() -1);
-                startCustomBreakTime.remove(startCustomBreakTime.size() -1);
+            if (customBreaks.size() > 0 && customBreakTime.size() > 0) {
+                customBreaks.remove(customBreaks.size() - 1);
+                customBreakTime.remove(customBreakTime.size() - 1);
+                startCustomBreaks.remove(startCustomBreaks.size() - 1);
+                startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
 
             }
         }
         Log.i("customSize", "set sizes are " + customSets.size() + " and " + startCustomSets.size());
         Log.i("customSize", "break sizes are " + customBreaks.size() + " and " + startCustomBreaks.size());
 
-//        numberOfSets = startCustomSets.size();
-//        numberOfBreaks = startCustomBreaks.size();
-//        savedSets = numberOfSets;
-//        savedBreaks = numberOfBreaks;
         resetTimer(true);
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-        timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
+
+        if (customSetTime.size() > 0) {
+            timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() - 1) / 1000));
+        } else {
+            timeLeft.setText("?");
+        }
     }
 
     private void endAnimation() {
