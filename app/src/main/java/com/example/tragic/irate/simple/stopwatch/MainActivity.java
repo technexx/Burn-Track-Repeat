@@ -128,11 +128,15 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> customBreaks;
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
+    ArrayList<String> startCustomSets;
+    ArrayList<String> startCustomBreaks;
+    ArrayList<Long> startCustomSetTime;
+    ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Break and Set list sizes different - due to pause and reset leaving break w/ one more since set was subtracted?
-    //Todo: Custom text changes incorrectly after onFinish()
-    //Todo: Custom round skips fade to 0 opacity, since they are removed rather than repurposed.
-    //Todo: Custom index oob crashing?
+    //Todo: Second set draws dot text incorrectly in Custom mode.
+    //Todo: Need to be able to change first set on Custom.
+    //Todo: Remove add/subtract ability in Custom mode during active timer phase.
+    //Todo: Spinner arrow sometimes changes position.
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
     //Todo: Rename app, of course.
@@ -194,6 +198,10 @@ public class MainActivity extends AppCompatActivity {
         customBreaks = new ArrayList<>();
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
+        startCustomSets = new ArrayList<>();
+        startCustomBreaks = new ArrayList<>();
+        startCustomSetTime = new ArrayList<>();
+        startCustomBreakTime = new ArrayList<>();
 
         Handler handler = new Handler();
 
@@ -227,9 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
                         dotDraws.setMode(1);
                         retrieveSpins(modeOneSpins);
-                        handler.postDelayed(() -> {
-                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                        }, 50);
+                        handler.postDelayed(() -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
 
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
                         break;
@@ -244,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
                         dotDraws.setMode(2);
                         retrieveSpins(modeTwoSpins);
+                        breakCounter = -1;
 
                         handler.postDelayed(() -> {
                             dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
@@ -261,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.setMode(3);
                         dotDraws.setTime(customSets);
                         dotDraws.breakTime(customBreaks);
-
                         handler.postDelayed(() -> {
                             dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         }, 50);
@@ -287,7 +293,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-//                resetTimer(true);
             }
 
             @Override
@@ -313,7 +318,6 @@ public class MainActivity extends AppCompatActivity {
         for (long i=3; i<6; i++) {
             pomList2.add(i);
         }
-        //15-30 minute break time.
         for (long i=10; i<30; i+=5) {
             pomList3.add(i+5);
         }
@@ -342,8 +346,12 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0; i<3; i++) {
             customSets.add(spinListString1.get(5));
             customBreaks.add(spinListString2.get(8));
+            startCustomSets.add(spinListString1.get(5));
+            startCustomBreaks.add(spinListString2.get(8));
             customSetTime.add(spinList1.get(5) * 1000);
             customBreakTime.add(spinList2.get(8) * 1000);
+            startCustomSetTime.add(spinList1.get(5) * 1000);
+            startCustomBreakTime.add(spinList2.get(8) * 1000);
         }
 
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
@@ -459,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
                     relaxedEnded = false;
                     breakPause = maxProgress;
                 }
-                if (pomEnded) {
+                if (pomEnded ) {
                     timeLeft.setText(convertSeconds(spinList1.get(modeFourSpins.get(1))));
                     progressBar.setProgress(10000);
                     endAnimation.cancel();
@@ -538,7 +546,7 @@ public class MainActivity extends AppCompatActivity {
                     paused = true;
                 }
                 if (numberOfSets >=0 && numberOfBreaks >=0) {
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0 );
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
@@ -557,7 +565,6 @@ public class MainActivity extends AppCompatActivity {
             adjustCustom(false);
         });
     }
-
 
     public void setStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
@@ -582,7 +589,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (setCounter <=1) {
-            if (mode == 3) setMillis = customSetTime.get(customSets.size()-1);
+            if (mode == 3) setMillis = customSetTime.get(customSetTime.size()-1);
         }
 
         if (setCounter > 1) {
@@ -608,14 +615,14 @@ public class MainActivity extends AppCompatActivity {
                 if (mode !=4) {
                     if (fadeDone == 1) {
                         if (!fadePaused) {
-                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets-1), savedBreaks-numberOfBreaks, 1); fadePaused = true;
+                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
+                            fadePaused = true;
                         } else {
                             //fadeDone value does not matter here.
                             dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1 );
                             fadePaused = false;
                         }
                     }
-//                    Log.i("sets", "CustomTimer sets are: " + customSets);
                 } else {
                     //For Pomodoro.
                     dotDraws.pomDraw(pomDotCounter, 1);
@@ -636,12 +643,6 @@ public class MainActivity extends AppCompatActivity {
                 if (mode !=4) {
                     breakStart();
                     onBreak = true;
-                    if (mode == 3) {
-                        if (customSets.size() > 0) {
-                            customSets.remove(customSets.size() -1);
-                            customSetTime.remove(customSetTime.size()-1);
-                        }
-                    }
                 } else {
                     if (pomDotCounter <7) {
                         if (pomStage == 1) {
@@ -663,6 +664,10 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                     }
                 }
+                if (mode == 3) {
+                    dotDraws.setTime(startCustomSets);
+                    dotDraws.breakTime(startCustomBreaks);
+                }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
@@ -677,7 +682,9 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-        if (mode == 2) breakCounter = -1;
+        if (mode == 3 && breakCounter <=1) {
+            breakMillis = customBreakTime.get(customSetTime.size() -1);
+        }
 
         if (breakCounter >= 1) {
             objectAnimator.cancel();
@@ -686,12 +693,10 @@ public class MainActivity extends AppCompatActivity {
             Log.i("progress", "breakPause value is " + breakPause);
         }
 
-        if (mode == 3) breakMillis = customBreakTime.get(customBreaks.size()-1);
-
         objectAnimator.setDuration(breakMillis);
         objectAnimator.start();
-
         fadeDone = 3;
+
         timer = new CountDownTimer(breakMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -704,7 +709,7 @@ public class MainActivity extends AppCompatActivity {
                 boolean fadePaused = false;
                 if (fadeDone == 3) {
                     if (!fadePaused) {
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks- (numberOfBreaks-1), fadeDone); fadePaused = true;
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone); fadePaused = true;
                     } else {
                         dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
                         fadePaused = false;
@@ -717,14 +722,22 @@ public class MainActivity extends AppCompatActivity {
                 fadeDone = 4;
                 timerEnded = true;
                 numberOfBreaks--;
-                Log.i("time", "time is " + timeLeft);
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-
-                if (customBreaks.size() >0) {
-                    customBreaks.remove(customBreaks.size() -1);
-                    customBreakTime.remove(customBreakTime.size()-1);
+                if (mode == 3) {
+                    if (customSets.size() > 0) {
+                        customSets.remove(customSets.size() - 1);
+                        customSetTime.remove(customSetTime.size() - 1);
+                    }
+                    if (customBreaks.size() >0) {
+                        customBreaks.remove(customBreaks.size() -1);
+                        customBreakTime.remove(customBreakTime.size()-1);
+                    }
+                    dotDraws.setTime(startCustomSets);
+                    dotDraws.breakTime(startCustomBreaks);
+                    Log.i("customValue", "static set values are " + startCustomSets + " and static break values are " + startCustomBreaks);
+                    Log.i("customValue", "set and break counts are " + savedSets + " and" + savedBreaks);
                 }
 
                 if (numberOfBreaks >0) {
@@ -733,10 +746,7 @@ public class MainActivity extends AppCompatActivity {
                         setStart();
                         onBreak = false;
                     } else {
-                        relaxedEnded = true;
-                        timeLeft.setText("0");
-                        endAnimation();
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
+                        breakStart();
                     }
                 } else {
                     switch (mode) {
@@ -747,6 +757,7 @@ public class MainActivity extends AppCompatActivity {
                         case 2:
                             relaxedCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
+                            relaxedEnded = true;
                             break;
                         case 3:
                             customCyclesDone++;
@@ -755,7 +766,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     endAnimation();
                     timeLeft.setText("0");
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
                 }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
@@ -769,7 +780,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void resetTimer(boolean complete) {
         Handler handler = new Handler();
-        progressBar.setProgress(10000);
         timerEnded = false;
         //Executes when a single SET or BREAK is done.
         if (!complete) {
@@ -783,7 +793,7 @@ public class MainActivity extends AppCompatActivity {
                 setCounter = 0;
             }
         } else {
-            //Executes whenever we need to reset our timers.
+            progressBar.setProgress(10000);
             timeLeft.setText(convertSeconds(setStart/1000));
 
             handler.postDelayed((Runnable) () -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
@@ -822,10 +832,25 @@ public class MainActivity extends AppCompatActivity {
                     minus_sign.setVisibility(View.VISIBLE);
                     onBreak = false;
 
-                    numberOfSets = customSets.size();
-                    numberOfBreaks = customBreaks.size();
+                    numberOfSets = startCustomSets.size();
+                    numberOfBreaks = startCustomBreaks.size();
                     savedSets = numberOfSets;
                     savedBreaks = numberOfBreaks;
+
+                    customSets = new ArrayList<>();
+                    customBreaks = new ArrayList<>();
+                    customSetTime = new ArrayList<>();
+                    customBreakTime = new ArrayList<>();
+                    for (int i=0; i<startCustomSets.size(); i++) {
+                        customSets.add(startCustomSets.get(i));
+                        customBreaks.add(startCustomBreaks.get(i));
+                        customSetTime.add(startCustomSetTime.get(i));
+                        customBreakTime.add(startCustomBreakTime.get(i));
+                    }
+
+                    Log.i("resetCustom", "sets are " + customSets + " and " + startCustomSets);
+                    Log.i("resetCustom", "breaks are " + customBreaks + " and " + startCustomBreaks);
+
                     dotDraws.setTime(customSets);
                     dotDraws.breakTime(customBreaks);
 
@@ -906,33 +931,46 @@ public class MainActivity extends AppCompatActivity {
         if (adding) {
             if (customSets.size() <10 && customSetTime.size() >0) {
                 customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
+                startCustomSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
                 customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
+                startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
+
                 timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
             } else {
                 Toast.makeText(getApplicationContext(), "Max sets reached!", Toast.LENGTH_SHORT).show();
             }
             if (customBreaks.size() <10 && customBreakTime.size() >0) {
                 customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
+                startCustomBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
                 customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
+                startCustomBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
             }
         } else {
             if (customSets.size() >1 && customSetTime.size() >1) {
                 customSets.remove(customSets.size() -1);
+                startCustomSets.remove(startCustomSets.size() -1);
                 customSetTime.remove(customSetTime.size()-1);
+                startCustomSetTime.remove(customSetTime.size()-1);
+
                 timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
-                Log.i("custom", "set sizes are " + customSets.size() + " and " + customSetTime.size());
             } else {
                 Toast.makeText(getApplicationContext(), "Can't have 0 sets!", Toast.LENGTH_SHORT).show();
             }
             if (customBreaks.size() >1  && customBreakTime.size() >1) {
                 customBreaks.remove(customBreaks.size() -1);
+                startCustomBreaks.remove(startCustomBreaks.size() -1);
                 customBreakTime.remove(customBreakTime.size() -1);
-                Log.i("custom", "break sizes are " + customBreaks.size() + " and " + customBreakTime.size());
+                startCustomBreakTime.remove(startCustomBreakTime.size() -1);
 
             }
         }
+        Log.i("customSize", "set sizes are " + customSets.size() + " and " + startCustomSets.size());
+        Log.i("customSize", "break sizes are " + customBreaks.size() + " and " + startCustomBreaks.size());
 
-        resetTimer(true);
+        numberOfSets = startCustomSets.size();
+        numberOfBreaks = startCustomBreaks.size();
+        savedSets = numberOfSets;
+        savedBreaks = numberOfBreaks;
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
         timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
