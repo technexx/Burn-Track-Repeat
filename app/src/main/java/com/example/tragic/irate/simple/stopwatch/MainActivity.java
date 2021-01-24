@@ -133,9 +133,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Second set draws dot text incorrectly in Custom mode.
     //Todo: Need to be able to change first set on Custom.
-    //Todo: Remove add/subtract ability in Custom mode during active timer phase.
     //Todo: Spinner arrow sometimes changes position.
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
@@ -931,8 +929,8 @@ public class MainActivity extends AppCompatActivity {
         if (adding) {
             if (customSets.size() <10 && customSetTime.size() >0) {
                 customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
-                startCustomSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
                 customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
+                startCustomSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
                 startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) *1000);
 
                 timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
@@ -941,15 +939,15 @@ public class MainActivity extends AppCompatActivity {
             }
             if (customBreaks.size() <10 && customBreakTime.size() >0) {
                 customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
-                startCustomBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
                 customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
+                startCustomBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
                 startCustomBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) *1000);
             }
         } else {
             if (customSets.size() >1 && customSetTime.size() >1) {
                 customSets.remove(customSets.size() -1);
-                startCustomSets.remove(startCustomSets.size() -1);
                 customSetTime.remove(customSetTime.size()-1);
+                startCustomSets.remove(startCustomSets.size() -1);
                 startCustomSetTime.remove(customSetTime.size()-1);
 
                 timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));
@@ -958,8 +956,8 @@ public class MainActivity extends AppCompatActivity {
             }
             if (customBreaks.size() >1  && customBreakTime.size() >1) {
                 customBreaks.remove(customBreaks.size() -1);
-                startCustomBreaks.remove(startCustomBreaks.size() -1);
                 customBreakTime.remove(customBreakTime.size() -1);
+                startCustomBreaks.remove(startCustomBreaks.size() -1);
                 startCustomBreakTime.remove(startCustomBreakTime.size() -1);
 
             }
@@ -967,10 +965,11 @@ public class MainActivity extends AppCompatActivity {
         Log.i("customSize", "set sizes are " + customSets.size() + " and " + startCustomSets.size());
         Log.i("customSize", "break sizes are " + customBreaks.size() + " and " + startCustomBreaks.size());
 
-        numberOfSets = startCustomSets.size();
-        numberOfBreaks = startCustomBreaks.size();
-        savedSets = numberOfSets;
-        savedBreaks = numberOfBreaks;
+//        numberOfSets = startCustomSets.size();
+//        numberOfBreaks = startCustomBreaks.size();
+//        savedSets = numberOfSets;
+//        savedBreaks = numberOfBreaks;
+        resetTimer(true);
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
         timeLeft.setText(convertSeconds(customSetTime.get(customSetTime.size() -1)/1000));

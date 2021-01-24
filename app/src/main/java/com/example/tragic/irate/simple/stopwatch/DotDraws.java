@@ -110,16 +110,6 @@ public class DotDraws extends View {
             }
         }
 
-//                drawText(mSetTime, mX, mY, (int) (mSetTime.size() - i));
-//                //From size 4, i = 0, 1, 2, 3.
-//                // (0) draws 3.
-//                // (0) draws 2, (1) draws 3.
-//                // (0) draws 1, (1) draws 2, (2) draws 3.
-//                // (0) draws 4, (1) draws 3, (2) draws 2, (3) draws 1.
-////                drawText(mSetTime, mX, mY, mSetTime.size()-1 - ());
-//
-//                mX += 108;
-
         if (mMode !=4) {
             for (int i=0; i<mBreakCount; i++) {
                 if (mMode == 2) {
