@@ -93,57 +93,53 @@ public class DotDraws extends View {
         if (mMode == 2) mY2 = 670;
 
         if (mMode != 2 && mMode !=4) {
-            for (int i=0; i<mSetCount-mSetReduce; i++) {
+            for (int i=0; i < mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
-                mPaint.setAlpha(255);
-                mCanvas.drawCircle(mX, mY, 45, mPaint);
-
-                drawText(mSetTime, mX, mY, i);
-                mX += 108;
-            }
-
-            for (int i=0; i<mSetReduce; i++) {
-                //Paint MUST be set here as well, since first loop does not execute w/ 1 set left.
-                mPaint.setColor(Color.GREEN);
-                if (mFadeDone == 1 && i==0) {
-                    fadeDot();
-                } else {
+                if (mSetReduce + i == mSetCount) {
+                    if (mFadeDone == 1) {
+                        fadeDot();
+                    }
+                } else if (mSetReduce + i >= mSetCount) {
                     mPaint.setAlpha(100);
+                } else {
+                    mPaint.setAlpha(255);
                 }
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
-                drawText(mSetTime, mX, mY, mSetTime.size() -1);
+                drawText(mSetTime, mX, mY, i);
                 mX += 108;
             }
         }
 
-        if (mMode !=4) {
-            for (int i=0; i<mBreakCount-mBreakReduce; i++) {
-                mPaint.setColor(Color.RED);
-                mPaint.setAlpha(255);
-                if (mMode ==2) {
-                    mPaint.setColor(Color.GREEN);
-                } else {
-                    mPaint.setColor(Color.RED);
-                }
-                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                drawText(mBreakTime, mX2, mY2, i);
-                mX2 += 108;
-            }
+//                drawText(mSetTime, mX, mY, (int) (mSetTime.size() - i));
+//                //From size 4, i = 0, 1, 2, 3.
+//                // (0) draws 3.
+//                // (0) draws 2, (1) draws 3.
+//                // (0) draws 1, (1) draws 2, (2) draws 3.
+//                // (0) draws 4, (1) draws 3, (2) draws 2, (3) draws 1.
+////                drawText(mSetTime, mX, mY, mSetTime.size()-1 - ());
+//
+//                mX += 108;
 
-            for (int i=0; i<mBreakReduce; i++) {
+        if (mMode !=4) {
+            for (int i=0; i<mBreakCount; i++) {
                 if (mMode == 2) {
                     mPaint.setColor(Color.GREEN);
                 } else {
                     mPaint.setColor(Color.RED);
                 }
-                if (mFadeDone == 3 && i == 0) {
-                    fadeDot();
-                } else {
+                if (mBreakReduce + i == mBreakCount) {
+                    if (mFadeDone == 3) {
+                        fadeDot();
+                    }
+                } else if (mBreakReduce +i >= mBreakCount) {
                     mPaint.setAlpha(100);
                 }
+                else {
+                    mPaint.setAlpha(255);
+                }
                 mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                drawText(mBreakTime, mX2, mY2, mBreakTime.size()-1);
-                mX2+=108;
+                drawText(mBreakTime, mX2, mY2, i);
+                mX2 += 108;
             }
         }
 
@@ -205,8 +201,6 @@ public class DotDraws extends View {
                 }
                 mCanvas.drawRect(mX+110, 630, mX+220, 740, mPaint);
         }
-        Log.i("mxLog", "mX is " + mX);
-        Log.i("mxLog", "mX2 is " + mX2);
     }
 
     private void drawText(ArrayList<String> list, float x, float y, int i) {
