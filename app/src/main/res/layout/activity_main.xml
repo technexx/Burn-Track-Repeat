@@ -69,17 +69,6 @@
         android:textSize="20sp"
         android:textColor="@color/white"/>
 
-    <Spinner
-        android:id="@+id/spin1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/heading"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white">
-    </Spinner>
-
     <TextView
         android:text="None"
         android:id="@+id/blank_spinner1"
@@ -93,25 +82,41 @@
     </TextView>
 
     <Spinner
+        android:id="@+id/spin1"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/heading"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="220dp"
+        android:backgroundTint="@color/white"
+        android:popupBackground="@color/black">
+    </Spinner>
+
+
+
+    <Spinner
         android:id="@+id/spin2"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s1"
         android:layout_marginTop="18dp"
         android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white">
+        android:backgroundTint="@color/white"
+        android:popupBackground="@color/black">
     </Spinner>
 
     <Spinner
         android:id="@+id/spin3"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s2"
         android:layout_marginTop="18dp"
         android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white">
+        android:backgroundTint="@color/white"
+        android:popupBackground="@color/black">
     </Spinner>
 
     <ImageButton

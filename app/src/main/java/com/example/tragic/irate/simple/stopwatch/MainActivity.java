@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -134,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
+    //Todo: Fix timer textView at initial access
+    //Todo: Spinner arrow sometimes changes position.
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
     //Todo: Rename app, of course.
@@ -215,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
         modeFourSpins.add(1, spinner2.getSelectedItemPosition());
         modeFourSpins.add(2, spinner3.getSelectedItemPosition());
 
+//        spinner1.getBackground().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -225,42 +230,30 @@ public class MainActivity extends AppCompatActivity {
                         spinner1.setVisibility(View.VISIBLE);
                         s1.setVisibility(View.VISIBLE);
                         blank_spinner.setVisibility(View.GONE);
-                        retrieveSpins(modeOneSpins);
-
-                        spinner1.setAdapter(spinAdapter1);
-                        spinner2.setAdapter(spinAdapter2);
-                        spinner3.setAdapter(spinAdapter3);
+                        retrieveSpins(modeOneSpins, false);
 
                         dotDraws.setMode(1);
                         handler.postDelayed(() -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
-
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
                         break;
                     case 1:
                         mode = 2;
-                        retrieveSpins(modeTwoSpins);
+                        breakCounter = -1;
                         heading.setText(R.string.relaxed);
                         spinner1.setVisibility(View.GONE);
                         blank_spinner.setVisibility(View.VISIBLE);
-
-                        spinner2.setAdapter(spinAdapter2);
-                        spinner3.setAdapter(spinAdapter3);
+                        retrieveSpins(modeTwoSpins, false);
 
                         dotDraws.setMode(2);
-                        breakCounter = -1;
-
                         handler.postDelayed(() -> {
                             dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         }, 50);
-
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
                         break;
                     case 2:
                         mode=3;
-                        retrieveSpins(modeThreeSpins);
                         heading.setText(R.string.variable);
-                        spinner1.setAdapter(spinAdapter1);
-                        spinner2.setAdapter(spinAdapter2);
+                        retrieveSpins(modeThreeSpins, false);
 
                         dotDraws.setMode(3);
                         dotDraws.setTime(customSets);
@@ -274,15 +267,10 @@ public class MainActivity extends AppCompatActivity {
                     case 3:
                         mode=4;
                         heading.setText(R.string.pomodoro);
-                        retrieveSpins(modeFourSpins);
-
-                        spinner1.setAdapter(pomAdapter1);
-                        spinner2.setAdapter(pomAdapter2);
-                        spinner3.setAdapter(pomAdapter3);
+                        retrieveSpins(modeFourSpins, true);
 
                         dotDraws.setMode(4);
                         dotDraws.pomDraw(1, 0);
-
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                         break;
                 }
@@ -319,9 +307,16 @@ public class MainActivity extends AppCompatActivity {
             pomList3.add(i+5);
         }
 
+
+        //Default for Strict, since this mode begins at app launch.
+        spinner1.setSelection(3);
+        spinner2.setSelection(1);
+        spinner3.setSelection(2);
+
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
         spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
         spinAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString3);
+
         pomAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList1);
         pomAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList2);
         pomAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, pomList3);
@@ -329,11 +324,6 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setAdapter(spinAdapter1);
         spinner2.setAdapter(spinAdapter2);
         spinner3.setAdapter(spinAdapter3);
-
-        //Default for Strict, since this mode begins at app launch.
-        spinner1.setSelection(3);
-        spinner2.setSelection(1);
-        spinner3.setSelection(2);
 
         //Default for Relaxed.
         modeTwoSpins.set(1, 5);
@@ -925,7 +915,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void retrieveSpins(List<Integer> spinList) {
+    public void retrieveSpins(List<Integer> spinList, boolean isPom) {
+        //Todo: Re-setting adapter always defaults spin selection to un-set list.
+        if (!isPom) {
+            spinner1.setAdapter(spinAdapter1);
+            spinner2.setAdapter(spinAdapter2);
+            spinner3.setAdapter(spinAdapter3);
+        } else {
+            spinner1.setAdapter(pomAdapter1);
+            spinner2.setAdapter(pomAdapter2);
+            spinner3.setAdapter(pomAdapter3);
+        }
+
         if (spinList.size() != 0) {
             spinner1.setSelection(spinList.get(0));
             spinner2.setSelection(spinList.get(1));
@@ -935,6 +936,7 @@ public class MainActivity extends AppCompatActivity {
                 savedSets = modeThreeSpins.get(2);
             }
         }
+
     }
 
     public void adjustCustom(boolean adding) {
