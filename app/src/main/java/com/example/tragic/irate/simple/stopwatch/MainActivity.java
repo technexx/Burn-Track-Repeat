@@ -134,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Spinner arrow sometimes changes position.
     //Todo: Auto-save option for prev. tabs after switching.
     //Todo: Add taskbar notification for timers.
     //Todo: Rename app, of course.
@@ -226,19 +225,20 @@ public class MainActivity extends AppCompatActivity {
                         spinner1.setVisibility(View.VISIBLE);
                         s1.setVisibility(View.VISIBLE);
                         blank_spinner.setVisibility(View.GONE);
+                        retrieveSpins(modeOneSpins);
 
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
                         spinner3.setAdapter(spinAdapter3);
 
                         dotDraws.setMode(1);
-                        retrieveSpins(modeOneSpins);
                         handler.postDelayed(() -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
 
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
                         break;
                     case 1:
                         mode = 2;
+                        retrieveSpins(modeTwoSpins);
                         heading.setText(R.string.relaxed);
                         spinner1.setVisibility(View.GONE);
                         blank_spinner.setVisibility(View.VISIBLE);
@@ -247,7 +247,6 @@ public class MainActivity extends AppCompatActivity {
                         spinner3.setAdapter(spinAdapter3);
 
                         dotDraws.setMode(2);
-                        retrieveSpins(modeTwoSpins);
                         breakCounter = -1;
 
                         handler.postDelayed(() -> {
@@ -258,10 +257,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 2:
                         mode=3;
+                        retrieveSpins(modeThreeSpins);
                         heading.setText(R.string.variable);
                         spinner1.setAdapter(spinAdapter1);
                         spinner2.setAdapter(spinAdapter2);
-                        retrieveSpins(modeThreeSpins);
 
                         dotDraws.setMode(3);
                         dotDraws.setTime(customSets);
@@ -275,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
                     case 3:
                         mode=4;
                         heading.setText(R.string.pomodoro);
+                        retrieveSpins(modeFourSpins);
 
                         spinner1.setAdapter(pomAdapter1);
                         spinner2.setAdapter(pomAdapter2);
@@ -283,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.setMode(4);
                         dotDraws.pomDraw(1, 0);
 
-                        retrieveSpins(modeFourSpins);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                         break;
                 }
