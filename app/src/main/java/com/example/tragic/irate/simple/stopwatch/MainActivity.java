@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -24,8 +25,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -125,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
     DotDraws dotDraws;
     int fadeDone;
     int mode=1;
+    ValueAnimator valueAnimatorDown;
+    ValueAnimator valueAnimatorUp;
 
     ArrayList<String> customSets;
     ArrayList<String> customBreaks;
@@ -135,9 +140,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Fix timer textView at initial access
-    //Todo: Spinner arrow sometimes changes position.
-    //Todo: Auto-save option for prev. tabs after switching.
+    //Todo: Strict mode spinner presets not saving.
+    //Todo: Save timer PROGRESS between tabs.
     //Todo: Add taskbar notification for timers.
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
@@ -174,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         dotDraws = findViewById(R.id.dotdraws);
         heading = findViewById(R.id.heading);
         heading.setText(R.string.strict);
+        timeLeft.setTextSize(90f);
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("Strict"));
@@ -218,13 +223,17 @@ public class MainActivity extends AppCompatActivity {
         modeFourSpins.add(1, spinner2.getSelectedItemPosition());
         modeFourSpins.add(2, spinner3.getSelectedItemPosition());
 
-//        spinner1.getBackground().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
+        valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
+        valueAnimatorDown.setDuration(500);
+        valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
+        valueAnimatorUp.setDuration(500);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
                     case 0:
+                        changeTextSize (valueAnimatorUp);
                         mode=1;
                         heading.setText(R.string.strict);
                         spinner1.setVisibility(View.VISIBLE);
@@ -235,8 +244,10 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.setMode(1);
                         handler.postDelayed(() -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
+
                         break;
                     case 1:
+                        changeTextSize (valueAnimatorUp);
                         mode = 2;
                         breakCounter = -1;
                         heading.setText(R.string.relaxed);
@@ -251,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
                         break;
                     case 2:
+                        changeTextSize(valueAnimatorUp);
                         mode=3;
                         heading.setText(R.string.variable);
                         retrieveSpins(modeThreeSpins, false);
@@ -265,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         break;
                     case 3:
+                        changeTextSize(valueAnimatorDown);
                         mode=4;
                         heading.setText(R.string.pomodoro);
                         retrieveSpins(modeFourSpins, true);
@@ -282,7 +295,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
             }
         });
 
@@ -307,12 +319,6 @@ public class MainActivity extends AppCompatActivity {
             pomList3.add(i+5);
         }
 
-
-        //Default for Strict, since this mode begins at app launch.
-        spinner1.setSelection(3);
-        spinner2.setSelection(1);
-        spinner3.setSelection(2);
-
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
         spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
         spinAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString3);
@@ -325,11 +331,18 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setAdapter(spinAdapter2);
         spinner3.setAdapter(spinAdapter3);
 
-        //Default for Relaxed.
+        //Default spinner values for Strict.
+        spinner1.setSelection(3);
+        spinner2.setSelection(1);
+        spinner3.setSelection(2);
+
+        //Default spinner values for Relaxed and Custom.
         modeTwoSpins.set(1, 5);
         modeTwoSpins.set(2, 2);
+        modeThreeSpins.set(0, 5);
+        modeThreeSpins.set(1, 5);
 
-        //Default for Custom.
+        //Default list values for Custom.
         for (int i=0; i<3; i++) {
             customSets.add(spinListString1.get(5));
             customBreaks.add(spinListString2.get(8));
@@ -916,7 +929,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void retrieveSpins(List<Integer> spinList, boolean isPom) {
-        //Todo: Re-setting adapter always defaults spin selection to un-set list.
         if (!isPom) {
             spinner1.setAdapter(spinAdapter1);
             spinner2.setAdapter(spinAdapter2);
@@ -936,7 +948,6 @@ public class MainActivity extends AppCompatActivity {
                 savedSets = modeThreeSpins.get(2);
             }
         }
-
     }
 
     public void adjustCustom(boolean adding) {
@@ -997,5 +1008,13 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar.setAnimation(endAnimation);
         timeLeft.setAnimation(endAnimation);
+    }
+
+    public void changeTextSize( ValueAnimator va) {
+        va.addUpdateListener(animation -> {
+            float sizeChange = (float) va.getAnimatedValue();
+            timeLeft.setTextSize(sizeChange);
+        });
+        va.start();
     }
 }
