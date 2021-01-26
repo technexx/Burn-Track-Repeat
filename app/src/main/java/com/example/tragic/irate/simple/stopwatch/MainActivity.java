@@ -156,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Hard reset fix. Textview vs. millis timer fix.
+    //Todo: Switching to Custom tab causes saving issues.
+    //Todo: timeLeft text syncing issues on pause/resume.
     //Todo: Dot draws rely on numberOf vars, save or don't reset those.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Save timer PROGRESS between tabs.
@@ -246,6 +247,8 @@ public class MainActivity extends AppCompatActivity {
         valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
         valueAnimatorUp.setDuration(500);
 
+        progressMode(setMillis, setPause);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -257,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
                         blank_spinner.setVisibility(View.GONE);
 
                         mode=1;
+                        setSavedProgress(true);
                         changeTextSize (valueAnimatorUp);
                         retrieveSpins(modeOneSpins, false);
 
@@ -390,6 +394,7 @@ public class MainActivity extends AppCompatActivity {
                     long pos = spinList1.get(position);
                     if (setMillis == 0 ) {
                         setMillis = pos*1000;
+                        if (mode == 3) setMillis = customSetTime.get(customSetTime.size()-1);
                     }
                     //Retains default spinner value for set time.
                     setStart = (int) pos*1000;
@@ -456,8 +461,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        progressMode(setMillis, setPause);
-
         progressBar.setOnClickListener(v-> {
             if (!timerDisabled) {
                 if (mode == 2) {
@@ -500,7 +503,7 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator.cancel();
                     reset.setVisibility(View.VISIBLE);
                     paused = false;
-                }  else {
+                } else {
                     resetTimer(true);
                 }
                 if (endAnimation != null) endAnimation.cancel();
@@ -614,10 +617,6 @@ public class MainActivity extends AppCompatActivity {
                     setMillis = pomMillis3;
                     objectAnimator.setDuration(pomMillis3);
             }
-        }
-
-        if (setCounter <=1) {
-            if (mode == 3) setMillis = customSetTime.get(customSetTime.size()-1);
         }
 
         if (setCounter > 1) {
@@ -844,12 +843,13 @@ public class MainActivity extends AppCompatActivity {
                 timeLeft.setText(convertSeconds((setStart+999)/1000));
                 hardReset = false;
             } else {
-                if (mode==2) progressBar.setProgress((int) breakPause); else {
+                if (mode==2) {
+                    progressBar.setProgress((int) breakPause);
+                } else {
                     progressBar.setProgress((int) setPause);
                     timeLeft.setText(convertSeconds((setMillis+999) /1000));
                 }
             }
-
             numberOfSets = savedSets;
             numberOfBreaks = savedBreaks;
             paused = false;
