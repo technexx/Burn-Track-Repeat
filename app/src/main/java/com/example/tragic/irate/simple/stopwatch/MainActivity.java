@@ -117,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
     long savedPomDuration;
 
     boolean hardReset;
+    int firstSpinCount;
+    int secondSpinCount;
+    int thirdSpinCount;
 
     long pomMillis1;
     long pomMillis2;
@@ -156,7 +159,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Switching to Custom tab causes saving issues.
+    //Todo: Spinner resets need to be fixed.
+    //Todo: Skipping rounds to end while timer is on does not reset progressBar after next onClick.
     //Todo: timeLeft text syncing issues on pause/resume.
     //Todo: Dot draws rely on numberOf vars, save or don't reset those.
     //Todo: Selecting from spinners does not extend to black layout outside text.
@@ -315,6 +319,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
+                firstSpinCount = 0;
+                secondSpinCount = 0;
+                thirdSpinCount = 0;
             }
 
             @Override
@@ -385,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                firstSpinCount++;
                 if (mode == 4) {
                     long pos = pomList1.get(position);
                     pomMillis1 = pos*60000;
@@ -399,6 +407,7 @@ public class MainActivity extends AppCompatActivity {
                     //Retains default spinner value for set time.
                     setStart = (int) pos*1000;
                 }
+                if (firstSpinCount >1) hardReset = true;
                 saveSpins();
                 resetTimer(true);
             }
@@ -412,6 +421,7 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                secondSpinCount++;
                 //Used as a global changing variable for break time.
                 long pos = spinList2.get(position);
                 breakMillis = pos*1000;
@@ -424,6 +434,7 @@ public class MainActivity extends AppCompatActivity {
                     long pos2 = pomList2.get(position);
                     pomMillis2 = pos2*60000;
                 }
+                if (secondSpinCount >1) hardReset = true;
                 saveSpins();
                 resetTimer(true);
             }
@@ -437,6 +448,7 @@ public class MainActivity extends AppCompatActivity {
         spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                thirdSpinCount++;
                 long pos = spinList3.get(position);
                 if (mode !=3) {
                     numberOfSets = spinList3.get(position);
@@ -451,6 +463,7 @@ public class MainActivity extends AppCompatActivity {
                     long pos2 = pomList3.get(position);
                     pomMillis3 = pos2*60000;
                 }
+                if (thirdSpinCount >1) hardReset = true;
                 saveSpins();
                 resetTimer(true);
             }
@@ -628,6 +641,7 @@ public class MainActivity extends AppCompatActivity {
         }
         objectAnimator.setDuration(setMillis);
         objectAnimator.start();
+        Log.i("what!", "setPause is " + setPause + " and setMillis is " + setMillis);
 
         fadeDone = 1;
         //This now retains the saved millis value.
