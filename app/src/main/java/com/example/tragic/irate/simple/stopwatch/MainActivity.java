@@ -96,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
 
     long breakMillis;
     int breakStart;
-    double breakPause;
     long setMillis;
     int setStart;
     double setPause = 10000;
+    double breakPause = 10000;
 
     long savedStrictMillis;
     long savedRelaxedMillis;
@@ -159,18 +159,16 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Spinner resets need to be fixed.
-    //Todo: Skipping rounds to end while timer is on does not reset progressBar after next onClick.
+    //Todo: Hard reset -> Tab switch - > Back to Strict recalls previously paused values.
+    //Todo: Prog bar and duration fix for re-tabbing to Relaxed Mode.
     //Todo: timeLeft text syncing issues on pause/resume.
     //Todo: Dot draws rely on numberOf vars, save or don't reset those.
     //Todo: Selecting from spinners does not extend to black layout outside text.
-    //Todo: Save timer PROGRESS between tabs.
     //Todo: Add taskbar notification for timers.
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
-    //Todo: Expand progressBar or make text smaller for Pomodoro.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -280,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                         retrieveSpins(modeTwoSpins, false);
 
                         mode = 2;
+                        setSavedProgress(false);
                         breakCounter = -1;
                         changeTextSize (valueAnimatorUp);
                         dotDraws.setMode(2);
@@ -291,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 2:
                         mode=3;
+                        setSavedProgress(true);
                         changeTextSize(valueAnimatorUp);
                         heading.setText(R.string.variable);
                         retrieveSpins(modeThreeSpins, false);
@@ -306,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 3:
                         mode=4;
+                        setSavedProgress(true);
                         changeTextSize(valueAnimatorDown);
                         heading.setText(R.string.pomodoro);
                         retrieveSpins(modeFourSpins, true);
@@ -400,12 +401,11 @@ public class MainActivity extends AppCompatActivity {
                     setPause = pomMillis1;
                 } else {
                     long pos = spinList1.get(position);
+                    setStart = (int) pos*1000;
                     if (setMillis == 0 ) {
                         setMillis = pos*1000;
                         if (mode == 3) setMillis = customSetTime.get(customSetTime.size()-1);
                     }
-                    //Retains default spinner value for set time.
-                    setStart = (int) pos*1000;
                 }
                 if (firstSpinCount >1) hardReset = true;
                 saveSpins();
@@ -422,17 +422,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 secondSpinCount++;
-                //Used as a global changing variable for break time.
-                long pos = spinList2.get(position);
-                breakMillis = pos*1000;
-                //Retains default spinner value for break time.
-                breakStart = (int) breakMillis;
-                //Retains remaining value after every break timer pause.
-                breakPause = breakMillis;
-
                 if (mode == 4) {
-                    long pos2 = pomList2.get(position);
-                    pomMillis2 = pos2*60000;
+                    long pos = pomList2.get(position);
+                    pomMillis2 = pos*60000;
+                } else {
+                    long pos = spinList2.get(position);
+                    breakStart = (int) pos*1000;
+                    if (breakMillis == 0) {
+                        breakMillis = pos*1000;
+                        if (mode == 3) breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                    }
                 }
                 if (secondSpinCount >1) hardReset = true;
                 saveSpins();
@@ -506,7 +505,7 @@ public class MainActivity extends AppCompatActivity {
                         relaxedEnded = false;
                         breakPause = maxProgress;
                     }
-                    if (pomEnded ) {
+                    if (pomEnded) {
                         timeLeft.setText(convertSeconds(spinList1.get(modeFourSpins.get(1))));
                         progressBar.setProgress(10000);
                         endAnimation.cancel();
@@ -517,6 +516,7 @@ public class MainActivity extends AppCompatActivity {
                     reset.setVisibility(View.VISIBLE);
                     paused = false;
                 } else {
+                    hardReset = true;
                     resetTimer(true);
                 }
                 if (endAnimation != null) endAnimation.cancel();
@@ -611,7 +611,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setStart() {
-        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
+        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
         //Using setMillis as countdown var for all stages of Pomodoro.
@@ -641,7 +641,6 @@ public class MainActivity extends AppCompatActivity {
         }
         objectAnimator.setDuration(setMillis);
         objectAnimator.start();
-        Log.i("what!", "setPause is " + setPause + " and setMillis is " + setMillis);
 
         fadeDone = 1;
         //This now retains the saved millis value.
@@ -685,6 +684,8 @@ public class MainActivity extends AppCompatActivity {
                 paused = true;
 
                 if (mode !=4) {
+                    breakPause = maxProgress;
+                    breakMillis = breakStart;
                     breakStart();
                     onBreak = true;
                 } else {
@@ -731,11 +732,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (breakCounter >= 1) {
-            objectAnimator.cancel();
             setSavedProgress(false);
+            objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
-            Log.i("progress", "breakPause value is " + breakPause);
         }
 
         objectAnimator.setDuration(breakMillis);
@@ -745,6 +745,7 @@ public class MainActivity extends AppCompatActivity {
         timer = new CountDownTimer(breakMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
+                progressMode(breakMillis, breakPause);
                 breakPause = (long) ((int) objectAnimator.getAnimatedValue());
                 breakMillis = millisUntilFinished;
 
@@ -788,9 +789,13 @@ public class MainActivity extends AppCompatActivity {
                 if (numberOfBreaks >0) {
                     resetTimer(false);
                     if (mode !=2) {
+                        setPause = maxProgress;
+                        setMillis = setStart;
                         setStart();
                         onBreak = false;
                     } else {
+                        breakPause = maxProgress;
+                        breakMillis = breakStart;
                         breakStart();
                     }
                 } else {
@@ -847,14 +852,20 @@ public class MainActivity extends AppCompatActivity {
             minus_sign.setVisibility(View.GONE);
 
             if (hardReset) {
-                breakCounter = 0;
-                setCounter = 0;
                 setPause = maxProgress;
                 breakPause = maxProgress;
                 setMillis = setStart;
                 breakMillis = breakStart;
                 progressBar.setProgress(10000);
                 timeLeft.setText(convertSeconds((setStart+999)/1000));
+                if (!onBreak) {
+                    setCounter = 0;
+                    progressMode(setStart, 10000);
+                } else {
+                    breakCounter = 0;
+                    progressMode(breakStart, 10000);
+                }
+
                 hardReset = false;
             } else {
                 if (mode==2) {
@@ -1059,7 +1070,7 @@ public class MainActivity extends AppCompatActivity {
         timeLeft.setAnimation(endAnimation);
     }
 
-    public void changeTextSize( ValueAnimator va) {
+    public void changeTextSize(ValueAnimator va) {
         va.addUpdateListener(animation -> {
             float sizeChange = (float) va.getAnimatedValue();
             timeLeft.setTextSize(sizeChange);
