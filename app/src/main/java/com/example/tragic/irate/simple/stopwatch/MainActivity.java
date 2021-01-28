@@ -98,23 +98,18 @@ public class MainActivity extends AppCompatActivity {
     int breakStart;
     long setMillis;
     int setStart;
-    double setPause = 10000;
-    double breakPause = 10000;
+    int setPause = 10000;
+    int breakPause = 10000;
 
     long savedStrictMillis;
     long savedRelaxedMillis;
     long savedCustomMillis;
     long savedPomMillis;
 
-    double savedStrictProgress;
-    double savedRelaxedProgress;
-    double savedCustomProgress;
-    double savedPomProgress;
-
-    long savedStrictDuration;
-    long savedRelaxedDuration;
-    long savedCustomDuration;
-    long savedPomDuration;
+    int savedStrictProgress;
+    int savedRelaxedProgress;
+    int savedCustomProgress;
+    int savedPomProgress;
 
     boolean hardReset;
     int firstSpinCount;
@@ -159,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Hard reset -> Tab switch - > Back to Strict recalls previously paused values.
     //Todo: Prog bar and duration fix for re-tabbing to Relaxed Mode.
     //Todo: timeLeft text syncing issues on pause/resume.
     //Todo: Dot draws rely on numberOf vars, save or don't reset those.
@@ -398,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                     long pos = pomList1.get(position);
                     pomMillis1 = pos*60000;
                     setStart = (int) pomMillis1;
-                    setPause = pomMillis1;
+                    setPause = (int) pomMillis1;
                 } else {
                     long pos = spinList1.get(position);
                     setStart = (int) pos*1000;
@@ -406,6 +400,7 @@ public class MainActivity extends AppCompatActivity {
                         setMillis = pos*1000;
                         if (mode == 3) setMillis = customSetTime.get(customSetTime.size()-1);
                     }
+                    if (setPause == 0) setPause = maxProgress;
                 }
                 if (firstSpinCount >1) hardReset = true;
                 saveSpins();
@@ -432,6 +427,7 @@ public class MainActivity extends AppCompatActivity {
                         breakMillis = pos*1000;
                         if (mode == 3) breakMillis = customBreakTime.get(customBreakTime.size()-1);
                     }
+                    if (breakPause == 0) breakPause = maxProgress;
                 }
                 if (secondSpinCount >1) hardReset = true;
                 saveSpins();
@@ -611,7 +607,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setStart() {
-        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
+        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
         //Using setMillis as countdown var for all stages of Pomodoro.
@@ -649,7 +645,7 @@ public class MainActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 progressMode(setMillis, setPause);
 
-                setPause = (long) ((int) objectAnimator.getAnimatedValue());
+                setPause = (int) objectAnimator.getAnimatedValue();
                 setMillis = millisUntilFinished;
                 timeLeft.setText(convertSeconds((millisUntilFinished + 999)/1000));
 
@@ -746,7 +742,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTick(long millisUntilFinished) {
                 progressMode(breakMillis, breakPause);
-                breakPause = (long) ((int) objectAnimator.getAnimatedValue());
+                breakPause = (int) objectAnimator.getAnimatedValue();
                 breakMillis = millisUntilFinished;
 
                 progressMode(breakMillis, breakPause);
@@ -852,8 +848,6 @@ public class MainActivity extends AppCompatActivity {
             minus_sign.setVisibility(View.GONE);
 
             if (hardReset) {
-                setPause = maxProgress;
-                breakPause = maxProgress;
                 setMillis = setStart;
                 breakMillis = breakStart;
                 progressBar.setProgress(10000);
@@ -865,7 +859,6 @@ public class MainActivity extends AppCompatActivity {
                     breakCounter = 0;
                     progressMode(breakStart, 10000);
                 }
-
                 hardReset = false;
             } else {
                 if (mode==2) {
@@ -1078,7 +1071,7 @@ public class MainActivity extends AppCompatActivity {
         va.start();
     }
 
-    public void progressMode(long millis, double progress) {
+    public void progressMode(long millis, int progress) {
         switch (mode) {
             case 1:
                 savedStrictMillis = millis;;
@@ -1115,4 +1108,53 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    //    public void objectAnim(int condition) {
+//        //1 instantiate, 2 start, 3 cancel, 4 setDuration, 5 getValue.
+//        switch (mode) {
+//            case 1:
+//                switch (condition) {
+//                    case 1:
+//                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
+//                        objectAnimator.setInterpolator(new LinearInterpolator());
+//                        break;
+//                    case 2: objectAnimator.start(); break;
+//                    case 3: if (objectAnimator!=null) objectAnimator.cancel(); break;
+//                    case 4: if (!onBreak) objectAnimator.setDuration(setMillis); else objectAnimator.setDuration(breakMillis);
+//                }
+//                break;
+//            case 2:
+//                switch (condition) {
+//                    case 1:
+//                        objectAnimator2 = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
+//                        objectAnimator2.setInterpolator(new LinearInterpolator());
+//                        break;
+//                    case 2: objectAnimator2.start(); break;
+//                    case 3: if (objectAnimator2!=null) objectAnimator2.cancel(); break;
+//                    case 4: if (!onBreak) objectAnimator2.setDuration(setMillis); else objectAnimator2.setDuration(breakMillis);
+//                }
+//                break;
+//            case 3:
+//                switch (condition) {
+//                    case 1:
+//                        objectAnimator3 = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
+//                        objectAnimator3.setInterpolator(new LinearInterpolator());
+//                        break;
+//                    case 2: objectAnimator3.start(); break;
+//                    case 3: if (objectAnimator3!=null) objectAnimator3.cancel(); break;
+//                    case 4: if (!onBreak) objectAnimator3.setDuration(setMillis); else objectAnimator3.setDuration(breakMillis);
+//                }
+//                break;
+//            case 4:
+//                switch (condition) {
+//                    case 1:
+//                        objectAnimator4 = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
+//                        objectAnimator4.setInterpolator(new LinearInterpolator());
+//                        break;
+//                    case 2: objectAnimator4.start(); break;
+//                    case 3: if (objectAnimator4 != null) objectAnimator4.cancel(); break;
+//                    case 4: if (!onBreak) objectAnimator4.setDuration(setMillis); else objectAnimator4.setDuration(breakMillis);
+//                }
+//        }
+//    }
 }
