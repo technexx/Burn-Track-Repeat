@@ -87,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
 
     List<Integer> modeOneSpins;
     List<Integer> modeTwoSpins;
-    List<Integer> modeThreeSpins;
-    List<Integer> modeFourSpins;
 
     int breakCounter;
     int setCounter;
@@ -101,13 +99,9 @@ public class MainActivity extends AppCompatActivity {
     int setPause = 10000;
     int breakPause = 10000;
 
-    long savedStrictMillis;
-    long savedRelaxedMillis;
     long savedCustomMillis;
     long savedPomMillis;
 
-    int savedStrictProgress;
-    int savedRelaxedProgress;
     int savedCustomProgress;
     int savedPomProgress;
 
@@ -122,8 +116,6 @@ public class MainActivity extends AppCompatActivity {
     int pomStage=1;
     int pomDotCounter=1;
 
-    int strictCyclesDone;
-    int relaxedCyclesDone;
     int customCyclesDone;
     int pomCyclesDone;
 
@@ -135,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
     boolean timerEnded;
     boolean paused;
     boolean onBreak;
-    boolean relaxedEnded;
     boolean pomEnded;
     boolean timerDisabled;
 
@@ -153,6 +144,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> startCustomBreaks;
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
+
+    //Todo: NEW: REVISED: Custom, Pom, and Stopwatch. Option for "break only" in Custom. Possible "Saved Presets" SQL for Custom in 4th tab or popup window.
+    //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
     //Todo: Prog bar and duration fix for re-tabbing to Relaxed Mode.
     //Todo: timeLeft text syncing issues on pause/resume.
@@ -194,13 +188,13 @@ public class MainActivity extends AppCompatActivity {
         heading = findViewById(R.id.heading);
         heading.setText(R.string.strict);
         timeLeft.setTextSize(90f);
+        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
-        tabLayout.addTab(tabLayout.newTab().setText("Strict"));
-        tabLayout.addTab(tabLayout.newTab().setText("Relaxed"));
         tabLayout.addTab(tabLayout.newTab().setText("Custom"));
         tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
+        Handler handler = new Handler();
         spinList1 = new ArrayList<>();
         spinList2 = new ArrayList<>();
         spinList3 = new ArrayList<>();
@@ -212,8 +206,6 @@ public class MainActivity extends AppCompatActivity {
         List<Long> pomList3 = new ArrayList<>();
         modeOneSpins = new ArrayList<>();
         modeTwoSpins = new ArrayList<>();
-        modeThreeSpins = new ArrayList<>();
-        modeFourSpins = new ArrayList<>();
         customSets = new ArrayList<>();
         customBreaks = new ArrayList<>();
         customSetTime = new ArrayList<>();
@@ -223,113 +215,13 @@ public class MainActivity extends AppCompatActivity {
         startCustomSetTime = new ArrayList<>();
         startCustomBreakTime = new ArrayList<>();
 
-        Handler handler = new Handler();
-
-        modeOneSpins.add(0, spinner1.getSelectedItemPosition());
-        modeOneSpins.add(1, spinner2.getSelectedItemPosition());
-        modeOneSpins.add(2, spinner3.getSelectedItemPosition());
-        modeTwoSpins.add(0, spinner1.getSelectedItemPosition());
-        modeTwoSpins.add(1, spinner2.getSelectedItemPosition());
-        modeTwoSpins.add(2, spinner3.getSelectedItemPosition());
-        modeThreeSpins.add(0, spinner1.getSelectedItemPosition());
-        modeThreeSpins.add(1, spinner2.getSelectedItemPosition());
-        modeThreeSpins.add(2, spinner3.getSelectedItemPosition());
-        modeFourSpins.add(0, spinner1.getSelectedItemPosition());
-        modeFourSpins.add(1, spinner2.getSelectedItemPosition());
-        modeFourSpins.add(2, spinner3.getSelectedItemPosition());
-
-        valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
-        valueAnimatorDown.setDuration(500);
-        valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
-        valueAnimatorUp.setDuration(500);
-
-        progressMode(setMillis, setPause);
-
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (tab.getPosition()) {
-                    case 0:
-                        heading.setText(R.string.strict);
-                        spinner1.setVisibility(View.VISIBLE);
-                        s1.setVisibility(View.VISIBLE);
-                        blank_spinner.setVisibility(View.GONE);
-
-                        mode=1;
-                        setSavedProgress(true);
-                        changeTextSize (valueAnimatorUp);
-                        retrieveSpins(modeOneSpins, false);
-
-                        dotDraws.setMode(1);
-                        handler.postDelayed(() -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
-                        progressBar.setProgress((int) setPause);
-                        break;
-                    case 1:
-                        heading.setText(R.string.relaxed);
-                        spinner1.setVisibility(View.GONE);
-                        blank_spinner.setVisibility(View.VISIBLE);
-                        retrieveSpins(modeTwoSpins, false);
-
-                        mode = 2;
-                        setSavedProgress(false);
-                        breakCounter = -1;
-                        changeTextSize (valueAnimatorUp);
-                        dotDraws.setMode(2);
-
-                        handler.postDelayed(() -> {
-                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                        }, 50);
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
-                        break;
-                    case 2:
-                        mode=3;
-                        setSavedProgress(true);
-                        changeTextSize(valueAnimatorUp);
-                        heading.setText(R.string.variable);
-                        retrieveSpins(modeThreeSpins, false);
-
-                        dotDraws.setMode(3);
-                        dotDraws.setTime(customSets);
-                        dotDraws.breakTime(customBreaks);
-                        handler.postDelayed(() -> {
-                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                        }, 50);
-
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                        break;
-                    case 3:
-                        mode=4;
-                        setSavedProgress(true);
-                        changeTextSize(valueAnimatorDown);
-                        heading.setText(R.string.pomodoro);
-                        retrieveSpins(modeFourSpins, true);
-
-                        dotDraws.setMode(4);
-                        dotDraws.pomDraw(1, 0);
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
-                        break;
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                firstSpinCount = 0;
-                secondSpinCount = 0;
-                thirdSpinCount = 0;
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
-
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
             spinListString1.add(convertSeconds(i+5));
             spinList2.add(i+5);
             spinListString2.add(convertSeconds(i+5));
         }
+
         for (long i=0; i<10; i++) {
             spinList3.add(i+1);
             spinListString3.add(convertSeconds(i+1));
@@ -345,6 +237,26 @@ public class MainActivity extends AppCompatActivity {
             pomList3.add(i+5);
         }
 
+        //Default list values for Custom.
+        for (int i=0; i<3; i++) {
+            customSets.add(spinListString1.get(5));
+            customBreaks.add(spinListString2.get(8));
+            startCustomSets.add(spinListString1.get(5));
+            startCustomBreaks.add(spinListString2.get(8));
+            customSetTime.add(spinList1.get(5) * 1000);
+            customBreakTime.add(spinList2.get(8) * 1000);
+            startCustomSetTime.add(spinList1.get(5) * 1000);
+            startCustomBreakTime.add(spinList2.get(8) * 1000);
+        }
+        Log.i("custom", "custom sets are " + customSets + "custom breaks are " + customBreaks);
+
+        modeOneSpins.add(0, spinner1.getSelectedItemPosition());
+        modeOneSpins.add(1, spinner2.getSelectedItemPosition());
+        modeOneSpins.add(2, spinner3.getSelectedItemPosition());
+        modeTwoSpins.add(0, spinner1.getSelectedItemPosition());
+        modeTwoSpins.add(1, spinner2.getSelectedItemPosition());
+        modeTwoSpins.add(2, spinner3.getSelectedItemPosition());
+
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
         spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
         spinAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString3);
@@ -357,51 +269,80 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setAdapter(spinAdapter2);
         spinner3.setAdapter(spinAdapter3);
 
-        //Default spinner values for Strict.
+        //Default spinner values for Custom
         spinner1.setSelection(3);
         spinner2.setSelection(1);
         spinner3.setSelection(2);
 
-        //Default spinner values for Relaxed and Custom.
         modeOneSpins.set(0, 5);
-        modeTwoSpins.set(1, 5);
-        modeTwoSpins.set(1, 5);
-        modeTwoSpins.set(2, 2);
-        modeThreeSpins.set(0, 5);
-        modeThreeSpins.set(1, 5);
+        modeOneSpins.set(1, 5);
 
-        //Default list values for Custom.
-        for (int i=0; i<3; i++) {
-            customSets.add(spinListString1.get(5));
-            customBreaks.add(spinListString2.get(8));
-            startCustomSets.add(spinListString1.get(5));
-            startCustomBreaks.add(spinListString2.get(8));
-            customSetTime.add(spinList1.get(5) * 1000);
-            customBreakTime.add(spinList2.get(8) * 1000);
-            startCustomSetTime.add(spinList1.get(5) * 1000);
-            startCustomBreakTime.add(spinList2.get(8) * 1000);
-        }
+        valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
+        valueAnimatorDown.setDuration(500);
+        valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
+        valueAnimatorUp.setDuration(500);
 
-        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
+        savedSets = customSets.size();
+        savedBreaks = customBreaks.size();
+        dotDraws.setMode(1);
+        dotDraws.setTime(customSets);
+        dotDraws.breakTime(customBreaks);
+        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+        progressMode(setMillis, setPause);
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        mode=1;
+                        heading.setText(R.string.variable);
+                        changeTextSize(valueAnimatorUp);
+                        retrieveSpins(modeOneSpins, false);
+
+                        handler.postDelayed(() -> {
+                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        }, 50);
+
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                        break;
+                    case 1:
+                        mode=2;
+                        heading.setText(R.string.pomodoro);
+                        changeTextSize(valueAnimatorDown);
+                        retrieveSpins(modeTwoSpins, true);
+
+                        dotDraws.setMode(2);
+                        dotDraws.pomDraw(1, 0);
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                firstSpinCount = 0;
+                secondSpinCount = 0;
+                thirdSpinCount = 0;
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
 
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 firstSpinCount++;
-                if (mode == 4) {
+                if (mode == 1) {
+                    setMillis = customSetTime.get(customSetTime.size()-1);
+                } else {
                     long pos = pomList1.get(position);
                     pomMillis1 = pos*60000;
                     setStart = (int) pomMillis1;
                     setPause = (int) pomMillis1;
-                } else {
-                    long pos = spinList1.get(position);
-                    setStart = (int) pos*1000;
-                    if (setMillis == 0 ) {
-                        setMillis = pos*1000;
-                        if (mode == 3) setMillis = customSetTime.get(customSetTime.size()-1);
-                    }
-                    if (setPause == 0) setPause = maxProgress;
                 }
+                // { else setSavedProgress(true);
                 if (firstSpinCount >1) hardReset = true;
                 saveSpins();
                 resetTimer(true);
@@ -417,18 +358,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 secondSpinCount++;
-                if (mode == 4) {
+                if (mode == 1) {
+                    breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                } else {
                     long pos = pomList2.get(position);
                     pomMillis2 = pos*60000;
-                } else {
-                    long pos = spinList2.get(position);
-                    breakStart = (int) pos*1000;
-                    if (breakMillis == 0) {
-                        breakMillis = pos*1000;
-                        if (mode == 3) breakMillis = customBreakTime.get(customBreakTime.size()-1);
-                    }
-                    if (breakPause == 0) breakPause = maxProgress;
                 }
+//                    { setSavedProgress(false);
                 if (secondSpinCount >1) hardReset = true;
                 saveSpins();
                 resetTimer(true);
@@ -444,16 +380,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 thirdSpinCount++;
-                long pos = spinList3.get(position);
-                if (mode !=3) {
-                    numberOfSets = spinList3.get(position);
-                }
-                //These will always start equal.
-                numberOfBreaks = numberOfSets;
-                //(saved) vars for static reference.
-                savedSets = numberOfSets;
-                savedBreaks = numberOfBreaks;
-
                 if (mode == 4) {
                     long pos2 = pomList3.get(position);
                     pomMillis3 = pos2*60000;
@@ -471,9 +397,6 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar.setOnClickListener(v-> {
             if (!timerDisabled) {
-                if (mode == 2) {
-                    onBreak = true;
-                }
                 if (mode == 4) {
                     onBreak = false;
                 }
@@ -494,15 +417,8 @@ public class MainActivity extends AppCompatActivity {
                     paused = true;
                     //Pausing
                 } else if (!timerEnded) {
-                    if (relaxedEnded) {
-                        timeLeft.setText(convertSeconds(spinList2.get(modeTwoSpins.get(1))));
-                        progressBar.setProgress(10000);
-                        endAnimation.cancel();
-                        relaxedEnded = false;
-                        breakPause = maxProgress;
-                    }
                     if (pomEnded) {
-                        timeLeft.setText(convertSeconds(spinList1.get(modeFourSpins.get(1))));
+                        timeLeft.setText(convertSeconds(spinList1.get(modeTwoSpins.get(1))));
                         progressBar.setProgress(10000);
                         endAnimation.cancel();
                         pomEnded = false;
@@ -525,19 +441,15 @@ public class MainActivity extends AppCompatActivity {
         cycle_reset.setOnClickListener(v -> {
             switch (mode) {
                 case 1:
-                    strictCyclesDone = 0; break;
-                case 2:
-                    relaxedCyclesDone = 0; break;
-                case 3:
                     customCyclesDone = 0; break;
-                case 4:
+                case 2:
                     pomCyclesDone = 0;
             }
             cycles_completed.setText(getString(R.string.cycles_done, "0"));
         });
 
         skip.setOnClickListener(v -> {
-            if (mode !=4) {
+            if (mode == 1) {
                 numberOfSets--;
                 numberOfBreaks--;
                 if (timer != null) {
@@ -554,30 +466,16 @@ public class MainActivity extends AppCompatActivity {
                     paused = false;
                     progressBar.setProgress(10000);
 
-                    if (mode !=2) {
-                        timeLeft.setText(convertSeconds((setStart+999)/1000));
-                    } else {
-                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
-                    }
-                    if (mode == 3) {
-                        adjustCustom(false);
-                    }
-                    paused = false;
+                    //Todo: For "breaks only":
+                    timeLeft.setText(convertSeconds((setStart+999)/1000));
+//                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
+
+                    adjustCustom(false);
                     resetTimer(false);
-                } else if (numberOfSets == 0 && numberOfBreaks == 0){
-                    switch (mode) {
-                        case 1:
-                            strictCyclesDone++;
-                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
-                            break;
-                        case 2:
-                            relaxedCyclesDone++;
-                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
-                            break;
-                        case 3:
-                            customCyclesDone++;
-                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                    }
+                    paused = false;
+                } else if (numberOfSets == 0 && numberOfBreaks == 0) {
+                    customCyclesDone++;
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     endAnimation();
                     progressBar.setProgress(0);
                     timeLeft.setText("0");
@@ -651,7 +549,7 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean fadePaused = false;
 
-                if (mode !=4) {
+                if (mode == 1) {
                     if (fadeDone == 1) {
                         if (!fadePaused) {
                             dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
@@ -679,7 +577,7 @@ public class MainActivity extends AppCompatActivity {
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-                if (mode !=4) {
+                if (mode == 1) {
                     breakPause = maxProgress;
                     breakMillis = breakStart;
                     breakStart();
@@ -705,10 +603,8 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                     }
                 }
-                if (mode == 3) {
-                    dotDraws.setTime(startCustomSets);
-                    dotDraws.breakTime(startCustomBreaks);
-                }
+                dotDraws.setTime(startCustomSets);
+                dotDraws.breakTime(startCustomBreaks);
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
@@ -723,7 +619,7 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-        if (mode == 3 && breakCounter <=1) {
+        if (breakCounter <=1) {
             breakMillis = customBreakTime.get(customSetTime.size() -1);
         }
 
@@ -767,7 +663,6 @@ public class MainActivity extends AppCompatActivity {
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-                if (mode == 3) {
                     if (customSets.size() > 0) {
                         customSets.remove(customSets.size() - 1);
                         customSetTime.remove(customSetTime.size() - 1);
@@ -780,7 +675,6 @@ public class MainActivity extends AppCompatActivity {
                     dotDraws.breakTime(startCustomBreaks);
                     Log.i("customValue", "static set values are " + startCustomSets + " and static break values are " + startCustomBreaks);
                     Log.i("customValue", "set and break counts are " + savedSets + " and" + savedBreaks);
-                }
 
                 if (numberOfBreaks >0) {
                     resetTimer(false);
@@ -795,21 +689,8 @@ public class MainActivity extends AppCompatActivity {
                         breakStart();
                     }
                 } else {
-                    switch (mode) {
-                        case 1:
-                            strictCyclesDone++;
-                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(strictCyclesDone)));
-                            break;
-                        case 2:
-                            relaxedCyclesDone++;
-                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(relaxedCyclesDone)));
-                            relaxedEnded = true;
-                            break;
-                        case 3:
-                            customCyclesDone++;
-                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-
-                    }
+                    customCyclesDone++;
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     endAnimation();
                     timeLeft.setText("0");
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
@@ -829,18 +710,16 @@ public class MainActivity extends AppCompatActivity {
         timerEnded = false;
         if (!complete) {
             if (onBreak) {
-//                breakMillis = breakStart;
                 timeLeft.setText(convertSeconds((breakStart+999)/1000));
                 breakCounter = 0;
             } else {
-//                setMillis = setStart;
                 timeLeft.setText(convertSeconds((setStart+999)/1000));
                 setCounter = 0;
             }
         } else {
             progressBar.setProgress(10000);
 
-            handler.postDelayed((Runnable) () -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
+            handler.postDelayed(() -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
             spinner1.setVisibility(View.VISIBLE);
             spinner3.setVisibility(View.VISIBLE);
             blank_spinner.setVisibility(View.GONE);
@@ -850,23 +729,17 @@ public class MainActivity extends AppCompatActivity {
             if (hardReset) {
                 setMillis = setStart;
                 breakMillis = breakStart;
+                setCounter = 0;
+                breakCounter = 0;
                 progressBar.setProgress(10000);
                 timeLeft.setText(convertSeconds((setStart+999)/1000));
-                if (!onBreak) {
-                    setCounter = 0;
-                    progressMode(setStart, 10000);
-                } else {
-                    breakCounter = 0;
-                    progressMode(breakStart, 10000);
-                }
+                if (timer != null) timer.cancel();
+                if (objectAnimator != null) objectAnimator.cancel();
+                if (endAnimation != null) endAnimation.cancel();
                 hardReset = false;
             } else {
-                if (mode==2) {
-                    progressBar.setProgress((int) breakPause);
-                } else {
-                    progressBar.setProgress((int) setPause);
-                    timeLeft.setText(convertSeconds((setMillis+999) /1000));
-                }
+                progressBar.setProgress((int) setPause);
+                timeLeft.setText(convertSeconds((setMillis+999) /1000));
             }
             numberOfSets = savedSets;
             numberOfBreaks = savedBreaks;
@@ -874,16 +747,6 @@ public class MainActivity extends AppCompatActivity {
 
             switch (mode) {
                 case 1:
-                    onBreak = false;
-                    break;
-                case 2:
-                    timeLeft.setText(convertSeconds((breakStart+999)/1000));
-                    breakCounter = -1;
-                    spinner1.setVisibility(View.GONE);
-                    blank_spinner.setVisibility(View.VISIBLE);
-                    onBreak = true;
-                    break;
-                case 3:
                     if (customSetTime.size() > 0 && customBreakTime.size() >0) {
                         setMillis = customSetTime.get(customSetTime.size()-1);
                         breakMillis = customBreakTime.get(customBreakTime.size()-1);
@@ -904,6 +767,7 @@ public class MainActivity extends AppCompatActivity {
                     customBreaks = new ArrayList<>();
                     customSetTime = new ArrayList<>();
                     customBreakTime = new ArrayList<>();
+
                     if (startCustomSets.size() >0) {
                         for (int i=0; i<startCustomSets.size(); i++) {
                             customSets.add(startCustomSets.get(i));
@@ -919,15 +783,14 @@ public class MainActivity extends AppCompatActivity {
 
                     dotDraws.setTime(customSets);
                     dotDraws.breakTime(customBreaks);
-
                     break;
-                case 4:
+                case 2:
                     timeLeft.setText(convertSeconds((pomMillis1+999)/1000));
                     setCounter = -1;
                     onBreak = false;
             }
 
-            if (mode !=4) {
+            if (mode == 1) {
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
                 s3.setText(R.string.set_number);
@@ -937,9 +800,9 @@ public class MainActivity extends AppCompatActivity {
                 s3.setText(R.string.long_break);
             }
 
-            if (timer != null) timer.cancel();
-            if (objectAnimator != null) objectAnimator.cancel();
-            if (endAnimation != null) endAnimation.cancel();
+//            if (timer != null) timer.cancel();
+//            if (objectAnimator != null) objectAnimator.cancel();
+//            if (endAnimation != null) endAnimation.cancel();
         }
     }
 
@@ -962,22 +825,12 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 modeOneSpins.set(0, spinner1.getSelectedItemPosition());
                 modeOneSpins.set(1, spinner2.getSelectedItemPosition());
-                modeOneSpins.set(2, spinner3.getSelectedItemPosition());
+                modeOneSpins.set(2, (int) customSets.size());
                 break;
             case 2:
                 modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
                 modeTwoSpins.set(1, spinner2.getSelectedItemPosition());
                 modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
-                break;
-            case 3:
-                modeThreeSpins.set(0, spinner1.getSelectedItemPosition());
-                modeThreeSpins.set(1, spinner2.getSelectedItemPosition());
-                modeThreeSpins.set(2, (int) customSets.size());
-                break;
-            case 4:
-                modeFourSpins.set(0, spinner1.getSelectedItemPosition());
-                modeFourSpins.set(1, spinner2.getSelectedItemPosition());
-                modeFourSpins.set(2, spinner3.getSelectedItemPosition());
         }
     }
 
@@ -993,12 +846,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (spinList.size() != 0) {
-            spinner1.setSelection(spinList.get(0));
-            spinner2.setSelection(spinList.get(1));
-            if (mode != 3) {
-                spinner3.setSelection(spinList.get(2));
-            } else {
-                savedSets = modeThreeSpins.get(2);
+            if (mode == 1) {
+                spinner1.setSelection(spinList.get(0));
+                spinner2.setSelection(spinList.get(1));
+                savedSets = modeOneSpins.get(2);
             }
         }
     }
@@ -1011,7 +862,7 @@ public class MainActivity extends AppCompatActivity {
                 startCustomSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
                 startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
 
-                timeLeft.setText(convertSeconds(customSetTime.get((customSetTime.size() - 1+999)) / 1000));
+                timeLeft.setText(convertSeconds(((customSetTime.get(customSetTime.size() - 1)) +999) / 1000));
             } else {
                 Toast.makeText(getApplicationContext(), "Max sets reached!", Toast.LENGTH_SHORT).show();
             }
@@ -1074,18 +925,10 @@ public class MainActivity extends AppCompatActivity {
     public void progressMode(long millis, int progress) {
         switch (mode) {
             case 1:
-                savedStrictMillis = millis;;
-                savedStrictProgress = progress;
-                break;
-            case 2:
-                savedRelaxedMillis = millis;
-                savedRelaxedProgress = progress;
-                break;
-            case 3:
                 savedCustomMillis = millis;
                 savedCustomProgress = progress;
                 break;
-            case 4:
+            case 2:
                 savedPomMillis = millis;
                 savedPomProgress = progress;
         }
@@ -1094,67 +937,28 @@ public class MainActivity extends AppCompatActivity {
     public void setSavedProgress(boolean onSet) {
         if (onSet) {
             switch (mode) {
-                case 1: setPause = savedStrictProgress; setMillis = savedStrictMillis; break;
-                case 2: setPause = savedRelaxedProgress; setMillis = savedRelaxedMillis; break;
-                case 3: setPause = savedCustomProgress; setMillis = savedCustomMillis; break;
-                case 4: setPause = savedPomProgress; setMillis = savedPomMillis;
+                case 1: setPause = savedCustomProgress; setMillis = savedCustomMillis; break;
+                case 2: setPause = savedPomProgress; setMillis = savedPomMillis;
             }
         } else {
             switch (mode) {
-                case 1: breakPause = savedStrictProgress; breakMillis = savedStrictMillis; break;
-                case 2: breakPause = savedRelaxedProgress; breakMillis = savedRelaxedMillis; break;
-                case 3: breakPause = savedCustomProgress; breakMillis = savedCustomMillis; break;
-                case 4: breakPause = savedPomProgress; breakMillis = savedPomMillis;
+                case 1: breakPause = savedCustomProgress; breakMillis = savedCustomMillis;
             }
         }
     }
 
-    //    public void objectAnim(int condition) {
-//        //1 instantiate, 2 start, 3 cancel, 4 setDuration, 5 getValue.
-//        switch (mode) {
-//            case 1:
-//                switch (condition) {
-//                    case 1:
-//                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
-//                        objectAnimator.setInterpolator(new LinearInterpolator());
-//                        break;
-//                    case 2: objectAnimator.start(); break;
-//                    case 3: if (objectAnimator!=null) objectAnimator.cancel(); break;
-//                    case 4: if (!onBreak) objectAnimator.setDuration(setMillis); else objectAnimator.setDuration(breakMillis);
-//                }
-//                break;
-//            case 2:
-//                switch (condition) {
-//                    case 1:
-//                        objectAnimator2 = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
-//                        objectAnimator2.setInterpolator(new LinearInterpolator());
-//                        break;
-//                    case 2: objectAnimator2.start(); break;
-//                    case 3: if (objectAnimator2!=null) objectAnimator2.cancel(); break;
-//                    case 4: if (!onBreak) objectAnimator2.setDuration(setMillis); else objectAnimator2.setDuration(breakMillis);
-//                }
-//                break;
-//            case 3:
-//                switch (condition) {
-//                    case 1:
-//                        objectAnimator3 = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
-//                        objectAnimator3.setInterpolator(new LinearInterpolator());
-//                        break;
-//                    case 2: objectAnimator3.start(); break;
-//                    case 3: if (objectAnimator3!=null) objectAnimator3.cancel(); break;
-//                    case 4: if (!onBreak) objectAnimator3.setDuration(setMillis); else objectAnimator3.setDuration(breakMillis);
-//                }
-//                break;
-//            case 4:
-//                switch (condition) {
-//                    case 1:
-//                        objectAnimator4 = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
-//                        objectAnimator4.setInterpolator(new LinearInterpolator());
-//                        break;
-//                    case 2: objectAnimator4.start(); break;
-//                    case 3: if (objectAnimator4 != null) objectAnimator4.cancel(); break;
-//                    case 4: if (!onBreak) objectAnimator4.setDuration(setMillis); else objectAnimator4.setDuration(breakMillis);
-//                }
-//        }
-//    }
+    public void recallTimer() {
+        if (objectAnimator != null) objectAnimator.cancel();
+        if (mode != 2) {
+            if (setMillis != 0) progressMode(setMillis, setPause);
+            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
+            objectAnimator.setDuration(setMillis);
+        } else {
+            if (breakMillis != 0) progressMode(breakMillis, breakPause);
+            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) breakPause, 0);
+            objectAnimator.setDuration(breakMillis);
+        }
+        objectAnimator.setInterpolator(new LinearInterpolator());
+        objectAnimator.start();
+    }
 }

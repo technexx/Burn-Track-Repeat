@@ -92,7 +92,8 @@ public class DotDraws extends View {
         mX = 60; mY = 625; mX2 = 60; mY2 = 755;
         if (mMode == 2) mY2 = 670;
 
-        if (mMode != 2 && mMode !=4) {
+        //Todo: Skip if "breaks only"
+        if (mMode == 1) {
             for (int i=0; i < mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
                 if (mSetReduce + i == mSetCount) {
@@ -110,8 +111,9 @@ public class DotDraws extends View {
             }
         }
 
-        if (mMode !=4) {
+        if (mMode == 1) {
             for (int i=0; i<mBreakCount; i++) {
+                //Todo: "skipping"
                 if (mMode == 2) {
                     mPaint.setColor(Color.GREEN);
                 } else {
@@ -133,7 +135,8 @@ public class DotDraws extends View {
             }
         }
 
-        if (mMode == 4) {
+        //Todo: "skipping"
+        if (mMode == 2) {
             mX = 115; mX2=mX+115;
             //Fading last object drawn. Setting previous ones to "greyed out"
             for (int i=0; i<mPomDot; i++) {
@@ -194,7 +197,7 @@ public class DotDraws extends View {
     }
 
     private void drawText(ArrayList<String> list, float x, float y, int i) {
-        if (mMode == 3) {
+        if (mMode == 1) {
             mPaintText.setColor(Color.BLACK);
             if (list.size() >0) {
                 if (list.get(i).length() <= 2) {
