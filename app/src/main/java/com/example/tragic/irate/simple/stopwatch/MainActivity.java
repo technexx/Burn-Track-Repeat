@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     CountDownTimer timer;
     TextView reset;
     ObjectAnimator objectAnimator;
+    ObjectAnimator objectAnimator2;
     Animation endAnimation;
     Handler handler;
 
@@ -136,19 +137,15 @@ public class MainActivity extends AppCompatActivity {
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
 
-    ArrayList<String> customSets;
-    ArrayList<String> customBreaks;
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
-    ArrayList<String> startCustomSets;
-    ArrayList<String> startCustomBreaks;
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
     //Todo: Possible "Saved Presets" SharedPref for Custom in 4th tab or popup window.
     //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
-    //Todo: Skipping round and resuming will use old round's time.
+    //Todo: Skipping after set but before break subtracts both.
     //Todo: Choose where to add sets/breaks.
     //Todo: Breaks only option.
     //Todo: Make sure timers run and recall during tab switches.
@@ -207,12 +204,8 @@ public class MainActivity extends AppCompatActivity {
         List<Long> pomList3 = new ArrayList<>();
         modeOneSpins = new ArrayList<>();
         modeTwoSpins = new ArrayList<>();
-        customSets = new ArrayList<>();
-        customBreaks = new ArrayList<>();
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
-        startCustomSets = new ArrayList<>();
-        startCustomBreaks = new ArrayList<>();
         startCustomSetTime = new ArrayList<>();
         startCustomBreakTime = new ArrayList<>();
 
@@ -240,10 +233,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Default list values for Custom.
         for (int i=0; i<3; i++) {
-            customSets.add(spinListString1.get(5));
-            customBreaks.add(spinListString2.get(8));
-            startCustomSets.add(spinListString1.get(5));
-            startCustomBreaks.add(spinListString2.get(8));
             customSetTime.add(spinList1.get(5) * 1000);
             customBreakTime.add(spinList2.get(8) * 1000);
             startCustomSetTime.add(spinList1.get(5) * 1000);
@@ -284,8 +273,8 @@ public class MainActivity extends AppCompatActivity {
 
         mode = 1;
         dotDraws.setMode(1);
-        savedSets = customSets.size();
-        savedBreaks = customBreaks.size();
+        savedSets = customSetTime.size();
+        savedBreaks = customBreakTime.size();
         numberOfSets = savedSets;
         numberOfBreaks = savedBreaks;
         long setLaunch = customSetTime.get(customSetTime.size() -1);
@@ -294,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
         resetTimer();
         saveValues(setMillis, setPause);
 
-        //Todo: setValues does not copy to list (now that we're only doing custom).
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -495,8 +483,8 @@ public class MainActivity extends AppCompatActivity {
                 if (numberOfSets >=0 && numberOfBreaks >=0) {
                     //Beginning set/break count so dots fade instead of disappear.
                     //Todo: THIS changes all "5" list instances to :05 because it is a GLOBAL var and drawText alters it.
-                    dotDraws.setTime(startCustomSets);
-                    dotDraws.breakTime(startCustomBreaks);
+                    dotDraws.setTime(startCustomSetTime);
+                    dotDraws.breakTime(startCustomBreakTime);
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
                 }
             } else {
@@ -621,8 +609,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 endAnimation();
-                dotDraws.setTime(startCustomSets);
-                dotDraws.breakTime(startCustomBreaks);
+                dotDraws.setTime(startCustomSetTime);
+                dotDraws.breakTime(startCustomBreakTime);
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
 //                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
@@ -679,16 +667,14 @@ public class MainActivity extends AppCompatActivity {
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-                    if (customSets.size() > 0) {
-                        customSets.remove(customSets.size() - 1);
+                    if (customSetTime.size() > 0) {
                         customSetTime.remove(customSetTime.size() - 1);
                     }
-                    if (customBreaks.size() >0) {
-                        customBreaks.remove(customBreaks.size() -1);
+                    if (customBreakTime.size() >0) {
                         customBreakTime.remove(customBreakTime.size()-1);
                     }
-                    dotDraws.setTime(startCustomSets);
-                    dotDraws.breakTime(startCustomBreaks);
+                    dotDraws.setTime(startCustomSetTime);
+                    dotDraws.breakTime(startCustomBreakTime);
 
                 endAnimation();
                 if (numberOfBreaks >0) {
@@ -745,9 +731,9 @@ public class MainActivity extends AppCompatActivity {
 
         switch (mode) {
             case 1:
-                if (customSetTime.size() > 0 && customBreakTime.size() >0) {
-                    setMillis = customSetTime.get(customSetTime.size()-1);
-                    breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                if (startCustomSetTime.size() >0 && startCustomBreakTime.size() >0) {
+                    setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
+                    breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
                     timeLeft.setText(convertSeconds((setMillis+999)/1000));
                 }
 
@@ -756,31 +742,26 @@ public class MainActivity extends AppCompatActivity {
                 minus_sign.setVisibility(View.VISIBLE);
                 onBreak = false;
 
-                numberOfSets = startCustomSets.size();
-                numberOfBreaks = startCustomBreaks.size();
+                numberOfSets = startCustomSetTime.size();
+                numberOfBreaks = startCustomBreakTime.size();
                 savedSets = numberOfSets;
                 savedBreaks = numberOfBreaks;
 
-                customSets = new ArrayList<>();
-                customBreaks = new ArrayList<>();
                 customSetTime = new ArrayList<>();
                 customBreakTime = new ArrayList<>();
 
-                if (startCustomSets.size() >0) {
-                    for (int i=0; i<startCustomSets.size(); i++) {
-                        customSets.add(startCustomSets.get(i));
+                if (startCustomSetTime.size() >0) {
+                    for (int i=0; i<startCustomSetTime.size(); i++) {
                         customSetTime.add(startCustomSetTime.get(i));
-                        customBreaks.add(startCustomBreaks.get(i));
                         customBreakTime.add(startCustomBreakTime.get(i));
-                        Log.i("what", "what " + startCustomSets);
                     }
                     timerDisabled = false;
                 } else {
                     timerDisabled = true;
                     reset.setVisibility(View.GONE);
                 }
-                dotDraws.setTime(customSets);
-                dotDraws.breakTime(customBreaks);
+                dotDraws.setTime(customSetTime);
+                dotDraws.breakTime(customBreakTime);
                 break;
             case 2:
                 timeLeft.setText(convertSeconds((pomMillis1+999)/1000));
@@ -817,7 +798,7 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 modeOneSpins.set(0, spinner1.getSelectedItemPosition());
                 modeOneSpins.set(1, spinner2.getSelectedItemPosition());
-                modeOneSpins.set(2, (int) customSets.size());
+                modeOneSpins.set(2, (int) customSetTime.size());
                 break;
             case 2:
                 modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
@@ -848,39 +829,30 @@ public class MainActivity extends AppCompatActivity {
 
     public void adjustCustom(boolean adding) {
         if (adding) {
-            if (customSets.size() < 10 && customSetTime.size() >= 0) {
-                customSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
+            if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
                 customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
-                startCustomSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
                 startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
             } else {
                 Toast.makeText(getApplicationContext(), "Max sets reached!", Toast.LENGTH_SHORT).show();
             }
-            if (customBreaks.size() < 10 && customBreakTime.size() >= 0) {
-                customBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
+            if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
                 customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
-                startCustomBreaks.add(spinListString2.get(spinner2.getSelectedItemPosition()));
                 startCustomBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
             }
         } else {
-            if (customSets.size() > 0 && customSetTime.size() > 0) {
-                customSets.remove(customSets.size() - 1);
+            if (customSetTime.size() > 0 && customSetTime.size() > 0) {
                 customSetTime.remove(customSetTime.size() - 1);
-                startCustomSets.remove(startCustomSets.size() - 1);
                 startCustomSetTime.remove(startCustomSetTime.size() - 1);
             } else {
                 Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
             }
-            if (customBreaks.size() > 0 && customBreakTime.size() > 0) {
-                customBreaks.remove(customBreaks.size() - 1);
+            if (customBreakTime.size() > 0 && customBreakTime.size() > 0) {
                 customBreakTime.remove(customBreakTime.size() - 1);
-                startCustomBreaks.remove(startCustomBreaks.size() - 1);
                 startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
 
             }
         }
-        Log.i("customSize", "set sizes are " + customSets.size() + " and " + startCustomSets.size());
-        Log.i("customSize", "break sizes are " + customBreaks.size() + " and " + startCustomBreaks.size());
+        Log.i("custom", "set start is " + startCustomSetTime + " and remaining sets are " + customSetTime);
 
         resetTimer();
         saveSpins();
@@ -935,20 +907,5 @@ public class MainActivity extends AppCompatActivity {
                 case 1: breakPause = savedCustomProgress; breakMillis = savedCustomMillis;
             }
         }
-    }
-
-    public void recallTimer() {
-        if (objectAnimator != null) objectAnimator.cancel();
-        if (mode != 2) {
-            if (setMillis != 0) saveValues(setMillis, setPause);
-            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) setPause, 0);
-            objectAnimator.setDuration(setMillis);
-        } else {
-            if (breakMillis != 0) saveValues(breakMillis, breakPause);
-            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) breakPause, 0);
-            objectAnimator.setDuration(breakMillis);
-        }
-        objectAnimator.setInterpolator(new LinearInterpolator());
-        objectAnimator.start();
     }
 }

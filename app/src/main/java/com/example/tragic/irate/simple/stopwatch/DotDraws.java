@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class DotDraws extends View {
@@ -38,10 +39,8 @@ public class DotDraws extends View {
     int mFadeDone;
     int mMode;
     int mPomDot;
-    ArrayList<String> mSetTime = new ArrayList<>();
-    ArrayList<String> mBreakTime = new ArrayList<>();
-    boolean mBigSetText;
-    boolean mBigBreakText;
+    ArrayList<String> mSetTime;
+    ArrayList<String> mBreakTime;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -71,12 +70,18 @@ public class DotDraws extends View {
         mMode = mode;
     }
 
-    public void setTime(ArrayList<String> setTime) {
-        mSetTime = setTime;;
+    public void setTime(ArrayList<Long> setTime) {
+        mSetTime = new ArrayList<>();
+        for (int i=0; i<setTime.size(); i++) {
+            mSetTime.add(convertSeconds(setTime.get(i)/1000));
+        }
     }
 
-    public void breakTime(ArrayList<String> breakTime) {
-        mBreakTime = breakTime;
+    public void breakTime(ArrayList<Long> breakTime) {
+        mBreakTime = new ArrayList<>();
+        for (int i=0; i<breakTime.size(); i++) {
+            mBreakTime.add(convertSeconds(breakTime.get(i)/1000));
+        }
     }
 
     public void pomDraw(int pomDot, int fadeDone) {
@@ -209,5 +214,18 @@ public class DotDraws extends View {
                 }
             }
         }
+    }
+
+    public String convertSeconds(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+
+        if (totalSeconds >=60) {
+            minutes = totalSeconds/60;
+            remainingSeconds = totalSeconds % 60;
+            return (minutes + ":" + df.format(remainingSeconds));
+        } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
+        else return "5";
     }
 }
