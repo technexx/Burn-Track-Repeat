@@ -435,12 +435,12 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator.cancel();
                     reset.setVisibility(View.VISIBLE);
                     paused = false;
-                    Log.i("setPause", "setPause in progress is " + setPause);
                 } else {
                     //Todo: Reset (for custom) should bring back starting set/breaks
                     resetTimer();
                     if (endAnimation != null) endAnimation.cancel();
-                    if (mode==1) timeLeft.setText(startCustomSets.get(startCustomSets.size()-1));
+                    long resetTime = startCustomSetTime.get((startCustomSetTime.size()-1));
+                    if (mode==1) timeLeft.setText(convertSeconds(resetTime/1000));
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
@@ -478,8 +478,8 @@ public class MainActivity extends AppCompatActivity {
 
                     if (customSetTime.size() >0) customSetTime.remove(customSetTime.size()-1);
                     if (customBreakTime.size() >0) customBreakTime.remove(customBreakTime.size()-1);
-
-                    //Todo: For "breaks only":
+//
+//                    //Todo: For "breaks only":
                     timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
                     paused = false;
@@ -493,6 +493,8 @@ public class MainActivity extends AppCompatActivity {
                     paused = true;
                 }
                 if (numberOfSets >=0 && numberOfBreaks >=0) {
+                    //Beginning set/break count so dots fade instead of disappear.
+                    //Todo: THIS changes all "5" list instances to :05 because it is a GLOBAL var and drawText alters it.
                     dotDraws.setTime(startCustomSets);
                     dotDraws.breakTime(startCustomBreaks);
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
@@ -500,8 +502,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
             }
-            Log.i("customSize", "skip start set-custom size is " + startCustomSets.size());
-
         });
 
         plus_sign.setOnClickListener(v -> {
@@ -772,6 +772,7 @@ public class MainActivity extends AppCompatActivity {
                         customSetTime.add(startCustomSetTime.get(i));
                         customBreaks.add(startCustomBreaks.get(i));
                         customBreakTime.add(startCustomBreakTime.get(i));
+                        Log.i("what", "what " + startCustomSets);
                     }
                     timerDisabled = false;
                 } else {
@@ -807,9 +808,8 @@ public class MainActivity extends AppCompatActivity {
             minutes = totalSeconds/60;
             remainingSeconds = totalSeconds % 60;
             return (minutes + ":" + df.format(remainingSeconds));
-        } else {
-            return String.valueOf(totalSeconds);
-        }
+        } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
+        else return "5";
     }
 
     public void saveSpins() {
@@ -853,7 +853,6 @@ public class MainActivity extends AppCompatActivity {
                 customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
                 startCustomSets.add(spinListString1.get(spinner1.getSelectedItemPosition()));
                 startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
-                timeLeft.setText(convertSeconds(((customSetTime.get(customSetTime.size() - 1)) +999) / 1000));
             } else {
                 Toast.makeText(getApplicationContext(), "Max sets reached!", Toast.LENGTH_SHORT).show();
             }
