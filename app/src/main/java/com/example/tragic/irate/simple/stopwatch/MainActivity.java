@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     TextView reset;
     ObjectAnimator objectAnimator;
     Animation endAnimation;
+    Handler handler;
 
     TextView s1;
     TextView s2;
@@ -195,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("Custom"));
         tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
-        Handler handler = new Handler();
+        handler = new Handler();
         spinList1 = new ArrayList<>();
         spinList2 = new ArrayList<>();
         spinList3 = new ArrayList<>();
@@ -295,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         resetTimer();
         saveValues(setMillis, setPause);
 
-        //Todo: setValue does not copy to list (now that we're only doing custom).
+        //Todo: setValues does not copy to list (now that we're only doing custom).
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -536,7 +537,6 @@ public class MainActivity extends AppCompatActivity {
             if (customSetTime.size() >0) setMillis = customSetTime.get(customSetTime.size()-1);
         }
 
-        //Todo: Fetch proper values from saved custom list.
         //Set timer RESUMES here, and fetches the saved timer objects.
         if (setCounter > 1) {
             setValues(true);
@@ -584,16 +584,19 @@ public class MainActivity extends AppCompatActivity {
                 numberOfSets--;
                 timeLeft.setText("0");
                 setCounter = 0;
-
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
                 if (mode == 1) {
                     breakPause = maxProgress;
                     breakMillis = breakStart;
-                    breakStart();
                     onBreak = true;
                     timerEnded = false;
+                    endAnimation();
+                    handler.postDelayed((Runnable) () -> {
+                        breakStart();
+                        endAnimation.cancel();
+                    },750);
                 } else {
                     if (pomDotCounter <7) {
                         if (pomStage == 1) {
@@ -615,6 +618,7 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                     }
                 }
+                endAnimation();
                 dotDraws.setTime(startCustomSets);
                 dotDraws.breakTime(startCustomBreaks);
 
@@ -671,6 +675,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 fadeDone = 4;
                 numberOfBreaks--;
+                timeLeft.setText("0");
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
@@ -685,18 +690,22 @@ public class MainActivity extends AppCompatActivity {
                     dotDraws.setTime(startCustomSets);
                     dotDraws.breakTime(startCustomBreaks);
 
+                endAnimation();
                 if (numberOfBreaks >0) {
                     breakCounter = 0;
                     setPause = maxProgress;
                     setMillis = setStart;
-                    setStart();
                     onBreak = false;
                     timerEnded = false;
+
+                    handler.postDelayed((Runnable) () -> {
+                        setStart();
+                        endAnimation.cancel();
+                    },750);
                 } else {
                     customCyclesDone++;
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     endAnimation();
-                    timeLeft.setText("0");
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
                     timerEnded = true;
                 }
