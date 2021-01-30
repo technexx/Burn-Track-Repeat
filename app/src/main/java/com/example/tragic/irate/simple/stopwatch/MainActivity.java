@@ -145,9 +145,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
 
-    //Todo: Possible "Saved Presets" SQL for Custom in 4th tab or popup window.
+    //Todo: Possible "Saved Presets" SharedPref for Custom in 4th tab or popup window.
     //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
+    //Todo: Skipping round and resuming will use old round's time.
     //Todo: Choose where to add sets/breaks.
     //Todo: Breaks only option.
     //Todo: Make sure timers run and recall during tab switches.
@@ -439,6 +440,7 @@ public class MainActivity extends AppCompatActivity {
                     //Todo: Reset (for custom) should bring back starting set/breaks
                     resetTimer();
                     if (endAnimation != null) endAnimation.cancel();
+                    if (mode==1) timeLeft.setText(startCustomSets.get(startCustomSets.size()-1));
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
@@ -474,8 +476,11 @@ public class MainActivity extends AppCompatActivity {
                     paused = false;
                     progressBar.setProgress(10000);
 
+                    if (customSetTime.size() >0) customSetTime.remove(customSetTime.size()-1);
+                    if (customBreakTime.size() >0) customBreakTime.remove(customBreakTime.size()-1);
+
                     //Todo: For "breaks only":
-                    timeLeft.setText(convertSeconds((setStart+999)/1000));
+                    timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
                     paused = false;
                 } else if (numberOfSets == 0 && numberOfBreaks == 0) {

@@ -127,7 +127,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s2"
         android:layout_marginTop="12dp"
-        android:layout_marginStart="206dp"
+        android:layout_marginStart="203dp"
         android:backgroundTint="@color/black">
     </ImageButton>
 
@@ -139,7 +139,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s2"
         android:layout_marginTop="12dp"
-        android:layout_marginStart="275dp"
+        android:layout_marginStart="272dp"
         android:backgroundTint="@color/black">
     </ImageButton>
 
