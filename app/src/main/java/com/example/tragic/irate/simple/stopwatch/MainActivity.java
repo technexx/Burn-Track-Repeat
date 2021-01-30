@@ -151,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Make sure timers run and recall during tab switches.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Add taskbar notification for timers.
+    //Fast pause/resume sometimes borks timer text.
+    //Todo: Less blurry +/- icons.
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
     //Todo: Add onOptionsSelected dots for About, etc.
@@ -377,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 thirdSpinCount++;
-                if (mode == 4) {
+                if (mode == 2) {
                     long pos2 = pomList3.get(position);
                     pomMillis3 = pos2*60000;
                 }
@@ -393,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
 
         progressBar.setOnClickListener(v-> {
             if (!timerDisabled) {
-                if (mode == 4) {
+                if (mode == 2) {
                     onBreak = false;
                 }
                 //Switches to saved time from start time after initial clicks.
@@ -448,8 +450,6 @@ public class MainActivity extends AppCompatActivity {
 
         skip.setOnClickListener(v -> {
             if (mode == 1) {
-                numberOfSets--;
-                numberOfBreaks--;
                 if (timer != null) {
                     timer.cancel();
                 }
@@ -464,8 +464,15 @@ public class MainActivity extends AppCompatActivity {
                     paused = false;
                     progressBar.setProgress(10000);
 
-                    if (customSetTime.size() >0) customSetTime.remove(customSetTime.size()-1);
-                    if (customBreakTime.size() >0) customBreakTime.remove(customBreakTime.size()-1);
+                    if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
+                        customSetTime.remove(customSetTime.size()-1);
+                        numberOfSets--;
+                    }
+                    if (customBreakTime.size() >0 && customBreakTime.size() != customSetTime.size()) {
+                        customBreakTime.remove(customBreakTime.size()-1);
+                        numberOfBreaks--;
+                        onBreak = false;
+                    }
 //
 //                    //Todo: For "breaks only":
                     timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
@@ -510,7 +517,7 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator.setInterpolator(new LinearInterpolator());
 
         //Set timer BEGINS here, and fetches start values in their saved lists.
-        if (mode==4 && setCounter <1) {
+        if (mode==2 && setCounter <1) {
             switch (pomStage) {
                 case 1:
                     setMillis = pomMillis1;
@@ -576,6 +583,12 @@ public class MainActivity extends AppCompatActivity {
                 setCounter = 0;
                 //Ensures first click of next break triggers pause.
                 paused = true;
+                //Todo: Move back to break if this borks.
+                if (customSetTime.size() > 0) {
+                    customSetTime.remove(customSetTime.size() - 1);
+                }
+                Log.i("blah", "what " + customSetTime.size() + " " + customBreakTime.size());
+
 
                 if (mode == 1) {
                     breakPause = maxProgress;
@@ -626,7 +639,7 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator.setInterpolator(new LinearInterpolator());
 
         if (breakCounter <=1) {
-            if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customSetTime.size() -1);
+            if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
         }
 
         if (breakCounter >= 1) {
@@ -667,9 +680,6 @@ public class MainActivity extends AppCompatActivity {
                 //Ensures first click of next break triggers pause.
                 paused = true;
 
-                    if (customSetTime.size() > 0) {
-                        customSetTime.remove(customSetTime.size() - 1);
-                    }
                     if (customBreakTime.size() >0) {
                         customBreakTime.remove(customBreakTime.size()-1);
                     }
