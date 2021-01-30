@@ -148,11 +148,9 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible "Saved Presets" SQL for Custom in 4th tab or popup window.
     //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
-
-    //Todo: Resetting after
-    //Todo: Between sets and breaks, old setStart (e.g. 30) pops up.
-    //Todo: Smooth transition (use ValueAnimator or Animator) between set/break time.
-    //Todo: timeLeft text syncing issues on pause/resume.
+    //Todo: Choose where to add sets/breaks.
+    //Todo: Breaks only option.
+    //Todo: Make sure timers run and recall during tab switches.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Add taskbar notification for timers.
     //Todo: Rename app, of course.
@@ -250,7 +248,6 @@ public class MainActivity extends AppCompatActivity {
             startCustomSetTime.add(spinList1.get(5) * 1000);
             startCustomBreakTime.add(spinList2.get(8) * 1000);
         }
-        Log.i("custom", "custom sets are " + customSets + "custom breaks are " + customBreaks);
 
         modeOneSpins.add(0, spinner1.getSelectedItemPosition());
         modeOneSpins.add(1, spinner2.getSelectedItemPosition());
@@ -480,8 +477,6 @@ public class MainActivity extends AppCompatActivity {
                     //Todo: For "breaks only":
                     timeLeft.setText(convertSeconds((setStart+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
-
-                    adjustCustom(false);
                     paused = false;
                 } else if (numberOfSets == 0 && numberOfBreaks == 0) {
                     customCyclesDone++;
@@ -493,11 +488,15 @@ public class MainActivity extends AppCompatActivity {
                     paused = true;
                 }
                 if (numberOfSets >=0 && numberOfBreaks >=0) {
+                    dotDraws.setTime(startCustomSets);
+                    dotDraws.breakTime(startCustomBreaks);
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
             }
+            Log.i("customSize", "skip start set-custom size is " + startCustomSets.size());
+
         });
 
         plus_sign.setOnClickListener(v -> {
@@ -837,7 +836,7 @@ public class MainActivity extends AppCompatActivity {
             if (mode == 1) {
                 spinner1.setSelection(spinList.get(0));
                 spinner2.setSelection(spinList.get(1));
-                savedSets = modeOneSpins.get(2);
+//                savedSets = modeOneSpins.get(2);
             }
         }
     }
