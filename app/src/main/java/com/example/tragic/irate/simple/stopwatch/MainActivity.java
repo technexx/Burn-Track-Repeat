@@ -354,7 +354,6 @@ public class MainActivity extends AppCompatActivity {
                     pomMillis1 = pos*60000;
                     setStart = (int) pomMillis1;
                 }
-                // { else setValues(true);
                 if (firstSpinCount >1) resetTimer();
                 saveSpins();
             }
@@ -377,7 +376,6 @@ public class MainActivity extends AppCompatActivity {
                     long pos = pomList2.get(position);
                     pomMillis2 = pos*60000;
                 }
-//                    { setValues(false);
                 if (secondSpinCount >1) resetTimer();
                 saveSpins();
 
@@ -439,6 +437,7 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator.cancel();
                     reset.setVisibility(View.VISIBLE);
                     paused = false;
+                    Log.i("setPause", "setPause in progress is " + setPause);
                 } else {
                     //Todo: Reset (for custom) should bring back starting set/breaks
                     resetTimer();
@@ -542,6 +541,7 @@ public class MainActivity extends AppCompatActivity {
             setValues(true);
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (setPause), 0);
+            Log.i("setPause", "setPause in setStart is " + setPause);
             objectAnimator.setInterpolator(new LinearInterpolator());
             progressBar.setProgress((int) setPause);
         }
@@ -553,14 +553,12 @@ public class MainActivity extends AppCompatActivity {
         timer = new CountDownTimer(setMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
-                saveValues(setMillis, setPause);
-
                 setPause = (int) objectAnimator.getAnimatedValue();
+                saveValues(setMillis, setPause);
                 setMillis = millisUntilFinished;
                 timeLeft.setText(convertSeconds((millisUntilFinished + 999)/1000));
 
                 boolean fadePaused = false;
-
                 if (mode == 1) {
                     if (fadeDone == 1) {
                         if (!fadePaused) {
@@ -653,11 +651,9 @@ public class MainActivity extends AppCompatActivity {
         timer = new CountDownTimer(breakMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
-                saveValues(breakMillis, breakPause);
                 breakPause = (int) objectAnimator.getAnimatedValue();
-                breakMillis = millisUntilFinished;
-
                 saveValues(breakMillis, breakPause);
+                breakMillis = millisUntilFinished;
                 timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
 
                 boolean fadePaused = false;
