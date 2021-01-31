@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     int breakCounter;
     int setCounter;
+    int pomSetCounter;
     int maxProgress = 10000;
 
     long breakMillis;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     int setStart;
     int setPause = 10000;
     int breakPause = 10000;
+    long pos;
 
     long savedCustomMillis;
     long savedPomMillis;
@@ -130,7 +132,8 @@ public class MainActivity extends AppCompatActivity {
     boolean onBreak;
     boolean pomEnded;
     boolean timerDisabled;
-    boolean halted;
+    boolean customHalted = true;
+    boolean pomHalted = true;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -146,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible "Saved Presets" SharedPref for Custom in 4th tab or popup window.
     //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
-    //Todo: Skipping after set but before break subtracts both.
     //Todo: Choose where to add sets/breaks.
     //Todo: Breaks only option.
     //Todo: Make sure timers run and recall during tab switches.
@@ -242,13 +244,6 @@ public class MainActivity extends AppCompatActivity {
             startCustomBreakTime.add(spinList2.get(8) * 1000);
         }
 
-        modeOneSpins.add(0, spinner1.getSelectedItemPosition());
-        modeOneSpins.add(1, spinner2.getSelectedItemPosition());
-        modeOneSpins.add(2, spinner3.getSelectedItemPosition());
-        modeTwoSpins.add(0, spinner1.getSelectedItemPosition());
-        modeTwoSpins.add(1, spinner2.getSelectedItemPosition());
-        modeTwoSpins.add(2, spinner3.getSelectedItemPosition());
-
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
         spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
         spinAdapter3 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString3);
@@ -266,14 +261,17 @@ public class MainActivity extends AppCompatActivity {
         spinner2.setSelection(0);
         spinner3.setSelection(2);
 
-//        modeOneSpins.set(0, 5);
-//        modeOneSpins.set(1, 8);
+        //Elements here are retrieved as spinner positions via retrieveSpins(), and therefore must be <= than the number of spinner entries.
+        modeTwoSpins.add(0, 2);
+        modeTwoSpins.add(1, 2);
+        modeTwoSpins.add(2, 2);
 
         valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
         valueAnimatorDown.setDuration(500);
         valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
         valueAnimatorUp.setDuration(500);
 
+        //Custom defaults
         mode = 1;
         dotDraws.setMode(1);
         savedSets = customSetTime.size();
@@ -282,9 +280,11 @@ public class MainActivity extends AppCompatActivity {
         numberOfBreaks = savedBreaks;
         long setLaunch = customSetTime.get(customSetTime.size() -1);
         setStart = (int) setLaunch;
-
-        resetTimer();
         saveValues(setMillis, setPause);
+
+        //Pom defaults
+        pomMillis1 = modeTwoSpins.get(0)+15 * (5*60000);
+        resetTimer();
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -302,6 +302,9 @@ public class MainActivity extends AppCompatActivity {
                         }, 50);
 
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+
+                        paused = customHalted;
+                        switchTimer(1, paused);
                         break;
                     case 1:
                         mode=2;
@@ -313,11 +316,24 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.setMode(2);
                         dotDraws.pomDraw(1, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
+                        plus_sign.setVisibility(View.GONE);
+                        minus_sign.setVisibility(View.GONE);
+                        spinner3.setVisibility(View.VISIBLE);
+
+                        paused = pomHalted;
+                        switchTimer(2, paused);
                 }
+                Log.i("halted", "custom halted is " + customHalted + " and pom halted is " + pomHalted);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        customHalted = paused; break;
+                    case 1:
+                        pomHalted = paused;
+                }
                 firstSpinCount = 0;
                 secondSpinCount = 0;
                 thirdSpinCount = 0;
@@ -337,14 +353,15 @@ public class MainActivity extends AppCompatActivity {
                         setMillis = customSetTime.get(customSetTime.size()-1);
                         setStart = (int) setMillis;
                     }
-
                 } else {
-                    long pos = pomList1.get(position);
+                    pos = pomList1.get(position);
                     pomMillis1 = pos*60000;
                     setStart = (int) pomMillis1;
                 }
-                if (firstSpinCount >1) resetTimer();
-                saveSpins();
+                if (firstSpinCount >1) {
+                    saveSpins();
+                    resetTimer();
+                }
             }
 
             @Override
@@ -362,12 +379,13 @@ public class MainActivity extends AppCompatActivity {
                         breakMillis = customBreakTime.get(customBreakTime.size()-1);
                     }
                 } else {
-                    long pos = pomList2.get(position);
+                    pos = pomList2.get(position);
                     pomMillis2 = pos*60000;
                 }
-                if (secondSpinCount >1) resetTimer();
-                saveSpins();
-
+                if (secondSpinCount >1) {
+                    saveSpins();
+                    resetTimer();
+                }
             }
 
             @Override
@@ -384,8 +402,10 @@ public class MainActivity extends AppCompatActivity {
                     long pos2 = pomList3.get(position);
                     pomMillis3 = pos2*60000;
                 }
-                if (thirdSpinCount >1) resetTimer();
-                saveSpins();
+                if (thirdSpinCount >1) {
+                    saveSpins();
+                    resetTimer();
+                }
             }
 
             @Override
@@ -402,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
                 if (onBreak) {
                     breakCounter++;
                 } else {
-                    setCounter++;
+                    if (mode==1) setCounter++; else pomSetCounter++;
                 }
                 if (paused) {
                     if (onBreak) {
@@ -508,11 +528,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setStart() {
+        //Todo: Remember that setCounter value will carry over between tabs. Might be okay because of pomMillis default value.
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
         //Set timer BEGINS here, and fetches start values in their saved lists.
-        if (mode==2 && setCounter <1) {
+        if (mode==2 && pomSetCounter <1) {
             switch (pomStage) {
                 case 1:
                     setMillis = pomMillis1;
@@ -711,12 +732,6 @@ public class MainActivity extends AppCompatActivity {
         Handler handler = new Handler();
         timerEnded = false;
 
-        spinner1.setVisibility(View.VISIBLE);
-        spinner3.setVisibility(View.VISIBLE);
-        blank_spinner.setVisibility(View.GONE);
-        plus_sign.setVisibility(View.GONE);
-        minus_sign.setVisibility(View.GONE);
-
         setPause = setStart;
         breakPause = breakStart;
         setCounter = 0;
@@ -738,10 +753,6 @@ public class MainActivity extends AppCompatActivity {
                     breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
                     timeLeft.setText(convertSeconds((setMillis+999)/1000));
                 }
-
-                spinner3.setVisibility(View.GONE);
-                plus_sign.setVisibility(View.VISIBLE);
-                minus_sign.setVisibility(View.VISIBLE);
                 onBreak = false;
 
                 numberOfSets = startCustomSetTime.size();
@@ -760,26 +771,16 @@ public class MainActivity extends AppCompatActivity {
                     timerDisabled = false;
                 } else {
                     timerDisabled = true;
-                    reset.setVisibility(View.GONE);
                 }
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
                 break;
             case 2:
                 timeLeft.setText(convertSeconds((pomMillis1+999)/1000));
-                setCounter = -1;
+                pomSetCounter = -1;
                 onBreak = false;
         }
         handler.postDelayed(() -> dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0), 50);
-        if (mode == 1) {
-            s1.setText(R.string.set_time);
-            s2.setText(R.string.break_time);
-            s3.setText(R.string.set_number);
-        } else {
-            s1.setText(R.string.work_time);
-            s2.setText(R.string.small_break);
-            s3.setText(R.string.long_break);
-        }
     }
 
     public String convertSeconds(long totalSeconds) {
@@ -793,40 +794,6 @@ public class MainActivity extends AppCompatActivity {
             return (minutes + ":" + df.format(remainingSeconds));
         } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
         else return "5";
-    }
-
-    public void saveSpins() {
-        switch (mode) {
-            case 1:
-                modeOneSpins.set(0, spinner1.getSelectedItemPosition());
-                modeOneSpins.set(1, spinner2.getSelectedItemPosition());
-                modeOneSpins.set(2, (int) customSetTime.size());
-                break;
-            case 2:
-                modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
-                modeTwoSpins.set(1, spinner2.getSelectedItemPosition());
-                modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
-        }
-    }
-
-    public void retrieveSpins(List<Integer> spinList, boolean isPom) {
-        if (!isPom) {
-            spinner1.setAdapter(spinAdapter1);
-            spinner2.setAdapter(spinAdapter2);
-            spinner3.setAdapter(spinAdapter3);
-        } else {
-            spinner1.setAdapter(pomAdapter1);
-            spinner2.setAdapter(pomAdapter2);
-            spinner3.setAdapter(pomAdapter3);
-        }
-
-        if (spinList.size() != 0) {
-            if (mode == 1) {
-                spinner1.setSelection(spinList.get(0));
-                spinner2.setSelection(spinList.get(1));
-//                savedSets = modeOneSpins.get(2);
-            }
-        }
     }
 
     public void adjustCustom(boolean adding) {
@@ -886,6 +853,39 @@ public class MainActivity extends AppCompatActivity {
         va.start();
     }
 
+    public void saveSpins() {
+        switch (mode) {
+            case 1:
+                modeOneSpins.set(0, spinner1.getSelectedItemPosition());
+                modeOneSpins.set(1, spinner2.getSelectedItemPosition());
+                modeOneSpins.set(2, (int) customSetTime.size());
+                break;
+            case 2:
+                modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
+                modeTwoSpins.set(1, spinner2.getSelectedItemPosition());
+                modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
+        }
+    }
+
+    public void retrieveSpins(List<Integer> spinList, boolean isPom) {
+        if (!isPom) {
+            spinner1.setAdapter(spinAdapter1);
+            spinner2.setAdapter(spinAdapter2);
+            spinner3.setAdapter(spinAdapter3);
+        } else {
+            spinner1.setAdapter(pomAdapter1);
+            spinner2.setAdapter(pomAdapter2);
+            spinner3.setAdapter(pomAdapter3);
+        }
+
+        if (spinList.size() != 0) {
+            spinner1.setSelection(spinList.get(0));
+            spinner2.setSelection(spinList.get(1));
+            spinner3.setSelection(spinList.get(2));
+        }
+    }
+
+
     public void saveValues(long millis, int progress) {
         switch (mode) {
             case 1:
@@ -908,6 +908,42 @@ public class MainActivity extends AppCompatActivity {
             switch (mode) {
                 case 1: breakPause = savedCustomProgress; breakMillis = savedCustomMillis;
             }
+        }
+    }
+
+    public void switchTimer(int mode, boolean halted) {
+        switch (mode) {
+            case 1:
+                plus_sign.setVisibility(View.VISIBLE);
+                minus_sign.setVisibility(View.VISIBLE);
+                spinner3.setVisibility(View.GONE);
+                s1.setText(R.string.set_time);
+                s2.setText(R.string.break_time);
+                s3.setText(R.string.set_number);
+                timeLeft.setText(convertSeconds((setMillis+999)/1000));
+                break;
+            case 2:
+                plus_sign.setVisibility(View.GONE);
+                minus_sign.setVisibility(View.GONE);
+                spinner3.setVisibility(View.VISIBLE);
+                s1.setText(R.string.work_time);
+                s2.setText(R.string.small_break);
+                s3.setText(R.string.long_break);
+
+                switch (pomStage) {
+                    case 1:
+                        timeLeft.setText(convertSeconds((pomMillis1)/1000)); break;
+                    case 2:
+                        timeLeft.setText(convertSeconds((pomMillis2)/1000)); break;
+                    case 3:
+                        timeLeft.setText(convertSeconds((pomMillis3)/1000));
+                }
+                break;
+        }
+
+        if (halted) {
+            if (objectAnimator!=null) objectAnimator.cancel();
+            if (timer!=null) timer.cancel();
         }
     }
 }
