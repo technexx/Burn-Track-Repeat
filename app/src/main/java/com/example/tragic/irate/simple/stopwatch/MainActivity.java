@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     boolean onBreak;
     boolean pomEnded;
     boolean timerDisabled;
+    boolean halted;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Make sure timers run and recall during tab switches.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Add taskbar notification for timers.
-    //Fast pause/resume sometimes borks timer text.
+    //Todo: Fast pause/resume sometimes borks timer text.
     //Todo: Less blurry +/- icons.
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
@@ -398,22 +399,19 @@ public class MainActivity extends AppCompatActivity {
                 if (mode == 2) {
                     onBreak = false;
                 }
-                //Switches to saved time from start time after initial clicks.
                 if (onBreak) {
                     breakCounter++;
                 } else {
                     setCounter++;
                 }
-                //Resuming from a pause.
-                if (!paused) {
+                if (paused) {
                     if (onBreak) {
                         breakStart();
                     } else {
                         setStart();
                     }
                     reset.setVisibility(View.INVISIBLE);
-                    paused = true;
-                    //Pausing
+                    paused = false;
                 } else if (!timerEnded) {
                     if (pomEnded) {
                         timeLeft.setText(convertSeconds(spinList1.get(modeTwoSpins.get(1))));
@@ -424,9 +422,8 @@ public class MainActivity extends AppCompatActivity {
                     timer.cancel();
                     objectAnimator.cancel();
                     reset.setVisibility(View.VISIBLE);
-                    paused = false;
+                    paused = true;
                 } else {
-                    //Todo: Reset (for custom) should bring back starting set/breaks
                     resetTimer();
                     if (endAnimation != null) endAnimation.cancel();
                     long resetTime = startCustomSetTime.get((startCustomSetTime.size()-1));
@@ -461,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
                     breakCounter = 0;
                     setMillis = setStart;
                     breakMillis = breakStart;
-                    paused = false;
+                    paused = true;
                     progressBar.setProgress(10000);
 
                     if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
@@ -477,7 +474,6 @@ public class MainActivity extends AppCompatActivity {
 //                    //Todo: For "breaks only":
                     timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
-                    paused = false;
                 } else if (numberOfSets == 0 && numberOfBreaks == 0) {
                     customCyclesDone++;
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -485,11 +481,10 @@ public class MainActivity extends AppCompatActivity {
                     progressBar.setProgress(0);
                     timeLeft.setText("0");
                     timerEnded = true;
-                    paused = true;
+                    paused = false;
                 }
                 if (numberOfSets >=0 && numberOfBreaks >=0) {
                     //Beginning set/break count so dots fade instead of disappear.
-                    //Todo: THIS changes all "5" list instances to :05 because it is a GLOBAL var and drawText alters it.
                     dotDraws.setTime(startCustomSetTime);
                     dotDraws.breakTime(startCustomBreakTime);
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
@@ -582,8 +577,6 @@ public class MainActivity extends AppCompatActivity {
                 timeLeft.setText("0");
                 setCounter = 0;
                 //Ensures first click of next break triggers pause.
-                paused = true;
-                //Todo: Move back to break if this borks.
                 if (customSetTime.size() > 0) {
                     customSetTime.remove(customSetTime.size() - 1);
                 }
@@ -678,7 +671,6 @@ public class MainActivity extends AppCompatActivity {
                 numberOfBreaks--;
                 timeLeft.setText("0");
                 //Ensures first click of next break triggers pause.
-                paused = true;
 
                     if (customBreakTime.size() >0) {
                         customBreakTime.remove(customBreakTime.size()-1);
@@ -733,7 +725,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setProgress(10000);
         numberOfSets = savedSets;
         numberOfBreaks = savedBreaks;
-        paused = false;
+        paused = true;
 
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
