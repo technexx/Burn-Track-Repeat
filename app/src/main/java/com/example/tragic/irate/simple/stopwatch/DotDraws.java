@@ -34,8 +34,10 @@ public class DotDraws extends View {
     long mSetReduce;
     long mBreakReduce;
 
-    int alpha = 255;
+    int mAlpha = 255;
+    int mAlpha2 = 255;
     int cycle;
+    int cycle2;
     int mFadeDone;
     int mMode;
     int mPomDot;
@@ -88,6 +90,14 @@ public class DotDraws extends View {
         this.mPomDot = pomDot; this.mFadeDone = fadeDone;
         setupPaint();
         invalidate();
+    }
+
+    public void setAlpha() {
+        if (mMode==1) {
+            mAlpha = 255; cycle = 0;
+        } else if (mMode==2) {
+            mAlpha2 = 255; cycle2 = 0;
+        }
     }
 
     @Override
@@ -160,15 +170,28 @@ public class DotDraws extends View {
     }
 
     public void fadeDot() {
-        if (alpha >255) alpha = 255;
-        mPaint.setAlpha(alpha);
-        cycle++;
-        if (cycle <10) {
-            alpha -=25;
-        } else {
-            alpha +=25;
-            if (cycle >19) cycle = 0;
+        if (mMode == 1)  {
+            if (mAlpha >255) mAlpha = 255;
+            mPaint.setAlpha(mAlpha);
+            cycle++;
+            if (cycle <10) {
+                mAlpha -=25;
+            } else {
+                mAlpha +=25;
+                if (cycle >19) cycle = 0;
+            }
+        } else if (mMode==2) {
+            if (mAlpha2 >255) mAlpha2 = 255;
+            mPaint.setAlpha(mAlpha2);
+            cycle2++;
+            if (cycle2 <10) {
+                mAlpha2 -=25;
+            } else {
+                mAlpha2 +=25;
+                if (cycle2 >19) cycle2 = 0;
+            }
         }
+
     }
 
     public void pomDraw(int i, boolean fade) {

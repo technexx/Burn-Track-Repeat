@@ -566,9 +566,7 @@ public class MainActivity extends AppCompatActivity {
         }
         progressBar.setProgress((int) setPause);
         progressBar.getProgress();
-
-//        objectAnimator.setDuration(setMillis);
-//        objectAnimator.start();
+        dotDraws.setAlpha();
 
         fadeDone = 1;
         //This now retains the saved millis value.
@@ -873,14 +871,17 @@ public class MainActivity extends AppCompatActivity {
     public void saveSpins() {
         switch (mode) {
             case 1:
-                modeOneSpins.set(0, spinner1.getSelectedItemPosition());
-                modeOneSpins.set(1, spinner2.getSelectedItemPosition());
-                modeOneSpins.set(2, (int) customSetTime.size());
+                if (modeOneSpins.size() >=3) {
+                    modeOneSpins.set(0, spinner1.getSelectedItemPosition());
+                    modeOneSpins.set(1, spinner2.getSelectedItemPosition());
+                    modeOneSpins.set(2, (int) customSetTime.size());              }
                 break;
             case 2:
-                modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
-                modeTwoSpins.set(1, spinner2.getSelectedItemPosition());
-                modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
+                if (modeTwoSpins.size() >=3) {
+                    modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
+                    modeTwoSpins.set(1, spinner2.getSelectedItemPosition());
+                    modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
+                }
         }
     }
 
