@@ -149,8 +149,10 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible "Saved Presets" SharedPref for Custom in 4th tab or popup window.
     //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
+    //Todo: Set - > Break transition b0rked for Custom.
     //Todo: Choose where to add sets/breaks.
     //Todo: Breaks only option.
+    //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Make sure timers run and recall during tab switches.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Add taskbar notification for timers.
@@ -182,8 +184,6 @@ public class MainActivity extends AppCompatActivity {
 
         reset.setVisibility(View.INVISIBLE);
         blank_spinner.setVisibility(View.GONE);
-        plus_sign.setVisibility(View.GONE);
-        minus_sign.setVisibility(View.GONE);
 
         progressBar = findViewById(R.id.progressBar);
         timeLeft = findViewById(R.id.timeLeft);
@@ -213,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
         customBreakTime = new ArrayList<>();
         startCustomSetTime = new ArrayList<>();
         startCustomBreakTime = new ArrayList<>();
+        s3.setText(R.string.set_number);
+        spinner3.setVisibility(View.GONE);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -313,9 +315,9 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.pomDraw(1, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
 
-                        setValues();
                         retrieveSpins(modeTwoSpins, true);
                         paused = pomHalted;
+                        setValues();
                         switchTimer(2, paused);
                 }
                 Log.i("halted", "custom halted is " + customHalted + " and pom halted is " + pomHalted);
@@ -344,10 +346,10 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 firstSpinCount++;
                 if (mode == 1) {
-//                    if (customSetTime.size() >0) {
-//                        setMillis = customSetTime.get(customSetTime.size()-1);
-//                        setStart = (int) setMillis;
-//                    }
+                    if (customSetTime.size() >0) {
+                        setMillis = customSetTime.get(customSetTime.size()-1);
+                        setStart = (int) setMillis;
+                    }
                 } else {
                     pos = pomList1.get(position);
                     pomMillis1 = pos*60000;
@@ -544,6 +546,7 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 if (setCounter <=1) {
                     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+                    if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
                 } else {
                     objectAnimator.cancel();
                     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (setPause), 0);
@@ -660,12 +663,12 @@ public class MainActivity extends AppCompatActivity {
     public void breakStart() {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
+        setValues();
 
         if (breakCounter <=1) {
             if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
         }
 
-        setValues();
         if (breakCounter >= 1) {
             objectAnimator.cancel();
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
@@ -784,7 +787,6 @@ public class MainActivity extends AppCompatActivity {
                 breakCounter = 0;
 
                 savedCustomMillis = setMillis;
-                savedPomProgress = 10000;
                 if (objectAnimator != null) objectAnimator.cancel();
                 break;
             case 2:
@@ -923,13 +925,15 @@ public class MainActivity extends AppCompatActivity {
                 case 2: setMillis = savedPomMillis; setPause = savedPomProgress;
             }
         } else {
+            //Todo: Break values are using old (end of set) set values.
             switch (mode) {
                 case 1: breakPause = savedCustomProgress; breakMillis = savedCustomMillis;
             }
         }
     }
 
-    //Todo: Resetting in Pom retrieves original pomMillis, not new spinner.
+    //Todo: Need to pause or cancel animator objects. Overriding with another on same progressBar doesn't stop it.
+    //Todo: There is a resume method w/ animator.
     public void switchTimer(int mode, boolean halted) {
         switch (mode) {
             case 1:
@@ -938,10 +942,10 @@ public class MainActivity extends AppCompatActivity {
                 spinner3.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
-                s3.setText(R.string.set_number);
                 if (halted) {
                     if (objectAnimator!=null) objectAnimator.cancel();
                     if (timer!=null) timer.cancel();
+                    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (setPause), 0);
                 }
                 break;
             case 2:
@@ -954,6 +958,7 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     if (objectAnimator2!=null) objectAnimator2.cancel();
                     if (timer!=null) timer.cancel();
+                    if (objectAnimator != null) objectAnimator.pause();
                 }
                 break;
         }
