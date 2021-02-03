@@ -105,9 +105,8 @@ public class MainActivity extends AppCompatActivity {
     int breakStart;
     long setMillis;
     int setStart;
-    int setPause = 10000;
-    int breakPause = 10000;
-    int pomPause = 10000;
+    int customProgressPause = 10000;
+    int pomProgressPause = 10000;
     int pomStart;
     long pomMillis;
     long pos;
@@ -116,9 +115,6 @@ public class MainActivity extends AppCompatActivity {
 
     long savedCustomMillis;
     long savedPomMillis;
-
-    int savedCustomProgress;
-    int savedPomProgress;
 
     int firstSpinCount;
     int secondSpinCount;
@@ -310,8 +306,8 @@ public class MainActivity extends AppCompatActivity {
         //Pom defaults
         pomMillis = pomList1.get(2)*60000;
 
-        savedCustomProgress = maxProgress;
-        savedPomProgress = maxProgress;
+        customProgressPause = maxProgress;
+        pomProgressPause = maxProgress;
         savedCustomMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
         savedPomMillis = pomMillis;
 
@@ -530,12 +526,10 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 timeLeft.setVisibility(View.VISIBLE);
                 if (!setBegun) {
-                    if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
-                    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+                    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
                     objectAnimator.setInterpolator(new LinearInterpolator());
                     objectAnimator.setDuration(setMillis);
                     objectAnimator.start();
-                    setBegun = true;
                 } else {
                     if (objectAnimator!=null) objectAnimator.resume();
                 }
@@ -543,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
             case 2:
                 timeLeft2.setVisibility(View.VISIBLE);
                 if (!pomBegun) {
-                    objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) maxProgress, 0);
+                    objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) pomProgressPause, 0);
                     objectAnimator2.setInterpolator(new LinearInterpolator());
                     objectAnimator2.setDuration(pomMillis);
                     objectAnimator2.start();
@@ -559,11 +553,16 @@ public class MainActivity extends AppCompatActivity {
     public void startTimer() {
         switch (mode) {
             case 1:
-                if (setBegun) setMillis = setMillisUntilFinished;
+                if (setBegun) {
+                    setMillis = setMillisUntilFinished;
+                } else {
+                    if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
+                }
+                setBegun = true;
                 timer = new CountDownTimer(setMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        setPause = (int) objectAnimator.getAnimatedValue();
+                        customProgressPause = (int) objectAnimator.getAnimatedValue();
                         setMillis = millisUntilFinished;
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                         boolean fadePaused = false;
@@ -584,12 +583,12 @@ public class MainActivity extends AppCompatActivity {
                         fadeDone = 2;
                         numberOfSets--;
                         timeLeft.setText("0");
+                        customProgressPause = maxProgress;
                         if (customSetTime.size() > 0) {
                             customSetTime.remove(customSetTime.size() - 1);
                         }
-
-                        breakPause = maxProgress;
-                        breakMillis = breakStart;
+                        if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
+                        setBegun = false;
                         onBreak = true;
                         timerEnded = false;
                         endAnimation();
@@ -597,7 +596,6 @@ public class MainActivity extends AppCompatActivity {
                             breakStart();
                             endAnimation.cancel();
                         },750);
-                        endAnimation();
                         dotDraws.setTime(startCustomSetTime);
                         dotDraws.breakTime(startCustomBreakTime);
                     }
@@ -608,7 +606,7 @@ public class MainActivity extends AppCompatActivity {
                 timer2 = new CountDownTimer(pomMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        pomPause = (int) objectAnimator2.getAnimatedValue();
+                        pomProgressPause = (int) objectAnimator2.getAnimatedValue();
                         pomMillis = millisUntilFinished;
                         timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
                         dotDraws.pomDraw(pomDotCounter, 1);
@@ -619,6 +617,7 @@ public class MainActivity extends AppCompatActivity {
                         fadeDone = 2;
                         numberOfSets--;
                         timeLeft2.setText("0");
+                        pomProgressPause = maxProgress;
 
                         switch (pomDotCounter) {
                             case 2: case 4: case 6:
@@ -651,13 +650,9 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
         objectAnimator.setInterpolator(new LinearInterpolator());
 
-        if (breakCounter <=1) {
-            if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
-        }
-
         if (breakCounter >= 1) {
             objectAnimator.cancel();
-            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (breakPause), 0);
+            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) (customProgressPause), 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
         }
 
@@ -668,7 +663,7 @@ public class MainActivity extends AppCompatActivity {
         timer = new CountDownTimer(breakMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
-                breakPause = (int) objectAnimator.getAnimatedValue();
+                customProgressPause = (int) objectAnimator.getAnimatedValue();
                 breakMillis = millisUntilFinished;
                 timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
 
@@ -688,8 +683,6 @@ public class MainActivity extends AppCompatActivity {
                 fadeDone = 4;
                 numberOfBreaks--;
                 timeLeft.setText("0");
-                //Ensures first click of next break triggers pause.
-
                     if (customBreakTime.size() >0) {
                         customBreakTime.remove(customBreakTime.size()-1);
                     }
@@ -699,13 +692,14 @@ public class MainActivity extends AppCompatActivity {
                 endAnimation();
                 if (numberOfBreaks >0) {
                     breakCounter = 0;
-                    setPause = maxProgress;
-                    setMillis = setStart;
+                    customProgressPause = maxProgress;
                     onBreak = false;
                     timerEnded = false;
+                    if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
 
-                    handler.postDelayed((Runnable) () -> {
+                    handler.postDelayed(() -> {
                         startObjectAnimator();
+                        startTimer();
                         endAnimation.cancel();
                     },750);
                 } else {
@@ -911,12 +905,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                     reset.setVisibility(View.VISIBLE);
                 } else if (pausing == RESUMING_TIMER) {
-                    startTimer();
                     if (onBreak) {
                         breakStart();
                     } else {
                         startObjectAnimator();
                     }
+                    startTimer();
                     if (mode==1) customHalted = false; if (mode==2) pomHalted = false;
                     reset.setVisibility(View.INVISIBLE);
                 }
@@ -931,8 +925,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void resetTimer() {
         removeViews();
-//        numberOfSets = savedSets;
-//        numberOfBreaks = savedBreaks;
         //Todo: Separate end animations.
         if (endAnimation != null) endAnimation.cancel();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
@@ -940,10 +932,9 @@ public class MainActivity extends AppCompatActivity {
         switch (mode) {
             case 1:
                 progressBar.setProgress(10000);
+                customProgressPause = maxProgress;
                 timerEnded = false;
                 setBegun = false;
-                setPause = setStart;
-                breakPause = breakStart;
 
                 if (timer != null) timer.cancel();
                 if (objectAnimator != null) objectAnimator.cancel();
@@ -979,9 +970,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 progressBar2.setProgress(10000);
-                timerEnded2 = false;
                 pomBegun = false;
-                pomPause = pomStart;
+                pomProgressPause = maxProgress;
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
                 timeLeft2.setVisibility(View.VISIBLE);
@@ -989,7 +979,7 @@ public class MainActivity extends AppCompatActivity {
                 timePaused2.setText(convertSeconds((pomMillis1+999)/1000));
                 onBreak = false;
                 pomMillis = savedPomMillis;
-                savedPomProgress = 10000;
+                pomProgressPause = maxProgress;
                 break;
         }
     }
