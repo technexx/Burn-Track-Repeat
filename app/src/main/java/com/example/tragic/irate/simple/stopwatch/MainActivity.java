@@ -99,8 +99,6 @@ public class MainActivity extends AppCompatActivity {
     int RESUMING_TIMER = 2;
 
     int breakCounter;
-    int setCounter;
-    int pomSetCounter;
     int maxProgress = 10000;
 
     long breakMillis;
@@ -141,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
     long savedSets;
 
     boolean timerEnded;
+    boolean timerEnded2;
     boolean paused;
     boolean onBreak;
     boolean pomEnded;
@@ -169,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Keep alpha level of dots between tab switches.
+    //Todo: Bit of tearing switching between progressBars.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Add taskbar notification for timers.
     //Todo: Less blurry +/- icons.
@@ -332,8 +332,7 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
                         retrieveSpins(modeOneSpins, false);
-                        paused = customHalted;
-                        switchTimer(1, paused);
+                        switchTimer(1, customHalted);
                         break;
                     case 1:
                         mode=2;
@@ -344,20 +343,19 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
 
                         retrieveSpins(modeTwoSpins, true);
-                        paused = pomHalted;
-                        switchTimer(2, paused);
+                        switchTimer(2, pomHalted);
                 }
                 Log.i("halted", "custom halted is " + customHalted + " and pom halted is " + pomHalted);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                switch (tab.getPosition()) {
-                    case 0:
-                        customHalted = paused; break;
-                    case 1:
-                        pomHalted = paused;
-                }
+//                switch (tab.getPosition()) {
+//                    case 0:
+//                        customHalted = paused; break;
+//                    case 1:
+//                        pomHalted = paused;
+//                }
                 firstSpinCount = 0;
                 secondSpinCount = 0;
                 thirdSpinCount = 0;
@@ -380,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     pos = pomList1.get(position);
                     pomMillis1 = pos*60000;
-                    setStart = (int) pomMillis1;
+                    savedPomMillis = pomMillis1;
                 }
                 if (firstSpinCount >1) {
                     saveSpins();
@@ -439,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar.setOnClickListener(v-> {
-            if (!paused) {
+            if (!customHalted) {
                 pauseAndResumeTimer(PAUSING_TIMER);
             } else {
                 pauseAndResumeTimer(RESUMING_TIMER);
@@ -447,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         progressBar2.setOnClickListener(v-> {
-            if (!paused) {
+            if (!pomHalted) {
                 pauseAndResumeTimer(PAUSING_TIMER);
             } else {
                 pauseAndResumeTimer(RESUMING_TIMER);
@@ -473,7 +471,6 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator.cancel();
                 }
                 if (numberOfSets >0 && numberOfBreaks >0) {
-                    setCounter = 0;
                     breakCounter = 0;
                     setMillis = setStart;
                     breakMillis = breakStart;
@@ -550,7 +547,7 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator2.setInterpolator(new LinearInterpolator());
                     objectAnimator2.setDuration(pomMillis);
                     objectAnimator2.start();
-                    pomBegun = false;
+                    pomBegun = true;
                 } else {
                     if (objectAnimator2!=null) objectAnimator2.resume();
                 }
@@ -587,7 +584,6 @@ public class MainActivity extends AppCompatActivity {
                         fadeDone = 2;
                         numberOfSets--;
                         timeLeft.setText("0");
-                        setCounter = 0;
                         if (customSetTime.size() > 0) {
                             customSetTime.remove(customSetTime.size() - 1);
                         }
@@ -612,8 +608,7 @@ public class MainActivity extends AppCompatActivity {
                 timer2 = new CountDownTimer(pomMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        pomMillis = (int) objectAnimator2.getAnimatedValue();
-//                        saveValues(setMillis, setPause);
+                        pomPause = (int) objectAnimator2.getAnimatedValue();
                         pomMillis = millisUntilFinished;
                         timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
                         dotDraws.pomDraw(pomDotCounter, 1);
@@ -624,7 +619,6 @@ public class MainActivity extends AppCompatActivity {
                         fadeDone = 2;
                         numberOfSets--;
                         timeLeft2.setText("0");
-                        setCounter = 0;
 
                         switch (pomDotCounter) {
                             case 2: case 4: case 6:
@@ -635,7 +629,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                         pomDotCounter++;
                         if (pomDotCounter <8) {
-//                            setStart();
                             startObjectAnimator();
                         } else {
                             pomEnded = true;
@@ -712,7 +705,6 @@ public class MainActivity extends AppCompatActivity {
                     timerEnded = false;
 
                     handler.postDelayed((Runnable) () -> {
-//                        setStart();
                         startObjectAnimator();
                         endAnimation.cancel();
                     },750);
@@ -892,8 +884,6 @@ public class MainActivity extends AppCompatActivity {
     public void pauseAndResumeTimer(int pausing) {
         if (onBreak) {
             breakCounter++;
-        } else {
-            if (mode==1) setCounter++; else pomSetCounter++;
         }
 
         if (!timerDisabled) {
@@ -907,6 +897,7 @@ public class MainActivity extends AppCompatActivity {
                             String pausedTime = (convertSeconds((setMillisUntilFinished + 999)/1000));
                             timePaused.setVisibility(View.VISIBLE);
                             timePaused.setText(pausedTime);
+                            customHalted = true;
                             break;
                         case 2:
                             pomMillisUntilFinished = pomMillis;
@@ -915,10 +906,10 @@ public class MainActivity extends AppCompatActivity {
                             String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999)/1000));
                             timePaused2.setVisibility(View.VISIBLE);
                             timePaused2.setText(pausedTime2);
+                            pomHalted = true;
                             break;
                     }
                     reset.setVisibility(View.VISIBLE);
-                    paused = true;
                 } else if (pausing == RESUMING_TIMER) {
                     startTimer();
                     if (onBreak) {
@@ -926,8 +917,8 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         startObjectAnimator();
                     }
+                    if (mode==1) customHalted = false; if (mode==2) pomHalted = false;
                     reset.setVisibility(View.INVISIBLE);
-                    paused = false;
                 }
             } else {
                 resetTimer();
@@ -940,19 +931,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void resetTimer() {
         removeViews();
-        timerEnded = false;
-        setPause = setStart;
-        breakPause = breakStart;
-        numberOfSets = savedSets;
-        numberOfBreaks = savedBreaks;
-        paused = true;
-
+//        numberOfSets = savedSets;
+//        numberOfBreaks = savedBreaks;
+        //Todo: Separate end animations.
         if (endAnimation != null) endAnimation.cancel();
+        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
         switch (mode) {
             case 1:
                 progressBar.setProgress(10000);
+                timerEnded = false;
                 setBegun = false;
+                setPause = setStart;
+                breakPause = breakStart;
+
                 if (timer != null) timer.cancel();
                 if (objectAnimator != null) objectAnimator.cancel();
                 if (startCustomSetTime.size() >0 && startCustomBreakTime.size() >0) {
@@ -983,23 +975,22 @@ public class MainActivity extends AppCompatActivity {
                 }
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
-                setCounter = 0;
-                breakCounter = 0;
-
                 savedCustomMillis = setMillis;
                 break;
             case 2:
                 progressBar2.setProgress(10000);
+                timerEnded2 = false;
+                pomBegun = false;
+                pomPause = pomStart;
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
                 timeLeft2.setVisibility(View.VISIBLE);
                 timeLeft2.setText(convertSeconds((pomMillis1+999)/1000));
                 timePaused2.setText(convertSeconds((pomMillis1+999)/1000));
-                pomSetCounter =0;
                 onBreak = false;
-                savedPomMillis = pomMillis1;
+                pomMillis = savedPomMillis;
                 savedPomProgress = 10000;
+                break;
         }
-        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
     }
 }
