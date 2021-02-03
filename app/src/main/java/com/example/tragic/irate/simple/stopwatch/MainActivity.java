@@ -174,6 +174,8 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Add actual stop watch!
     //Todo: timerEnded var MIGHT cause issues w/ different modes, but might not because of resetTimer().
 
+    //Todo: NOTE: Arising progressBar issues may be tied to startObjectAnimator and startTimer order of execution. May be better to consolidate them.
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -526,11 +528,13 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 timeLeft.setVisibility(View.VISIBLE);
                 if (!setBegun) {
+                    if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
                     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
                     objectAnimator.setInterpolator(new LinearInterpolator());
                     objectAnimator.setDuration(setMillis);
                     objectAnimator.start();
                 } else {
+                    setMillis = setMillisUntilFinished;
                     if (objectAnimator!=null) objectAnimator.resume();
                 }
                 break;
@@ -543,6 +547,7 @@ public class MainActivity extends AppCompatActivity {
                     objectAnimator2.start();
                     pomBegun = true;
                 } else {
+                    pomMillis = pomMillisUntilFinished;
                     if (objectAnimator2!=null) objectAnimator2.resume();
                 }
                 break;
@@ -553,11 +558,6 @@ public class MainActivity extends AppCompatActivity {
     public void startTimer() {
         switch (mode) {
             case 1:
-                if (setBegun) {
-                    setMillis = setMillisUntilFinished;
-                } else {
-                    if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
-                }
                 setBegun = true;
                 timer = new CountDownTimer(setMillis, 50) {
                     @Override
@@ -602,7 +602,7 @@ public class MainActivity extends AppCompatActivity {
                 }.start();
                 break;
             case 2:
-                if (pomBegun) pomMillis = pomMillisUntilFinished;
+                pomBegun = true;
                 timer2 = new CountDownTimer(pomMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
@@ -614,6 +614,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onFinish() {
+                        pomBegun = false;
                         fadeDone = 2;
                         numberOfSets--;
                         timeLeft2.setText("0");
