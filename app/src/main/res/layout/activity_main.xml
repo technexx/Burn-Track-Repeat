@@ -246,6 +246,20 @@
         android:background="@drawable/circle_shape">
     </ProgressBar>
 
+    <ProgressBar
+        android:id="@+id/progressBar2"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="4dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="10000"
+        android:progressDrawable="@drawable/circle_progress"
+        android:background="@drawable/circle_shape">
+    </ProgressBar>
+
     <TextView
         android:id="@+id/reset"
         android:text="Reset"

@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     TextView heading;
     ProgressBar progressBar;
+    ProgressBar progressBar2;
     TextView timeLeft;
     TextView timeLeft2;
     TextView timePaused;
@@ -167,10 +168,9 @@ public class MainActivity extends AppCompatActivity {
 
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
-    //Todo: Make sure timers run and recall during tab switches.
+    //Todo: Keep alpha level of dots between tab switches.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Add taskbar notification for timers.
-    //Todo: Fast pause/resume sometimes borks timer text.
     //Todo: Less blurry +/- icons.
     //Todo: Rename app, of course.
     //Todo: Possible sqlite db for saved presets.
@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
         blank_spinner.setVisibility(View.GONE);
 
         progressBar = findViewById(R.id.progressBar);
+        progressBar2 = findViewById(R.id.progressBar2);
         timeLeft = findViewById(R.id.timeLeft);
         timeLeft2 = findViewById(R.id.timeLeft2);
         timePaused = findViewById(R.id.timePaused);
@@ -239,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
         timeLeft2.setVisibility(View.GONE);
         timePaused.setVisibility(View.GONE);
         timePaused2.setVisibility(View.GONE);
+        progressBar2.setVisibility(View.GONE);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -312,6 +314,9 @@ public class MainActivity extends AppCompatActivity {
         savedPomProgress = maxProgress;
         savedCustomMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
         savedPomMillis = pomMillis;
+
+        progressBar.setProgress(maxProgress);
+        progressBar2.setProgress(maxProgress);
         resetTimer();
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -441,6 +446,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        progressBar2.setOnClickListener(v-> {
+            if (!paused) {
+                pauseAndResumeTimer(PAUSING_TIMER);
+            } else {
+                pauseAndResumeTimer(RESUMING_TIMER);
+            }
+        });
+
         cycle_reset.setOnClickListener(v -> {
             switch (mode) {
                 case 1:
@@ -520,8 +533,8 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 timeLeft.setVisibility(View.VISIBLE);
                 if (!setBegun) {
-                    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                     if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
+                    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                     objectAnimator.setInterpolator(new LinearInterpolator());
                     objectAnimator.setDuration(setMillis);
                     objectAnimator.start();
@@ -533,7 +546,7 @@ public class MainActivity extends AppCompatActivity {
             case 2:
                 timeLeft2.setVisibility(View.VISIBLE);
                 if (!pomBegun) {
-                    objectAnimator2 = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+                    objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) maxProgress, 0);
                     objectAnimator2.setInterpolator(new LinearInterpolator());
                     objectAnimator2.setDuration(pomMillis);
                     objectAnimator2.start();
@@ -547,10 +560,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startTimer() {
-        if (setBegun) setMillis = setMillisUntilFinished;
         switch (mode) {
             case 1:
-                //Todo: Move saved setMillis back into timer @ !notBegun. Might need sep var from setMillis since it is also used above.
+                if (setBegun) setMillis = setMillisUntilFinished;
                 timer = new CountDownTimer(setMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
@@ -564,7 +576,6 @@ public class MainActivity extends AppCompatActivity {
                                 dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
                                 fadePaused = true;
                             } else {
-                                //fadeDone value does not matter here.
                                 dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1);
                                 fadePaused = false;
                             }
@@ -575,9 +586,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onFinish() {
                         fadeDone = 2;
                         numberOfSets--;
-                        timeLeft2.setText("0");
+                        timeLeft.setText("0");
                         setCounter = 0;
-                        //Ensures first click of next break triggers pause.
                         if (customSetTime.size() > 0) {
                             customSetTime.remove(customSetTime.size() - 1);
                         }
@@ -598,14 +608,14 @@ public class MainActivity extends AppCompatActivity {
                 }.start();
                 break;
             case 2:
+                if (pomBegun) pomMillis = pomMillisUntilFinished;
                 timer2 = new CountDownTimer(pomMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         pomMillis = (int) objectAnimator2.getAnimatedValue();
 //                        saveValues(setMillis, setPause);
                         pomMillis = millisUntilFinished;
-                        pomMillisUntilFinished = pomMillis;
-                        timeLeft2.setText(convertSeconds((pomMillisUntilFinished + 999)/1000));
+                        timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
                         dotDraws.pomDraw(pomDotCounter, 1);
                     }
 
@@ -828,11 +838,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Todo: Tabbing back resets the timer/progressBar after onClick.
     public void switchTimer(int mode, boolean halted) {
         removeViews();
         switch (mode) {
             case 1:
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar2.setVisibility(View.INVISIBLE);
                 plus_sign.setVisibility(View.VISIBLE);
                 minus_sign.setVisibility(View.VISIBLE);
                 spinner3.setVisibility(View.GONE);
@@ -850,6 +861,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case 2:
+                progressBar2.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
                 plus_sign.setVisibility(View.GONE);
                 minus_sign.setVisibility(View.GONE);
                 spinner3.setVisibility(View.VISIBLE);
@@ -860,7 +873,6 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     timePaused2.setVisibility(View.VISIBLE);
                     timePaused2.setText(convertSeconds((pomMillisUntilFinished + 999)/1000));
-
                 } else {
                     startObjectAnimator();
                     timeLeft2.setVisibility(View.VISIBLE);
@@ -897,6 +909,7 @@ public class MainActivity extends AppCompatActivity {
                             timePaused.setText(pausedTime);
                             break;
                         case 2:
+                            pomMillisUntilFinished = pomMillis;
                             if (objectAnimator2!=null) objectAnimator2.pause();
                             if (timer2!=null) timer2.cancel();;
                             String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999)/1000));
@@ -930,8 +943,6 @@ public class MainActivity extends AppCompatActivity {
         timerEnded = false;
         setPause = setStart;
         breakPause = breakStart;
-
-        progressBar.setProgress(10000);
         numberOfSets = savedSets;
         numberOfBreaks = savedBreaks;
         paused = true;
@@ -940,6 +951,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (mode) {
             case 1:
+                progressBar.setProgress(10000);
                 setBegun = false;
                 if (timer != null) timer.cancel();
                 if (objectAnimator != null) objectAnimator.cancel();
@@ -977,6 +989,7 @@ public class MainActivity extends AppCompatActivity {
                 savedCustomMillis = setMillis;
                 break;
             case 2:
+                progressBar2.setProgress(10000);
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
                 timeLeft2.setVisibility(View.VISIBLE);
