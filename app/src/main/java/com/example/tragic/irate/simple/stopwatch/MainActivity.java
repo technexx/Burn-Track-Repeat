@@ -98,24 +98,18 @@ public class MainActivity extends AppCompatActivity {
     int PAUSING_TIMER = 1;
     int RESUMING_TIMER = 2;
 
-
-    int maxProgress = 10000;
-
     long breakMillis;
     int breakStart;
     long setMillis;
     int setStart;
+    int maxProgress = 10000;
     int customProgressPause = 10000;
     int pomProgressPause = 10000;
-    int pomStart;
     long pomMillis;
     long pos;
     long setMillisUntilFinished;
     long breakMillisUntilFinished;
     long pomMillisUntilFinished;
-
-    long savedCustomMillis;
-    long savedPomMillis;
 
     int firstSpinCount;
     int secondSpinCount;
@@ -124,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
     long pomMillis1;
     long pomMillis2;
     long pomMillis3;
-    int pomStage=1;
     int pomDotCounter=1;
 
     int customCyclesDone;
@@ -136,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
     long savedSets;
 
     boolean timerEnded;
-    boolean timerEnded2;
     boolean paused;
     boolean onBreak;
     boolean pomEnded;
@@ -159,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
 
-    //Todo: Fix pause on breaks.
+    //Todo: Run through all Skip and Reset iterations.
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Keep alpha level of dots between tab switches.
@@ -310,11 +302,6 @@ public class MainActivity extends AppCompatActivity {
         //Pom defaults
         pomMillis = pomList1.get(2)*60000;
 
-        customProgressPause = maxProgress;
-        pomProgressPause = maxProgress;
-        savedCustomMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
-        savedPomMillis = pomMillis;
-
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
         resetTimer();
@@ -345,17 +332,10 @@ public class MainActivity extends AppCompatActivity {
                         retrieveSpins(modeTwoSpins, true);
                         switchTimer(2, pomHalted);
                 }
-                Log.i("halted", "custom halted is " + customHalted + " and pom halted is " + pomHalted);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-//                switch (tab.getPosition()) {
-//                    case 0:
-//                        customHalted = paused; break;
-//                    case 1:
-//                        pomHalted = paused;
-//                }
                 firstSpinCount = 0;
                 secondSpinCount = 0;
                 thirdSpinCount = 0;
@@ -378,7 +358,6 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     pos = pomList1.get(position);
                     pomMillis1 = pos*60000;
-                    savedPomMillis = pomMillis1;
                 }
                 if (firstSpinCount >1) {
                     saveSpins();
@@ -555,9 +534,7 @@ public class MainActivity extends AppCompatActivity {
                         breakMillis = breakMillisUntilFinished;
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
-
                 }
-
                 break;
             case 2:
                 timeLeft2.setVisibility(View.VISIBLE);
@@ -766,8 +743,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
-        Log.i("custom", "set start is " + startCustomSetTime + " and remaining sets are " + customSetTime);
-
         resetTimer();
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
@@ -825,7 +800,6 @@ public class MainActivity extends AppCompatActivity {
             spinner2.setAdapter(pomAdapter2);
             spinner3.setAdapter(pomAdapter3);
         }
-
         if (spinList.size() != 0) {
             spinner1.setSelection(spinList.get(0));
             spinner2.setSelection(spinList.get(1));
@@ -979,7 +953,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
-                savedCustomMillis = setMillis;
                 break;
             case 2:
                 progressBar2.setProgress(10000);
@@ -991,7 +964,6 @@ public class MainActivity extends AppCompatActivity {
                 timeLeft2.setText(convertSeconds((pomMillis1+999)/1000));
                 timePaused2.setText(convertSeconds((pomMillis1+999)/1000));
                 onBreak = false;
-                pomMillis = savedPomMillis;
                 pomProgressPause = maxProgress;
                 break;
         }
