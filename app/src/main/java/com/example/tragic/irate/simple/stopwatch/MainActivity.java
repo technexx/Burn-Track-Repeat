@@ -151,7 +151,10 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
 
+    //Todo: Reset Pom, tab switch, Pom textView back @ pre-reset values, tho starts at correct value.
     //Todo: Run through all Skip and Reset iterations.
+    //Todo: Dotdraws doubling up in fade/not stopping.
+    //Todo: Pom textView blip occurs after resetTimer() in Custom mode.
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Keep alpha level of dots between tab switches.
@@ -162,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Add actual stop watch!
-    //Todo: timerEnded var MIGHT cause issues w/ different modes, but might not because of resetTimer().
 
     //Todo: Possible "Saved Presets" SharedPref for Custom in 4th tab or popup window.
     //Todo: Possible: Save sets/breaks completed on any given day. Add weight/resistance to each.
@@ -313,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         mode=1;
                         heading.setText(R.string.variable);
-                        changeTextSize(valueAnimatorUp);
+                        changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                         dotDraws.setMode(1);
                         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -324,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
                     case 1:
                         mode=2;
                         heading.setText(R.string.pomodoro);
-                        changeTextSize(valueAnimatorDown);
+                        changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
                         dotDraws.setMode(2);
                         dotDraws.pomDraw(1, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
@@ -504,7 +506,6 @@ public class MainActivity extends AppCompatActivity {
     public void startObjectAnimator() {
         fadeDone = 3;
         removeViews();
-        timeLeft.setVisibility(View.VISIBLE);
 
         switch (mode) {
             case 1:
@@ -765,10 +766,11 @@ public class MainActivity extends AppCompatActivity {
         timeLeft.setAnimation(endAnimation);
     }
 
-    public void changeTextSize(ValueAnimator va) {
+    public void changeTextSize(ValueAnimator va, TextView textView, TextView textViewPaused) {
         va.addUpdateListener(animation -> {
             float sizeChange = (float) va.getAnimatedValue();
-            timeLeft.setTextSize(sizeChange);
+            textView.setTextSize(sizeChange);
+            textViewPaused.setTextSize(sizeChange);
         });
         va.start();
     }
@@ -828,7 +830,6 @@ public class MainActivity extends AppCompatActivity {
                     timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                 }
                 break;
-
             case 2:
                 progressBar2.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
@@ -841,11 +842,11 @@ public class MainActivity extends AppCompatActivity {
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
                     timePaused2.setVisibility(View.VISIBLE);
-                    timePaused2.setText(convertSeconds((pomMillisUntilFinished + 999)/1000));
+                    timePaused2.setText(convertSeconds((pomMillis + 999)/1000));
                 } else {
                     startObjectAnimator();
                     timeLeft2.setVisibility(View.VISIBLE);
-                    timeLeft2.setText(convertSeconds((pomMillisUntilFinished + 999)/1000));
+                    timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
                 }
                 break;
         }
@@ -859,6 +860,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pauseAndResumeTimer(int pausing) {
+        removeViews();
         if (!timerDisabled) {
             if (!timerEnded) {
                 if (pausing == PAUSING_TIMER) {
@@ -897,7 +899,14 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         startTimer();
                     }
-                    if (mode==1) customHalted = false; if (mode==2) pomHalted = false;
+                    switch (mode) {
+                        case 1:
+                            customHalted = false;
+                            break;
+                        case 2:
+                            pomHalted = false;
+                            break;
+                    }
                     reset.setVisibility(View.INVISIBLE);
                 }
             } else {
@@ -961,8 +970,9 @@ public class MainActivity extends AppCompatActivity {
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
                 timeLeft2.setVisibility(View.VISIBLE);
-                timeLeft2.setText(convertSeconds((pomMillis1+999)/1000));
-                timePaused2.setText(convertSeconds((pomMillis1+999)/1000));
+                pomMillis = pomMillis1;
+                timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
+                timePaused2.setText(convertSeconds((pomMillis+999)/1000));
                 onBreak = false;
                 pomProgressPause = maxProgress;
                 break;
