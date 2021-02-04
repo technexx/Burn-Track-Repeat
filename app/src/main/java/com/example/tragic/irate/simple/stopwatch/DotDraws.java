@@ -133,7 +133,7 @@ public class DotDraws extends View {
                     mPaint.setColor(Color.RED);
                 }
                 if (mBreakReduce + i == mBreakCount) {
-                    if (mFadeDone == 3) {
+                    if (mFadeDone == 2) {
                         fadeDot();
                     }
                 } else if (mBreakReduce +i >= mBreakCount) {
@@ -170,43 +170,43 @@ public class DotDraws extends View {
     }
 
     public void fadeDot() {
-        if (mMode == 1)  {
-            if (mAlpha >255) mAlpha = 255;
-            mPaint.setAlpha(mAlpha);
-            cycle++;
-            if (cycle <10) {
-                mAlpha -=25;
-            } else {
-                mAlpha +=25;
-                if (cycle >19) cycle = 0;
-            }
-        } else if (mMode==2) {
-            if (mAlpha2 >255) mAlpha2 = 255;
-            mPaint.setAlpha(mAlpha2);
-            cycle2++;
-            if (cycle2 <10) {
-                mAlpha2 -=25;
-            } else {
-                mAlpha2 +=25;
-                if (cycle2 >19) cycle2 = 0;
-            }
+        if (mAlpha >255) mAlpha = 255;
+        mPaint.setAlpha(mAlpha);
+        cycle++;
+        if (cycle <10) {
+            mAlpha -=25;
+        } else {
+            mAlpha +=25;
+            if (cycle >19) cycle = 0;
         }
-
     }
 
+    public void fadeDot2() {
+        if (mAlpha2 >255) mAlpha2 = 255;
+        mPaint.setAlpha(mAlpha2);
+        cycle2++;
+        if (cycle2 <10) {
+            mAlpha2 -=25;
+        } else {
+            mAlpha2 +=25;
+            if (cycle2 >19) cycle2 = 0;
+        }
+    }
+
+    //Todo: fadeDot() running twice in mode 1 - triggered by Pom starting.
     public void pomDraw(int i, boolean fade) {
         switch (i+1) {
             case 1: case 3: case 5: case 7:
                 mPaint.setColor(Color.GREEN);
-                if (fade && mFadeDone == 1) {
-                    fadeDot();
+                if (fade && mFadeDone == 3) {
+                    fadeDot2();
                 }
                 mCanvas.drawCircle(mX, 685, 60, mPaint);
                 break;
             case 2: case 4: case 6:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 1) {
-                    fadeDot();
+                if (fade && mFadeDone == 3) {
+                    fadeDot2();
                 }
                 mCanvas.drawCircle(mX2, 685, 30, mPaint);
                 mX+=230;
@@ -214,8 +214,8 @@ public class DotDraws extends View {
                 break;
             case 8:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 1) {
-                    fadeDot();
+                if (fade && mFadeDone == 3) {
+                    fadeDot2();
                 }
                 mCanvas.drawRect(mX+110, 630, mX+220, 740, mPaint);
         }

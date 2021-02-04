@@ -151,9 +151,10 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
 
-    //Todo: Reset Pom, tab switch, Pom textView back @ pre-reset values, tho starts at correct value.
+    //Todo: Custom fading b0rked when Pom is on.
     //Todo: Run through all Skip and Reset iterations.
     //Todo: Dotdraws doubling up in fade/not stopping.
+    //Todo: Only change textSize before timer(s) start - looks weird otherwise.
     //Todo: Pom textView blip occurs after resetTimer() in Custom mode.
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
@@ -169,8 +170,6 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible "Saved Presets" SharedPref for Custom in 4th tab or popup window.
     //Todo: Possible: Save sets/breaks completed on any given day. Add weight/resistance to each.
     //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
-
-    //Todo: NOTE: Arising progressBar issues may be tied to startObjectAnimator and startTimer order of execution. May be better to consolidate them.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -466,8 +465,8 @@ public class MainActivity extends AppCompatActivity {
                         numberOfBreaks--;
                         onBreak = false;
                     }
-//
-//                    //Todo: For "breaks only":
+
+                    //Todo: For "breaks only":
                     timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
                 } else if (numberOfSets == 0 && numberOfBreaks == 0) {
@@ -504,7 +503,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startObjectAnimator() {
-        fadeDone = 3;
         removeViews();
 
         switch (mode) {
@@ -523,7 +521,7 @@ public class MainActivity extends AppCompatActivity {
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 } else {
-                    fadeDone = 3;
+                    fadeDone = 2;
                     if (!breakBegun) {
                         if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
@@ -538,6 +536,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case 2:
+                fadeDone = 3;
                 timeLeft2.setVisibility(View.VISIBLE);
                 if (!pomBegun) {
                     objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) pomProgressPause, 0);
@@ -567,19 +566,21 @@ public class MainActivity extends AppCompatActivity {
                         boolean fadePaused = false;
 
                         if (fadeDone == 1) {
-                            if (!fadePaused) {
-                                dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
-                                fadePaused = true;
-                            } else {
-                                dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 1);
-                                fadePaused = false;
+                            if (mode==1) {
+                                if (!fadePaused) {
+                                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
+                                    fadePaused = true;
+                                } else {
+                                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0);
+                                    fadePaused = false;
+                                }
                             }
                         }
                     }
 
                     @Override
                     public void onFinish() {
-                        fadeDone = 2;
+                        fadeDone = 0;
                         numberOfSets--;
                         timeLeft.setText("0");
                         customProgressPause = maxProgress;
@@ -609,13 +610,12 @@ public class MainActivity extends AppCompatActivity {
                         pomProgressPause = (int) objectAnimator2.getAnimatedValue();
                         pomMillis = millisUntilFinished;
                         timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
-                        dotDraws.pomDraw(pomDotCounter, 1);
+                        if (mode==2) dotDraws.pomDraw(pomDotCounter, 3);
                     }
 
                     @Override
                     public void onFinish() {
                         pomBegun = false;
-                        fadeDone = 2;
                         numberOfSets--;
                         timeLeft2.setText("0");
                         pomProgressPause = maxProgress;
@@ -655,12 +655,14 @@ public class MainActivity extends AppCompatActivity {
                 breakMillis = millisUntilFinished;
                 timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
                 boolean fadePaused = false;
-                if (fadeDone == 3) {
-                    if (!fadePaused) {
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone); fadePaused = true;
-                    } else {
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, fadeDone);
-                        fadePaused = false;
+                if (fadeDone == 2) {
+                    if (mode==1) {
+                        if (!fadePaused) {
+                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 2); fadePaused = true;
+                        } else {
+                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0);
+                            fadePaused = false;
+                        }
                     }
                 }
             }
@@ -668,7 +670,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 breakBegun = false;
-                fadeDone = 4;
                 numberOfBreaks--;
                 timeLeft.setText("0");
                     if (customBreakTime.size() >0) {
@@ -693,7 +694,7 @@ public class MainActivity extends AppCompatActivity {
                     customCyclesDone++;
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     endAnimation();
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), fadeDone);
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
                     timerEnded = true;
                 }
 
@@ -938,7 +939,6 @@ public class MainActivity extends AppCompatActivity {
                     setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
                     breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
                     timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                    timeLeft2.setText(convertSeconds((setMillis+999)/1000));
                 }
                 timeLeft.setVisibility(View.VISIBLE);
                 onBreak = false;
