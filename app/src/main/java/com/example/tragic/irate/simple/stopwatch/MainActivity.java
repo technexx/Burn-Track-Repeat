@@ -151,9 +151,7 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
 
-    //Todo: Custom fading b0rked when Pom is on.
     //Todo: Run through all Skip and Reset iterations.
-    //Todo: Dotdraws doubling up in fade/not stopping.
     //Todo: Only change textSize before timer(s) start - looks weird otherwise.
     //Todo: Pom textView blip occurs after resetTimer() in Custom mode.
     //Todo: Breaks only option.
@@ -443,50 +441,55 @@ public class MainActivity extends AppCompatActivity {
         });
 
         skip.setOnClickListener(v -> {
-            if (mode == 1) {
-                if (timer != null) {
-                    timer.cancel();
-                }
-                if (objectAnimator != null) {
-                    objectAnimator.cancel();
-                }
-                if (numberOfSets >0 && numberOfBreaks >0) {
-                    setMillis = setStart;
-                    breakMillis = breakStart;
-                    paused = true;
-                    progressBar.setProgress(10000);
-
-                    if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
-                        customSetTime.remove(customSetTime.size()-1);
-                        numberOfSets--;
+            if (customSetTime.size()>0) {
+                int oldCycle = 0;
+                if (mode == 1) {
+                    if (timer != null) {
+                        timer.cancel();
                     }
-                    if (customBreakTime.size() >0 && customBreakTime.size() != customSetTime.size()) {
-                        customBreakTime.remove(customBreakTime.size()-1);
-                        numberOfBreaks--;
-                        onBreak = false;
+                    if (objectAnimator != null) {
+                        objectAnimator.cancel();
                     }
+                    if (numberOfSets >0 && numberOfBreaks >0) {
+                        setMillis = setStart;
+                        breakMillis = breakStart;
+                        paused = true;
+                        progressBar.setProgress(10000);
 
-                    //Todo: For "breaks only":
-                    timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
+                        if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
+                            customSetTime.remove(customSetTime.size()-1);
+                            numberOfSets--;
+                        }
+                        if (customBreakTime.size() >0 && customBreakTime.size() != customSetTime.size()) {
+                            customBreakTime.remove(customBreakTime.size()-1);
+                            numberOfBreaks--;
+                            onBreak = false;
+                            oldCycle = customCyclesDone;
+                        }
+
+                        //Todo: For "breaks only":
+                        if (customSetTime.size() >0) timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
-                } else if (numberOfSets == 0 && numberOfBreaks == 0) {
-                    customCyclesDone++;
-                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                    endAnimation();
-                    progressBar.setProgress(0);
-                    timeLeft.setText("0");
-                    timerEnded = true;
-                    paused = false;
+                    }
+                    if (numberOfSets == 0 && numberOfBreaks == 0) {
+                        if (oldCycle==customCyclesDone) customCyclesDone++;
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                        endAnimation();
+                        progressBar.setProgress(0);
+                        timeLeft.setText("0");
+                        timerEnded = true;
+                        paused = false;
+                    }
+                    if (numberOfSets >=0 && numberOfBreaks >=0) {
+                        dotDraws.setTime(startCustomSetTime);
+                        dotDraws.breakTime(startCustomBreakTime);
+                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
                 }
-                if (numberOfSets >=0 && numberOfBreaks >=0) {
-                    //Beginning set/break count so dots fade instead of disappear.
-                    dotDraws.setTime(startCustomSetTime);
-                    dotDraws.breakTime(startCustomBreakTime);
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
-                }
-            } else {
-                Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
             }
+
         });
 
         plus_sign.setOnClickListener(v -> {
@@ -861,8 +864,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pauseAndResumeTimer(int pausing) {
-        removeViews();
         if (!timerDisabled) {
+            removeViews();
             if (!timerEnded) {
                 if (pausing == PAUSING_TIMER) {
                     switch (mode) {
