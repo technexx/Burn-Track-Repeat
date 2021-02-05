@@ -151,9 +151,9 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
 
+    //Todo: Skipping round
     //Todo: Run through all Skip and Reset iterations.
     //Todo: Only change textSize before timer(s) start - looks weird otherwise.
-    //Todo: Pom textView blip occurs after resetTimer() in Custom mode.
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Keep alpha level of dots between tab switches.
@@ -442,6 +442,7 @@ public class MainActivity extends AppCompatActivity {
 
         skip.setOnClickListener(v -> {
             if (customSetTime.size()>0) {
+                customHalted = true;
                 int oldCycle = 0;
                 if (mode == 1) {
                     if (timer != null) {
@@ -451,9 +452,10 @@ public class MainActivity extends AppCompatActivity {
                         objectAnimator.cancel();
                     }
                     if (numberOfSets >0 && numberOfBreaks >0) {
-                        setMillis = setStart;
-                        breakMillis = breakStart;
-                        paused = true;
+                        setBegun = false;
+                        customProgressPause = maxProgress;
+                        timePaused.setVisibility(View.VISIBLE);
+                        timeLeft.setVisibility(View.GONE);
                         progressBar.setProgress(10000);
 
                         if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
@@ -468,10 +470,12 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         //Todo: For "breaks only":
-                        if (customSetTime.size() >0) timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
+                        if (customSetTime.size() >0) timePaused.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
                     }
                     if (numberOfSets == 0 && numberOfBreaks == 0) {
+                        timePaused.setVisibility(View.GONE);
+                        timeLeft.setVisibility(View.VISIBLE);
                         if (oldCycle==customCyclesDone) customCyclesDone++;
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         endAnimation();
@@ -560,6 +564,7 @@ public class MainActivity extends AppCompatActivity {
         switch (mode) {
             case 1:
                 setBegun = true;
+                timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                 timer = new CountDownTimer(setMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
