@@ -151,14 +151,14 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
 
-    //Todo: Skipping round
-    //Todo: Run through all Skip and Reset iterations.
+    //Todo: Switching tabs resets dotDraws.
     //Todo: Only change textSize before timer(s) start - looks weird otherwise.
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Keep alpha level of dots between tab switches.
     //Todo: Bit of tearing switching between progressBars.
     //Todo: Selecting from spinners does not extend to black layout outside text.
+    //Todo: Smooth transition between tab timer textviews.
     //Todo: Add taskbar notification for timers.
     //Todo: Less blurry +/- icons.
     //Todo: Rename app, of course.
@@ -314,9 +314,8 @@ public class MainActivity extends AppCompatActivity {
                         heading.setText(R.string.variable);
                         changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                         dotDraws.setMode(1);
-                        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        if (!setBegun) dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-
                         retrieveSpins(modeOneSpins, false);
                         switchTimer(1, customHalted);
                         break;
@@ -618,7 +617,7 @@ public class MainActivity extends AppCompatActivity {
                         pomProgressPause = (int) objectAnimator2.getAnimatedValue();
                         pomMillis = millisUntilFinished;
                         timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
-                        if (mode==2) dotDraws.pomDraw(pomDotCounter, 3);
+                        dotDraws.pomDraw(pomDotCounter, 3);
                     }
 
                     @Override
@@ -784,6 +783,22 @@ public class MainActivity extends AppCompatActivity {
         va.start();
     }
 
+//    public void changeTextSize(ValueAnimator va, TextView textView, TextView textViewPaused, boolean started) {
+//        if (!started) {
+//            va.addUpdateListener(animation -> {
+//                float sizeChange = (float) va.getAnimatedValue();
+//                textView.setTextSize(sizeChange);
+//                textViewPaused.setTextSize(sizeChange);
+//            });
+//            va.start();
+//        } else {
+//            timeLeft.setTextSize(90f);
+//            timePaused.setTextSize(90f);
+//            timeLeft2.setTextSize(70f);
+//            timePaused2.setTextSize(70f);
+//        }
+//    }
+
     public void saveSpins() {
         switch (mode) {
             case 1:
@@ -833,6 +848,7 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     timePaused.setVisibility(View.VISIBLE);
                     timePaused.setText(convertSeconds((setMillis + 999)/1000));
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
                 } else {
                     startObjectAnimator();
                     timeLeft.setVisibility(View.VISIBLE);
@@ -852,6 +868,7 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     timePaused2.setVisibility(View.VISIBLE);
                     timePaused2.setText(convertSeconds((pomMillis + 999)/1000));
+                    dotDraws.pomDraw(pomDotCounter, 0);
                 } else {
                     startObjectAnimator();
                     timeLeft2.setVisibility(View.VISIBLE);
