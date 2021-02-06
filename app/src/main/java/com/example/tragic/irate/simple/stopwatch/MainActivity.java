@@ -1,49 +1,34 @@
 package com.example.tragic.irate.simple.stopwatch;
 
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.DashPathEffect;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Vibrator;;
-import android.util.AttributeSet;
-import android.util.Log;
+;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListPopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.material.tabs.TabLayout;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
     //Todo: Add taskbar notification for timers.
+    //Todo: Add color scheme options.
     //Todo: Less blurry +/- icons.
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
@@ -175,10 +161,31 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Possible: Save sets/breaks completed on any given day. Add weight/resistance to each.
     //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
+//    @Override
+//    public boolean onCreateOptionsMenu(final Menu menu) {
+//        MenuInflater inflater = getMenuInflater();ac
+//        inflater.inflate(R.menu.options_menu, menu);
+//        return true;
+//    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.breaks_only:
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.custom_bar);
 
         s1 = findViewById(R.id.s1);
         s2 = findViewById(R.id.s2);
@@ -204,8 +211,6 @@ public class MainActivity extends AppCompatActivity {
         timePaused = findViewById(R.id.timePaused);
         timePaused2 = findViewById(R.id.timePaused2);
         dotDraws = findViewById(R.id.dotdraws);
-        heading = findViewById(R.id.heading);
-        heading.setText(R.string.strict);
         timeLeft.setTextSize(90f);
         timePaused.setTextSize(90f);
         timeLeft2.setTextSize(70f);
@@ -317,7 +322,6 @@ public class MainActivity extends AppCompatActivity {
                 switch (tab.getPosition()) {
                     case 0:
                         mode=1;
-                        heading.setText(R.string.variable);
                         changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                         dotDraws.setMode(1);
                         if (!setBegun) dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
@@ -327,7 +331,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 1:
                         mode=2;
-                        heading.setText(R.string.pomodoro);
                         changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
                         dotDraws.setMode(2);
                         dotDraws.pomDraw(1, 0);
