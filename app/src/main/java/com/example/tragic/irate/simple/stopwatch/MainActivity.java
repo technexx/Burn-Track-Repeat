@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -35,7 +37,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView heading;
+    Button breaks_only;
     ProgressBar progressBar;
     ProgressBar progressBar2;
     TextView timeLeft;
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
     boolean drawing = true;
+    boolean setMode;
     float savedCustomAlpha;
     int savedCustomCycle;
     float savedPomAlpha;
@@ -204,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
         reset.setVisibility(View.INVISIBLE);
         blank_spinner.setVisibility(View.GONE);
 
+        breaks_only = findViewById(R.id.breaks_only);
         progressBar = findViewById(R.id.progressBar);
         progressBar2 = findViewById(R.id.progressBar2);
         timeLeft = findViewById(R.id.timeLeft);
@@ -417,7 +421,16 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
+        breaks_only.setOnClickListener(v-> {
+            if (setMode) {
+                setMode = false;
+                breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
+            } else {
+                setMode = true;
+                breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
             }
         });
 
