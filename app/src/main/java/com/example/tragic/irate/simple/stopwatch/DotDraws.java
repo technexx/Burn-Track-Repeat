@@ -44,6 +44,11 @@ public class DotDraws extends View {
     ArrayList<String> mSetTime;
     ArrayList<String> mBreakTime;
 
+    float savedCustomAlpha;
+    int savedCustomCycle;
+    float savedPomAlpha;
+    int savedPomCycle;
+
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setFocusable(true);
@@ -100,9 +105,32 @@ public class DotDraws extends View {
         }
     }
 
+    public void retrieveAlpha(boolean customDots, float alpha, int cycle) {
+        if (customDots) {
+            this.savedCustomAlpha = alpha; this.savedCustomCycle = cycle;
+        } else {
+            this.savedPomAlpha = alpha; this.savedPomCycle = cycle;
+        }
+    }
+
+//    public float getAlpha() {
+//        float savedAlpha = 0;
+//        int savedCycle;
+//        if (mMode==1) {
+//            savedAlpha = mAlpha; savedCycle = cycle;
+//        } else if (mMode==2) {
+//            savedAlpha = mAlpha2; savedCycle = cycle2;
+//        }
+//        return savedAlpha;
+//    }
+
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
+//        savedCustomAlpha = mAlpha;
+//        savedCustomCycle = cycle;
+//        savedPomAlpha = mAlpha2;
+//        savedPomCycle = cycle2;
 
         mX = 60; mY = 625; mX2 = 60; mY2 = 755;
         if (mMode == 2) mY2 = 670;
@@ -179,6 +207,8 @@ public class DotDraws extends View {
             mAlpha +=25;
             if (cycle >19) cycle = 0;
         }
+        savedCustomAlpha = mAlpha;
+        savedCustomCycle = cycle;
     }
 
     public void fadeDot2() {
@@ -191,21 +221,23 @@ public class DotDraws extends View {
             mAlpha2 +=25;
             if (cycle2 >19) cycle2 = 0;
         }
+        savedPomAlpha = mAlpha2;
+        savedPomCycle = cycle2;
     }
 
-    //Todo: fadeDot() running twice in mode 1 - triggered by Pom starting.
+    //Todo: Fadedot from 3 -> 1.
     public void pomDraw(int i, boolean fade) {
         switch (i+1) {
             case 1: case 3: case 5: case 7:
                 mPaint.setColor(Color.GREEN);
-                if (fade && mFadeDone == 3) {
+                if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
                 mCanvas.drawCircle(mX, 685, 60, mPaint);
                 break;
             case 2: case 4: case 6:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 3) {
+                if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
                 mCanvas.drawCircle(mX2, 685, 30, mPaint);
@@ -214,7 +246,7 @@ public class DotDraws extends View {
                 break;
             case 8:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 3) {
+                if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
                 mCanvas.drawRect(mX+110, 630, mX+220, 740, mPaint);

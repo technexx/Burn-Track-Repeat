@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
     DotDraws dotDraws;
     int fadeDone;
     int mode=1;
+    boolean fadePaused;
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
 
@@ -150,6 +151,11 @@ public class MainActivity extends AppCompatActivity {
     boolean setBegun;
     boolean breakBegun;
     boolean pomBegun;
+    boolean drawing = true;
+    float savedCustomAlpha;
+    int savedCustomCycle;
+    float savedPomAlpha;
+    int savedPomCycle;
 
     //Todo: Switching tabs resets dotDraws.
     //Todo: Only change textSize before timer(s) start - looks weird otherwise.
@@ -326,7 +332,6 @@ public class MainActivity extends AppCompatActivity {
                         dotDraws.setMode(2);
                         dotDraws.pomDraw(1, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
-
                         retrieveSpins(modeTwoSpins, true);
                         switchTimer(2, pomHalted);
                 }
@@ -510,7 +515,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void startObjectAnimator() {
         removeViews();
-
         switch (mode) {
             case 1:
                 fadeDone = 1;
@@ -570,18 +574,8 @@ public class MainActivity extends AppCompatActivity {
                         customProgressPause = (int) objectAnimator.getAnimatedValue();
                         setMillis = millisUntilFinished;
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
-                        boolean fadePaused = false;
-
-                        if (fadeDone == 1) {
-                            if (mode==1) {
-                                if (!fadePaused) {
-                                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
-                                    fadePaused = true;
-                                } else {
-                                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0);
-                                    fadePaused = false;
-                                }
-                            }
+                        if (drawing) {
+                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
                         }
                     }
 
@@ -617,7 +611,9 @@ public class MainActivity extends AppCompatActivity {
                         pomProgressPause = (int) objectAnimator2.getAnimatedValue();
                         pomMillis = millisUntilFinished;
                         timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
-                        dotDraws.pomDraw(pomDotCounter, 3);
+                        if (!drawing) {
+                            dotDraws.pomDraw(pomDotCounter, 1);
+                        }
                     }
 
                     @Override
@@ -662,16 +658,7 @@ public class MainActivity extends AppCompatActivity {
                 breakMillis = millisUntilFinished;
                 timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
                 boolean fadePaused = false;
-                if (fadeDone == 2) {
-                    if (mode==1) {
-                        if (!fadePaused) {
-                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 2); fadePaused = true;
-                        } else {
-                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- numberOfSets, savedBreaks-numberOfBreaks, 0);
-                            fadePaused = false;
-                        }
-                    }
-                }
+                dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 2);
             }
 
             @Override
@@ -837,6 +824,7 @@ public class MainActivity extends AppCompatActivity {
         removeViews();
         switch (mode) {
             case 1:
+                drawing = true;
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 plus_sign.setVisibility(View.VISIBLE);
@@ -856,6 +844,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case 2:
+                drawing = false;
                 progressBar2.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
                 plus_sign.setVisibility(View.GONE);
