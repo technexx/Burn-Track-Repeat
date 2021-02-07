@@ -146,7 +146,7 @@ public class DotDraws extends View {
                     mPaint.setColor(Color.RED);
                 }
                 if (mBreakReduce + i == mBreakCount) {
-                    if (mFadeDone == 1) {
+                    if (mFadeDone == 2) {
                         fadeDot();
                     }
                 } else if (mBreakReduce +i >= mBreakCount) {
