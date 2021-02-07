@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
     boolean breakBegun;
     boolean pomBegun;
     boolean drawing = true;
-    boolean setMode;
+    boolean breaksOnly;
     float savedCustomAlpha;
     int savedCustomCycle;
     float savedPomAlpha;
@@ -424,23 +424,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
         breaks_only.setOnClickListener(v-> {
-            if (setMode) {
-                setMode = false;
+            if (!breaksOnly) {
+                breaksOnly = true;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
                 dotDraws.breaksOnly(true);
                 spinner1.setVisibility(View.GONE);
                 blank_spinner.setVisibility(View.VISIBLE);
             } else {
-                setMode = true;
+                breaksOnly = false;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                 dotDraws.breaksOnly(false);
                 spinner1.setVisibility(View.VISIBLE);
                 blank_spinner.setVisibility(View.GONE);
             }
             if (mode==1) {
-                dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
+                dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
             }
-
         });
 
         progressBar.setOnClickListener(v-> {
@@ -585,7 +584,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
-//        dotDraws.setAlpha();
     }
 
     public void startTimer() {

@@ -118,12 +118,10 @@ public class DotDraws extends View {
         savedPomCycle = cycle2;
 
         mX = 60; mY = 585; mX2 = 60; mY2 = 715;
-        if (mBreaksOnly) {
-            mX2 = 60; mY2 = 645;
-        }
+        if (mBreaksOnly) mY2 = 645;
 
         if (mMode == 1 && !mBreaksOnly) {
-            for (int i=0; i < mSetCount; i++) {
+            for (int i=0; i<mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
                 if (mSetReduce + i == mSetCount) {
                     if (mFadeDone == 1) {
@@ -148,7 +146,7 @@ public class DotDraws extends View {
                     mPaint.setColor(Color.RED);
                 }
                 if (mBreakReduce + i == mBreakCount) {
-                    if (mFadeDone == 2) {
+                    if (mFadeDone == 1) {
                         fadeDot();
                     }
                 } else if (mBreakReduce +i >= mBreakCount) {
