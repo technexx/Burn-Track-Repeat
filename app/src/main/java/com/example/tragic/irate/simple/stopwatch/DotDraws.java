@@ -157,9 +157,15 @@ public class DotDraws extends View {
                 else {
                     mPaint.setAlpha(255);
                 }
-                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                drawText(mBreakTime, mX2, mY2, i);
-                mX2 += 108;
+                if (!mBreaksOnly) {
+                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                    drawText(mBreakTime, mX2, mY2, i);
+                    mX2 += 108;
+                } else {
+                    mCanvas.drawOval(mX2-40, mY2-70, mX2+48, mY2+75, mPaint);
+                    drawText(mBreakTime, mX2+5, mY2, i);
+                    mX2+=107;
+                }
             }
         }
 

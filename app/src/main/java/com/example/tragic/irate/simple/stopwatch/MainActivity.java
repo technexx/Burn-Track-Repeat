@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Todo: Only change textSize before timer(s) start - looks weird otherwise.
     //Todo: Breaks only option.
+    //Todo: Reset alpha on resetTimer and add/subtract rounds.
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Bit of tearing switching between progressBars.
     //Todo: Selecting from spinners does not extend to black layout outside text.
@@ -426,16 +427,15 @@ public class MainActivity extends AppCompatActivity {
             if (setMode) {
                 setMode = false;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
-                dotDraws.breaksOnly(false);
-                spinner1.setVisibility(View.VISIBLE);
-                blank_spinner.setVisibility(View.GONE);
-
-            } else {
-                setMode = true;
-                breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                 dotDraws.breaksOnly(true);
                 spinner1.setVisibility(View.GONE);
                 blank_spinner.setVisibility(View.VISIBLE);
+            } else {
+                setMode = true;
+                breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
+                dotDraws.breaksOnly(false);
+                spinner1.setVisibility(View.VISIBLE);
+                blank_spinner.setVisibility(View.GONE);
             }
             if (mode==1) {
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
@@ -745,7 +745,7 @@ public class MainActivity extends AppCompatActivity {
                 customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
                 startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
             } else {
-                Toast.makeText(getApplicationContext(), "Max sets reached!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
             }
             if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
                 customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
@@ -875,6 +875,8 @@ public class MainActivity extends AppCompatActivity {
                 plus_sign.setVisibility(View.GONE);
                 minus_sign.setVisibility(View.GONE);
                 spinner3.setVisibility(View.VISIBLE);
+                spinner1.setVisibility(View.VISIBLE);
+                blank_spinner.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
