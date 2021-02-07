@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_marginStart="220dp"
         android:textSize="20sp">
     </TextView>

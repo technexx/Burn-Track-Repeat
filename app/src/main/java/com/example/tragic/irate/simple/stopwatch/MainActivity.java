@@ -145,11 +145,9 @@ public class MainActivity extends AppCompatActivity {
     float savedPomAlpha;
     int savedPomCycle;
 
-    //Todo: Switching tabs resets dotDraws.
     //Todo: Only change textSize before timer(s) start - looks weird otherwise.
     //Todo: Breaks only option.
     //Todo: Add confirmation to reset Pom and its cycles.
-    //Todo: Keep alpha level of dots between tab switches.
     //Todo: Bit of tearing switching between progressBars.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
@@ -428,10 +426,21 @@ public class MainActivity extends AppCompatActivity {
             if (setMode) {
                 setMode = false;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
+                dotDraws.breaksOnly(false);
+                spinner1.setVisibility(View.VISIBLE);
+                blank_spinner.setVisibility(View.GONE);
+
             } else {
                 setMode = true;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
+                dotDraws.breaksOnly(true);
+                spinner1.setVisibility(View.GONE);
+                blank_spinner.setVisibility(View.VISIBLE);
             }
+            if (mode==1) {
+                dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
+            }
+
         });
 
         progressBar.setOnClickListener(v-> {
@@ -852,7 +861,7 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     timePaused.setVisibility(View.VISIBLE);
                     timePaused.setText(convertSeconds((setMillis + 999)/1000));
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
+                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
                 } else {
                     startObjectAnimator();
                     timeLeft.setVisibility(View.VISIBLE);
@@ -873,7 +882,7 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     timePaused2.setVisibility(View.VISIBLE);
                     timePaused2.setText(convertSeconds((pomMillis + 999)/1000));
-                    dotDraws.pomDraw(pomDotCounter, 0);
+                    dotDraws.pomDraw(pomDotCounter, 1);
                 } else {
                     startObjectAnimator();
                     timeLeft2.setVisibility(View.VISIBLE);
@@ -881,6 +890,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
         }
+        dotDraws.retrieveAlpha();
     }
 
     public void removeViews() {
