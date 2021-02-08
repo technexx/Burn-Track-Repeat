@@ -102,6 +102,15 @@ public class DotDraws extends View {
         this.mBreaksOnly = breaksOnly;
     }
 
+    public void setAlpha() {
+        switch (mMode) {
+            case 1:
+                mAlpha = 255; cycle = 0; break;
+            case 2:
+                mAlpha2 = 255; cycle2 = 0; break;
+        }
+    }
+
     public void retrieveAlpha() {
         mAlpha = savedCustomAlpha;
         cycle = savedCustomCycle;

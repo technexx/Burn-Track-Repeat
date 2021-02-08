@@ -10,4 +10,6 @@
     <string name="small_break">Mini Break:</string>
     <string name="long_break">Standard Break</string>
     <string name="cycles_done">Cycles Completed: %1$s</string>
+
+    <string name="pom_reset">Confirm Pomodoro Reset</string>
 </resources>

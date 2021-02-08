@@ -6,17 +6,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 ;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -24,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -141,13 +146,11 @@ public class MainActivity extends AppCompatActivity {
     boolean pomBegun;
     boolean drawing = true;
     boolean breaksOnly;
-    float savedCustomAlpha;
-    int savedCustomCycle;
-    float savedPomAlpha;
-    int savedPomCycle;
 
-    //Todo: Reset alpha on resetTimer and add/subtract rounds.
+    View popUpView;
+
     //Todo: Add confirmation to reset Pom and its cycles.
+    //Todo: Set timerText to current break when switching to breaksOnly.
     //Todo: Bit of tearing switching between progressBars.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
@@ -523,7 +526,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
                 }
             }
-
         });
 
         plus_sign.setOnClickListener(v -> {
@@ -535,13 +537,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         reset.setOnClickListener(v -> {
-            resetTimer();
+            reset.setVisibility(View.GONE);
+            if (mode!=2) {
+                resetTimer();
+            } else {
+                popUpView = v;
+                LayoutInflater inflater = (LayoutInflater) popUpView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                popUpView = inflater.inflate(R.layout.pom_reset_popup, null);
+                PopupWindow popupWindow  = new PopupWindow(popUpView, WindowManager.LayoutParams.WRAP_CONTENT, 75, true);
+                popupWindow.showAtLocation(popUpView, Gravity.CENTER, 0, 900);
+
+                TextView confirm_reset = popUpView.findViewById(R.id.pom_reset_text);
+                confirm_reset.setOnClickListener(v2-> {
+                    resetTimer();
+                    popupWindow.dismiss();
+                });
+            }
+
         });
     }
 
     public void startObjectAnimator() {
         removeViews();
-        Log.i("testy", "new millis " + breakStart + setStart);
         switch (mode) {
             case 1:
                 fadeDone = 1;
@@ -944,13 +962,13 @@ public class MainActivity extends AppCompatActivity {
                             timePaused.setText(pausedTime);
                             break;
                         case 2:
+                            pomHalted = true;
                             pomMillisUntilFinished = pomMillis;
                             if (objectAnimator2!=null) objectAnimator2.pause();
                             if (timer2!=null) timer2.cancel();;
                             String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999)/1000));
                             timePaused2.setVisibility(View.VISIBLE);
                             timePaused2.setText(pausedTime2);
-                            pomHalted = true;
                             break;
                     }
                     reset.setVisibility(View.VISIBLE);
@@ -984,6 +1002,7 @@ public class MainActivity extends AppCompatActivity {
         removeViews();
         //Todo: Separate end animations.
         if (endAnimation != null) endAnimation.cancel();
+        dotDraws.setAlpha();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
         switch (mode) {
