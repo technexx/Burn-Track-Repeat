@@ -121,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
     long savedBreaks;
     long savedSets;
 
-    boolean timerEnded;
+    boolean customTimerEnded;
+    boolean pomTimerEnded;
     boolean paused;
     boolean onBreak;
     boolean pomEnded;
@@ -453,6 +454,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 pauseAndResumeTimer(RESUMING_TIMER);
             }
+
         });
 
         progressBar2.setOnClickListener(v-> {
@@ -514,7 +516,7 @@ public class MainActivity extends AppCompatActivity {
                         endAnimation();
                         progressBar.setProgress(0);
                         timeLeft.setText("0");
-                        timerEnded = true;
+                        customTimerEnded = true;
                         paused = false;
                     }
                     if (numberOfSets >=0 && numberOfBreaks >=0) {
@@ -636,7 +638,7 @@ public class MainActivity extends AppCompatActivity {
                         if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
 
                         setBegun = false;
-                        timerEnded = false;
+                        customTimerEnded = false;
                         endAnimation();
                         handler.postDelayed((Runnable) () -> {
                             startObjectAnimator();
@@ -713,17 +715,17 @@ public class MainActivity extends AppCompatActivity {
                 breakBegun = false;
                 numberOfBreaks--;
                 timeLeft.setText("0");
-                    if (customBreakTime.size() >0) {
-                        customBreakTime.remove(customBreakTime.size()-1);
-                    }
+                if (customBreakTime.size() >0) {
+                    customBreakTime.remove(customBreakTime.size()-1);
+                }
                 if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
                 dotDraws.setTime(startCustomSetTime);
-                    dotDraws.breakTime(startCustomBreakTime);
+                dotDraws.breakTime(startCustomBreakTime);
 
                 endAnimation();
                 if (numberOfBreaks >0) {
                     customProgressPause = maxProgress;
-                    timerEnded = false;
+                    customTimerEnded = false;
 
                     handler.postDelayed(() -> {
                         startObjectAnimator();
@@ -741,7 +743,7 @@ public class MainActivity extends AppCompatActivity {
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     endAnimation();
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
-                    timerEnded = true;
+                    customTimerEnded = true;
 
                     setMillis = setStart;
                     breakMillis = breakStart;
@@ -941,10 +943,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if (!timerDisabled) {
             removeViews();
-            if (!timerEnded) {
-                if (pausing == PAUSING_TIMER) {
-                    switch (mode) {
-                        case 1:
+            switch (mode) {
+                case 1:
+                    if (!customTimerEnded) {
+                        if (pausing == PAUSING_TIMER) {
                             String pausedTime = "";
                             if (timer!=null) timer.cancel();
                             if (objectAnimator!=null) objectAnimator.pause();
@@ -959,9 +961,26 @@ public class MainActivity extends AppCompatActivity {
                                 pausedTime = (convertSeconds((breakMillisUntilFinished + 999)/1000));
                             }
                             timePaused.setVisibility(View.VISIBLE);
+                            reset.setVisibility(View.VISIBLE);
                             timePaused.setText(pausedTime);
-                            break;
-                        case 2:
+                        } else if (pausing == RESUMING_TIMER){
+                            customHalted = false;
+                            startObjectAnimator();
+                            if (onBreak) {
+                                breakStart();
+                            } else {
+                                startTimer();
+                            }
+                            reset.setVisibility(View.INVISIBLE);
+                        }
+                    } else {
+                        resetTimer();
+                        if (endAnimation != null) endAnimation.cancel();
+                    }
+                    break;
+                case 2:
+                    if (!pomTimerEnded) {
+                        if (pausing == PAUSING_TIMER) {
                             pomHalted = true;
                             pomMillisUntilFinished = pomMillis;
                             if (objectAnimator2!=null) objectAnimator2.pause();
@@ -969,29 +988,19 @@ public class MainActivity extends AppCompatActivity {
                             String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999)/1000));
                             timePaused2.setVisibility(View.VISIBLE);
                             timePaused2.setText(pausedTime2);
-                            break;
-                    }
-                    reset.setVisibility(View.VISIBLE);
-                } else if (pausing == RESUMING_TIMER) {
-                    switch (mode) {
-                        case 1:
-                            customHalted = false;
-                            break;
-                        case 2:
+                            reset.setVisibility(View.VISIBLE);
+                        } else if (pausing == RESUMING_TIMER){
                             pomHalted = false;
-                            break;
-                    }
-                    startObjectAnimator();
-                    if (onBreak) {
-                        breakStart();
+                            startObjectAnimator();
+                            startTimer();
+                            reset.setVisibility(View.INVISIBLE);
+                        }
                     } else {
-                        startTimer();
+                        resetTimer();
+                        if (endAnimation != null) endAnimation.cancel();
+                        reset.setVisibility(View.INVISIBLE);
                     }
-                    reset.setVisibility(View.INVISIBLE);
-                }
-            } else {
-                resetTimer();
-                if (endAnimation != null) endAnimation.cancel();
+                    break;
             }
         } else if ((!onBreak && customSetTime.size()==0) || (onBreak && customBreakTime.size()==0) ) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
@@ -1009,7 +1018,7 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 progressBar.setProgress(10000);
                 customProgressPause = maxProgress;
-                timerEnded = false;
+                customTimerEnded = false;
                 setBegun = false;
                 breakBegun = false;
                 customHalted = true;
@@ -1049,6 +1058,7 @@ public class MainActivity extends AppCompatActivity {
                 dotDraws.breakTime(customBreakTime);
                 break;
             case 2:
+                pomTimerEnded = false;
                 progressBar2.setProgress(10000);
                 pomBegun = false;
                 pomProgressPause = maxProgress;
@@ -1059,9 +1069,10 @@ public class MainActivity extends AppCompatActivity {
                 timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
                 timePaused2.setText(convertSeconds((pomMillis+999)/1000));
                 onBreak = false;
-                pomHalted = false;
+                pomHalted = true;
                 pomProgressPause = maxProgress;
                 break;
         }
     }
 }
+
