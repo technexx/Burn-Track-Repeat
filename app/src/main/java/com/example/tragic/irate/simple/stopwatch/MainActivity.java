@@ -146,9 +146,6 @@ public class MainActivity extends AppCompatActivity {
     float savedPomAlpha;
     int savedPomCycle;
 
-    //Todo: Pause/resume glitches w/ multiple timers if used at end of timer.
-    //Todo: Only change textSize before timer(s) start - looks weird otherwise.
-    //Todo: Breaks only option.
     //Todo: Reset alpha on resetTimer and add/subtract rounds.
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Bit of tearing switching between progressBars.
@@ -389,6 +386,7 @@ public class MainActivity extends AppCompatActivity {
                 if (mode == 1) {
                     if (customBreakTime.size() >0) {
                         breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                        breakStart = (int) breakMillis;
                     }
                 } else {
                     pos = pomList2.get(position);
@@ -543,6 +541,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startObjectAnimator() {
         removeViews();
+        Log.i("testy", "new millis " + breakStart + setStart);
         switch (mode) {
             case 1:
                 fadeDone = 1;
@@ -725,6 +724,10 @@ public class MainActivity extends AppCompatActivity {
                     endAnimation();
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
                     timerEnded = true;
+
+                    setMillis = setStart;
+                    breakMillis = breakStart;
+                    timerDisabled = false;
                 }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
@@ -915,7 +918,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pauseAndResumeTimer(int pausing) {
-        if (setMillis <=500 || breakMillis <=500) timerDisabled = true;
+        if (setMillis <=500 || breakMillis <=500) {
+            timerDisabled = true;
+        }
         if (!timerDisabled) {
             removeViews();
             if (!timerEnded) {
@@ -970,7 +975,7 @@ public class MainActivity extends AppCompatActivity {
                 resetTimer();
                 if (endAnimation != null) endAnimation.cancel();
             }
-        } else if ((!onBreak && customSetTime.size()==0) || (onBreak && customBreakTime.size()==0)) {
+        } else if ((!onBreak && customSetTime.size()==0) || (onBreak && customBreakTime.size()==0) ) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
         }
     }
@@ -989,16 +994,20 @@ public class MainActivity extends AppCompatActivity {
                 setBegun = false;
                 breakBegun = false;
                 customHalted = true;
+                if (!breaksOnly) onBreak = false; else onBreak =true;
 
                 if (timer != null) timer.cancel();
                 if (objectAnimator != null) objectAnimator.cancel();
+
                 if (startCustomSetTime.size() >0 && startCustomBreakTime.size() >0) {
                     setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
                     breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
-                    timeLeft.setText(convertSeconds((setMillis+999)/1000));
+                    if (!breaksOnly) timeLeft.setText(convertSeconds((setMillis+999)/1000)); else
+                        timeLeft.setText(convertSeconds((breakMillis+999)/1000));
+
+
                 }
                 timeLeft.setVisibility(View.VISIBLE);
-                if (!breaksOnly) onBreak = false; else onBreak =true;
 
                 numberOfSets = startCustomSetTime.size();
                 numberOfBreaks = startCustomBreakTime.size();
