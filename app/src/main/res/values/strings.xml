@@ -3,6 +3,8 @@
     <string name="variable">Variable Mode</string>
     <string name="pomodoro">Pomodoro</string>
 
+    <string name="reset">Reset</string>
+    <string name="clear_cycles">Clear Cycles</string>
     <string name="set_time">Set Time:</string>
     <string name="break_time">Break Duration:</string>
     <string name="set_number">Number of Rounds:</string>
@@ -12,4 +14,5 @@
     <string name="cycles_done">Cycles Completed: %1$s</string>
 
     <string name="pom_reset">Confirm Pomodoro Reset</string>
+    <string name="pom_cycle_reset">Confirm Cycle Reset</string>
 </resources>

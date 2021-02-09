@@ -1,7 +1,9 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -148,13 +150,12 @@ public class MainActivity extends AppCompatActivity {
     boolean drawing = true;
     boolean breaksOnly;
 
-    View popUpView;
-
     //Todo: Add confirmation to reset Pom and its cycles.
     //Todo: Set timerText to current break when switching to breaksOnly.
     //Todo: Bit of tearing switching between progressBars.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
+    //Todo: Smaller click radius for progressBar.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
     //Todo: Less blurry +/- icons.
@@ -470,9 +471,33 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     customCyclesDone = 0; break;
                 case 2:
-                    pomCyclesDone = 0;
+                    if (pomCyclesDone >=0) {
+
+                        cycle_reset.setVisibility(View.GONE);
+                        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                        View view = inflater.inflate(R.layout.pom_reset_popup, null);
+                        PopupWindow popupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
+                        popupWindow.showAtLocation(view, Gravity.CENTER, 400, 475);
+
+                        TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
+                        confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
+                        confirm_reset.setText(R.string.pom_cycle_reset);
+
+                        ConstraintLayout cl = findViewById(R.id.main_layout);
+                        cl.setOnClickListener(v2-> {
+                            popupWindow.dismiss();
+                            cycle_reset.setVisibility(View.VISIBLE);
+                        });
+
+                        confirm_reset.setOnClickListener(v2-> {
+                            pomCyclesDone = 0;
+                            cycle_reset.setVisibility(View.VISIBLE);
+                            cycles_completed.setText(getString(R.string.cycles_done, "0"));
+                            popupWindow.dismiss();;
+                        });
+                    }
             }
-            cycles_completed.setText(getString(R.string.cycles_done, "0"));
         });
 
         skip.setOnClickListener(v -> {
@@ -543,17 +568,23 @@ public class MainActivity extends AppCompatActivity {
             if (mode!=2) {
                 resetTimer();
             } else {
-                popUpView = v;
-                LayoutInflater inflater = (LayoutInflater) popUpView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                popUpView = inflater.inflate(R.layout.pom_reset_popup, null);
-                PopupWindow popupWindow  = new PopupWindow(popUpView, WindowManager.LayoutParams.WRAP_CONTENT, 75, true);
-                popupWindow.showAtLocation(popUpView, Gravity.CENTER, 0, 900);
+                View view = inflater.inflate(R.layout.pom_reset_popup, null);
+                PopupWindow popupWindow  = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
+                popupWindow.showAtLocation(view, Gravity.CENTER, 0, 900);
 
-                TextView confirm_reset = popUpView.findViewById(R.id.pom_reset_text);
+                TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
+                confirm_reset.setText(R.string.pom_reset);
                 confirm_reset.setOnClickListener(v2-> {
                     resetTimer();
                     popupWindow.dismiss();
+                });
+
+                ConstraintLayout cl = findViewById(R.id.main_layout);
+                cl.setOnClickListener(v2-> {
+                    popupWindow.dismiss();
+                    reset.setVisibility(View.VISIBLE);
                 });
             }
 
