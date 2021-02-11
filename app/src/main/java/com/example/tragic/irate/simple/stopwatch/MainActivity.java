@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -137,8 +138,6 @@ public class MainActivity extends AppCompatActivity {
     int mode=1;
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
-    ValueAnimator valueAnimatorFadeIn;
-    ValueAnimator valueAnimatorFadeOut;
 
     ArrayList<Long> customSetTime;
     ArrayList<Long> customBreakTime;
@@ -158,8 +157,12 @@ public class MainActivity extends AppCompatActivity {
     boolean fadePomTimer;
     float customAlpha;
     float pomAlpha;
+    boolean alphaSet;
+    ObjectAnimator fadeInObj;
+    ObjectAnimator fadeOutObj;
 
-    //Todo: Some alpha glitches (views remaining) on timer texts. Views reset alpha if setting text.
+    //Todo: First pom start shows background textview
+    //Todo: Overlap w/ quick tab switches.
     //Todo: Breaks Only mode set/breaks not mutually exclusive - make separate list for breaksOnly.
     //Todo: Set timerText to current break when switching to breaksOnly.
     //Todo: Selecting from spinners does not extend to black layout outside text.
@@ -318,16 +321,12 @@ public class MainActivity extends AppCompatActivity {
 
         valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
         valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
-        valueAnimatorFadeIn = new ValueAnimator().ofFloat(0f, 1.0f);
-        valueAnimatorFadeOut = new ValueAnimator().ofFloat(1.0f, 0f);
-        valueAnimatorDown.setDuration(500);
-        valueAnimatorUp.setDuration(500);
-        valueAnimatorFadeIn.setDuration(1000);
-        valueAnimatorFadeOut.setDuration(1000);
+        valueAnimatorDown.setDuration(1000);
+        valueAnimatorUp.setDuration(1000);
 
-        ObjectAnimator newAnim = ObjectAnimator.ofFloat(timePaused, "alpha", 1,0f, 0f);
-        newAnim.setInterpolator(new LinearInterpolator());
-        newAnim.setDuration(1000);
+//        ObjectAnimator newAnim = ObjectAnimator.ofFloat(timePaused, "alpha", 1,0f, 0f);
+//        newAnim.setInterpolator(new LinearInterpolator());
+//        newAnim.setDuration(1000);
 
         //Custom defaults
         mode = 1;
@@ -629,7 +628,6 @@ public class MainActivity extends AppCompatActivity {
         switch (mode) {
             case 1:
                 fadeDone = 1;
-//                timeLeft.setAlpha(1);
                 if (!onBreak) {
                     if (!setBegun) {
                         if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
@@ -658,7 +656,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 fadeDone = 3;
-//                timeLeft2.setAlpha(1);
                 if (!pomBegun) {
                     objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) pomProgressPause, 0);
                     objectAnimator2.setInterpolator(new LinearInterpolator());
@@ -683,6 +680,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onTick(long millisUntilFinished) {
                         customProgressPause = (int) objectAnimator.getAnimatedValue();
                         setMillis = millisUntilFinished;
+
+//                        if (setMillis+3500 < countdownVar) {
+//                        }
 
                         if (fadeCustomTimer) {
                             if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
@@ -921,16 +921,21 @@ public class MainActivity extends AppCompatActivity {
         va.start();
     }
 
+    //Todo: Cancel all previous obj animators after creation.
     public void fadeTextIn(TextView textView) {
-        ObjectAnimator obj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
-        obj.setDuration(500);
-        obj.start();
+        textView.setVisibility(View.VISIBLE);
+
+        if (fadeInObj!=null) fadeInObj.cancel();
+        fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
+        fadeInObj.setDuration(1500);
+        fadeInObj.start();
     }
 
     public void fadeOutText(TextView textView) {
-        ObjectAnimator obj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
-        obj.setDuration(500);
-        obj.start();
+        if (fadeOutObj!=null) fadeOutObj.cancel();
+        fadeOutObj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
+        fadeOutObj.setDuration(1000);
+        fadeOutObj.start();
     }
 
     public void saveSpins() {
@@ -968,7 +973,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void switchTimer(int mode, boolean halted) {
-//        removeViews();
+        removeViews();
         switch (mode) {
             case 1:
                 drawing = true;
@@ -984,8 +989,9 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     timePaused.setText(convertSeconds((setMillis + 999)/1000));
                     handler.postDelayed(() -> {
-                        fadeTextIn(timePaused);
+
                     },250);
+                    fadeTextIn(timePaused);
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
                 } else {
                     customAlpha = 0;
@@ -1009,8 +1015,9 @@ public class MainActivity extends AppCompatActivity {
                 if (halted) {
                     timePaused2.setText(convertSeconds((pomMillis + 999)/1000));
                     handler.postDelayed(() -> {
-                        fadeTextIn(timePaused2);
+
                     },250);
+                    fadeTextIn(timePaused2);
                     dotDraws.pomDraw(pomDotCounter, 1);
                 } else {
                     pomAlpha = 0;
@@ -1027,6 +1034,13 @@ public class MainActivity extends AppCompatActivity {
         timeLeft.setAlpha(0);
         timePaused2.setAlpha(0);
         timeLeft2.setAlpha(0);
+    }
+
+    public void destroyViews() {
+        timePaused.setVisibility(View.GONE);
+        timeLeft.setVisibility(View.GONE);
+        timePaused2.setVisibility(View.GONE);
+        timeLeft2.setVisibility(View.GONE);
     }
 
     public void pauseAndResumeTimer(int pausing) {
