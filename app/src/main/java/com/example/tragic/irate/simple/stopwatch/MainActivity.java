@@ -151,6 +151,15 @@ public class MainActivity extends AppCompatActivity {
     boolean drawing = true;
     boolean breaksOnly;
 
+    PopupWindow cyclePopupWindow;
+    PopupWindow resetPopUpWindow;
+
+    boolean fadeCustomTimer;
+    boolean fadePomTimer;
+    float customAlpha;
+    float pomAlpha;
+
+    //Todo: Some alpha glitches (views remaining) on timer texts. Views reset alpha if setting text.
     //Todo: Breaks Only mode set/breaks not mutually exclusive - make separate list for breaksOnly.
     //Todo: Set timerText to current break when switching to breaksOnly.
     //Todo: Selecting from spinners does not extend to black layout outside text.
@@ -342,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         mode=1;
                         switchTimer(1, customHalted);
-                        changeTextSize(valueAnimatorUp, timeLeft, timePaused);;
+                        changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                         dotDraws.setMode(1);
                         if (!setBegun) dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -370,6 +379,8 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 1:
                         if (pomHalted) fadeOutText(timePaused2); else fadeOutText(timeLeft2);
+                        if (cyclePopupWindow!=null) cyclePopupWindow.dismiss();
+                        if (resetPopUpWindow!=null) resetPopUpWindow.dismiss();
                         break;
                 }
             }
@@ -499,8 +510,8 @@ public class MainActivity extends AppCompatActivity {
                         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
                         View view = inflater.inflate(R.layout.pom_reset_popup, null);
-                        PopupWindow popupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
-                        popupWindow.showAtLocation(view, Gravity.CENTER, 400, 475);
+                        cyclePopupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
+                        cyclePopupWindow.showAtLocation(view, Gravity.CENTER, 400, 475);
 
                         TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
                         confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -508,7 +519,7 @@ public class MainActivity extends AppCompatActivity {
 
                         ConstraintLayout cl = findViewById(R.id.main_layout);
                         cl.setOnClickListener(v2-> {
-                            popupWindow.dismiss();
+                            cyclePopupWindow.dismiss();
                             cycle_reset.setVisibility(View.VISIBLE);
                         });
 
@@ -516,7 +527,7 @@ public class MainActivity extends AppCompatActivity {
                             pomCyclesDone = 0;
                             cycle_reset.setVisibility(View.VISIBLE);
                             cycles_completed.setText(getString(R.string.cycles_done, "0"));
-                            popupWindow.dismiss();;
+                            cyclePopupWindow.dismiss();;
                         });
                     }
             }
@@ -593,19 +604,19 @@ public class MainActivity extends AppCompatActivity {
                 LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
                 View view = inflater.inflate(R.layout.pom_reset_popup, null);
-                PopupWindow popupWindow  = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
-                popupWindow.showAtLocation(view, Gravity.CENTER, 0, 900);
+                resetPopUpWindow  = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
+                resetPopUpWindow.showAtLocation(view, Gravity.CENTER, 0, 900);
 
                 TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
                 confirm_reset.setText(R.string.pom_reset);
                 confirm_reset.setOnClickListener(v2-> {
                     resetTimer();
-                    popupWindow.dismiss();
+                    resetPopUpWindow.dismiss();
                 });
 
                 ConstraintLayout cl = findViewById(R.id.main_layout);
                 cl.setOnClickListener(v2-> {
-                    popupWindow.dismiss();
+                    resetPopUpWindow.dismiss();
                     reset.setVisibility(View.VISIBLE);
                 });
             }
@@ -614,11 +625,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startObjectAnimator() {
-        removeViews();
+//        removeViews();
         switch (mode) {
             case 1:
                 fadeDone = 1;
-                timeLeft.setAlpha(1);
+//                timeLeft.setAlpha(1);
                 if (!onBreak) {
                     if (!setBegun) {
                         if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
@@ -647,7 +658,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 fadeDone = 3;
-                timeLeft2.setAlpha(1);
+//                timeLeft2.setAlpha(1);
                 if (!pomBegun) {
                     objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) pomProgressPause, 0);
                     objectAnimator2.setInterpolator(new LinearInterpolator());
@@ -672,6 +683,14 @@ public class MainActivity extends AppCompatActivity {
                     public void onTick(long millisUntilFinished) {
                         customProgressPause = (int) objectAnimator.getAnimatedValue();
                         setMillis = millisUntilFinished;
+
+                        if (fadeCustomTimer) {
+                            if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
+                            else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
+                            else timeLeft.setAlpha(customAlpha+=.12);
+                        }
+                        if (customAlpha >=1) fadeCustomTimer = false;
+
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                         if (drawing) {
                             dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
@@ -701,9 +720,11 @@ public class MainActivity extends AppCompatActivity {
                         },750);
                         dotDraws.setTime(startCustomSetTime);
                         dotDraws.breakTime(startCustomBreakTime);
+                        fadeCustomTimer = false;
                     }
                 }.start();
                 break;
+
             case 2:
                 pomBegun = true;
                 timer2 = new CountDownTimer(pomMillis, 50) {
@@ -711,6 +732,15 @@ public class MainActivity extends AppCompatActivity {
                     public void onTick(long millisUntilFinished) {
                         pomProgressPause = (int) objectAnimator2.getAnimatedValue();
                         pomMillis = millisUntilFinished;
+
+//                        if (fadePomTimer) timeLeft2.setAlpha(pomAlpha+=0.1);
+                        if (fadePomTimer) {
+                            if (pomAlpha<0.25) timeLeft2.setAlpha(pomAlpha+=0.04);
+                            else if (pomAlpha<0.5) timeLeft2.setAlpha(pomAlpha+=.08);
+                            else timeLeft2.setAlpha(pomAlpha+=.12);
+                        }
+                        if (pomAlpha >=1) fadePomTimer = false;
+
                         timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
                         if (!drawing) {
                             dotDraws.pomDraw(pomDotCounter, 1);
@@ -757,6 +787,14 @@ public class MainActivity extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 customProgressPause = (int) objectAnimator.getAnimatedValue();
                 breakMillis = millisUntilFinished;
+
+                if (fadeCustomTimer) {
+                    if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
+                    else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
+                    else timeLeft.setAlpha(customAlpha+=.12);
+                }
+                if (customAlpha >=1) fadeCustomTimer = false;
+
                 timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
                 if (drawing) {
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 2);
@@ -801,6 +839,7 @@ public class MainActivity extends AppCompatActivity {
                     setMillis = setStart;
                     breakMillis = breakStart;
                     timerDisabled = false;
+                    fadeCustomTimer = false;
                 }
 
 //                    if (Build.VERSION.SDK_INT >= 26) {
@@ -884,13 +923,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void fadeTextIn(TextView textView) {
         ObjectAnimator obj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
-        obj.setDuration(1000);
+        obj.setDuration(500);
         obj.start();
     }
 
     public void fadeOutText(TextView textView) {
         ObjectAnimator obj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
-        obj.setDuration(1000);
+        obj.setDuration(500);
         obj.start();
     }
 
@@ -943,12 +982,15 @@ public class MainActivity extends AppCompatActivity {
                 s2.setText(R.string.break_time);
                 if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
                 if (halted) {
-                    fadeTextIn(timePaused);
                     timePaused.setText(convertSeconds((setMillis + 999)/1000));
+                    handler.postDelayed(() -> {
+                        fadeTextIn(timePaused);
+                    },250);
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
                 } else {
+                    customAlpha = 0;
+                    fadeCustomTimer = true;
                     startObjectAnimator();
-                    timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                 }
                 break;
             case 2:
@@ -965,15 +1007,15 @@ public class MainActivity extends AppCompatActivity {
                 s3.setText(R.string.long_break);
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
-//                    fadeText(valueAnimatorFadeIn, timePaused2);
                     timePaused2.setText(convertSeconds((pomMillis + 999)/1000));
+                    handler.postDelayed(() -> {
+                        fadeTextIn(timePaused2);
+                    },250);
                     dotDraws.pomDraw(pomDotCounter, 1);
-                    fadeTextIn(timePaused2);
                 } else {
-//                    fadeText(valueAnimatorFadeIn, timeLeft2);
+                    pomAlpha = 0;
+                    fadePomTimer = true;
                     startObjectAnimator();
-                    timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
-                    fadeTextIn(timeLeft2);
                 }
                 break;
         }
@@ -981,10 +1023,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void removeViews() {
-//        timePaused.setVisibility(View.GONE);
-//        timePaused2.setVisibility(View.GONE);
-//        timeLeft.setVisibility(View.GONE);
-//        timeLeft2.setVisibility(View.GONE);
         timePaused.setAlpha(0);
         timeLeft.setAlpha(0);
         timePaused2.setAlpha(0);
@@ -1001,12 +1039,12 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     if (!customTimerEnded) {
                         if (pausing == PAUSING_TIMER) {
+                            timePaused.setAlpha(1);
                             String pausedTime = "";
                             if (timer!=null) timer.cancel();
                             if (objectAnimator!=null) objectAnimator.pause();
                             customHalted = true;
 
-//                            if (breaksOnly) onBreak = true;
                             if (!onBreak) {
                                 setMillisUntilFinished = setMillis;
                                 pausedTime = (convertSeconds((setMillisUntilFinished + 999)/1000));
@@ -1014,10 +1052,10 @@ public class MainActivity extends AppCompatActivity {
                                 breakMillisUntilFinished = breakMillis;
                                 pausedTime = (convertSeconds((breakMillisUntilFinished + 999)/1000));
                             }
-                            timePaused.setAlpha(1);
                             reset.setVisibility(View.VISIBLE);
                             timePaused.setText(pausedTime);
                         } else if (pausing == RESUMING_TIMER){
+                            timeLeft.setAlpha(1);
                             customHalted = false;
                             startObjectAnimator();
                             if (onBreak) {
@@ -1035,15 +1073,16 @@ public class MainActivity extends AppCompatActivity {
                 case 2:
                     if (!pomTimerEnded) {
                         if (pausing == PAUSING_TIMER) {
+                            timePaused2.setAlpha(1);
                             pomHalted = true;
                             pomMillisUntilFinished = pomMillis;
                             if (objectAnimator2!=null) objectAnimator2.pause();
                             if (timer2!=null) timer2.cancel();;
                             String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999)/1000));
-                            timePaused2.setAlpha(1);
                             timePaused2.setText(pausedTime2);
                             reset.setVisibility(View.VISIBLE);
                         } else if (pausing == RESUMING_TIMER){
+                            timeLeft2.setAlpha(1);
                             pomHalted = false;
                             startObjectAnimator();
                             startTimer();
@@ -1087,7 +1126,6 @@ public class MainActivity extends AppCompatActivity {
                     if (!breaksOnly) timePaused.setText(convertSeconds((setMillis+999)/1000)); else
                         timePaused.setText(convertSeconds((breakMillis+999)/1000));
                 }
-                timeLeft.setAlpha(1);
                 timePaused.setAlpha(1);
 
                 numberOfSets = startCustomSetTime.size();
@@ -1117,8 +1155,8 @@ public class MainActivity extends AppCompatActivity {
                 pomProgressPause = maxProgress;
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
-                timeLeft2.setAlpha(1);
-                timePaused.setAlpha(1);
+//                timeLeft2.setAlpha(1);
+                timePaused2.setAlpha(1);
                 pomMillis = pomMillis1;
                 timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
                 timePaused2.setText(convertSeconds((pomMillis+999)/1000));
