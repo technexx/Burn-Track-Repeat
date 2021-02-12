@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
 
-    //Todo: Text blip when starting timer in breaksOnly. Think it's the previous value of breakMillis.
     //Todo: Test skip cycles a bit more. Add second cycles completed.
     //Todo: Separate spinner2 value saves for breaksOnly.
     //Todo: Selecting from spinners does not extend to black layout outside text.
@@ -573,7 +572,10 @@ public class MainActivity extends AppCompatActivity {
                                 oldCycle = customCyclesDone;
                                 breakBegun = false;
                             }
-                            if (breaksOnlyTime.size() >0) timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size()-1)+999)/1000));
+                            if (breaksOnlyTime.size() >0) {
+                                timeLeft.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
+                                timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size()-1)+999)/1000));
+                            }
                         }
                     }
                     if (numberOfBreaks == 0) {
@@ -583,6 +585,7 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         endAnimation();
                         progressBar.setProgress(0);
+                        timeLeft.setText("0");
                         timePaused.setText("0");
                         customTimerEnded = true;
                         paused = false;
@@ -592,8 +595,6 @@ public class MainActivity extends AppCompatActivity {
                             dotDraws.breakTime(startCustomBreakTime);
                             dotDraws.setTime(startCustomSetTime);
                         } else{
-                            timeLeft.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
-                            timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
                             dotDraws.breakTime(startBreaksOnlyTime);
                         }
                         dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
