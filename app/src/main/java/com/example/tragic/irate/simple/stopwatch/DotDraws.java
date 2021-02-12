@@ -126,7 +126,7 @@ public class DotDraws extends View {
         savedPomAlpha = mAlpha2;
         savedPomCycle = cycle2;
 
-        mX = 60; mY = 585; mX2 = 60; mY2 = 715;
+        mX = 60; mY = 600; mX2 = 60; mY2 = 730;
         if (mBreaksOnly) mY2 = 645;
 
         if (mMode == 1 && !mBreaksOnly) {
