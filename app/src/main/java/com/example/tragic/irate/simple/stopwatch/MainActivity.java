@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
     int setStart;
     int maxProgress = 10000;
     int customProgressPause = 10000;
+    int breaksOnlyPause = 10000;
     int pomProgressPause = 10000;
     long pomMillis;
     long pos;
@@ -143,6 +144,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Long> customBreakTime;
     ArrayList<Long> startCustomSetTime;
     ArrayList<Long> startCustomBreakTime;
+    ArrayList<Long> startBreaksOnlyTime;
+    ArrayList<Long> breaksOnlyTime;
 
     boolean setBegun;
     boolean breakBegun;
@@ -161,9 +164,8 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
 
-    //Todo: First pom start shows background textview
-    //Todo: Overlap w/ quick tab switches.
-    //Todo: Breaks Only mode set/breaks not mutually exclusive - make separate list for breaksOnly.
+    //Todo: Skip cycles for sep. breakOnly list.
+    //Todo: Separate spinner2 value saves for breaksOnly.
     //Todo: Set timerText to current break when switching to breaksOnly.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
@@ -256,12 +258,10 @@ public class MainActivity extends AppCompatActivity {
         customBreakTime = new ArrayList<>();
         startCustomSetTime = new ArrayList<>();
         startCustomBreakTime = new ArrayList<>();
+        breaksOnlyTime = new ArrayList<>();
+        startBreaksOnlyTime = new ArrayList<>();
         s3.setText(R.string.set_number);
         spinner3.setVisibility(View.GONE);
-//        timeLeft2.setVisibility(View.GONE);
-//        timePaused.setVisibility(View.GONE);
-//        timePaused2.setVisibility(View.GONE);
-//        timePaused.setAlpha(0);
         timeLeft.setAlpha(0);
         timePaused2.setAlpha(0);
         timeLeft2.setAlpha(0);
@@ -295,6 +295,8 @@ public class MainActivity extends AppCompatActivity {
             customBreakTime.add(spinList2.get(8) * 1000);
             startCustomSetTime.add(spinList1.get(5) * 1000);
             startCustomBreakTime.add(spinList2.get(8) * 1000);
+            breaksOnlyTime.add(spinList2.get(8) * 1000);
+            startBreaksOnlyTime.add(spinList2.get(8) * 1000);
         }
 
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
@@ -323,10 +325,6 @@ public class MainActivity extends AppCompatActivity {
         valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
         valueAnimatorDown.setDuration(1000);
         valueAnimatorUp.setDuration(1000);
-
-//        ObjectAnimator newAnim = ObjectAnimator.ofFloat(timePaused, "alpha", 1,0f, 0f);
-//        newAnim.setInterpolator(new LinearInterpolator());
-//        newAnim.setDuration(1000);
 
         //Custom defaults
         mode = 1;
@@ -419,10 +417,12 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 secondSpinCount++;
                 if (mode == 1) {
-                    if (customBreakTime.size() >0) {
-                        breakMillis = customBreakTime.get(customBreakTime.size()-1);
-                        breakStart = (int) breakMillis;
+                    if (!breaksOnly) {
+                        if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size()-1);
+                    } else {
+                        if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(breaksOnlyTime.size()-1);
                     }
+                    breakStart = (int) breakMillis;
                 } else {
                     pos = pomList2.get(position);
                     pomMillis2 = pos*60000;
@@ -458,27 +458,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         breaks_only.setOnClickListener(v-> {
             cycles_completed.setVisibility(View.GONE);
             if (!breaksOnly) {
                 breaksOnly = true;
                 onBreak = true;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
-                timeLeft.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
                 dotDraws.breaksOnly(true);
                 spinner1.setVisibility(View.GONE);
                 blank_spinner.setVisibility(View.VISIBLE);
+                timePaused.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
+//                dotDraws.breakTime(customBreakTime);
             } else {
                 breaksOnly = false;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                 dotDraws.breaksOnly(false);
                 spinner1.setVisibility(View.VISIBLE);
                 blank_spinner.setVisibility(View.GONE);
+                timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
+//                dotDraws.breakTime(breaksOnlyTime);
             }
             if (mode==1) {
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
             }
+            resetTimer();
         });
 
         progressBar.setOnClickListener(v-> {
@@ -532,6 +535,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         skip.setOnClickListener(v -> {
             if (customSetTime.size()>0) {
                 customHalted = true;
@@ -561,7 +565,6 @@ public class MainActivity extends AppCompatActivity {
                             oldCycle = customCyclesDone;
                         }
 
-                        //Todo: For "breaks only":
                         if (customSetTime.size() >0) timePaused.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
 //                        timeLeft.setText(convertSeconds((breakStart+999)/1000));
                     }
@@ -572,7 +575,7 @@ public class MainActivity extends AppCompatActivity {
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         endAnimation();
                         progressBar.setProgress(0);
-                        timeLeft.setText("0");
+                        timePaused.setText("0");
                         customTimerEnded = true;
                         paused = false;
                     }
@@ -624,7 +627,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startObjectAnimator() {
-//        removeViews();
         switch (mode) {
             case 1:
                 fadeDone = 1;
@@ -642,7 +644,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     fadeDone = 2;
                     if (!breakBegun) {
-                        if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
+                        if (!breaksOnly) if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1); else
+                            if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(breaksOnlyTime.size()-1);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(breakMillis);
@@ -680,9 +683,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onTick(long millisUntilFinished) {
                         customProgressPause = (int) objectAnimator.getAnimatedValue();
                         setMillis = millisUntilFinished;
-
-//                        if (setMillis+3500 < countdownVar) {
-//                        }
 
                         if (fadeCustomTimer) {
                             if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
@@ -806,12 +806,21 @@ public class MainActivity extends AppCompatActivity {
                 breakBegun = false;
                 numberOfBreaks--;
                 timeLeft.setText("0");
-                if (customBreakTime.size() >0) {
-                    customBreakTime.remove(customBreakTime.size()-1);
+                if (!breaksOnly) {
+                    if (customBreakTime.size() >0) {
+                        customBreakTime.remove(customBreakTime.size()-1);
+                    }
+                    if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
+                    dotDraws.setTime(startCustomSetTime);
+                    dotDraws.breakTime(startCustomBreakTime);
+                } else {
+                    if (breaksOnlyTime.size()>0) {
+                        breaksOnlyTime.remove(breaksOnlyTime.size()-1);
+                    }
+                    if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(breaksOnlyTime.size() -1);
+                    dotDraws.setTime(startBreaksOnlyTime);
+                    dotDraws.breakTime(startBreaksOnlyTime);
                 }
-                if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
-                dotDraws.setTime(startCustomSetTime);
-                dotDraws.breakTime(startCustomBreakTime);
 
                 endAnimation();
                 if (numberOfBreaks >0) {
@@ -866,38 +875,62 @@ public class MainActivity extends AppCompatActivity {
 
     public void adjustCustom(boolean adding) {
         if (adding) {
-            if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
-                customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
-                startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
+            if (!breaksOnly) {
+                if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
+                    customSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
+                    startCustomSetTime.add(spinList1.get(spinner1.getSelectedItemPosition()) * 1000);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                }
+                if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
+                    customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
+                    startCustomBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
+                }
             } else {
-                Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-            }
-            if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
-                customBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
-                startCustomBreakTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
+                if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
+                    breaksOnlyTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
+                    startBreaksOnlyTime.add(spinList2.get(spinner2.getSelectedItemPosition()) * 1000);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                }
             }
         } else {
-            if (customSetTime.size() > 0 && customSetTime.size() > 0) {
-                customSetTime.remove(customSetTime.size() - 1);
-                startCustomSetTime.remove(startCustomSetTime.size() - 1);
+            if (!breaksOnly) {
+                if (customSetTime.size() > 0 && startCustomSetTime.size() > 0) {
+                    customSetTime.remove(customSetTime.size() - 1);
+                    startCustomSetTime.remove(startCustomSetTime.size() - 1);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                }
+                if (customBreakTime.size() > 0 && startCustomBreakTime.size() > 0) {
+                    customBreakTime.remove(customBreakTime.size() - 1);
+                    startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
+                }
             } else {
-                Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-            }
-            if (customBreakTime.size() > 0 && customBreakTime.size() > 0) {
-                customBreakTime.remove(customBreakTime.size() - 1);
-                startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
+                if (breaksOnlyTime.size() > 0 && startBreaksOnlyTime.size() > 0) {
+                    breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
+                    startBreaksOnlyTime.remove(startBreaksOnlyTime.size() - 1);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                }
             }
         }
         resetTimer();
         saveSpins();
         dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
-        if (!breaksOnly && customSetTime.size() > 0) {
-            timeLeft.setText(convertSeconds((customSetTime.get(customSetTime.size() - 1) +999) / 1000));
-        } else if (breaksOnly && customBreakTime.size() >0) {
-            timeLeft.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
+        if (!breaksOnly) {
+            if (customSetTime.size()>0) {
+                timePaused.setText(convertSeconds((customSetTime.get(customSetTime.size() - 1) +999) / 1000));
+            } else {
+                timePaused.setText("?");
+            }
         } else {
-            timeLeft.setText("?");
+            if (breaksOnlyTime.size()>0) {
+                timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
+            } else {
+                timePaused.setText("?");
+            }
         }
     }
 
@@ -921,10 +954,8 @@ public class MainActivity extends AppCompatActivity {
         va.start();
     }
 
-    //Todo: Cancel all previous obj animators after creation.
     public void fadeTextIn(TextView textView) {
         textView.setVisibility(View.VISIBLE);
-
         if (fadeInObj!=null) fadeInObj.cancel();
         fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
         fadeInObj.setDuration(1500);
@@ -986,6 +1017,7 @@ public class MainActivity extends AppCompatActivity {
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
                 if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
+                if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
                 if (halted) {
                     timePaused.setText(convertSeconds((setMillis + 999)/1000));
                     handler.postDelayed(() -> {
@@ -1036,19 +1068,14 @@ public class MainActivity extends AppCompatActivity {
         timeLeft2.setAlpha(0);
     }
 
-    public void destroyViews() {
-        timePaused.setVisibility(View.GONE);
-        timeLeft.setVisibility(View.GONE);
-        timePaused2.setVisibility(View.GONE);
-        timeLeft2.setVisibility(View.GONE);
-    }
-
     public void pauseAndResumeTimer(int pausing) {
         if (setMillis <=500 || breakMillis <=500) {
             timerDisabled = true;
         }
         if (!timerDisabled) {
             removeViews();
+            if (fadeInObj!=null) fadeInObj.cancel();
+            if (fadeOutObj!=null) fadeOutObj.cancel();
             switch (mode) {
                 case 1:
                     if (!customTimerEnded) {
@@ -1109,7 +1136,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
             }
-        } else if ((!onBreak && customSetTime.size()==0) || (onBreak && customBreakTime.size()==0) ) {
+        } else if ( (!breaksOnly && customSetTime.size()==0) || (breaksOnly && breaksOnlyTime.size()==0)) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
         }
     }
@@ -1118,11 +1145,12 @@ public class MainActivity extends AppCompatActivity {
         removeViews();
         //Todo: Separate end animations.
         if (endAnimation != null) endAnimation.cancel();
-        dotDraws.setAlpha();
-        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+//        dotDraws.setAlpha();
+//        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
 
         switch (mode) {
             case 1:
+                timePaused.setAlpha(1);
                 progressBar.setProgress(10000);
                 customProgressPause = maxProgress;
                 customTimerEnded = false;
@@ -1134,33 +1162,57 @@ public class MainActivity extends AppCompatActivity {
                 if (timer != null) timer.cancel();
                 if (objectAnimator != null) objectAnimator.cancel();
 
-                if (startCustomSetTime.size() >0 && startCustomBreakTime.size() >0) {
+                if (startCustomSetTime.size()>0) {
                     setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
-                    breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
-                    if (!breaksOnly) timePaused.setText(convertSeconds((setMillis+999)/1000)); else
-                        timePaused.setText(convertSeconds((breakMillis+999)/1000));
+                    timePaused.setText(convertSeconds((setMillis+999)/1000));
                 }
-                timePaused.setAlpha(1);
+                if (!breaksOnly) {
+                    if (startCustomBreakTime.size()>0) {
+                        breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
+                        timePaused.setText(convertSeconds((setMillis+999)/1000));
+                    }
+                } else {
+                    if (startBreaksOnlyTime.size()>0) {
+                        breakMillis = startBreaksOnlyTime.get(startBreaksOnlyTime.size()-1);
+                        timePaused.setText(convertSeconds((breakMillis+999)/1000));
+                    }
+                }
 
                 numberOfSets = startCustomSetTime.size();
-                numberOfBreaks = startCustomBreakTime.size();
+                if (!breaksOnly) numberOfBreaks = startCustomBreakTime.size(); else numberOfBreaks = startBreaksOnlyTime.size();
                 savedSets = numberOfSets;
                 savedBreaks = numberOfBreaks;
 
-                customSetTime = new ArrayList<>();
-                customBreakTime = new ArrayList<>();
-
-                if (startCustomSetTime.size() >0) {
-                    for (int i=0; i<startCustomSetTime.size(); i++) {
-                        customSetTime.add(startCustomSetTime.get(i));
-                        customBreakTime.add(startCustomBreakTime.get(i));
-                    }
-                    timerDisabled = false;
+                if (!breaksOnly) {
+                    customSetTime = new ArrayList<>();
+                    customBreakTime = new ArrayList<>();
                 } else {
-                    timerDisabled = true;
+                    breaksOnlyTime = new ArrayList<>();
                 }
-                dotDraws.setTime(customSetTime);
-                dotDraws.breakTime(customBreakTime);
+
+                if (!breaksOnly) {
+                    if (startCustomSetTime.size() >0) {
+                        for (int i=0; i<startCustomSetTime.size(); i++) {
+                            customSetTime.add(startCustomSetTime.get(i));
+                            customBreakTime.add(startCustomBreakTime.get(i));
+                        }
+                        timerDisabled = false;
+                    } else {
+                        timerDisabled = true;
+                    }
+                    dotDraws.setTime(customSetTime);
+                    dotDraws.breakTime(customBreakTime);
+                } else {
+                    if (startBreaksOnlyTime.size()>0) {
+                        breaksOnlyTime.addAll(startBreaksOnlyTime);
+                        timerDisabled = false;
+                    } else {
+                        timerDisabled = true;
+                    }
+                    dotDraws.breakTime(breaksOnlyTime);
+                }
+                dotDraws.setAlpha();
+                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                 break;
             case 2:
                 pomTimerEnded = false;
