@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     List<String> spinListString3;
 
     List<Integer> modeOneSpins;
+    List<Integer> modeOneBreakOnlySpins;
     List<Integer> modeTwoSpins;
 
     int PAUSING_TIMER = 1;
@@ -165,8 +166,7 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
 
-    //Todo: Test skip cycles a bit more. Add second cycles completed.
-    //Todo: Separate spinner2 value saves for breaksOnly.
+    //Todo: Separate spinner2 saves for breaksOnly.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
     //Todo: Smaller click radius for progressBar.
@@ -253,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
         List<Long> pomList2 = new ArrayList<>();
         List<Long> pomList3 = new ArrayList<>();
         modeOneSpins = new ArrayList<>();
+        modeOneBreakOnlySpins = new ArrayList<>();
         modeTwoSpins = new ArrayList<>();
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
@@ -314,7 +315,9 @@ public class MainActivity extends AppCompatActivity {
         //Default spinner values for Custom
         spinner1.setSelection(0);
         spinner2.setSelection(0);
-        spinner3.setSelection(2);
+//        spinner3.setSelection(2);
+        modeOneSpins.add(spinner1.getSelectedItemPosition());
+        modeOneSpins.add(spinner2.getSelectedItemPosition());
 
         //Elements here are retrieved as spinner positions via retrieveSpins(), and therefore must be <= than the number of spinner entries.
         modeTwoSpins.add(0, 2);
@@ -1008,13 +1011,15 @@ public class MainActivity extends AppCompatActivity {
         fadeOutObj.start();
     }
 
+    //Todo: Remember spinner3 list for breaksOnly.
     public void saveSpins() {
         switch (mode) {
             case 1:
-                if (modeOneSpins.size() >=3) {
+                if (modeOneSpins.size() >=2) {
                     modeOneSpins.set(0, spinner1.getSelectedItemPosition());
                     modeOneSpins.set(1, spinner2.getSelectedItemPosition());
-                    modeOneSpins.set(2, (int) customSetTime.size());              }
+//                    modeOneSpins.set(2, (int) customSetTime.size());
+                }
                 break;
             case 2:
                 if (modeTwoSpins.size() >=3) {
@@ -1029,7 +1034,7 @@ public class MainActivity extends AppCompatActivity {
         if (!isPom) {
             spinner1.setAdapter(spinAdapter1);
             spinner2.setAdapter(spinAdapter2);
-            spinner3.setAdapter(spinAdapter3);
+//            spinner3.setAdapter(spinAdapter3);
         } else {
             spinner1.setAdapter(pomAdapter1);
             spinner2.setAdapter(pomAdapter2);
@@ -1038,7 +1043,9 @@ public class MainActivity extends AppCompatActivity {
         if (spinList.size() != 0) {
             spinner1.setSelection(spinList.get(0));
             spinner2.setSelection(spinList.get(1));
-            spinner3.setSelection(spinList.get(2));
+            if (isPom) {
+                spinner3.setSelection(spinList.get(2));
+            }
         }
     }
 
