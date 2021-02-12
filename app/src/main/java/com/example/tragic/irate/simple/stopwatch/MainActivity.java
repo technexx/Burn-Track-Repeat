@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
     int pomDotCounter=1;
 
     int customCyclesDone;
+    int breaksOnlyCyclesDone;
     int pomCyclesDone;
 
     long numberOfSets;
@@ -350,7 +351,6 @@ public class MainActivity extends AppCompatActivity {
                         changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                         dotDraws.setMode(1);
                         if (!setBegun) dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         retrieveSpins(modeOneSpins, false);
                         break;
                     case 1:
@@ -360,7 +360,6 @@ public class MainActivity extends AppCompatActivity {
                         changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
                         dotDraws.setMode(2);
                         dotDraws.pomDraw(1, 0);
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 }
             }
 
@@ -466,8 +465,11 @@ public class MainActivity extends AppCompatActivity {
                 dotDraws.breaksOnly(true);
                 spinner1.setVisibility(View.GONE);
                 blank_spinner.setVisibility(View.VISIBLE);
-                timeLeft.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
-                timePaused.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
+                if (breaksOnlyTime.size()>0) {
+                    timeLeft.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
+                    timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
+                }
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
             } else {
                 setBegun = false;
                 breaksOnly = false;
@@ -475,8 +477,11 @@ public class MainActivity extends AppCompatActivity {
                 dotDraws.breaksOnly(false);
                 spinner1.setVisibility(View.VISIBLE);
                 blank_spinner.setVisibility(View.GONE);
-                timeLeft.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
-                timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
+                if (customBreakTime.size()>0) {
+                    timeLeft.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
+                    timePaused.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
+                }
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
             }
             if (mode==1) {
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
@@ -503,8 +508,7 @@ public class MainActivity extends AppCompatActivity {
 
         cycle_reset.setOnClickListener(v -> {
             switch (mode) {
-                case 1:
-                    customCyclesDone = 0; break;
+                case 1:if (!breaksOnly) customCyclesDone = 0; else breaksOnlyCyclesDone = 0; break;
                 case 2:
                     if (pomCyclesDone >=0) {
 
@@ -539,6 +543,7 @@ public class MainActivity extends AppCompatActivity {
             if (customSetTime.size()>0) {
                 customHalted = true;
                 int oldCycle = 0;
+                int oldCycle2 = 0;
                 if (mode == 1) {
                     if (timer != null) {
                         timer.cancel();
@@ -569,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
                             if (breaksOnlyTime.size() >0) {
                                 breaksOnlyTime.remove(breaksOnlyTime.size()-1);
                                 numberOfBreaks--;
-                                oldCycle = customCyclesDone;
+                                oldCycle2 = breaksOnlyCyclesDone;
                                 breakBegun = false;
                             }
                             if (breaksOnlyTime.size() >0) {
@@ -581,8 +586,18 @@ public class MainActivity extends AppCompatActivity {
                     if (numberOfBreaks == 0) {
                         timePaused.setAlpha(0);
                         timeLeft.setAlpha(1);
-                        if (oldCycle==customCyclesDone) customCyclesDone++;
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                        if (!breaksOnly) {
+                            if (oldCycle == customCyclesDone) {
+                                customCyclesDone++;
+                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                            }
+                        } else {
+                            if (oldCycle2 == breaksOnlyCyclesDone) {
+                                breaksOnlyCyclesDone++;
+                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                            }
+                        }
+                        Log.i("cycles", "custom are " + customCyclesDone + " and breaksOnly are " + breaksOnlyCyclesDone);
                         endAnimation();
                         progressBar.setProgress(0);
                         timeLeft.setText("0");
@@ -857,8 +872,13 @@ public class MainActivity extends AppCompatActivity {
                         timerDisabled = false;
                     },750);
                 } else {
-                    customCyclesDone++;
-                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                    if (!breaksOnly) {
+                        customCyclesDone++;
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                    } else {
+                        breaksOnlyCyclesDone++;
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                    }
                     endAnimation();
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
                     customTimerEnded = true;
@@ -1027,7 +1047,13 @@ public class MainActivity extends AppCompatActivity {
         switch (mode) {
             case 1:
                 drawing = true;
-                if (!breaksOnly) onBreak = false; else onBreak = true;
+                if (!breaksOnly) {
+                    onBreak = false;
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                } else {
+                    onBreak = true;
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                }
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 plus_sign.setVisibility(View.VISIBLE);
@@ -1053,6 +1079,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 2:
                 drawing = false;
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 progressBar2.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
                 plus_sign.setVisibility(View.GONE);
