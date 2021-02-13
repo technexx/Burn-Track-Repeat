@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
 
-    //Todo: Separate spinner2 saves for breaksOnly.
+    //Todo: Glitches when switching from breaksOnly while in Pom mode.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
     //Todo: Smaller click radius for progressBar.
@@ -315,9 +315,11 @@ public class MainActivity extends AppCompatActivity {
         //Default spinner values for Custom
         spinner1.setSelection(0);
         spinner2.setSelection(0);
-//        spinner3.setSelection(2);
         modeOneSpins.add(spinner1.getSelectedItemPosition());
         modeOneSpins.add(spinner2.getSelectedItemPosition());
+
+        //Setting default spinner positional value for breaksOnly mode, since we do not begin here w/ spinner values to pass in.
+        modeOneBreakOnlySpins.add(8);
 
         //Elements here are retrieved as spinner positions via retrieveSpins(), and therefore must be <= than the number of spinner entries.
         modeTwoSpins.add(0, 2);
@@ -354,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
                         changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                         dotDraws.setMode(1);
                         if (!setBegun) dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                        retrieveSpins(modeOneSpins, false);
+                        if (!breaksOnly) retrieveSpins(modeOneSpins, false); else retrieveSpins(modeOneBreakOnlySpins, false);
                         break;
                     case 1:
                         mode=2;
@@ -459,10 +461,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Todo: Remember we are switching TO breaksOnly in first bit.
         breaks_only.setOnClickListener(v-> {
             if (!breaksOnly) {
                 setBegun = true;
-                breaksOnly = true;
                 onBreak = true;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
                 dotDraws.breaksOnly(true);
@@ -473,9 +475,10 @@ public class MainActivity extends AppCompatActivity {
                     timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
                 }
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                breaksOnly = true;
+                retrieveSpins(modeOneBreakOnlySpins, false);
             } else {
                 setBegun = false;
-                breaksOnly = false;
                 breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                 dotDraws.breaksOnly(false);
                 spinner1.setVisibility(View.VISIBLE);
@@ -485,6 +488,8 @@ public class MainActivity extends AppCompatActivity {
                     timePaused.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
                 }
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                breaksOnly = false;
+                retrieveSpins(modeOneSpins, false);
             }
             if (mode==1) {
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
@@ -1011,42 +1016,53 @@ public class MainActivity extends AppCompatActivity {
         fadeOutObj.start();
     }
 
-    //Todo: Remember spinner3 list for breaksOnly.
     public void saveSpins() {
         switch (mode) {
             case 1:
-                if (modeOneSpins.size() >=2) {
-                    modeOneSpins.set(0, spinner1.getSelectedItemPosition());
-                    modeOneSpins.set(1, spinner2.getSelectedItemPosition());
-//                    modeOneSpins.set(2, (int) customSetTime.size());
+                if (!breaksOnly) {
+                    if (modeOneSpins.size() >= 2) {
+                        modeOneSpins.set(0, spinner1.getSelectedItemPosition());
+                        modeOneSpins.set(1, spinner2.getSelectedItemPosition());
+                    }
+                } else {
+                    if (modeOneBreakOnlySpins.size() >= 1) {
+                        modeOneBreakOnlySpins.set(0, spinner2.getSelectedItemPosition());
+                    }
                 }
                 break;
             case 2:
-                if (modeTwoSpins.size() >=3) {
+                if (modeTwoSpins.size() >= 3) {
                     modeTwoSpins.set(0, spinner1.getSelectedItemPosition());
                     modeTwoSpins.set(1, spinner2.getSelectedItemPosition());
                     modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
                 }
         }
+        Log.i("spins", "modeOneSpins are " + modeOneSpins);
     }
 
     public void retrieveSpins(List<Integer> spinList, boolean isPom) {
         if (!isPom) {
-            spinner1.setAdapter(spinAdapter1);
+            if (!breaksOnly) spinner1.setAdapter(spinAdapter1);
             spinner2.setAdapter(spinAdapter2);
-//            spinner3.setAdapter(spinAdapter3);
         } else {
             spinner1.setAdapter(pomAdapter1);
             spinner2.setAdapter(pomAdapter2);
             spinner3.setAdapter(pomAdapter3);
         }
         if (spinList.size() != 0) {
-            spinner1.setSelection(spinList.get(0));
-            spinner2.setSelection(spinList.get(1));
             if (isPom) {
                 spinner3.setSelection(spinList.get(2));
+            } else {
+                if (!breaksOnly) {
+                    spinner1.setSelection(spinList.get(0));
+                    spinner2.setSelection(spinList.get(1));
+                } else {
+                    spinner2.setSelection(spinList.get(0));
+                }
             }
         }
+        Log.i("retrieveSpins", "list is " + spinList);
+
     }
 
     public void switchTimer(int mode, boolean halted) {
