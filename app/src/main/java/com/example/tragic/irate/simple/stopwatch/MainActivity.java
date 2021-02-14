@@ -31,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     Button breaks_only;
     ProgressBar progressBar;
     ProgressBar progressBar2;
+    ImageView stopWatchButton;
     TextView timeLeft;
     TextView timeLeft2;
     TextView timePaused;
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
     boolean timerDisabled;
     boolean customHalted = true;
     boolean pomHalted = true;
+    boolean stopwatchHalted;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -166,7 +169,8 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
 
-    //Todo: Glitches when switching from breaksOnly while in Pom mode.
+    //Todo: Add fade in/out to breaksOnly.
+    //Todo: Test countdowns/switches from breaksOnly.
     //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smooth transition between tab timer textviews.
     //Todo: Smaller click radius for progressBar.
@@ -227,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
         breaks_only = findViewById(R.id.breaks_only);
         progressBar = findViewById(R.id.progressBar);
         progressBar2 = findViewById(R.id.progressBar2);
+        stopWatchButton = findViewById(R.id.stopWatchButton);
         timeLeft = findViewById(R.id.timeLeft);
         timeLeft2 = findViewById(R.id.timeLeft2);
         timePaused = findViewById(R.id.timePaused);
@@ -241,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("Custom"));
         tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+        tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
         handler = new Handler();
         spinList1 = new ArrayList<>();
@@ -267,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
         timePaused2.setAlpha(0);
         timeLeft2.setAlpha(0);
         progressBar2.setVisibility(View.GONE);
+        stopWatchButton.setVisibility(View.GONE);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -353,7 +360,6 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         mode=1;
                         switchTimer(1, customHalted);
-                        changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                         dotDraws.setMode(1);
                         if (!setBegun) dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                         if (!breaksOnly) retrieveSpins(modeOneSpins, false); else retrieveSpins(modeOneBreakOnlySpins, false);
@@ -362,9 +368,12 @@ public class MainActivity extends AppCompatActivity {
                         mode=2;
                         switchTimer(2, pomHalted);
                         retrieveSpins(modeTwoSpins, true);
-                        changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
                         dotDraws.setMode(2);
                         dotDraws.pomDraw(1, 0);
+                        break;
+                    case 2:
+                        mode=3;
+                        switchTimer(3, stopwatchHalted);
                 }
             }
 
@@ -461,40 +470,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Todo: Remember we are switching TO breaksOnly in first bit.
         breaks_only.setOnClickListener(v-> {
-            if (!breaksOnly) {
-                setBegun = true;
-                onBreak = true;
-                breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
-                dotDraws.breaksOnly(true);
-                spinner1.setVisibility(View.GONE);
-                blank_spinner.setVisibility(View.VISIBLE);
-                if (breaksOnlyTime.size()>0) {
-                    timeLeft.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
-                    timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
-                }
-                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                breaksOnly = true;
-                retrieveSpins(modeOneBreakOnlySpins, false);
-            } else {
-                setBegun = false;
-                breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
-                dotDraws.breaksOnly(false);
-                spinner1.setVisibility(View.VISIBLE);
-                blank_spinner.setVisibility(View.GONE);
-                if (customBreakTime.size()>0) {
-                    timeLeft.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
-                    timePaused.setText(convertSeconds((customBreakTime.get(customBreakTime.size() - 1) +999) / 1000));
-                }
-                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                breaksOnly = false;
-                retrieveSpins(modeOneSpins, false);
-            }
             if (mode==1) {
+                if (!breaksOnly) {
+                    setBegun = true;
+                    onBreak = true;
+                    breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
+                    dotDraws.breaksOnly(true);
+                    spinner1.setVisibility(View.GONE);
+                    blank_spinner.setVisibility(View.VISIBLE);
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                    breaksOnly = true;
+                    retrieveSpins(modeOneBreakOnlySpins, false);
+                } else {
+                    setBegun = false;
+                    breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
+                    dotDraws.breaksOnly(false);
+                    spinner1.setVisibility(View.VISIBLE);
+                    blank_spinner.setVisibility(View.GONE);
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                    breaksOnly = false;
+                    retrieveSpins(modeOneSpins, false);
+                }
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
+                resetTimer();
             }
-            resetTimer();
         });
 
         progressBar.setOnClickListener(v-> {
@@ -1002,7 +1002,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fadeTextIn(TextView textView) {
-        textView.setVisibility(View.VISIBLE);
+//        textView.setVisibility(View.VISIBLE);
         if (fadeInObj!=null) fadeInObj.cancel();
         fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
         fadeInObj.setDuration(1500);
@@ -1067,6 +1067,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void switchTimer(int mode, boolean halted) {
         removeViews();
+        tabViews();
         switch (mode) {
             case 1:
                 drawing = true;
@@ -1077,15 +1078,10 @@ public class MainActivity extends AppCompatActivity {
                     onBreak = true;
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 }
-                progressBar.setVisibility(View.VISIBLE);
-                progressBar2.setVisibility(View.INVISIBLE);
-                plus_sign.setVisibility(View.VISIBLE);
-                minus_sign.setVisibility(View.VISIBLE);
-                spinner3.setVisibility(View.GONE);
-                s1.setText(R.string.set_time);
-                s2.setText(R.string.break_time);
+
                 if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
                 if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
+                changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                 if (halted) {
                     if (!breaksOnly) {
                         timePaused.setText(convertSeconds((setMillis + 999)/1000));
@@ -1103,16 +1099,8 @@ public class MainActivity extends AppCompatActivity {
             case 2:
                 drawing = false;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
-                progressBar2.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.INVISIBLE);
-                plus_sign.setVisibility(View.GONE);
-                minus_sign.setVisibility(View.GONE);
-                spinner3.setVisibility(View.VISIBLE);
-                spinner1.setVisibility(View.VISIBLE);
-                blank_spinner.setVisibility(View.GONE);
-                s1.setText(R.string.work_time);
-                s2.setText(R.string.small_break);
-                s3.setText(R.string.long_break);
+                changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
+
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
                     timePaused2.setText(convertSeconds((pomMillis + 999)/1000));
@@ -1124,15 +1112,11 @@ public class MainActivity extends AppCompatActivity {
                     startObjectAnimator();
                 }
                 break;
+            case 3:
+                dotDraws.setMode(3);
+                dotDraws.pomDraw(pomDotCounter, 1);
         }
         dotDraws.retrieveAlpha();
-    }
-
-    public void removeViews() {
-        timePaused.setAlpha(0);
-        timeLeft.setAlpha(0);
-        timePaused2.setAlpha(0);
-        timeLeft2.setAlpha(0);
     }
 
     public void pauseAndResumeTimer(int pausing) {
@@ -1208,6 +1192,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void removeViews() {
+        timePaused.setAlpha(0);
+        timeLeft.setAlpha(0);
+        timePaused2.setAlpha(0);
+        timeLeft2.setAlpha(0);
+    }
+
+    public void tabViews(){
+        switch (mode) {
+            case 1:
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar2.setVisibility(View.INVISIBLE);
+                stopWatchButton.setVisibility(View.INVISIBLE);
+                plus_sign.setVisibility(View.VISIBLE);
+                minus_sign.setVisibility(View.VISIBLE);
+                spinner1.setVisibility(View.VISIBLE);
+                spinner2.setVisibility(View.VISIBLE);
+                spinner3.setVisibility(View.INVISIBLE);
+                s1.setVisibility(View.VISIBLE);
+                s2.setVisibility(View.VISIBLE);
+                s3.setVisibility(View.VISIBLE);
+                s1.setText(R.string.set_time);
+                s2.setText(R.string.break_time);
+                break;
+            case 2:
+                progressBar.setVisibility(View.INVISIBLE);
+                progressBar2.setVisibility(View.VISIBLE);
+                stopWatchButton.setVisibility(View.INVISIBLE);
+                plus_sign.setVisibility(View.GONE);
+                minus_sign.setVisibility(View.GONE);
+                spinner1.setVisibility(View.VISIBLE);
+                spinner2.setVisibility(View.VISIBLE);
+                spinner3.setVisibility(View.VISIBLE);
+                blank_spinner.setVisibility(View.GONE);
+                s1.setVisibility(View.VISIBLE);
+                s2.setVisibility(View.VISIBLE);
+                s3.setVisibility(View.VISIBLE);
+                s1.setText(R.string.work_time);
+                s2.setText(R.string.small_break);
+                s3.setText(R.string.long_break);
+                break;
+            case 3:
+                progressBar.setVisibility(View.INVISIBLE);
+                progressBar2.setVisibility(View.INVISIBLE);
+                stopWatchButton.setVisibility(View.VISIBLE);
+                plus_sign.setVisibility(View.GONE);
+                minus_sign.setVisibility(View.GONE);
+                spinner1.setVisibility(View.GONE);
+                spinner2.setVisibility(View.GONE);
+                spinner3.setVisibility(View.GONE);
+                blank_spinner.setVisibility(View.GONE);
+                s1.setVisibility(View.GONE);
+                s2.setVisibility(View.GONE);
+                s3.setVisibility(View.GONE);
+        }
+    }
+
     public void resetTimer() {
         removeViews();
         //Todo: Separate end animations.
@@ -1229,16 +1270,19 @@ public class MainActivity extends AppCompatActivity {
 
                 if (startCustomSetTime.size()>0) {
                     setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
+                    timeLeft.setText(convertSeconds((setMillis+999)/1000));
                     timePaused.setText(convertSeconds((setMillis+999)/1000));
                 }
                 if (!breaksOnly) {
                     if (startCustomBreakTime.size()>0) {
                         breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
+                        timeLeft.setText(convertSeconds((setMillis+999)/1000));
                         timePaused.setText(convertSeconds((setMillis+999)/1000));
                     }
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breakMillis = startBreaksOnlyTime.get(startBreaksOnlyTime.size()-1);
+                        timeLeft.setText(convertSeconds((breakMillis+999)/1000));
                         timePaused.setText(convertSeconds((breakMillis+999)/1000));
                     }
                 }
@@ -1285,8 +1329,6 @@ public class MainActivity extends AppCompatActivity {
                 pomProgressPause = maxProgress;
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
-//                timeLeft2.setAlpha(1);
-//                timePaused2.setAlpha(1);
                 pomMillis = pomMillis1;
                 timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
                 timePaused2.setText(convertSeconds((pomMillis+999)/1000));

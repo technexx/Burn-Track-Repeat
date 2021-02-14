@@ -50,6 +50,8 @@ public class DotDraws extends View {
     int savedPomAlpha;
     int savedPomCycle;
 
+    boolean mRemoveCanvas;
+
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setFocusable(true);
@@ -126,8 +128,8 @@ public class DotDraws extends View {
         savedPomAlpha = mAlpha2;
         savedPomCycle = cycle2;
 
-        mX = 60; mY = 600; mX2 = 60; mY2 = 730;
-        if (mBreaksOnly) mY2 = 645;
+        mX = 60; mY = 490; mX2 = 60; mY2 = 620;
+        if (mBreaksOnly) mY2 = 535;
 
         if (mMode == 1 && !mBreaksOnly) {
             for (int i=0; i<mSetCount; i++) {
@@ -195,6 +197,8 @@ public class DotDraws extends View {
                 }
             }
         }
+
+        if (mMode==3) mCanvas.drawColor(Color.BLACK);
     }
 
     public void fadeDot() {
@@ -232,14 +236,14 @@ public class DotDraws extends View {
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawCircle(mX, 650, 60, mPaint);
+                mCanvas.drawCircle(mX, 540, 60, mPaint);
                 break;
             case 2: case 4: case 6:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawCircle(mX2, 650, 30, mPaint);
+                mCanvas.drawCircle(mX2, 540, 30, mPaint);
                 mX+=230;
                 mX2=mX+115;
                 break;
@@ -248,7 +252,7 @@ public class DotDraws extends View {
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawRect(mX+110, 595, mX+220, 705, mPaint);
+                mCanvas.drawRect(mX+110, 485, mX+220, 595, mPaint);
         }
     }
 
