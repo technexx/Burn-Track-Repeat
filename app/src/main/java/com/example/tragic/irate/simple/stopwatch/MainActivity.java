@@ -241,6 +241,9 @@ public class MainActivity extends AppCompatActivity {
         timePaused.setTextSize(90f);
         timeLeft2.setTextSize(70f);
         timePaused2.setTextSize(70f);
+        skip.setText(R.string.skip_round);
+        cycle_reset.setText(R.string.clear_cycles);
+        cycles_completed.setText(R.string.cycles_done);
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
@@ -1200,6 +1203,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tabViews(){
+        ConstraintLayout.LayoutParams params= (ConstraintLayout.LayoutParams) skip.getLayoutParams();
+        ConstraintLayout.LayoutParams params2 = (ConstraintLayout.LayoutParams) cycle_reset.getLayoutParams();
         switch (mode) {
             case 1:
                 progressBar.setVisibility(View.VISIBLE);
@@ -1215,6 +1220,11 @@ public class MainActivity extends AppCompatActivity {
                 s3.setVisibility(View.VISIBLE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
+                skip.setText(R.string.skip_round);
+                cycle_reset.setText(R.string.clear_cycles);
+                cycles_completed.setText(R.string.cycles_done);
+                params.width = 150;
+                params2.width = 150;
                 break;
             case 2:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -1232,6 +1242,11 @@ public class MainActivity extends AppCompatActivity {
                 s1.setText(R.string.work_time);
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
+                skip.setText(R.string.skip_round);
+                cycle_reset.setText(R.string.clear_cycles);
+                cycles_completed.setText(R.string.cycles_done);
+                params.width = 150;
+                params2.width = 150;
                 break;
             case 3:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -1246,7 +1261,14 @@ public class MainActivity extends AppCompatActivity {
                 s1.setVisibility(View.GONE);
                 s2.setVisibility(View.GONE);
                 s3.setVisibility(View.GONE);
+                skip.setText(R.string.lap);
+                cycle_reset.setText(R.string.clear_laps);
+                cycles_completed.setText(R.string.laps_completed);
+                params.width = 200;
+                params2.width = 200;
         }
+        skip.setLayoutParams(params);
+        cycle_reset.setLayoutParams(params2);
     }
 
     public void resetTimer() {

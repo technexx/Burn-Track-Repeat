@@ -153,7 +153,6 @@
 
     <TextView
         android:id="@+id/skip"
-        android:text="Skip Round"
         android:textColor="@color/white"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
@@ -167,7 +166,6 @@
 
     <TextView
         android:id="@+id/cycle_reset"
-        android:text="Clear Cycles"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"

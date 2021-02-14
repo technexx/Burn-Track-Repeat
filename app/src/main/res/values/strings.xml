@@ -5,12 +5,14 @@
 
     <string name="reset">Reset</string>
     <string name="clear_cycles">Clear Cycles</string>
+    <string name="skip_round">Skip Round</string>
     <string name="set_time">Set Time:</string>
     <string name="break_time">Break Duration:</string>
     <string name="set_number">Number of Rounds:</string>
     <string name="work_time">Work Time:</string>
     <string name="small_break">Mini Break:</string>
     <string name="long_break">Standard Break:</string>
+
     <string name="cycles_done">Cycles Completed: %1$s</string>
 
     <string name="pom_reset">Confirm Pomodoro Reset</string>
