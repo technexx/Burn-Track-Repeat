@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -44,6 +45,8 @@ import com.google.android.material.tabs.TabLayout;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
     TextView timeLeft2;
     TextView timePaused;
     TextView timePaused2;
+    TextView timeLeft3;
+    TextView timePaused3;
+    TextView secondsLeft;
+    TextView msTime;
+    TextView msTimePaused;
     CountDownTimer timer;
     CountDownTimer timer2;
     TextView reset;
@@ -70,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     TextView cycles_completed;
     TextView cycle_reset;
     TextView skip;
+    TextView newLap;
     Spinner spinner1;
     Spinner spinner2;
     Spinner spinner3;
@@ -120,9 +129,17 @@ public class MainActivity extends AppCompatActivity {
     long pomMillis3;
     int pomDotCounter=1;
 
+    double ms;
+    double msDisplay;
+    double seconds;
+    double minutes;
+    ArrayList<String> currentLapList;
+    ArrayList<String> savedLapList;
+
     int customCyclesDone;
     int breaksOnlyCyclesDone;
     int pomCyclesDone;
+    int lapsDone;
 
     long numberOfSets;
     long numberOfBreaks;
@@ -137,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     boolean timerDisabled;
     boolean customHalted = true;
     boolean pomHalted = true;
-    boolean stopwatchHalted;
+    boolean stopwatchHalted = true;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -165,9 +182,10 @@ public class MainActivity extends AppCompatActivity {
     boolean fadePomTimer;
     float customAlpha;
     float pomAlpha;
-    boolean alphaSet;
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
+    RecyclerView lapRecycler;
+    LapAdapter lapAdapter;
 
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Test countdowns/switches from breaksOnly.
@@ -224,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
         cycles_completed = findViewById(R.id.cycles_completed);
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
+        newLap = findViewById(R.id.new_lap);
 
         reset.setVisibility(View.INVISIBLE);
         blank_spinner.setVisibility(View.GONE);
@@ -234,14 +253,23 @@ public class MainActivity extends AppCompatActivity {
         stopWatchButton = findViewById(R.id.stopWatchButton);
         timeLeft = findViewById(R.id.timeLeft);
         timeLeft2 = findViewById(R.id.timeLeft2);
+        timeLeft3 =findViewById(R.id.timeLeft3);
         timePaused = findViewById(R.id.timePaused);
         timePaused2 = findViewById(R.id.timePaused2);
+        timePaused3 = findViewById(R.id.timePaused3);
+        msTime = findViewById(R.id.msTime);
+        msTimePaused = findViewById(R.id.msTimePaused);
         dotDraws = findViewById(R.id.dotdraws);
+        lapRecycler = findViewById(R.id.lap_recycler);
+
         timeLeft.setTextSize(90f);
         timePaused.setTextSize(90f);
         timeLeft2.setTextSize(70f);
         timePaused2.setTextSize(70f);
+        timeLeft3.setTextSize(90f);
+        timePaused3.setTextSize(90f);
         skip.setText(R.string.skip_round);
+        newLap.setText(R.string.lap);
         cycle_reset.setText(R.string.clear_cycles);
         cycles_completed.setText(R.string.cycles_done);
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -270,13 +298,17 @@ public class MainActivity extends AppCompatActivity {
         startCustomBreakTime = new ArrayList<>();
         breaksOnlyTime = new ArrayList<>();
         startBreaksOnlyTime = new ArrayList<>();
+        currentLapList = new ArrayList<>();
+        savedLapList = new ArrayList<>();
+
         s3.setText(R.string.set_number);
         spinner3.setVisibility(View.GONE);
-        timeLeft.setAlpha(0);
-        timePaused2.setAlpha(0);
-        timeLeft2.setAlpha(0);
         progressBar2.setVisibility(View.GONE);
         stopWatchButton.setVisibility(View.GONE);
+        newLap.setVisibility(View.GONE);
+
+        removeViews();
+        timePaused.setAlpha(1);
 
         for (long i=0; i<300; i+=5) {
             spinList1.add(i+5);
@@ -631,6 +663,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        newLap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
         plus_sign.setOnClickListener(v -> {
             adjustCustom(true);
         });
@@ -663,7 +701,44 @@ public class MainActivity extends AppCompatActivity {
                     reset.setVisibility(View.VISIBLE);
                 });
             }
+        });
 
+        stopWatchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DecimalFormat df = new DecimalFormat("0");
+                DecimalFormat df2 = new DecimalFormat("00");
+                if (stopwatchHalted) {
+                    final Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            //ms can never be more than 60/sec due to refresh rate.
+                            ms+=1;
+                            msDisplay+=1;
+                            if (msDisplay>59) msDisplay=0;
+
+                            seconds = ms/60;
+                            minutes = seconds/60;
+
+                            String newMs = df2.format((msDisplay/60) * 100);
+                            String newSeconds = df.format(seconds);
+
+                            timeLeft3.setText(newSeconds);
+                            msTime.setText(newMs);
+                            Log.i("newMs", "new ms is " + newMs + " " + newSeconds);
+
+                            handler.postDelayed(this, 10);
+                        }
+                    };
+                    handler.post(r);
+                    stopwatchHalted = false;
+                    reset.setVisibility(View.INVISIBLE);
+                } else {
+                    handler.removeCallbacksAndMessages(null);
+                    stopwatchHalted = true;
+                    reset.setVisibility(View.VISIBLE);
+                }
+            }
         });
     }
 
@@ -1116,6 +1191,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case 3:
+                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsDone)));
                 dotDraws.setMode(3);
                 dotDraws.pomDraw(pomDotCounter, 1);
         }
@@ -1200,10 +1276,13 @@ public class MainActivity extends AppCompatActivity {
         timeLeft.setAlpha(0);
         timePaused2.setAlpha(0);
         timeLeft2.setAlpha(0);
+        timeLeft3.setAlpha(0);
+        timePaused3.setAlpha(0);
+        msTime.setAlpha(0);
+        msTimePaused.setAlpha(0);
     }
 
     public void tabViews(){
-        ConstraintLayout.LayoutParams params= (ConstraintLayout.LayoutParams) skip.getLayoutParams();
         ConstraintLayout.LayoutParams params2 = (ConstraintLayout.LayoutParams) cycle_reset.getLayoutParams();
         switch (mode) {
             case 1:
@@ -1218,12 +1297,11 @@ public class MainActivity extends AppCompatActivity {
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
+                skip.setVisibility(View.VISIBLE);
+                newLap.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
-                skip.setText(R.string.skip_round);
                 cycle_reset.setText(R.string.clear_cycles);
-                cycles_completed.setText(R.string.cycles_done);
-                params.width = 150;
                 params2.width = 150;
                 break;
             case 2:
@@ -1239,13 +1317,12 @@ public class MainActivity extends AppCompatActivity {
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
+                skip.setVisibility(View.VISIBLE);
+                newLap.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
-                skip.setText(R.string.skip_round);
                 cycle_reset.setText(R.string.clear_cycles);
-                cycles_completed.setText(R.string.cycles_done);
-                params.width = 150;
                 params2.width = 150;
                 break;
             case 3:
@@ -1261,19 +1338,21 @@ public class MainActivity extends AppCompatActivity {
                 s1.setVisibility(View.GONE);
                 s2.setVisibility(View.GONE);
                 s3.setVisibility(View.GONE);
-                skip.setText(R.string.lap);
+                skip.setVisibility(View.GONE);
+                newLap.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
-                cycles_completed.setText(R.string.laps_completed);
-                params.width = 200;
                 params2.width = 200;
+                timeLeft3.setAlpha(1);
+                msTime.setAlpha(1);
+                timeLeft3.setText("0");
+                msTime.setText("0");
         }
-        skip.setLayoutParams(params);
         cycle_reset.setLayoutParams(params2);
     }
 
     public void resetTimer() {
         removeViews();
-        //Todo: Separate end animations.
+        //Todo: Separate end animations, especially since adding stopwatch.
         if (endAnimation != null) endAnimation.cancel();
 
         switch (mode) {
@@ -1357,6 +1436,20 @@ public class MainActivity extends AppCompatActivity {
                 onBreak = false;
                 pomHalted = true;
                 pomProgressPause = maxProgress;
+                break;
+            case 3:
+                ms = 0;
+                msDisplay = 0;
+                seconds = 0;
+                minutes = 0;
+                if (currentLapList.size()>0) currentLapList.clear();
+                if (savedLapList.size()>0) savedLapList.clear();
+                timePaused3.setAlpha(1);
+                msTimePaused.setAlpha(1);
+                timeLeft3.setText("0");
+                timePaused3.setText("0");
+                msTime.setText("00");
+                msTimePaused.setText("00");
                 break;
         }
     }

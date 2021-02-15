@@ -165,6 +165,19 @@
     </TextView>
 
     <TextView
+        android:id="@+id/new_lap"
+        android:textColor="@color/white"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="380dp"
+        android:layout_marginStart="33dp"
+        android:textSize="14sp">
+    </TextView>
+
+    <TextView
         android:id="@+id/cycle_reset"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
@@ -220,6 +233,54 @@
         app:layout_constraintEnd_toEndOf="@id/progressBar">
     </TextView>
 
+    <TextView
+        android:id="@+id/timeLeft3"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/progressBar"
+        app:layout_constraintBottom_toBottomOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="@id/progressBar"
+        app:layout_constraintEnd_toEndOf="@id/progressBar">
+    </TextView>
+
+    <TextView
+        android:id="@+id/timePaused3"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/progressBar"
+        app:layout_constraintBottom_toBottomOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="@id/progressBar"
+        app:layout_constraintEnd_toEndOf="@id/progressBar">
+    </TextView>
+
+    <TextView
+        android:id="@+id/msTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white"
+        android:layout_marginBottom="30dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/msTimePaused"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white"
+        android:layout_marginBottom="30dp"
+        android:textSize="16sp">
+    </TextView>
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="230dp"
@@ -259,6 +320,16 @@
         android:src="@drawable/circle_stopwatch">
     </ImageView>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/lap_recycler"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintBottom_toTopOf="@id/stopWatchButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+    </androidx.recyclerview.widget.RecyclerView>
+
     <TextView
         android:id="@+id/reset"
         android:text="Reset"
@@ -269,7 +340,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="@color/black"
         android:textColor="@color/white"
-        android:layout_marginBottom="3sp"
+        android:layout_marginBottom="3dp"
         android:textSize="16sp">
     </TextView>
 
