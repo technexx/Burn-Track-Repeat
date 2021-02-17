@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/black">
 
     <TextView
         android:id="@+id/lap_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/light_grey"
+        android:textSize="18sp">
     </TextView>
 
     <TextView
@@ -17,17 +20,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/lap_number"
+        app:layout_constraintEnd_toStartOf="@id/saved_laps"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="6dp">
+        android:layout_marginStart="6dp"
+        android:textColor="@color/white"
+        android:textSize="18sp">
     </TextView>
 
     <TextView
-        android:id="@+id/total_lap_time"
+        android:id="@+id/saved_laps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/current_lap"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="6dp">
+        android:layout_marginStart="6dp"
+        android:textColor="@color/white"
+        android:textSize="18sp">
     </TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

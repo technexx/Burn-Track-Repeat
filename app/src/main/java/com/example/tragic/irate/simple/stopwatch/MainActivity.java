@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.animation.Animator;
@@ -130,9 +131,16 @@ public class MainActivity extends AppCompatActivity {
     int pomDotCounter=1;
 
     double ms;
-    double msDisplay;
+    double msConvert;
+    double msConvert2;
+    double msDisplay = 30;
     double seconds;
     double minutes;
+    double msReset;
+    boolean lapTaken;
+    int lapNumber;
+    String newMs;
+    String savedMs;
     ArrayList<String> currentLapList;
     ArrayList<String> savedLapList;
 
@@ -341,6 +349,11 @@ public class MainActivity extends AppCompatActivity {
             breaksOnlyTime.add(spinList2.get(8) * 1000);
             startBreaksOnlyTime.add(spinList2.get(8) * 1000);
         }
+
+        LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
+        lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
+        lapRecycler.setAdapter(lapAdapter);
+        lapRecycler.setLayoutManager(lm);
 
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
         spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
@@ -663,12 +676,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        newLap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
         plus_sign.setOnClickListener(v -> {
             adjustCustom(true);
         });
@@ -703,6 +710,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Todo: Quick "new laps" often display diff value for seconds in new but not saved.
+        //Todo: ms display begins at 30.
+        //Todo: Ms display resets on pause/resume.
+        //Todo: 1ms delay between new and saved values added - make sure they sync.
+        //Todo: Cap seconds/minutes at 59.
         stopWatchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -714,19 +726,30 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             //ms can never be more than 60/sec due to refresh rate.
                             ms+=1;
+                            msReset +=1;
+                            msConvert+=1;
+                            msConvert2+=1;
                             msDisplay+=1;
+                            if (msConvert>59) msConvert=0;
+                            if (msConvert2>59) msConvert2=0;
                             if (msDisplay>59) msDisplay=0;
 
                             seconds = ms/60;
                             minutes = seconds/60;
 
-                            String newMs = df2.format((msDisplay/60) * 100);
-                            String newSeconds = df.format(seconds);
+                            newMs = df2.format((msConvert2/60) * 100);
+                            savedMs = df2.format((msConvert/60) * 100);
+                            String displayMs = df2.format((msDisplay/60) * 100);
 
-                            timeLeft3.setText(newSeconds);
-                            msTime.setText(newMs);
-                            Log.i("newMs", "new ms is " + newMs + " " + newSeconds);
+                            String formattedSeconds = df.format(seconds);
 
+                            timeLeft3.setText(formattedSeconds);
+                            msTime.setText(displayMs);
+
+                            if (lapTaken){
+
+                                lapTaken = false;
+                            }
                             handler.postDelayed(this, 10);
                         }
                     };
@@ -739,6 +762,32 @@ public class MainActivity extends AppCompatActivity {
                     reset.setVisibility(View.VISIBLE);
                 }
             }
+        });
+
+        newLap.setOnClickListener(v -> {
+            Log.i("testMS", "ms is " + ms + " and seconds are "  + seconds + " and msDisplay is " + msConvert);
+            lapNumber++;
+
+            double newSeconds = msReset/60;
+            double newMinutes = newSeconds/60;
+            if (newSeconds<1) newSeconds = 0;
+            if (seconds<1) seconds = 0;
+
+            String newEntries = String.format(Locale.getDefault(), "%02d:%02d:%s", (int) newMinutes, (int) newSeconds, newMs);
+            String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%s", (int) minutes, (int) seconds, savedMs);
+
+            Log.i("msValue", "msReset is " + msReset);
+            Log.i("msValue", "new ms is " + newMs + " and savedMs is " + savedMs);
+            Log.i("msValue", "new seconds are " + newSeconds + " and saved seconds are " + seconds);
+
+            currentLapList.add(newEntries);
+            savedLapList.add(savedEntries);
+
+            lapAdapter.notifyDataSetChanged();
+
+            msReset = 0;
+            msConvert2 = 0;
+            lapTaken = true;
         });
     }
 
@@ -1438,18 +1487,21 @@ public class MainActivity extends AppCompatActivity {
                 pomProgressPause = maxProgress;
                 break;
             case 3:
+                stopwatchHalted = true;
                 ms = 0;
-                msDisplay = 0;
+                msConvert = 0;
+                msConvert2 = 0;
+                msDisplay = 30;
+                msReset = 0;
                 seconds = 0;
                 minutes = 0;
+                timeLeft3.setAlpha(1);
+                msTime.setAlpha(1);
+                timeLeft3.setText("0");
+                msTime.setText("00");
                 if (currentLapList.size()>0) currentLapList.clear();
                 if (savedLapList.size()>0) savedLapList.clear();
-                timePaused3.setAlpha(1);
-                msTimePaused.setAlpha(1);
-                timeLeft3.setText("0");
-                timePaused3.setText("0");
-                msTime.setText("00");
-                msTimePaused.setText("00");
+                lapAdapter.notifyDataSetChanged();
                 break;
         }
     }

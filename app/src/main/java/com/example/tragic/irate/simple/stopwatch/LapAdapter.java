@@ -1,6 +1,8 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +36,14 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
-
+        holder.lapNumber.setText("# " + (position+1));
+        holder.currentLap.setText(mCurrentLap.get(position));
+        holder.savedLapTime.setText(mSavedLap.get(position));
     }
 
-    //Todo: Size to match list.
     @Override
     public int getItemCount() {
-        return 0;
+        return mSavedLap.size();
     }
 
     public class LapViewHolder extends RecyclerView.ViewHolder {
@@ -52,7 +55,7 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
             super(itemView);
             lapNumber = itemView.findViewById(R.id.lap_number);
             currentLap = itemView.findViewById(R.id.current_lap);
-            savedLapTime = itemView.findViewById(R.id.total_lap_time);
+            savedLapTime = itemView.findViewById(R.id.saved_laps);
         }
     }
 }
