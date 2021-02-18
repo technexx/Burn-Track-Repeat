@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     double ms;
     double msConvert;
     double msConvert2;
-    double msDisplay = 30;
+    double msDisplay;
     double seconds;
     double minutes;
     double msReset;
@@ -711,8 +711,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Todo: ms display begins at 30.
-        //Todo: Cap seconds/minutes at 59.
         stopWatchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -740,10 +738,11 @@ public class MainActivity extends AppCompatActivity {
                             newMsConvert = Integer.parseInt(newMs);
                             savedMsConvert = Integer.parseInt(savedMs);
 
+                            //Conversion to long solves +30 ms delay for display.
                             String displayMs = df2.format((msDisplay/60) * 100);
-                            String formattedSeconds = df.format(seconds);
+                            String displayTime = convertStopwatch((long) seconds);
 
-                            timeLeft3.setText(formattedSeconds);
+                            timeLeft3.setText(displayTime);
                             msTime.setText(displayMs);
                             handler.postDelayed(this, 10);
                         }
@@ -788,7 +787,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
             }
-            Log.i("holder", "holding is " + Arrays.toString(holder));
 
             newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
 
@@ -1057,6 +1055,22 @@ public class MainActivity extends AppCompatActivity {
         else return "5";
     }
 
+    public String convertStopwatch(long seconds) {
+        long minutes;
+        long roundedSeconds;
+        DecimalFormat df = new DecimalFormat("0");
+        DecimalFormat df2 = new DecimalFormat("00");
+        if (seconds>=60) {
+            minutes = seconds/60;
+            roundedSeconds = seconds % 60;
+            if (minutes>=10 && timeLeft3.getTextSize() != 70f) timeLeft3.setTextSize(70f);
+            return (df.format(minutes) + ":" + df2.format(roundedSeconds));
+        } else {
+            if (timeLeft3.getTextSize() != 90f) timeLeft3.setTextSize(90f);
+            return df.format(seconds);
+        }
+    }
+
     public void adjustCustom(boolean adding) {
         if (adding) {
             if (!breaksOnly) {
@@ -1140,7 +1154,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fadeTextIn(TextView textView) {
-//        textView.setVisibility(View.VISIBLE);
         if (fadeInObj!=null) fadeInObj.cancel();
         fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
         fadeInObj.setDuration(1500);
@@ -1502,7 +1515,7 @@ public class MainActivity extends AppCompatActivity {
                 ms = 0;
                 msConvert = 0;
                 msConvert2 = 0;
-                msDisplay = 30;
+                msDisplay = 0;
                 msReset = 0;
                 seconds = 0;
                 minutes = 0;
