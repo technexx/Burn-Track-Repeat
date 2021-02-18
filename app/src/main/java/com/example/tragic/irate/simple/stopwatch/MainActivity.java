@@ -45,6 +45,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -137,10 +138,10 @@ public class MainActivity extends AppCompatActivity {
     double seconds;
     double minutes;
     double msReset;
-    boolean lapTaken;
-    int lapNumber;
     String newMs;
     String savedMs;
+    int newMsConvert;
+    int savedMsConvert;
     ArrayList<String> currentLapList;
     ArrayList<String> savedLapList;
 
@@ -710,10 +711,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Todo: Quick "new laps" often display diff value for seconds in new but not saved.
         //Todo: ms display begins at 30.
-        //Todo: Ms display resets on pause/resume.
-        //Todo: 1ms delay between new and saved values added - make sure they sync.
         //Todo: Cap seconds/minutes at 59.
         stopWatchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -739,17 +737,14 @@ public class MainActivity extends AppCompatActivity {
 
                             newMs = df2.format((msConvert2/60) * 100);
                             savedMs = df2.format((msConvert/60) * 100);
-                            String displayMs = df2.format((msDisplay/60) * 100);
+                            newMsConvert = Integer.parseInt(newMs);
+                            savedMsConvert = Integer.parseInt(savedMs);
 
+                            String displayMs = df2.format((msDisplay/60) * 100);
                             String formattedSeconds = df.format(seconds);
 
                             timeLeft3.setText(formattedSeconds);
                             msTime.setText(displayMs);
-
-                            if (lapTaken){
-
-                                lapTaken = false;
-                            }
                             handler.postDelayed(this, 10);
                         }
                     };
@@ -765,20 +760,38 @@ public class MainActivity extends AppCompatActivity {
         });
 
         newLap.setOnClickListener(v -> {
-            Log.i("testMS", "ms is " + ms + " and seconds are "  + seconds + " and msDisplay is " + msConvert);
-            lapNumber++;
-
             double newSeconds = msReset/60;
             double newMinutes = newSeconds/60;
-            if (newSeconds<1) newSeconds = 0;
-            if (seconds<1) seconds = 0;
 
-            String newEntries = String.format(Locale.getDefault(), "%02d:%02d:%s", (int) newMinutes, (int) newSeconds, newMs);
-            String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%s", (int) minutes, (int) seconds, savedMs);
+            double savedMinutes = 0;
+            double savedSeconds = 0;
+            double savedMs = 0;
 
-            Log.i("msValue", "msReset is " + msReset);
-            Log.i("msValue", "new ms is " + newMs + " and savedMs is " + savedMs);
-            Log.i("msValue", "new seconds are " + newSeconds + " and saved seconds are " + seconds);
+            //Todo: Either move this beneath list additions and check it again most recent, or add it to the list itself from here.
+            String[] holder = null;
+            if (savedLapList.size()>0) {
+                holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
+                savedMinutes = newMinutes + Integer.parseInt(holder[0]);
+                savedSeconds = newSeconds + Integer.parseInt(holder[1]);
+                savedMs = newMsConvert + Integer.parseInt(holder[2]);
+
+                if (savedMs>99) {
+                    savedMs = savedMs-100;
+                    savedSeconds +=1;
+                }
+                if (savedSeconds>99){
+                    savedSeconds = savedSeconds-100;
+                    savedMinutes +=1;
+                }
+                String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
+            } else {
+                String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+            }
+            Log.i("holder", "holding is " + Arrays.toString(holder));
+
+
+            String newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
+            String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
 
             currentLapList.add(newEntries);
             savedLapList.add(savedEntries);
@@ -787,7 +800,6 @@ public class MainActivity extends AppCompatActivity {
 
             msReset = 0;
             msConvert2 = 0;
-            lapTaken = true;
         });
     }
 
