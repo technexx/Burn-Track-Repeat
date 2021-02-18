@@ -767,7 +767,8 @@ public class MainActivity extends AppCompatActivity {
             double savedSeconds = 0;
             double savedMs = 0;
 
-            //Todo: Either move this beneath list additions and check it again most recent, or add it to the list itself from here.
+            String newEntries = "";
+            String savedEntries = "";
             String[] holder = null;
             if (savedLapList.size()>0) {
                 holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
@@ -783,15 +784,13 @@ public class MainActivity extends AppCompatActivity {
                     savedSeconds = savedSeconds-100;
                     savedMinutes +=1;
                 }
-                String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
+                savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
             } else {
-                String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+                savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
             }
             Log.i("holder", "holding is " + Arrays.toString(holder));
 
-
-            String newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
-            String savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+            newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
 
             currentLapList.add(newEntries);
             savedLapList.add(savedEntries);
