@@ -29,6 +29,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.widget.ActionMenuView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -87,19 +88,20 @@ public class MainActivity extends AppCompatActivity {
     ImageButton plus_sign;
     ImageButton minus_sign;
 
-    ArrayAdapter<String> spinAdapter1;
-    ArrayAdapter<String> spinAdapter2;
-    ArrayAdapter<String> spinAdapter3;
-    ArrayAdapter<Long> pomAdapter1;
-    ArrayAdapter<Long> pomAdapter2;
-    ArrayAdapter<Long> pomAdapter3;
-
     List<Long> spinList1;
     List<Long> spinList2;
     List<Long> spinList3;
     List<String> spinListString1;
     List<String> spinListString2;
     List<String> spinListString3;
+
+    ArrayAdapter<String> spinAdapter1;
+    ArrayAdapter<String> spinAdapter2;
+    ArrayAdapter<String> spinAdapter3;
+    ArrayAdapter<Long> pomAdapter1;
+    ArrayAdapter<Long> pomAdapter2;
+    ArrayAdapter<Long> pomAdapter3;
+    ArrayAdapter<String> dotSpinAdapter;
 
     List<Integer> modeOneSpins;
     List<Integer> modeOneBreakOnlySpins;
@@ -197,29 +199,27 @@ public class MainActivity extends AppCompatActivity {
     LapAdapter lapAdapter;
 
     //Todo: Add fade in/out to breaksOnly.
-    //Todo: Selecting from spinners does not extend to black layout outside text.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
-    //Todo: Less blurry +/- icons.
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
 
     //Todo: Possible "Saved Presets" SharedPref for Custom in onOptionsSelected.
     //Todo: Possible: Save sets/breaks completed on any given day. Add weight/resistance to each.
 
-//    @Override
-//    public boolean onCreateOptionsMenu(final Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.options_menu, menu);
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
+    }
 
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.breaks_only:
+            case R.id.saved_cycles:
 
         }
         return super.onOptionsItemSelected(item);
