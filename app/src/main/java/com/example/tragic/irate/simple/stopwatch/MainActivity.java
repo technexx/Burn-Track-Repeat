@@ -197,24 +197,20 @@ public class MainActivity extends AppCompatActivity {
     LapAdapter lapAdapter;
 
     //Todo: Add fade in/out to breaksOnly.
-    //Todo: Test countdowns/switches from breaksOnly.
     //Todo: Selecting from spinners does not extend to black layout outside text.
-    //Todo: Smooth transition between tab timer textviews.
-    //Todo: Smaller click radius for progressBar.
+    //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
     //Todo: Less blurry +/- icons.
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
-    //Todo: Add actual stop watch!
 
-    //Todo: Possible "Saved Presets" SharedPref for Custom in 4th tab or popup window.
+    //Todo: Possible "Saved Presets" SharedPref for Custom in onOptionsSelected.
     //Todo: Possible: Save sets/breaks completed on any given day. Add weight/resistance to each.
-    //Todo: Use separate vars for each Mode, since active timers will need to keep updating each.
 
 //    @Override
 //    public boolean onCreateOptionsMenu(final Menu menu) {
-//        MenuInflater inflater = getMenuInflater();ac
+//        MenuInflater inflater = getMenuInflater();
 //        inflater.inflate(R.menu.options_menu, menu);
 //        return true;
 //    }
