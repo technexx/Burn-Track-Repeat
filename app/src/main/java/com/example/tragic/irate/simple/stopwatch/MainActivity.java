@@ -321,6 +321,8 @@ public class MainActivity extends AppCompatActivity {
             spinList2.add(i+5);
             spinListString2.add(convertSeconds(i+5));
         }
+        spinListString1.set(0, "05");
+        spinListString2.set(0, "05");
 
         for (long i=0; i<10; i++) {
             spinList3.add(i+1);
