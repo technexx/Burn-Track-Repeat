@@ -13,10 +13,12 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 ;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -42,8 +44,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.example.tragic.irate.simple.stopwatch.Database.CyclesDao;
+import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +61,7 @@ import java.util.Timer;
 public class MainActivity extends AppCompatActivity {
 
     Button breaks_only;
+    TextView save_cycles;
     ProgressBar progressBar;
     ProgressBar progressBar2;
     ImageView stopWatchButton;
@@ -188,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
     PopupWindow cyclePopupWindow;
     PopupWindow resetPopUpWindow;
+    PopupWindow savedCyclePopupWindow;
 
     boolean fadeCustomTimer;
     boolean fadePomTimer;
@@ -197,6 +206,21 @@ public class MainActivity extends AppCompatActivity {
     ObjectAnimator fadeOutObj;
     RecyclerView lapRecycler;
     LapAdapter lapAdapter;
+
+    CyclesDatabase cyclesDatabase;
+    List<Cycles> cyclesList;
+    Cycles cycles;
+
+    String convertedSetList;
+    String convertedBreakList;
+    ArrayList<String> setsArray;
+    ArrayList<String> breaksArray;
+    ArrayList<String> breaksOnlyArray;
+    boolean testSwitch;
+
+    RecyclerView savedCycleRecycler;
+    SavedCycleAdapter savedCycleAdapter;
+    View cyclePopupView;
 
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
@@ -219,16 +243,68 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.saved_cycles:
+            case R.id.saved_cycle_list:
+                AsyncTask.execute(() -> {
+                    cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                    if (setsArray!=null) setsArray.clear();
+                    if (breaksArray!=null) breaksArray.clear();
 
+                    if (cyclesList.size()>0) {
+                        for (int i=0; i<cyclesList.size(); i++) {
+                            setsArray.add(cyclesList.get(i).getSets());
+                            breaksArray.add(cyclesList.get(i).getBreaks());
+                        }
+//                    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
+//                    savedCycleRecycler.setAdapter(savedCycleAdapter);
+                        runOnUiThread(() -> {
+                            savedCycleAdapter.notifyDataSetChanged();
+                        });
+                    }
+                });
+                savedCyclePopupWindow = new PopupWindow(cyclePopupView, 800, 1200, false);
+                savedCyclePopupWindow.showAtLocation(cyclePopupView, Gravity.CENTER, 0, 100);
+
+                ConstraintLayout cl = findViewById(R.id.main_layout);
+                cl.setOnClickListener(v2-> {
+                    savedCyclePopupWindow.dismiss();
+                });
+                break;
+            case R.id.delete_all_cycles:
+                cyclesDatabase.cyclesDao().deleteAll();
         }
         return super.onOptionsItemSelected(item);
     }
 
+    //Todo: Issue w/ notify might be the re-instantiation of vars here.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AsyncTask.execute(() -> {
+            cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+            cyclesList = new ArrayList<>();
+            cycles = new Cycles();
+
+            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+            if (cyclesList.size()>0) {
+                for (int i=0; i<cyclesList.size(); i++) {
+                    setsArray.add(cyclesList.get(i).getSets());
+                    breaksArray.add(cyclesList.get(i).getBreaks());
+                }
+            }
+        });
+        setsArray = new ArrayList<>();
+        breaksArray = new ArrayList<>();
+
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        cyclePopupView = inflater.inflate(R.layout.saved_cycles_recycler, null);
+        savedCycleRecycler = cyclePopupView.findViewById(R.id.cycle_list_recycler);
+
+        LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
+        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
+        savedCycleRecycler.setAdapter(savedCycleAdapter);
+        savedCycleRecycler.setLayoutManager(lm2);
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -253,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
         blank_spinner.setVisibility(View.GONE);
 
         breaks_only = findViewById(R.id.breaks_only);
+        save_cycles = findViewById(R.id.save_cycles);
         progressBar = findViewById(R.id.progressBar);
         progressBar2 = findViewById(R.id.progressBar2);
         stopWatchButton = findViewById(R.id.stopWatchButton);
@@ -305,6 +382,9 @@ public class MainActivity extends AppCompatActivity {
         startBreaksOnlyTime = new ArrayList<>();
         currentLapList = new ArrayList<>();
         savedLapList = new ArrayList<>();
+        setsArray = new ArrayList<>();
+        breaksArray = new ArrayList<>();
+        breaksOnlyArray = new ArrayList<>();
 
         s3.setText(R.string.set_number);
         spinner3.setVisibility(View.GONE);
@@ -544,6 +624,44 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        save_cycles.setOnClickListener(v->{
+            Gson gson = new Gson();
+            AsyncTask.execute(() -> {
+                if (!breaksOnly) {
+                    convertedSetList = gson.toJson(customSetTime);
+                    convertedBreakList = gson.toJson(customBreakTime);
+                    cycles.setSets(convertedSetList);
+                    cycles.setBreaks(convertedBreakList);
+
+                    //Array is the conversion back to List.
+                    Type type = new TypeToken<ArrayList<String>>() {}.getType();
+                    setsArray = gson.fromJson(convertedSetList, type);
+                    breaksArray = gson.fromJson(convertedBreakList, type);
+
+                    cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                    if (cyclesList.size()>0) {
+                        for (int i=0; i<cyclesList.size(); i++) {
+                            if (!cyclesList.get(i).getSets().equals(convertedSetList) || !cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
+                                cyclesDatabase.cyclesDao().insertCycle(cycles);
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "added!", Toast.LENGTH_SHORT).show();
+                                });
+                            } else {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        }
+                    } else {
+                        cyclesDatabase.cyclesDao().insertCycle(cycles);
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), "added!", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            });
+        });
+
         progressBar.setOnClickListener(v-> {
             if (!customHalted) {
                 pauseAndResumeTimer(PAUSING_TIMER);
@@ -568,9 +686,9 @@ public class MainActivity extends AppCompatActivity {
                     if (pomCyclesDone >=0) {
 
                         cycle_reset.setVisibility(View.GONE);
-                        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        LayoutInflater inflater2 = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                        View view = inflater.inflate(R.layout.pom_reset_popup, null);
+                        View view = inflater2.inflate(R.layout.pom_reset_popup, null);
                         cyclePopupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
                         cyclePopupWindow.showAtLocation(view, Gravity.CENTER, 400, 475);
 
@@ -688,9 +806,9 @@ public class MainActivity extends AppCompatActivity {
             if (mode!=2) {
                 resetTimer();
             } else {
-                LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater3 = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                View view = inflater.inflate(R.layout.pom_reset_popup, null);
+                View view = inflater3.inflate(R.layout.pom_reset_popup, null);
                 resetPopUpWindow  = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
                 resetPopUpWindow.showAtLocation(view, Gravity.CENTER, 0, 900);
 

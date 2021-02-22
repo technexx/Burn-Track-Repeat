@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
-
     Context mContext;
     List<String> mCurrentLap;
     List<String> mSavedLap;

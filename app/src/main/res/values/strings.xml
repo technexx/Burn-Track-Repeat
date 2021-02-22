@@ -25,4 +25,7 @@
 
     <string name="save_cycles">Save</string>
     <string name="saved_cycle_list">Saved Cycles</string>
+
+    <string name="cycle_saved">Cycle saved!</string>
+    <string name="cycle_exists">Identical cycle already exists!</string>
 </resources>
