@@ -254,8 +254,6 @@ public class MainActivity extends AppCompatActivity {
                             setsArray.add(cyclesList.get(i).getSets());
                             breaksArray.add(cyclesList.get(i).getBreaks());
                         }
-//                    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
-//                    savedCycleRecycler.setAdapter(savedCycleAdapter);
                         runOnUiThread(() -> {
                             savedCycleAdapter.notifyDataSetChanged();
                         });
@@ -275,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //Todo: Issue w/ notify might be the re-instantiation of vars here.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
