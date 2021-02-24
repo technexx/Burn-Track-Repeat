@@ -44,13 +44,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
 
-//            String setConv = mSetsList.get(position).replace("[", "");
-//            setConv = setConv.replace("]", "");
-//            String breakConv = mBreaksList.get(position).replace("[", "");
-//            breakConv = breakConv.replace("]", "");
-
             String setConv = mSetsList.get(position).replace("\"", "");
             String breakConv = mBreaksList.get(position).replace("\"", "");
+            setConv = setConv.replace("]", "");
+            setConv = setConv.replace("[", "");
+            setConv = setConv.replace(",", "  ");
+            breakConv = breakConv.replace("]", "");
+            breakConv = breakConv.replace("[", "");
+            breakConv = breakConv.replace(",", "  ");
 
             customHolder.customSet.setText(setConv);
             customHolder.customBreak.setText(breakConv);

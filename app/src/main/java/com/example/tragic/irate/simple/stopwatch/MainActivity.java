@@ -246,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<Integer> breakCount = new ArrayList<>();
                     if (cyclesList.size()>0) {
                         for (int i=0; i<cyclesList.size(); i++) {
+                            //getSets/Breaks returns String [xx, xy, xz] etc.
                             setsArray.add(cyclesList.get(i).getSets());
                             breaksArray.add(cyclesList.get(i).getBreaks());
                             tempSets = cyclesList.get(i).getSets().split(",");
@@ -253,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
                             setCount.add(tempSets.length);
                             breakCount.add(tempBreaks.length);
                         }
+                        Log.i("cycleList", "cycleList entry count is " + cyclesList.size());
                         Log.i("newSave", "tempSets and breaks are " + Arrays.toString(tempSets) + " and " + Arrays.toString(tempBreaks));
                         Log.i("newSave", "setCount and break are " + setCount + " and " + breakCount);
                         runOnUiThread(() -> {
