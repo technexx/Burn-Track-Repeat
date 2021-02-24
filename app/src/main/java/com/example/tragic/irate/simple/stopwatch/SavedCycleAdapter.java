@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,10 +31,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         if(!mBreaksOnly) {
-            View view = LayoutInflater.from(context).inflate(R.layout.custom_saved_cycles, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.saved_cycles_views, parent, false);
             return new CustomHolder(view);
         } else {
-            View view = LayoutInflater.from(context).inflate(R.layout.saved_breaks_only_cycles, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.saved_cycles_breaks_only_views, parent, false);
             return new BreaksOnlyHolder(view);
         }
     }
@@ -43,10 +44,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
 
-            String setConv = mSetsList.get(position).replace("[", "");
-            setConv = setConv.replace("]", "");
-            String breakConv = mBreaksList.get(position).replace("[", "");
-            breakConv = breakConv.replace("]", "");
+//            String setConv = mSetsList.get(position).replace("[", "");
+//            setConv = setConv.replace("]", "");
+//            String breakConv = mBreaksList.get(position).replace("[", "");
+//            breakConv = breakConv.replace("]", "");
+
+            String setConv = mSetsList.get(position).replace("\"", "");
+            String breakConv = mBreaksList.get(position).replace("\"", "");
 
             customHolder.customSet.setText(setConv);
             customHolder.customBreak.setText(breakConv);
@@ -58,6 +62,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemCount() {
+        Log.i("sizetest", "size is "+ mSetsList.size());
         if (!mBreaksOnly && mSetsList.size() > 0) return mSetsList.size();
         else if (mBreaksOnly && mBreaksOnlyList.size() > 0) return mBreaksOnlyList.size();
         else return 0;

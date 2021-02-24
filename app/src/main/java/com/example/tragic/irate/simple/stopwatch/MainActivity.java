@@ -1,24 +1,20 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 ;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,12 +22,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.widget.ActionMenuView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,9 +36,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import com.example.tragic.irate.simple.stopwatch.Database.CyclesDao;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
@@ -56,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -216,11 +207,11 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> setsArray;
     ArrayList<String> breaksArray;
     ArrayList<String> breaksOnlyArray;
-    boolean testSwitch;
 
     RecyclerView savedCycleRecycler;
     SavedCycleAdapter savedCycleAdapter;
-    View cyclePopupView;
+    View savedCyclePopupView;
+    DotDraws savedDraws;
 
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
@@ -249,18 +240,32 @@ public class MainActivity extends AppCompatActivity {
                     if (setsArray!=null) setsArray.clear();
                     if (breaksArray!=null) breaksArray.clear();
 
+                    String[] tempSets = null;
+                    String[] tempBreaks = null;
+                    ArrayList<Integer> setCount = new ArrayList<>();
+                    ArrayList<Integer> breakCount = new ArrayList<>();
                     if (cyclesList.size()>0) {
                         for (int i=0; i<cyclesList.size(); i++) {
                             setsArray.add(cyclesList.get(i).getSets());
                             breaksArray.add(cyclesList.get(i).getBreaks());
+                            tempSets = cyclesList.get(i).getSets().split(",");
+                            tempBreaks = cyclesList.get(i).getBreaks().split(",");
+                            setCount.add(tempSets.length);
+                            breakCount.add(tempBreaks.length);
                         }
+                        Log.i("newSave", "tempSets and breaks are " + Arrays.toString(tempSets) + " and " + Arrays.toString(tempBreaks));
+                        Log.i("newSave", "setCount and break are " + setCount + " and " + breakCount);
                         runOnUiThread(() -> {
+                            savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+                            savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
                             savedCycleAdapter.notifyDataSetChanged();
+
+                            savedDraws = savedCyclePopupView.findViewById(R.id.saved_draws);
+                            savedDraws.setMode(10);
+                            savedDraws.drawSavedCycles(setCount, breakCount, setsArray, breaksArray);
                         });
                     }
                 });
-                savedCyclePopupWindow = new PopupWindow(cyclePopupView, 800, 1200, false);
-                savedCyclePopupWindow.showAtLocation(cyclePopupView, Gravity.CENTER, 0, 100);
 
                 ConstraintLayout cl = findViewById(R.id.main_layout);
                 cl.setOnClickListener(v2-> {
@@ -295,8 +300,8 @@ public class MainActivity extends AppCompatActivity {
         breaksArray = new ArrayList<>();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        cyclePopupView = inflater.inflate(R.layout.saved_cycles_recycler, null);
-        savedCycleRecycler = cyclePopupView.findViewById(R.id.cycle_list_recycler);
+        savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
+        savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
 
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
         savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
@@ -339,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
         msTime = findViewById(R.id.msTime);
         msTimePaused = findViewById(R.id.msTimePaused);
         dotDraws = findViewById(R.id.dotdraws);
+        savedDraws = findViewById(R.id.saved_draws);
         lapRecycler = findViewById(R.id.lap_recycler);
 
         timeLeft.setTextSize(90f);
@@ -625,8 +631,16 @@ public class MainActivity extends AppCompatActivity {
             Gson gson = new Gson();
             AsyncTask.execute(() -> {
                 if (!breaksOnly) {
-                    convertedSetList = gson.toJson(customSetTime);
-                    convertedBreakList = gson.toJson(customBreakTime);
+                    ArrayList<String> tempSets = new ArrayList<>();
+                    ArrayList<String> tempBreaks = new ArrayList<>();
+                    for (int i=0; i<customSetTime.size(); i++) {
+                        tempSets.add(convertSeconds ( (customSetTime.get(i)) /1000));
+                    }
+                    for (int i=0; i<customBreakTime.size(); i++){
+                        tempBreaks.add(convertSeconds( (customBreakTime.get(i)) /1000));
+                    }
+                    convertedSetList = gson.toJson(tempSets);
+                    convertedBreakList = gson.toJson(tempBreaks);
                     cycles.setSets(convertedSetList);
                     cycles.setBreaks(convertedBreakList);
 

@@ -50,7 +50,10 @@ public class DotDraws extends View {
     int savedPomAlpha;
     int savedPomCycle;
 
-    boolean mRemoveCanvas;
+    ArrayList<Integer> mSavedSetCounts;
+    ArrayList<Integer> mSavedBreakCounts;
+    ArrayList<String> mSavedSetValues;
+    ArrayList<String> mSavedBreakValues;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -120,6 +123,11 @@ public class DotDraws extends View {
         cycle2 = savedPomCycle;
     }
 
+    public void drawSavedCycles(ArrayList<Integer> savedSetCounts, ArrayList<Integer> savedBreakCounts, ArrayList<String> savedSetValues, ArrayList<String> savedBreakValues) {
+        mSavedSetCounts = savedSetCounts; mSavedBreakCounts = savedBreakCounts; mSavedSetValues = savedSetValues; mSavedBreakValues = savedBreakValues;
+        setupPaint();
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
@@ -130,6 +138,19 @@ public class DotDraws extends View {
 
         mX = 60; mY = 490; mX2 = 60; mY2 = 620;
         if (mBreaksOnly) mY2 = 535;
+
+        //Todo: Move Y value to draw multiple rows. Call drawText from here.
+        if (mMode == 10) {
+            mX = 30; mY = 30;
+            //Individual sets in a single row - drawing right.
+            for (int i=0; i<mSavedSetValues.size(); i++) {
+                mPaint.setColor(Color.GREEN);
+                mCanvas.drawCircle(mX, mY, 20, mPaint);
+                mPaint.setColor(Color.RED);
+                mCanvas.drawCircle(mX, mY+40, 20, mPaint);
+                mX+=50;
+            }
+        }
 
         if (mMode == 1 && !mBreaksOnly) {
             for (int i=0; i<mSetCount; i++) {
