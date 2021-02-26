@@ -259,6 +259,11 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("newSave", "cycleList entry count is " + cyclesList.size());
                         Log.i("newSave", "number of ROWS are " + setsArray.size() + " and " + breaksArray.size());
                         Log.i("newSave", "setCount and break sizes are " + setCount.size() + " and " + breakCount.size());
+
+                        //Todo: For testing only.
+                        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
+                        savedCycleRecycler.setAdapter(savedCycleAdapter);
+
                         runOnUiThread(() -> {
                             savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                             savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
@@ -273,12 +278,20 @@ public class MainActivity extends AppCompatActivity {
                                 savedCyclePopupWindow.dismiss();
                             });
                         });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 });
                 break;
+                //Todo: Confirmation of delete all.
             case R.id.delete_all_cycles:
                 cyclesDatabase.cyclesDao().deleteAll();
-                Toast.makeText(getApplicationContext(), "deleted!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -639,7 +652,6 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<String> tempSets = new ArrayList<>();
                     ArrayList<String> tempBreaks = new ArrayList<>();
                     for (int i=0; i<customSetTime.size(); i++) {
-                        long hold = customSetTime.get(i);
                         tempSets.add(convertSeconds ( (customSetTime.get(i)) /1000));
                         if (tempSets.get(i).equals("5")) tempSets.set(i, "05");
                     }
@@ -658,23 +670,26 @@ public class MainActivity extends AppCompatActivity {
                     breaksArray = gson.fromJson(convertedBreakList, type);
 
                     cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                    boolean duplicate = false;
                     if (cyclesList.size()>0) {
                         for (int i=0; i<cyclesList.size(); i++) {
-                            if (!cyclesList.get(i).getSets().equals(convertedSetList) || !cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
-                                cyclesDatabase.cyclesDao().insertCycle(cycles);
-                                runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "added!", Toast.LENGTH_SHORT).show();
-                                });
-                            } else {
+                            if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
+                                duplicate = true;
                                 runOnUiThread(() -> {
                                     Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
                                 });
                             }
                         }
+                        if (!duplicate) {
+                            cyclesDatabase.cyclesDao().insertCycle(cycles);
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
                     } else {
                         cyclesDatabase.cyclesDao().insertCycle(cycles);
                         runOnUiThread(() -> {
-                            Toast.makeText(getApplicationContext(), "added!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Cycle added!!", Toast.LENGTH_SHORT).show();
                         });
                     }
                     savedCycleAdapter.notifyDataSetChanged();
