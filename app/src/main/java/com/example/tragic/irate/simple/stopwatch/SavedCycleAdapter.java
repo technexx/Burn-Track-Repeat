@@ -1,6 +1,8 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,10 +50,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             String breakConv = mBreaksList.get(position).replace("\"", "");
             setConv = setConv.replace("]", "");
             setConv = setConv.replace("[", "");
-            setConv = setConv.replace(",", "  ");
+            setConv = setConv.replace(",", " - ");
             breakConv = breakConv.replace("]", "");
             breakConv = breakConv.replace("[", "");
-            breakConv = breakConv.replace(",", "  ");
+            breakConv = breakConv.replace(",", " - ");
 
             customHolder.customSet.setText(setConv);
             customHolder.customBreak.setText(breakConv);
@@ -63,7 +65,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemCount() {
-        Log.i("sizetest", "size is "+ mSetsList.size());
         if (!mBreaksOnly && mSetsList.size() > 0) return mSetsList.size();
         else if (mBreaksOnly && mBreaksOnlyList.size() > 0) return mBreaksOnlyList.size();
         else return 0;
@@ -73,6 +74,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public TextView customSet;
         public TextView customBreak;
 
+        @SuppressLint("ResourceAsColor")
         public CustomHolder(@NonNull View itemView) {
             super(itemView);
             customSet = itemView.findViewById(R.id.saved_custom_set_view);

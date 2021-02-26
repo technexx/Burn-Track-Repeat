@@ -54,6 +54,7 @@ public class DotDraws extends View {
     ArrayList<Integer> mSavedBreakCounts;
     ArrayList<String> mSavedSetValues;
     ArrayList<String> mSavedBreakValues;
+    int nextRow = 1;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -64,13 +65,18 @@ public class DotDraws extends View {
     private void setupPaint(){
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPaint.setStrokeWidth(5);
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaintText = new Paint();
         mPaintText.setAntiAlias(true);
         mPaintText.setStrokeWidth(5);
+    }
+
+    private void hollowPaint() {
+        mPaint = new Paint();
+        mPaint.setStrokeWidth(4);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     public void newDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
@@ -125,7 +131,7 @@ public class DotDraws extends View {
 
     public void drawSavedCycles(ArrayList<Integer> savedSetCounts, ArrayList<Integer> savedBreakCounts, ArrayList<String> savedSetValues, ArrayList<String> savedBreakValues) {
         mSavedSetCounts = savedSetCounts; mSavedBreakCounts = savedBreakCounts; mSavedSetValues = savedSetValues; mSavedBreakValues = savedBreakValues;
-        setupPaint();
+        hollowPaint();
     }
 
     @Override
@@ -139,18 +145,25 @@ public class DotDraws extends View {
         mX = 60; mY = 490; mX2 = 60; mY2 = 620;
         if (mBreaksOnly) mY2 = 535;
 
-        //Todo: Move Y value to draw multiple rows. Call drawText from here.
-        if (mMode == 10) {
-            mX = 30; mY = 30;
-            //Individual sets in a single row - drawing right.
-            for (int i=0; i<mSavedSetValues.size(); i++) {
-                mPaint.setColor(Color.GREEN);
-                mCanvas.drawCircle(mX, mY, 20, mPaint);
-                mPaint.setColor(Color.RED);
-                mCanvas.drawCircle(mX, mY+40, 20, mPaint);
-                mX+=50;
-            }
-        }
+//        if (mMode == 10) {
+//            mX = 50; mY = 42;
+//            //Individual sets in a single row - drawing right. mSavedSetValues size is how many ROW counts we have (i.e. saved cycles).
+//            for (int i=0; i<mSavedSetValues.size(); i++) {
+//                nextRow +=1;
+//                for (int j=0; j<mSavedSetCounts.get(i); j++) {
+//                    mPaint.setColor(Color.GREEN);
+//                    mCanvas.drawCircle(mX, mY, 34, mPaint);
+//                    mPaint.setColor(Color.RED);
+//                    mCanvas.drawCircle(mX, mY+81, 34, mPaint);
+//                    mX+=78;
+////                    mY = mY + (100*nextRow);
+//                    Log.i("goingup", "getting values " + mSavedSetCounts.get(i));
+//                }
+//                nextRow+=1;
+//                mX = 50;
+//                mY+=195;
+//            }
+//        }
 
         if (mMode == 1 && !mBreaksOnly) {
             for (int i=0; i<mSetCount; i++) {

@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,6 +11,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -213,15 +215,13 @@ public class MainActivity extends AppCompatActivity {
     View savedCyclePopupView;
     DotDraws savedDraws;
 
+    //Todo: Saved cycles crashes if selected when popup is in view.
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
-
-    //Todo: Possible "Saved Presets" SharedPref for Custom in onOptionsSelected.
-    //Todo: Possible: Save sets/breaks completed on any given day. Add weight/resistance to each.
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    //Todo: Draws fixed at X/Y and do not scroll. Need new solution. Also, lots of duplicate rows.
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -253,10 +254,11 @@ public class MainActivity extends AppCompatActivity {
                             tempBreaks = cyclesList.get(i).getBreaks().split(",");
                             setCount.add(tempSets.length);
                             breakCount.add(tempBreaks.length);
+                            Log.i("newSave", "tempSets and breaks are " + Arrays.toString(tempSets) + " and " + Arrays.toString(tempBreaks));
                         }
-                        Log.i("cycleList", "cycleList entry count is " + cyclesList.size());
-                        Log.i("newSave", "tempSets and breaks are " + Arrays.toString(tempSets) + " and " + Arrays.toString(tempBreaks));
-                        Log.i("newSave", "setCount and break are " + setCount + " and " + breakCount);
+                        Log.i("newSave", "cycleList entry count is " + cyclesList.size());
+                        Log.i("newSave", "number of ROWS are " + setsArray.size() + " and " + breaksArray.size());
+                        Log.i("newSave", "setCount and break sizes are " + setCount.size() + " and " + breakCount.size());
                         runOnUiThread(() -> {
                             savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                             savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
@@ -265,17 +267,18 @@ public class MainActivity extends AppCompatActivity {
                             savedDraws = savedCyclePopupView.findViewById(R.id.saved_draws);
                             savedDraws.setMode(10);
                             savedDraws.drawSavedCycles(setCount, breakCount, setsArray, breaksArray);
+
+                            ConstraintLayout cl = findViewById(R.id.main_layout);
+                            cl.setOnClickListener(v2-> {
+                                savedCyclePopupWindow.dismiss();
+                            });
                         });
                     }
-                });
-
-                ConstraintLayout cl = findViewById(R.id.main_layout);
-                cl.setOnClickListener(v2-> {
-                    savedCyclePopupWindow.dismiss();
                 });
                 break;
             case R.id.delete_all_cycles:
                 cyclesDatabase.cyclesDao().deleteAll();
+                Toast.makeText(getApplicationContext(), "deleted!", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -636,10 +639,13 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<String> tempSets = new ArrayList<>();
                     ArrayList<String> tempBreaks = new ArrayList<>();
                     for (int i=0; i<customSetTime.size(); i++) {
+                        long hold = customSetTime.get(i);
                         tempSets.add(convertSeconds ( (customSetTime.get(i)) /1000));
+                        if (tempSets.get(i).equals("5")) tempSets.set(i, "05");
                     }
                     for (int i=0; i<customBreakTime.size(); i++){
                         tempBreaks.add(convertSeconds( (customBreakTime.get(i)) /1000));
+                        if (tempBreaks.get(i).equals("5")) tempBreaks.set(i, "05");
                     }
                     convertedSetList = gson.toJson(tempSets);
                     convertedBreakList = gson.toJson(tempBreaks);
@@ -671,6 +677,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "added!", Toast.LENGTH_SHORT).show();
                         });
                     }
+                    savedCycleAdapter.notifyDataSetChanged();
                 }
             });
         });
