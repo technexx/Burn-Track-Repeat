@@ -365,6 +365,10 @@ public class MainActivity extends AppCompatActivity {
         savedDraws = findViewById(R.id.saved_draws);
         lapRecycler = findViewById(R.id.lap_recycler);
 
+        s1.setText(R.string.set_time);
+        s2.setText(R.string.break_time);
+        s3.setText(R.string.set_number);
+
         timeLeft.setTextSize(90f);
         timePaused.setTextSize(90f);
         timeLeft2.setTextSize(70f);
@@ -1512,12 +1516,13 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
-                stopWatchButton.setVisibility(View.INVISIBLE);
+                stopWatchButton.setVisibility(View.GONE);
                 plus_sign.setVisibility(View.VISIBLE);
                 minus_sign.setVisibility(View.VISIBLE);
                 spinner1.setVisibility(View.VISIBLE);
                 spinner2.setVisibility(View.VISIBLE);
-                spinner3.setVisibility(View.INVISIBLE);
+                spinner3.setVisibility(View.GONE);
+
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
@@ -1525,13 +1530,15 @@ public class MainActivity extends AppCompatActivity {
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
+                s3.setText(R.string.set_number);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
                 break;
             case 2:
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.VISIBLE);
-                stopWatchButton.setVisibility(View.INVISIBLE);
+                stopWatchButton.setVisibility(View.GONE);
+
                 plus_sign.setVisibility(View.GONE);
                 minus_sign.setVisibility(View.GONE);
                 spinner1.setVisibility(View.VISIBLE);
