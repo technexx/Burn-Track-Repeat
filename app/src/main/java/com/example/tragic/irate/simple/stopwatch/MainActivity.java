@@ -210,10 +210,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<String> breaksArray;
     ArrayList<String> breaksOnlyArray;
 
+    ConstraintLayout cl;
     RecyclerView savedCycleRecycler;
     SavedCycleAdapter savedCycleAdapter;
     View savedCyclePopupView;
     DotDraws savedDraws;
+    boolean disableSavedPopup;
 
     //Todo: Saved cycles crashes if selected when popup is in view.
     //Todo: Add fade in/out to breaksOnly.
@@ -226,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public void onCycleClick(int position) {
         AsyncTask.execute(() -> {
+            disableSavedPopup = false;
             customSetTime.clear();
             startCustomSetTime.clear();
             customBreakTime.clear();
@@ -268,58 +271,61 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
-                AsyncTask.execute(() -> {
-                    cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-                    if (setsArray!=null) setsArray.clear();
-                    if (breaksArray!=null) breaksArray.clear();
+                if (!disableSavedPopup) {
+                    AsyncTask.execute(() -> {
+                        disableSavedPopup = true;
+                        cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                        if (setsArray!=null) setsArray.clear();
+                        if (breaksArray!=null) breaksArray.clear();
 
-                    String[] tempSets = null;
-                    String[] tempBreaks = null;
-                    ArrayList<Integer> setCount = new ArrayList<>();
-                    ArrayList<Integer> breakCount = new ArrayList<>();
-                    if (cyclesList.size()>0) {
-                        for (int i=0; i<cyclesList.size(); i++) {
-                            //getSets/Breaks returns String [xx, xy, xz] etc.
-                            setsArray.add(cyclesList.get(i).getSets());
-                            breaksArray.add(cyclesList.get(i).getBreaks());
-                            tempSets = cyclesList.get(i).getSets().split(",");
-                            tempBreaks = cyclesList.get(i).getBreaks().split(",");
-                            setCount.add(tempSets.length);
-                            breakCount.add(tempBreaks.length);
-                            Log.i("newSave", "tempSets and breaks are " + Arrays.toString(tempSets) + " and " + Arrays.toString(tempBreaks));
-                        }
-                        Log.i("newSave", "cycleList entry count is " + cyclesList.size());
-                        Log.i("newSave", "number of ROWS are " + setsArray.size() + " and " + breaksArray.size());
-                        Log.i("newSave", "setCount and break sizes are " + setCount.size() + " and " + breakCount.size());
-
-                        //Todo: For testing only.
-                        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
-                        savedCycleRecycler.setAdapter(savedCycleAdapter);
-                        savedCycleAdapter.setItemClick(MainActivity.this);
-
-                        runOnUiThread(() -> {
-                            savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
-                            savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
-                            savedCycleAdapter.notifyDataSetChanged();
-
-                            savedDraws = savedCyclePopupView.findViewById(R.id.saved_draws);
-                            savedDraws.setMode(10);
-                            savedDraws.drawSavedCycles(setCount, breakCount, setsArray, breaksArray);
-
-                            ConstraintLayout cl = findViewById(R.id.main_layout);
-                            cl.setOnClickListener(v2-> {
-                                savedCyclePopupWindow.dismiss();
-                            });
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show();
+                        String[] tempSets = null;
+                        String[] tempBreaks = null;
+                        ArrayList<Integer> setCount = new ArrayList<>();
+                        ArrayList<Integer> breakCount = new ArrayList<>();
+                        if (cyclesList.size()>0) {
+                            for (int i=0; i<cyclesList.size(); i++) {
+                                //getSets/Breaks returns String [xx, xy, xz] etc.
+                                setsArray.add(cyclesList.get(i).getSets());
+                                breaksArray.add(cyclesList.get(i).getBreaks());
+                                tempSets = cyclesList.get(i).getSets().split(",");
+                                tempBreaks = cyclesList.get(i).getBreaks().split(",");
+                                setCount.add(tempSets.length);
+                                breakCount.add(tempBreaks.length);
+                                Log.i("newSave", "tempSets and breaks are " + Arrays.toString(tempSets) + " and " + Arrays.toString(tempBreaks));
                             }
-                        });
-                    }
-                });
+                            Log.i("newSave", "cycleList entry count is " + cyclesList.size());
+                            Log.i("newSave", "number of ROWS are " + setsArray.size() + " and " + breaksArray.size());
+                            Log.i("newSave", "setCount and break sizes are " + setCount.size() + " and " + breakCount.size());
+
+                            //Todo: For testing only.
+                            savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
+                            savedCycleRecycler.setAdapter(savedCycleAdapter);
+                            savedCycleAdapter.setItemClick(MainActivity.this);
+
+                            runOnUiThread(() -> {
+                                savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+                                savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
+                                savedCycleAdapter.notifyDataSetChanged();
+
+                                savedDraws = savedCyclePopupView.findViewById(R.id.saved_draws);
+                                savedDraws.setMode(10);
+                                savedDraws.drawSavedCycles(setCount, breakCount, setsArray, breaksArray);
+
+                                cl.setOnClickListener(v2-> {
+                                    savedCyclePopupWindow.dismiss();
+                                    disableSavedPopup = false;
+                                });
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                }
                 break;
                 //Todo: Confirmation of delete all.
             case R.id.delete_all_cycles:
@@ -398,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws = findViewById(R.id.dotdraws);
         savedDraws = findViewById(R.id.saved_draws);
         lapRecycler = findViewById(R.id.lap_recycler);
+        cl = findViewById(R.id.main_layout);
 
         s1.setText(R.string.set_time);
         s2.setText(R.string.break_time);
@@ -736,7 +743,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else {
                         cyclesDatabase.cyclesDao().insertCycle(cycles);
                         runOnUiThread(() -> {
-                            Toast.makeText(getApplicationContext(), "Cycle added!!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                         });
                     }
                     savedCycleAdapter.notifyDataSetChanged();
@@ -778,7 +785,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
                         confirm_reset.setText(R.string.pom_cycle_reset);
 
-                        ConstraintLayout cl = findViewById(R.id.main_layout);
                         cl.setOnClickListener(v2-> {
                             cyclePopupWindow.dismiss();
                             cycle_reset.setVisibility(View.VISIBLE);
@@ -901,7 +907,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     resetPopUpWindow.dismiss();
                 });
 
-                ConstraintLayout cl = findViewById(R.id.main_layout);
                 cl.setOnClickListener(v2-> {
                     resetPopUpWindow.dismiss();
                     reset.setVisibility(View.VISIBLE);
