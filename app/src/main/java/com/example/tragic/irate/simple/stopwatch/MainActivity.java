@@ -204,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     List<Cycles> cyclesList;
     Cycles cycles;
 
-    String convertedSetList;
-    String convertedBreakList;
     ArrayList<String> setsArray;
     ArrayList<String> breaksArray;
     ArrayList<String> breaksOnlyArray;
@@ -217,11 +215,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DotDraws savedDraws;
     boolean disableSavedPopup;
 
-    //Todo: Saved cycles crashes if selected when popup is in view.
+    //Todo: Manage save for sets/breaks in progress and w/ 0 sets/breaks in list.
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
+    //Todo: All DB calls in aSync.
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
 
@@ -271,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
+                //Todo: Get values for breaksOnly.
                 if (!disableSavedPopup) {
                     AsyncTask.execute(() -> {
                         disableSavedPopup = true;
@@ -692,41 +692,51 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         save_cycles.setOnClickListener(v->{
             Gson gson = new Gson();
+            if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
+                Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
+                return;
+            }
+
             AsyncTask.execute(() -> {
+                cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                ArrayList<String> tempSets = new ArrayList<>();
+                ArrayList<String> tempBreaks = new ArrayList<>();
+                ArrayList<String> tempBreaksOnly = new ArrayList<>();
+                String convertedSetList = "";
+                String convertedBreakList = "";
+                String convertedBreakOnlyList = "";
+
                 if (!breaksOnly) {
-                    ArrayList<String> tempSets = new ArrayList<>();
-                    ArrayList<String> tempBreaks = new ArrayList<>();
-                    for (int i=0; i<customSetTime.size(); i++) {
-                        tempSets.add(convertSeconds ( (customSetTime.get(i)) /1000));
+                    for (int i=0; i<startCustomSetTime.size(); i++) {
+                        tempSets.add(convertSeconds ( (startCustomSetTime.get(i)) /1000));
                         if (tempSets.get(i).equals("5")) tempSets.set(i, "05");
                     }
-                    for (int i=0; i<customBreakTime.size(); i++){
-                        tempBreaks.add(convertSeconds( (customBreakTime.get(i)) /1000));
+                    for (int i=0; i<startCustomBreakTime.size(); i++){
+                        tempBreaks.add(convertSeconds( (startCustomBreakTime.get(i))/1000));
                         if (tempBreaks.get(i).equals("5")) tempBreaks.set(i, "05");
                     }
                     convertedSetList = gson.toJson(tempSets);
                     convertedBreakList = gson.toJson(tempBreaks);
 
                     convertedSetList = convertedSetList.replace("\"", "");
-                    convertedBreakList = convertedBreakList.replace("\"", "");
                     convertedSetList = convertedSetList.replace("]", "");
                     convertedSetList = convertedSetList.replace("[", "");
                     convertedSetList = convertedSetList.replace(",", " - ");
+                    convertedBreakList = convertedBreakList.replace("\"", "");
                     convertedBreakList = convertedBreakList.replace("]", "");
                     convertedBreakList = convertedBreakList.replace("[", "");
                     convertedBreakList = convertedBreakList.replace(",", " - ");
                     cycles.setSets(convertedSetList);
                     cycles.setBreaks(convertedBreakList);
 
-                    //Array is the conversion back to List.
-//                    Type type = new TypeToken<ArrayList<String>>() {}.getType();
-//                    setsArray = gson.fromJson(convertedSetList, type);
-//                    breaksArray = gson.fromJson(convertedBreakList, type);
-
-                    cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                    ///Todo: Need to get different sizes depending on number of non-null columns in list. Check if each column is null?
                     boolean duplicate = false;
-                    if (cyclesList.size()>0) {
-                        for (int i=0; i<cyclesList.size(); i++) {
+                    int columnSize = 0;
+                    for (int i=0; i<cyclesList.size(); i++) {
+                        if (cyclesList.get(i).getSets()!=null) columnSize+=1;
+                    }
+                    if (cyclesList.size() >0 && cyclesList.get(0).getSets()!=null) {
+                        for (int i=0; i<columnSize; i++) {
                             if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
                                 duplicate = true;
                                 runOnUiThread(() -> {
@@ -746,8 +756,46 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                         });
                     }
-                    savedCycleAdapter.notifyDataSetChanged();
+                } else {
+                    for (int i=0; i<startBreaksOnlyTime.size(); i++) {
+                        tempBreaksOnly.add(convertSeconds(startBreaksOnlyTime.get(i)/1000));
+                        if (tempBreaksOnly.get(i).equals("5")) tempBreaks.set(i, "05");
+                    }
+                    convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
+                    convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
+                    convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
+                    convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
+                    convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
+                    cycles.setBreaksOnly(convertedBreakOnlyList);
+
+                    boolean duplicate = false;
+                    int columnSize = 0;
+                    for (int i=0; i<cyclesList.size(); i++) {
+                        if (cyclesList.get(i).getBreaksOnly()!=null) columnSize+=1;
+                    }
+                    if (cyclesList.size()>0 && cyclesList.get(0).getBreaksOnly()!=null) {
+                        for (int i=0; i<columnSize; i++) {
+                            if (cyclesList.get(i).getBreaksOnly().equals(convertedBreakOnlyList)) {
+                                duplicate = true;
+                                runOnUiThread(() -> {
+                                    Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        }
+                        if (!duplicate) {
+                            cyclesDatabase.cyclesDao().insertCycle(cycles);
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    } else {
+                        cyclesDatabase.cyclesDao().insertCycle(cycles);
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
+                        });
+                    }
                 }
+                savedCycleAdapter.notifyDataSetChanged();
             });
         });
 
