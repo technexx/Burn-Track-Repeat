@@ -51,7 +51,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener{
 
     Button breaks_only;
     TextView save_cycles;
@@ -224,13 +224,45 @@ public class MainActivity extends AppCompatActivity {
     //Todo: Add onOptionsSelected dots for About, etc.
 
     @Override
+    public void onCycleClick(int position) {
+        AsyncTask.execute(() -> {
+            customSetTime.clear();
+            startCustomSetTime.clear();
+            customBreakTime.clear();
+            startCustomBreakTime.clear();
+
+            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+            String tempSets = cyclesList.get(position).getSets();
+            String tempBreaks = cyclesList.get(position).getBreaks();
+
+            String[] setSplit = tempSets.split(" - ", 0);
+            String[] breakSplit = tempBreaks.split(" - ", 0);
+
+            for (int i=0; i<setSplit.length; i++) {
+                customSetTime.add(Long.parseLong(setSplit[i])*1000);
+                startCustomSetTime.add(Long.parseLong(setSplit[i])*1000);
+                customBreakTime.add(Long.parseLong(breakSplit[i])*1000);
+                startCustomBreakTime.add(Long.parseLong(breakSplit[i])*1000);
+            }
+
+            runOnUiThread(() -> {
+                resetTimer();
+                savedCyclePopupWindow.dismiss();
+
+            });
+            Log.i("Okay", tempSets + " " + tempBreaks);
+            Log.i("Okay", "new list is " + customSetTime);
+        });
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
         return true;
     }
 
-    //Todo: Draws fixed at X/Y and do not scroll. Need new solution. Also, lots of duplicate rows.
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -263,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
                         //Todo: For testing only.
                         savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
                         savedCycleRecycler.setAdapter(savedCycleAdapter);
+                        savedCycleAdapter.setItemClick(MainActivity.this);
 
                         runOnUiThread(() -> {
                             savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
@@ -325,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
         savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
         savedCycleRecycler.setAdapter(savedCycleAdapter);
         savedCycleRecycler.setLayoutManager(lm2);
+        savedCycleAdapter.setItemClick(MainActivity.this);
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -665,13 +699,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                     convertedSetList = gson.toJson(tempSets);
                     convertedBreakList = gson.toJson(tempBreaks);
+
+                    convertedSetList = convertedSetList.replace("\"", "");
+                    convertedBreakList = convertedBreakList.replace("\"", "");
+                    convertedSetList = convertedSetList.replace("]", "");
+                    convertedSetList = convertedSetList.replace("[", "");
+                    convertedSetList = convertedSetList.replace(",", " - ");
+                    convertedBreakList = convertedBreakList.replace("]", "");
+                    convertedBreakList = convertedBreakList.replace("[", "");
+                    convertedBreakList = convertedBreakList.replace(",", " - ");
                     cycles.setSets(convertedSetList);
                     cycles.setBreaks(convertedBreakList);
 
                     //Array is the conversion back to List.
-                    Type type = new TypeToken<ArrayList<String>>() {}.getType();
-                    setsArray = gson.fromJson(convertedSetList, type);
-                    breaksArray = gson.fromJson(convertedBreakList, type);
+//                    Type type = new TypeToken<ArrayList<String>>() {}.getType();
+//                    setsArray = gson.fromJson(convertedSetList, type);
+//                    breaksArray = gson.fromJson(convertedBreakList, type);
 
                     cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
                     boolean duplicate = false;
@@ -1687,4 +1730,5 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
 }

@@ -20,6 +20,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     ArrayList<String> mBreaksList;
     ArrayList<String> mBreaksOnlyList;
     boolean mBreaksOnly;
+    onCycleClickListener mOnCycleClickListener;
+
+    public interface onCycleClickListener {
+        void onCycleClick (int position);
+    }
+
+    public void setItemClick(onCycleClickListener xOnCycleClickListener) {
+        this.mOnCycleClickListener = xOnCycleClickListener;
+    }
 
     public SavedCycleAdapter() {
     }
@@ -46,17 +55,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
 
-            String setConv = mSetsList.get(position).replace("\"", "");
-            String breakConv = mBreaksList.get(position).replace("\"", "");
-            setConv = setConv.replace("]", "");
-            setConv = setConv.replace("[", "");
-            setConv = setConv.replace(",", " - ");
-            breakConv = breakConv.replace("]", "");
-            breakConv = breakConv.replace("[", "");
-            breakConv = breakConv.replace(",", " - ");
+            customHolder.customSet.setText(mSetsList.get(position));
+            customHolder.customBreak.setText(mBreaksList.get(position));
 
-            customHolder.customSet.setText(setConv);
-            customHolder.customBreak.setText(breakConv);
+            customHolder.fullView.setOnClickListener(v -> {
+                mOnCycleClickListener.onCycleClick(position);
+            });
+
         } else if (holder instanceof BreaksOnlyHolder) {
             BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
             breaksOnlyHolder.breaksOnlyBreak.setText(mBreaksOnlyList.get(position));
@@ -73,12 +78,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public class CustomHolder extends RecyclerView.ViewHolder {
         public TextView customSet;
         public TextView customBreak;
+        public View fullView;
 
         @SuppressLint("ResourceAsColor")
         public CustomHolder(@NonNull View itemView) {
             super(itemView);
             customSet = itemView.findViewById(R.id.saved_custom_set_view);
             customBreak = itemView.findViewById(R.id.saved_custom_break_view);
+            fullView = itemView;
         }
     }
 
