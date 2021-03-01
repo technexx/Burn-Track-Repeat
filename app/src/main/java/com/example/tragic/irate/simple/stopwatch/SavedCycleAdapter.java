@@ -57,7 +57,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             customHolder.customSet.setText(mSetsList.get(position));
             customHolder.customBreak.setText(mBreaksList.get(position));
-
             customHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
             });
@@ -65,6 +64,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else if (holder instanceof BreaksOnlyHolder) {
             BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
             breaksOnlyHolder.breaksOnlyBreak.setText(mBreaksOnlyList.get(position));
+            breaksOnlyHolder.fullView.setOnClickListener(v -> {
+                mOnCycleClickListener.onCycleClick(position);
+            });
         }
     }
 
@@ -91,10 +93,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public class BreaksOnlyHolder extends RecyclerView.ViewHolder {
         public TextView breaksOnlyBreak;
+        public View fullView;
 
         public BreaksOnlyHolder(@NonNull View itemView) {
             super(itemView);
             breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
+            fullView = itemView;
         }
     }
 }

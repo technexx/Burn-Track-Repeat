@@ -4,8 +4,10 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.tragic.irate.simple.stopwatch.Cycles;
+import com.example.tragic.irate.simple.stopwatch.CyclesBO;
 
 import java.util.List;
 
@@ -30,18 +32,15 @@ public interface CyclesDao {
     @Query("DELETE from Cycles")
     void deleteAll();
 
+    @Query("SELECT * from CyclesBO where Id=:listID")
+    List<CyclesBO> loadCyclesBOEntry (int listID);
 
-//    @Query("SELECT sets from Cycles WHERE Id=:listID")
-//    List<Cycles> loadSingleSet (int listID);
-//
-//    @Query("SELECT breaks from Cycles WHERE Id=:listID")
-//    List<Cycles> loadSingleBreak (int listID);
-//
-//
-//    @Query("SELECT sets from Cycles")
-//    List<Cycles> loadAllSets();
-//
-//    @Query("SELECT breaks from Cycles")
-//    List<Cycles> loadAllBreaks();
-//
+    @Query("SELECT * from CyclesBO")
+    List<CyclesBO> loadAllBOCycles();
+
+    @Insert
+    void insertBOCycle(CyclesBO cyclesBO);
+
+    @Query("DELETE from CyclesBO")
+    void deleteAllBO();
 }

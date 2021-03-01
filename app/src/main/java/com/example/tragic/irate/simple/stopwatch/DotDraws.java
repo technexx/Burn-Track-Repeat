@@ -50,12 +50,6 @@ public class DotDraws extends View {
     int savedPomAlpha;
     int savedPomCycle;
 
-    ArrayList<Integer> mSavedSetCounts;
-    ArrayList<Integer> mSavedBreakCounts;
-    ArrayList<String> mSavedSetValues;
-    ArrayList<String> mSavedBreakValues;
-    int nextRow = 1;
-
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setFocusable(true);
@@ -129,11 +123,6 @@ public class DotDraws extends View {
         cycle2 = savedPomCycle;
     }
 
-    public void drawSavedCycles(ArrayList<Integer> savedSetCounts, ArrayList<Integer> savedBreakCounts, ArrayList<String> savedSetValues, ArrayList<String> savedBreakValues) {
-        mSavedSetCounts = savedSetCounts; mSavedBreakCounts = savedBreakCounts; mSavedSetValues = savedSetValues; mSavedBreakValues = savedBreakValues;
-        hollowPaint();
-    }
-
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
@@ -144,26 +133,6 @@ public class DotDraws extends View {
 
         mX = 60; mY = 490; mX2 = 60; mY2 = 620;
         if (mBreaksOnly) mY2 = 535;
-
-//        if (mMode == 10) {
-//            mX = 50; mY = 42;
-//            //Individual sets in a single row - drawing right. mSavedSetValues size is how many ROW counts we have (i.e. saved cycles).
-//            for (int i=0; i<mSavedSetValues.size(); i++) {
-//                nextRow +=1;
-//                for (int j=0; j<mSavedSetCounts.get(i); j++) {
-//                    mPaint.setColor(Color.GREEN);
-//                    mCanvas.drawCircle(mX, mY, 34, mPaint);
-//                    mPaint.setColor(Color.RED);
-//                    mCanvas.drawCircle(mX, mY+81, 34, mPaint);
-//                    mX+=78;
-////                    mY = mY + (100*nextRow);
-//                    Log.i("goingup", "getting values " + mSavedSetCounts.get(i));
-//                }
-//                nextRow+=1;
-//                mX = 50;
-//                mY+=195;
-//            }
-//        }
 
         if (mMode == 1 && !mBreaksOnly) {
             for (int i=0; i<mSetCount; i++) {

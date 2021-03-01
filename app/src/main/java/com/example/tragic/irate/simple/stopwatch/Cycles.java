@@ -10,13 +10,8 @@ public class Cycles {
     public int id;
     public String sets;
     public String breaks;
-    public String breaksOnly;
 
     public Cycles() {
-    }
-
-    public Cycles(String breaksOnly) {
-        this.breaksOnly = breaksOnly;
     }
 
     public Cycles(String sets, String breaks) {
@@ -45,13 +40,5 @@ public class Cycles {
 
     public void setBreaks(String breaks) {
         this.breaks = breaks;
-    }
-
-    public String getBreaksOnly() {
-        return breaksOnly;
-    }
-
-    public void setBreaksOnly(String breaksOnly) {
-        this.breaksOnly = breaksOnly;
     }
 }
