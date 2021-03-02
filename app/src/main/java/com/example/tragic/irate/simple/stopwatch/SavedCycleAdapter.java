@@ -2,7 +2,6 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mContext;
@@ -55,8 +56,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
 
-            customHolder.customSet.setText(mSetsList.get(position));
-            customHolder.customBreak.setText(mBreaksList.get(position));
+//            customHolder.customSet.setText(mSetsList.get(position));
+//            customHolder.customBreak.setText(mBreaksList.get(position));
+            customHolder.customSet.setText(convertTime(mSetsList).get(position));
+            customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
+
             customHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
             });
@@ -100,5 +104,52 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
             fullView = itemView;
         }
+    }
+
+    //Todo: Each position/entry in our String array is the totality of the above sets, i.e. we are only receiving TWO (sets/breaks) arrays. Therefore any return value from this method must include the totality of saved sets/breaks.
+
+    //Todo: Format result. Remove formatting from Main's save method since it is no longer necessary.
+    public ArrayList<String> convertTime(ArrayList<String> time) {
+        ArrayList<Long> newLong = new ArrayList<>();
+        ArrayList<String> newString = new ArrayList<>();
+        String listConv = "";
+        String[] newSplit = null;
+        String finalSplit = "";
+        ArrayList<String> finalList = new ArrayList<>();
+
+        for (int i=0; i<time.size(); i++) {
+            //Getting each String entry from String Array.
+            listConv = String.valueOf(time.get(i));
+            //Splitting into String[] entries.
+            newSplit = listConv.split(" - ", 0);
+
+            for (int k=0; k<newSplit.length; k++) {
+                //Creating new ArrayList of Long values.
+                newLong.add(Long.parseLong(newSplit[k]));
+                //Converting each Long value into a String we can display.
+                newString.add(convertSeconds(newLong.get(k)));
+            }
+            finalSplit = String.valueOf(newString);
+            finalList.add(finalSplit);
+
+            newLong = new ArrayList<>();
+            newString = new ArrayList<>();
+        }
+
+        Log.i("tester", "list conv is " + listConv + " and newSplit is " + Arrays.toString(newSplit) + " and newLong is " + newLong + " and newString is " + newString );
+        return finalList;
+    }
+
+    public String convertSeconds(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+
+        if (totalSeconds >=60) {
+            minutes = totalSeconds/60;
+            remainingSeconds = totalSeconds % 60;
+            return (minutes + ":" + df.format(remainingSeconds));
+        } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
+        else return "05";
     }
 }

@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Add update for retrieved row?
     //Todo: Manage save for sets/breaks in progress and w/ 0 sets/breaks in list.
     //Todo: Add fade in/out to breaksOnly.
+    //Todo: Reduce font for larger timer numbers in Custom mode.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
@@ -236,7 +237,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             customBreakTime.clear();
             startCustomBreakTime.clear();
 
-            //Todo: Long parse error w/ x:xx times.
             if (!breaksOnly) {
                 cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
                 String tempSets = cyclesList.get(position).getSets();
@@ -280,7 +280,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
-                //Todo: Get values for breaksOnly.
                 if (!disableSavedPopup) {
                     AsyncTask.execute(() -> {
                         disableSavedPopup = true;
@@ -302,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 if (cyclesList.get(i).getSets()!=null) columnSize+=1;
                             }
 
+                            //Todo: Retrieved as [xx xx xx] Strings from DB, then converted to String ArrayList for adapter. Currently Strings being retrieved in callback as total seconds (i.e. multiples of 5, w/ no punctuation). Need only to change their display in recycler.
                             if (cyclesList.size()>0 && cyclesList.get(0).getSets()!=null) {
                                 for (int i=0; i<columnSize; i++) {
                                     //getSets/Breaks returns String [xx, xy, xz] etc.
@@ -729,21 +729,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             AsyncTask.execute(() -> {
                 cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
                 cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
-                ArrayList<String> tempSets = new ArrayList<>();
-                ArrayList<String> tempBreaks = new ArrayList<>();
-                ArrayList<String> tempBreaksOnly = new ArrayList<>();
+                ArrayList<Long> tempSets = new ArrayList<>();
+                ArrayList<Long> tempBreaks = new ArrayList<>();
+                ArrayList<Long> tempBreaksOnly = new ArrayList<>();
                 String convertedSetList = "";
                 String convertedBreakList = "";
                 String convertedBreakOnlyList = "";
 
                 if (!breaksOnly) {
                     for (int i=0; i<startCustomSetTime.size(); i++) {
-                        tempSets.add(convertSeconds ( (startCustomSetTime.get(i)) /1000));
-                        if (tempSets.get(i).equals("5")) tempSets.set(i, "05");
+                        tempSets.add(startCustomSetTime.get(i) /1000);
+//                        if (tempSets.get(i).equals("5")) tempSets.set(i, "05");
                     }
                     for (int i=0; i<startCustomBreakTime.size(); i++){
-                        tempBreaks.add(convertSeconds( (startCustomBreakTime.get(i))/1000));
-                        if (tempBreaks.get(i).equals("5")) tempBreaks.set(i, "05");
+                        tempBreaks.add(startCustomBreakTime.get(i)/1000);
+//                        if (tempBreaks.get(i).equals("5")) tempBreaks.set(i, "05");
                     }
                     convertedSetList = gson.toJson(tempSets);
                     convertedBreakList = gson.toJson(tempBreaks);
@@ -787,8 +787,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                 } else {
                     for (int i=0; i<startBreaksOnlyTime.size(); i++) {
-                        tempBreaksOnly.add(convertSeconds(startBreaksOnlyTime.get(i)/1000));
-                        if (tempBreaksOnly.get(i).equals("5")) tempBreaks.set(i, "05");
+                        tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
+//                        if (tempBreaksOnly.get(i).equals("5")) tempBreaks.set(i, "05");
                     }
                     convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
                     convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
