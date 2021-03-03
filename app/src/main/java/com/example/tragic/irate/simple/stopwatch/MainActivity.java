@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener{
 
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ObjectAnimator objectAnimator;
     ObjectAnimator objectAnimator2;
     Animation endAnimation;
-    Handler handler;
+    public Handler handler;
 
     TextView s1;
     TextView s2;
@@ -216,6 +218,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View savedCyclePopupView;
     DotDraws savedDraws;
     boolean disableSavedPopup;
+    boolean fadeInSaves;
+    int setCountDiff;
+    int breakCountDiff;
 
     //Todo: Add update for retrieved row?
     //Todo: Manage save for sets/breaks in progress and w/ 0 sets/breaks in list.
@@ -232,10 +237,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void onCycleClick(int position) {
         AsyncTask.execute(() -> {
             disableSavedPopup = false;
-            customSetTime.clear();
-            startCustomSetTime.clear();
-            customBreakTime.clear();
-            startCustomBreakTime.clear();
 
             if (!breaksOnly) {
                 cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
@@ -243,6 +244,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 String tempBreaks = cyclesList.get(position).getBreaks();
                 String[] setSplit = tempSets.split(" - ", 0);
                 String[] breakSplit = tempBreaks.split(" - ", 0);
+
+                setCountDiff = startCustomSetTime.size() - setSplit.length;
+                breakCountDiff = startCustomBreakTime.size() - breakSplit.length;
+                customSetTime.clear();
+                startCustomSetTime.clear();
+                customBreakTime.clear();
+                startCustomBreakTime.clear();
 
                 for (int i=0; i<setSplit.length; i++) {
                     customSetTime.add(Long.parseLong(setSplit[i])*1000);
@@ -255,12 +263,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 String tempBreaksOnly = cyclesBOList.get(position).getBreaksOnly();
                 String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
 
+                breakCountDiff = startBreaksOnlyTime.size() - breaksOnlySplit.length;
+                startBreaksOnlyTime.clear();
+                breaksOnlyTime.clear();
+
                 for (int i=0; i<breaksOnlySplit.length; i++) {
                     breaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
                     startBreaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
                 }
             }
             runOnUiThread(() -> {
+                fadeInSaves = true;
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
             });
@@ -822,7 +835,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         });
                     }
                 }
-                savedCycleAdapter.notifyDataSetChanged();
             });
         });
 
@@ -1775,6 +1787,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.breakTime(breaksOnlyTime);
                 }
                 dotDraws.setAlpha();
+
+                if (fadeInSaves) {
+                    dotDraws.fadeInSaves(false);
+                    CountDownTimer ct = new CountDownTimer(2500, 100) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        }
+
+                        @Override
+                        public void onFinish() {
+                        }
+                    }.start();
+                }
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                 break;
             case 2:
@@ -1810,5 +1836,4 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
         }
     }
-
 }

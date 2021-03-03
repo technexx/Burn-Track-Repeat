@@ -1,5 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -49,6 +50,10 @@ public class DotDraws extends View {
     int savedCustomCycle;
     int savedPomAlpha;
     int savedPomCycle;
+    boolean mFadeInSaves;
+    boolean fadeBackIn;
+    int testCount;
+    int mCountDiff;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -63,14 +68,6 @@ public class DotDraws extends View {
         mPaintText = new Paint();
         mPaintText.setAntiAlias(true);
         mPaintText.setStrokeWidth(5);
-    }
-
-    private void hollowPaint() {
-        mPaint = new Paint();
-        mPaint.setStrokeWidth(4);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     public void newDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
@@ -123,6 +120,14 @@ public class DotDraws extends View {
         cycle2 = savedPomCycle;
     }
 
+    public void fadeInSaves(boolean restartFade, int countDiff) {
+        this.mCountDiff = countDiff;
+        mFadeInSaves = true;
+        fadeBackIn = restartFade;
+        mAlpha = 255;
+        testCount = 0;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
@@ -146,6 +151,9 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setAlpha(255);
                 }
+                if (mFadeInSaves) {
+                    fadeInAll();
+                }
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
                 drawText(mSetTime, mX, mY, i);
                 mX += 108;
@@ -168,6 +176,9 @@ public class DotDraws extends View {
                 }
                 else {
                     mPaint.setAlpha(255);
+                }
+                if (mFadeInSaves) {
+                    fadeInAll();
                 }
                 if (!mBreaksOnly) {
                     mCanvas.drawCircle(mX2, mY2, 45, mPaint);
@@ -230,6 +241,23 @@ public class DotDraws extends View {
         }
         savedPomAlpha = mAlpha2;
         savedPomCycle = cycle2;
+    }
+
+    public void fadeInAll() {
+        mPaint.setAlpha(mAlpha);
+        if (!fadeBackIn) {
+            mAlpha-=10; testCount++;
+        } else {
+            mAlpha+=10; testCount++;
+            if (mAlpha>255) {
+                mAlpha = 255;
+                return;
+            }
+        }
+        if (mAlpha<=0) {
+            fadeBackIn = true;
+        }
+        Log.i("fade", "alpha is " + mAlpha + " and int count is " + testCount);
     }
 
     public void pomDraw(int i, boolean fade) {

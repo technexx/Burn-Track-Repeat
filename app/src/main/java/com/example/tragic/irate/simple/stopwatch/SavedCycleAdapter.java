@@ -55,19 +55,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
-
-//            customHolder.customSet.setText(mSetsList.get(position));
-//            customHolder.customBreak.setText(mBreaksList.get(position));
             customHolder.customSet.setText(convertTime(mSetsList).get(position));
             customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
-
             customHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
             });
-
         } else if (holder instanceof BreaksOnlyHolder) {
             BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
-            breaksOnlyHolder.breaksOnlyBreak.setText(mBreaksOnlyList.get(position));
+            breaksOnlyHolder.breaksOnlyBreak.setText(convertTime(mBreaksOnlyList).get(position));
             breaksOnlyHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
             });
@@ -88,7 +83,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         @SuppressLint("ResourceAsColor")
         public CustomHolder(@NonNull View itemView) {
-            super(itemView);
+            super(itemView) ;
             customSet = itemView.findViewById(R.id.saved_custom_set_view);
             customBreak = itemView.findViewById(R.id.saved_custom_break_view);
             fullView = itemView;
@@ -106,9 +101,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    //Todo: Each position/entry in our String array is the totality of the above sets, i.e. we are only receiving TWO (sets/breaks) arrays. Therefore any return value from this method must include the totality of saved sets/breaks.
-
-    //Todo: Format result. Remove formatting from Main's save method since it is no longer necessary.
     public ArrayList<String> convertTime(ArrayList<String> time) {
         ArrayList<Long> newLong = new ArrayList<>();
         ArrayList<String> newString = new ArrayList<>();
@@ -130,6 +122,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 newString.add(convertSeconds(newLong.get(k)));
             }
             finalSplit = String.valueOf(newString);
+            finalSplit = finalSplit.replace("[", "");
+            finalSplit = finalSplit.replace("]", "");
+            finalSplit = finalSplit.replace(",", " - ");
             finalList.add(finalSplit);
 
             newLong = new ArrayList<>();
