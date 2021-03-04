@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,13 +24,22 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     ArrayList<String> mBreaksOnlyList;
     boolean mBreaksOnly;
     onCycleClickListener mOnCycleClickListener;
+    onDeleteCycleListener mOnDeleteCycleListener;
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
     }
 
+    public interface onDeleteCycleListener {
+        void onCycleDelete (int position);
+    }
+
     public void setItemClick(onCycleClickListener xOnCycleClickListener) {
         this.mOnCycleClickListener = xOnCycleClickListener;
+    }
+
+    public void setDeleteCycle(onDeleteCycleListener xOnDeleteCycleListener) {
+        this.mOnDeleteCycleListener = xOnDeleteCycleListener;
     }
 
     public SavedCycleAdapter() {
@@ -57,14 +68,23 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             CustomHolder customHolder = (CustomHolder) holder;
             customHolder.customSet.setText(convertTime(mSetsList).get(position));
             customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
+
             customHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
             });
+            customHolder.customTrash.setOnClickListener(v-> {
+                mOnDeleteCycleListener.onCycleDelete(position);
+            });
+
         } else if (holder instanceof BreaksOnlyHolder) {
             BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
             breaksOnlyHolder.breaksOnlyBreak.setText(convertTime(mBreaksOnlyList).get(position));
+
             breaksOnlyHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
+            });
+            breaksOnlyHolder.breaksOnlyTrash.setOnClickListener(v-> {
+                mOnDeleteCycleListener.onCycleDelete(position);
             });
         }
     }
@@ -79,6 +99,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public class CustomHolder extends RecyclerView.ViewHolder {
         public TextView customSet;
         public TextView customBreak;
+        public ImageButton customTrash;
         public View fullView;
 
         @SuppressLint("ResourceAsColor")
@@ -86,17 +107,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             super(itemView) ;
             customSet = itemView.findViewById(R.id.saved_custom_set_view);
             customBreak = itemView.findViewById(R.id.saved_custom_break_view);
+            customTrash = itemView.findViewById(R.id.delete_cycle);
             fullView = itemView;
         }
     }
 
     public class BreaksOnlyHolder extends RecyclerView.ViewHolder {
         public TextView breaksOnlyBreak;
+        public ImageButton breaksOnlyTrash;
         public View fullView;
 
         public BreaksOnlyHolder(@NonNull View itemView) {
             super(itemView);
             breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
+            breaksOnlyTrash = itemView.findViewById(R.id.delete_cycle);
             fullView = itemView;
         }
     }

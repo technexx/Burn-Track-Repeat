@@ -53,7 +53,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener{
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener{
 
     Button breaks_only;
     TextView save_cycles;
@@ -216,12 +216,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     RecyclerView savedCycleRecycler;
     SavedCycleAdapter savedCycleAdapter;
     View savedCyclePopupView;
-    DotDraws savedDraws;
     boolean disableSavedPopup;
-    boolean fadeInSaves;
-    int setCountDiff;
-    int breakCountDiff;
-    int drawCount;
 
     //Todo: Add update for retrieved row?
     //Todo: Manage save for sets/breaks in progress and w/ 0 sets/breaks in list.
@@ -246,8 +241,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 String[] setSplit = tempSets.split(" - ", 0);
                 String[] breakSplit = tempBreaks.split(" - ", 0);
 
-                setCountDiff = startCustomSetTime.size() - setSplit.length;
-                breakCountDiff = startCustomBreakTime.size() - breakSplit.length;
                 customSetTime.clear();
                 startCustomSetTime.clear();
                 customBreakTime.clear();
@@ -264,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 String tempBreaksOnly = cyclesBOList.get(position).getBreaksOnly();
                 String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
 
-                breakCountDiff = startBreaksOnlyTime.size() - breaksOnlySplit.length;
                 startBreaksOnlyTime.clear();
                 breaksOnlyTime.clear();
 
@@ -274,12 +266,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
             runOnUiThread(() -> {
-//                fadeInSaves = true;
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
             });
         });
 
+    }
+
+    //Todo: Retrieve and delete callback position.
+    @Override
+    public void onCycleDelete(int position) {
+        AsyncTask.execute(() -> {
+            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+            cycles = cyclesList.get(position);
+            cyclesDatabase.cyclesDao().deleteCycle(cycles);
+            runOnUiThread(() -> {
+                savedCycleAdapter.notifyDataSetChanged();
+                Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
+            });
+        });
     }
 
     @Override
@@ -314,8 +319,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             for (int i=0; i<cyclesList.size(); i++) {
                                 if (cyclesList.get(i).getSets()!=null) columnSize+=1;
                             }
-
-                            //Todo: Retrieved as [xx xx xx] Strings from DB, then converted to String ArrayList for adapter. Currently Strings being retrieved in callback as total seconds (i.e. multiples of 5, w/ no punctuation). Need only to change their display in recycler.
                             if (cyclesList.size()>0 && cyclesList.get(0).getSets()!=null) {
                                 for (int i=0; i<columnSize; i++) {
                                     //getSets/Breaks returns String [xx, xy, xz] etc.
@@ -335,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
                                 savedCycleRecycler.setAdapter(savedCycleAdapter);
                                 savedCycleAdapter.setItemClick(MainActivity.this);
+                                savedCycleAdapter.setDeleteCycle(MainActivity.this);
                                 runOnUiThread(() -> {
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -354,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, true);
                                 savedCycleRecycler.setAdapter(savedCycleAdapter);
                                 savedCycleAdapter.setItemClick(MainActivity.this);
+                                savedCycleAdapter.setDeleteCycle(MainActivity.this);
                                 runOnUiThread(() -> {
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                                     savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
@@ -408,7 +413,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
         savedCycleRecycler.setAdapter(savedCycleAdapter);
         savedCycleRecycler.setLayoutManager(lm2);
+
         savedCycleAdapter.setItemClick(MainActivity.this);
+        savedCycleAdapter.setDeleteCycle(MainActivity.this);
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -1787,23 +1794,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     dotDraws.breakTime(breaksOnlyTime);
                 }
-                //
-//                if (fadeInSaves) {
-//                    new CountDownTimer(5000, 100) {
-//                        @Override
-//                        public void onTick(long millisUntilFinished) {
-//                            drawCount+=1;
-//                            if (drawCount<25) dotDraws.fadeSaves(drawCount, false); else dotDraws.fadeSaves(drawCount, true);
-//                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-//                        }
-//
-//                        @Override
-//                        public void onFinish() {
-//                            drawCount = 0;
-//                        }
-//                    }.start();
-//                }
-
                 dotDraws.setAlpha();
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                 break;

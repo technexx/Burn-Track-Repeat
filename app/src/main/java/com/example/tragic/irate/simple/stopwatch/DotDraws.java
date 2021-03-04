@@ -50,13 +50,6 @@ public class DotDraws extends View {
     int savedCustomCycle;
     int savedPomAlpha;
     int savedPomCycle;
-    boolean mFadeInSaves;
-    boolean fadeBackIn;
-    int mDrawCount;
-    int mSetCountDiff;
-    int mBreakCountDiff;
-    int mSaveAlpha = 255;
-    boolean mTimeToFadeIn;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -122,10 +115,6 @@ public class DotDraws extends View {
         mAlpha2 = savedPomAlpha;
         cycle2 = savedPomCycle;
     }
-
-//    public void fadeSaves(int drawCount, boolean timeToFadeIn) {
-//        mFadeInSaves = true; this.mDrawCount = drawCount; this.mTimeToFadeIn = timeToFadeIn;
-//    }
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -235,18 +224,6 @@ public class DotDraws extends View {
         }
         savedPomAlpha = mAlpha2;
         savedPomCycle = cycle2;
-    }
-
-    public void fadeOutAll() {
-        mCanvas.saveLayerAlpha(null, mSaveAlpha);
-        mSaveAlpha-=10;
-        if (mSaveAlpha<0) mSaveAlpha = 0;
-    }
-
-    public void fadeInAll() {
-        mCanvas.saveLayerAlpha(null, mSaveAlpha);
-        mSaveAlpha+=10;
-        if (mSaveAlpha>255) mSaveAlpha = 255;
     }
 
     public void pomDraw(int i, boolean fade) {

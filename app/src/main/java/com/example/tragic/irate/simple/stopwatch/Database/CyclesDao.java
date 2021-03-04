@@ -23,6 +23,12 @@ public interface CyclesDao {
     @Query("SELECT id from Cycles")
     List<Cycles> loadAllIds();
 
+//    @Query("SELECT sets AND breaks from Cycles")
+//    List<Cycles> getCustomSetsAndBreaks();
+
+//    @Query("SELECT breaksOnly from CyclesBO")
+//    List<Cycles> getBreaksOnlyBreaks();
+
     @Insert
     void insertCycle(Cycles cycles);
 
