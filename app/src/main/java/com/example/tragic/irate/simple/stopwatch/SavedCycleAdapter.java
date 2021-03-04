@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mContext;
@@ -87,6 +88,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mOnDeleteCycleListener.onCycleDelete(position);
             });
         }
+    }
+
+    public void updateBreaksOnlyCycles() {
+
     }
 
     @Override

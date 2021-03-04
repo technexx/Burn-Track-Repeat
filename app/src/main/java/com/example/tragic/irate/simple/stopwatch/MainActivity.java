@@ -176,12 +176,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
 
-    ArrayList<Long> customSetTime;
-    ArrayList<Long> customBreakTime;
-    ArrayList<Long> startCustomSetTime;
-    ArrayList<Long> startCustomBreakTime;
-    ArrayList<Long> startBreaksOnlyTime;
-    ArrayList<Long> breaksOnlyTime;
+    public ArrayList<Long> customSetTime;
+    public ArrayList<Long> customBreakTime;
+    public ArrayList<Long> startCustomSetTime;
+    public ArrayList<Long> startCustomBreakTime;
+    public ArrayList<Long> startBreaksOnlyTime;
+    public ArrayList<Long> breaksOnlyTime;
 
     boolean setBegun;
     boolean breakBegun;
@@ -273,16 +273,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     }
 
-    //Todo: Retrieve and delete callback position.
     @Override
     public void onCycleDelete(int position) {
         AsyncTask.execute(() -> {
-            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+            //Todo: If this bugs, we need to make sure cycleList is defined before we retrieve anything.
             cycles = cyclesList.get(position);
             cyclesDatabase.cyclesDao().deleteCycle(cycles);
+            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
             runOnUiThread(() -> {
+                setsArray.clear();
+                breaksArray.clear();
+                for (int i=0; i<cyclesList.size(); i++) {
+                    setsArray.add(cyclesList.get(i).getSets());
+                    breaksArray.add(cyclesList.get(i).getBreaks());
+                }
                 savedCycleAdapter.notifyDataSetChanged();
                 Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
+                cl.setOnClickListener(v-> {
+                    savedCyclePopupWindow.dismiss();
+                    disableSavedPopup = false;
+                });
             });
         });
     }
@@ -328,15 +338,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     tempBreaks = cyclesList.get(i).getBreaks().split(",");
                                     setCount.add(tempSets.length);
                                     breakCount.add(tempBreaks.length);
-                                    Log.i("newSave", "tempSets and breaks are " + Arrays.toString(tempSets) + " and " + Arrays.toString(tempBreaks));
                                 }
-                                Log.i("newSave", "cycleList entry count is " + cyclesList.size());
-                                Log.i("newSave", "number of ROWS are " + setsArray.size() + " and " + breaksArray.size());
-                                Log.i("newSave", "setCount and break sizes are " + setCount.size() + " and " + breakCount.size());
+                                savedCycleAdapter.notifyDataSetChanged();
+//                                savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
+//                                savedCycleRecycler.setAdapter(savedCycleAdapter);
 
-                                //Todo: For testing only.
-                                savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
-                                savedCycleRecycler.setAdapter(savedCycleAdapter);
                                 savedCycleAdapter.setItemClick(MainActivity.this);
                                 savedCycleAdapter.setDeleteCycle(MainActivity.this);
                                 runOnUiThread(() -> {
@@ -355,8 +361,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     tempBreaksOnly = cyclesBOList.get(i).getBreaksOnly().split(",");
                                     breaksOnlyCount.add(tempBreaksOnly.length);
                                 }
-                                savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, true);
-                                savedCycleRecycler.setAdapter(savedCycleAdapter);
+//                                savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, true);
+//                                savedCycleRecycler.setAdapter(savedCycleAdapter);
+                                savedCycleAdapter.notifyDataSetChanged();
                                 savedCycleAdapter.setItemClick(MainActivity.this);
                                 savedCycleAdapter.setDeleteCycle(MainActivity.this);
                                 runOnUiThread(() -> {
