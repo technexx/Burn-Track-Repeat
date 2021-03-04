@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean fadeInSaves;
     int setCountDiff;
     int breakCountDiff;
+    int drawCount;
 
     //Todo: Add update for retrieved row?
     //Todo: Manage save for sets/breaks in progress and w/ 0 sets/breaks in list.
@@ -273,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
             runOnUiThread(() -> {
-                fadeInSaves = true;
+//                fadeInSaves = true;
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
             });
@@ -336,6 +337,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 savedCycleAdapter.setItemClick(MainActivity.this);
                                 runOnUiThread(() -> {
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+                                    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
                                     savedCycleAdapter.notifyDataSetChanged();
                                 });
@@ -1786,21 +1788,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     dotDraws.breakTime(breaksOnlyTime);
                 }
+                //
+//                if (fadeInSaves) {
+//                    new CountDownTimer(5000, 100) {
+//                        @Override
+//                        public void onTick(long millisUntilFinished) {
+//                            drawCount+=1;
+//                            if (drawCount<25) dotDraws.fadeSaves(drawCount, false); else dotDraws.fadeSaves(drawCount, true);
+//                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+//                        }
+//
+//                        @Override
+//                        public void onFinish() {
+//                            drawCount = 0;
+//                        }
+//                    }.start();
+//                }
+
                 dotDraws.setAlpha();
-
-                if (fadeInSaves) {
-                    dotDraws.fadeInSaves(false);
-                    CountDownTimer ct = new CountDownTimer(2500, 100) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                        }
-
-                        @Override
-                        public void onFinish() {
-                        }
-                    }.start();
-                }
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                 break;
             case 2:

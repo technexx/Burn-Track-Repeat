@@ -52,8 +52,11 @@ public class DotDraws extends View {
     int savedPomCycle;
     boolean mFadeInSaves;
     boolean fadeBackIn;
-    int testCount;
-    int mCountDiff;
+    int mDrawCount;
+    int mSetCountDiff;
+    int mBreakCountDiff;
+    int mSaveAlpha = 255;
+    boolean mTimeToFadeIn;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -120,13 +123,9 @@ public class DotDraws extends View {
         cycle2 = savedPomCycle;
     }
 
-    public void fadeInSaves(boolean restartFade, int countDiff) {
-        this.mCountDiff = countDiff;
-        mFadeInSaves = true;
-        fadeBackIn = restartFade;
-        mAlpha = 255;
-        testCount = 0;
-    }
+//    public void fadeSaves(int drawCount, boolean timeToFadeIn) {
+//        mFadeInSaves = true; this.mDrawCount = drawCount; this.mTimeToFadeIn = timeToFadeIn;
+//    }
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -151,14 +150,12 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setAlpha(255);
                 }
-                if (mFadeInSaves) {
-                    fadeInAll();
-                }
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
                 drawText(mSetTime, mX, mY, i);
                 mX += 108;
             }
         }
+
 
         if (mMode == 1) {
             for (int i=0; i<mBreakCount; i++) {
@@ -176,9 +173,6 @@ public class DotDraws extends View {
                 }
                 else {
                     mPaint.setAlpha(255);
-                }
-                if (mFadeInSaves) {
-                    fadeInAll();
                 }
                 if (!mBreaksOnly) {
                     mCanvas.drawCircle(mX2, mY2, 45, mPaint);
@@ -243,21 +237,16 @@ public class DotDraws extends View {
         savedPomCycle = cycle2;
     }
 
+    public void fadeOutAll() {
+        mCanvas.saveLayerAlpha(null, mSaveAlpha);
+        mSaveAlpha-=10;
+        if (mSaveAlpha<0) mSaveAlpha = 0;
+    }
+
     public void fadeInAll() {
-        mPaint.setAlpha(mAlpha);
-        if (!fadeBackIn) {
-            mAlpha-=10; testCount++;
-        } else {
-            mAlpha+=10; testCount++;
-            if (mAlpha>255) {
-                mAlpha = 255;
-                return;
-            }
-        }
-        if (mAlpha<=0) {
-            fadeBackIn = true;
-        }
-        Log.i("fade", "alpha is " + mAlpha + " and int count is " + testCount);
+        mCanvas.saveLayerAlpha(null, mSaveAlpha);
+        mSaveAlpha+=10;
+        if (mSaveAlpha>255) mSaveAlpha = 255;
     }
 
     public void pomDraw(int i, boolean fade) {
