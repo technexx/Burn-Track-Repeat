@@ -7,20 +7,13 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cycle_list_recycler"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="10dp">
     </androidx.recyclerview.widget.RecyclerView>
-
-    <com.example.tragic.irate.simple.stopwatch.DotDraws
-        android:id="@+id/saved_draws"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-    </com.example.tragic.irate.simple.stopwatch.DotDraws>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,4 +28,5 @@
 
     <string name="cycle_saved">Cycle saved!</string>
     <string name="cycle_exists">Identical cycle already exists!</string>
+    <string name="bullet">\u2022</string>
 </resources>

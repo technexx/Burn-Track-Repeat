@@ -124,7 +124,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             finalSplit = String.valueOf(newString);
             finalSplit = finalSplit.replace("[", "");
             finalSplit = finalSplit.replace("]", "");
-            finalSplit = finalSplit.replace(",", " - ");
+            finalSplit = finalSplit.replace(",", " " + mContext.getString( R.string.bullet));
             finalList.add(finalSplit);
 
             newLong = new ArrayList<>();

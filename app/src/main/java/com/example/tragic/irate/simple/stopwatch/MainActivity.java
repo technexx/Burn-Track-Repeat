@@ -446,7 +446,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         msTime = findViewById(R.id.msTime);
         msTimePaused = findViewById(R.id.msTimePaused);
         dotDraws = findViewById(R.id.dotdraws);
-        savedDraws = findViewById(R.id.saved_draws);
         lapRecycler = findViewById(R.id.lap_recycler);
         cl = findViewById(R.id.main_layout);
 
