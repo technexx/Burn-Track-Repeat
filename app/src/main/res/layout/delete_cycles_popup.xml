@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/Gray">
+
+    <TextView
+        android:text="Are you sure?"
+        android:id="@+id/delete_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20sp"
+        android:textSize="18sp"
+        android:textColor="@color/white">
+    </TextView>
+
+    <Button
+        android:text="Yes"
+        android:id="@+id/confirm_yes"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/confirm_no"
+        android:textSize="16sp"
+        android:textColor="@color/white">
+    </Button>
+
+    <Button
+        android:text="No"
+        android:id="@+id/confirm_no"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/confirm_yes"
+        android:textSize="16sp"
+        android:textColor="@color/white"
+        android:src="@drawable/rectangle_shape">
+    </Button>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
