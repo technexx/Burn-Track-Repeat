@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View deleteCyclePopupView;
     boolean disableSavedPopup;
 
-    //Todo: Unique constraint errors w/ delete + insertion. Deleting removes the id (e.g. 33, 34, 35 can removed 34), next addition will create 34 for ID, then NEXT will try to use 35 which already exists.
+    //Todo: Remember that any reference to our GLOBAL version of a cycles position will retain that position unless changed.
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
@@ -278,8 +278,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void onCycleDelete(int position) {
         AsyncTask.execute(() -> {
             cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-            cycles = cyclesList.get(position);
-            cyclesDatabase.cyclesDao().deleteCycle(cycles);
+            Cycles deleteCycle = cyclesList.get(position);
+            cyclesDatabase.cyclesDao().deleteCycle(deleteCycle);
             cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
             runOnUiThread(() -> {
                 setsArray.clear();
@@ -296,10 +296,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 });
 
                 cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-                Log.i("idError", "listID is " + cyclesList.get(cyclesList.size()-1).getId());
-                for (int i=0; i<cyclesList.size(); i++) {
-                    Log.i("idError", "all IDs are " + cyclesList.get(i).getId());
-                }
             });
         });
     }
@@ -355,6 +351,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
+                                    for (int i=0; i<cyclesList.size(); i++) {
+                                        Log.i("idError", "all IDs are " + cyclesList.get(i).getId());
+                                    }
                                 });
                         } else {
                                 runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
@@ -803,8 +802,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     boolean duplicate = false;
                     if (cyclesList.size() >0 && cyclesList.get(0).getSets()!=null) {
-                        int id = cyclesList.get(cyclesList.size()-1).getId();
-                        cycles.setId(id+1);
+//                        int id = cyclesList.get(cyclesList.size()-1).getId();
+//                        cycles.setId(id+1);
                         for (int i=0; i<cyclesList.size(); i++) {
                             if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
                                 duplicate = true;

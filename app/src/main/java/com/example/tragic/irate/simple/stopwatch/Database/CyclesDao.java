@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch.Database;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -23,13 +24,7 @@ public interface CyclesDao {
     @Query("SELECT id from Cycles")
     List<Cycles> loadAllIds();
 
-//    @Query("SELECT sets AND breaks from Cycles")
-//    List<Cycles> getCustomSetsAndBreaks();
-
-//    @Query("SELECT breaksOnly from CyclesBO")
-//    List<Cycles> getBreaksOnlyBreaks();
-
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCycle(Cycles cycles);
 
     @Delete
