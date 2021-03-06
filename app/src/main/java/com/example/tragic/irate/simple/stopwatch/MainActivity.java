@@ -221,6 +221,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean disableSavedPopup;
 
     //Todo: Remember that any reference to our GLOBAL version of a cycles position will retain that position unless changed.
+    //Todo: Fix breaksOnly breaks display.
+    //Todo: Add sort feature to saves?
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
@@ -314,11 +316,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case R.id.saved_cycle_list:
                 if (!disableSavedPopup) {
                     AsyncTask.execute(() -> {
-                        disableSavedPopup = true;
                         cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
                         cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
                         if (setsArray!=null) setsArray.clear();
                         if (breaksArray!=null) breaksArray.clear();
+                        if (breaksOnlyArray!=null) breaksOnlyArray.clear();
 
                         String[] tempSets = null;
                         String[] tempBreaks = null;
@@ -333,6 +335,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 if (cyclesList.get(i).getSets()!=null) columnSize+=1;
                             }
                             if (cyclesList.size()>0 && cyclesList.get(0).getSets()!=null) {
+                                disableSavedPopup = true;
                                 for (int i=0; i<columnSize; i++) {
                                     //getSets/Breaks returns String [xx, xy, xz] etc.
                                     setsArray.add(cyclesList.get(i).getSets());
@@ -351,35 +354,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
-                                    for (int i=0; i<cyclesList.size(); i++) {
-                                        Log.i("idError", "all IDs are " + cyclesList.get(i).getId());
-                                    }
                                 });
                         } else {
                                 runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
                             }
                         } else {
                             if (cyclesBOList.size()>0) {
+                                disableSavedPopup = true;
                                 for (int i=0; i<cyclesBOList.size(); i++) {
                                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                                     tempBreaksOnly = cyclesBOList.get(i).getBreaksOnly().split(",");
                                     breaksOnlyCount.add(tempBreaksOnly.length);
                                 }
                                 runOnUiThread(() -> {
-                                    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
+                                    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, true);
                                     savedCycleRecycler.setAdapter(savedCycleAdapter);
                                     savedCycleAdapter.setItemClick(MainActivity.this);
                                     savedCycleAdapter.setDeleteCycle(MainActivity.this);
 
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+                                    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
-                                    savedCycleAdapter.notifyDataSetChanged();
                                 });
+                            } else {
+                                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
                             }
                         }
                         runOnUiThread(() -> cl.setOnClickListener(v2-> {
                             savedCyclePopupWindow.dismiss();
                             disableSavedPopup = false;
+                            Log.i("savedStuff", "array sizes are " + setsArray.size() + " + " + breaksArray.size() + " + " + breaksOnlyArray.size());
                         }));
                     });
                 }
@@ -735,6 +739,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         breaks_only.setOnClickListener(v-> {
+            if (savedCyclePopupWindow!=null) {
+                disableSavedPopup = false;
+                savedCyclePopupWindow.dismiss();
+            }
             if (mode==1) {
                 if (!breaksOnly) {
                     setBegun = true;
@@ -761,7 +769,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        //Todo: After single row deletion, insert is trying to add SAME id as previous addition.
         save_cycles.setOnClickListener(v->{
             Gson gson = new Gson();
             if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
@@ -853,7 +860,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         }
                         if (!duplicate) {
-
                             cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
                             runOnUiThread(() -> {
                                 Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();

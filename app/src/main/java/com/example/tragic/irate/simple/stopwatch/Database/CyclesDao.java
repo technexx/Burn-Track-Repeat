@@ -39,7 +39,7 @@ public interface CyclesDao {
     @Query("SELECT * from CyclesBO")
     List<CyclesBO> loadAllBOCycles();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertBOCycle(CyclesBO cyclesBO);
 
     @Query("DELETE from CyclesBO")

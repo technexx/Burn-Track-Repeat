@@ -125,7 +125,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         public BreaksOnlyHolder(@NonNull View itemView) {
             super(itemView);
             breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
-            breaksOnlyTrash = itemView.findViewById(R.id.delete_cycle);
+            breaksOnlyTrash = itemView.findViewById(R.id.delete_cycle_bo);
             fullView = itemView;
         }
     }
