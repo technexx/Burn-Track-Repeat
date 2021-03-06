@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean disableSavedPopup;
 
     //Todo: Remember that any reference to our GLOBAL version of a cycles position will retain that position unless changed.
-    //Todo: Fix breaksOnly breaks display.
+    //Todo: breaksOnly toggle should switch saved cycle display.
     //Todo: Add sort feature to saves?
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
@@ -278,28 +278,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     @Override
     public void onCycleDelete(int position) {
-        AsyncTask.execute(() -> {
-            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-            Cycles deleteCycle = cyclesList.get(position);
-            cyclesDatabase.cyclesDao().deleteCycle(deleteCycle);
-            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-            runOnUiThread(() -> {
-                setsArray.clear();
-                breaksArray.clear();
-                for (int i=0; i<cyclesList.size(); i++) {
-                    setsArray.add(cyclesList.get(i).getSets());
-                    breaksArray.add(cyclesList.get(i).getBreaks());
-                }
-                savedCycleAdapter.notifyDataSetChanged();
-                Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
-                cl.setOnClickListener(v-> {
-                    savedCyclePopupWindow.dismiss();
-                    disableSavedPopup = false;
-                });
-
+        if (!breaksOnly) {
+            AsyncTask.execute(() -> {
                 cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                Cycles removedCycle = cyclesList.get(position);
+                cyclesDatabase.cyclesDao().deleteCycle(removedCycle);
+                cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+
+                runOnUiThread(() -> {
+                    setsArray.clear();
+                    breaksArray.clear();
+                    for (int i=0; i<cyclesList.size(); i++) {
+                        setsArray.add(cyclesList.get(i).getSets());
+                        breaksArray.add(cyclesList.get(i).getBreaks());
+                    }
+                });
             });
+        } else {
+            cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
+            CyclesBO removedBOCycle = cyclesBOList.get(position);
+            cyclesDatabase.cyclesDao().deleteBOCycle(removedBOCycle);
+            cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
+
+            runOnUiThread(() -> {
+                breaksOnlyArray.clear();
+                for (int i=0; i<cyclesBOList.size(); i++) {
+                    breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+                }
+            });
+        }
+        savedCycleAdapter.notifyDataSetChanged();
+        Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
+        cl.setOnClickListener(v-> {
+            savedCyclePopupWindow.dismiss();
+            disableSavedPopup = false;
         });
+
     }
 
     @Override

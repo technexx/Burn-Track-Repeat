@@ -30,6 +30,9 @@ public interface CyclesDao {
     @Delete
     void deleteCycle(Cycles cycles);
 
+    @Delete
+    void deleteBOCycle(CyclesBO cyclesBO);
+
     @Query("DELETE from Cycles")
     void deleteAll();
 
