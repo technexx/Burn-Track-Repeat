@@ -10,6 +10,8 @@ public class Cycles {
     public int id;
     public String sets;
     public String breaks;
+    public long timeAdded;
+    public int itemCount;
 
     public Cycles() {
     }
@@ -40,5 +42,21 @@ public class Cycles {
 
     public void setBreaks(String breaks) {
         this.breaks = breaks;
+    }
+
+    public long getTimeAdded() {
+        return timeAdded;
+    }
+
+    public void setTimeAdded(long timeAdded) {
+        this.timeAdded = timeAdded;
+    }
+
+    public int getItemCount() {
+        return itemCount;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
     }
 }

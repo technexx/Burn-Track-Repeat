@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView timePaused2;
     TextView timeLeft3;
     TextView timePaused3;
-    TextView secondsLeft;
     TextView msTime;
     TextView msTimePaused;
     CountDownTimer timer;
@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int setStart;
     int maxProgress = 10000;
     int customProgressPause = 10000;
-    int breaksOnlyPause = 10000;
     int pomProgressPause = 10000;
     long pomMillis;
     long pos;
@@ -192,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     PopupWindow cyclePopupWindow;
     PopupWindow resetPopUpWindow;
     PopupWindow savedCyclePopupWindow;
-    PopupWindow deleteAllPopupWindow;
+    PopupWindow sortPopupWindow;
 
     boolean fadeCustomTimer;
     boolean fadePomTimer;
@@ -218,10 +217,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SavedCycleAdapter savedCycleAdapter;
     View savedCyclePopupView;
     View deleteCyclePopupView;
+    View sortCyclePopupView;
 
-    //Todo: Remember that any reference to our GLOBAL version of a cycles position will retain that position unless changed.
-    //Todo: breaksOnly toggle should remove savedCycle popop if pressed while active
-    //Todo: Add sort feature to saves?
+    TextView sortRecent;
+    TextView sortNotRecent;
+    TextView sortHigh;
+    TextView sortLow;
+
+    //Todo: Save sets/breaks array based on sort to be recalled when cycle list is selected
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
@@ -231,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
 
+    //Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
     public void onCycleClick(int position) {
         AsyncTask.execute(() -> {
@@ -308,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
         cl.setOnClickListener(v-> {
             savedCyclePopupWindow.dismiss();
+            save_cycles.setText(R.string.save_cycles);
         });
 
     }
@@ -332,20 +337,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
+                save_cycles.setText(R.string.sort_cycles);
                     AsyncTask.execute(() -> {
                         cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
                         cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
-                        if (setsArray!=null) setsArray.clear();
-                        if (breaksArray!=null) breaksArray.clear();
-                        if (breaksOnlyArray!=null) breaksOnlyArray.clear();
+                        clearArrays(false);
 
-                        String[] tempSets = null;
-                        String[] tempBreaks = null;
-                        String[] tempBreaksOnly = null;
-                        ArrayList<Integer> setCount = new ArrayList<>();
-                        ArrayList<Integer> breakCount = new ArrayList<>();
-                        ArrayList<Integer> breaksOnlyCount = new ArrayList<>();
-                                                if (!breaksOnly) {
+                        if (!breaksOnly) {
                             int columnSize = 0;
                             for (int i=0; i<cyclesList.size(); i++) {
                                 if (cyclesList.get(i).getSets()!=null) columnSize+=1;
@@ -354,12 +352,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 for (int i=0; i<columnSize; i++) {
                                     //getSets/Breaks returns String [xx, xy, xz] etc.
                                     setsArray.add(cyclesList.get(i).getSets());
-                                    breaksArray.add(cyclesList.get(i).getBreaks());
-                                    tempSets = cyclesList.get(i).getSets().split(",");
-                                    tempBreaks = cyclesList.get(i).getBreaks().split(",");
-                                    setCount.add(tempSets.length);
-                                    breakCount.add(tempBreaks.length);
-                                }
+                                    breaksArray.add(cyclesList.get(i).getBreaks()); }
                                 runOnUiThread(() -> {
                                     savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
                                     savedCycleRecycler.setAdapter(savedCycleAdapter);
@@ -377,8 +370,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             if (cyclesBOList.size()>0) {
                                 for (int i=0; i<cyclesBOList.size(); i++) {
                                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-                                    tempBreaksOnly = cyclesBOList.get(i).getBreaksOnly().split(",");
-                                    breaksOnlyCount.add(tempBreaksOnly.length);
                                 }
                                 runOnUiThread(() -> {
                                     savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, true);
@@ -396,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         runOnUiThread(() -> cl.setOnClickListener(v2-> {
                             savedCyclePopupWindow.dismiss();
-                            Log.i("savedStuff", "array sizes are " + setsArray.size() + " + " + breaksArray.size() + " + " + breaksOnlyArray.size());
+                            save_cycles.setText(R.string.save_cycles);
                         }));
                     });
 
@@ -439,12 +430,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
         setsArray = new ArrayList<>();
         breaksArray = new ArrayList<>();
+        breaksOnlyArray = new ArrayList<>();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-
         savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
         deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
+        sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
+        sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
+        sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
+        sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
+        sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
 
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -536,10 +532,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         startBreaksOnlyTime = new ArrayList<>();
         currentLapList = new ArrayList<>();
         savedLapList = new ArrayList<>();
-        setsArray = new ArrayList<>();
-        breaksArray = new ArrayList<>();
-        breaksOnlyArray = new ArrayList<>();
 
+        blank_spinner.setText(R.string.no_sets);
         s3.setText(R.string.set_number);
         spinner3.setVisibility(View.GONE);
         progressBar2.setVisibility(View.GONE);
@@ -752,7 +746,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         breaks_only.setOnClickListener(v-> {
-            if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) {
+            if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
                 savedCyclePopupWindow.dismiss();
                 return;
             }
@@ -783,9 +777,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         save_cycles.setOnClickListener(v->{
-            if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()){
-                savedCyclePopupWindow.dismiss();
-                return;
+            if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()){
+                sortPopupWindow = new PopupWindow(sortCyclePopupView, 325, 375, true);
+                sortPopupWindow.showAtLocation(sortCyclePopupView, Gravity.TOP, 325, 10);
+
+                sortRecent.setOnClickListener(v1 -> {
+                    AsyncTask.execute(() -> {
+                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
+                        clearArrays(true);
+                    });
+                });
+
+                sortNotRecent.setOnClickListener(v2 ->{
+                    AsyncTask.execute(() -> {
+                        cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent();
+                        clearArrays(true);
+                    });
+                });
+
+                sortHigh.setOnClickListener(v3 -> {
+                    AsyncTask.execute(() -> {
+                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+                        clearArrays(true);
+                    });
+                });
+
+                sortLow.setOnClickListener(v4 -> {
+                    AsyncTask.execute(() -> {
+                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+                        clearArrays(true);
+                    });
+                });
+//                savedCyclePopupWindow.dismiss();
+//                return;
             }
             Gson gson = new Gson();
             if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
@@ -823,11 +847,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     convertedBreakList = convertedBreakList.replace(",", " - ");
                     cycles.setSets(convertedSetList);
                     cycles.setBreaks(convertedBreakList);
+                    cycles.setTimeAdded(System.currentTimeMillis());
+                    cycles.setItemCount(startCustomSetTime.size());
 
                     boolean duplicate = false;
                     if (cyclesList.size() >0 && cyclesList.get(0).getSets()!=null) {
-//                        int id = cyclesList.get(cyclesList.size()-1).getId();
-//                        cycles.setId(id+1);
                         for (int i=0; i<cyclesList.size(); i++) {
                             if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
                                 duplicate = true;
@@ -842,10 +866,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                             });
                             cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-                            Log.i("idError", "listID is " + cyclesList.get(cyclesList.size()-1).getId());
-                            for (int i=0; i<cyclesList.size(); i++) {
-                                Log.i("idError", "all IDs are " + cyclesList.get(i).getId());
-                            }
                         }
                     } else {
                         cyclesDatabase.cyclesDao().insertCycle(cycles);
@@ -929,6 +949,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         cl.setOnClickListener(v2-> {
                             cyclePopupWindow.dismiss();
                             cycle_reset.setVisibility(View.VISIBLE);
+                            save_cycles.setText(R.string.save_cycles);
                         });
 
                         confirm_reset.setOnClickListener(v2-> {
@@ -1051,6 +1072,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cl.setOnClickListener(v2-> {
                     resetPopUpWindow.dismiss();
                     reset.setVisibility(View.VISIBLE);
+                    save_cycles.setText(R.string.save_cycles);
                 });
             }
         });
@@ -1711,7 +1733,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 spinner1.setVisibility(View.VISIBLE);
                 spinner2.setVisibility(View.VISIBLE);
                 spinner3.setVisibility(View.GONE);
-
+                if (!breaksOnly) blank_spinner.setVisibility(View.VISIBLE);
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
@@ -1768,6 +1790,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 msTime.setText("0");
         }
         cycle_reset.setLayoutParams(params2);
+    }
+
+    public void clearArrays(boolean populateList) {
+        if (setsArray!=null) setsArray.clear();
+        if (breaksArray!=null) breaksArray.clear();
+        if (breaksOnlyArray!=null) breaksOnlyArray.clear();
+
+        if (populateList) {
+            if (!breaksOnly) {
+                for (int i=0; i<cyclesList.size(); i++) {
+                    setsArray.add(cyclesList.get(i).getSets());
+                    breaksArray.add(cyclesList.get(i).getBreaks());
+                }
+            } else {
+                for (int i=0; i<breaksOnlyArray.size(); i++) {
+                    breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+                }
+            }
+            runOnUiThread(() -> {
+                savedCycleAdapter.notifyDataSetChanged();
+            });
+        }
     }
 
     public void resetTimer() {

@@ -3,6 +3,7 @@
     <string name="variable">Variable Mode</string>
     <string name="pomodoro">Pomodoro</string>
 
+    <string name="no_sets">None</string>
     <string name="reset">Reset</string>
     <string name="clear_cycles">Clear Cycles</string>
     <string name="skip_round">Skip Round</string>
@@ -24,6 +25,7 @@
     <string name="lap_number"># %1$s</string>
 
     <string name="save_cycles">Save</string>
+    <string name="sort_cycles">Sort</string>
     <string name="saved_cycle_list">Saved Cycles</string>
 
     <string name="cycle_saved">Cycle saved!</string>
