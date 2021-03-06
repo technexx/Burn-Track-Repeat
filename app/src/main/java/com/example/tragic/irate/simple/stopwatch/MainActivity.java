@@ -218,10 +218,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SavedCycleAdapter savedCycleAdapter;
     View savedCyclePopupView;
     View deleteCyclePopupView;
-    boolean disableSavedPopup;
 
     //Todo: Remember that any reference to our GLOBAL version of a cycles position will retain that position unless changed.
-    //Todo: breaksOnly toggle should switch saved cycle display.
+    //Todo: breaksOnly toggle should remove savedCycle popop if pressed while active
     //Todo: Add sort feature to saves?
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
@@ -235,8 +234,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public void onCycleClick(int position) {
         AsyncTask.execute(() -> {
-            disableSavedPopup = false;
-
             if (!breaksOnly) {
                 cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
                 String tempSets = cyclesList.get(position).getSets();
@@ -311,7 +308,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
         cl.setOnClickListener(v-> {
             savedCyclePopupWindow.dismiss();
-            disableSavedPopup = false;
         });
 
     }
@@ -323,12 +319,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return true;
     }
 
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (savedCyclePopupWindow != null && savedCyclePopupWindow.isShowing()) savedCyclePopupWindow.dismiss();
+        return true;
+    }
+
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
+
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
-                if (!disableSavedPopup) {
                     AsyncTask.execute(() -> {
                         cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
                         cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
@@ -342,14 +345,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         ArrayList<Integer> setCount = new ArrayList<>();
                         ArrayList<Integer> breakCount = new ArrayList<>();
                         ArrayList<Integer> breaksOnlyCount = new ArrayList<>();
-
-                        if (!breaksOnly) {
+                                                if (!breaksOnly) {
                             int columnSize = 0;
                             for (int i=0; i<cyclesList.size(); i++) {
                                 if (cyclesList.get(i).getSets()!=null) columnSize+=1;
                             }
                             if (cyclesList.size()>0 && cyclesList.get(0).getSets()!=null) {
-                                disableSavedPopup = true;
                                 for (int i=0; i<columnSize; i++) {
                                     //getSets/Breaks returns String [xx, xy, xz] etc.
                                     setsArray.add(cyclesList.get(i).getSets());
@@ -374,7 +375,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         } else {
                             if (cyclesBOList.size()>0) {
-                                disableSavedPopup = true;
                                 for (int i=0; i<cyclesBOList.size(); i++) {
                                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                                     tempBreaksOnly = cyclesBOList.get(i).getBreaksOnly().split(",");
@@ -396,11 +396,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         runOnUiThread(() -> cl.setOnClickListener(v2-> {
                             savedCyclePopupWindow.dismiss();
-                            disableSavedPopup = false;
                             Log.i("savedStuff", "array sizes are " + setsArray.size() + " + " + breaksArray.size() + " + " + breaksOnlyArray.size());
                         }));
                     });
-                }
+
                 break;
 
             case R.id.delete_all_cycles:
@@ -753,9 +752,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         breaks_only.setOnClickListener(v-> {
-            if (savedCyclePopupWindow!=null) {
-                disableSavedPopup = false;
+            if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) {
                 savedCyclePopupWindow.dismiss();
+                return;
             }
             if (mode==1) {
                 if (!breaksOnly) {
@@ -784,6 +783,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         save_cycles.setOnClickListener(v->{
+            if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()){
+                savedCyclePopupWindow.dismiss();
+                return;
+            }
             Gson gson = new Gson();
             if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
                 Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
