@@ -165,25 +165,27 @@
         android:id="@+id/new_lap"
         android:textColor="@color/white"
         android:layout_width="70dp"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/progressBar"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="380dp"
+        android:layout_marginTop="350dp"
         android:layout_marginStart="33dp"
-        android:textSize="14sp">
+        android:textSize="14sp"
+        android:gravity="center">
     </TextView>
 
     <TextView
         android:id="@+id/cycle_reset"
         android:layout_width="50dp"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/progressBar"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="380dp"
+        android:layout_marginTop="350dp"
         android:layout_marginEnd="12dp"
-        android:textSize="14sp">
+        android:textSize="14sp"
+        android:gravity="center">
     </TextView>
 
     <TextView

@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayAdapter<Long> pomAdapter1;
     ArrayAdapter<Long> pomAdapter2;
     ArrayAdapter<Long> pomAdapter3;
-    ArrayAdapter<String> dotSpinAdapter;
 
     List<Integer> modeOneSpins;
     List<Integer> modeOneBreakOnlySpins;
@@ -148,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int savedMsConvert;
     ArrayList<String> currentLapList;
     ArrayList<String> savedLapList;
+    Runnable stopWatchRunnable;
 
     int customCyclesDone;
     int breaksOnlyCyclesDone;
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView sortHigh;
     TextView sortLow;
 
-    //Todo: Save sets/breaks array based on sort to be recalled when cycle list is selected
+    //Todo: Auto scroll to latest entry in newLap.
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
@@ -294,7 +294,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breaksArray.add(cyclesList.get(i).getBreaks());
                     }
                     savedCycleAdapter.notifyDataSetChanged();
-                    if (setsArray.size()==0) savedCyclePopupWindow.dismiss();
+                    if (setsArray.size()==0) {
+                        savedCyclePopupWindow.dismiss();
+                        save_cycles.setText(R.string.save_cycles);
+                    }
                 });
             });
         } else {
@@ -309,7 +312,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                 }
                 savedCycleAdapter.notifyDataSetChanged();
-                if (breaksOnlyArray.size()==0) savedCyclePopupWindow.dismiss();
+                if (breaksOnlyArray.size()==0) {
+                    savedCyclePopupWindow.dismiss();
+                    save_cycles.setText(R.string.save_cycles);
+                }
             });
         }
         Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
@@ -1080,7 +1086,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 DecimalFormat df = new DecimalFormat("0");
                 DecimalFormat df2 = new DecimalFormat("00");
                 if (stopwatchHalted) {
-                    final Runnable r = new Runnable() {
+                    stopWatchRunnable = new Runnable() {
                         @Override
                         public void run() {
                             //ms can never be more than 60/sec due to refresh rate.
@@ -1110,9 +1116,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             handler.postDelayed(this, 10);
                         }
                     };
-                    handler.post(r);
+                    handler.post(stopWatchRunnable);
                     stopwatchHalted = false;
                     reset.setVisibility(View.INVISIBLE);
+
                 } else {
                     handler.removeCallbacksAndMessages(null);
                     stopwatchHalted = true;
@@ -1132,34 +1139,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             String newEntries = "";
             String savedEntries = "";
             String[] holder = null;
-            if (savedLapList.size()>0) {
-                holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
-                savedMinutes = newMinutes + Integer.parseInt(holder[0]);
-                savedSeconds = newSeconds + Integer.parseInt(holder[1]);
-                savedMs = newMsConvert + Integer.parseInt(holder[2]);
+            //Todo: newLap should only trigger when timer is active.
+            if (!stopwatchHalted) {
+                if (savedLapList.size()>0) {
+                    holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
+                    savedMinutes = newMinutes + Integer.parseInt(holder[0]);
+                    savedSeconds = newSeconds + Integer.parseInt(holder[1]);
+                    savedMs = newMsConvert + Integer.parseInt(holder[2]);
 
-                if (savedMs>99) {
-                    savedMs = savedMs-100;
-                    savedSeconds +=1;
+                    if (savedMs>99) {
+                        savedMs = savedMs-100;
+                        savedSeconds +=1;
+                    }
+                    if (savedSeconds>99){
+                        savedSeconds = savedSeconds-100;
+                        savedMinutes +=1;
+                    }
+                    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
+                } else {
+                    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
                 }
-                if (savedSeconds>99){
-                    savedSeconds = savedSeconds-100;
-                    savedMinutes +=1;
-                }
-                savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
-            } else {
-                savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+
+                newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
+
+                currentLapList.add(newEntries);
+                savedLapList.add(savedEntries);
+                lapAdapter.notifyDataSetChanged();
+
+                msReset = 0;
+                msConvert2 = 0;
             }
-
-            newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
-
-            currentLapList.add(newEntries);
-            savedLapList.add(savedEntries);
-
-            lapAdapter.notifyDataSetChanged();
-
-            msReset = 0;
-            msConvert2 = 0;
         });
     }
 
