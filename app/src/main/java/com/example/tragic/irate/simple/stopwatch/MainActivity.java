@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ObjectAnimator fadeOutObj;
     RecyclerView lapRecycler;
     LapAdapter lapAdapter;
+    LinearLayoutManager lapLayout;
 
     CyclesDatabase cyclesDatabase;
     List<Cycles> cyclesList;
@@ -580,10 +581,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             startBreaksOnlyTime.add(spinList2.get(8) * 1000);
         }
 
-        LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
+        lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
         lapRecycler.setAdapter(lapAdapter);
-        lapRecycler.setLayoutManager(lm);
+        lapRecycler.setLayoutManager(lapLayout);
+
 
         spinAdapter1 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString1);
         spinAdapter2 = new ArrayAdapter<>(getApplicationContext(), R.layout.spinner, spinListString2);
@@ -1164,6 +1166,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 currentLapList.add(newEntries);
                 savedLapList.add(savedEntries);
+                lapLayout.scrollToPosition(savedLapList.size()-1);
                 lapAdapter.notifyDataSetChanged();
 
                 msReset = 0;
