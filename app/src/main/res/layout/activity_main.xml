@@ -152,13 +152,14 @@
         android:id="@+id/skip"
         android:textColor="@color/white"
         android:layout_width="50dp"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/progressBar"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="380dp"
-        android:layout_marginStart="30dp"
-        android:textSize="14sp">
+        android:layout_marginTop="350dp"
+        android:layout_marginStart="25dp"
+        android:textSize="14sp"
+        android:gravity="center_vertical">
     </TextView>
 
     <TextView
@@ -172,7 +173,7 @@
         android:layout_marginTop="350dp"
         android:layout_marginStart="33dp"
         android:textSize="14sp"
-        android:gravity="center">
+        android:gravity="center_vertical">
     </TextView>
 
     <TextView
@@ -185,7 +186,7 @@
         android:layout_marginTop="350dp"
         android:layout_marginEnd="12dp"
         android:textSize="14sp"
-        android:gravity="center">
+        android:gravity="center_vertical">
     </TextView>
 
     <TextView
