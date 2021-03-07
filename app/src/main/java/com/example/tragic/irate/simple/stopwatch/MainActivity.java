@@ -293,6 +293,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         setsArray.add(cyclesList.get(i).getSets());
                         breaksArray.add(cyclesList.get(i).getBreaks());
                     }
+                    savedCycleAdapter.notifyDataSetChanged();
+                    if (setsArray.size()==0) savedCyclePopupWindow.dismiss();
                 });
             });
         } else {
@@ -306,9 +308,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 for (int i=0; i<cyclesBOList.size(); i++) {
                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                 }
+                savedCycleAdapter.notifyDataSetChanged();
+                if (breaksOnlyArray.size()==0) savedCyclePopupWindow.dismiss();
             });
         }
-        savedCycleAdapter.notifyDataSetChanged();
         Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
         cl.setOnClickListener(v-> {
             savedCyclePopupWindow.dismiss();
@@ -354,10 +357,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     setsArray.add(cyclesList.get(i).getSets());
                                     breaksArray.add(cyclesList.get(i).getBreaks()); }
                                 runOnUiThread(() -> {
-                                    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
-                                    savedCycleRecycler.setAdapter(savedCycleAdapter);
-                                    savedCycleAdapter.setItemClick(MainActivity.this);
-                                    savedCycleAdapter.setDeleteCycle(MainActivity.this);
+                                    savedCycleAdapter.notifyDataSetChanged();
 
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -372,10 +372,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                                 }
                                 runOnUiThread(() -> {
-                                    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, true);
-                                    savedCycleRecycler.setAdapter(savedCycleAdapter);
-                                    savedCycleAdapter.setItemClick(MainActivity.this);
-                                    savedCycleAdapter.setDeleteCycle(MainActivity.this);
+                                    savedCycleAdapter.notifyDataSetChanged();
 
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -444,10 +441,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
+
         savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, false);
         savedCycleRecycler.setAdapter(savedCycleAdapter);
         savedCycleRecycler.setLayoutManager(lm2);
-
         savedCycleAdapter.setItemClick(MainActivity.this);
         savedCycleAdapter.setDeleteCycle(MainActivity.this);
 
@@ -1733,7 +1730,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 spinner1.setVisibility(View.VISIBLE);
                 spinner2.setVisibility(View.VISIBLE);
                 spinner3.setVisibility(View.GONE);
-                if (!breaksOnly) blank_spinner.setVisibility(View.VISIBLE);
+                if (breaksOnly) blank_spinner.setVisibility(View.VISIBLE);
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
