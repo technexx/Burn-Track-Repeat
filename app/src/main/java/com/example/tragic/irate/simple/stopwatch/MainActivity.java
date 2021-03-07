@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView sortHigh;
     TextView sortLow;
 
-    //Todo: Auto scroll to latest entry in newLap.
+    //Todo; Fix Pom reset.
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
@@ -945,7 +945,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         View view = inflater2.inflate(R.layout.pom_reset_popup, null);
                         cyclePopupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
-                        cyclePopupWindow.showAtLocation(view, Gravity.CENTER, 400, 475);
+                        cyclePopupWindow.showAtLocation(view, Gravity.CENTER, 400, 465);
 
                         TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
                         confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -1577,6 +1577,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         if (spinList.size() != 0) {
             if (isPom) {
+                spinner1.setSelection(spinList.get(0));
+                spinner2.setSelection(spinList.get(1));
                 spinner3.setSelection(spinList.get(2));
             } else {
                 if (!breaksOnly) {
@@ -1586,9 +1588,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     spinner2.setSelection(spinList.get(0));
                 }
             }
+//            pomAdapter1.notifyDataSetChanged();
+//            pomAdapter2.notifyDataSetChanged();
+//            pomAdapter3.notifyDataSetChanged();
         }
-        Log.i("retrieveSpins", "list is " + spinList);
-
     }
 
     public void switchTimer(int mode, boolean halted) {
@@ -1906,9 +1909,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 pomMillis = pomMillis1;
                 timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
                 timePaused2.setText(convertSeconds((pomMillis+999)/1000));
+                timePaused2.setAlpha(1);
                 onBreak = false;
                 pomHalted = true;
                 pomProgressPause = maxProgress;
+                dotDraws.pomDraw(1, 0);
                 break;
             case 3:
                 stopwatchHalted = true;
