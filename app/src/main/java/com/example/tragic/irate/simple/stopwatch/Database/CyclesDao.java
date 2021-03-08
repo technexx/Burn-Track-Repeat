@@ -33,6 +33,18 @@ public interface CyclesDao {
     @Query("SELECT * from CYCLES ORDER by itemCount ASC")
     List<Cycles> loadCyclesLeastItems();
 
+    @Query("SELECT * from CYCLESBO ORDER by timeAdded DESC")
+    List<CyclesBO> loadCyclesMostRecentBO();
+
+    @Query("SELECT * from CYCLESBO ORDER by timeAdded ASC")
+    List<CyclesBO> loadCycleLeastRecentBO();
+
+    @Query("SELECT * from CYCLESBO ORDER by itemCount DESC")
+    List<CyclesBO> loadCyclesMostItemsBO();
+
+    @Query("SELECT * from CYCLESBO ORDER by itemCount ASC")
+    List<CyclesBO> loadCyclesLeastItemsBO();
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCycle(Cycles cycles);
 

@@ -43,11 +43,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.mOnDeleteCycleListener = xOnDeleteCycleListener;
     }
 
-    public SavedCycleAdapter() {
+    public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList) {
+        this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList;
     }
 
-    public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, boolean breaksOnly) {
-        this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mBreaksOnly = breaksOnly;
+    public void setBreaksOnly(boolean breaksOnly){
+        mBreaksOnly = breaksOnly;
     }
 
     @NonNull
@@ -155,8 +156,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             newLong = new ArrayList<>();
             newString = new ArrayList<>();
         }
-
-        Log.i("tester", "list conv is " + listConv + " and newSplit is " + Arrays.toString(newSplit) + " and newLong is " + newLong + " and newString is " + newString );
         return finalList;
     }
 

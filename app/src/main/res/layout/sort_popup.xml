@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/Gray">
 
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:textSize="16sp">
     </TextView>
@@ -24,8 +24,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_most_recent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
         android:textSize="16sp">
     </TextView>
 
@@ -36,8 +36,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_least_recent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
         android:textSize="16sp">
     </TextView>
 
@@ -48,9 +48,20 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_number_high"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
         android:textSize="16sp">
     </TextView>
+
+    <ImageView
+        android:id="@+id/sortCheckmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/sort_most_recent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="14dp"
+        android:src="@drawable/check_16">
+    </ImageView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
