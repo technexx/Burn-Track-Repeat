@@ -147,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     double msReset;
     String newMs;
     String savedMs;
+    String displayMs = "00";
+    String displayTime = "0";
     int newMsConvert;
     int savedMsConvert;
     ArrayList<String> currentLapList;
@@ -233,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int sortModeBO = 1;
 
     //Todo: Retain Sort type and expand view click radius on Sort.
+    //Todo: Overlap of Pom view when switching quickly to stopwatch.
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Add taskbar notification for timers.
@@ -674,6 +677,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (cyclePopupWindow!=null) cyclePopupWindow.dismiss();
                         if (resetPopUpWindow!=null) resetPopUpWindow.dismiss();
                         break;
+                    case 2:
+                        if (stopwatchHalted) {
+                            fadeOutText(timePaused3);
+//                            fadeOutText(msTimePaused);
+                        } else {
+                            fadeOutText(timeLeft3);
+//                            fadeOutText(msTime);
+                        }
                 }
             }
 
@@ -1124,8 +1135,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             savedMsConvert = Integer.parseInt(savedMs);
 
                             //Conversion to long solves +30 ms delay for display.
-                            String displayMs = df2.format((msDisplay/60) * 100);
-                            String displayTime = convertStopwatch((long) seconds);
+                            displayMs = df2.format((msDisplay/60) * 100);
+                            displayTime = convertStopwatch((long) seconds);
 
                             timeLeft3.setText(displayTime);
                             msTime.setText(displayMs);
@@ -1684,9 +1695,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
             case 3:
+                //Same animation instance can't be used simultaneously for both TextViews.
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsDone)));
                 dotDraws.setMode(3);
                 dotDraws.pomDraw(pomDotCounter, 1);
+                fadeTextIn(timePaused3);
+//                fadeTextIn(msTimePaused);
         }
         dotDraws.retrieveAlpha();
     }
@@ -1838,10 +1852,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 newLap.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
                 params2.width = 200;
-                timeLeft3.setAlpha(1);
                 msTime.setAlpha(1);
-                timeLeft3.setText("0");
-                msTime.setText("0");
+                msTimePaused.setAlpha(1);
+                timeLeft3.setText(displayTime);
+                msTime.setText(displayMs);
+                timePaused3.setText(displayTime);
+                msTimePaused.setText(displayMs);
         }
         cycle_reset.setLayoutParams(params2);
     }
