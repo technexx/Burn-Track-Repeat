@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DotDraws dotDraws;
     int fadeDone;
     int mode=1;
+    ValueAnimator sizeAnimator;
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
 
@@ -225,9 +226,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView sortHigh;
     TextView sortLow;
 
-    //Todo; Fix Pom reset.
     //Todo: Add fade in/out to breaksOnly.
     //Todo: Reduce font for larger timer numbers in Custom mode.
+    //Todo: Add checkmark to current sort value. Try to replicate save/sort text error.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
@@ -275,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 savedCyclePopupWindow.dismiss();
             });
         });
-
     }
 
     @Override
@@ -432,6 +432,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
         });
+
+        valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
+        valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
+        valueAnimatorDown.setDuration(1000);
+        valueAnimatorUp.setDuration(1000);
+
         setsArray = new ArrayList<>();
         breaksArray = new ArrayList<>();
         breaksOnlyArray = new ArrayList<>();
@@ -612,11 +618,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         modeTwoSpins.add(0, 2);
         modeTwoSpins.add(1, 2);
         modeTwoSpins.add(2, 2);
-
-        valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
-        valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
-        valueAnimatorDown.setDuration(1000);
-        valueAnimatorUp.setDuration(1000);
 
         //Custom defaults
         mode = 1;
@@ -997,7 +998,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 onBreak = false;
                                 oldCycle = customCyclesDone;
                             }
-                            if (customSetTime.size() >0) timePaused.setText(convertSeconds((customSetTime.get(customSetTime.size()-1)+999)/1000));
+                            if (customSetTime.size() >0) setNewText(timePaused, (customSetTime.get(customSetTime.size()-1)+999)/1000);;
                         } else {
                             if (breaksOnlyTime.size() >0) {
                                 breaksOnlyTime.remove(breaksOnlyTime.size()-1);
@@ -1006,8 +1007,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 breakBegun = false;
                             }
                             if (breaksOnlyTime.size() >0) {
-                                timeLeft.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
-                                timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size()-1)+999)/1000));
+                                setNewText(timeLeft, (breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000);
+                                setNewText(timePaused, (breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000);
                             }
                         }
                     }
@@ -1229,7 +1230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (mode) {
             case 1:
                 setBegun = true;
-                timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+                setNewText(timeLeft,(setMillis + 999)/1000);
                 timer = new CountDownTimer(setMillis, 50) {
                     @Override
                     public void onTick(long millisUntilFinished) {
@@ -1243,7 +1244,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (customAlpha >=1) fadeCustomTimer = false;
 
-                        timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+                        setNewText(timeLeft, (setMillis + 999)/1000);
                         if (drawing) {
                             dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
                         }
@@ -1293,7 +1294,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (pomAlpha >=1) fadePomTimer = false;
 
-                        timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
+                        setNewText(timeLeft2, ((pomMillis + 999)/1000));
                         if (!drawing) {
                             dotDraws.pomDraw(pomDotCounter, 1);
                         }
@@ -1347,7 +1348,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 if (customAlpha >=1) fadeCustomTimer = false;
 
-                timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
+                setNewText(timeLeft, (millisUntilFinished +999) / 1000);
                 if (drawing) {
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 2);
                 }
@@ -1417,7 +1418,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }.start();
     }
 
-    public String convertSeconds(long totalSeconds) {
+    private String convertSeconds(long totalSeconds) {
         DecimalFormat df = new DecimalFormat("00");
         long minutes;
         long remainingSeconds;
@@ -1426,8 +1427,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             minutes = totalSeconds/60;
             remainingSeconds = totalSeconds % 60;
             return (minutes + ":" + df.format(remainingSeconds));
-        } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
-        else return "5";
+        } else {
+            if (totalSeconds != 5) return String.valueOf(totalSeconds);
+            else return "5";
+        }
     }
 
     public String convertStopwatch(long seconds) {
@@ -1494,14 +1497,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (!breaksOnly) {
             if (customSetTime.size()>0) {
-                timePaused.setText(convertSeconds((customSetTime.get(customSetTime.size() - 1) +999) / 1000));
+                setNewText(timePaused, (customSetTime.get(customSetTime.size() - 1) +999) / 1000);
             } else {
                 timePaused.setText("?");
             }
         } else {
             if (breaksOnlyTime.size()>0) {
-                timeLeft.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
-                timePaused.setText(convertSeconds((breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000));
+                setNewText(timePaused, (breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000);
             } else {
                 timePaused.setText("?");
             }
@@ -1520,12 +1522,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void changeTextSize(ValueAnimator va, TextView textView, TextView textViewPaused) {
-        va.addUpdateListener(animation -> {
-            float sizeChange = (float) va.getAnimatedValue();
-            textView.setTextSize(sizeChange);
-            textViewPaused.setTextSize(sizeChange);
+        sizeAnimator = va;
+        sizeAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float sizeChange = (float) va.getAnimatedValue();
+                textView.setTextSize(sizeChange);
+                textViewPaused.setTextSize(sizeChange);
+            }
         });
-        va.start();
+        sizeAnimator.setRepeatCount(0);
+        sizeAnimator.start();
     }
 
     public void fadeTextIn(TextView textView) {
@@ -1588,9 +1595,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     spinner2.setSelection(spinList.get(0));
                 }
             }
-//            pomAdapter1.notifyDataSetChanged();
-//            pomAdapter2.notifyDataSetChanged();
-//            pomAdapter3.notifyDataSetChanged();
         }
     }
 
@@ -1613,9 +1617,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                 if (halted) {
                     if (!breaksOnly) {
-                        timePaused.setText(convertSeconds((setMillis + 999)/1000));
+                        setNewText(timePaused, (setMillis + 999)/1000);
                     } else {
-                        timePaused.setText(convertSeconds((breakMillis + 999)/1000));
+                        setNewText(timePaused, (breakMillis + 999)/1000);
                     }
                     fadeTextIn(timePaused);
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
@@ -1632,7 +1636,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
-                    timePaused2.setText(convertSeconds((pomMillis + 999)/1000));
+                    setNewText(timePaused2, (pomMillis + 999)/1000);
                     fadeTextIn(timePaused2);
                     dotDraws.pomDraw(pomDotCounter, 1);
                 } else {
@@ -1841,26 +1845,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 breakBegun = false;
                 customHalted = true;
                 if (!breaksOnly) onBreak = false; else onBreak =true;
-
                 if (timer != null) timer.cancel();
                 if (objectAnimator != null) objectAnimator.cancel();
 
                 if (startCustomSetTime.size()>0) {
                     setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
-                    timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                    timePaused.setText(convertSeconds((setMillis+999)/1000));
+                    setNewText(timePaused, (setMillis+999)/1000);
+                    setNewText(timeLeft, (setMillis+999)/1000);
                 }
                 if (!breaksOnly) {
                     if (startCustomBreakTime.size()>0) {
                         breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
-                        timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                        timePaused.setText(convertSeconds((setMillis+999)/1000));
+                        setNewText(timePaused, (setMillis+999)/1000);
+                        setNewText(timeLeft, (setMillis+999)/1000);
                     }
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breakMillis = startBreaksOnlyTime.get(startBreaksOnlyTime.size()-1);
-                        timeLeft.setText(convertSeconds((breakMillis+999)/1000));
-                        timePaused.setText(convertSeconds((breakMillis+999)/1000));
+                        setNewText(timePaused, (breakMillis+999)/1000);
+                        setNewText(timeLeft, (breakMillis+999)/1000);
                     }
                 }
                 numberOfSets = startCustomSetTime.size();
@@ -1907,8 +1910,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
                 pomMillis = pomMillis1;
-                timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
-                timePaused2.setText(convertSeconds((pomMillis+999)/1000));
+                setNewText(timeLeft2, (pomMillis + 999)/1000);
+                setNewText(timePaused2, (pomMillis + 999)/1000);
                 timePaused2.setAlpha(1);
                 onBreak = false;
                 pomHalted = true;
@@ -1933,5 +1936,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 lapAdapter.notifyDataSetChanged();
                 break;
         }
+    }
+
+    //Todo: Can't convert long w/ String colons.
+    public void setNewText(TextView textView, long newTime) {
+        String oldText = (String) textView.getText();
+//        String newText = convertSeconds(time);
+        if (!oldText.equals("")) {
+            oldText = oldText.replace(":", "");
+            long oldTime = Long.parseLong(oldText);
+            if (oldTime<60 && newTime>=60) {
+                switch (mode) {
+                    case 1:
+                        changeTextSize(valueAnimatorDown, timeLeft, timePaused); break;
+                    case 2:
+                        changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
+                }
+                textView.setText(convertSeconds(newTime));
+            } else if (oldTime>=60 && newTime<60) {
+                switch (mode) {
+                    case 1:
+                        changeTextSize(valueAnimatorUp, timeLeft, timePaused); break;
+                    case 2:
+                        changeTextSize(valueAnimatorUp, timeLeft2, timePaused2);
+                }
+            }
+        }
+        textView.setText(convertSeconds(newTime));
     }
 }

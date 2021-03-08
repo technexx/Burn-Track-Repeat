@@ -90,10 +90,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    public void updateBreaksOnlyCycles() {
-
-    }
-
     @Override
     public int getItemCount() {
         if (!mBreaksOnly && mSetsList.size() > 0) return mSetsList.size();
