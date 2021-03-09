@@ -202,8 +202,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     boolean fadeCustomTimer;
     boolean fadePomTimer;
+    boolean fadeStopwatchTimer;
     float customAlpha;
     float pomAlpha;
+    float stopwatchAlpha;
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
     RecyclerView lapRecycler;
@@ -1110,9 +1112,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DecimalFormat df = new DecimalFormat("0");
                 DecimalFormat df2 = new DecimalFormat("00");
                 if (stopwatchHalted) {
+                    //Todo: fadeTextIn under switchTimer will overwrite alpha value of timePaused3 if we click before animation is done.
+                    timeLeft3.setAlpha(1);
+                    timePaused3.setAlpha(0);
+                    msTime.setAlpha(1);
+                    msTimePaused.setAlpha(0);
                     stopWatchRunnable = new Runnable() {
                         @Override
                         public void run() {
@@ -1148,6 +1154,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     reset.setVisibility(View.INVISIBLE);
 
                 } else {
+                    timeLeft3.setAlpha(0);
+                    timePaused3.setAlpha(1);
+                    msTime.setAlpha(0);
+                    msTimePaused.setAlpha(1);
+                    timePaused3.setText(timeLeft3.getText());
+                    msTimePaused.setText(msTime.getText());
                     handler.removeCallbacksAndMessages(null);
                     stopwatchHalted = true;
                     reset.setVisibility(View.VISIBLE);
@@ -1264,9 +1276,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (fadeCustomTimer) {
                             if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
                             else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
-                            else timeLeft.setAlpha(customAlpha+=.12);
+                            else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.12);
+                            else if (customAlpha>=1) fadeCustomTimer = false;
                         }
-                        if (customAlpha >=1) fadeCustomTimer = false;
 
                         setNewText(timeLeft, (setMillis + 999)/1000);
                         if (drawing) {
@@ -1314,7 +1326,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (fadePomTimer) {
                             if (pomAlpha<0.25) timeLeft2.setAlpha(pomAlpha+=0.04);
                             else if (pomAlpha<0.5) timeLeft2.setAlpha(pomAlpha+=.08);
-                            else timeLeft2.setAlpha(pomAlpha+=.12);
+                            else if (pomAlpha<1) timeLeft2.setAlpha(pomAlpha+=.12);
+                            else if (pomAlpha>=1) fadePomTimer = false;
                         }
                         if (pomAlpha >=1) fadePomTimer = false;
 
@@ -1699,8 +1712,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsDone)));
                 dotDraws.setMode(3);
                 dotDraws.pomDraw(pomDotCounter, 1);
-                fadeTextIn(timePaused3);
-//                fadeTextIn(msTimePaused);
+                if (stopwatchHalted) {
+                    fadeTextIn(timePaused3);
+                } else {
+                    fadeTextIn(timeLeft3);
+                }
         }
         dotDraws.retrieveAlpha();
     }
@@ -1854,9 +1870,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 params2.width = 200;
                 msTime.setAlpha(1);
                 msTimePaused.setAlpha(1);
+
                 timeLeft3.setText(displayTime);
-                msTime.setText(displayMs);
                 timePaused3.setText(displayTime);
+                msTime.setText(displayMs);
                 msTimePaused.setText(displayMs);
         }
         cycle_reset.setLayoutParams(params2);
