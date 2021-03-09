@@ -149,6 +149,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String savedMs;
     String displayMs = "00";
     String displayTime = "0";
+    String newEntries;
+    String savedEntries;
+    String resetEntries;
     int newMsConvert;
     int savedMsConvert;
     ArrayList<String> currentLapList;
@@ -158,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int customCyclesDone;
     int breaksOnlyCyclesDone;
     int pomCyclesDone;
-    int lapsDone;
+    int lapsNumber;
 
     long numberOfSets;
     long numberOfBreaks;
@@ -202,10 +205,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     boolean fadeCustomTimer;
     boolean fadePomTimer;
-    boolean fadeStopwatchTimer;
     float customAlpha;
     float pomAlpha;
-    float stopwatchAlpha;
     ObjectAnimator fadeInObj;
     ObjectAnimator fadeOutObj;
     RecyclerView lapRecycler;
@@ -236,10 +237,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int sortMode = 1;
     int sortModeBO = 1;
 
-    //Todo: Retain Sort type and expand view click radius on Sort.
-    //Todo: Overlap of Pom view when switching quickly to stopwatch.
-    //Todo: Add fade in/out to breaksOnly.
+    //Todo: stopwatch pauseText still lingers w/ fast switch from other tabs.
+    //Todo: textSize on stopwatch.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
+    //Todo: Top of interior of progressBar does not respond to click - may have to set click to textView.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
     //Todo: All DB calls in aSync.
@@ -417,6 +418,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -662,6 +664,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 2:
                         mode=3;
                         switchTimer(3, stopwatchHalted);
+                        lapRecycler.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -687,6 +690,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             fadeOutText(timeLeft3);
 //                            fadeOutText(msTime);
                         }
+                        lapRecycler.setVisibility(View.GONE);
                 }
             }
 
@@ -966,7 +970,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 1:if (!breaksOnly) customCyclesDone = 0; else breaksOnlyCyclesDone = 0; break;
                 case 2:
                     if (pomCyclesDone >=0) {
-
                         cycle_reset.setVisibility(View.GONE);
                         LayoutInflater inflater2 = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -991,6 +994,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             cyclePopupWindow.dismiss();;
                         });
                     }
+                    break;
+                case 3:
+                    resetEntries = newEntries;
+                    currentLapList.clear();
+                    savedLapList.clear();
+                    lapAdapter.notifyDataSetChanged();
+                    lapsNumber = 0;
+                    msReset = 0;
+
+                    cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
             }
         });
 
@@ -1109,6 +1122,52 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
+        newLap.setOnClickListener(v -> {
+            double newSeconds = msReset/60;
+            double newMinutes = newSeconds/60;
+
+            double savedMinutes = 0;
+            double savedSeconds = 0;
+            double savedMs = 0;
+
+//            String newEntries = "";
+//            String savedEntries = "";
+            String[] holder = null;
+            if (!stopwatchHalted) {
+                if (savedLapList.size()>0) {
+                    holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
+                    savedMinutes = newMinutes + Integer.parseInt(holder[0]);
+                    savedSeconds = newSeconds + Integer.parseInt(holder[1]);
+                    savedMs = newMsConvert + Integer.parseInt(holder[2]);
+
+                    if (savedMs>99) {
+                        savedMs = savedMs-100;
+                        savedSeconds +=1;
+                    }
+                    if (savedSeconds>99){
+                        savedSeconds = savedSeconds-100;
+                        savedMinutes +=1;
+                    }
+                    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
+                } else {
+                    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+                }
+
+                newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
+
+                currentLapList.add(newEntries);
+                savedLapList.add(savedEntries);
+                lapLayout.scrollToPosition(savedLapList.size()-1);
+                lapAdapter.notifyDataSetChanged();
+
+                lapsNumber++;
+                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
+
+                msReset = 0;
+                msConvert2 = 0;
+            }
+        });
+
         stopWatchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1164,50 +1223,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     stopwatchHalted = true;
                     reset.setVisibility(View.VISIBLE);
                 }
-            }
-        });
-
-        newLap.setOnClickListener(v -> {
-            double newSeconds = msReset/60;
-            double newMinutes = newSeconds/60;
-
-            double savedMinutes = 0;
-            double savedSeconds = 0;
-            double savedMs = 0;
-
-            String newEntries = "";
-            String savedEntries = "";
-            String[] holder = null;
-            //Todo: newLap should only trigger when timer is active.
-            if (!stopwatchHalted) {
-                if (savedLapList.size()>0) {
-                    holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
-                    savedMinutes = newMinutes + Integer.parseInt(holder[0]);
-                    savedSeconds = newSeconds + Integer.parseInt(holder[1]);
-                    savedMs = newMsConvert + Integer.parseInt(holder[2]);
-
-                    if (savedMs>99) {
-                        savedMs = savedMs-100;
-                        savedSeconds +=1;
-                    }
-                    if (savedSeconds>99){
-                        savedSeconds = savedSeconds-100;
-                        savedMinutes +=1;
-                    }
-                    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
-                } else {
-                    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
-                }
-
-                newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
-
-                currentLapList.add(newEntries);
-                savedLapList.add(savedEntries);
-                lapLayout.scrollToPosition(savedLapList.size()-1);
-                lapAdapter.notifyDataSetChanged();
-
-                msReset = 0;
-                msConvert2 = 0;
             }
         });
     }
@@ -1600,14 +1615,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void fadeTextIn(TextView textView) {
         if (fadeInObj!=null) fadeInObj.cancel();
         fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
-        fadeInObj.setDuration(1500);
+        fadeInObj.setDuration(1000);
         fadeInObj.start();
     }
 
     public void fadeOutText(TextView textView) {
         if (fadeOutObj!=null) fadeOutObj.cancel();
         fadeOutObj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
-        fadeOutObj.setDuration(1000);
+        fadeOutObj.setDuration(750);
         fadeOutObj.start();
     }
 
@@ -1709,7 +1724,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 3:
                 //Same animation instance can't be used simultaneously for both TextViews.
-                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsDone)));
+                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
                 dotDraws.setMode(3);
                 dotDraws.pomDraw(pomDotCounter, 1);
                 if (stopwatchHalted) {
@@ -2024,10 +2039,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 msReset = 0;
                 seconds = 0;
                 minutes = 0;
+                lapsNumber = 0;
                 timeLeft3.setAlpha(1);
                 msTime.setAlpha(1);
                 timeLeft3.setText("0");
                 msTime.setText("00");
+                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
                 if (currentLapList.size()>0) currentLapList.clear();
                 if (savedLapList.size()>0) savedLapList.clear();
                 lapAdapter.notifyDataSetChanged();

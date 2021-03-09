@@ -35,9 +35,9 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
-        holder.lapNumber.setText("# " + (position+1));
         holder.currentLap.setText(mCurrentLap.get(position));
         holder.savedLapTime.setText(mSavedLap.get(position));
+        holder.lapNumber.setText("# " + (position+1));
     }
 
     @Override
