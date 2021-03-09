@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean customHalted = true;
     boolean pomHalted = true;
     boolean stopwatchHalted = true;
+    float lastTextSize;
 
     DotDraws dotDraws;
     int fadeDone;
@@ -237,8 +238,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int sortMode = 1;
     int sortModeBO = 1;
 
-    //Todo: stopwatch pauseText still lingers w/ fast switch from other tabs.
-    //Todo: textSize on stopwatch.
+    //Todo: textSize conditional changes for all 3 modes. Right now it only compares the SAME textView value, i.e. the one being changed within the mode. We need to compare each mode's size to the one being switched to.
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Top of interior of progressBar does not respond to click - may have to set click to textView.
     //Todo: Add taskbar notification for timers.
@@ -1172,8 +1172,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void onClick(View v) {
                 DecimalFormat df2 = new DecimalFormat("00");
+                if (fadeInObj!=null) fadeInObj.cancel();
                 if (stopwatchHalted) {
-                    //Todo: fadeTextIn under switchTimer will overwrite alpha value of timePaused3 if we click before animation is done.
                     timeLeft3.setAlpha(1);
                     timePaused3.setAlpha(0);
                     msTime.setAlpha(1);
@@ -1295,7 +1295,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             else if (customAlpha>=1) fadeCustomTimer = false;
                         }
 
-                        setNewText(timeLeft, (setMillis + 999)/1000);
+                        timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+//                        setNewText(timeLeft, (setMillis + 999)/1000);
                         if (drawing) {
                             dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
                         }
@@ -1346,7 +1347,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (pomAlpha >=1) fadePomTimer = false;
 
-                        setNewText(timeLeft2, ((pomMillis + 999)/1000));
+                        timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
+//                        setNewText(timeLeft2, ((pomMillis + 999)/1000));
                         if (!drawing) {
                             dotDraws.pomDraw(pomDotCounter, 1);
                         }
@@ -1400,7 +1402,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 if (customAlpha >=1) fadeCustomTimer = false;
 
-                setNewText(timeLeft, (millisUntilFinished +999) / 1000);
+                timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
+//                setNewText(timeLeft, (millisUntilFinished +999) / 1000);
                 if (drawing) {
                     dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 2);
                 }
@@ -1647,7 +1650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     modeTwoSpins.set(2, spinner3.getSelectedItemPosition());
                 }
         }
-        Log.i("spins", "modeOneSpins are " + modeOneSpins);
     }
 
     public void retrieveSpins(List<Integer> spinList, boolean isPom) {
@@ -1691,7 +1693,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
                 if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
-                changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+//                changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                 if (halted) {
                     if (!breaksOnly) {
                         setNewText(timePaused, (setMillis + 999)/1000);
@@ -1709,7 +1711,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
                 drawing = false;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
-                changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
+//                changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
 
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
