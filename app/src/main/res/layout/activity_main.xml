@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="11dp"
         android:textSize="20sp"
         android:textColor="@color/white"
         />
@@ -41,7 +41,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s1"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15.5dp"
         android:textSize="20sp"
         android:textColor="@color/white"
         />
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s2"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15dp"
         android:layout_marginStart="8dp"
         android:textSize="20sp"
         android:textColor="@color/white"/>
@@ -63,9 +63,99 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15.5dp"
         android:layout_marginStart="228dp"
         android:textSize="20sp">
+    </TextView>
+
+    <ImageButton
+        android:id="@+id/plus_sets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tabLayout"
+        android:layout_marginTop="48dp"
+        android:layout_marginStart="150dp"
+        android:backgroundTint="@color/black"
+        android:background="@drawable/rounded">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/minus_sets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/subtract_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tabLayout"
+        android:layout_marginTop="48dp"
+        android:layout_marginStart="310dp"
+        android:backgroundTint="@color/black"
+        android:background="@drawable/rounded">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/plus_breaks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/plus_sets"
+        android:layout_marginStart="150dp"
+        android:backgroundTint="@color/black"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/minus_breaks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/subtract_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/minus_sets"
+        android:layout_marginStart="310dp"
+        android:backgroundTint="@color/black"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/plus_rounds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/plus_breaks"
+        android:layout_marginStart="150dp"
+        android:backgroundTint="@color/black"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/minus_rounds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/subtract_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/minus_breaks"
+        android:layout_marginStart="310dp"
+        android:backgroundTint="@color/black"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/rounded">
+    </ImageButton>
+
+    <TextView
+        android:id="@+id/round_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/plus_rounds"
+        app:layout_constraintEnd_toStartOf="@id/minus_rounds"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="133dp"
+        android:textSize="22sp"
+        android:textColor="@color/white">
     </TextView>
 
     <Spinner
@@ -103,30 +193,6 @@
         android:backgroundTint="@color/white"
         android:popupBackground="@color/black">
     </Spinner>
-
-    <ImageButton
-        android:id="@+id/plus_sign"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/add_24"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="128dp"
-        android:layout_marginStart="214dp"
-        android:backgroundTint="@color/black">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/minus_sign"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/subtract_24"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="128dp"
-        android:layout_marginStart="272dp"
-        android:backgroundTint="@color/black">
-    </ImageButton>
 
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"

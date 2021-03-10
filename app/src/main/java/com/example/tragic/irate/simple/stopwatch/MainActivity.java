@@ -92,12 +92,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Spinner spinner1;
     Spinner spinner2;
     Spinner spinner3;
-    ImageButton plus_sign;
-    ImageButton minus_sign;
+    ImageView plus_sets;
+    ImageView minus_sets;
+    ImageView plus_breaks;
+    ImageView minus_breaks;
+    ImageButton plus_rounds;
+    ImageButton minus_rounds;
     ImageView sortCheckmark;
-    ImageView check2;
-    ImageView check3;
-    ImageView check4;
+    TextView roundCount;
 
     List<Long> spinList1;
     List<Long> spinList2;
@@ -487,8 +489,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         spinner3 = findViewById(R.id.spin3);
         blank_spinner = findViewById(R.id.blank_spinner1);
         reset = findViewById(R.id.reset);
-        plus_sign = findViewById(R.id.plus_sign);
-        minus_sign = findViewById(R.id.minus_sign);
+        plus_sets = findViewById(R.id.plus_sets);
+        minus_sets = findViewById(R.id.minus_sets);
+        plus_breaks = findViewById(R.id.plus_breaks);
+        minus_breaks = findViewById(R.id.minus_breaks);
+        plus_rounds = findViewById(R.id.plus_rounds);
+        minus_rounds = findViewById(R.id.minus_rounds);
+        roundCount = findViewById(R.id.round_count);
         cycles_completed = findViewById(R.id.cycles_completed);
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
@@ -517,6 +524,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
 //        pauseResumeButton.setBackgroundColor(R.color.prog);
         pauseResumeButton.setRippleColor(null);
+
+        spinner1.setVisibility(View.GONE);
+        spinner2.setVisibility(View.GONE);
+        spinner3.setVisibility(View.GONE);
 
         s1.setText(R.string.set_time);
         s2.setText(R.string.break_time);
@@ -605,6 +616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             breaksOnlyTime.add(spinList2.get(8) * 1000);
             startBreaksOnlyTime.add(spinList2.get(8) * 1000);
         }
+        roundCount.setText(String.valueOf(customSetTime.size()));
 
         lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
@@ -1088,11 +1100,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        plus_sign.setOnClickListener(v -> {
+        plus_rounds.setOnClickListener(v -> {
             adjustCustom(true);
         });
 
-        minus_sign.setOnClickListener(v -> {
+        minus_rounds.setOnClickListener(v -> {
             adjustCustom(false);
         });
 
@@ -1505,6 +1517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timePaused.setText("?");
             }
         }
+        if (!breaksOnly) roundCount.setText(String.valueOf(customSetTime.size())); else roundCount.setText(String.valueOf(breaksOnlyTime.size()));
     }
 
     private void endAnimation() {
@@ -1869,8 +1882,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
-                plus_sign.setVisibility(View.VISIBLE);
-                minus_sign.setVisibility(View.VISIBLE);
+                plus_rounds.setVisibility(View.VISIBLE);
+                minus_rounds.setVisibility(View.VISIBLE);
                 spinner1.setVisibility(View.VISIBLE);
                 spinner2.setVisibility(View.VISIBLE);
                 spinner3.setVisibility(View.GONE);
@@ -1891,8 +1904,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar2.setVisibility(View.VISIBLE);
                 stopWatchView.setVisibility(View.GONE);
 
-                plus_sign.setVisibility(View.GONE);
-                minus_sign.setVisibility(View.GONE);
+                plus_rounds.setVisibility(View.GONE);
+                minus_rounds.setVisibility(View.GONE);
                 spinner1.setVisibility(View.VISIBLE);
                 spinner2.setVisibility(View.VISIBLE);
                 spinner3.setVisibility(View.VISIBLE);
@@ -1912,8 +1925,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.VISIBLE);
-                plus_sign.setVisibility(View.GONE);
-                minus_sign.setVisibility(View.GONE);
+                plus_rounds.setVisibility(View.GONE);
+                minus_rounds.setVisibility(View.GONE);
                 spinner1.setVisibility(View.GONE);
                 spinner2.setVisibility(View.GONE);
                 spinner3.setVisibility(View.GONE);
@@ -1988,7 +2001,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         removeViews();
         //Todo: Separate end animations, especially since adding stopwatch.
         if (endAnimation != null) endAnimation.cancel();
-
         switch (mode) {
             case 1:
                 timePaused.setAlpha(1);
@@ -2044,6 +2056,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     dotDraws.setTime(customSetTime);
                     dotDraws.breakTime(customBreakTime);
+                    roundCount.setText(String.valueOf(customSetTime.size()));
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breaksOnlyTime.addAll(startBreaksOnlyTime);
@@ -2052,6 +2065,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timerDisabled = true;
                     }
                     dotDraws.breakTime(breaksOnlyTime);
+                    roundCount.setText(String.valueOf(breaksOnlyTime.size()));
                 }
                 dotDraws.setAlpha();
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
