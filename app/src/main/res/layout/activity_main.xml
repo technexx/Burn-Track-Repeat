@@ -334,14 +334,14 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pauseResumeButton"
-        android:layout_width="190dp"
-        android:layout_height="205dp"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="18sp"
+        android:layout_marginBottom="14dp"
         app:cornerRadius="90dp"
-        app:strokeWidth="0dp">
+        android:background="@color/black">
     </com.google.android.material.button.MaterialButton>
 
     <androidx.recyclerview.widget.RecyclerView

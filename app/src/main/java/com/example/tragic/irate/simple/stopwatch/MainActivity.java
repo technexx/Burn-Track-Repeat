@@ -512,6 +512,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cl = findViewById(R.id.main_layout);
         pauseResumeButton = findViewById(R.id.pauseResumeButton);
         pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
+//        pauseResumeButton.setBackgroundColor(R.color.prog);
         pauseResumeButton.setRippleColor(null);
 
         s1.setText(R.string.set_time);
