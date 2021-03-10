@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -238,6 +240,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView sortLow;
     int sortMode = 1;
     int sortModeBO = 1;
+    ImageView pauseResumeView;
+    MaterialButton pauseResumeButton;
 
     //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
     //Todo: Top of interior of progressBar does not respond to click - may have to set click to textView.
@@ -508,6 +512,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws = findViewById(R.id.dotdraws);
         lapRecycler = findViewById(R.id.lap_recycler);
         cl = findViewById(R.id.main_layout);
+        pauseResumeButton = findViewById(R.id.pauseResumeButton);
+        pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
+        pauseResumeButton.setRippleColor(null);
 
         s1.setText(R.string.set_time);
         s2.setText(R.string.break_time);
@@ -956,19 +963,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        progressBar.setOnClickListener(v-> {
-            if (!customHalted) {
-                pauseAndResumeTimer(PAUSING_TIMER);
-            } else {
-                pauseAndResumeTimer(RESUMING_TIMER);
-            }
-        });
+//        progressBar.setOnClickListener(v-> {
+//            if (!customHalted) {
+//                pauseAndResumeTimer(PAUSING_TIMER);
+//            } else {
+//                pauseAndResumeTimer(RESUMING_TIMER);
+//            }
+//        });
+//
+//        progressBar2.setOnClickListener(v-> {
+//            if (!pomHalted) {
+//                pauseAndResumeTimer(PAUSING_TIMER);
+//            } else {
+//                pauseAndResumeTimer(RESUMING_TIMER);
+//            }
+//        });
 
-        progressBar2.setOnClickListener(v-> {
-            if (!pomHalted) {
-                pauseAndResumeTimer(PAUSING_TIMER);
-            } else {
-                pauseAndResumeTimer(RESUMING_TIMER);
+        pauseResumeButton.setOnClickListener(v-> {
+            switch (mode) {
+                case 1:
+                    if (!customHalted) {
+                        pauseAndResumeTimer(PAUSING_TIMER);
+                    } else {
+                        pauseAndResumeTimer(RESUMING_TIMER);
+                    }
+                    break;
+                case 2:
+                    if (!pomHalted) {
+                        pauseAndResumeTimer(PAUSING_TIMER);
+                    } else {
+                        pauseAndResumeTimer(RESUMING_TIMER);
+                    }
+                    break;
             }
         });
 
@@ -2076,9 +2102,5 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 lapAdapter.notifyDataSetChanged();
                 break;
         }
-    }
-
-    public void setPauseAndResume(TextView textView) {
-
     }
 }
