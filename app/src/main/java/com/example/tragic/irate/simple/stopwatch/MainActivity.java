@@ -564,6 +564,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar2.setVisibility(View.GONE);
         stopWatchView.setVisibility(View.GONE);
         newLap.setVisibility(View.GONE);
+        lapRecycler.setVisibility(View.GONE);
 
         removeViews();
         timePaused.setAlpha(1);
