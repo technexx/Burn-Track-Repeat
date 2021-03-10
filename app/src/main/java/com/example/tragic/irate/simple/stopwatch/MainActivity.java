@@ -243,8 +243,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageView pauseResumeView;
     MaterialButton pauseResumeButton;
 
+    //Todo: Rippling for certain onClicks.
+    //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
+    //Todo: Test all Pom cycles.
     //Todo: All DB calls in aSync.
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
@@ -986,33 +989,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         cycle_reset.setOnClickListener(v -> {
             switch (mode) {
-                case 1:if (!breaksOnly) customCyclesDone = 0; else breaksOnlyCyclesDone = 0; break;
+                case 1:
+                    clearCycles(customCyclesDone);
+                    break;
                 case 2:
-                    if (pomCyclesDone >=0) {
-                        cycle_reset.setVisibility(View.GONE);
-                        LayoutInflater inflater2 = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                        View view = inflater2.inflate(R.layout.pom_reset_popup, null);
-                        cyclePopupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
-                        cyclePopupWindow.showAtLocation(view, Gravity.CENTER, 400, 465);
-
-                        TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
-                        confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
-                        confirm_reset.setText(R.string.pom_cycle_reset);
-
-                        cl.setOnClickListener(v2-> {
-                            cyclePopupWindow.dismiss();
-                            cycle_reset.setVisibility(View.VISIBLE);
-                            save_cycles.setText(R.string.save_cycles);
-                        });
-
-                        confirm_reset.setOnClickListener(v2-> {
-                            pomCyclesDone = 0;
-                            cycle_reset.setVisibility(View.VISIBLE);
-                            cycles_completed.setText(getString(R.string.cycles_done, "0"));
-                            cyclePopupWindow.dismiss();;
-                        });
-                    }
+                    clearCycles(pomCyclesDone);
                     break;
                 case 3:
                     resetEntries = newEntries;
@@ -1839,6 +1820,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         } else if ( (!breaksOnly && customSetTime.size()==0) || (breaksOnly && breaksOnlyTime.size()==0)) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void clearCycles(int cycleCount) {
+        if (cycleCount>0) {
+            cycle_reset.setVisibility(View.GONE);
+            LayoutInflater inflater2 = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View view = inflater2.inflate(R.layout.pom_reset_popup, null);
+            cyclePopupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
+            cyclePopupWindow.showAtLocation(view, Gravity.CENTER, 400, 465);
+
+            TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
+            confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
+            confirm_reset.setText(R.string.pom_cycle_reset);
+
+            cl.setOnClickListener(v2-> {
+                cyclePopupWindow.dismiss();
+                cycle_reset.setVisibility(View.VISIBLE);
+                save_cycles.setText(R.string.save_cycles);
+            });
+
+            confirm_reset.setOnClickListener(v2-> {
+                if (mode==1) customCyclesDone = 0; else if (mode==2) pomCyclesDone = 0;
+                cycle_reset.setVisibility(View.VISIBLE);
+                cycles_completed.setText(getString(R.string.cycles_done, "0"));
+                cyclePopupWindow.dismiss();;
+            });
         }
     }
 
