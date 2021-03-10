@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView save_cycles;
     ProgressBar progressBar;
     ProgressBar progressBar2;
-    ImageView stopWatchButton;
+    ImageView stopWatchView;
     TextView timeLeft;
     TextView timeLeft2;
     TextView timePaused;
@@ -243,14 +243,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageView pauseResumeView;
     MaterialButton pauseResumeButton;
 
-    //Todo: Smaller click radius for progressBar - it uses square as shape w/ circle drawn within.
-    //Todo: Top of interior of progressBar does not respond to click - may have to set click to textView.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
     //Todo: All DB calls in aSync.
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
-    //Todo: Repository for db.
+    //Todo: Repository for db. Look at Executor/other alternate thread methods.
 
     //Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
@@ -500,7 +498,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         save_cycles = findViewById(R.id.save_cycles);
         progressBar = findViewById(R.id.progressBar);
         progressBar2 = findViewById(R.id.progressBar2);
-        stopWatchButton = findViewById(R.id.stopWatchButton);
+        stopWatchView = findViewById(R.id.stopWatchView);
         timeLeft = findViewById(R.id.timeLeft);
         timeLeft2 = findViewById(R.id.timeLeft2);
         timeLeft3 =findViewById(R.id.timeLeft3);
@@ -563,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s3.setText(R.string.set_number);
         spinner3.setVisibility(View.GONE);
         progressBar2.setVisibility(View.GONE);
-        stopWatchButton.setVisibility(View.GONE);
+        stopWatchView.setVisibility(View.GONE);
         newLap.setVisibility(View.GONE);
 
         removeViews();
@@ -963,22 +961,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-//        progressBar.setOnClickListener(v-> {
-//            if (!customHalted) {
-//                pauseAndResumeTimer(PAUSING_TIMER);
-//            } else {
-//                pauseAndResumeTimer(RESUMING_TIMER);
-//            }
-//        });
-//
-//        progressBar2.setOnClickListener(v-> {
-//            if (!pomHalted) {
-//                pauseAndResumeTimer(PAUSING_TIMER);
-//            } else {
-//                pauseAndResumeTimer(RESUMING_TIMER);
-//            }
-//        });
-
         pauseResumeButton.setOnClickListener(v-> {
             switch (mode) {
                 case 1:
@@ -995,6 +977,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         pauseAndResumeTimer(RESUMING_TIMER);
                     }
                     break;
+                case 3:
+                    pauseAndResumeTimer(0);
             }
         });
 
@@ -1198,64 +1182,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 msReset = 0;
                 msConvert2 = 0;
-            }
-        });
-
-        stopWatchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DecimalFormat df2 = new DecimalFormat("00");
-                if (fadeInObj!=null) fadeInObj.cancel();
-                if (stopwatchHalted) {
-                    timeLeft3.setAlpha(1);
-                    timePaused3.setAlpha(0);
-                    msTime.setAlpha(1);
-                    msTimePaused.setAlpha(0);
-                    stopWatchRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            //ms can never be more than 60/sec due to refresh rate.
-                            ms+=1;
-                            msReset +=1;
-                            msConvert+=1;
-                            msConvert2+=1;
-                            msDisplay+=1;
-                            if (msConvert>59) msConvert=0;
-                            if (msConvert2>59) msConvert2=0;
-                            if (msDisplay>59) msDisplay=0;
-
-                            seconds = ms/60;
-                            minutes = seconds/60;
-
-                            newMs = df2.format((msConvert2/60) * 100);
-                            savedMs = df2.format((msConvert/60) * 100);
-                            newMsConvert = Integer.parseInt(newMs);
-                            savedMsConvert = Integer.parseInt(savedMs);
-
-                            //Conversion to long solves +30 ms delay for display.
-                            displayMs = df2.format((msDisplay/60) * 100);
-                            displayTime = convertStopwatch((long) seconds);
-
-                            timeLeft3.setText(displayTime);
-                            msTime.setText(displayMs);
-                            handler.postDelayed(this, 10);
-                        }
-                    };
-                    handler.post(stopWatchRunnable);
-                    stopwatchHalted = false;
-                    reset.setVisibility(View.INVISIBLE);
-
-                } else {
-                    timeLeft3.setAlpha(0);
-                    timePaused3.setAlpha(1);
-                    msTime.setAlpha(0);
-                    msTimePaused.setAlpha(1);
-                    timePaused3.setText(timeLeft3.getText());
-                    msTimePaused.setText(msTime.getText());
-                    handler.removeCallbacksAndMessages(null);
-                    stopwatchHalted = true;
-                    reset.setVisibility(View.VISIBLE);
-                }
             }
         });
     }
@@ -1855,6 +1781,59 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         reset.setVisibility(View.INVISIBLE);
                     }
                     break;
+                case 3:
+                    DecimalFormat df2 = new DecimalFormat("00");
+                    if (fadeInObj!=null) fadeInObj.cancel();
+                    if (stopwatchHalted) {
+                        timeLeft3.setAlpha(1);
+                        timePaused3.setAlpha(0);
+                        msTime.setAlpha(1);
+                        msTimePaused.setAlpha(0);
+                        stopWatchRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                //ms can never be more than 60/sec due to refresh rate.
+                                ms+=1;
+                                msReset +=1;
+                                msConvert+=1;
+                                msConvert2+=1;
+                                msDisplay+=1;
+                                if (msConvert>59) msConvert=0;
+                                if (msConvert2>59) msConvert2=0;
+                                if (msDisplay>59) msDisplay=0;
+
+                                seconds = ms/60;
+                                minutes = seconds/60;
+
+                                newMs = df2.format((msConvert2/60) * 100);
+                                savedMs = df2.format((msConvert/60) * 100);
+                                newMsConvert = Integer.parseInt(newMs);
+                                savedMsConvert = Integer.parseInt(savedMs);
+
+                                //Conversion to long solves +30 ms delay for display.
+                                displayMs = df2.format((msDisplay/60) * 100);
+                                displayTime = convertStopwatch((long) seconds);
+
+                                timeLeft3.setText(displayTime);
+                                msTime.setText(displayMs);
+                                handler.postDelayed(this, 10);
+                            }
+                        };
+                        handler.post(stopWatchRunnable);
+                        stopwatchHalted = false;
+                        reset.setVisibility(View.INVISIBLE);
+
+                    } else {
+                        timeLeft3.setAlpha(0);
+                        timePaused3.setAlpha(1);
+                        msTime.setAlpha(0);
+                        msTimePaused.setAlpha(1);
+                        timePaused3.setText(timeLeft3.getText());
+                        msTimePaused.setText(msTime.getText());
+                        handler.removeCallbacksAndMessages(null);
+                        stopwatchHalted = true;
+                        reset.setVisibility(View.VISIBLE);
+                    }
             }
         } else if ( (!breaksOnly && customSetTime.size()==0) || (breaksOnly && breaksOnlyTime.size()==0)) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
@@ -1878,7 +1857,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
-                stopWatchButton.setVisibility(View.GONE);
+                stopWatchView.setVisibility(View.GONE);
                 plus_sign.setVisibility(View.VISIBLE);
                 minus_sign.setVisibility(View.VISIBLE);
                 spinner1.setVisibility(View.VISIBLE);
@@ -1899,7 +1878,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.VISIBLE);
-                stopWatchButton.setVisibility(View.GONE);
+                stopWatchView.setVisibility(View.GONE);
 
                 plus_sign.setVisibility(View.GONE);
                 minus_sign.setVisibility(View.GONE);
@@ -1921,7 +1900,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 3:
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
-                stopWatchButton.setVisibility(View.VISIBLE);
+                stopWatchView.setVisibility(View.VISIBLE);
                 plus_sign.setVisibility(View.GONE);
                 minus_sign.setVisibility(View.GONE);
                 spinner1.setVisibility(View.GONE);
