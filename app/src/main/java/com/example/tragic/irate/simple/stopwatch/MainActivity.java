@@ -87,19 +87,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView blank_spinner;
     TextView cycles_completed;
     TextView cycle_reset;
-    TextView skip;
-    TextView newLap;
-    Spinner spinner1;
-    Spinner spinner2;
-    Spinner spinner3;
+    TextView set_time;
+    TextView break_time;
     ImageView plus_sets;
     ImageView minus_sets;
     ImageView plus_breaks;
     ImageView minus_breaks;
     ImageButton plus_rounds;
     ImageButton minus_rounds;
+
     ImageView sortCheckmark;
     TextView roundCount;
+    TextView skip;
+    TextView newLap;
+    Spinner spinner1;
+    Spinner spinner2;
+    Spinner spinner3;
 
     List<Long> spinList1;
     List<Long> spinList2;
@@ -489,6 +492,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         spinner3 = findViewById(R.id.spin3);
         blank_spinner = findViewById(R.id.blank_spinner1);
         reset = findViewById(R.id.reset);
+        set_time = findViewById(R.id.set_time);
+        break_time = findViewById(R.id.break_time);
         plus_sets = findViewById(R.id.plus_sets);
         minus_sets = findViewById(R.id.minus_sets);
         plus_breaks = findViewById(R.id.plus_breaks);
@@ -1545,7 +1550,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void setNewText(TextView oldTextView, TextView currentTextView, long newTime) {
         boolean fadeTime = false;
         String oldText = (String) oldTextView.getText();
-        if (!oldText.equals("")) {
+        if (!oldText.equals("") && !oldText.equals("?")) {
             oldText = oldText.replace(":", "");
             long oldTime = Long.parseLong(oldText);
             if (oldTime<60 && newTime>=60) {
