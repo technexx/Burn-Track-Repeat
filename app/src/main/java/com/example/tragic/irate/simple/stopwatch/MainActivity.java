@@ -128,6 +128,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long pomMillisUntilFinished;
     boolean incrementValues;
     int incrementTimer;
+    Runnable changeSetValue;
+    Runnable changeBreakValue;
+    Runnable valueSpeed;
 
     int firstSpinCount;
     int secondSpinCount;
@@ -601,47 +604,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         incrementTimer = 10;
 
-        Runnable changeSetValue = new Runnable() {
-            @Override
-            public void run() {
-                if (incrementValues) setValue+=1; else setValue -=1;
-                mHandler.postDelayed(this, changeIncrementSpeed());
-            }
-        };
-        Runnable changeBreakValue = new Runnable() {
-            @Override
-            public void run() {
-                if (!breaksOnly) {
-                    if (incrementValues) breakValue+=1; else breakValue -=1;
-                } else
-                    if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
-            }
-        };
-
-        Runnable valueSpeed = new Runnable() {
-            @Override
-            public void run() {
-                if (incrementTimer>1) incrementTimer-=1;
-                mHandler.postDelayed(this, 300);
-            }
-        };
-
         plus_sets.setOnTouchListener((v, event) -> {
             incrementValues = true;
-            switch(event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
-                    mHandler = new Handler();
-                    mHandler.post(changeSetValue);
-                    mHandler.post(valueSpeed);
-                    break;
-                case MotionEvent.ACTION_UP:
-//                    mHandler.removeCallbacks(changeSetValue);
-                    mHandler.removeCallbacksAndMessages(null);
-                    incrementTimer = 10;
-            }
-            Log.i("speedtest", "value is " + incrementTimer);
-            set_time.setText(String.valueOf(setValue));
+            setIncrements(event, changeSetValue);
+            set_time.setText(String.valueOf(setValue+1));
             return true;
         });
 
@@ -1343,9 +1309,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }.start();
     }
 
-    public long changeIncrementSpeed() {
-        return incrementTimer*10;
-//        if (incrementTimer <2) return 100; else if (incrementTimer >=2 && incrementTimer <4) return 50; else return 10;
+    public void setIncrements(MotionEvent event, Runnable runnable) {
+        changeSetValue = new Runnable() {
+            @Override
+            public void run() {
+                if (incrementValues) setValue+=1; else setValue -=1;
+                mHandler.postDelayed(this, incrementTimer*10);
+            }
+        };
+
+        changeBreakValue = new Runnable() {
+            @Override
+            public void run() {
+                if (!breaksOnly) {
+                    if (incrementValues) breakValue+=1; else breakValue -=1;
+                } else
+                    if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
+                mHandler.postDelayed(this, incrementTimer*10);
+            }
+        };
+
+        valueSpeed = new Runnable() {
+            @Override
+            public void run() {
+                if (incrementTimer>1) incrementTimer-=1;
+                mHandler.postDelayed(this, 300);
+            }
+        };
+
+        switch(event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
+                mHandler = new Handler();
+                mHandler.postDelayed(runnable,50);
+                mHandler.postDelayed(valueSpeed, 50);
+                break;
+            case MotionEvent.ACTION_UP:
+                mHandler.removeCallbacksAndMessages(null);
+                incrementTimer = 10;
+        }
     }
 
     private String convertSeconds(long totalSeconds) {
