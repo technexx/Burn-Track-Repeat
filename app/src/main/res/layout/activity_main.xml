@@ -58,13 +58,13 @@
         android:textColor="@color/white"/>
 
     <TextView
-        android:id="@+id/blank_spinner1"
+        android:id="@+id/no_set_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         android:layout_marginTop="15.5dp"
-        android:layout_marginStart="228dp"
         android:textSize="20sp">
     </TextView>
 
@@ -147,7 +147,6 @@
     </ImageButton>
 
     <TextView
-        android:text="30"
         android:id="@+id/set_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -160,7 +159,6 @@
     </TextView>
 
     <TextView
-        android:text="30"
         android:id="@+id/break_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

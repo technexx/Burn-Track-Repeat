@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long setValue;
     long breakValue;
     long breaksOnlyValue;
-    TextView blank_spinner;
+    TextView no_set_header;
     TextView cycles_completed;
     TextView cycle_reset;
     TextView set_time;
@@ -245,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
+    //Todo: Have skip round reset dot alpha.
     //Todo: Add color scheme options.
     //Todo: Test all Pom cycles.
     //Todo: All DB calls in aSync.
@@ -368,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         if (!breaksOnly) {
                             savedCycleAdapter.setBreaksOnly(false);
-                            if (cyclesList.size()>0 && cyclesList.get(0).getSets()!=null) {
+                            if (cyclesList.size()>0) {
                                 for (int i=0; i<cyclesList.size(); i++) {
                                     //getSets/Breaks returns String [xx, xy, xz] etc.
                                     setsArray.add(cyclesList.get(i).getSets());
@@ -481,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s1 = findViewById(R.id.s1);
         s2 = findViewById(R.id.s2);
         s3 = findViewById(R.id.s3);
-        blank_spinner = findViewById(R.id.blank_spinner1);
+        no_set_header = findViewById(R.id.no_set_header);
         reset = findViewById(R.id.reset);
         set_time = findViewById(R.id.set_time);
         break_time = findViewById(R.id.break_time);
@@ -498,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         newLap = findViewById(R.id.new_lap);
 
         reset.setVisibility(View.INVISIBLE);
-        blank_spinner.setVisibility(View.GONE);
+        no_set_header.setVisibility(View.GONE);
 
         breaks_only = findViewById(R.id.breaks_only);
         save_cycles = findViewById(R.id.save_cycles);
@@ -557,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentLapList = new ArrayList<>();
         savedLapList = new ArrayList<>();
 
-        blank_spinner.setText(R.string.no_sets);
+        no_set_header.setText(R.string.no_sets);
         s3.setText(R.string.set_number);
         progressBar2.setVisibility(View.GONE);
         stopWatchView.setVisibility(View.GONE);
@@ -568,7 +569,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timePaused.setAlpha(1);
 
         //Default list values for Custom.
-        //Todo: Replace these w/ saved/last used values.
         for (int i=0; i<3; i++) {
             customSetTime.add((long) 30 * 1000);
             customBreakTime.add((long) 30 * 1000);
@@ -728,18 +728,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             if (mode==1) {
                 if (!breaksOnly) {
+                    s1.setVisibility(View.INVISIBLE);
+                    plus_sets.setVisibility(View.INVISIBLE);
+                    minus_sets.setVisibility(View.INVISIBLE);
+                    set_time.setVisibility(View.INVISIBLE);
                     setBegun = true;
                     onBreak = true;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
                     dotDraws.breaksOnly(true);
-                    blank_spinner.setVisibility(View.VISIBLE);
+                    no_set_header.setVisibility(View.VISIBLE);
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                     breaksOnly = true;
                 } else {
+                    s1.setVisibility(View.VISIBLE);
+                    plus_sets.setVisibility(View.VISIBLE);
+                    minus_sets.setVisibility(View.VISIBLE);
+                    set_time.setVisibility(View.VISIBLE);
                     setBegun = false;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                     dotDraws.breaksOnly(false);
-                    blank_spinner.setVisibility(View.GONE);
+                    no_set_header.setVisibility(View.GONE);
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     breaksOnly = false;
                 }
@@ -919,7 +927,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_reset.setOnClickListener(v -> {
             switch (mode) {
                 case 1:
-                    clearCycles(customCyclesDone);
+                    if (!breaksOnly) clearCycles(customCyclesDone); else clearCycles(breaksOnlyCyclesDone);
                     break;
                 case 2:
                     clearCycles(pomCyclesDone);
@@ -1767,7 +1775,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 stopWatchView.setVisibility(View.GONE);
                 plus_rounds.setVisibility(View.VISIBLE);
                 minus_rounds.setVisibility(View.VISIBLE);
-                if (breaksOnly) blank_spinner.setVisibility(View.VISIBLE);
+                if (breaksOnly) no_set_header.setVisibility(View.VISIBLE);
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
@@ -1786,7 +1794,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 plus_rounds.setVisibility(View.GONE);
                 minus_rounds.setVisibility(View.GONE);
-                blank_spinner.setVisibility(View.GONE);
+                no_set_header.setVisibility(View.GONE);
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
@@ -1803,7 +1811,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.VISIBLE);
                 plus_rounds.setVisibility(View.GONE);
-                blank_spinner.setVisibility(View.GONE);
+                no_set_header.setVisibility(View.GONE);
                 s1.setVisibility(View.GONE);
                 s2.setVisibility(View.GONE);
                 s3.setVisibility(View.GONE);

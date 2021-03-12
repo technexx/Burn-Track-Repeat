@@ -3,7 +3,7 @@
     <string name="variable">Variable Mode</string>
     <string name="pomodoro">Pomodoro</string>
 
-    <string name="no_sets">None</string>
+    <string name="no_sets">Breaks Only</string>
     <string name="reset">Reset</string>
     <string name="clear_cycles">Clear Cycles</string>
     <string name="skip_round">Skip Round</string>

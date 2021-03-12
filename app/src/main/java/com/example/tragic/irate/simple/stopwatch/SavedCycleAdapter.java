@@ -26,6 +26,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     boolean mBreaksOnly;
     onCycleClickListener mOnCycleClickListener;
     onDeleteCycleListener mOnDeleteCycleListener;
+    public static final int SETS_AND_BREAKS = 0;
+    public static final int BREAKSONLY = 1;
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
@@ -55,7 +57,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        if(!mBreaksOnly) {
+        if (viewType == SETS_AND_BREAKS) {
             View view = LayoutInflater.from(context).inflate(R.layout.saved_cycles_views, parent, false);
             return new CustomHolder(view);
         } else {
@@ -89,6 +91,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mOnDeleteCycleListener.onCycleDelete(position);
             });
         }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (!mBreaksOnly) return SETS_AND_BREAKS; else return BREAKSONLY;
     }
 
     @Override
