@@ -184,42 +184,6 @@
         android:textColor="@color/white">
     </TextView>
 
-    <Spinner
-        android:id="@+id/spin1"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white"
-        android:popupBackground="@color/black">
-    </Spinner>
-
-    <Spinner
-        android:id="@+id/spin2"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/s1"
-        android:layout_marginTop="18dp"
-        android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white"
-        android:popupBackground="@color/black">
-    </Spinner>
-
-    <Spinner
-        android:id="@+id/spin3"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/s2"
-        android:layout_marginTop="17dp"
-        android:layout_marginStart="220dp"
-        android:backgroundTint="@color/white"
-        android:popupBackground="@color/black">
-    </Spinner>
-
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="wrap_content"
