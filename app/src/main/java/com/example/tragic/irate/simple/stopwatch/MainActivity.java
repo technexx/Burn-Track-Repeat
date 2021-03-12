@@ -611,19 +611,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
-        minus_sets.setOnClickListener(v-> {
-            setValue-=1;
+        minus_sets.setOnTouchListener((v, event) -> {
+            incrementValues = false;
+            setIncrements(event, changeSetValue);
             set_time.setText(String.valueOf(setValue));
+            return true;
         });
 
-        plus_breaks.setOnClickListener(v-> {
-            if (!breaksOnly) breakValue+=1; else breaksOnlyValue +=1;
-            break_time.setText(String.valueOf(breakValue));
+        plus_breaks.setOnTouchListener((v, event) -> {
+            incrementValues = true;
+            setIncrements(event, changeBreakValue);
+            if (!breaksOnly) break_time.setText(String.valueOf(breakValue)); else break_time.setText(String.valueOf(breaksOnlyValue));
+            return true;
         });
 
-        minus_breaks.setOnClickListener(v-> {
-            if (!breaksOnly) breakValue-=1; else breaksOnlyValue -=1;
-            break_time.setText(String.valueOf(breakValue));
+        minus_breaks.setOnTouchListener((v, event) -> {
+            incrementValues = false;
+            setIncrements(event, changeBreakValue);
+            if (!breaksOnly) break_time.setText(String.valueOf(breakValue)); else break_time.setText(String.valueOf(breaksOnlyValue));
+            return true;
         });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -1348,6 +1354,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 mHandler.removeCallbacksAndMessages(null);
                 incrementTimer = 10;
         }
+        if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
     }
 
     private String convertSeconds(long totalSeconds) {
