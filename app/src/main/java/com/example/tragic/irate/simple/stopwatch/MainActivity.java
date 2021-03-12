@@ -599,6 +599,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
         resetTimer();
+        incrementTimer = 10;
 
         Runnable changeSetValue = new Runnable() {
             @Override
@@ -620,8 +621,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Runnable valueSpeed = new Runnable() {
             @Override
             public void run() {
-                incrementTimer+=1;
-                mHandler.postDelayed(this, 1000);
+                if (incrementTimer>1) incrementTimer-=1;
+                mHandler.postDelayed(this, 300);
             }
         };
 
@@ -637,7 +638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case MotionEvent.ACTION_UP:
 //                    mHandler.removeCallbacks(changeSetValue);
                     mHandler.removeCallbacksAndMessages(null);
-                    incrementTimer = 0;
+                    incrementTimer = 10;
             }
             Log.i("speedtest", "value is " + incrementTimer);
             set_time.setText(String.valueOf(setValue));
@@ -1343,7 +1344,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public long changeIncrementSpeed() {
-        if (incrementTimer <2) return 100; else if (incrementTimer >=2 && incrementTimer <4) return 50; else return 10;
+        return incrementTimer*10;
+//        if (incrementTimer <2) return 100; else if (incrementTimer >=2 && incrementTimer <4) return 50; else return 10;
     }
 
     private String convertSeconds(long totalSeconds) {
