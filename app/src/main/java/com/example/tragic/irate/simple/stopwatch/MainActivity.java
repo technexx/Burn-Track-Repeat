@@ -604,31 +604,58 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         incrementTimer = 10;
 
+        changeSetValue = new Runnable() {
+            @Override
+            public void run() {
+                if (incrementValues) setValue+=1; else setValue -=1;
+                mHandler.postDelayed(this, incrementTimer*10);
+            }
+        };
+
+        changeBreakValue = new Runnable() {
+            @Override
+            public void run() {
+                if (!breaksOnly) {
+                    if (incrementValues) breakValue+=1; else breakValue -=1;
+                } else
+                    if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
+                mHandler.postDelayed(this, incrementTimer*10);
+            }
+        };
+
+        valueSpeed = new Runnable() {
+            @Override
+            public void run() {
+                if (incrementTimer>1) incrementTimer-=1;
+                mHandler.postDelayed(this, 300);
+            }
+        };
+
         plus_sets.setOnTouchListener((v, event) -> {
             incrementValues = true;
             setIncrements(event, changeSetValue);
-            set_time.setText(String.valueOf(setValue+1));
+            set_time.setText(convertSeconds(setValue));
             return true;
         });
 
         minus_sets.setOnTouchListener((v, event) -> {
             incrementValues = false;
             setIncrements(event, changeSetValue);
-            set_time.setText(String.valueOf(setValue));
+            set_time.setText(convertSeconds(setValue));
             return true;
         });
 
         plus_breaks.setOnTouchListener((v, event) -> {
             incrementValues = true;
             setIncrements(event, changeBreakValue);
-            if (!breaksOnly) break_time.setText(String.valueOf(breakValue)); else break_time.setText(String.valueOf(breaksOnlyValue));
+            if (!breaksOnly) break_time.setText(convertSeconds(breakValue)); else break_time.setText(convertSeconds(breaksOnlyValue));
             return true;
         });
 
         minus_breaks.setOnTouchListener((v, event) -> {
             incrementValues = false;
             setIncrements(event, changeBreakValue);
-            if (!breaksOnly) break_time.setText(String.valueOf(breakValue)); else break_time.setText(String.valueOf(breaksOnlyValue));
+            if (!breaksOnly) break_time.setText(convertSeconds(breakValue)); else break_time.setText(convertSeconds(breaksOnlyValue));
             return true;
         });
 
@@ -1316,33 +1343,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void setIncrements(MotionEvent event, Runnable runnable) {
-        changeSetValue = new Runnable() {
-            @Override
-            public void run() {
-                if (incrementValues) setValue+=1; else setValue -=1;
-                mHandler.postDelayed(this, incrementTimer*10);
-            }
-        };
-
-        changeBreakValue = new Runnable() {
-            @Override
-            public void run() {
-                if (!breaksOnly) {
-                    if (incrementValues) breakValue+=1; else breakValue -=1;
-                } else
-                    if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
-                mHandler.postDelayed(this, incrementTimer*10);
-            }
-        };
-
-        valueSpeed = new Runnable() {
-            @Override
-            public void run() {
-                if (incrementTimer>1) incrementTimer-=1;
-                mHandler.postDelayed(this, 300);
-            }
-        };
-
         switch(event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
@@ -1355,6 +1355,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 incrementTimer = 10;
         }
         if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
+        if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
+        Log.i("testValues", "set and break values are " + setValue + " and " + breakValue);
     }
 
     private String convertSeconds(long totalSeconds) {

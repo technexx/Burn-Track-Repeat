@@ -75,7 +75,7 @@
         android:src="@drawable/add_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/tabLayout"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="45dp"
         android:layout_marginStart="150dp"
         android:backgroundTint="@color/black"
         android:background="@drawable/rounded">
@@ -88,7 +88,7 @@
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/tabLayout"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="45dp"
         android:layout_marginStart="310dp"
         android:backgroundTint="@color/black"
         android:background="@drawable/rounded">
