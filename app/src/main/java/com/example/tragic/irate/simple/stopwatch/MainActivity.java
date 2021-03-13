@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 ;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -97,9 +99,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView no_set_header;
     TextView cycles_completed;
     TextView cycle_reset;
-    TextView first_value_text;
-    TextView second_value_text;
-    TextView third_value_text;
+    EditText first_value_text;
+    EditText second_value_text;
+    EditText third_value_text;
     ImageView plus_first_value;
     ImageView minus_first_value;
     ImageView plus_second_value;
@@ -250,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     MaterialButton pauseResumeButton;
 
     //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
+    //Todo: Add/Remove cycle elements from indiviudal places.
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
@@ -611,6 +614,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
+
+        //Todo: Third value on Custom should not be EditText.
         resetTimer();
         incrementTimer = 10;
 
@@ -728,25 +733,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             return true;
         });
-
-//        plus_third_value.setOnClickListener(v -> {
-//            switch (mode) {
-//                case 1: adjustCustom(true); break;
-//                case 2:
-//                    incrementValues = true;
-//                    setIncrements();
-//            }
-//
-//        });
-
-//        minus_third_value.setOnClickListener(v -> {
-//            switch (mode) {
-//                case 1:
-//                    adjustCustom(false); break;
-//                case 2:
-//
-//            }
-//        });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -1532,17 +1518,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (adding) {
             if (!breaksOnly) {
                 if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
+                    setValue = Long.parseLong(first_value_text.getText().toString());
                     customSetTime.add(setValue * 1000);
                     startCustomSetTime.add(setValue * 1000);
                 } else {
                     Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                 }
                 if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
+                    breakValue = Long.parseLong(second_value_text.getText().toString());
                     customBreakTime.add(breakValue * 1000);
                     startCustomBreakTime.add(breakValue * 1000);
                 }
             } else {
                 if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
+                    breaksOnlyValue = Long.parseLong(second_value_text.getText().toString());
                     breaksOnlyTime.add(breaksOnlyValue * 1000);
                     startBreaksOnlyTime.add(breaksOnlyValue * 1000);
                 } else {
@@ -1937,6 +1926,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setText(R.string.set_number);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
+                first_value_text.setFilters(new InputFilter[]{
+                        new NumberFilter(5, 300)
+                });
+                second_value_text.setFilters(new InputFilter[]{
+                        new NumberFilter(5, 300)
+                });
                 break;
             case 2:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -1962,6 +1957,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setText(R.string.long_break);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
+                first_value_text.setFilters(new InputFilter[]{
+                        new NumberFilter(10, 120)
+                });
+                second_value_text.setFilters(new InputFilter[]{
+                        new NumberFilter(1, 10)
+                });
+                third_value_text.setFilters(new InputFilter[]{
+                        new NumberFilter(10, 60)
+                });
                 break;
             case 3:
                 progressBar.setVisibility(View.INVISIBLE);
