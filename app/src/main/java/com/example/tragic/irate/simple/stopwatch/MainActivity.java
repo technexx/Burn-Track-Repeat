@@ -990,7 +990,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     lapAdapter.notifyDataSetChanged();
                     lapsNumber = 0;
                     msReset = 0;
-
                     cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
             }
         });
@@ -1798,7 +1797,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             });
 
             confirm_reset.setOnClickListener(v2-> {
-                if (mode==1) customCyclesDone = 0; else if (mode==2) pomCyclesDone = 0;
+                if (mode==1) {
+                    if (!breaksOnly) customCyclesDone = 0; else breaksOnlyCyclesDone = 0;
+                } else if (mode==2) pomCyclesDone = 0;
                 cycle_reset.setVisibility(View.VISIBLE);
                 cycles_completed.setText(getString(R.string.cycles_done, "0"));
                 cyclePopupWindow.dismiss();;
@@ -1827,9 +1828,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 plus_rounds.setVisibility(View.VISIBLE);
                 minus_rounds.setVisibility(View.VISIBLE);
                 if (breaksOnly) no_set_header.setVisibility(View.VISIBLE);
-                s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
+                if (!breaksOnly) {
+                    s1.setVisibility(View.VISIBLE);
+                    plus_sets.setVisibility(View.VISIBLE);
+                    minus_sets.setVisibility(View.VISIBLE);
+                    no_set_header.setVisibility(View.GONE);
+                } else {
+                    s1.setVisibility(View.INVISIBLE);
+                    plus_sets.setVisibility(View.INVISIBLE);
+                    minus_sets.setVisibility(View.INVISIBLE);
+                    no_set_header.setVisibility(View.VISIBLE);
+                }
+
+                plus_breaks.setVisibility(View.VISIBLE);
+                minus_breaks.setVisibility(View.VISIBLE);
+                plus_rounds.setVisibility(View.VISIBLE);
+                minus_rounds.setVisibility(View.VISIBLE);
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
@@ -1842,13 +1858,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.VISIBLE);
                 stopWatchView.setVisibility(View.GONE);
-
-                plus_rounds.setVisibility(View.GONE);
-                minus_rounds.setVisibility(View.GONE);
                 no_set_header.setVisibility(View.GONE);
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
+                plus_sets.setVisibility(View.VISIBLE);
+                minus_sets.setVisibility(View.VISIBLE);
+                plus_breaks.setVisibility(View.VISIBLE);
+                minus_breaks.setVisibility(View.VISIBLE);
+                plus_rounds.setVisibility(View.VISIBLE);
+                minus_rounds.setVisibility(View.VISIBLE);
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
@@ -1866,6 +1885,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s1.setVisibility(View.GONE);
                 s2.setVisibility(View.GONE);
                 s3.setVisibility(View.GONE);
+                plus_sets.setVisibility(View.GONE);
+                minus_sets.setVisibility(View.GONE);
+                plus_breaks.setVisibility(View.GONE);
+                minus_breaks.setVisibility(View.GONE);
+                plus_rounds.setVisibility(View.GONE);
+                minus_rounds.setVisibility(View.GONE);
                 skip.setVisibility(View.GONE);
                 newLap.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
