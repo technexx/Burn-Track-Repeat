@@ -29,8 +29,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -726,30 +729,78 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 savedCyclePopupWindow.dismiss();
                 return;
             }
+
+            Animation fadeIn = new AlphaAnimation(0, 1);
+            fadeIn.setDuration(400);
+
+            Animation fadeOut = new AlphaAnimation(1, 0);
+            fadeOut.setDuration(100);
+
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if (breaksOnly) {
+                        s1.setVisibility(View.INVISIBLE);
+                        plus_sets.setVisibility(View.INVISIBLE);
+                        minus_sets.setVisibility(View.INVISIBLE);
+                        set_time.setVisibility(View.INVISIBLE);
+                        no_set_header.setAnimation(fadeIn);
+                    }
+                }
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+
+            fadeIn.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    if (breaksOnly) no_set_header.setVisibility(View.VISIBLE); else {
+                        no_set_header.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if (!breaksOnly) {
+                        s1.setVisibility(View.VISIBLE);
+                        plus_sets.setVisibility(View.VISIBLE);
+                        minus_sets.setVisibility(View.VISIBLE);
+                        set_time.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+
             if (mode==1) {
                 if (!breaksOnly) {
-                    s1.setVisibility(View.INVISIBLE);
-                    plus_sets.setVisibility(View.INVISIBLE);
-                    minus_sets.setVisibility(View.INVISIBLE);
-                    set_time.setVisibility(View.INVISIBLE);
+                    breaksOnly = true;
+                    s1.setAnimation(fadeOut);
+                    set_time.setAnimation(fadeOut);
+                    plus_sets.setAnimation(fadeOut);
+                    minus_sets.setAnimation(fadeOut);
                     setBegun = true;
                     onBreak = true;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
                     dotDraws.breaksOnly(true);
-                    no_set_header.setVisibility(View.VISIBLE);
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                    breaksOnly = true;
                 } else {
-                    s1.setVisibility(View.VISIBLE);
-                    plus_sets.setVisibility(View.VISIBLE);
-                    minus_sets.setVisibility(View.VISIBLE);
-                    set_time.setVisibility(View.VISIBLE);
+                    breaksOnly = false;
+                    no_set_header.setAnimation(fadeOut);
+                    s1.setAnimation(fadeIn);
+                    set_time.setAnimation(fadeIn);
+                    plus_sets.setAnimation(fadeIn);
+                    minus_sets.setAnimation(fadeIn);
                     setBegun = false;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                     dotDraws.breaksOnly(false);
-                    no_set_header.setVisibility(View.GONE);
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                    breaksOnly = false;
                 }
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
                 resetTimer();
