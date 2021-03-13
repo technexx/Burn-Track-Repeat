@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="10dp"
         android:textSize="20sp"
         android:textColor="@color/white"
         style="popup"
@@ -42,7 +42,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s1"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="15.5dp"
+        android:layout_marginTop="16.5dp"
         android:textSize="20sp"
         android:textColor="@color/white"
         />
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/s2"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="16.5dp"
         android:layout_marginStart="8dp"
         android:textSize="20sp"
         android:textColor="@color/white"/>
@@ -70,7 +70,7 @@
     </TextView>
 
     <ImageButton
-        android:id="@+id/plus_sets"
+        android:id="@+id/plus_first_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/add_24"
@@ -83,7 +83,7 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/minus_sets"
+        android:id="@+id/minus_first_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/subtract_24"
@@ -96,12 +96,12 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/plus_breaks"
+        android:id="@+id/plus_second_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/add_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/plus_sets"
+        app:layout_constraintTop_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="150dp"
         android:backgroundTint="@color/black"
         android:layout_marginTop="12dp"
@@ -109,12 +109,12 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/minus_breaks"
+        android:id="@+id/minus_second_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/minus_sets"
+        app:layout_constraintTop_toBottomOf="@id/minus_first_value"
         android:layout_marginStart="310dp"
         android:backgroundTint="@color/black"
         android:layout_marginTop="12dp"
@@ -122,12 +122,12 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/plus_rounds"
+        android:id="@+id/plus_third_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/add_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/plus_breaks"
+        app:layout_constraintTop_toBottomOf="@id/plus_second_value"
         android:layout_marginStart="150dp"
         android:backgroundTint="@color/black"
         android:layout_marginTop="12dp"
@@ -135,12 +135,12 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/minus_rounds"
+        android:id="@+id/minus_third_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/minus_breaks"
+        app:layout_constraintTop_toBottomOf="@id/minus_second_value"
         android:layout_marginStart="310dp"
         android:backgroundTint="@color/black"
         android:layout_marginTop="12dp"
@@ -148,11 +148,11 @@
     </ImageButton>
 
     <TextView
-        android:id="@+id/set_time"
+        android:id="@+id/first_value_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/plus_rounds"
-        app:layout_constraintEnd_toStartOf="@id/minus_rounds"
+        app:layout_constraintStart_toEndOf="@id/plus_third_value"
+        app:layout_constraintEnd_toStartOf="@id/minus_third_value"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="46dp"
         android:textSize="22sp"
@@ -160,24 +160,24 @@
     </TextView>
 
     <TextView
-        android:id="@+id/break_time"
+        android:id="@+id/second_value_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/plus_rounds"
-        app:layout_constraintEnd_toStartOf="@id/minus_rounds"
-        app:layout_constraintTop_toBottomOf="@id/set_time"
+        app:layout_constraintStart_toEndOf="@id/plus_third_value"
+        app:layout_constraintEnd_toStartOf="@id/minus_third_value"
+        app:layout_constraintTop_toBottomOf="@id/first_value_text"
         android:layout_marginTop="13.5dp"
         android:textSize="22sp"
         android:textColor="@color/white">
     </TextView>
 
     <TextView
-        android:id="@+id/round_count"
+        android:id="@+id/third_value_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/plus_rounds"
-        app:layout_constraintEnd_toStartOf="@id/minus_rounds"
-        app:layout_constraintTop_toBottomOf="@id/break_time"
+        app:layout_constraintStart_toEndOf="@id/plus_third_value"
+        app:layout_constraintEnd_toStartOf="@id/minus_third_value"
+        app:layout_constraintTop_toBottomOf="@id/second_value_text"
         android:layout_marginTop="13.5dp"
         android:textSize="22sp"
         android:textColor="@color/white">

@@ -91,20 +91,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long setValue;
     long breakValue;
     long breaksOnlyValue;
+    long pomValue1;
+    long pomValue2;
+    long pomValue3;
     TextView no_set_header;
     TextView cycles_completed;
     TextView cycle_reset;
-    TextView set_time;
-    TextView break_time;
-    ImageView plus_sets;
-    ImageView minus_sets;
-    ImageView plus_breaks;
-    ImageView minus_breaks;
-    ImageButton plus_rounds;
-    ImageButton minus_rounds;
+    TextView first_value_text;
+    TextView second_value_text;
+    TextView third_value_text;
+    ImageView plus_first_value;
+    ImageView minus_first_value;
+    ImageView plus_second_value;
+    ImageView minus_second_value;
+    ImageButton plus_third_value;
+    ImageButton minus_third_value;
 
     ImageView sortCheckmark;
-    TextView roundCount;
     TextView skip;
     TextView newLap;
 
@@ -131,8 +134,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long pomMillisUntilFinished;
     boolean incrementValues;
     int incrementTimer;
-    Runnable changeSetValue;
-    Runnable changeBreakValue;
+    Runnable changeFirstValue;
+    Runnable changeSecondValue;
+    Runnable changeThirdValue;
     Runnable valueSpeed;
 
     int firstSpinCount;
@@ -245,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageView pauseResumeView;
     MaterialButton pauseResumeButton;
 
+    //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
@@ -343,7 +348,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedCyclePopupWindow.dismiss();
             save_cycles.setText(R.string.save_cycles);
         });
-
     }
 
     @Override
@@ -487,15 +491,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s3 = findViewById(R.id.s3);
         no_set_header = findViewById(R.id.no_set_header);
         reset = findViewById(R.id.reset);
-        set_time = findViewById(R.id.set_time);
-        break_time = findViewById(R.id.break_time);
-        plus_sets = findViewById(R.id.plus_sets);
-        minus_sets = findViewById(R.id.minus_sets);
-        plus_breaks = findViewById(R.id.plus_breaks);
-        minus_breaks = findViewById(R.id.minus_breaks);
-        plus_rounds = findViewById(R.id.plus_rounds);
-        minus_rounds = findViewById(R.id.minus_rounds);
-        roundCount = findViewById(R.id.round_count);
+        first_value_text = findViewById(R.id.first_value_text);
+        second_value_text = findViewById(R.id.second_value_text);
+        plus_first_value = findViewById(R.id.plus_first_value);
+        minus_first_value = findViewById(R.id.minus_first_value);
+        plus_second_value = findViewById(R.id.plus_second_value);
+        minus_second_value = findViewById(R.id.minus_second_value);
+        plus_third_value = findViewById(R.id.plus_third_value);
+        minus_third_value = findViewById(R.id.minus_third_value);
+        third_value_text = findViewById(R.id.third_value_text);
         cycles_completed = findViewById(R.id.cycles_completed);
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
@@ -583,11 +587,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setValue = 30;
         breakValue = 30;
         breaksOnlyValue = 30;
+        pomValue1 = 25;
+        pomValue2 = 5;
+        pomValue3 = 15;
         setMillis = setValue;
         breakMillis = breakValue;
-        set_time.setText(convertSeconds(setValue));
-        break_time.setText(convertSeconds(breakValue));
-        roundCount.setText(String.valueOf(customSetTime.size()));
+        first_value_text.setText(convertSeconds(setValue));
+        second_value_text.setText(convertSeconds(breakValue));
+        third_value_text.setText(String.valueOf(customSetTime.size()));
 
         lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
@@ -607,21 +614,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         incrementTimer = 10;
 
-        changeSetValue = new Runnable() {
+        changeFirstValue = new Runnable() {
             @Override
             public void run() {
-                if (incrementValues) setValue+=1; else setValue -=1;
+                switch (mode) {
+                    case 1:
+                        if (incrementValues) setValue+=1; else setValue -=1; break;
+                    case 2:
+                        if (incrementValues) pomValue1+=1; else pomValue1 -=1; break;
+                }
                 mHandler.postDelayed(this, incrementTimer*10);
             }
         };
 
-        changeBreakValue = new Runnable() {
+        changeSecondValue = new Runnable() {
             @Override
             public void run() {
-                if (!breaksOnly) {
-                    if (incrementValues) breakValue+=1; else breakValue -=1;
-                } else
-                    if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
+                switch (mode) {
+                    case 1:
+                        if (!breaksOnly) {
+                            if (incrementValues) breakValue+=1; else breakValue -=1;
+                        } else
+                        if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1; break;
+                    case 2:
+                        if (incrementValues) pomValue2+=1; else pomValue2 -=1; break;
+                }
+                mHandler.postDelayed(this, incrementTimer*10);
+            }
+        };
+
+        changeThirdValue = new Runnable() {
+            @Override
+            public void run() {
+                if (incrementValues) pomValue3+=1; else pomValue3 -=1;
                 mHandler.postDelayed(this, incrementTimer*10);
             }
         };
@@ -634,33 +659,94 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         };
 
-        plus_sets.setOnTouchListener((v, event) -> {
+        plus_first_value.setOnTouchListener((v, event) -> {
             incrementValues = true;
-            setIncrements(event, changeSetValue);
-            set_time.setText(convertSeconds(setValue));
+            setIncrements(event, changeFirstValue);
+            switch (mode) {
+                case 1: first_value_text.setText(convertSeconds(setValue)); break;
+                case 2: first_value_text.setText(convertSeconds(pomValue1)); break;
+            }
             return true;
         });
 
-        minus_sets.setOnTouchListener((v, event) -> {
+        minus_first_value.setOnTouchListener((v, event) -> {
             incrementValues = false;
-            setIncrements(event, changeSetValue);
-            set_time.setText(convertSeconds(setValue));
+            setIncrements(event, changeFirstValue);
+            switch (mode) {
+                case 1: first_value_text.setText(convertSeconds(setValue)); break;
+                case 2: first_value_text.setText(convertSeconds(pomValue1)); break;
+
+            }
             return true;
         });
 
-        plus_breaks.setOnTouchListener((v, event) -> {
+        plus_second_value.setOnTouchListener((v, event) -> {
             incrementValues = true;
-            setIncrements(event, changeBreakValue);
-            if (!breaksOnly) break_time.setText(convertSeconds(breakValue)); else break_time.setText(convertSeconds(breaksOnlyValue));
+            setIncrements(event, changeSecondValue);
+            switch (mode) {
+                case 1:
+                    if (!breaksOnly) second_value_text.setText(convertSeconds(breakValue)); else second_value_text.setText(convertSeconds(breaksOnlyValue)); break;
+                case 2: second_value_text.setText(convertSeconds(pomValue2)); break;
+
+            }
             return true;
         });
 
-        minus_breaks.setOnTouchListener((v, event) -> {
+        minus_second_value.setOnTouchListener((v, event) -> {
             incrementValues = false;
-            setIncrements(event, changeBreakValue);
-            if (!breaksOnly) break_time.setText(convertSeconds(breakValue)); else break_time.setText(convertSeconds(breaksOnlyValue));
+            setIncrements(event, changeSecondValue);
+            switch (mode) {
+                case 1:
+                    if (!breaksOnly) second_value_text.setText(convertSeconds(breakValue)); else second_value_text.setText(convertSeconds(breaksOnlyValue)); break;
+                case 2: second_value_text.setText(convertSeconds(pomValue2)); break;
+            }
             return true;
         });
+
+        plus_third_value.setOnTouchListener((v, event) -> {
+            switch (mode) {
+                case 1:
+                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(true);  break;
+                case 2:
+                    incrementValues = true;
+                    setIncrements(event, changeThirdValue);
+                    third_value_text.setText(convertSeconds(pomValue3));
+                    break;
+            }
+            return true;
+        });
+
+        minus_third_value.setOnTouchListener((v, event) -> {
+            switch (mode) {
+                case 1:
+                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(false);  break;
+                case 2:
+                    incrementValues = false;
+                    setIncrements(event, changeThirdValue);
+                    third_value_text.setText(convertSeconds(pomValue3));
+                    break;
+            }
+            return true;
+        });
+
+//        plus_third_value.setOnClickListener(v -> {
+//            switch (mode) {
+//                case 1: adjustCustom(true); break;
+//                case 2:
+//                    incrementValues = true;
+//                    setIncrements();
+//            }
+//
+//        });
+
+//        minus_third_value.setOnClickListener(v -> {
+//            switch (mode) {
+//                case 1:
+//                    adjustCustom(false); break;
+//                case 2:
+//
+//            }
+//        });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -744,9 +830,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 public void onAnimationEnd(Animation animation) {
                     if (breaksOnly) {
                         s1.setVisibility(View.INVISIBLE);
-                        plus_sets.setVisibility(View.INVISIBLE);
-                        minus_sets.setVisibility(View.INVISIBLE);
-                        set_time.setVisibility(View.INVISIBLE);
+                        plus_first_value.setVisibility(View.INVISIBLE);
+                        minus_first_value.setVisibility(View.INVISIBLE);
+                        first_value_text.setVisibility(View.INVISIBLE);
                         no_set_header.setAnimation(fadeIn);
                     }
                 }
@@ -767,9 +853,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 public void onAnimationEnd(Animation animation) {
                     if (!breaksOnly) {
                         s1.setVisibility(View.VISIBLE);
-                        plus_sets.setVisibility(View.VISIBLE);
-                        minus_sets.setVisibility(View.VISIBLE);
-                        set_time.setVisibility(View.VISIBLE);
+                        plus_first_value.setVisibility(View.VISIBLE);
+                        minus_first_value.setVisibility(View.VISIBLE);
+                        first_value_text.setVisibility(View.VISIBLE);
                     }
                 }
 
@@ -782,9 +868,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!breaksOnly) {
                     breaksOnly = true;
                     s1.setAnimation(fadeOut);
-                    set_time.setAnimation(fadeOut);
-                    plus_sets.setAnimation(fadeOut);
-                    minus_sets.setAnimation(fadeOut);
+                    first_value_text.setAnimation(fadeOut);
+                    plus_first_value.setAnimation(fadeOut);
+                    minus_first_value.setAnimation(fadeOut);
                     setBegun = true;
                     onBreak = true;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
@@ -794,9 +880,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnly = false;
                     no_set_header.setAnimation(fadeOut);
                     s1.setAnimation(fadeIn);
-                    set_time.setAnimation(fadeIn);
-                    plus_sets.setAnimation(fadeIn);
-                    minus_sets.setAnimation(fadeIn);
+                    first_value_text.setAnimation(fadeIn);
+                    plus_first_value.setAnimation(fadeIn);
+                    minus_first_value.setAnimation(fadeIn);
                     setBegun = false;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                     dotDraws.breaksOnly(false);
@@ -1073,14 +1159,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
-
-        plus_rounds.setOnClickListener(v -> {
-            adjustCustom(true);
-        });
-
-        minus_rounds.setOnClickListener(v -> {
-            adjustCustom(false);
         });
 
         reset.setOnClickListener(v -> {
@@ -1414,7 +1492,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
         if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
-        Log.i("testValues", "set and break values are " + setValue + " and " + breakValue);
+        if (pomValue1<10) pomValue1 = 10; if (pomValue1>120) pomValue1 = 120;
+        if (pomValue2<1) pomValue2 = 1; if (pomValue2>10) pomValue2 = 10;
+        if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
     }
 
     private String convertSeconds(long totalSeconds) {
@@ -1506,7 +1586,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timePaused.setText("?");
             }
         }
-        if (!breaksOnly) roundCount.setText(String.valueOf(customSetTime.size())); else roundCount.setText(String.valueOf(breaksOnlyTime.size()));
+        if (!breaksOnly) third_value_text.setText(String.valueOf(customSetTime.size())); else third_value_text.setText(String.valueOf(breaksOnlyTime.size()));
     }
 
     private void endAnimation() {
@@ -1825,27 +1905,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
-                plus_rounds.setVisibility(View.VISIBLE);
-                minus_rounds.setVisibility(View.VISIBLE);
+                plus_third_value.setVisibility(View.VISIBLE);
+                minus_third_value.setVisibility(View.VISIBLE);
                 if (breaksOnly) no_set_header.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
                 if (!breaksOnly) {
                     s1.setVisibility(View.VISIBLE);
-                    plus_sets.setVisibility(View.VISIBLE);
-                    minus_sets.setVisibility(View.VISIBLE);
+                    plus_first_value.setVisibility(View.VISIBLE);
+                    minus_first_value.setVisibility(View.VISIBLE);
                     no_set_header.setVisibility(View.GONE);
+                    first_value_text.setText(convertSeconds(setValue));
+                    second_value_text.setText(convertSeconds(breakValue));
+                    third_value_text.setText(String.valueOf(startCustomSetTime.size()));
                 } else {
                     s1.setVisibility(View.INVISIBLE);
-                    plus_sets.setVisibility(View.INVISIBLE);
-                    minus_sets.setVisibility(View.INVISIBLE);
+                    plus_first_value.setVisibility(View.INVISIBLE);
+                    minus_first_value.setVisibility(View.INVISIBLE);
                     no_set_header.setVisibility(View.VISIBLE);
+                    second_value_text.setText(convertSeconds(breaksOnlyValue));
+                    third_value_text.setText(String.valueOf(startBreaksOnlyTime.size()));
                 }
-
-                plus_breaks.setVisibility(View.VISIBLE);
-                minus_breaks.setVisibility(View.VISIBLE);
-                plus_rounds.setVisibility(View.VISIBLE);
-                minus_rounds.setVisibility(View.VISIBLE);
+                plus_second_value.setVisibility(View.VISIBLE);
+                minus_second_value.setVisibility(View.VISIBLE);
+                plus_third_value.setVisibility(View.VISIBLE);
+                minus_third_value.setVisibility(View.VISIBLE);
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
@@ -1862,12 +1946,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.VISIBLE);
-                plus_sets.setVisibility(View.VISIBLE);
-                minus_sets.setVisibility(View.VISIBLE);
-                plus_breaks.setVisibility(View.VISIBLE);
-                minus_breaks.setVisibility(View.VISIBLE);
-                plus_rounds.setVisibility(View.VISIBLE);
-                minus_rounds.setVisibility(View.VISIBLE);
+                plus_first_value.setVisibility(View.VISIBLE);
+                minus_first_value.setVisibility(View.VISIBLE);
+                plus_second_value.setVisibility(View.VISIBLE);
+                minus_second_value.setVisibility(View.VISIBLE);
+                plus_third_value.setVisibility(View.VISIBLE);
+                minus_third_value.setVisibility(View.VISIBLE);
+                first_value_text.setText(convertSeconds(pomValue1));
+                second_value_text.setText(convertSeconds(pomValue2));
+                third_value_text.setText(convertSeconds(pomValue3));
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
@@ -1880,17 +1967,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.VISIBLE);
-                plus_rounds.setVisibility(View.GONE);
+                plus_third_value.setVisibility(View.GONE);
                 no_set_header.setVisibility(View.GONE);
                 s1.setVisibility(View.GONE);
                 s2.setVisibility(View.GONE);
                 s3.setVisibility(View.GONE);
-                plus_sets.setVisibility(View.GONE);
-                minus_sets.setVisibility(View.GONE);
-                plus_breaks.setVisibility(View.GONE);
-                minus_breaks.setVisibility(View.GONE);
-                plus_rounds.setVisibility(View.GONE);
-                minus_rounds.setVisibility(View.GONE);
+                plus_first_value.setVisibility(View.GONE);
+                minus_first_value.setVisibility(View.GONE);
+                plus_second_value.setVisibility(View.GONE);
+                minus_second_value.setVisibility(View.GONE);
+                plus_third_value.setVisibility(View.GONE);
+                minus_third_value.setVisibility(View.GONE);
                 skip.setVisibility(View.GONE);
                 newLap.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
@@ -2013,7 +2100,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     dotDraws.setTime(customSetTime);
                     dotDraws.breakTime(customBreakTime);
-                    roundCount.setText(String.valueOf(customSetTime.size()));
+                    third_value_text.setText(String.valueOf(customSetTime.size()));
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breaksOnlyTime.addAll(startBreaksOnlyTime);
@@ -2022,7 +2109,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timerDisabled = true;
                     }
                     dotDraws.breakTime(breaksOnlyTime);
-                    roundCount.setText(String.valueOf(breaksOnlyTime.size()));
+                    third_value_text.setText(String.valueOf(breaksOnlyTime.size()));
                 }
                 dotDraws.setAlpha();
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
