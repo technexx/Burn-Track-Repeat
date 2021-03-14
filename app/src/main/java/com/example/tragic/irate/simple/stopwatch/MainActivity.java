@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageView minus_second_value;
     ImageButton plus_third_value;
     ImageButton minus_third_value;
+    Button add_cycle;
+    Button sub_cycle;
 
     ImageView sortCheckmark;
     TextView skip;
@@ -248,11 +250,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView sortLow;
     int sortMode = 1;
     int sortModeBO = 1;
-    ImageView pauseResumeView;
     MaterialButton pauseResumeButton;
+    int blankCount;
 
+    //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
     //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
-    //Todo: Add/Remove cycle elements from indiviudal places.
+    //Todo: Add/Remove cycle elements from individual places.
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
@@ -263,6 +266,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Repository for db. Look at Executor/other alternate thread methods.
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+            dotDraws.selectCycle(x, y);
+        }
+        return false;
+    }
 
     //Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
@@ -503,6 +516,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         plus_third_value = findViewById(R.id.plus_third_value);
         minus_third_value = findViewById(R.id.minus_third_value);
         third_value_text = findViewById(R.id.third_value_text);
+        add_cycle = findViewById(R.id.add_cycle);
+        sub_cycle = findViewById(R.id.subtract_cycle);
         cycles_completed = findViewById(R.id.cycles_completed);
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
@@ -732,6 +747,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
             }
             return true;
+        });
+
+        add_cycle.setOnClickListener(v-> {
+
+        });
+
+        sub_cycle.setOnClickListener(v-> {
+
         });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -1521,6 +1544,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     setValue = Long.parseLong(first_value_text.getText().toString());
                     customSetTime.add(setValue * 1000);
                     startCustomSetTime.add(setValue * 1000);
+//                    blankCount+=1;
+//                    dotDraws.drawBlanks(blankCount);
+//                    ArrayList<Long> testArray = new ArrayList<>();
+//                    dotDraws.setTime(testArray);
                 } else {
                     Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                 }

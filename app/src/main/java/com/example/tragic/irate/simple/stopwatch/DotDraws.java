@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.graphics.RectF;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -34,6 +36,7 @@ public class DotDraws extends View {
     long mBreakCount;
     long mSetReduce;
     long mBreakReduce;
+    int mBlankCount;
 
     int mAlpha = 255;
     int mAlpha2 = 255;
@@ -50,6 +53,9 @@ public class DotDraws extends View {
     int savedCustomCycle;
     int savedPomAlpha;
     int savedPomCycle;
+    int mPosX;
+    int mPosY;
+    boolean mDrawBox;
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -61,14 +67,19 @@ public class DotDraws extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setStrokeWidth(4);
         mPaintText = new Paint();
         mPaintText.setAntiAlias(true);
-        mPaintText.setStrokeWidth(5);
+    }
+
+    public void selectionPaint() {
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(3);
+        mPaint.setColor(Color.GRAY);
     }
 
     public void newDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
         this.mSetCount = setCount; this.mBreakCount = breakCount; this.mSetReduce = setReduce; this.mBreakReduce = breakReduce; this.mFadeDone = fadeDone;
-        setupPaint();
         invalidate();
     }
 
@@ -116,8 +127,30 @@ public class DotDraws extends View {
         cycle2 = savedPomCycle;
     }
 
+    public void drawBlanks(int blankCount) {
+        mBlankCount = blankCount;
+        invalidate();
+    }
+
+    public void selectCycle(int posX, int posY) {
+        mPosX = posX; mPosY = posY;
+        mDrawBox = true;
+        invalidate();
+    }
+
+    public int setBoxCoordinates(int x, int y){
+        int pos = 0;
+        //Y range is always the same.
+        if (y>=750 && y<=1050) {
+            if (x>100 && x<=200) pos = 1; if (x>200 && x<=300) pos = 2; if (x>300 && x<=400) pos = 3; if (x>400 && x<=500) pos = 4; if (x>500 && x<=600) pos = 5; if (x>600 && x<=700) pos = 6; if (x>700 && x<=800) pos = 7; if (x>800 && x<=900) pos = 8;if (x>900) pos = 9;
+        }
+
+        return pos;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
+        setupPaint();
         this.mCanvas = canvas;
         savedCustomAlpha = mAlpha;
         savedCustomCycle = cycle;
@@ -128,8 +161,20 @@ public class DotDraws extends View {
         if (mBreaksOnly) mY2 = 535;
 
         if (mMode == 1 && !mBreaksOnly) {
+            //Todo: Blank counts.
+            for (int k=0; k<mBlankCount; k++) {
+                mPaint.setStyle(Paint.Style.STROKE);
+                mPaint.setColor(Color.GREEN);
+                mCanvas.drawCircle(mX, mY, 45, mPaint);
+                mX += 108;
+                mPaint.setColor(Color.RED);
+                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                mX2+=108;
+            }
+
             for (int i=0; i<mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
+                mPaint.setStyle(Paint.Style.FILL);
                 if (mSetReduce + i == mSetCount) {
                     if (mFadeDone == 1) {
                         fadeDot();
@@ -145,6 +190,12 @@ public class DotDraws extends View {
             }
         }
 
+        if (mDrawBox) {
+            selectionPaint();
+            int touchedPos = setBoxCoordinates(mPosX, mPosY);
+            mCanvas.drawRect((100*touchedPos) +(8*touchedPos) + 10, 425, (100*touchedPos)+ 100 + (8*touchedPos) + 10, 685, mPaint);
+            Log.i("touchTest", "pos is " + touchedPos + " and Y is " + mPosY);
+        }
 
         if (mMode == 1) {
             for (int i=0; i<mBreakCount; i++) {
