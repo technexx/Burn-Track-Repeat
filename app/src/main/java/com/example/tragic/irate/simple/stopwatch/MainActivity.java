@@ -63,7 +63,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener{
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, DotDraws.sendPosition{
 
     Button breaks_only;
     TextView save_cycles;
@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int sortMode = 1;
     int sortModeBO = 1;
     MaterialButton pauseResumeButton;
-    int blankCount;
 
     //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
     //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
@@ -268,11 +267,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Repository for db. Look at Executor/other alternate thread methods.
 
     @Override
+    public void sendPos(int pos) {
+        Log.i("testcb", "pos is " + pos);
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
         int y = (int) event.getY();
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
-            dotDraws.selectCycle(x, y);
+            dotDraws.selectCycle(x, y, startCustomSetTime.size());
         }
         return false;
     }
@@ -545,6 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pauseResumeButton = findViewById(R.id.pauseResumeButton);
         pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
         pauseResumeButton.setRippleColor(null);
+
+        dotDraws.onPositionSelect(MainActivity.this);
 
         s1.setText(R.string.set_time);
         s2.setText(R.string.break_time);

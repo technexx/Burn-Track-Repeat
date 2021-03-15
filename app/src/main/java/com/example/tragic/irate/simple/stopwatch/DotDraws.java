@@ -56,6 +56,16 @@ public class DotDraws extends View {
     int mPosX;
     int mPosY;
     boolean mDrawBox;
+    int mListSize;
+    sendPosition mSendPosition;
+
+    public interface sendPosition {
+        void sendPos(int pos);
+    }
+
+    public void onPositionSelect(sendPosition xSendPosition) {
+        this.mSendPosition = xSendPosition;
+    }
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -132,8 +142,8 @@ public class DotDraws extends View {
 //        invalidate();
 //    }
 
-    public void selectCycle(int posX, int posY) {
-        mPosX = posX; mPosY = posY;
+    public void selectCycle(int posX, int posY, int size) {
+        mPosX = posX; mPosY = posY; mListSize = size;
         mDrawBox = true;
         invalidate();
     }
@@ -142,9 +152,8 @@ public class DotDraws extends View {
         int pos = 0;
         //Y range is always the same.
         if (y>=750 && y<=1050) {
-            if (x>100 && x<=200) pos = 1; if (x>200 && x<=300) pos = 2; if (x>300 && x<=400) pos = 3; if (x>400 && x<=500) pos = 4; if (x>500 && x<=600) pos = 5; if (x>600 && x<=700) pos = 6; if (x>700 && x<=800) pos = 7; if (x>800 && x<=900) pos = 8;if (x>900) pos = 9;
+            if (x>120 && x<=220 && mListSize>=2) pos = 1; if (x>220 && x<=320 && mListSize>=3) pos = 2; if (x>320 && x<=420 && mListSize>=4) pos = 3; if (x>420 && x<=520 && mListSize>=5) pos = 4; if (x>520 && x<=620 && mListSize>=6) pos = 5; if (x>620 && x<=720 && mListSize>=7) pos = 6; if (x>720 && x<=820 && mListSize>=8) pos = 7; if (x>820 && x<=920 && mListSize>=9) pos = 8;if (x>920 && mListSize>=10) pos = 9;
         }
-
         return pos;
     }
 
@@ -189,11 +198,14 @@ public class DotDraws extends View {
             }
         }
 
-        //Todo: Options to move or delete individual set/break. No blank circles, just a box around each.
+        //Todo: Options to move or delete individual set/break.
         if (mDrawBox) {
             selectionPaint();
             int touchedPos = setBoxCoordinates(mPosX, mPosY);
-            mCanvas.drawRect((100*touchedPos) +(8*touchedPos) + 10, 425, (100*touchedPos)+ 100 + (8*touchedPos) + 10, 685, mPaint);
+            if (mListSize>0) {
+                mCanvas.drawRect((100*touchedPos) +(8*touchedPos) + 10, 425, (100*touchedPos)+ 100 + (8*touchedPos) + 10, 685, mPaint);
+                mSendPosition.sendPos(touchedPos);
+            }
         }
 
         if (mMode == 1) {
