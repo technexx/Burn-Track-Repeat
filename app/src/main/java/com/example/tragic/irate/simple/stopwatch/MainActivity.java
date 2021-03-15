@@ -99,9 +99,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView no_set_header;
     TextView cycles_completed;
     TextView cycle_reset;
-    EditText first_value_text;
-    EditText second_value_text;
-    EditText third_value_text;
+    EditText first_value_edit;
+    EditText second_value_edit;
+    EditText third_value_edit;
     ImageView plus_first_value;
     ImageView minus_first_value;
     ImageView plus_second_value;
@@ -507,15 +507,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s3 = findViewById(R.id.s3);
         no_set_header = findViewById(R.id.no_set_header);
         reset = findViewById(R.id.reset);
-        first_value_text = findViewById(R.id.first_value_text);
-        second_value_text = findViewById(R.id.second_value_text);
+        first_value_edit = findViewById(R.id.first_value_edit);
+        second_value_edit = findViewById(R.id.second_value_edit);
         plus_first_value = findViewById(R.id.plus_first_value);
         minus_first_value = findViewById(R.id.minus_first_value);
         plus_second_value = findViewById(R.id.plus_second_value);
         minus_second_value = findViewById(R.id.minus_second_value);
         plus_third_value = findViewById(R.id.plus_third_value);
         minus_third_value = findViewById(R.id.minus_third_value);
-        third_value_text = findViewById(R.id.third_value_text);
+        third_value_edit = findViewById(R.id.third_value_edit);
         add_cycle = findViewById(R.id.add_cycle);
         sub_cycle = findViewById(R.id.subtract_cycle);
         cycles_completed = findViewById(R.id.cycles_completed);
@@ -610,9 +610,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValue3 = 15;
         setMillis = setValue;
         breakMillis = breakValue;
-        first_value_text.setText(convertSeconds(setValue));
-        second_value_text.setText(convertSeconds(breakValue));
-        third_value_text.setText(String.valueOf(customSetTime.size()));
+        first_value_edit.setText(convertSeconds(setValue));
+        second_value_edit.setText(convertSeconds(breakValue));
+        third_value_edit.setText(String.valueOf(customSetTime.size()));
 
         lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
@@ -633,6 +633,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Todo: Third value on Custom should not be EditText.
         resetTimer();
         incrementTimer = 10;
+
+//        first_value_edit.setOnClickListener(v-> {
+//            first_value_edit.setCursorVisible(true);
+//        });
 
         changeFirstValue = new Runnable() {
             @Override
@@ -683,8 +687,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             incrementValues = true;
             setIncrements(event, changeFirstValue);
             switch (mode) {
-                case 1: first_value_text.setText(convertSeconds(setValue)); break;
-                case 2: first_value_text.setText(convertSeconds(pomValue1)); break;
+                case 1: first_value_edit.setText(convertSeconds(setValue)); break;
+                case 2: first_value_edit.setText(convertSeconds(pomValue1)); break;
             }
             return true;
         });
@@ -693,8 +697,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             incrementValues = false;
             setIncrements(event, changeFirstValue);
             switch (mode) {
-                case 1: first_value_text.setText(convertSeconds(setValue)); break;
-                case 2: first_value_text.setText(convertSeconds(pomValue1)); break;
+                case 1: first_value_edit.setText(convertSeconds(setValue)); break;
+                case 2: first_value_edit.setText(convertSeconds(pomValue1)); break;
 
             }
             return true;
@@ -705,8 +709,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setIncrements(event, changeSecondValue);
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) second_value_text.setText(convertSeconds(breakValue)); else second_value_text.setText(convertSeconds(breaksOnlyValue)); break;
-                case 2: second_value_text.setText(convertSeconds(pomValue2)); break;
+                    if (!breaksOnly) second_value_edit.setText(convertSeconds(breakValue)); else second_value_edit.setText(convertSeconds(breaksOnlyValue)); break;
+                case 2: second_value_edit.setText(convertSeconds(pomValue2)); break;
 
             }
             return true;
@@ -717,8 +721,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setIncrements(event, changeSecondValue);
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) second_value_text.setText(convertSeconds(breakValue)); else second_value_text.setText(convertSeconds(breaksOnlyValue)); break;
-                case 2: second_value_text.setText(convertSeconds(pomValue2)); break;
+                    if (!breaksOnly) second_value_edit.setText(convertSeconds(breakValue)); else second_value_edit.setText(convertSeconds(breaksOnlyValue)); break;
+                case 2: second_value_edit.setText(convertSeconds(pomValue2)); break;
             }
             return true;
         });
@@ -730,7 +734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2:
                     incrementValues = true;
                     setIncrements(event, changeThirdValue);
-                    third_value_text.setText(convertSeconds(pomValue3));
+                    third_value_edit.setText(convertSeconds(pomValue3));
                     break;
             }
             return true;
@@ -743,7 +747,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2:
                     incrementValues = false;
                     setIncrements(event, changeThirdValue);
-                    third_value_text.setText(convertSeconds(pomValue3));
+                    third_value_edit.setText(convertSeconds(pomValue3));
                     break;
             }
             return true;
@@ -841,7 +845,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         s1.setVisibility(View.INVISIBLE);
                         plus_first_value.setVisibility(View.INVISIBLE);
                         minus_first_value.setVisibility(View.INVISIBLE);
-                        first_value_text.setVisibility(View.INVISIBLE);
+                        first_value_edit.setVisibility(View.INVISIBLE);
                         no_set_header.setAnimation(fadeIn);
                     }
                 }
@@ -864,7 +868,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         s1.setVisibility(View.VISIBLE);
                         plus_first_value.setVisibility(View.VISIBLE);
                         minus_first_value.setVisibility(View.VISIBLE);
-                        first_value_text.setVisibility(View.VISIBLE);
+                        first_value_edit.setVisibility(View.VISIBLE);
                     }
                 }
 
@@ -877,7 +881,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!breaksOnly) {
                     breaksOnly = true;
                     s1.setAnimation(fadeOut);
-                    first_value_text.setAnimation(fadeOut);
+                    first_value_edit.setAnimation(fadeOut);
                     plus_first_value.setAnimation(fadeOut);
                     minus_first_value.setAnimation(fadeOut);
                     setBegun = true;
@@ -889,7 +893,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnly = false;
                     no_set_header.setAnimation(fadeOut);
                     s1.setAnimation(fadeIn);
-                    first_value_text.setAnimation(fadeIn);
+                    first_value_edit.setAnimation(fadeIn);
                     plus_first_value.setAnimation(fadeIn);
                     minus_first_value.setAnimation(fadeIn);
                     setBegun = false;
@@ -1492,8 +1496,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case MotionEvent.ACTION_DOWN:
                 //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
                 mHandler = new Handler();
-                mHandler.postDelayed(runnable,50);
-                mHandler.postDelayed(valueSpeed, 50);
+                mHandler.postDelayed(runnable,25);
+                mHandler.postDelayed(valueSpeed, 25);
                 break;
             case MotionEvent.ACTION_UP:
                 mHandler.removeCallbacksAndMessages(null);
@@ -1541,7 +1545,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (adding) {
             if (!breaksOnly) {
                 if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
-                    setValue = Long.parseLong(first_value_text.getText().toString());
+                    setValue = Long.parseLong(first_value_edit.getText().toString());
                     customSetTime.add(setValue * 1000);
                     startCustomSetTime.add(setValue * 1000);
 //                    blankCount+=1;
@@ -1552,13 +1556,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                 }
                 if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
-                    breakValue = Long.parseLong(second_value_text.getText().toString());
+                    breakValue = Long.parseLong(second_value_edit.getText().toString());
                     customBreakTime.add(breakValue * 1000);
                     startCustomBreakTime.add(breakValue * 1000);
                 }
             } else {
                 if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
-                    breaksOnlyValue = Long.parseLong(second_value_text.getText().toString());
+                    breaksOnlyValue = Long.parseLong(second_value_edit.getText().toString());
                     breaksOnlyTime.add(breaksOnlyValue * 1000);
                     startBreaksOnlyTime.add(breaksOnlyValue * 1000);
                 } else {
@@ -1602,7 +1606,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timePaused.setText("?");
             }
         }
-        if (!breaksOnly) third_value_text.setText(String.valueOf(customSetTime.size())); else third_value_text.setText(String.valueOf(breaksOnlyTime.size()));
+        if (!breaksOnly) third_value_edit.setText(String.valueOf(customSetTime.size())); else third_value_edit.setText(String.valueOf(breaksOnlyTime.size()));
     }
 
     private void endAnimation() {
@@ -1931,16 +1935,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     plus_first_value.setVisibility(View.VISIBLE);
                     minus_first_value.setVisibility(View.VISIBLE);
                     no_set_header.setVisibility(View.GONE);
-                    first_value_text.setText(convertSeconds(setValue));
-                    second_value_text.setText(convertSeconds(breakValue));
-                    third_value_text.setText(String.valueOf(startCustomSetTime.size()));
+                    first_value_edit.setText(convertSeconds(setValue));
+                    second_value_edit.setText(convertSeconds(breakValue));
+                    third_value_edit.setText(String.valueOf(startCustomSetTime.size()));
                 } else {
                     s1.setVisibility(View.INVISIBLE);
                     plus_first_value.setVisibility(View.INVISIBLE);
                     minus_first_value.setVisibility(View.INVISIBLE);
                     no_set_header.setVisibility(View.VISIBLE);
-                    second_value_text.setText(convertSeconds(breaksOnlyValue));
-                    third_value_text.setText(String.valueOf(startBreaksOnlyTime.size()));
+                    second_value_edit.setText(convertSeconds(breaksOnlyValue));
+                    third_value_edit.setText(String.valueOf(startBreaksOnlyTime.size()));
                 }
                 plus_second_value.setVisibility(View.VISIBLE);
                 minus_second_value.setVisibility(View.VISIBLE);
@@ -1953,10 +1957,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setText(R.string.set_number);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
-                first_value_text.setFilters(new InputFilter[]{
+                first_value_edit.setFilters(new InputFilter[]{
                         new NumberFilter(5, 300)
                 });
-                second_value_text.setFilters(new InputFilter[]{
+                second_value_edit.setFilters(new InputFilter[]{
                         new NumberFilter(5, 300)
                 });
                 break;
@@ -1974,9 +1978,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 minus_second_value.setVisibility(View.VISIBLE);
                 plus_third_value.setVisibility(View.VISIBLE);
                 minus_third_value.setVisibility(View.VISIBLE);
-                first_value_text.setText(convertSeconds(pomValue1));
-                second_value_text.setText(convertSeconds(pomValue2));
-                third_value_text.setText(convertSeconds(pomValue3));
+                first_value_edit.setText(convertSeconds(pomValue1));
+                second_value_edit.setText(convertSeconds(pomValue2));
+                third_value_edit.setText(convertSeconds(pomValue3));
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
@@ -1984,13 +1988,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setText(R.string.long_break);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
-                first_value_text.setFilters(new InputFilter[]{
+                first_value_edit.setFilters(new InputFilter[]{
                         new NumberFilter(10, 120)
                 });
-                second_value_text.setFilters(new InputFilter[]{
+                second_value_edit.setFilters(new InputFilter[]{
                         new NumberFilter(1, 10)
                 });
-                third_value_text.setFilters(new InputFilter[]{
+                third_value_edit.setFilters(new InputFilter[]{
                         new NumberFilter(10, 60)
                 });
                 break;
@@ -2131,7 +2135,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     dotDraws.setTime(customSetTime);
                     dotDraws.breakTime(customBreakTime);
-                    third_value_text.setText(String.valueOf(customSetTime.size()));
+                    third_value_edit.setText(String.valueOf(customSetTime.size()));
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breaksOnlyTime.addAll(startBreaksOnlyTime);
@@ -2140,7 +2144,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timerDisabled = true;
                     }
                     dotDraws.breakTime(breaksOnlyTime);
-                    third_value_text.setText(String.valueOf(breaksOnlyTime.size()));
+                    third_value_edit.setText(String.valueOf(breaksOnlyTime.size()));
                 }
                 dotDraws.setAlpha();
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);

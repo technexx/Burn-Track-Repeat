@@ -148,7 +148,7 @@
     </ImageButton>
 
     <EditText
-        android:id="@+id/first_value_text"
+        android:id="@+id/first_value_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_first_value"
@@ -158,11 +158,12 @@
         android:textSize="22sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:inputType="number">
+        android:inputType="number"
+        android:cursorVisible="false">
     </EditText>
 
     <EditText
-        android:id="@+id/second_value_text"
+        android:id="@+id/second_value_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_second_value"
@@ -172,11 +173,12 @@
         android:textSize="22sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        >
+        android:inputType="number"
+        android:cursorVisible="false">
     </EditText>
 
     <EditText
-        android:id="@+id/third_value_text"
+        android:id="@+id/third_value_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_third_value"
@@ -186,7 +188,8 @@
         android:textSize="22sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        >
+        android:cursorVisible="false"
+        android:inputType="number">
     </EditText>
 
     <Button

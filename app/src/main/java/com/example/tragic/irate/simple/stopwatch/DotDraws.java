@@ -127,10 +127,10 @@ public class DotDraws extends View {
         cycle2 = savedPomCycle;
     }
 
-    public void drawBlanks(int blankCount) {
-        mBlankCount = blankCount;
-        invalidate();
-    }
+//    public void drawBlanks(int blankCount) {
+//        mBlankCount = blankCount;
+//        invalidate();
+//    }
 
     public void selectCycle(int posX, int posY) {
         mPosX = posX; mPosY = posY;
@@ -161,20 +161,19 @@ public class DotDraws extends View {
         if (mBreaksOnly) mY2 = 535;
 
         if (mMode == 1 && !mBreaksOnly) {
-            //Todo: Blank counts.
-            for (int k=0; k<mBlankCount; k++) {
-                mPaint.setStyle(Paint.Style.STROKE);
-                mPaint.setColor(Color.GREEN);
-                mCanvas.drawCircle(mX, mY, 45, mPaint);
-                mX += 108;
-                mPaint.setColor(Color.RED);
-                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                mX2+=108;
-            }
+//            for (int k=0; k<mBlankCount; k++) {
+//                mPaint.setStyle(Paint.Style.STROKE);
+//                mPaint.setColor(Color.GREEN);
+//                mCanvas.drawCircle(mX, mY, 45, mPaint);
+//                mX += 108;
+//                mPaint.setColor(Color.RED);
+//                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+//                mX2+=108;
+//            }
 
+            mPaint.setStyle(Paint.Style.FILL);
             for (int i=0; i<mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
-                mPaint.setStyle(Paint.Style.FILL);
                 if (mSetReduce + i == mSetCount) {
                     if (mFadeDone == 1) {
                         fadeDot();
@@ -190,14 +189,15 @@ public class DotDraws extends View {
             }
         }
 
+        //Todo: Options to move or delete individual set/break. No blank circles, just a box around each.
         if (mDrawBox) {
             selectionPaint();
             int touchedPos = setBoxCoordinates(mPosX, mPosY);
             mCanvas.drawRect((100*touchedPos) +(8*touchedPos) + 10, 425, (100*touchedPos)+ 100 + (8*touchedPos) + 10, 685, mPaint);
-            Log.i("touchTest", "pos is " + touchedPos + " and Y is " + mPosY);
         }
 
         if (mMode == 1) {
+            mPaint.setStyle(Paint.Style.FILL);
             for (int i=0; i<mBreakCount; i++) {
                 if (mMode == 2) {
                     mPaint.setColor(Color.GREEN);
