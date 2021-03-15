@@ -57,6 +57,9 @@ public class DotDraws extends View {
     int mPosY;
     boolean mDrawBox;
     int mListSize;
+    int currentPos;
+    int previousPos;
+    boolean mCurrentlySelected;
     sendPosition mSendPosition;
 
     public interface sendPosition {
@@ -137,24 +140,15 @@ public class DotDraws extends View {
         cycle2 = savedPomCycle;
     }
 
-//    public void drawBlanks(int blankCount) {
-//        mBlankCount = blankCount;
-//        invalidate();
-//    }
-
     public void selectCycle(int posX, int posY, int size) {
         mPosX = posX; mPosY = posY; mListSize = size;
-        mDrawBox = true;
-        invalidate();
-    }
+        if (posY>=810 && posY<=1000) {
+            if (posX >120 && posX <=220 && mListSize>=2) currentPos = 1; if (posX >220 && posX <=320 && mListSize>=3) currentPos = 2; if (posX >320 && posX <=420 && mListSize>=4) currentPos = 3; if (posX >420 && posX <=520 && mListSize>=5) currentPos = 4; if (posX >520 && posX <=620 && mListSize>=6) currentPos = 5; if (posX >620 && posX <=720 && mListSize>=7) currentPos = 6; if (posX >720 && posX <=820 && mListSize>=8) currentPos = 7; if (posX >820 && posX <=920 && mListSize>=9) currentPos = 8;if (posX >920 && mListSize>=10) currentPos = 9;
 
-    public int setBoxCoordinates(int x, int y){
-        int pos = 0;
-        //Y range is always the same.
-        if (y>=750 && y<=1050) {
-            if (x>120 && x<=220 && mListSize>=2) pos = 1; if (x>220 && x<=320 && mListSize>=3) pos = 2; if (x>320 && x<=420 && mListSize>=4) pos = 3; if (x>420 && x<=520 && mListSize>=5) pos = 4; if (x>520 && x<=620 && mListSize>=6) pos = 5; if (x>620 && x<=720 && mListSize>=7) pos = 6; if (x>720 && x<=820 && mListSize>=8) pos = 7; if (x>820 && x<=920 && mListSize>=9) pos = 8;if (x>920 && mListSize>=10) pos = 9;
+            if (previousPos!=currentPos) mDrawBox = true; else mDrawBox = false;
+            previousPos = 0;
+            invalidate();
         }
-        return pos;
     }
 
     @Override
@@ -170,16 +164,6 @@ public class DotDraws extends View {
         if (mBreaksOnly) mY2 = 535;
 
         if (mMode == 1 && !mBreaksOnly) {
-//            for (int k=0; k<mBlankCount; k++) {
-//                mPaint.setStyle(Paint.Style.STROKE);
-//                mPaint.setColor(Color.GREEN);
-//                mCanvas.drawCircle(mX, mY, 45, mPaint);
-//                mX += 108;
-//                mPaint.setColor(Color.RED);
-//                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-//                mX2+=108;
-//            }
-
             mPaint.setStyle(Paint.Style.FILL);
             for (int i=0; i<mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
@@ -201,10 +185,10 @@ public class DotDraws extends View {
         //Todo: Options to move or delete individual set/break.
         if (mDrawBox) {
             selectionPaint();
-            int touchedPos = setBoxCoordinates(mPosX, mPosY);
             if (mListSize>0) {
-                mCanvas.drawRect((100*touchedPos) +(8*touchedPos) + 10, 425, (100*touchedPos)+ 100 + (8*touchedPos) + 10, 685, mPaint);
-                mSendPosition.sendPos(touchedPos);
+                mCanvas.drawRect((100*currentPos) +(8*currentPos) + 10, 425, (100*currentPos)+ 100 + (8*currentPos) + 10, 685, mPaint);
+                mSendPosition.sendPos(currentPos);
+                previousPos = currentPos;
             }
         }
 
