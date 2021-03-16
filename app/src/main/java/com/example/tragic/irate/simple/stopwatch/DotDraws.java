@@ -153,12 +153,15 @@ public class DotDraws extends View {
             if (posX > 880 && posX <= 990 && mListSize >= 9) currentPos = 8;
             if (posX > 990 && mListSize >= 10) currentPos = 9;
             Log.i("findpos", String.valueOf(posX));
-            if (previousPos != currentPos) mDrawBox = true;
+            if (previousPos != currentPos) {
+                mDrawBox = true;
+            }
             else {
                 mDrawBox = false;
                 currentPos = -1;
             }
             previousPos = -1;
+            mSendPosition.sendPos(currentPos);
         }
 
         invalidate();
@@ -205,7 +208,7 @@ public class DotDraws extends View {
             selectionPaint();
             if (mListSize>0 && currentPos>=0) {
                 mCanvas.drawRect((100*currentPos) +(8*currentPos) + 10, 425, (100*currentPos)+ 100 + (8*currentPos) + 10, 685, mPaint);
-                mSendPosition.sendPos(currentPos);
+//                mSendPosition.sendPos(currentPos);
                 previousPos = currentPos;
                 currentPos = -1;
             }

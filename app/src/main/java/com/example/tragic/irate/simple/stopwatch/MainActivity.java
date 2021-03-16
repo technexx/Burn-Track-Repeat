@@ -541,6 +541,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         left_arrow = findViewById(R.id.left_arrow);
         right_arrow = findViewById(R.id.right_arrow);
 
+
+        left_arrow.setVisibility(View.INVISIBLE);
+        right_arrow.setVisibility(View.INVISIBLE);
         reset.setVisibility(View.INVISIBLE);
         no_set_header.setVisibility(View.GONE);
 
