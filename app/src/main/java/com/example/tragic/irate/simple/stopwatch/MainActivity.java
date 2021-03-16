@@ -763,8 +763,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         left_arrow.setOnClickListener(v-> {
-            //Todo: First set method replaces the <- value we need to use next, thus duplicating it w/ the first.
             if (startCustomSetTime.size()>=2 && receivedPos>0) {
+
                 long holder = startCustomSetTime.get(receivedPos-1);
                 startCustomSetTime.set(receivedPos-1, startCustomSetTime.get(receivedPos));
                 startCustomSetTime.set(receivedPos, holder);
@@ -780,12 +780,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                receivedPos -=1;
+                dotDraws.setCycle(receivedPos);
+                Log.i("posTest", "pos is " + receivedPos);
             }
         });
 
         right_arrow.setOnClickListener(v-> {
             if (startCustomSetTime.size()-1 > receivedPos) {
-                long holder = startCustomSetTime.get(receivedPos-1);
+
+                long holder = startCustomSetTime.get(receivedPos+1);
                 startCustomSetTime.set(receivedPos+1, startCustomSetTime.get(receivedPos));
                 startCustomSetTime.set(receivedPos, holder);
                 customSetTime.set(receivedPos+1, customSetTime.get(receivedPos));
@@ -800,6 +804,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                receivedPos +=1;
+                dotDraws.setCycle(receivedPos);
+                Log.i("posTest", "pos is " + receivedPos);
+
             }
         });
 
