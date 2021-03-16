@@ -58,8 +58,7 @@ public class DotDraws extends View {
     boolean mDrawBox;
     int mListSize;
     int currentPos;
-    int previousPos;
-    boolean mCurrentlySelected;
+    int previousPos = -1;
     sendPosition mSendPosition;
 
     public interface sendPosition {
@@ -143,10 +142,10 @@ public class DotDraws extends View {
     public void selectCycle(int posX, int posY, int size) {
         mPosX = posX; mPosY = posY; mListSize = size;
         if (posY>=810 && posY<=1000) {
-            if (posX >120 && posX <=220 && mListSize>=2) currentPos = 1; if (posX >220 && posX <=320 && mListSize>=3) currentPos = 2; if (posX >320 && posX <=420 && mListSize>=4) currentPos = 3; if (posX >420 && posX <=520 && mListSize>=5) currentPos = 4; if (posX >520 && posX <=620 && mListSize>=6) currentPos = 5; if (posX >620 && posX <=720 && mListSize>=7) currentPos = 6; if (posX >720 && posX <=820 && mListSize>=8) currentPos = 7; if (posX >820 && posX <=920 && mListSize>=9) currentPos = 8;if (posX >920 && mListSize>=10) currentPos = 9;
-
+            if (posX<=110) currentPos = 0; if (posX >110 && posX <=220 && mListSize>=2) currentPos = 1; if (posX >220 && posX <=330 && mListSize>=3) currentPos = 2; if (posX >330 && posX <=440 && mListSize>=4) currentPos = 3; if (posX >440 && posX <=550 && mListSize>=5) currentPos = 4; if (posX >550 && posX <=660 && mListSize>=6) currentPos = 5; if (posX >660 && posX <=770 && mListSize>=7) currentPos = 6; if (posX >770 && posX <=880 && mListSize>=8) currentPos = 7; if (posX >880 && posX <=990 && mListSize>=9) currentPos = 8;if (posX >990 && mListSize>=10) currentPos = 9;
+            Log.i("findpos", String.valueOf(posX));
             if (previousPos!=currentPos) mDrawBox = true; else mDrawBox = false;
-            previousPos = 0;
+            previousPos = -1;
             invalidate();
         }
     }

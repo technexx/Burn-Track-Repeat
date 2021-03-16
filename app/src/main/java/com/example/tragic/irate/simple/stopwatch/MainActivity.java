@@ -110,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton minus_third_value;
     Button add_cycle;
     Button sub_cycle;
+    ImageButton left_arrow;
+    ImageButton right_arrow;
 
     ImageView sortCheckmark;
     TextView skip;
@@ -252,6 +254,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int sortModeBO = 1;
     MaterialButton pauseResumeButton;
 
+    int receivedPos;
+
     //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
     //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
     //Todo: Add/Remove cycle elements from individual places.
@@ -268,6 +272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     @Override
     public void sendPos(int pos) {
+        receivedPos = pos;
         Log.i("testcb", "pos is " + pos);
     }
 
@@ -526,6 +531,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
         newLap = findViewById(R.id.new_lap);
+        left_arrow = findViewById(R.id.left_arrow);
+        right_arrow = findViewById(R.id.right_arrow);
 
         reset.setVisibility(View.INVISIBLE);
         no_set_header.setVisibility(View.GONE);
@@ -640,10 +647,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         incrementTimer = 10;
 
-//        first_value_edit.setOnClickListener(v-> {
-//            first_value_edit.setCursorVisible(true);
-//        });
-
         changeFirstValue = new Runnable() {
             @Override
             public void run() {
@@ -757,6 +760,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
             }
             return true;
+        });
+
+        left_arrow.setOnClickListener(v-> {
+            //Todo: First set method replaces the <- value we need to use next, thus duplicating it w/ the first.
+            if (startCustomSetTime.size()>=2 && receivedPos>0) {
+                long holder = startCustomSetTime.get(receivedPos-1);
+                startCustomSetTime.set(receivedPos-1, startCustomSetTime.get(receivedPos));
+                startCustomSetTime.set(receivedPos, holder);
+                customSetTime.set(receivedPos-1, customSetTime.get(receivedPos));
+                customSetTime.set(receivedPos, holder);
+
+                holder = startCustomBreakTime.get(receivedPos-1);
+                startCustomBreakTime.set(receivedPos-1, startCustomBreakTime.get(receivedPos));
+                startCustomBreakTime.set(receivedPos, holder);
+                customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
+                customBreakTime.set(receivedPos, holder);
+
+                dotDraws.setTime(customSetTime);
+                dotDraws.breakTime(customBreakTime);
+                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+            }
+        });
+
+        right_arrow.setOnClickListener(v-> {
+            if (startCustomSetTime.size()-1 > receivedPos) {
+                long holder = startCustomSetTime.get(receivedPos-1);
+                startCustomSetTime.set(receivedPos+1, startCustomSetTime.get(receivedPos));
+                startCustomSetTime.set(receivedPos, holder);
+                customSetTime.set(receivedPos+1, customSetTime.get(receivedPos));
+                customSetTime.set(receivedPos, holder);
+
+                holder = startCustomBreakTime.get(receivedPos+1);
+                startCustomBreakTime.set(receivedPos+1, startCustomBreakTime.get(receivedPos));
+                startCustomBreakTime.set(receivedPos, holder);
+                customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
+                customBreakTime.set(receivedPos, holder);
+
+                dotDraws.setTime(customSetTime);
+                dotDraws.breakTime(customBreakTime);
+                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+            }
         });
 
         add_cycle.setOnClickListener(v-> {
@@ -1531,6 +1575,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public long convertStringToLong(String time) {
+        if (time.length()>=3) {
+            String[] timeString = time.split(":");
+            return (Long.parseLong(timeString[0]) * 60) + Long.parseLong(timeString[1]);
+        } else return Long.parseLong(time);
+    }
+
     public String convertStopwatch(long seconds) {
         long minutes;
         long roundedSeconds;
@@ -1551,24 +1602,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (adding) {
             if (!breaksOnly) {
                 if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
-                    setValue = Long.parseLong(first_value_edit.getText().toString());
+                    setValue = convertStringToLong(first_value_edit.getText().toString());
                     customSetTime.add(setValue * 1000);
                     startCustomSetTime.add(setValue * 1000);
-//                    blankCount+=1;
-//                    dotDraws.drawBlanks(blankCount);
-//                    ArrayList<Long> testArray = new ArrayList<>();
-//                    dotDraws.setTime(testArray);
                 } else {
                     Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                 }
                 if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
-                    breakValue = Long.parseLong(second_value_edit.getText().toString());
+                    breakValue = convertStringToLong(second_value_edit.getText().toString());
                     customBreakTime.add(breakValue * 1000);
                     startCustomBreakTime.add(breakValue * 1000);
                 }
             } else {
                 if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
-                    breaksOnlyValue = Long.parseLong(second_value_edit.getText().toString());
+                    breaksOnlyValue = convertStringToLong(second_value_edit.getText().toString());
                     breaksOnlyTime.add(breaksOnlyValue * 1000);
                     startBreaksOnlyTime.add(breaksOnlyValue * 1000);
                 } else {
