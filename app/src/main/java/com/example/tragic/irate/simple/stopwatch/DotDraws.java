@@ -57,7 +57,7 @@ public class DotDraws extends View {
     int mPosY;
     boolean mDrawBox;
     int mListSize;
-    int currentPos;
+    int currentPos = -1;
     int previousPos = -1;
     sendPosition mSendPosition;
 
@@ -199,10 +199,11 @@ public class DotDraws extends View {
         //Todo: Options to move or delete individual set/break.
         if (mDrawBox) {
             selectionPaint();
-            if (mListSize>0) {
+            if (mListSize>0 && currentPos>=0) {
                 mCanvas.drawRect((100*currentPos) +(8*currentPos) + 10, 425, (100*currentPos)+ 100 + (8*currentPos) + 10, 685, mPaint);
                 mSendPosition.sendPos(currentPos);
                 previousPos = currentPos;
+                currentPos = -1;
             }
         }
 
