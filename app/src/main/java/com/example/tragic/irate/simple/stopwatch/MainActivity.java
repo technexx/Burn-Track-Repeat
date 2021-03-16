@@ -273,6 +273,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public void sendPos(int pos) {
         receivedPos = pos;
+        if (pos == -1) {
+            left_arrow.setVisibility(View.INVISIBLE);
+            right_arrow.setVisibility(View.INVISIBLE);
+        } else {
+            left_arrow.setVisibility(View.VISIBLE);
+            right_arrow.setVisibility(View.VISIBLE);
+        }
         Log.i("testcb", "pos is " + pos);
     }
 
@@ -787,7 +794,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         right_arrow.setOnClickListener(v-> {
-            if (startCustomSetTime.size()-1 > receivedPos) {
+            if (startCustomSetTime.size()-1 > receivedPos && receivedPos>0) {
 
                 long holder = startCustomSetTime.get(receivedPos+1);
                 startCustomSetTime.set(receivedPos+1, startCustomSetTime.get(receivedPos));

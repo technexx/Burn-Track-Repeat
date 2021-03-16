@@ -154,9 +154,13 @@ public class DotDraws extends View {
             if (posX > 990 && mListSize >= 10) currentPos = 9;
             Log.i("findpos", String.valueOf(posX));
             if (previousPos != currentPos) mDrawBox = true;
-            else mDrawBox = false;
+            else {
+                mDrawBox = false;
+                currentPos = -1;
+            }
             previousPos = -1;
         }
+
         invalidate();
     }
 
