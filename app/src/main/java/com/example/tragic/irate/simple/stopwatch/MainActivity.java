@@ -239,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<String> breaksArray;
     ArrayList<String> breaksOnlyArray;
 
-    ConstraintLayout cl;
     RecyclerView savedCycleRecycler;
     SavedCycleAdapter savedCycleAdapter;
     View savedCyclePopupView;
@@ -253,8 +252,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int sortMode = 1;
     int sortModeBO = 1;
     MaterialButton pauseResumeButton;
-
     int receivedPos;
+    MotionEvent motionEvent;
 
     //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
     //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
@@ -283,13 +282,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Log.i("testcb", "pos is " + pos);
     }
 
+    //Todo: Not executing after calling saves from onOptionsSelected. Best solution is probably to find another way to close popUp window.
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        motionEvent = event;
         int x = (int) event.getX();
         int y = (int) event.getY();
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
             dotDraws.selectCycle(x, y, startCustomSetTime.size());
         }
+        //This dismisses our popup window when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
+        if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) savedCyclePopupWindow.dismiss();
         return false;
     }
 
@@ -351,10 +354,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breaksArray.add(cyclesList.get(i).getBreaks());
                     }
                     savedCycleAdapter.notifyDataSetChanged();
-                    if (setsArray.size()==0) {
-                        savedCyclePopupWindow.dismiss();
-                        save_cycles.setText(R.string.save_cycles);
-                    }
+//                    if (setsArray.size()==0) {
+//                        savedCyclePopupWindow.dismiss();
+//                        save_cycles.setText(R.string.save_cycles);
+//                    }
                 });
             });
         } else {
@@ -376,10 +379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             });
         }
         Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
-        cl.setOnClickListener(v-> {
-            savedCyclePopupWindow.dismiss();
-            save_cycles.setText(R.string.save_cycles);
-        });
     }
 
     @Override
@@ -415,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     breaksArray.add(cyclesList.get(i).getBreaks());
                                 }
                                 runOnUiThread(() -> {
-                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
                                     save_cycles.setText(R.string.sort_cycles);
@@ -430,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                                 }
                                 runOnUiThread(() -> {
-                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
                                     save_cycles.setText(R.string.sort_cycles);
@@ -439,13 +438,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
                             }
                         }
-                        runOnUiThread(() -> cl.setOnClickListener(v2-> {
-                            savedCycleAdapter.notifyDataSetChanged();
-                            savedCyclePopupWindow.dismiss();
-                            save_cycles.setText(R.string.save_cycles);
-                        }));
                     });
-
                 break;
 
             case R.id.delete_all_cycles:
@@ -562,7 +555,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         msTimePaused = findViewById(R.id.msTimePaused);
         dotDraws = findViewById(R.id.dotdraws);
         lapRecycler = findViewById(R.id.lap_recycler);
-        cl = findViewById(R.id.main_layout);
         pauseResumeButton = findViewById(R.id.pauseResumeButton);
         pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
         pauseResumeButton.setRippleColor(null);
@@ -772,7 +764,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
-        //Todo: Reset receivedPos on breaksOnly switch.
         left_arrow.setOnClickListener(v-> {
             if (!breaksOnly) {
                 if (startCustomSetTime.size()>=2 && receivedPos>0) {
@@ -1289,12 +1280,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 confirm_reset.setOnClickListener(v2-> {
                     resetTimer();
                     resetPopUpWindow.dismiss();
-                });
-
-                cl.setOnClickListener(v2-> {
-                    resetPopUpWindow.dismiss();
-                    reset.setVisibility(View.VISIBLE);
-                    save_cycles.setText(R.string.save_cycles);
                 });
             }
         });
@@ -1994,12 +1979,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
             confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
             confirm_reset.setText(R.string.pom_cycle_reset);
-
-            cl.setOnClickListener(v2-> {
-                cyclePopupWindow.dismiss();
-                cycle_reset.setVisibility(View.VISIBLE);
-                save_cycles.setText(R.string.save_cycles);
-            });
 
             confirm_reset.setOnClickListener(v2-> {
                 if (mode==1) {
