@@ -211,7 +211,6 @@ public class DotDraws extends View {
             selectionPaint();
             if (mListSize>0 && currentPos>=0) {
                 mCanvas.drawRect((100*currentPos) +(8*currentPos) + 10, 425, (100*currentPos)+ 100 + (8*currentPos) + 10, 685, mPaint);
-//                mSendPosition.sendPos(currentPos);
                 previousPos = currentPos;
                 currentPos = -1;
             }
@@ -240,7 +239,7 @@ public class DotDraws extends View {
                     drawText(mBreakTime, mX2, mY2, i);
                     mX2 += 108;
                 } else {
-                    mCanvas.drawOval(mX2-40, mY2-70, mX2+48, mY2+75, mPaint);
+                    mCanvas.drawRoundRect(mX2-40, mY2-85, mX2+48, mY2+90, 45, 45, mPaint);
                     drawText(mBreakTime, mX2+5, mY2, i);
                     mX2+=107;
                 }

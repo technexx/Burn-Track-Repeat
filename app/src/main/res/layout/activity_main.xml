@@ -195,25 +195,23 @@
     <Button
         android:id="@+id/add_cycle"
         android:layout_width="50dp"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         app:layout_constraintTop_toTopOf="@id/tabLayout"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="40dp"
-        android:textColorHint="@color/white"
-        android:text="ADD">
+        android:textColorHint="@color/white">
     </Button>
 
     <Button
         android:id="@+id/subtract_cycle"
         android:layout_width="50dp"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         app:layout_constraintTop_toBottomOf="@id/add_cycle"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="5dp"
-        android:textColor="@color/white"
-        android:text="SUB">
+        android:textColor="@color/white">
     </Button>
 
     <ImageButton
