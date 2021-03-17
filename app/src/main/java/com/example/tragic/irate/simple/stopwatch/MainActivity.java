@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public void sendPos(int pos) {
         receivedPos = pos;
-        if (pos == -1) {
+        if (pos <=0) {
             left_arrow.setVisibility(View.INVISIBLE);
             right_arrow.setVisibility(View.INVISIBLE);
         } else {
@@ -772,53 +772,83 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
+        //Todo: Reset receivedPos on breaksOnly switch.
         left_arrow.setOnClickListener(v-> {
-            if (startCustomSetTime.size()>=2 && receivedPos>0) {
+            if (!breaksOnly) {
+                if (startCustomSetTime.size()>=2 && receivedPos>0) {
 
-                long holder = startCustomSetTime.get(receivedPos-1);
-                startCustomSetTime.set(receivedPos-1, startCustomSetTime.get(receivedPos));
-                startCustomSetTime.set(receivedPos, holder);
-                customSetTime.set(receivedPos-1, customSetTime.get(receivedPos));
-                customSetTime.set(receivedPos, holder);
+                    long holder = startCustomSetTime.get(receivedPos-1);
+                    startCustomSetTime.set(receivedPos-1, startCustomSetTime.get(receivedPos));
+                    startCustomSetTime.set(receivedPos, holder);
+                    customSetTime.set(receivedPos-1, customSetTime.get(receivedPos));
+                    customSetTime.set(receivedPos, holder);
 
-                holder = startCustomBreakTime.get(receivedPos-1);
-                startCustomBreakTime.set(receivedPos-1, startCustomBreakTime.get(receivedPos));
-                startCustomBreakTime.set(receivedPos, holder);
-                customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
-                customBreakTime.set(receivedPos, holder);
+                    holder = startCustomBreakTime.get(receivedPos-1);
+                    startCustomBreakTime.set(receivedPos-1, startCustomBreakTime.get(receivedPos));
+                    startCustomBreakTime.set(receivedPos, holder);
+                    customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
+                    customBreakTime.set(receivedPos, holder);
 
-                dotDraws.setTime(customSetTime);
-                dotDraws.breakTime(customBreakTime);
-                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                receivedPos -=1;
-                dotDraws.setCycle(receivedPos);
-                Log.i("posTest", "pos is " + receivedPos);
+                    dotDraws.setTime(customSetTime);
+                    dotDraws.breakTime(customBreakTime);
+                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    receivedPos -=1;
+                    dotDraws.setCycle(receivedPos);
+                }
+            } else {
+                if (startBreaksOnlyTime.size()>=2 && receivedPos>0) {
+                    long holder = startBreaksOnlyTime.get(receivedPos-1);
+                    startBreaksOnlyTime.set(receivedPos-1, startBreaksOnlyTime.get(receivedPos));
+                    startBreaksOnlyTime.set(receivedPos, holder);
+                    breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
+                    breaksOnlyTime.set(receivedPos, holder);
+
+                    dotDraws.breakTime(breaksOnlyTime);
+                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    receivedPos -=1;
+                    dotDraws.setCycle(receivedPos);
+                }
             }
         });
 
         right_arrow.setOnClickListener(v-> {
-            if (startCustomSetTime.size()-1 > receivedPos && receivedPos>0) {
+            if (!breaksOnly) {
+                if (startCustomSetTime.size()-1 > receivedPos && receivedPos>=0) {
 
-                long holder = startCustomSetTime.get(receivedPos+1);
-                startCustomSetTime.set(receivedPos+1, startCustomSetTime.get(receivedPos));
-                startCustomSetTime.set(receivedPos, holder);
-                customSetTime.set(receivedPos+1, customSetTime.get(receivedPos));
-                customSetTime.set(receivedPos, holder);
+                    long holder = startCustomSetTime.get(receivedPos+1);
+                    startCustomSetTime.set(receivedPos+1, startCustomSetTime.get(receivedPos));
+                    startCustomSetTime.set(receivedPos, holder);
+                    customSetTime.set(receivedPos+1, customSetTime.get(receivedPos));
+                    customSetTime.set(receivedPos, holder);
 
-                holder = startCustomBreakTime.get(receivedPos+1);
-                startCustomBreakTime.set(receivedPos+1, startCustomBreakTime.get(receivedPos));
-                startCustomBreakTime.set(receivedPos, holder);
-                customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
-                customBreakTime.set(receivedPos, holder);
+                    holder = startCustomBreakTime.get(receivedPos+1);
+                    startCustomBreakTime.set(receivedPos+1, startCustomBreakTime.get(receivedPos));
+                    startCustomBreakTime.set(receivedPos, holder);
+                    customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
+                    customBreakTime.set(receivedPos, holder);
 
-                dotDraws.setTime(customSetTime);
-                dotDraws.breakTime(customBreakTime);
-                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-                receivedPos +=1;
-                dotDraws.setCycle(receivedPos);
-                Log.i("posTest", "pos is " + receivedPos);
+                    dotDraws.setTime(customSetTime);
+                    dotDraws.breakTime(customBreakTime);
+                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    receivedPos +=1;
+                    dotDraws.setCycle(receivedPos);
+                }
+            } else {
+                if (startBreaksOnlyTime.size()-1 > receivedPos && receivedPos>=0) {
 
+                    long holder = startBreaksOnlyTime.get(receivedPos+1);
+                    startBreaksOnlyTime.set(receivedPos+1, startBreaksOnlyTime.get(receivedPos));
+                    startBreaksOnlyTime.set(receivedPos, holder);
+                    breaksOnlyTime.set(receivedPos+1, breaksOnlyTime.get(receivedPos));
+                    breaksOnlyTime.set(receivedPos, holder);
+
+                    dotDraws.breakTime(breaksOnlyTime);
+                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    receivedPos +=1;
+                    dotDraws.setCycle(receivedPos);
+                }
             }
+
         });
 
         add_cycle.setOnClickListener(v-> {
@@ -896,6 +926,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 savedCyclePopupWindow.dismiss();
                 return;
             }
+            receivedPos = -1;
 
             Animation fadeIn = new AlphaAnimation(0, 1);
             fadeIn.setDuration(400);
@@ -1652,10 +1683,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     customBreakTime.remove(customBreakTime.size() - 1);
                     startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
                 }
+                if (customSetTime.size()-1<receivedPos) receivedPos = customSetTime.size()-1;
             } else {
                 if (breaksOnlyTime.size() > 0 && startBreaksOnlyTime.size() > 0) {
                     breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
                     startBreaksOnlyTime.remove(startBreaksOnlyTime.size() - 1);
+                    if (breaksOnlyTime.size()-1<receivedPos) receivedPos = breaksOnlyTime.size()-1;
                 } else {
                     Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                 }
@@ -1678,6 +1711,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         }
         if (!breaksOnly) third_value_edit.setText(String.valueOf(customSetTime.size())); else third_value_edit.setText(String.valueOf(breaksOnlyTime.size()));
+        if (receivedPos >=0) dotDraws.setCycle(receivedPos);
     }
 
     private void endAnimation() {

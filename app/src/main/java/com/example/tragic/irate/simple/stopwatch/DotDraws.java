@@ -162,6 +162,9 @@ public class DotDraws extends View {
             }
             previousPos = -1;
             mSendPosition.sendPos(currentPos);
+        } else {
+            currentPos = -1;
+            mSendPosition.sendPos(currentPos);
         }
 
         invalidate();
