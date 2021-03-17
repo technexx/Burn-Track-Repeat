@@ -9,17 +9,21 @@ import androidx.room.Update;
 
 import com.example.tragic.irate.simple.stopwatch.Cycles;
 import com.example.tragic.irate.simple.stopwatch.CyclesBO;
+import com.example.tragic.irate.simple.stopwatch.PomCycles;
 
 import java.util.List;
 
 @Dao
 public interface CyclesDao {
 
-    @Query("SELECT * from Cycles WHERE Id=:listID")
-    List<Cycles> loadCycleEntry (int listID);
-
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
+
+    @Query("SELECT * from CyclesBO")
+    List<CyclesBO> loadAllBOCycles();
+
+    @Query("SELECT * from PomCycles")
+    List<PomCycles> loadAllPomCycles();
 
     @Query("SELECT * from CYCLES ORDER by timeAdded DESC")
     List<Cycles> loadCyclesMostRecent();
@@ -45,8 +49,20 @@ public interface CyclesDao {
     @Query("SELECT * from CYCLESBO ORDER by itemCount ASC")
     List<CyclesBO> loadCyclesLeastItemsBO();
 
+    @Query("SELECT * from POMCYCLES ORDER by timeAdded DESC")
+    List<PomCycles> loadPomCyclesMostItems();
+
+    @Query("SELECT * from POMCYCLES ORDER by timeAdded ASC")
+    List<PomCycles> loadPomCyclesLeastItems();
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCycle(Cycles cycles);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertBOCycle(CyclesBO cyclesBO);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertPomCycle(PomCycles pomCycles);
 
     @Delete
     void deleteCycle(Cycles cycles);
@@ -54,18 +70,15 @@ public interface CyclesDao {
     @Delete
     void deleteBOCycle(CyclesBO cyclesBO);
 
+    @Delete
+    void deletePomCycle(PomCycles pomCycles);
+
     @Query("DELETE from Cycles")
     void deleteAll();
 
-    @Query("SELECT * from CyclesBO where Id=:listID")
-    List<CyclesBO> loadCyclesBOEntry (int listID);
-
-    @Query("SELECT * from CyclesBO")
-    List<CyclesBO> loadAllBOCycles();
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertBOCycle(CyclesBO cyclesBO);
-
     @Query("DELETE from CyclesBO")
     void deleteAllBO();
+
+    @Query("DELETE from PomCycles")
+    void deleteAllPomCycles();
 }

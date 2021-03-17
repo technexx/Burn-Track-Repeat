@@ -145,10 +145,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Runnable changeThirdValue;
     Runnable valueSpeed;
 
-    int firstSpinCount;
-    int secondSpinCount;
-    int thirdSpinCount;
-
+    int roundCount;
+    int roundCountBO;
     long pomMillis1;
     long pomMillis2;
     long pomMillis3;
@@ -234,6 +232,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Cycles cycles;
     List<CyclesBO> cyclesBOList;
     CyclesBO cyclesBO;
+    List<PomCycles> pomCyclesList;
+    PomCycles pomCycles;
 
     ArrayList<String> setsArray;
     ArrayList<String> breaksArray;
@@ -467,9 +467,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles = new Cycles();
             cyclesBOList = new ArrayList<>();
             cyclesBO = new CyclesBO();
+            pomCyclesList = new ArrayList<>();
+            pomCycles = new PomCycles();
 
             cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
             cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
+            pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
             if (cyclesList.size()>0) {
                 for (int i=0; i<cyclesList.size(); i++) {
                     setsArray.add(cyclesList.get(i).getSets());
@@ -645,7 +648,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
 
-        //Todo: Third value on Custom should not be EditText.
         resetTimer();
         incrementTimer = 10;
 
@@ -875,9 +877,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                firstSpinCount = 0;
-                secondSpinCount = 0;
-                thirdSpinCount = 0;
                 switch (tab.getPosition()) {
                     case 0:
                         if (customHalted) {
@@ -969,6 +968,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             if (mode==1) {
                 if (!breaksOnly) {
+                    second_value_edit.setText(convertSeconds(breaksOnlyValue));
+                    third_value_edit.setText(String.valueOf(roundCountBO));
+
                     breaksOnly = true;
                     s1.setAnimation(fadeOut);
                     first_value_edit.setAnimation(fadeOut);
@@ -980,6 +982,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.breaksOnly(true);
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 } else {
+                    first_value_edit.setText(convertSeconds(setValue));
+                    second_value_edit.setText(convertSeconds(breakValue));
+                    third_value_edit.setText(String.valueOf(roundCount));
+
                     breaksOnly = false;
                     no_set_header.setAnimation(fadeOut);
                     s1.setAnimation(fadeIn);
@@ -1440,7 +1446,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         pomProgressPause = (int) objectAnimator2.getAnimatedValue();
                         pomMillis = millisUntilFinished;
 
-//                        if (fadePomTimer) timeLeft2.setAlpha(pomAlpha+=0.1);
                         if (fadePomTimer) {
                             if (pomAlpha<0.25) timeLeft2.setAlpha(pomAlpha+=0.04);
                             else if (pomAlpha<0.5) timeLeft2.setAlpha(pomAlpha+=.08);
@@ -1450,7 +1455,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (pomAlpha >=1) fadePomTimer = false;
 
                         timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
-//                        setNewText(timeLeft2, ((pomMillis + 999)/1000));
                         if (!drawing) {
                             dotDraws.pomDraw(pomDotCounter, 1);
                         }
@@ -1695,7 +1699,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timePaused.setText("?");
             }
         }
-        if (!breaksOnly) third_value_edit.setText(String.valueOf(customSetTime.size())); else third_value_edit.setText(String.valueOf(breaksOnlyTime.size()));
+        if (!breaksOnly) {
+            roundCount = customSetTime.size();
+            third_value_edit.setText(String.valueOf(roundCount));
+        } else {
+            roundCountBO = breaksOnlyTime.size();
+            third_value_edit.setText(String.valueOf(roundCountBO));
+        }
         if (receivedPos >=0) dotDraws.setCycle(receivedPos);
     }
 

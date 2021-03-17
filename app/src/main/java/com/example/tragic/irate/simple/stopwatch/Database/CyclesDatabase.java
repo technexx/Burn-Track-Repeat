@@ -9,8 +9,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.tragic.irate.simple.stopwatch.Cycles;
 import com.example.tragic.irate.simple.stopwatch.CyclesBO;
+import com.example.tragic.irate.simple.stopwatch.PomCycles;
 
-@Database(entities = {Cycles.class, CyclesBO.class}, version = 1, exportSchema =  false)
+@Database(entities = {Cycles.class, CyclesBO.class, PomCycles.class}, version = 1, exportSchema =  false)
 
 public abstract class CyclesDatabase extends RoomDatabase {
     private static CyclesDatabase INSTANCE;
