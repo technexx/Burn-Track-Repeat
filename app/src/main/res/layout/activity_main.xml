@@ -58,17 +58,6 @@
         android:textSize="20sp"
         android:textColor="@color/white"/>
 
-    <TextView
-        android:id="@+id/no_set_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        android:layout_marginTop="10dp"
-        android:textSize="20sp">
-    </TextView>
-
     <ImageButton
         android:id="@+id/plus_first_value"
         android:layout_width="wrap_content"
