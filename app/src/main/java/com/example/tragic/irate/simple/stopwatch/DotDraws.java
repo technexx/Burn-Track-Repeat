@@ -10,17 +10,21 @@ import android.graphics.PathDashPathEffect;
 import android.graphics.PathEffect;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
+import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -206,7 +210,6 @@ public class DotDraws extends View {
             }
         }
 
-        //Todo: Options to move or delete individual set/break.
         if (mDrawBox) {
             selectionPaint();
             if (mListSize>0 && currentPos>=0) {
@@ -239,7 +242,7 @@ public class DotDraws extends View {
                     drawText(mBreakTime, mX2, mY2, i);
                     mX2 += 108;
                 } else {
-                    mCanvas.drawRoundRect(mX2-40, mY2-85, mX2+48, mY2+90, 45, 45, mPaint);
+                    mCanvas.drawRoundRect(mX2-40, mY2-75, mX2+48, mY2+80, 45, 45, mPaint);
                     drawText(mBreakTime, mX2+5, mY2, i);
                     mX2+=107;
                 }
@@ -327,16 +330,35 @@ public class DotDraws extends View {
     private void drawText(ArrayList<String> list, float x, float y, int i) {
         if (mMode == 1) {
             mPaintText.setColor(Color.BLACK);
+            if (!mBreaksOnly)  {
+                mPaintText.setTypeface(Typeface.DEFAULT);
+            } else {
+                Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+                mPaintText.setTypeface(tf);
+            }
             if (list.size() >0) {
                 if (list.get(i).length() <= 2) {
                     if (list.get(i).length() == 1) {
                         list.set(i, "05");
                     }
-                    mPaintText.setTextSize(60f);
-                    mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
+                    if (!mBreaksOnly) {
+                        mPaintText.setTextSize(60f);
+                        mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
+                    } else {
+                        mPaintText.setTextSize(90f);
+                        mCanvas.drawText(list.get(i), x-44, y+28, mPaintText);
+                    }
+
                 } else {
-                    mPaintText.setTextSize(45f);
-                    mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
+                    if (!mBreaksOnly) {
+                        mPaintText.setTextSize(45f);
+                        mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
+                    } else {
+                        Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow_bold);
+                        mPaintText.setTypeface(tf);
+                        mPaintText.setTextSize(52f);
+                        mCanvas.drawText(list.get(i), x-45, y+17, mPaintText);
+                    }
                 }
             }
         }

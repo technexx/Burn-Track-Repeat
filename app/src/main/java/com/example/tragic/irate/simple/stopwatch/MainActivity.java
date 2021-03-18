@@ -695,10 +695,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         };
 
+        //Todo: Merge breaksOnly mode? I.e. add combos of each. (Set Add, Break Add, Both Add)  OR (Rest Add, i.e. longer break, for both).
+        //Todo: Text on big ovals just looks weird.
         //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
+        //Todo: Different layout (e.g. no increment rows) for Pom mode.
+        //Todo: Options to delete individual set/break.
+        //Todo: Label saved entries (e.g. squats, bench).
         plus_first_value.setOnTouchListener((v, event) -> {
             //Todo: EditText set to numbers only so cannot display convertSeconds String.
-            //Todo: Add "rest" time between set/breaks to fill 3rd slot?
             incrementValues = true;
             setIncrements(event, changeFirstValue);
             switch (mode) {
