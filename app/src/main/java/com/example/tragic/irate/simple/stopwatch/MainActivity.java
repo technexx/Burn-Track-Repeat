@@ -98,10 +98,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long pomValue1;
     long pomValue2;
     long pomValue3;
-    long secondsEditOne;
-    long minutesEditOne;
-    long minutesEditTwo;
-    long secondsEditTwo;
+    long editSetSeconds;
+    long editSetMinutes;
+    long editBreakMinutes;
+    long editBreakSeconds;
 
     TextView cycles_completed;
     TextView cycle_reset;
@@ -110,6 +110,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView first_value_sep;
     TextView first_value_textView;
     EditText second_value_edit;
+    EditText second_value_edit_two;
+    TextView second_value_sep;
+    TextView second_value_textView;
     EditText third_value_edit;
     ImageView plus_first_value;
     ImageView minus_first_value;
@@ -541,6 +544,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         first_value_sep = findViewById(R.id.first_value_sep);
         first_value_textView = findViewById(R.id.first_value_textView);
         second_value_edit = findViewById(R.id.second_value_edit);
+        second_value_edit_two = findViewById(R.id.second_value_edit_two);
+        second_value_sep = findViewById(R.id.second_value_sep);
+        second_value_textView = findViewById(R.id.second_value_textView);
         plus_first_value = findViewById(R.id.plus_first_value);
         minus_first_value = findViewById(R.id.minus_first_value);
         plus_second_value = findViewById(R.id.plus_second_value);
@@ -548,6 +554,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         plus_third_value = findViewById(R.id.plus_third_value);
         minus_third_value = findViewById(R.id.minus_third_value);
         third_value_edit = findViewById(R.id.third_value_edit);
+
         add_cycle = findViewById(R.id.add_cycle);
         sub_cycle = findViewById(R.id.subtract_cycle);
         cycles_completed = findViewById(R.id.cycles_completed);
@@ -731,10 +738,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setIncrements(event, changeFirstValue);
             switch (mode) {
                 case 1:
-                    first_value_textView.setText(convertSeconds(setValue));
-                    convertEditTime(setValue, 1);
-                    if (minutesEditOne!=0) first_value_edit.setText(String.valueOf(minutesEditOne)); else first_value_edit.setText(("0"));
-                    if (secondsEditOne!=0) first_value_edit_two.setText(String.valueOf(secondsEditOne)); else first_value_edit_two.setText("00");
+                    convertEditTime();
                     break;
                 case 2:
                     first_value_textView.setText(convertSeconds(pomValue1));
@@ -749,9 +753,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             incrementValues = false;
             setIncrements(event, changeFirstValue);
             switch (mode) {
-                case 1: first_value_edit.setText(convertSeconds(setValue)); break;
-                case 2: first_value_edit.setText(convertSeconds(pomValue1)); break;
-
+                case 1:
+                    convertEditTime();
+                    break;
+                case 2:
+                    first_value_edit.setText(convertSeconds(pomValue1));
+                    break;
             }
             return true;
         });
@@ -811,12 +818,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 if (!first_value_edit.getText().toString().equals("")) {
@@ -910,11 +914,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         add_cycle.setOnClickListener(v-> {
-
+            adjustCustom(true);
         });
 
         sub_cycle.setOnClickListener(v-> {
-
+            adjustCustom(false);
         });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -1990,7 +1994,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         mHandler.post(stopWatchRunnable);
                         stopwatchHalted = false;
                         reset.setVisibility(View.INVISIBLE);
-
                     } else {
                         timeLeft3.setAlpha(0);
                         timePaused3.setAlpha(1);
@@ -2055,19 +2058,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 first_value_edit.setVisibility(View.INVISIBLE);
                 first_value_edit_two.setVisibility(View.INVISIBLE);
                 first_value_sep.setVisibility(View.INVISIBLE);
-                convertEditTime(setValue, 1);
+                second_value_edit.setVisibility(View.INVISIBLE);
+                second_value_edit_two.setVisibility(View.INVISIBLE);
+                second_value_sep.setVisibility(View.INVISIBLE);
+//                convertEditTime(setValue, 1);
+                convertEditTime();
                 if (!breaksOnly) {
                     s1.setVisibility(View.VISIBLE);
                     plus_first_value.setVisibility(View.VISIBLE);
                     minus_first_value.setVisibility(View.VISIBLE);
-                    first_value_edit.setText(String.valueOf(minutesEditOne));
-                    first_value_edit_two.setText(String.valueOf(secondsEditOne));
-//                    second_value_edit.setText(convertSeconds(breakValue));
+                    first_value_edit.setText(String.valueOf(editSetMinutes));
+                    first_value_edit_two.setText(String.valueOf(editSetSeconds));
                 } else {
                     s1.setVisibility(View.INVISIBLE);
                     plus_first_value.setVisibility(View.INVISIBLE);
                     minus_first_value.setVisibility(View.INVISIBLE);
-//                    second_value_edit.setText(convertSeconds(breaksOnlyValue));
                 }
                 plus_second_value.setVisibility(View.VISIBLE);
                 minus_second_value.setVisibility(View.VISIBLE);
@@ -2083,9 +2088,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 params2.width = 150;
 //                first_value_edit.setFilters(new InputFilter[]{
 //                        new NumberFilter(0, 60)
-//                });
-//                second_value_edit.setFilters(new InputFilter[]{
-//                        new NumberFilter(5, 300)
 //                });
                 break;
             case 2:
@@ -2111,15 +2113,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setText(R.string.long_break);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
-//                first_value_edit.setFilters(new InputFilter[]{
-//                        new NumberFilter(10, 120)
-//                });
-//                second_value_edit.setFilters(new InputFilter[]{
-//                        new NumberFilter(1, 10)
-//                });
-//                third_value_edit.setFilters(new InputFilter[]{
-//                        new NumberFilter(10, 60)
-//                });
                 break;
             case 3:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -2332,18 +2325,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else return Long.parseLong(time);
     }
 
-    public void convertEditTime(long totalSeconds, int pos) {
-        switch (pos) {
-            case 1:
-                secondsEditOne = totalSeconds%60;
-                minutesEditOne = totalSeconds/60;
-                break;
-            case 2:
-                secondsEditTwo = totalSeconds%60;
-                minutesEditTwo = totalSeconds/60;
-                break;
+    public void convertEditTime() {
+        editSetSeconds = setValue%60;
+        editSetMinutes = setValue/60;
+        if (!breaksOnly) {
+            editBreakSeconds = breakValue%60;
+            editBreakMinutes = breakValue/60;
+            first_value_textView.setText(convertSeconds(setValue));
+            if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
+            if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else first_value_edit_two.setText("00");
+        } else {
+            editBreakSeconds = breaksOnlyValue%60;
+            editBreakMinutes = breaksOnlyValue/60;
         }
 
+        second_value_textView.setText(convertSeconds(breakValue));
+        if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
+        if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else second_value_edit_two.setText("00");
     }
 
     public String convertStopwatch(long seconds) {
