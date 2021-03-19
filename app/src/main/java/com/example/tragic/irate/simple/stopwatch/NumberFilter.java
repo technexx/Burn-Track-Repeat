@@ -24,7 +24,6 @@ public class NumberFilter implements InputFilter {
         return "";
     }
 
-
     private boolean inRange( int a, int b, int c) {
         return b > a ? c >= a && c <= b : c >= b && c <= a;
     }

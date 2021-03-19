@@ -20,7 +20,9 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 ;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -96,10 +98,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long pomValue1;
     long pomValue2;
     long pomValue3;
+    long secondsEditOne;
+    long minutesEditOne;
+    long minutesEditTwo;
+    long secondsEditTwo;
 
     TextView cycles_completed;
     TextView cycle_reset;
     EditText first_value_edit;
+    EditText first_value_edit_two;
+    TextView first_value_sep;
+    TextView first_value_textView;
     EditText second_value_edit;
     EditText third_value_edit;
     ImageView plus_first_value;
@@ -268,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Repository for db. Look at Executor/other alternate thread methods.
+    //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
 
     @Override
     public void sendPos(int pos) {
@@ -293,8 +303,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
             dotDraws.selectCycle(x, y, startCustomSetTime.size());
         }
-        //This dismisses our popup window when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
+        //This dismisses windows/views when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) savedCyclePopupWindow.dismiss();
+        if (first_value_edit.isShown()) {
+            first_value_textView.setVisibility(View.VISIBLE);
+            first_value_edit.setVisibility(View.INVISIBLE);
+            first_value_edit_two.setVisibility(View.INVISIBLE);
+            first_value_sep.setVisibility(View.INVISIBLE);
+        }
         return false;
     }
 
@@ -521,6 +537,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s3 = findViewById(R.id.s3);
         reset = findViewById(R.id.reset);
         first_value_edit = findViewById(R.id.first_value_edit);
+        first_value_edit_two = findViewById(R.id.first_value_edit_two);
+        first_value_sep = findViewById(R.id.first_value_sep);
+        first_value_textView = findViewById(R.id.first_value_textView);
         second_value_edit = findViewById(R.id.second_value_edit);
         plus_first_value = findViewById(R.id.plus_first_value);
         minus_first_value = findViewById(R.id.minus_first_value);
@@ -627,9 +646,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValue3 = 15;
         setMillis = setValue;
         breakMillis = breakValue;
-        first_value_edit.setText(convertSeconds(setValue));
-        second_value_edit.setText(convertSeconds(breakValue));
-        third_value_edit.setText(String.valueOf(customSetTime.size()));
 
         lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
@@ -649,6 +665,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         resetTimer();
         incrementTimer = 10;
+        tabViews();
+
+        first_value_textView.setOnClickListener(v-> {
+            if (first_value_textView.isShown()) {
+                first_value_textView.setVisibility(View.INVISIBLE);
+                first_value_edit.setVisibility(View.VISIBLE);
+                first_value_edit_two.setVisibility(View.VISIBLE);
+                first_value_sep.setVisibility(View.VISIBLE);
+            }
+        });
 
         changeFirstValue = new Runnable() {
             @Override
@@ -695,27 +721,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         };
 
-        //Todo: Merge breaksOnly mode? I.e. add combos of each. (Set Add, Break Add, Both Add)  OR (Rest Add, i.e. longer break, for both).
-        //Todo: Text on big ovals just looks weird.
         //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
         //Todo: Different layout (e.g. no increment rows) for Pom mode.
         //Todo: Options to delete individual set/break.
-        //Todo: Label saved entries (e.g. squats, bench).
+        //Todo: Label saved entries (e.g. squats, bench). Use blank row for label. Add db sort for label.
+        //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
         plus_first_value.setOnTouchListener((v, event) -> {
-            //Todo: EditText set to numbers only so cannot display convertSeconds String.
             incrementValues = true;
             setIncrements(event, changeFirstValue);
             switch (mode) {
                 case 1:
-                    first_value_edit.setText(convertSeconds(setValue)); break;
+                    first_value_textView.setText(convertSeconds(setValue));
+                    convertEditTime(setValue, 1);
+                    if (minutesEditOne!=0) first_value_edit.setText(String.valueOf(minutesEditOne)); else first_value_edit.setText(("0"));
+                    if (secondsEditOne!=0) first_value_edit_two.setText(String.valueOf(secondsEditOne)); else first_value_edit_two.setText("00");
+                    break;
                 case 2:
-                    first_value_edit.setText(convertSeconds(pomValue1));
+                    first_value_textView.setText(convertSeconds(pomValue1));
                     timePaused2.setText(convertSeconds(pomValue1));
                     timeLeft2.setText(convertSeconds(pomValue1));
                     break;
             }
-            Log.i("testVal", String.valueOf(pomValue1));
-
             return true;
         });
 
@@ -777,6 +803,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
             }
             return true;
+        });
+
+        first_value_edit.addTextChangedListener(new TextWatcher() {
+            String oldValue = "";
+            int val = 0;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!first_value_edit.getText().toString().equals("")) {
+                    String newValue = first_value_edit.getText().toString();
+                    if (!oldValue.equals(newValue)) {
+                        oldValue = newValue;
+                        val = Integer.parseInt(newValue);
+                        if (val>5) val = 5;
+                        first_value_edit.setText(String.valueOf(val));
+                    }
+                }
+            }
         });
 
         left_arrow.setOnClickListener(v-> {
@@ -1998,41 +2050,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
-                plus_third_value.setVisibility(View.VISIBLE);
-                minus_third_value.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
-                s3.setVisibility(View.VISIBLE);
+                s3.setVisibility(View.INVISIBLE);
+                first_value_edit.setVisibility(View.INVISIBLE);
+                first_value_edit_two.setVisibility(View.INVISIBLE);
+                first_value_sep.setVisibility(View.INVISIBLE);
+                convertEditTime(setValue, 1);
                 if (!breaksOnly) {
                     s1.setVisibility(View.VISIBLE);
                     plus_first_value.setVisibility(View.VISIBLE);
                     minus_first_value.setVisibility(View.VISIBLE);
-                    first_value_edit.setText(convertSeconds(setValue));
-                    second_value_edit.setText(convertSeconds(breakValue));
-                    third_value_edit.setText(String.valueOf(startCustomSetTime.size()));
+                    first_value_edit.setText(String.valueOf(minutesEditOne));
+                    first_value_edit_two.setText(String.valueOf(secondsEditOne));
+//                    second_value_edit.setText(convertSeconds(breakValue));
                 } else {
                     s1.setVisibility(View.INVISIBLE);
                     plus_first_value.setVisibility(View.INVISIBLE);
                     minus_first_value.setVisibility(View.INVISIBLE);
-                    second_value_edit.setText(convertSeconds(breaksOnlyValue));
-                    third_value_edit.setText(String.valueOf(startBreaksOnlyTime.size()));
+//                    second_value_edit.setText(convertSeconds(breaksOnlyValue));
                 }
                 plus_second_value.setVisibility(View.VISIBLE);
                 minus_second_value.setVisibility(View.VISIBLE);
-                plus_third_value.setVisibility(View.VISIBLE);
-                minus_third_value.setVisibility(View.VISIBLE);
+                plus_third_value.setVisibility(View.INVISIBLE);
+                minus_third_value.setVisibility(View.INVISIBLE);
+                third_value_edit.setVisibility(View.INVISIBLE);
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
-                s3.setText(R.string.set_number);
+                first_value_textView.setText(convertSeconds(setValue));
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
-                first_value_edit.setFilters(new InputFilter[]{
-                        new NumberFilter(5, 300)
-                });
-                second_value_edit.setFilters(new InputFilter[]{
-                        new NumberFilter(5, 300)
-                });
+//                first_value_edit.setFilters(new InputFilter[]{
+//                        new NumberFilter(0, 60)
+//                });
+//                second_value_edit.setFilters(new InputFilter[]{
+//                        new NumberFilter(5, 300)
+//                });
                 break;
             case 2:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -2057,15 +2111,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setText(R.string.long_break);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
-                first_value_edit.setFilters(new InputFilter[]{
-                        new NumberFilter(10, 120)
-                });
-                second_value_edit.setFilters(new InputFilter[]{
-                        new NumberFilter(1, 10)
-                });
-                third_value_edit.setFilters(new InputFilter[]{
-                        new NumberFilter(10, 60)
-                });
+//                first_value_edit.setFilters(new InputFilter[]{
+//                        new NumberFilter(10, 120)
+//                });
+//                second_value_edit.setFilters(new InputFilter[]{
+//                        new NumberFilter(1, 10)
+//                });
+//                third_value_edit.setFilters(new InputFilter[]{
+//                        new NumberFilter(10, 60)
+//                });
                 break;
             case 3:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -2270,11 +2324,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //Returns long of total seconds.
     public long convertStringToLong(String time) {
         if (time.length()>=3) {
             String[] timeString = time.split(":");
             return (Long.parseLong(timeString[0]) * 60) + Long.parseLong(timeString[1]);
         } else return Long.parseLong(time);
+    }
+
+    public void convertEditTime(long totalSeconds, int pos) {
+        switch (pos) {
+            case 1:
+                secondsEditOne = totalSeconds%60;
+                minutesEditOne = totalSeconds/60;
+                break;
+            case 2:
+                secondsEditTwo = totalSeconds%60;
+                minutesEditTwo = totalSeconds/60;
+                break;
+        }
+
     }
 
     public String convertStopwatch(long seconds) {

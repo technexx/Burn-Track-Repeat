@@ -22,6 +22,18 @@
     </com.google.android.material.tabs.TabLayout>
 
     <TextView
+        android:text="Test Layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/tabLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="140dp"
+        android:textColor="@color/teal_200"
+        android:textSize="24sp">
+    </TextView>
+
+    <TextView
         android:id="@+id/s1"
         android:text="Set Time:"
         android:layout_width="wrap_content"
@@ -30,7 +42,7 @@
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textColor="@color/white"
         style="popup"
         />
@@ -43,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@id/s1"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16.5dp"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textColor="@color/white"
         />
 
@@ -141,15 +153,60 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_first_value"
-        app:layout_constraintEnd_toStartOf="@id/minus_first_value"
+        app:layout_constraintEnd_toStartOf="@id/first_value_sep"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="36dp"
-        android:textSize="22sp"
+        android:layout_marginTop="33.5dp"
+        android:layout_marginStart="10dp"
+        android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
+        android:gravity="center_horizontal"
         android:inputType="number"
-        android:cursorVisible="false">
+        android:maxLength="2"
+        android:minWidth="35dp">
     </EditText>
+
+    <TextView
+        android:text=":"
+        android:id="@+id/first_value_sep"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/first_value_edit"
+        app:layout_constraintEnd_toStartOf="@id/first_value_edit_two"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="39.5dp"
+        android:textStyle="bold"
+        android:textSize="28sp">
+    </TextView>
+
+    <EditText
+        android:id="@+id/first_value_edit_two"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/first_value_sep"
+        app:layout_constraintEnd_toStartOf="@id/minus_first_value"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="33.5dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="25sp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:gravity="center_horizontal"
+        android:inputType="number"
+        android:maxLength="2"
+        android:minWidth="35dp">
+    </EditText>
+
+    <TextView
+        android:id="@+id/first_value_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/plus_first_value"
+        app:layout_constraintEnd_toStartOf="@id/minus_first_value"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="42dp"
+        android:textSize="25sp">
+    </TextView>
 
     <EditText
         android:id="@+id/second_value_edit"
@@ -159,7 +216,7 @@
         app:layout_constraintEnd_toStartOf="@id/minus_second_value"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="80dp"
-        android:textSize="22sp"
+        android:textSize="26sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:inputType="number"
