@@ -794,8 +794,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setIncrements(event, changeSecondValue);
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) second_value_edit.setText(convertSeconds(breakValue)); else second_value_edit.setText(convertSeconds(breaksOnlyValue)); break;
-                case 2: second_value_edit.setText(convertSeconds(pomValue2)); break;
+                    convertEditTime();
+                    break;
+                case 2:
+                    second_value_edit.setText(convertSeconds(pomValue2));
+                    break;
 
             }
             return true;
@@ -806,8 +809,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setIncrements(event, changeSecondValue);
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) second_value_edit.setText(convertSeconds(breakValue)); else second_value_edit.setText(convertSeconds(breaksOnlyValue)); break;
-                case 2: second_value_edit.setText(convertSeconds(pomValue2)); break;
+                    convertEditTime();
+                    break;
+                case 2:
+                    second_value_edit.setText(convertSeconds(pomValue2));
+                    break;
             }
             return true;
         });
