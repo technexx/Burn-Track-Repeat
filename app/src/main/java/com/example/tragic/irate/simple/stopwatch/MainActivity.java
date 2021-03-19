@@ -297,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    //Todo: Not executing after calling saves from onOptionsSelected. Best solution is probably to find another way to close popUp window.
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         motionEvent = event;
@@ -313,6 +312,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             first_value_edit.setVisibility(View.INVISIBLE);
             first_value_edit_two.setVisibility(View.INVISIBLE);
             first_value_sep.setVisibility(View.INVISIBLE);
+        }
+        if (second_value_edit.isShown()) {
+            second_value_textView.setVisibility(View.VISIBLE);
+            second_value_edit.setVisibility(View.INVISIBLE);
+            second_value_edit_two.setVisibility(View.INVISIBLE);
+            second_value_sep.setVisibility(View.INVISIBLE);
         }
         return false;
     }
@@ -681,6 +686,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 first_value_edit_two.setVisibility(View.VISIBLE);
                 first_value_sep.setVisibility(View.VISIBLE);
             }
+            if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
+                second_value_textView.setVisibility(View.VISIBLE);
+                second_value_edit.setVisibility(View.INVISIBLE);
+                second_value_edit_two.setVisibility(View.INVISIBLE);
+                second_value_sep.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        second_value_textView.setOnClickListener(v-> {
+            if (second_value_textView.isShown()) {
+                second_value_textView.setVisibility(View.INVISIBLE);
+                second_value_edit.setVisibility(View.VISIBLE);
+                second_value_edit_two.setVisibility(View.VISIBLE);
+                second_value_sep.setVisibility(View.VISIBLE);
+            }
+            if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
+                first_value_textView.setVisibility(View.VISIBLE);
+                first_value_edit.setVisibility(View.INVISIBLE);
+                first_value_edit_two.setVisibility(View.INVISIBLE);
+                first_value_sep.setVisibility(View.INVISIBLE);
+            }
         });
 
         changeFirstValue = new Runnable() {
@@ -812,28 +838,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
-        first_value_edit.addTextChangedListener(new TextWatcher() {
-            String oldValue = "";
-            int val = 0;
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!first_value_edit.getText().toString().equals("")) {
-                    String newValue = first_value_edit.getText().toString();
-                    if (!oldValue.equals(newValue)) {
-                        oldValue = newValue;
-                        val = Integer.parseInt(newValue);
-                        if (val>5) val = 5;
-                        first_value_edit.setText(String.valueOf(val));
-                    }
-                }
-            }
-        });
+        capEditNumber(first_value_edit, 5);
+        capEditNumber(first_value_edit_two, 59);
+        capEditNumber(second_value_edit, 5);
+        capEditNumber(second_value_edit_two, 59);
 
         left_arrow.setOnClickListener(v-> {
             if (!breaksOnly) {
@@ -2342,6 +2350,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_textView.setText(convertSeconds(breakValue));
         if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
         if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else second_value_edit_two.setText("00");
+    }
+
+    public void capEditNumber(EditText editText, int cap) {
+        editText.addTextChangedListener(new TextWatcher() {
+            String oldValue = "";
+            int val = 0;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!first_value_edit.getText().toString().equals("")) {
+                    String newValue = first_value_edit.getText().toString();
+                    if (!oldValue.equals(newValue)) {
+                        oldValue = newValue;
+                        val = Integer.parseInt(newValue);
+                        if (val>cap) val = cap;
+                        editText.setText(String.valueOf(val));
+                    }
+                }
+            }
+        });
     }
 
     public String convertStopwatch(long seconds) {
