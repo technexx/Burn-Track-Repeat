@@ -58,8 +58,10 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -67,6 +69,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, DotDraws.sendPosition{
 
+    View mainView;
     Button breaks_only;
     TextView save_cycles;
     ProgressBar progressBar;
@@ -211,6 +214,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
 
+    public ArrayList<String> customTitleArray;
+    public ArrayList<String> breaksOnlyTitleArray;
     public ArrayList<Long> customSetTime;
     public ArrayList<Long> customBreakTime;
     public ArrayList<Long> startCustomSetTime;
@@ -228,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     PopupWindow resetPopUpWindow;
     PopupWindow savedCyclePopupWindow;
     PopupWindow sortPopupWindow;
+    PopupWindow labelSavePopupWindow;
 
     boolean fadeCustomTimer;
     boolean fadePomTimer;
@@ -256,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View savedCyclePopupView;
     View deleteCyclePopupView;
     View sortCyclePopupView;
+    View cycleLabelView;
 
     TextView sortRecent;
     TextView sortNotRecent;
@@ -267,9 +274,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedPos;
     MotionEvent motionEvent;
 
+    //Todo: Label saved entries (e.g. squats, bench). Use blank row for label. Add db sort for label. Popup for save.
+    //Todo: Fix values added/subtracted to timer.
+    //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
+    //Todo: Different layout (e.g. no increment rows) for Pom mode.
+    //Todo: Options to delete individual set/break.
+    //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
     //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
     //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
     //Todo: Add/Remove cycle elements from individual places.
+
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
@@ -438,12 +452,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     //getSets/Breaks returns String [xx, xy, xz] etc.
                                     setsArray.add(cyclesList.get(i).getSets());
                                     breaksArray.add(cyclesList.get(i).getBreaks());
+                                    customTitleArray.add(cyclesList.get(i).getTitle());
                                 }
                                 runOnUiThread(() -> {
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-                                    savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
+                                    savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
                                     save_cycles.setText(R.string.sort_cycles);
+                                    savedCycleAdapter.notifyDataSetChanged();
                                 });
                         } else {
                                 runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
@@ -452,13 +468,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             savedCycleAdapter.setBreaksOnly(true);
                             if (cyclesBOList.size()>0) {
                                 for (int i=0; i<cyclesBOList.size(); i++) {
+                                    breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
                                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                                 }
                                 runOnUiThread(() -> {
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-                                    savedCyclePopupWindow.showAtLocation(savedCyclePopupView, Gravity.CENTER, 0, 100);
+                                    savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
                                     save_cycles.setText(R.string.sort_cycles);
+                                    savedCycleAdapter.notifyDataSetChanged();
                                 });
                             } else {
                                 runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
@@ -486,6 +504,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mainView = findViewById(R.id.main_layout);
 
         AsyncTask.execute(() -> {
             cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -515,12 +534,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setsArray = new ArrayList<>();
         breaksArray = new ArrayList<>();
         breaksOnlyArray = new ArrayList<>();
+        customTitleArray = new ArrayList<>();
+        breaksOnlyTitleArray = new ArrayList<>();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
         deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
         sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
+        cycleLabelView = inflater.inflate(R.layout.label_cycle_popup, null);
         sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
         sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
         sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
@@ -530,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
 
-        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray);
+        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, customTitleArray, breaksOnlyTitleArray);
         savedCycleRecycler.setAdapter(savedCycleAdapter);
         savedCycleRecycler.setLayoutManager(lm2);
         savedCycleAdapter.setItemClick(MainActivity.this);
@@ -623,6 +645,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomOneSaves = new ArrayList<>();
         pomTwoSaves = new ArrayList<>();
         pomThreeSaves = new ArrayList<>();
+
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
         startCustomSetTime = new ArrayList<>();
@@ -754,11 +777,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         };
 
-        //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
-        //Todo: Different layout (e.g. no increment rows) for Pom mode.
-        //Todo: Options to delete individual set/break.
-        //Todo: Label saved entries (e.g. squats, bench). Use blank row for label. Add db sort for label.
-        //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
         plus_first_value.setOnTouchListener((v, event) -> {
             incrementValues = true;
             setIncrements(event, changeFirstValue);
@@ -1090,7 +1108,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         save_cycles.setOnClickListener(v->{
             if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()){
                 sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
-                sortPopupWindow.showAtLocation(sortCyclePopupView, Gravity.TOP, 325, 10);
+                sortPopupWindow.showAtLocation(mainView, Gravity.TOP, 325, 10);
 
                 sortRecent.setOnClickListener(v1 -> {
                     sortCheckmark.setY(14);
@@ -1133,103 +1151,144 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 });
                 sortCheckmark.setY(0);
             } else {
-                Gson gson = new Gson();
-                if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
-                    Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
-                    return;
-                }
+                labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
+                labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+                labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
 
-                AsyncTask.execute(() -> {
-                    queryCycles();
-                    ArrayList<Long> tempSets = new ArrayList<>();
-                    ArrayList<Long> tempBreaks = new ArrayList<>();
-                    ArrayList<Long> tempBreaksOnly = new ArrayList<>();
-                    String convertedSetList = "";
-                    String convertedBreakList = "";
-                    String convertedBreakOnlyList = "";
+                EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
+                Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
+                Button cancel_save = cycleLabelView.findViewById(R.id.cancel_save);
 
-                    if (!breaksOnly) {
-                        for (int i=0; i<startCustomSetTime.size(); i++) {
-                            tempSets.add(startCustomSetTime.get(i) /1000);
-                        }
-                        for (int i=0; i<startCustomBreakTime.size(); i++){
-                            tempBreaks.add(startCustomBreakTime.get(i)/1000);
-                        }
-                        convertedSetList = gson.toJson(tempSets);
-                        convertedBreakList = gson.toJson(tempBreaks);
+                cancel_save.setOnClickListener(v2-> {
+                    if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                });
 
-                        convertedSetList = convertedSetList.replace("\"", "");
-                        convertedSetList = convertedSetList.replace("]", "");
-                        convertedSetList = convertedSetList.replace("[", "");
-                        convertedSetList = convertedSetList.replace(",", " - ");
-                        convertedBreakList = convertedBreakList.replace("\"", "");
-                        convertedBreakList = convertedBreakList.replace("]", "");
-                        convertedBreakList = convertedBreakList.replace("[", "");
-                        convertedBreakList = convertedBreakList.replace(",", " - ");
-                        cycles.setSets(convertedSetList);
-                        cycles.setBreaks(convertedBreakList);
-                        cycles.setTimeAdded(System.currentTimeMillis());
-                        cycles.setItemCount(startCustomSetTime.size());
+                //Todo: Pass editLabel's value into proper db row (for both Cycles and CyclesBO). First, add to db classes.  Use date/time for untitled.
+                confirm_save.setOnClickListener(v2-> {
+                    if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
+                        Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
+                        return;
+                    }
+                    Gson gson = new Gson();
+                    AsyncTask.execute(() -> {
+                        queryCycles();
+                        ArrayList<Long> tempSets = new ArrayList<>();
+                        ArrayList<Long> tempBreaks = new ArrayList<>();
+                        ArrayList<Long> tempBreaksOnly = new ArrayList<>();
+                        String convertedSetList = "";
+                        String convertedBreakList = "";
+                        String convertedBreakOnlyList = "";
 
-                        boolean duplicate = false;
-                        if (cyclesList.size() >0 && cyclesList.get(0).getSets()!=null) {
-                            for (int i=0; i<cyclesList.size(); i++) {
-                                if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
-                                    duplicate = true;
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
-                                    });
-                                }
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+
+                        if (!breaksOnly) {
+                            for (int i=0; i<startCustomSetTime.size(); i++) {
+                                tempSets.add(startCustomSetTime.get(i) /1000);
                             }
-                            if (!duplicate) {
+                            for (int i=0; i<startCustomBreakTime.size(); i++){
+                                tempBreaks.add(startCustomBreakTime.get(i)/1000);
+                            }
+                            convertedSetList = gson.toJson(tempSets);
+                            convertedBreakList = gson.toJson(tempBreaks);
+
+                            convertedSetList = convertedSetList.replace("\"", "");
+                            convertedSetList = convertedSetList.replace("]", "");
+                            convertedSetList = convertedSetList.replace("[", "");
+                            convertedSetList = convertedSetList.replace(",", " - ");
+                            convertedBreakList = convertedBreakList.replace("\"", "");
+                            convertedBreakList = convertedBreakList.replace("]", "");
+                            convertedBreakList = convertedBreakList.replace("[", "");
+                            convertedBreakList = convertedBreakList.replace(",", " - ");
+                            if (!editLabel.getText().toString().isEmpty()) {
+                                cycles.setTitle(editLabel.getText().toString());
+                                customTitleArray.add(editLabel.getText().toString());
+                            } else {
+                                String newDate = dateFormat.format(calendar.getTime());
+                                cycles.setTitle(newDate);
+                                customTitleArray.add(editLabel.getText().toString());
+                            }
+                            cycles.setSets(convertedSetList);
+                            cycles.setBreaks(convertedBreakList);
+                            cycles.setTimeAdded(System.currentTimeMillis());
+                            cycles.setItemCount(startCustomSetTime.size());
+
+                            boolean duplicate = false;
+                            if (cyclesList.size() >0 && cyclesList.get(0).getSets()!=null) {
+                                for (int i=0; i<cyclesList.size(); i++) {
+                                    if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
+                                        duplicate = true;
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+                                }
+                                if (!duplicate) {
+                                    cyclesDatabase.cyclesDao().insertCycle(cycles);
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
+                                        if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                                    });
+//                            queryCycles();
+                                }
+                            } else {
                                 cyclesDatabase.cyclesDao().insertCycle(cycles);
                                 runOnUiThread(() -> {
                                     Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
+                                    if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                                 });
-//                            queryCycles();
                             }
                         } else {
-                            cyclesDatabase.cyclesDao().insertCycle(cycles);
-                            runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    } else {
-                        for (int i=0; i<startBreaksOnlyTime.size(); i++) {
-                            tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
-                        }
-                        convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
-                        cyclesBO.setBreaksOnly(convertedBreakOnlyList);
+                            for (int i=0; i<startBreaksOnlyTime.size(); i++) {
+                                tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
+                            }
+                            convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
+                            convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
+                            convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
+                            convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
+                            convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
+                            if (!editLabel.getText().toString().isEmpty()) {
+                                cyclesBO.setTitle(editLabel.getText().toString());
+                                breaksOnlyTitleArray.add(editLabel.getText().toString());
+                            } else {
+                                String newDate = dateFormat.format(calendar.getTime());
+                                cyclesBO.setTitle(newDate);
+                                breaksOnlyTitleArray.add(editLabel.getText().toString());
+                            }
+                            cyclesBO.setBreaksOnly(convertedBreakOnlyList);
+                            cyclesBO.setTimeAdded(System.currentTimeMillis());
+                            cyclesBO.setItemCount(startBreaksOnlyTime.size());
 
-                        boolean duplicate = false;
-                        if (cyclesBOList.size()>0) {
-                            int id = cyclesList.get(cyclesList.size()-1).getId();
-                            cycles.setId(id+1);
-                            for (int i=0; i<cyclesBOList.size(); i++) {
-                                if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList)) {
-                                    duplicate = true;
+
+                            boolean duplicate = false;
+                            if (cyclesBOList.size()>0) {
+                                int id = cyclesList.get(cyclesList.size()-1).getId();
+                                cycles.setId(id+1);
+                                for (int i=0; i<cyclesBOList.size(); i++) {
+                                    if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList)) {
+                                        duplicate = true;
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+                                }
+                                if (!duplicate) {
+                                    cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
                                     runOnUiThread(() -> {
-                                        Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
+                                        if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                                     });
                                 }
-                            }
-                            if (!duplicate) {
+                            } else {
                                 cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
                                 runOnUiThread(() -> {
                                     Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
+                                    if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                                 });
                             }
-                        } else {
-                            cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
-                            runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
-                            });
                         }
-                    }
+                    });
+
                 });
             }
         });
@@ -1364,7 +1423,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 View view = inflater3.inflate(R.layout.pom_reset_popup, null);
                 resetPopUpWindow  = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
-                resetPopUpWindow.showAtLocation(view, Gravity.CENTER, 0, 900);
+                resetPopUpWindow.showAtLocation(mainView, Gravity.CENTER, 0, 900);
 
                 TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
                 confirm_reset.setText(R.string.pom_reset);
@@ -2032,7 +2091,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             View view = inflater2.inflate(R.layout.pom_reset_popup, null);
             cyclePopupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
-            cyclePopupWindow.showAtLocation(view, Gravity.CENTER, 400, 465);
+            cyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 400, 465);
 
             TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
             confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -2157,7 +2216,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_reset.setLayoutParams(params2);
     }
 
+
+    //Todo: Add titles here
     public void clearArrays(boolean populateList) {
+        if (customTitleArray!=null) customTitleArray.clear();
+        if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
         if (setsArray!=null) setsArray.clear();
         if (breaksArray!=null) breaksArray.clear();
         if (breaksOnlyArray!=null) breaksOnlyArray.clear();

@@ -23,11 +23,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     ArrayList<String> mSetsList;
     ArrayList<String> mBreaksList;
     ArrayList<String> mBreaksOnlyList;
+    ArrayList<String> mTitle;
+    ArrayList<String> mBreaksOnlyTitle;
     boolean mBreaksOnly;
     onCycleClickListener mOnCycleClickListener;
     onDeleteCycleListener mOnDeleteCycleListener;
     public static final int SETS_AND_BREAKS = 0;
-    public static final int BREAKSONLY = 1;
+    public static final int BREAKS_ONLY = 1;
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
@@ -45,8 +47,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.mOnDeleteCycleListener = xOnDeleteCycleListener;
     }
 
-    public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList) {
-        this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList;
+//    public SavedCycleAdapter(Context context, ArrayList<String> breaksOnlyList) {
+//        this.mContext = context; mBreaksOnlyList = breaksOnlyList;
+//    }
+    public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> title, ArrayList<String> breaksOnlyTitleArray) {
+        this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitleArray;
     }
 
     public void setBreaksOnly(boolean breaksOnly){
@@ -70,6 +75,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
+            customHolder.customName.setText(mTitle.get(position));
             customHolder.customSet.setText(convertTime(mSetsList).get(position));
             customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
@@ -82,6 +88,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         } else if (holder instanceof BreaksOnlyHolder) {
             BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
+            breaksOnlyHolder.breaksOnlyTitleArray.setText(mBreaksOnlyTitle.get(position));
             breaksOnlyHolder.breaksOnlyBreak.setText(convertTime(mBreaksOnlyList).get(position));
 
             breaksOnlyHolder.fullView.setOnClickListener(v -> {
@@ -95,7 +102,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemViewType(int position) {
-        if (!mBreaksOnly) return SETS_AND_BREAKS; else return BREAKSONLY;
+        if (!mBreaksOnly) return SETS_AND_BREAKS; else return BREAKS_ONLY;
     }
 
     @Override
@@ -106,6 +113,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public class CustomHolder extends RecyclerView.ViewHolder {
+        public TextView customName;
         public TextView customSet;
         public TextView customBreak;
         public ImageButton customTrash;
@@ -114,6 +122,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         @SuppressLint("ResourceAsColor")
         public CustomHolder(@NonNull View itemView) {
             super(itemView) ;
+            customName = itemView.findViewById(R.id.custom_name_header);
             customSet = itemView.findViewById(R.id.saved_custom_set_view);
             customBreak = itemView.findViewById(R.id.saved_custom_break_view);
             customTrash = itemView.findViewById(R.id.delete_cycle);
@@ -122,12 +131,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public class BreaksOnlyHolder extends RecyclerView.ViewHolder {
+        public TextView breaksOnlyTitleArray;
         public TextView breaksOnlyBreak;
         public ImageButton breaksOnlyTrash;
         public View fullView;
 
         public BreaksOnlyHolder(@NonNull View itemView) {
             super(itemView);
+            breaksOnlyTitleArray = itemView.findViewById(R.id.breaks_only_header);
             breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
             breaksOnlyTrash = itemView.findViewById(R.id.delete_cycle_bo);
             fullView = itemView;

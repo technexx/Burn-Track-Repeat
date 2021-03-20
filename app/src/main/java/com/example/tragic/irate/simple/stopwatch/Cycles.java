@@ -8,6 +8,7 @@ public class Cycles {
     @PrimaryKey (autoGenerate = true)
 
     public int id;
+    public String title;
     public String sets;
     public String breaks;
     public long timeAdded;
@@ -18,6 +19,14 @@ public class Cycles {
 
     public Cycles(String sets, String breaks) {
         this.sets = sets; this.breaks = breaks;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getId() {

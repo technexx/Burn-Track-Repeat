@@ -8,11 +8,20 @@ public class CyclesBO {
     @PrimaryKey (autoGenerate = true)
 
     public int id;
+    public String title;
     public String breaksOnly;
     public long timeAdded;
     public int itemCount;
 
     public CyclesBO() {
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public CyclesBO(String breaksOnly) {
