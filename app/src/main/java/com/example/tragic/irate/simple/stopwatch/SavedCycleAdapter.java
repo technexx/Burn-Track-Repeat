@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,6 +29,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     boolean mBreaksOnly;
     onCycleClickListener mOnCycleClickListener;
     onDeleteCycleListener mOnDeleteCycleListener;
+    onEditTitleListener mOnEditTitleListener;
     public static final int SETS_AND_BREAKS = 0;
     public static final int BREAKS_ONLY = 1;
 
@@ -39,6 +41,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         void onCycleDelete (int position);
     }
 
+    public interface onEditTitleListener {
+        void onTitleEdit (String text, int position);
+    }
+
     public void setItemClick(onCycleClickListener xOnCycleClickListener) {
         this.mOnCycleClickListener = xOnCycleClickListener;
     }
@@ -47,9 +53,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.mOnDeleteCycleListener = xOnDeleteCycleListener;
     }
 
-//    public SavedCycleAdapter(Context context, ArrayList<String> breaksOnlyList) {
-//        this.mContext = context; mBreaksOnlyList = breaksOnlyList;
-//    }
+    public void setTitleEdit(onEditTitleListener xOnEditTitleListener) {
+        this.mOnEditTitleListener = xOnEditTitleListener;
+    }
+
     public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> title, ArrayList<String> breaksOnlyTitleArray) {
         this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitleArray;
     }
@@ -75,9 +82,21 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
+            customHolder.editName.setVisibility(View.INVISIBLE);
             customHolder.customName.setText(mTitle.get(position));
             customHolder.customSet.setText(convertTime(mSetsList).get(position));
             customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
+
+            customHolder.customName.setOnClickListener(v-> {
+                customHolder.customName.setVisibility(View.INVISIBLE);
+                customHolder.editName.setVisibility(View.VISIBLE);
+                customHolder.editName.setText(customHolder.customName.getText().toString());
+            });
+
+            //Todo: Only want to send this over when we confirm w/ new button.
+            customHolder.editName.setOnClickListener(v-> {
+                mOnEditTitleListener.onTitleEdit(customHolder.editName.getText().toString(), position);
+            });
 
             customHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
@@ -113,6 +132,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public class CustomHolder extends RecyclerView.ViewHolder {
+        public EditText editName;
         public TextView customName;
         public TextView customSet;
         public TextView customBreak;
@@ -122,6 +142,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         @SuppressLint("ResourceAsColor")
         public CustomHolder(@NonNull View itemView) {
             super(itemView) ;
+            editName = itemView.findViewById(R.id.custom_header_edit);
             customName = itemView.findViewById(R.id.custom_name_header);
             customSet = itemView.findViewById(R.id.saved_custom_set_view);
             customBreak = itemView.findViewById(R.id.saved_custom_break_view);

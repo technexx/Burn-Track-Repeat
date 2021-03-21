@@ -19,6 +19,9 @@ public interface CyclesDao {
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
 
+    @Query("SELECT * from Cycles where id=:listID")
+    List<Cycles> loadSingleCycle(int listID);
+
     @Query("SELECT * from CyclesBO")
     List<CyclesBO> loadAllBOCycles();
 
@@ -63,6 +66,18 @@ public interface CyclesDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertPomCycle(PomCycles pomCycles);
+
+//    @Query("UPDATE cycles set title=:newTitle")
+//    void updateCustomTitle(String newTitle);
+
+    @Query("UPDATE cycles set title=:newTitle WHERE id=:listID")
+    void updateCustomTitle(String newTitle, int listID);
+
+    @Update
+    void updateCycles(Cycles cycles);
+
+    @Update
+    void updateBOCycles(CyclesBO cyclesBO);
 
     @Delete
     void deleteCycle(Cycles cycles);

@@ -67,7 +67,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, DotDraws.sendPosition{
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onEditTitleListener, DotDraws.sendPosition {
 
     View mainView;
     Button breaks_only;
@@ -264,6 +264,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View sortCyclePopupView;
     View cycleLabelView;
 
+    EditText custom_header_edit;
+    EditText breaksOnly_header_edit;
     TextView sortRecent;
     TextView sortNotRecent;
     TextView sortHigh;
@@ -274,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedPos;
     MotionEvent motionEvent;
 
-    //Todo: Label saved entries (e.g. squats, bench). Use blank row for label. Add db sort for label. Popup for save.
+    //Todo: Option to rename cycle title.
     //Todo: Fix values added/subtracted to timer.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Different layout (e.g. no increment rows) for Pom mode.
@@ -336,6 +338,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return false;
     }
 
+    //Todo: Update title position. Can get reference to the ID based on the position in the entity we've passed in.
+    @Override
+    public void onTitleEdit(String text, int position) {
+        AsyncTask.execute(() -> {
+            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+            int id = cyclesList.get(position).getId();
+            cyclesDatabase.cyclesDao().updateCustomTitle(text, id);
+
+            customTitleArray.set(position, text);
+            runOnUiThread(() -> {
+                savedCycleAdapter.notifyDataSetChanged();
+                Log.i("updatedtitle", "fetched db is " + cyclesDatabase.cyclesDao().loadAllBOCycles().toString() + "and updated list is " + customTitleArray);
+
+            });
+
+//            for (int i=0;i<cyclesList.size(); i++) {
+//
+//            }
+        });
+    }
+
+    //Todo: Add "Select" button instead of auto selecting on full view click here.
     //Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
     public void onCycleClick(int position) {
@@ -347,10 +371,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 String[] setSplit = tempSets.split(" - ", 0);
                 String[] breakSplit = tempBreaks.split(" - ", 0);
 
-                customSetTime.clear();
-                startCustomSetTime.clear();
-                customBreakTime.clear();
-                startCustomBreakTime.clear();
+//                customSetTime.clear();
+//                startCustomSetTime.clear();
+//                customBreakTime.clear();
+//                startCustomBreakTime.clear();
+                clearArrays(false);
 
                 for (int i=0; i<setSplit.length; i++) {
                     customSetTime.add(Long.parseLong(setSplit[i])*1000);
@@ -555,6 +580,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, customTitleArray, breaksOnlyTitleArray);
         savedCycleRecycler.setAdapter(savedCycleAdapter);
         savedCycleRecycler.setLayoutManager(lm2);
+        savedCycleAdapter.setTitleEdit(MainActivity.this);
         savedCycleAdapter.setItemClick(MainActivity.this);
         savedCycleAdapter.setDeleteCycle(MainActivity.this);
 
@@ -1262,8 +1288,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                             boolean duplicate = false;
                             if (cyclesBOList.size()>0) {
-                                int id = cyclesList.get(cyclesList.size()-1).getId();
-                                cycles.setId(id+1);
+//                                int id = cyclesList.get(cyclesList.size()-1).getId();
+//                                cycles.setId(id+1);
                                 for (int i=0; i<cyclesBOList.size(); i++) {
                                     if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList)) {
                                         duplicate = true;
