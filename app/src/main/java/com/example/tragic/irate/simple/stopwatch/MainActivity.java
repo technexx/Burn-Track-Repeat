@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long editBreakMinutes;
     long editBreakSeconds;
 
+    TextView cycle_header_text;
     TextView cycles_completed;
     TextView cycle_reset;
     EditText first_value_edit;
@@ -212,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean pomBegun;
     boolean drawing = true;
     boolean breaksOnly;
+    boolean existingCycle;
 
     PopupWindow clearCyclePopupWindow;
     PopupWindow resetPopUpWindow;
@@ -251,8 +253,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View savedCyclePopupView;
     View cycleLabelView;
 
-    EditText custom_header_edit;
-    EditText breaksOnly_header_edit;
     TextView sortRecent;
     TextView sortNotRecent;
     TextView sortHigh;
@@ -266,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Fix values added/subtracted to timer.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Different layout (e.g. no increment rows) for Pom mode.
+    //Todo: Recalled set/breaks should be re-saved instead of creating new saves.
     //Todo: Options to delete individual set/break.
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
     //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
@@ -331,7 +332,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return false;
     }
 
-    //Todo: Update title position. Can get reference to the ID based on the position in the entity we've passed in.
     @Override
     public void onTitleEdit(String text, int position) {
         if (savedCyclePopupWindow!=null) savedCyclePopupWindow.dismiss();
@@ -347,7 +347,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
         });
 
-        //Todo: ArrayLists passed into adapter are different than db entries (their order).
         confirm_save.setOnClickListener(v-> {
             AsyncTask.execute(() -> {
                 String newTitle = editLabel.getText().toString();
@@ -360,23 +359,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     savedCycleAdapter.notifyDataSetChanged();
                     Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                    savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
                 });
             });
         });
-
-//            for (int i=0;i<cyclesList.size(); i++) {
-//
-//            }
-
     }
 
-    //Todo: Add "Select" button instead of auto selecting on full view click here.
+    //Todo: Pass in title from adapter position to textView. Switch adapter onclick to the textView.
+    //Todo: Update button next to Saved that is greyed out if not applicable.
+    //Todo: Title edit should only be accessible on main page. Also add deletion option on main page.
     //Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
     public void onCycleClick(int position) {
+        save_cycles.setText(R.string.update_cycles);
         AsyncTask.execute(() -> {
+            //Used in save_cycles button to update our existing row instead of creating a new one.
+            existingCycle = true;
+
             queryCycles();
             if (!breaksOnly) {
+                //Getting instance of selected position of Cycle list entity. Also used in save_cycles.
+                cycles = cyclesList.get(position);
                 String tempSets = cyclesList.get(position).getSets();
                 String tempBreaks = cyclesList.get(position).getBreaks();
                 String[] setSplit = tempSets.split(" - ", 0);
@@ -394,6 +397,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     startCustomBreakTime.add(Long.parseLong(breakSplit[i])*1000);
                 }
             } else {
+                //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
+                cyclesBO = cyclesBOList.get(position);
                 String tempBreaksOnly = cyclesBOList.get(position).getBreaksOnly();
                 String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
 
@@ -474,7 +479,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
 
-        //Todo: The cycleList called from queryCycles() defaults to MOST RECENT, while Arrays are not updated by default from their least recent (i.e. first position is the first one added).
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
                 save_cycles.setText(R.string.sort_cycles);
@@ -601,6 +605,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s2 = findViewById(R.id.s2);
         s3 = findViewById(R.id.s3);
         reset = findViewById(R.id.reset);
+        cycle_header_text = findViewById(R.id.cycle_header_text);
         first_value_edit = findViewById(R.id.first_value_edit);
         first_value_edit_two = findViewById(R.id.first_value_edit_two);
         first_value_sep = findViewById(R.id.first_value_sep);
@@ -749,6 +754,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
         clearCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
         resetPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+
+        cycle_header_text.setOnClickListener(v-> {
+
+        });
 
         first_value_textView.setOnClickListener(v-> {
             if (first_value_textView.isShown()) {
@@ -1198,8 +1207,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 });
                 sortCheckmark.setY(0);
             } else {
-                labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 300);
-
+                if (!existingCycle) labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 300);
                 EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
                 Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
                 Button cancel_save = cycleLabelView.findViewById(R.id.cancel_save);
@@ -1245,6 +1253,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             convertedBreakList = convertedBreakList.replace("]", "");
                             convertedBreakList = convertedBreakList.replace("[", "");
                             convertedBreakList = convertedBreakList.replace(",", " - ");
+
+                            //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
+                            if (!existingCycle) cycles = new Cycles();
+
                             if (!editLabel.getText().toString().isEmpty()) {
                                 cycles.setTitle(editLabel.getText().toString());
                                 customTitleArray.add(editLabel.getText().toString());
@@ -1269,15 +1281,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     }
                                 }
                                 if (!duplicate) {
-                                    cyclesDatabase.cyclesDao().insertCycle(cycles);
+                                    if (!existingCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); else cyclesDatabase.cyclesDao().updateCycles(cycles);
                                     runOnUiThread(() -> {
                                         Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                                         if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                                     });
-//                            queryCycles();
                                 }
                             } else {
-                                cyclesDatabase.cyclesDao().insertCycle(cycles);
+                                if (!existingCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); else cyclesDatabase.cyclesDao().updateCycles(cycles);
                                 runOnUiThread(() -> {
                                     Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
@@ -1292,6 +1303,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
                             convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
                             convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
+
+                            //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
+                            if (!existingCycle) cyclesBO = new CyclesBO();
+
                             if (!editLabel.getText().toString().isEmpty()) {
                                 cyclesBO.setTitle(editLabel.getText().toString());
                                 breaksOnlyTitleArray.add(editLabel.getText().toString());
@@ -1307,8 +1322,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                             boolean duplicate = false;
                             if (cyclesBOList.size()>0) {
-//                                int id = cyclesList.get(cyclesList.size()-1).getId();
-//                                cycles.setId(id+1);
                                 for (int i=0; i<cyclesBOList.size(); i++) {
                                     if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList)) {
                                         duplicate = true;
@@ -1318,14 +1331,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     }
                                 }
                                 if (!duplicate) {
-                                    cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
+                                    if (!existingCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
                                     runOnUiThread(() -> {
                                         Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                                         if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                                     });
                                 }
                             } else {
-                                cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
+                                if (!existingCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
                                 runOnUiThread(() -> {
                                     Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
@@ -1333,7 +1346,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         }
                     });
-
+                    //Todo: We may revisit this.
+                    existingCycle = false;
                 });
             }
         });

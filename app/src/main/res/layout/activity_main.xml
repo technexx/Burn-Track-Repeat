@@ -22,7 +22,7 @@
     </com.google.android.material.tabs.TabLayout>
 
     <TextView
-        android:text="Test Layout"
+        android:id="@+id/cycle_header_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/tabLayout"

@@ -87,9 +87,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             customHolder.customSet.setText(convertTime(mSetsList).get(position));
             customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
-            customHolder.customName.setOnClickListener(v-> {
-                mOnEditTitleListener.onTitleEdit(customHolder.customName.getText().toString(), position);
-            });
+//            customHolder.customName.setOnClickListener(v-> {
+//                mOnEditTitleListener.onTitleEdit(customHolder.customName.getText().toString(), position);
+//            });
 
             customHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);

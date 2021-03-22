@@ -67,8 +67,7 @@ public interface CyclesDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertPomCycle(PomCycles pomCycles);
 
-//    @Query("UPDATE cycles set title=:newTitle")
-//    void updateCustomTitle(String newTitle);
+    
 
     @Query("UPDATE cycles set title=:newTitle WHERE id=:listID")
     void updateCustomTitle(String newTitle, int listID);
