@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,20 +83,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CustomHolder) {
             CustomHolder customHolder = (CustomHolder) holder;
-            customHolder.editName.setVisibility(View.INVISIBLE);
             customHolder.customName.setText(mTitle.get(position));
             customHolder.customSet.setText(convertTime(mSetsList).get(position));
             customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
             customHolder.customName.setOnClickListener(v-> {
-                customHolder.customName.setVisibility(View.INVISIBLE);
-                customHolder.editName.setVisibility(View.VISIBLE);
-                customHolder.editName.setText(customHolder.customName.getText().toString());
-            });
-
-            //Todo: Only want to send this over when we confirm w/ new button.
-            customHolder.editName.setOnClickListener(v-> {
-                mOnEditTitleListener.onTitleEdit(customHolder.editName.getText().toString(), position);
+                mOnEditTitleListener.onTitleEdit(customHolder.customName.getText().toString(), position);
             });
 
             customHolder.fullView.setOnClickListener(v -> {
@@ -132,7 +125,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public class CustomHolder extends RecyclerView.ViewHolder {
-        public EditText editName;
+//        public EditText editName;
         public TextView customName;
         public TextView customSet;
         public TextView customBreak;
@@ -142,7 +135,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         @SuppressLint("ResourceAsColor")
         public CustomHolder(@NonNull View itemView) {
             super(itemView) ;
-            editName = itemView.findViewById(R.id.custom_header_edit);
+//            editName = itemView.findViewById(R.id.custom_header_edit);
             customName = itemView.findViewById(R.id.custom_name_header);
             customSet = itemView.findViewById(R.id.saved_custom_set_view);
             customBreak = itemView.findViewById(R.id.saved_custom_break_view);

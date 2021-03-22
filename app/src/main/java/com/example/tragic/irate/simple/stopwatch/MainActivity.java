@@ -3,25 +3,20 @@ package com.example.tragic.irate.simple.stopwatch;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.content.AsyncQueryHandler;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 ;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -32,21 +27,15 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,18 +43,13 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onEditTitleListener, DotDraws.sendPosition {
 
@@ -277,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     MotionEvent motionEvent;
 
     //Todo: Option to rename cycle title.
+    //Todo: Fix save/sort.
     //Todo: Fix values added/subtracted to timer.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Different layout (e.g. no increment rows) for Pom mode.
@@ -321,8 +306,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
             dotDraws.selectCycle(x, y, startCustomSetTime.size());
         }
+        Log.i("coords", "x and y are " + x + " and " + y);
+
         //This dismisses windows/views when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
-        if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) savedCyclePopupWindow.dismiss();
+        if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
+            save_cycles.setText(R.string.save_cycles);
+            savedCyclePopupWindow.dismiss();
+        }
         if (first_value_edit.isShown()) {
             first_value_textView.setVisibility(View.VISIBLE);
             first_value_edit.setVisibility(View.INVISIBLE);
@@ -341,22 +331,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Update title position. Can get reference to the ID based on the position in the entity we've passed in.
     @Override
     public void onTitleEdit(String text, int position) {
-        AsyncTask.execute(() -> {
-            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-            int id = cyclesList.get(position).getId();
-            cyclesDatabase.cyclesDao().updateCustomTitle(text, id);
+        labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
+        labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
 
-            customTitleArray.set(position, text);
-            runOnUiThread(() -> {
-                savedCycleAdapter.notifyDataSetChanged();
-                Log.i("updatedtitle", "fetched db is " + cyclesDatabase.cyclesDao().loadAllBOCycles().toString() + "and updated list is " + customTitleArray);
+        EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
+        Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
+        Button cancel_save = cycleLabelView.findViewById(R.id.cancel_save);
+        editLabel.setText(text);
+        editLabel.setSelection(text.length());
 
+        cancel_save.setOnClickListener(v2-> {
+            if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+        });
+
+        //Todo: ArrayLists passed into adapter are different than db entries (their order).
+        confirm_save.setOnClickListener(v-> {
+            AsyncTask.execute(() -> {
+                String newTitle = editLabel.getText().toString();
+                cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                int id = cyclesList.get(position).getId();
+                cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, id);
+
+                customTitleArray.set(position, newTitle);
+                runOnUiThread(() -> {
+                    savedCycleAdapter.notifyDataSetChanged();
+                    cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                    ArrayList<String> temp = new ArrayList<>();
+                    for (int i=0; i<cyclesList.size(); i++){
+                        temp.add(cyclesDatabase.cyclesDao().loadAllCycles().get(i).getSets());
+                    }
+                    Log.i("newpositions", "sets string are " + temp + " and fetched cycleList position is " + id + " and  received position is " + position);
+                    Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
+                    if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                });
             });
+        });
 
 //            for (int i=0;i<cyclesList.size(); i++) {
 //
 //            }
-        });
+
     }
 
     //Todo: Add "Select" button instead of auto selecting on full view click here.
@@ -371,11 +386,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 String[] setSplit = tempSets.split(" - ", 0);
                 String[] breakSplit = tempBreaks.split(" - ", 0);
 
-//                customSetTime.clear();
-//                startCustomSetTime.clear();
-//                customBreakTime.clear();
-//                startCustomBreakTime.clear();
-                clearArrays(false);
+                customSetTime.clear();
+                startCustomSetTime.clear();
+                customBreakTime.clear();
+                startCustomBreakTime.clear();
 
                 for (int i=0; i<setSplit.length; i++) {
                     customSetTime.add(Long.parseLong(setSplit[i])*1000);
@@ -466,7 +480,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
-                    AsyncTask.execute(() -> {
+                save_cycles.setText(R.string.sort_cycles);
+                AsyncTask.execute(() -> {
                         queryCycles();
                         clearArrays(false);
 
@@ -480,10 +495,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     customTitleArray.add(cyclesList.get(i).getTitle());
                                 }
                                 runOnUiThread(() -> {
-                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
+                                    //Focusable must be false for save/sort switch function to work, otherwise window will steal focus from button.
+                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
-                                    save_cycles.setText(R.string.sort_cycles);
                                     savedCycleAdapter.notifyDataSetChanged();
                                 });
                         } else {
@@ -500,7 +515,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
                                     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
-                                    save_cycles.setText(R.string.sort_cycles);
                                     savedCycleAdapter.notifyDataSetChanged();
                                 });
                             } else {
@@ -1184,6 +1198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
                 Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
                 Button cancel_save = cycleLabelView.findViewById(R.id.cancel_save);
+                editLabel.setText("");
 
                 cancel_save.setOnClickListener(v2-> {
                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
@@ -2242,7 +2257,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_reset.setLayoutParams(params2);
     }
 
-
     //Todo: Add titles here
     public void clearArrays(boolean populateList) {
         if (customTitleArray!=null) customTitleArray.clear();
@@ -2256,10 +2270,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 for (int i=0; i<cyclesList.size(); i++) {
                     setsArray.add(cyclesList.get(i).getSets());
                     breaksArray.add(cyclesList.get(i).getBreaks());
+                    customTitleArray.add(cyclesList.get(i).getTitle());
                 }
             } else {
                 for (int i=0; i<breaksOnlyArray.size(); i++) {
                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+                    breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
                 }
             }
             runOnUiThread(() -> {

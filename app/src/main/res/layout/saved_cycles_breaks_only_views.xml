@@ -23,7 +23,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="14sp"
-        android:textColor="@color/silver">
+        android:textColor="@color/silver"
+        android:background="@null"
+        android:paddingTop="-10dp"
+        android:textCursorDrawable="@drawable/edit_text_cursor">
     </EditText>
 
     <TextView
@@ -43,8 +46,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/saved_breaks_only_view"
+        app:layout_constraintBottom_toBottomOf="@id/saved_breaks_only_view"
         android:background="@color/Gray"
         android:layout_marginBottom="4dp"
         android:src="@drawable/delete_24">
