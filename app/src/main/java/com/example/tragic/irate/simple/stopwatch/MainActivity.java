@@ -213,11 +213,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean drawing = true;
     boolean breaksOnly;
 
-    PopupWindow cyclePopupWindow;
+    PopupWindow clearCyclePopupWindow;
     PopupWindow resetPopUpWindow;
-    PopupWindow savedCyclePopupWindow;
     PopupWindow sortPopupWindow;
+    PopupWindow savedCyclePopupWindow;
     PopupWindow labelSavePopupWindow;
+    PopupWindow deleteAllPopupWindow;
 
     boolean fadeCustomTimer;
     boolean fadePomTimer;
@@ -243,9 +244,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     RecyclerView savedCycleRecycler;
     SavedCycleAdapter savedCycleAdapter;
-    View savedCyclePopupView;
+
+    View clearCyclePopupView;
     View deleteCyclePopupView;
     View sortCyclePopupView;
+    View savedCyclePopupView;
     View cycleLabelView;
 
     EditText custom_header_edit;
@@ -279,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Repository for db. Look at Executor/other alternate thread methods.
-//    Todo: Make sure number pad is dismissed when switching to stopwatch mode.
+    //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
 
 
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
@@ -331,9 +334,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Update title position. Can get reference to the ID based on the position in the entity we've passed in.
     @Override
     public void onTitleEdit(String text, int position) {
-        labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
-        labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 400);
+        if (savedCyclePopupWindow!=null) savedCyclePopupWindow.dismiss();
+        labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
         EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
         Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
@@ -491,8 +493,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 }
                                 runOnUiThread(() -> {
                                     //Focusable must be false for save/sort switch function to work, otherwise window will steal focus from button.
-                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
-                                    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
                                     savedCycleAdapter.notifyDataSetChanged();
                                 });
@@ -508,8 +508,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                                 }
                                 runOnUiThread(() -> {
-                                    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
-                                    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                                     savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
                                     savedCycleAdapter.notifyDataSetChanged();
                                 });
@@ -524,8 +522,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 AsyncTask.execute(() -> {
                     if (!breaksOnly) cyclesDatabase.cyclesDao().deleteAll(); else cyclesDatabase.cyclesDao().deleteAllBO();
                     runOnUiThread(() -> {
-//                        deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 600, 300, false);
-//                        deleteAllPopupWindow.showAtLocation(deleteCyclePopupView, Gravity.CENTER, 0, -450);
+                        deleteAllPopupWindow.showAtLocation(deleteCyclePopupView, Gravity.CENTER, 0, -450);
                         Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
                     });
                 });
@@ -578,6 +575,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
         sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
         cycleLabelView = inflater.inflate(R.layout.label_cycle_popup, null);
+        clearCyclePopupView = inflater.inflate(R.layout.pom_reset_popup, null);
+
         sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
         sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
         sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
@@ -737,6 +736,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         incrementTimer = 10;
         tabViews();
+
+        savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+        deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 600, 300, false);
+        labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
+        sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
+        clearCyclePopupWindow  = new PopupWindow(clearCyclePopupView, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
+        resetPopUpWindow  = new PopupWindow(clearCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
+        savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        clearCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        resetPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
         first_value_textView.setOnClickListener(v-> {
             if (first_value_textView.isShown()) {
@@ -1030,7 +1042,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else {
                             fadeOutText(timeLeft2); lastTextView = timeLeft2;
                         }
-                        if (cyclePopupWindow!=null) cyclePopupWindow.dismiss();
+                        if (clearCyclePopupWindow!=null) clearCyclePopupWindow.dismiss();
                         if (resetPopUpWindow!=null) resetPopUpWindow.dismiss();
                         break;
                     case 2:
@@ -1143,7 +1155,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         save_cycles.setOnClickListener(v->{
             if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()){
-                sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
                 sortPopupWindow.showAtLocation(mainView, Gravity.TOP, 325, 10);
 
                 sortRecent.setOnClickListener(v1 -> {
@@ -1187,8 +1198,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 });
                 sortCheckmark.setY(0);
             } else {
-                labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
-                labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                 labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 300);
 
                 EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
@@ -1200,7 +1209,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                 });
 
-                //Todo: Pass editLabel's value into proper db row (for both Cycles and CyclesBO). First, add to db classes.  Use date/time for untitled.
                 confirm_save.setOnClickListener(v2-> {
                     if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
                         Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
@@ -1456,13 +1464,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (mode!=2) {
                 resetTimer();
             } else {
-                LayoutInflater inflater3 = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                View view = inflater3.inflate(R.layout.pom_reset_popup, null);
-                resetPopUpWindow  = new PopupWindow(view, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
                 resetPopUpWindow.showAtLocation(mainView, Gravity.CENTER, 0, 900);
 
-                TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
+                TextView confirm_reset = clearCyclePopupView.findViewById(R.id.pom_reset_text);
                 confirm_reset.setText(R.string.pom_reset);
                 confirm_reset.setOnClickListener(v2-> {
                     resetTimer();
@@ -2124,13 +2128,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void clearCycles(int cycleCount) {
         if (cycleCount>0) {
             cycle_reset.setVisibility(View.GONE);
-            LayoutInflater inflater2 = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            clearCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 400, 465);
 
-            View view = inflater2.inflate(R.layout.pom_reset_popup, null);
-            cyclePopupWindow  = new PopupWindow(view, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
-            cyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 400, 465);
-
-            TextView confirm_reset = view.findViewById(R.id.pom_reset_text);
+            TextView confirm_reset = clearCyclePopupView.findViewById(R.id.pom_reset_text);
             confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
             confirm_reset.setText(R.string.pom_cycle_reset);
 
@@ -2140,7 +2140,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else if (mode==2) pomCyclesDone = 0;
                 cycle_reset.setVisibility(View.VISIBLE);
                 cycles_completed.setText(getString(R.string.cycles_done, "0"));
-                cyclePopupWindow.dismiss();;
+                clearCyclePopupWindow.dismiss();;
             });
         }
     }
