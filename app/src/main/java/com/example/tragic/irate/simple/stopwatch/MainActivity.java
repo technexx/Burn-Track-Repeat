@@ -260,8 +260,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedPos;
     MotionEvent motionEvent;
 
-    //Todo: Option to rename cycle title.
-    //Todo: Fix save/sort.
     //Todo: Fix values added/subtracted to timer.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Different layout (e.g. no increment rows) for Pom mode.
@@ -281,8 +279,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Rename app, of course.
     //Todo: Add onOptionsSelected dots for About, etc.
     //Todo: Repository for db. Look at Executor/other alternate thread methods.
-    //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
+//    Todo: Make sure number pad is dismissed when switching to stopwatch mode.
 
+
+    //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
     @Override
     public void sendPos(int pos) {
         if (mode==1) {
@@ -333,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void onTitleEdit(String text, int position) {
         labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
         labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
+        labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 400);
 
         EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
         Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
@@ -349,19 +349,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         confirm_save.setOnClickListener(v-> {
             AsyncTask.execute(() -> {
                 String newTitle = editLabel.getText().toString();
-                cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+                queryCycles();
                 int id = cyclesList.get(position).getId();
                 cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, id);
 
                 customTitleArray.set(position, newTitle);
                 runOnUiThread(() -> {
                     savedCycleAdapter.notifyDataSetChanged();
-                    cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-                    ArrayList<String> temp = new ArrayList<>();
-                    for (int i=0; i<cyclesList.size(); i++){
-                        temp.add(cyclesDatabase.cyclesDao().loadAllCycles().get(i).getSets());
-                    }
-                    Log.i("newpositions", "sets string are " + temp + " and fetched cycleList position is " + id + " and  received position is " + position);
                     Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                 });
@@ -478,6 +472,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
 
+        //Todo: The cycleList called from queryCycles() defaults to MOST RECENT, while Arrays are not updated by default from their least recent (i.e. first position is the first one added).
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
                 save_cycles.setText(R.string.sort_cycles);
@@ -501,7 +496,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
                                     savedCycleAdapter.notifyDataSetChanged();
                                 });
-                        } else {
+
+                            } else {
                                 runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
                             }
                         } else {
@@ -1193,7 +1189,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else {
                 labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
                 labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-                labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
+                labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 300);
 
                 EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
                 Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
@@ -2257,7 +2253,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_reset.setLayoutParams(params2);
     }
 
-    //Todo: Add titles here
     public void clearArrays(boolean populateList) {
         if (customTitleArray!=null) customTitleArray.clear();
         if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
