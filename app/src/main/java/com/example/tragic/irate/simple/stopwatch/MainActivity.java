@@ -336,15 +336,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return false;
     }
 
-    //Todo: Cycle position will not be correct if this has just been saved and not called from onCycleClick.
     @Override
     public void onTitleEdit(String text, int position) {
 
     }
 
-    //Todo: Switch adapter onclick to the textView for title change.
     //Todo: Update button next to Saved that is greyed out if not applicable.
-    //Todo: Title edit should only be accessible on main page. Also add deletion option on main page.
+    //Todo: Add delete option on main page.
+    //Todo: Identical cycle should either a)not apply or b)only apply to title AND set/break together.
     //Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
     public void onCycleClick(int position) {
@@ -352,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(() -> {
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
-            currentPos = position;
 
             queryCycles();
             if (!breaksOnly) {
@@ -743,6 +741,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
             int id = cycles.getId();
+            //Called if we are editing a title from a recently added, but not selected, cycle entry.
+
             String titleText = cycles.getTitle();
             edit_header.setText(titleText);
             edit_header.setSelection(titleText.length());
@@ -754,8 +754,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             confirm_header_save.setOnClickListener(v2-> {
                 AsyncTask.execute(() -> {
                     String newTitle = edit_header.getText().toString();
-                    cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, id);
-
+                    //Using currentPos if we are editing a title from a recently added, but not selected, cycle entry. Otherwise using selected position.
+                    if (!existingCycle) cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, id); else cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, currentPos);
                     runOnUiThread(() -> {
                         Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
                         cycle_header_text.setText(newTitle);
@@ -1275,7 +1275,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             cycles.setItemCount(startCustomSetTime.size());
 
                             boolean duplicate = false;
-                            if (cyclesList.size() >0 && cyclesList.get(0).getSets()!=null) {
+                            if (cyclesList.size()>0) {
                                 for (int i=0; i<cyclesList.size(); i++) {
                                     if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList)) {
                                         duplicate = true;
@@ -1284,17 +1284,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                         });
                                     }
                                 }
-                                if (!duplicate) {
-                                    if (!existingCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); else cyclesDatabase.cyclesDao().updateCycles(cycles);
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
-                                        if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-                                    });
+                            }
+                            if (!duplicate || cyclesList.size()==0) {
+                                if (!existingCycle){
+                                    cyclesDatabase.cyclesDao().insertCycle(cycles);
+                                    Toast.makeText(getApplicationContext(), "Cycle added", Toast.LENGTH_SHORT).show();
+                                    //The current "end position" of our entity is +1 because of insert, and size is +1 to position.
+                                    currentPos = cyclesList.size();
+                                } else {
+                                    cyclesDatabase.cyclesDao().updateCycles(cycles);
+                                    Toast.makeText(getApplicationContext(), "Cycle updated", Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                if (!existingCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); else cyclesDatabase.cyclesDao().updateCycles(cycles);
                                 runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                                 });
                             }
@@ -1334,17 +1335,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                         });
                                     }
                                 }
-                                if (!duplicate) {
-                                    if (!existingCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
-                                        if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-                                    });
+                            }
+                            if (!duplicate || cyclesBOList.size()==0) {
+                                if (!existingCycle) {
+                                    cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
+                                    Toast.makeText(getApplicationContext(), "Cycle added", Toast.LENGTH_SHORT).show();
+                                    //The current "end position" of our entity is +1 because of insert, and size is +1 to position.
+                                    currentPos = cyclesBOList.size();
+                                } else {
+                                    cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+                                    Toast.makeText(getApplicationContext(), "Cycle updated", Toast.LENGTH_SHORT).show();
                                 }
-                            } else {
-                                if (!existingCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
                                 runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Cycle added!", Toast.LENGTH_SHORT).show();
                                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                                 });
                             }
