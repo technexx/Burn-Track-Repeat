@@ -112,6 +112,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Button sub_cycle;
     ImageButton left_arrow;
     ImageButton right_arrow;
+    EditText edit_header;
+    Button confirm_header_save;
+    Button cancel_header_save;
 
     ImageView sortCheckmark;
     TextView skip;
@@ -213,7 +216,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean pomBegun;
     boolean drawing = true;
     boolean breaksOnly;
-    boolean existingCycle;
 
     PopupWindow clearCyclePopupWindow;
     PopupWindow resetPopUpWindow;
@@ -233,12 +235,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lapLayout;
 
     CyclesDatabase cyclesDatabase;
-    List<Cycles> cyclesList;
     Cycles cycles;
-    List<CyclesBO> cyclesBOList;
     CyclesBO cyclesBO;
-    List<PomCycles> pomCyclesList;
     PomCycles pomCycles;
+    List<Cycles> cyclesList;
+    List<CyclesBO> cyclesBOList;
+    List<PomCycles> pomCyclesList;
+    boolean existingCycle;
+    int currentPos;
 
     ArrayList<String> setsArray;
     ArrayList<String> breaksArray;
@@ -332,40 +336,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return false;
     }
 
+    //Todo: Cycle position will not be correct if this has just been saved and not called from onCycleClick.
     @Override
     public void onTitleEdit(String text, int position) {
-        if (savedCyclePopupWindow!=null) savedCyclePopupWindow.dismiss();
-        labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
-        EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
-        Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
-        Button cancel_save = cycleLabelView.findViewById(R.id.cancel_save);
-        editLabel.setText(text);
-        editLabel.setSelection(text.length());
-
-        cancel_save.setOnClickListener(v2-> {
-            if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-        });
-
-        confirm_save.setOnClickListener(v-> {
-            AsyncTask.execute(() -> {
-                String newTitle = editLabel.getText().toString();
-                queryCycles();
-                int id = cyclesList.get(position).getId();
-                cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, id);
-
-                customTitleArray.set(position, newTitle);
-                runOnUiThread(() -> {
-                    savedCycleAdapter.notifyDataSetChanged();
-                    Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
-                    if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-                    savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
-                });
-            });
-        });
     }
 
-    //Todo: Pass in title from adapter position to textView. Switch adapter onclick to the textView.
+    //Todo: Switch adapter onclick to the textView for title change.
     //Todo: Update button next to Saved that is greyed out if not applicable.
     //Todo: Title edit should only be accessible on main page. Also add deletion option on main page.
     //Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
@@ -375,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(() -> {
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
+            currentPos = position;
 
             queryCycles();
             if (!breaksOnly) {
@@ -411,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
             runOnUiThread(() -> {
+                if (!breaksOnly) cycle_header_text.setText(cycles.getTitle()); else cycle_header_text.setText(cyclesBO.getTitle());
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
             });
@@ -581,6 +560,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleLabelView = inflater.inflate(R.layout.label_cycle_popup, null);
         clearCyclePopupView = inflater.inflate(R.layout.pom_reset_popup, null);
 
+        edit_header = cycleLabelView.findViewById(R.id.cycle_name_edit);
+        confirm_header_save = cycleLabelView.findViewById(R.id.confirm_save);
+        cancel_header_save = cycleLabelView.findViewById(R.id.cancel_save);
+
         sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
         sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
         sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
@@ -660,6 +643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s1.setText(R.string.set_time);
         s2.setText(R.string.break_time);
         s3.setText(R.string.set_number);
+        confirm_header_save.setText(R.string.save_cycles);
 
         timeLeft.setTextSize(90f);
         timePaused.setTextSize(90f);
@@ -695,7 +679,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentLapList = new ArrayList<>();
         savedLapList = new ArrayList<>();
 
-        s3.setText(R.string.set_number);
         progressBar2.setVisibility(View.GONE);
         stopWatchView.setVisibility(View.GONE);
         newLap.setVisibility(View.GONE);
@@ -756,7 +739,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
         cycle_header_text.setOnClickListener(v-> {
+            confirm_header_save.setText(R.string.update_cycles);
+            labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
+            int id = cycles.getId();
+            String titleText = cycles.getTitle();
+            edit_header.setText(titleText);
+            edit_header.setSelection(titleText.length());
+
+            cancel_header_save.setOnClickListener(v2-> {
+                if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+            });
+
+            confirm_header_save.setOnClickListener(v2-> {
+                AsyncTask.execute(() -> {
+                    String newTitle = edit_header.getText().toString();
+                    cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, id);
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
+                        cycle_header_text.setText(newTitle);
+                        labelSavePopupWindow.dismiss();
+                    });
+                });
+            });
         });
 
         first_value_textView.setOnClickListener(v-> {
@@ -1207,17 +1213,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 });
                 sortCheckmark.setY(0);
             } else {
-                if (!existingCycle) labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 300);
-                EditText editLabel = cycleLabelView.findViewById(R.id.cycle_name_edit);
-                Button confirm_save = cycleLabelView.findViewById(R.id.confirm_save);
-                Button cancel_save = cycleLabelView.findViewById(R.id.cancel_save);
-                editLabel.setText("");
+                if (!existingCycle) labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
+                edit_header.setText("");
 
-                cancel_save.setOnClickListener(v2-> {
+                cancel_header_save.setOnClickListener(v2-> {
                     if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
                 });
 
-                confirm_save.setOnClickListener(v2-> {
+                confirm_header_save.setOnClickListener(v2-> {
+                    confirm_header_save.setText(R.string.save_cycles);
                     if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
                         Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
                         return;
@@ -1257,13 +1261,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
                             if (!existingCycle) cycles = new Cycles();
 
-                            if (!editLabel.getText().toString().isEmpty()) {
-                                cycles.setTitle(editLabel.getText().toString());
-                                customTitleArray.add(editLabel.getText().toString());
+                            if (!edit_header.getText().toString().isEmpty()) {
+                                cycles.setTitle(edit_header.getText().toString());
+                                customTitleArray.add(edit_header.getText().toString());
                             } else {
                                 String newDate = dateFormat.format(calendar.getTime());
                                 cycles.setTitle(newDate);
-                                customTitleArray.add(editLabel.getText().toString());
+                                customTitleArray.add(edit_header.getText().toString());
                             }
                             cycles.setSets(convertedSetList);
                             cycles.setBreaks(convertedBreakList);
@@ -1307,13 +1311,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
                             if (!existingCycle) cyclesBO = new CyclesBO();
 
-                            if (!editLabel.getText().toString().isEmpty()) {
-                                cyclesBO.setTitle(editLabel.getText().toString());
-                                breaksOnlyTitleArray.add(editLabel.getText().toString());
+                            if (!edit_header.getText().toString().isEmpty()) {
+                                cyclesBO.setTitle(edit_header.getText().toString());
+                                breaksOnlyTitleArray.add(edit_header.getText().toString());
                             } else {
                                 String newDate = dateFormat.format(calendar.getTime());
                                 cyclesBO.setTitle(newDate);
-                                breaksOnlyTitleArray.add(editLabel.getText().toString());
+                                breaksOnlyTitleArray.add(edit_header.getText().toString());
                             }
                             cyclesBO.setBreaksOnly(convertedBreakOnlyList);
                             cyclesBO.setTimeAdded(System.currentTimeMillis());
