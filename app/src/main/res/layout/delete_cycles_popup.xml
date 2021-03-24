@@ -3,19 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/Gray">
+    android:backgroundTint="@color/Gray"
+    android:background="@drawable/rounded">
 
     <TextView
-        android:text="Are you sure?"
-        android:id="@+id/delete_confirm"
+        android:id="@+id/delete_confirm_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20sp"
+        android:layout_marginTop="4dp"
         android:textSize="18sp"
-        android:textColor="@color/white">
+        android:textColor="@color/white"
+        android:gravity="center_horizontal">
     </TextView>
 
     <Button
