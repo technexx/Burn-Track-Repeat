@@ -356,17 +356,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     }
 
-    //Todo: Use new currentPos var for retrieving last used cycle when app is re-launched.
     //Todo: Update button next to Saved that is greyed out if not applicable. Use clear headers w/ in popup for save/update, and perhaps change color and sizing on edit title popup to differentiate.
-    //Todo: Add delete option on main page.
-    //Todo: Identical cycle should either a)not apply or b)only apply to title AND set/break together.
     //Todo: Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
     public void onCycleClick(int position) {
         setCycle(position);
     }
 
-    //Todo: Deleting position currently displayed should simply change Save/Update button availability.
     @Override
     public void onCycleDelete(int position) {
         if (!breaksOnly) {
@@ -668,25 +664,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        //Todo: Remember to change size conditional back to 0.
-        //Todo: This populates our UI in a way that calling setCycles() on app launch does not.
-//        if (cyclesList.size()>=0){
-//            for (int i=0; i<3; i++) {
-//                customSetTime.add((long) 30 * 1000);
-//                customBreakTime.add((long) 30 * 1000);
-//                startCustomSetTime.add((long) 30 * 1000);
-//                startCustomBreakTime.add((long) 30 * 1000);
-//            }
-//            setValue = 30;
-//            breakValue = 30;
-//        }
-//        if (cyclesBOList.size()>=0) {
-//            for (int i=0; i<3; i++) {
-//                breaksOnlyTime.add((long) 30 * 1000);
-//                startBreaksOnlyTime.add((long) 30 * 1000);
-//            }
-//            breaksOnlyValue = 30;
-//        }
+        if (cyclesList.size()==0){
+            for (int i=0; i<3; i++) {
+                customSetTime.add((long) 30 * 1000);
+                customBreakTime.add((long) 30 * 1000);
+                startCustomSetTime.add((long) 30 * 1000);
+                startCustomBreakTime.add((long) 30 * 1000);
+            }
+            setValue = 30;
+            breakValue = 30;
+        }
+        if (cyclesBOList.size()==0) {
+            for (int i=0; i<3; i++) {
+                breaksOnlyTime.add((long) 30 * 1000);
+                startBreaksOnlyTime.add((long) 30 * 1000);
+            }
+            breaksOnlyValue = 30;
+        }
 
         pomValue1 = 25;
         pomValue2 = 5;
@@ -723,7 +717,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         else currentPos = sharedPreferences.getInt("breaksOnlyPos", 0);
 
         //Since currentPos is never <0, lists must be at least 1 for this to trigger, so we will not get null exceptions.
-        if ((!breaksOnly && currentPos<cyclesList.size()) ||  (breaksOnly && currentPos<cyclesBOList.size())) setCycle(currentPos);
+        if ((!breaksOnly && currentPos<cyclesList.size()) || (breaksOnly && currentPos<cyclesBOList.size())){
+            setCycle(currentPos);
+            canSaveOrUpdate(false);
+        } else canSaveOrUpdate(true);
 
 
         savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
@@ -2373,6 +2370,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
             canSaveOrUpdateBreaksOnly = yesWeCan;
         }
+        existingCycle = !yesWeCan;
         if ( (!breaksOnly && canSaveOrUpdateCustom) || (breaksOnly && canSaveOrUpdateBreaksOnly) ) {
             save_cycles.setTextColor(getResources().getColor(R.color.white));
             update_cycles.setTextColor(getResources().getColor(R.color.white));
@@ -2594,7 +2592,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: This is all working on launch. Likely an adapter issue.
     public void setCycle(int position) {
         currentPos = position;
-        save_cycles.setText(R.string.update_cycles);
+//        save_cycles.setText(R.string.update_cycles);
         AsyncTask.execute(() -> {
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
