@@ -786,17 +786,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         first_value_textView.setOnClickListener(v-> {
-            if (first_value_textView.isShown()) {
-                first_value_textView.setVisibility(View.INVISIBLE);
-                first_value_edit.setVisibility(View.VISIBLE);
-                first_value_edit_two.setVisibility(View.VISIBLE);
-                first_value_sep.setVisibility(View.VISIBLE);
-            }
-            if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
-                second_value_textView.setVisibility(View.VISIBLE);
-                second_value_edit.setVisibility(View.INVISIBLE);
-                second_value_edit_two.setVisibility(View.INVISIBLE);
-                second_value_sep.setVisibility(View.INVISIBLE);
+            if (!breaksOnly) {
+                if (first_value_textView.isShown()) {
+                    first_value_textView.setVisibility(View.INVISIBLE);
+                    first_value_edit.setVisibility(View.VISIBLE);
+                    first_value_edit_two.setVisibility(View.VISIBLE);
+                    first_value_sep.setVisibility(View.VISIBLE);
+                }
+                if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
+                    second_value_textView.setVisibility(View.VISIBLE);
+                    second_value_edit.setVisibility(View.INVISIBLE);
+                    second_value_edit_two.setVisibility(View.INVISIBLE);
+                    second_value_sep.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -896,6 +898,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
+                    if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
                     break;
                 case 2:
                     second_value_edit.setText(convertSeconds(pomValue2));
@@ -911,6 +914,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
+                    if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
                     break;
                 case 2:
                     second_value_edit.setText(convertSeconds(pomValue2));
@@ -1123,7 +1127,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         s1.setAlpha(0.3f);
                         plus_first_value.setAlpha(0.3f);
                         minus_first_value.setAlpha(0.3f);
-                        first_value_edit.setAlpha(0.3f);
+                        first_value_textView.setAlpha(0.3f);
+                        first_value_edit.setVisibility(View.INVISIBLE);
+                        first_value_edit_two.setVisibility(View.INVISIBLE);
+                        second_value_edit.setVisibility(View.INVISIBLE);
+                        second_value_edit_two.setVisibility(View.INVISIBLE);
+                        first_value_textView.setVisibility(View.VISIBLE);
+                        second_value_textView.setVisibility(View.VISIBLE);
+                        first_value_sep.setVisibility(View.INVISIBLE);
+                        second_value_sep.setVisibility(View.INVISIBLE);
                     }
                 }
                 @Override
@@ -1142,7 +1154,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         s1.setAlpha(1);
                         plus_first_value.setAlpha(1.0f);
                         minus_first_value.setAlpha(1.0f);
-                        first_value_edit.setAlpha(1.0f);
+                        first_value_textView.setAlpha(1.0f);
+                        first_value_edit.setVisibility(View.INVISIBLE);
+                        first_value_edit_two.setVisibility(View.INVISIBLE);
+                        second_value_edit.setVisibility(View.INVISIBLE);
+                        second_value_edit_two.setVisibility(View.INVISIBLE);
+                        first_value_textView.setVisibility(View.VISIBLE);
+                        second_value_textView.setVisibility(View.VISIBLE);
+                        first_value_sep.setVisibility(View.INVISIBLE);
+                        second_value_sep.setVisibility(View.INVISIBLE);
                     }
                 }
                 @Override
@@ -1156,17 +1176,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Todo: Deactivate Update button if nothing is saved yet.
             if (mode==1) {
                 if (!breaksOnly) {
-                    second_value_edit.setText(convertSeconds(breaksOnlyValue));
-                    third_value_edit.setText(String.valueOf(roundCountBO));
-                    plus_first_value.setEnabled(false);
-                    first_value_edit.setEnabled(false);
-                    minus_first_value.setEnabled(false);
-
-                    breaksOnly = true;
+                    second_value_textView.setText(convertSeconds(breaksOnlyValue));
                     s1.setAnimation(fadeOut);
-                    first_value_edit.setAnimation(fadeOut);
                     plus_first_value.setAnimation(fadeOut);
                     minus_first_value.setAnimation(fadeOut);
+                    plus_first_value.setEnabled(false);
+                    minus_first_value.setEnabled(false);
+                    first_value_edit.setEnabled(false);
+                    first_value_edit_two.setEnabled(false);
+                    first_value_edit.setEnabled(false);
+                    first_value_edit_two.setEnabled(false);
+
+                    breaksOnly = true;
                     setBegun = true;
                     onBreak = true;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
@@ -1175,18 +1196,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     prefEdit.putBoolean("currentBreaksOnly", true);
                     canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
                 } else {
-                    first_value_edit.setText(convertSeconds(setValue));
-                    second_value_edit.setText(convertSeconds(breakValue));
-                    third_value_edit.setText(String.valueOf(roundCount));
-                    plus_first_value.setEnabled(true);
-                    first_value_edit.setEnabled(true);
-                    minus_first_value.setEnabled(true);
-
-                    breaksOnly = false;
                     s1.setAnimation(fadeIn);
-                    first_value_edit.setAnimation(fadeIn);
+                    first_value_textView.setText(convertSeconds(setValue));
+                    second_value_textView.setText(convertSeconds(breakValue));
                     plus_first_value.setAnimation(fadeIn);
                     minus_first_value.setAnimation(fadeIn);
+                    plus_first_value.setEnabled(true);
+                    minus_first_value.setEnabled(true);
+                    first_value_edit.setEnabled(true);
+                    first_value_edit_two.setEnabled(true);
+                    first_value_edit.setEnabled(true);
+                    first_value_edit_two.setEnabled(true);
+                    breaksOnly = false;
                     setBegun = false;
                     breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
                     dotDraws.breaksOnly(false);
