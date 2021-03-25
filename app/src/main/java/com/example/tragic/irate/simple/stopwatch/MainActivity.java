@@ -214,6 +214,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public ArrayList<Long> startCustomBreakTime;
     public ArrayList<Long> startBreaksOnlyTime;
     public ArrayList<Long> breaksOnlyTime;
+    String convertedSetList;
+    String convertedBreakList;
+    String convertedBreakOnlyList;
 
     boolean setBegun;
     boolean breakBegun;
@@ -277,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int currentPos;
     boolean canSaveOrUpdateCustom = true;
     boolean canSaveOrUpdateBreaksOnly = true;
+    boolean duplicateCycle;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
@@ -601,6 +605,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         save_cycles.setText(R.string.save_cycles);
         update_cycles.setText(R.string.update_cycles);
         confirm_header_save.setText(R.string.save_cycles);
+        cycle_header_text.setText("My Uber Workout");
 
         timeLeft.setTextSize(90f);
         timePaused.setTextSize(90f);
@@ -917,7 +922,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         plus_third_value.setOnTouchListener((v, event) -> {
             switch (mode) {
                 case 1:
-                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(true);  break;
+//                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(true);  break;
                 case 2:
                     incrementValues = true;
                     setIncrements(event, changeThirdValue);
@@ -930,7 +935,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         minus_third_value.setOnTouchListener((v, event) -> {
             switch (mode) {
                 case 1:
-                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(false);  break;
+//                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(false);  break;
                 case 2:
                     incrementValues = false;
                     setIncrements(event, changeThirdValue);
@@ -1145,7 +1150,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             });
 
-            //Todo: Also, adding then subtracting back to saved set does not grey out.
+            //Todo: Switching retains title of previous custom/breaksOnly. Does not change +/- values either since it only calls dotDraws for arrays.
+            //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
+            //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
+            //Todo: Deactivate Update button if nothing is saved yet.
             if (mode==1) {
                 if (!breaksOnly) {
                     second_value_edit.setText(convertSeconds(breaksOnlyValue));
@@ -2447,46 +2455,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    //Todo: Need update_cycles to ALWAYS update along w/ toast via this method, while save_cycles always adds.
     public void confirmedSaveOrUpdate(int saveOrUpdate) {
         if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
             Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
             return;
         }
-        Gson gson = new Gson();
         AsyncTask.execute(() -> {
-            queryCycles();
-            ArrayList<Long> tempSets = new ArrayList<>();
-            ArrayList<Long> tempBreaks = new ArrayList<>();
-            ArrayList<Long> tempBreaksOnly = new ArrayList<>();
-            String convertedSetList = "";
-            String convertedBreakList = "";
-            String convertedBreakOnlyList = "";
-
+            //Defaulting to unique cycle unless otherwise set by retrieveAndSetCycles();
+            duplicateCycle = false;
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
 
             if (!breaksOnly) {
-                for (int i=0; i<startCustomSetTime.size(); i++) {
-                    tempSets.add(startCustomSetTime.get(i) /1000);
-                }
-                for (int i=0; i<startCustomBreakTime.size(); i++){
-                    tempBreaks.add(startCustomBreakTime.get(i)/1000);
-                }
-                convertedSetList = gson.toJson(tempSets);
-                convertedBreakList = gson.toJson(tempBreaks);
-
-                convertedSetList = convertedSetList.replace("\"", "");
-                convertedSetList = convertedSetList.replace("]", "");
-                convertedSetList = convertedSetList.replace("[", "");
-                convertedSetList = convertedSetList.replace(",", " - ");
-                convertedBreakList = convertedBreakList.replace("\"", "");
-                convertedBreakList = convertedBreakList.replace("]", "");
-                convertedBreakList = convertedBreakList.replace("[", "");
-                convertedBreakList = convertedBreakList.replace(",", " - ");
-
-                //Todo: Update not actually updating! Likely due to, unlike after onCycleClick callback, we do not have a reference to the current cycle.
-                //Todo: Also, deactivate Update button if nothing is saved yet.
+                //Executes gSon->Json conversion and compares new String to db lists, setting duplicateCycles to TRUE if an instance matches.
+                retrieveAndCheckCycles();
                 //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
                 if (saveOrUpdate == SAVING_CYCLES) cycles = new Cycles(); else cycles = cyclesList.get(cyclesList.size()-1);
 
@@ -2498,23 +2480,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     cycles.setTitle(newDate);
                     customTitleArray.add(edit_header.getText().toString());
                 }
-                cycles.setSets(convertedSetList);
-                cycles.setBreaks(convertedBreakList);
-                cycles.setTimeAdded(System.currentTimeMillis());
-                cycles.setItemCount(startCustomSetTime.size());
 
-                boolean duplicate = false;
-                if (cyclesList.size()>0) {
-                    for (int i=0; i<cyclesList.size(); i++) {
-                        if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
-                            duplicate = true;
-                            runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    }
+                if (duplicateCycle) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                    });
                 }
-                if (!duplicate || cyclesList.size()==0) {
+                if (!duplicateCycle || cyclesList.size()==0) {
+                    cycles.setSets(convertedSetList);
+                    cycles.setBreaks(convertedBreakList);
+                    cycles.setTimeAdded(System.currentTimeMillis());
+                    cycles.setItemCount(startCustomSetTime.size());
                     if (saveOrUpdate == SAVING_CYCLES){
                         cyclesDatabase.cyclesDao().insertCycle(cycles);
                         //The current "end position" of our entity is +1 because of insert, and size is +1 to position.
@@ -2536,15 +2512,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     });
                 }
             } else {
-                for (int i=0; i<startBreaksOnlyTime.size(); i++) {
-                    tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
-                }
-                convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
-                convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
-                convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
-                convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
-                convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
-
                 //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
                 if (saveOrUpdate == SAVING_CYCLES) cyclesBO = new CyclesBO();
 
@@ -2556,22 +2523,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     cyclesBO.setTitle(newDate);
                     breaksOnlyTitleArray.add(edit_header.getText().toString());
                 }
-                cyclesBO.setBreaksOnly(convertedBreakOnlyList);
-                cyclesBO.setTimeAdded(System.currentTimeMillis());
-                cyclesBO.setItemCount(startBreaksOnlyTime.size());
 
-                boolean duplicate = false;
-                if (cyclesBOList.size()>0) {
-                    for (int i=0; i<cyclesBOList.size(); i++) {
-                        if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList) && cyclesBOList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
-                            duplicate = true;
-                            runOnUiThread(() -> {
-                                Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    }
+                if (duplicateCycle) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                    });
                 }
-                if (!duplicate || cyclesBOList.size()==0) {
+
+                if (!duplicateCycle || cyclesBOList.size()==0) {
+                    cyclesBO.setBreaksOnly(convertedBreakOnlyList);
+                    cyclesBO.setTimeAdded(System.currentTimeMillis());
+                    cyclesBO.setItemCount(startBreaksOnlyTime.size());
                     if (saveOrUpdate == SAVING_CYCLES) {
                         cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
                         /* The current "end position" of our entity is +1 because of insert, and size is +1 to position. */
@@ -2626,12 +2588,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     customBreakTime.add(Long.parseLong(breakSplit[i])*1000);
                     startCustomBreakTime.add(Long.parseLong(breakSplit[i])*1000);
                 }
-                setValue = Long.parseLong(setSplit[currentPos]);
-                breakValue = Long.parseLong(breakSplit[currentPos]);
+//                setValue = Long.parseLong(setSplit[currentPos]);
+//                breakValue = Long.parseLong(breakSplit[currentPos]);
                 prefEdit.putInt("customPos", currentPos);
             } else {
-                //Getting instance o
-                // f selected position of CycleBO list entity. Also used in save_cycles.
+                //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
                 cyclesBO = cyclesBOList.get(position);
                 String tempBreaksOnly = cyclesBOList.get(position).getBreaksOnly();
                 String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
@@ -2643,7 +2604,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
                     startBreaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
                 }
-                breaksOnlyValue = Long.parseLong(breaksOnlySplit[currentPos]);
+//                breaksOnlyValue = Long.parseLong(breaksOnlySplit[currentPos]);
                 prefEdit.putInt("breaksOnlyPos", currentPos);
             }
             runOnUiThread(() -> {
@@ -2654,5 +2615,56 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             });
             prefEdit.commit();
         });
+    }
+
+    private void retrieveAndCheckCycles() {
+        //This retrieves cycleList instance.
+        queryCycles();
+
+        Gson gson = new Gson();
+        ArrayList<Long> tempSets = new ArrayList<>();
+        ArrayList<Long> tempBreaks = new ArrayList<>();
+        ArrayList<Long> tempBreaksOnly = new ArrayList<>();
+
+        if (!breaksOnly) {
+            for (int i=0; i<startCustomSetTime.size(); i++) {
+                tempSets.add(startCustomSetTime.get(i) /1000);
+            }
+            for (int i=0; i<startCustomBreakTime.size(); i++){
+                tempBreaks.add(startCustomBreakTime.get(i)/1000);
+            }
+            convertedSetList = gson.toJson(tempSets);
+            convertedBreakList = gson.toJson(tempBreaks);
+
+            convertedSetList = convertedSetList.replace("\"", "");
+            convertedSetList = convertedSetList.replace("]", "");
+            convertedSetList = convertedSetList.replace("[", "");
+            convertedSetList = convertedSetList.replace(",", " - ");
+            convertedBreakList = convertedBreakList.replace("\"", "");
+            convertedBreakList = convertedBreakList.replace("]", "");
+            convertedBreakList = convertedBreakList.replace("[", "");
+            convertedBreakList = convertedBreakList.replace(",", " - ");
+
+            if (cyclesList.size()>0) {
+                for (int i=0; i<cyclesList.size(); i++) {
+                    if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) duplicateCycle = true;
+                }
+            }
+        } else {
+            for (int i=0; i<startBreaksOnlyTime.size(); i++) {
+                tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
+            }
+            convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
+            convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
+            convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
+            convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
+            convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
+
+            if (cyclesBOList.size()>0) {
+                for (int i=0; i<cyclesBOList.size(); i++) {
+                    if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList) && cyclesBOList.get(i).getTitle().equals(cycle_header_text.getText().toString())) duplicateCycle = true;
+                }
+            }
+        }
     }
 }
