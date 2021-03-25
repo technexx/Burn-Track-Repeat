@@ -275,8 +275,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedPos;
     MotionEvent motionEvent;
     int currentPos;
-    boolean canSaveOrUpdateCustom;
-    boolean canSaveOrUpdateBreaksOnly;
+    boolean canSaveOrUpdateCustom = true;
+    boolean canSaveOrUpdateBreaksOnly = true;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
@@ -1145,6 +1145,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             });
 
+            //Todo: Also, adding then subtracting back to saved set does not grey out.
             if (mode==1) {
                 if (!breaksOnly) {
                     second_value_edit.setText(convertSeconds(breaksOnlyValue));
@@ -1164,6 +1165,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.breaksOnly(true);
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                     prefEdit.putBoolean("currentBreaksOnly", true);
+                    canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
                 } else {
                     first_value_edit.setText(convertSeconds(setValue));
                     second_value_edit.setText(convertSeconds(breakValue));
@@ -1182,6 +1184,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.breaksOnly(false);
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     prefEdit.putBoolean("currentBreaksOnly", false);
+                    canSaveOrUpdate(canSaveOrUpdateCustom);
                 }
                 dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
                 resetTimer();
@@ -1194,7 +1197,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         update_cycles.setOnClickListener(v-> {
-            saveAndUpdateCycles();
+            confirmedSaveOrUpdate(UPDATING_CYCLES);
+//            saveAndUpdateCycles();
         });
 
         pauseResumeButton.setOnClickListener(v-> {
@@ -1835,7 +1839,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     startObjectAnimator();
                 }
                 break;
-            //Todo:Resize dots and add text to them.
             case 2:
                 drawing = false;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
@@ -2429,7 +2432,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             });
             sortCheckmark.setY(0);
         } else {
-            if (!existingCycle) labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
+//            if (!existingCycle) labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
+            labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
             edit_header.setText("");
 
             cancel_header_save.setOnClickListener(v2-> {
@@ -2438,161 +2442,166 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             confirm_header_save.setOnClickListener(v2-> {
                 confirm_header_save.setText(R.string.save_cycles);
-                if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
-                    Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
-                    return;
-                }
-                Gson gson = new Gson();
-                AsyncTask.execute(() -> {
-                    queryCycles();
-                    ArrayList<Long> tempSets = new ArrayList<>();
-                    ArrayList<Long> tempBreaks = new ArrayList<>();
-                    ArrayList<Long> tempBreaksOnly = new ArrayList<>();
-                    String convertedSetList = "";
-                    String convertedBreakList = "";
-                    String convertedBreakOnlyList = "";
-
-                    Calendar calendar = Calendar.getInstance();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-
-                    if (!breaksOnly) {
-                        for (int i=0; i<startCustomSetTime.size(); i++) {
-                            tempSets.add(startCustomSetTime.get(i) /1000);
-                        }
-                        for (int i=0; i<startCustomBreakTime.size(); i++){
-                            tempBreaks.add(startCustomBreakTime.get(i)/1000);
-                        }
-                        convertedSetList = gson.toJson(tempSets);
-                        convertedBreakList = gson.toJson(tempBreaks);
-
-                        convertedSetList = convertedSetList.replace("\"", "");
-                        convertedSetList = convertedSetList.replace("]", "");
-                        convertedSetList = convertedSetList.replace("[", "");
-                        convertedSetList = convertedSetList.replace(",", " - ");
-                        convertedBreakList = convertedBreakList.replace("\"", "");
-                        convertedBreakList = convertedBreakList.replace("]", "");
-                        convertedBreakList = convertedBreakList.replace("[", "");
-                        convertedBreakList = convertedBreakList.replace(",", " - ");
-
-                        //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
-                        if (!existingCycle) cycles = new Cycles();
-
-                        if (!edit_header.getText().toString().isEmpty()) {
-                            cycles.setTitle(edit_header.getText().toString());
-                            customTitleArray.add(edit_header.getText().toString());
-                        } else {
-                            String newDate = dateFormat.format(calendar.getTime());
-                            cycles.setTitle(newDate);
-                            customTitleArray.add(edit_header.getText().toString());
-                        }
-                        cycles.setSets(convertedSetList);
-                        cycles.setBreaks(convertedBreakList);
-                        cycles.setTimeAdded(System.currentTimeMillis());
-                        cycles.setItemCount(startCustomSetTime.size());
-
-                        boolean duplicate = false;
-                        if (cyclesList.size()>0) {
-                            for (int i=0; i<cyclesList.size(); i++) {
-                                if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
-                                    duplicate = true;
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
-                                    });
-                                }
-                            }
-                        }
-                        if (!duplicate || cyclesList.size()==0) {
-                            if (!existingCycle){
-                                cyclesDatabase.cyclesDao().insertCycle(cycles);
-                                //The current "end position" of our entity is +1 because of insert, and size is +1 to position.
-                                lastDatabasePos = cyclesList.size();
-                                currentPos = cyclesList.size();
-                                prefEdit.putInt("customPos", currentPos);
-                                runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Cycle added", Toast.LENGTH_SHORT).show();
-                                });
-                            } else {
-                                cyclesDatabase.cyclesDao().updateCycles(cycles);
-                                runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Cycle updated", Toast.LENGTH_SHORT).show();
-                                });
-                            }
-                            runOnUiThread(() -> {
-                                if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-                                canSaveOrUpdate(false);
-                            });
-                        }
-                    } else {
-                        for (int i=0; i<startBreaksOnlyTime.size(); i++) {
-                            tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
-                        }
-                        convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
-                        convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
-
-                        //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
-                        if (!existingCycle) cyclesBO = new CyclesBO();
-
-                        if (!edit_header.getText().toString().isEmpty()) {
-                            cyclesBO.setTitle(edit_header.getText().toString());
-                            breaksOnlyTitleArray.add(edit_header.getText().toString());
-                        } else {
-                            String newDate = dateFormat.format(calendar.getTime());
-                            cyclesBO.setTitle(newDate);
-                            breaksOnlyTitleArray.add(edit_header.getText().toString());
-                        }
-                        cyclesBO.setBreaksOnly(convertedBreakOnlyList);
-                        cyclesBO.setTimeAdded(System.currentTimeMillis());
-                        cyclesBO.setItemCount(startBreaksOnlyTime.size());
-
-                        boolean duplicate = false;
-                        if (cyclesBOList.size()>0) {
-                            for (int i=0; i<cyclesBOList.size(); i++) {
-                                if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList) && cyclesBOList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
-                                    duplicate = true;
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
-                                    });
-                                }
-                            }
-                        }
-                        if (!duplicate || cyclesBOList.size()==0) {
-                            if (!existingCycle) {
-                                cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
-                                /* The current "end position" of our entity is +1 because of insert, and size is +1 to position. */
-                                lastDatabasePos = cyclesBOList.size();
-                                currentPos = cyclesBOList.size();
-                                prefEdit.putInt("breaksOnlyPos", currentPos);
-                                runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Cycle added", Toast.LENGTH_SHORT).show();
-                                });
-                            } else {;
-                                cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-                                runOnUiThread(() -> {
-                                    Toast.makeText(getApplicationContext(), "Cycle updated", Toast.LENGTH_SHORT).show();
-                                });
-                            }
-                            runOnUiThread(() -> {
-                                if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-                                canSaveOrUpdate(false);
-                            });
-                        }
-                    }
-                    prefEdit.apply();
-                });
-                cycle_header_text.setText(edit_header.getText().toString());
-                //Todo: We may revisit this.
-                existingCycle = false;
+                confirmedSaveOrUpdate(SAVING_CYCLES);
             });
         }
     }
 
-    //Todo: This is all working on launch. Likely an adapter issue.
+    //Todo: Need update_cycles to ALWAYS update along w/ toast via this method, while save_cycles always adds.
+    public void confirmedSaveOrUpdate(int saveOrUpdate) {
+        if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0)) {
+            Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
+            return;
+        }
+        Gson gson = new Gson();
+        AsyncTask.execute(() -> {
+            queryCycles();
+            ArrayList<Long> tempSets = new ArrayList<>();
+            ArrayList<Long> tempBreaks = new ArrayList<>();
+            ArrayList<Long> tempBreaksOnly = new ArrayList<>();
+            String convertedSetList = "";
+            String convertedBreakList = "";
+            String convertedBreakOnlyList = "";
+
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+
+            if (!breaksOnly) {
+                for (int i=0; i<startCustomSetTime.size(); i++) {
+                    tempSets.add(startCustomSetTime.get(i) /1000);
+                }
+                for (int i=0; i<startCustomBreakTime.size(); i++){
+                    tempBreaks.add(startCustomBreakTime.get(i)/1000);
+                }
+                convertedSetList = gson.toJson(tempSets);
+                convertedBreakList = gson.toJson(tempBreaks);
+
+                convertedSetList = convertedSetList.replace("\"", "");
+                convertedSetList = convertedSetList.replace("]", "");
+                convertedSetList = convertedSetList.replace("[", "");
+                convertedSetList = convertedSetList.replace(",", " - ");
+                convertedBreakList = convertedBreakList.replace("\"", "");
+                convertedBreakList = convertedBreakList.replace("]", "");
+                convertedBreakList = convertedBreakList.replace("[", "");
+                convertedBreakList = convertedBreakList.replace(",", " - ");
+
+                //Todo: Update not actually updating! Likely due to, unlike after onCycleClick callback, we do not have a reference to the current cycle.
+                //Todo: Also, deactivate Update button if nothing is saved yet.
+                //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
+                if (saveOrUpdate == SAVING_CYCLES) cycles = new Cycles(); else cycles = cyclesList.get(cyclesList.size()-1);
+
+                if (!edit_header.getText().toString().isEmpty()) {
+                    cycles.setTitle(edit_header.getText().toString());
+                    customTitleArray.add(edit_header.getText().toString());
+                } else {
+                    String newDate = dateFormat.format(calendar.getTime());
+                    cycles.setTitle(newDate);
+                    customTitleArray.add(edit_header.getText().toString());
+                }
+                cycles.setSets(convertedSetList);
+                cycles.setBreaks(convertedBreakList);
+                cycles.setTimeAdded(System.currentTimeMillis());
+                cycles.setItemCount(startCustomSetTime.size());
+
+                boolean duplicate = false;
+                if (cyclesList.size()>0) {
+                    for (int i=0; i<cyclesList.size(); i++) {
+                        if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
+                            duplicate = true;
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+                }
+                if (!duplicate || cyclesList.size()==0) {
+                    if (saveOrUpdate == SAVING_CYCLES){
+                        cyclesDatabase.cyclesDao().insertCycle(cycles);
+                        //The current "end position" of our entity is +1 because of insert, and size is +1 to position.
+                        lastDatabasePos = cyclesList.size();
+                        currentPos = cyclesList.size();
+                        prefEdit.putInt("customPos", currentPos);
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), "Cycle added", Toast.LENGTH_SHORT).show();
+                        });
+                    } else {
+                        cyclesDatabase.cyclesDao().updateCycles(cycles);
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), "Cycle updated", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                    runOnUiThread(() -> {
+                        if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                        canSaveOrUpdate(false);
+                    });
+                }
+            } else {
+                for (int i=0; i<startBreaksOnlyTime.size(); i++) {
+                    tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
+                }
+                convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
+                convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
+                convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
+                convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
+                convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
+
+                //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
+                if (saveOrUpdate == SAVING_CYCLES) cyclesBO = new CyclesBO();
+
+                if (!edit_header.getText().toString().isEmpty()) {
+                    cyclesBO.setTitle(edit_header.getText().toString());
+                    breaksOnlyTitleArray.add(edit_header.getText().toString());
+                } else {
+                    String newDate = dateFormat.format(calendar.getTime());
+                    cyclesBO.setTitle(newDate);
+                    breaksOnlyTitleArray.add(edit_header.getText().toString());
+                }
+                cyclesBO.setBreaksOnly(convertedBreakOnlyList);
+                cyclesBO.setTimeAdded(System.currentTimeMillis());
+                cyclesBO.setItemCount(startBreaksOnlyTime.size());
+
+                boolean duplicate = false;
+                if (cyclesBOList.size()>0) {
+                    for (int i=0; i<cyclesBOList.size(); i++) {
+                        if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList) && cyclesBOList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
+                            duplicate = true;
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+                }
+                if (!duplicate || cyclesBOList.size()==0) {
+                    if (saveOrUpdate == SAVING_CYCLES) {
+                        cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
+                        /* The current "end position" of our entity is +1 because of insert, and size is +1 to position. */
+                        lastDatabasePos = cyclesBOList.size();
+                        currentPos = cyclesBOList.size();
+                        prefEdit.putInt("breaksOnlyPos", currentPos);
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), "Cycle added", Toast.LENGTH_SHORT).show();
+                        });
+                    } else {;
+                        cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), "Cycle updated", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                    runOnUiThread(() -> {
+                        if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                        canSaveOrUpdate(false);
+                    });
+                }
+            }
+            prefEdit.apply();
+        });
+        cycle_header_text.setText(edit_header.getText().toString());
+        //Todo: We may revisit this.
+        existingCycle = false;
+    }
+
     public void setCycle(int position) {
         currentPos = position;
-//        save_cycles.setText(R.string.update_cycles);
         AsyncTask.execute(() -> {
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
