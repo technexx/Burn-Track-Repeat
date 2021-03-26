@@ -644,16 +644,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         removeViews();
         timePaused.setAlpha(1);
+        mode = 1;
+        dotDraws.setMode(1);
 
-        cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
         cyclesList = new ArrayList<>();
-        cycles = new Cycles();
         cyclesBOList = new ArrayList<>();
-        cyclesBO = new CyclesBO();
         pomCyclesList = new ArrayList<>();
+        cycles = new Cycles();
+        cyclesBO = new CyclesBO();
         pomCycles = new PomCycles();
 
+        //Todo: We might be retrieving breaksOnly mode w/ out it being shown.
+        sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
+        prefEdit = sharedPreferences.edit();
+        mode = sharedPreferences.getInt("currentMode", 1);
+        breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
+        customPos = sharedPreferences.getInt("customPos", 0);
+        breaksOnlyPos = sharedPreferences.getInt("breaksOnlyPos", 0);
+        if (!breaksOnly) currentPos = customPos; else currentPos = breaksOnlyPos;
+
         AsyncTask.execute(() -> {
+            cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
             cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
             cyclesBOList = cyclesDatabase.cyclesDao().loadAllBOCycles();
             pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
@@ -674,14 +685,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             setValue = 30;
             breakValue = 30;
-        }
+        } else setCycle(customPos);
         if (cyclesBOList.size()==0) {
             for (int i=0; i<3; i++) {
                 breaksOnlyTime.add((long) 30 * 1000);
                 startBreaksOnlyTime.add((long) 30 * 1000);
             }
             breaksOnlyValue = 30;
-        }
+        } else setCycle(breaksOnlyPos);
+
+        //Custom defaults
+        savedSets = customSetTime.size();
+        savedBreaks = customBreakTime.size();
+        numberOfSets = savedSets;
+        numberOfBreaks = savedBreaks;
+
+        resetTimer();
 
         pomValue1 = 25;
         pomValue2 = 5;
@@ -694,29 +713,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         lapRecycler.setAdapter(lapAdapter);
         lapRecycler.setLayoutManager(lapLayout);
 
-        //Custom defaults
-        mode = 1;
-        dotDraws.setMode(1);
-        savedSets = customSetTime.size();
-        savedBreaks = customBreakTime.size();
-        numberOfSets = savedSets;
-        numberOfBreaks = savedBreaks;
 
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
 
-        resetTimer();
         incrementTimer = 10;
         tabViews();
-
-
-        sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
-        prefEdit = sharedPreferences.edit();
-        mode = sharedPreferences.getInt("currentMode", 1);
-        breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
-        customPos = sharedPreferences.getInt("customPos", 0);
-        breaksOnlyPos = sharedPreferences.getInt("breaksOnlyPos", 0);
-        if (!breaksOnly) currentPos = customPos; else currentPos = breaksOnlyPos;
 
         //Retrieves the most recently viewed cycle.
         //Since currentPos is never <0, lists must be at least 1 for this to trigger, so we will not get null exceptions.
@@ -2068,6 +2070,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
+                s1.setVisibility(View.VISIBLE);
                 s2.setVisibility(View.VISIBLE);
                 s3.setVisibility(View.INVISIBLE);
                 first_value_edit.setVisibility(View.INVISIBLE);
@@ -2079,16 +2082,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                convertEditTime(setValue, 1);
                 convertEditTime();
                 if (!breaksOnly) {
-                    s1.setVisibility(View.VISIBLE);
-                    plus_first_value.setVisibility(View.VISIBLE);
-                    minus_first_value.setVisibility(View.VISIBLE);
+//                    s1.setVisibility(View.VISIBLE);
                     first_value_edit.setText(String.valueOf(editSetMinutes));
                     first_value_edit_two.setText(String.valueOf(editSetSeconds));
                 } else {
-                    s1.setVisibility(View.INVISIBLE);
-                    plus_first_value.setVisibility(View.INVISIBLE);
-                    minus_first_value.setVisibility(View.INVISIBLE);
+//                    s1.setVisibility(View.INVISIBLE);
+//                    plus_first_value.setVisibility(View.INVISIBLE);
+//                    minus_first_value.setVisibility(View.INVISIBLE);
                 }
+                plus_first_value.setVisibility(View.VISIBLE);
+                minus_first_value.setVisibility(View.VISIBLE);
                 plus_second_value.setVisibility(View.VISIBLE);
                 minus_second_value.setVisibility(View.VISIBLE);
                 plus_third_value.setVisibility(View.INVISIBLE);
@@ -2267,7 +2270,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else {
                         timerDisabled = true;
                     }
-                    dotDraws.setTime(customSetTime);
                     dotDraws.breakTime(customBreakTime);
                     third_value_edit.setText(String.valueOf(customSetTime.size()));
                 } else {
@@ -2280,6 +2282,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.breakTime(breaksOnlyTime);
                     third_value_edit.setText(String.valueOf(breaksOnlyTime.size()));
                 }
+                //Always setting this to avoid null errors.
+                dotDraws.setTime(customSetTime);
                 dotDraws.setAlpha();
                 dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
                 break;
