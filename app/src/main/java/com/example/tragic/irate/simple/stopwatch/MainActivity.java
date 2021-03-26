@@ -700,8 +700,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         numberOfSets = savedSets;
         numberOfBreaks = savedBreaks;
 
-        resetTimer();
-
         pomValue1 = 25;
         pomValue2 = 5;
         pomValue3 = 15;
@@ -713,12 +711,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         lapRecycler.setAdapter(lapAdapter);
         lapRecycler.setLayoutManager(lapLayout);
 
-
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
 
         incrementTimer = 10;
         tabViews();
+        resetTimer();
+        //This is done because we are calling the method which "switches" from one to the other, and we want the last one used.
+        breaksOnly = !breaksOnly;
+        setBreaksOnlyMode();
 
         //Retrieves the most recently viewed cycle.
         //Since currentPos is never <0, lists must be at least 1 for this to trigger, so we will not get null exceptions.
@@ -1105,138 +1106,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         breaks_only.setOnClickListener(v-> {
-            if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
-                savedCyclePopupWindow.dismiss();
-                return;
-            }
-            receivedPos = -1;
-
-            Animation fadeIn = new AlphaAnimation(0.3f, 1.0f);
-            fadeIn.setDuration(100);
-
-            Animation fadeOut = new AlphaAnimation(1.0f, 0.3f);
-            fadeOut.setDuration(100);
-
-            fadeOut.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if (breaksOnly) {
-                        s1.setAlpha(0.3f);
-                        plus_first_value.setAlpha(0.3f);
-                        minus_first_value.setAlpha(0.3f);
-                        first_value_textView.setAlpha(0.3f);
-                        first_value_edit.setVisibility(View.INVISIBLE);
-                        first_value_edit_two.setVisibility(View.INVISIBLE);
-                        second_value_edit.setVisibility(View.INVISIBLE);
-                        second_value_edit_two.setVisibility(View.INVISIBLE);
-                        first_value_textView.setVisibility(View.VISIBLE);
-                        second_value_textView.setVisibility(View.VISIBLE);
-                        first_value_sep.setVisibility(View.INVISIBLE);
-                        second_value_sep.setVisibility(View.INVISIBLE);
-                    }
-                }
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-
-            fadeIn.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if (!breaksOnly) {
-                        s1.setAlpha(1);
-                        plus_first_value.setAlpha(1.0f);
-                        minus_first_value.setAlpha(1.0f);
-                        first_value_textView.setAlpha(1.0f);
-                        first_value_edit.setVisibility(View.INVISIBLE);
-                        first_value_edit_two.setVisibility(View.INVISIBLE);
-                        second_value_edit.setVisibility(View.INVISIBLE);
-                        second_value_edit_two.setVisibility(View.INVISIBLE);
-                        first_value_textView.setVisibility(View.VISIBLE);
-                        second_value_textView.setVisibility(View.VISIBLE);
-                        first_value_sep.setVisibility(View.INVISIBLE);
-                        second_value_sep.setVisibility(View.INVISIBLE);
-                    }
-                }
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-
-            //Todo: Deleting sets from popup and then trying to update will likely crash since currentPos var has not changed.
-            //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
-            //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
-            //Todo: Deactivate Update button if nothing is saved yet.
-            if (mode==1) {
-                if (!breaksOnly) {
-                    second_value_textView.setText(convertSeconds(breaksOnlyValue));
-                    s1.setAnimation(fadeOut);
-                    plus_first_value.setAnimation(fadeOut);
-                    minus_first_value.setAnimation(fadeOut);
-                    plus_first_value.setEnabled(false);
-                    minus_first_value.setEnabled(false);
-                    first_value_edit.setEnabled(false);
-                    first_value_edit_two.setEnabled(false);
-                    first_value_edit.setEnabled(false);
-                    first_value_edit_two.setEnabled(false);
-
-                    breaksOnly = true;
-                    setBegun = true;
-                    onBreak = true;
-                    breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
-                    dotDraws.breaksOnly(true);
-                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                    prefEdit.putBoolean("currentBreaksOnly", true);
-                    canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
-                    AsyncTask.execute(() -> {
-                        queryCycles();
-                        if (cyclesBOList.size()>0) {
-                            String title = cyclesBOList.get(breaksOnlyPos).getTitle();
-                            runOnUiThread(() -> {
-                                cycle_header_text.setText(title);
-                            });
-                        } else cycle_header_text.setText(R.string.default_title);
-                    });
-                } else {
-                    s1.setAnimation(fadeIn);
-                    first_value_textView.setText(convertSeconds(setValue));
-                    second_value_textView.setText(convertSeconds(breakValue));
-                    plus_first_value.setAnimation(fadeIn);
-                    minus_first_value.setAnimation(fadeIn);
-                    plus_first_value.setEnabled(true);
-                    minus_first_value.setEnabled(true);
-                    first_value_edit.setEnabled(true);
-                    first_value_edit_two.setEnabled(true);
-                    first_value_edit.setEnabled(true);
-                    first_value_edit_two.setEnabled(true);
-                    breaksOnly = false;
-                    setBegun = false;
-                    breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
-                    dotDraws.breaksOnly(false);
-                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                    prefEdit.putBoolean("currentBreaksOnly", false);
-                    canSaveOrUpdate(canSaveOrUpdateCustom);
-                    AsyncTask.execute(() -> {
-                        queryCycles();
-                        if (cyclesList.size() > 0) {
-                            String title = cyclesList.get(customPos).getTitle();
-                            runOnUiThread(() -> {
-                                cycle_header_text.setText(title);
-                            });
-                        } else cycle_header_text.setText(R.string.default_title);
-                    });
-                }
-                dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
-                resetTimer();
-                prefEdit.apply();
-            }
+            setBreaksOnlyMode();
         });
 
         save_cycles.setOnClickListener(v->{
@@ -1672,6 +1542,141 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                    }
             }
         }.start();
+    }
+
+    public void setBreaksOnlyMode() {
+        if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
+            savedCyclePopupWindow.dismiss();
+            return;
+        }
+        receivedPos = -1;
+
+        Animation fadeIn = new AlphaAnimation(0.3f, 1.0f);
+        fadeIn.setDuration(100);
+
+        Animation fadeOut = new AlphaAnimation(1.0f, 0.3f);
+        fadeOut.setDuration(100);
+
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (breaksOnly) {
+                    s1.setAlpha(0.3f);
+                    plus_first_value.setAlpha(0.3f);
+                    minus_first_value.setAlpha(0.3f);
+                    first_value_textView.setAlpha(0.3f);
+                    first_value_edit.setVisibility(View.INVISIBLE);
+                    first_value_edit_two.setVisibility(View.INVISIBLE);
+                    second_value_edit.setVisibility(View.INVISIBLE);
+                    second_value_edit_two.setVisibility(View.INVISIBLE);
+                    first_value_textView.setVisibility(View.VISIBLE);
+                    second_value_textView.setVisibility(View.VISIBLE);
+                    first_value_sep.setVisibility(View.INVISIBLE);
+                    second_value_sep.setVisibility(View.INVISIBLE);
+                }
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        fadeIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (!breaksOnly) {
+                    s1.setAlpha(1);
+                    plus_first_value.setAlpha(1.0f);
+                    minus_first_value.setAlpha(1.0f);
+                    first_value_textView.setAlpha(1.0f);
+                    first_value_edit.setVisibility(View.INVISIBLE);
+                    first_value_edit_two.setVisibility(View.INVISIBLE);
+                    second_value_edit.setVisibility(View.INVISIBLE);
+                    second_value_edit_two.setVisibility(View.INVISIBLE);
+                    first_value_textView.setVisibility(View.VISIBLE);
+                    second_value_textView.setVisibility(View.VISIBLE);
+                    first_value_sep.setVisibility(View.INVISIBLE);
+                    second_value_sep.setVisibility(View.INVISIBLE);
+                }
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        //Todo: Deleting sets from popup and then trying to update will likely crash since currentPos var has not changed.
+        //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
+        //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
+        //Todo: Deactivate Update button if nothing is saved yet.
+        if (mode==1) {
+            if (!breaksOnly) {
+                second_value_textView.setText(convertSeconds(breaksOnlyValue));
+                s1.setAnimation(fadeOut);
+                plus_first_value.setAnimation(fadeOut);
+                minus_first_value.setAnimation(fadeOut);
+                plus_first_value.setEnabled(false);
+                minus_first_value.setEnabled(false);
+                first_value_edit.setEnabled(false);
+                first_value_edit_two.setEnabled(false);
+                first_value_edit.setEnabled(false);
+                first_value_edit_two.setEnabled(false);
+
+                breaksOnly = true;
+                setBegun = true;
+                onBreak = true;
+                breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
+                dotDraws.breaksOnly(true);
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                prefEdit.putBoolean("currentBreaksOnly", true);
+                canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
+                AsyncTask.execute(() -> {
+                    queryCycles();
+                    if (cyclesBOList.size()>0) {
+                        String title = cyclesBOList.get(breaksOnlyPos).getTitle();
+                        runOnUiThread(() -> {
+                            cycle_header_text.setText(title);
+                        });
+                    } else cycle_header_text.setText(R.string.default_title);
+                });
+            } else {
+                s1.setAnimation(fadeIn);
+                first_value_textView.setText(convertSeconds(setValue));
+                second_value_textView.setText(convertSeconds(breakValue));
+                plus_first_value.setAnimation(fadeIn);
+                minus_first_value.setAnimation(fadeIn);
+                plus_first_value.setEnabled(true);
+                minus_first_value.setEnabled(true);
+                first_value_edit.setEnabled(true);
+                first_value_edit_two.setEnabled(true);
+                first_value_edit.setEnabled(true);
+                first_value_edit_two.setEnabled(true);
+                breaksOnly = false;
+                setBegun = false;
+                breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
+                dotDraws.breaksOnly(false);
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                prefEdit.putBoolean("currentBreaksOnly", false);
+                canSaveOrUpdate(canSaveOrUpdateCustom);
+                AsyncTask.execute(() -> {
+                    queryCycles();
+                    if (cyclesList.size() > 0) {
+                        String title = cyclesList.get(customPos).getTitle();
+                        runOnUiThread(() -> {
+                            cycle_header_text.setText(title);
+                        });
+                    } else cycle_header_text.setText(R.string.default_title);
+                });
+            }
+            dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
+            resetTimer();
+            prefEdit.apply();
+        }
     }
 
     public void setIncrements(MotionEvent event, Runnable runnable) {
