@@ -284,8 +284,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
+    //Todo: Updating error w/ title.
+    //Todo: Deleting sets from popup and then trying to update will likely crash since currentPos var has not changed.
+    //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
+    //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
+    //Todo: Deactivate Update button if nothing is saved yet.
 
-    //Todo: Fix values added/subtracted to timer.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Different layout (e.g. no increment rows) for Pom mode.
     //Todo: Recalled set/breaks should be re-saved instead of creating new saves.
@@ -654,7 +658,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesBO = new CyclesBO();
         pomCycles = new PomCycles();
 
-        //Todo: We might be retrieving breaksOnly mode w/ out it being shown.
         sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
         prefEdit = sharedPreferences.edit();
         mode = sharedPreferences.getInt("currentMode", 1);
@@ -685,14 +688,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             setValue = 30;
             breakValue = 30;
-        } else setCycle(customPos);
+        }
+
         if (cyclesBOList.size()==0) {
             for (int i=0; i<3; i++) {
                 breaksOnlyTime.add((long) 30 * 1000);
                 startBreaksOnlyTime.add((long) 30 * 1000);
             }
             breaksOnlyValue = 30;
-        } else setCycle(breaksOnlyPos);
+        }
 
         //Custom defaults
         savedSets = customSetTime.size();
@@ -721,6 +725,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breaksOnly = !breaksOnly;
         setBreaksOnlyMode();
 
+        //Todo: Calling setCycle() here. No need to repeat.
         //Retrieves the most recently viewed cycle.
         //Since currentPos is never <0, lists must be at least 1 for this to trigger, so we will not get null exceptions.
         if (!breaksOnly && customPos<cyclesList.size()) setCycle(customPos);
@@ -1610,10 +1615,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        //Todo: Deleting sets from popup and then trying to update will likely crash since currentPos var has not changed.
-        //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
-        //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
-        //Todo: Deactivate Update button if nothing is saved yet.
+
         if (mode==1) {
             if (!breaksOnly) {
                 second_value_textView.setText(convertSeconds(breaksOnlyValue));
@@ -2237,20 +2239,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 if (startCustomSetTime.size()>0) {
                     setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
-                    setNewText(timePaused, timePaused, (setMillis+999)/1000);
-                    setNewText(timeLeft, timeLeft, (setMillis+999)/1000);
+//                    setNewText(timePaused, timePaused, (setMillis+999)/1000);
+//                    setNewText(timeLeft, timeLeft, (setMillis+999)/1000);
                 }
                 if (!breaksOnly) {
                     if (startCustomBreakTime.size()>0) {
                         breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
-                        setNewText(timePaused, timePaused,  (setMillis+999)/1000);
-                        setNewText(timeLeft, timeLeft, (setMillis+999)/1000);
+                        timePaused.setText(convertSeconds((setMillis+999)/1000));
+                        timeLeft2.setText(convertSeconds((setMillis+999)/1000));
+//                        setNewText(timePaused, timePaused,  (setMillis+999)/1000);
+//                        setNewText(timeLeft, timeLeft, (setMillis+999)/1000);
                     }
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breakMillis = startBreaksOnlyTime.get(startBreaksOnlyTime.size()-1);
-                        setNewText(timePaused, timePaused,  (breakMillis+999)/1000);
-                        setNewText(timeLeft, timeLeft, (breakMillis+999)/1000);
+                        timePaused2.setText(convertSeconds((breakMillis+999)/1000));
+                        timeLeft2.setText(convertSeconds((breakMillis+999)/1000));
+//                        setNewText(timePaused, timePaused,  (breakMillis+999)/1000);
+//                        setNewText(timeLeft, timeLeft, (breakMillis+999)/1000);
                     }
                 }
                 numberOfSets = startCustomSetTime.size();
