@@ -284,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
-    //Todo: Updating error w/ title.
     //Todo: Deleting sets from popup and then trying to update will likely crash since currentPos var has not changed.
     //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
     //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
@@ -2521,14 +2520,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
                 if (saveOrUpdate == SAVING_CYCLES) cycles = new Cycles(); else cycles = cyclesList.get(cyclesList.size()-1);
 
-                if (!edit_header.getText().toString().isEmpty()) {
-                    cycles.setTitle(edit_header.getText().toString());
-                    customTitleArray.add(edit_header.getText().toString());
+                if (!cycle_header_text.getText().toString().isEmpty()) {
+                    cycles.setTitle(cycle_header_text.getText().toString());
                 } else {
                     String newDate = dateFormat.format(calendar.getTime());
                     cycles.setTitle(newDate);
-                    customTitleArray.add(edit_header.getText().toString());
                 }
+                customTitleArray.add(cycle_header_text.getText().toString());
 
                 if (duplicateCycle) {
                     runOnUiThread(() -> {
@@ -2564,14 +2562,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
                 if (saveOrUpdate == SAVING_CYCLES) cyclesBO = new CyclesBO();
 
-                if (!edit_header.getText().toString().isEmpty()) {
-                    cyclesBO.setTitle(edit_header.getText().toString());
-                    breaksOnlyTitleArray.add(edit_header.getText().toString());
+                if (!cycle_header_text.getText().toString().isEmpty()) {
+                    cyclesBO.setTitle(cycle_header_text.getText().toString());
                 } else {
                     String newDate = dateFormat.format(calendar.getTime());
                     cyclesBO.setTitle(newDate);
-                    breaksOnlyTitleArray.add(edit_header.getText().toString());
                 }
+                breaksOnlyTitleArray.add(cycle_header_text.getText().toString());
 
                 if (duplicateCycle) {
                     runOnUiThread(() -> {
@@ -2606,7 +2603,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             prefEdit.apply();
         });
-        cycle_header_text.setText(edit_header.getText().toString());
+        cycle_header_text.setText(cycle_header_text.getText().toString());
         //Todo: We may revisit this.
         existingCycle = false;
     }
