@@ -152,8 +152,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Runnable changeThirdValue;
     Runnable valueSpeed;
 
-    int roundCount;
-    int roundCountBO;
     long pomMillis1;
     long pomMillis2;
     long pomMillis3;
@@ -386,10 +384,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breaksArray.add(cyclesList.get(i).getBreaks());
                     }
                     savedCycleAdapter.notifyDataSetChanged();
-//                    if (setsArray.size()==0) {
-//                        savedCyclePopupWindow.dismiss();
-//                        save_cycles.setText(R.string.save_cycles);
-//                    }
                 });
             });
         } else {
@@ -1174,7 +1168,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             });
 
-            //Todo: Switching retains title of previous custom/breaksOnly.
+            //Todo: Deleting sets from popup and then trying to update will likely crash since currentPos var has not changed.
             //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
             //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
             //Todo: Deactivate Update button if nothing is saved yet.
@@ -1695,15 +1689,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomValue1<10) pomValue1 = 10; if (pomValue1>120) pomValue1 = 120;
         if (pomValue2<1) pomValue2 = 1; if (pomValue2>10) pomValue2 = 10;
         if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
-
-        Log.i("testVal", String.valueOf(pomValue1));
     }
 
+    //Todo: setValue is solid w/ +/- buttons. Need to make sure editText value can also transfer. Probably need a listener on editText.
     public void adjustCustom(boolean adding) {
         if (adding) {
             if (!breaksOnly) {
                 if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
-                    setValue = convertStringToLong(first_value_edit.getText().toString());
+//                    setValue = convertStringToLong(first_value_edit.getText().toString());
                     customSetTime.add(setValue * 1000);
                     startCustomSetTime.add(setValue * 1000);
                     canSaveOrUpdate(true);
@@ -1711,14 +1704,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                 }
                 if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
-                    breakValue = convertStringToLong(second_value_edit.getText().toString());
+//                    breakValue = convertStringToLong(second_value_edit.getText().toString());
                     customBreakTime.add(breakValue * 1000);
                     startCustomBreakTime.add(breakValue * 1000);
                     canSaveOrUpdate(true);
                 }
             } else {
                 if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
-                    breaksOnlyValue = convertStringToLong(second_value_edit.getText().toString());
+//                    breaksOnlyValue = convertStringToLong(second_value_edit.getText().toString());
                     breaksOnlyTime.add(breaksOnlyValue * 1000);
                     startBreaksOnlyTime.add(breaksOnlyValue * 1000);
                     canSaveOrUpdate(true);
@@ -1767,13 +1760,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else {
                 timePaused.setText("?");
             }
-        }
-        if (!breaksOnly) {
-            roundCount = customSetTime.size();
-            third_value_edit.setText(String.valueOf(roundCount));
-        } else {
-            roundCountBO = breaksOnlyTime.size();
-            third_value_edit.setText(String.valueOf(roundCountBO));
         }
         if (receivedPos >=0) dotDraws.setCycle(receivedPos);
     }
@@ -2377,6 +2363,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else second_value_edit_two.setText("00");
     }
 
+    //Todo: This is acting separately from changeFirst/changeSecond methods.
     public void capEditNumber(EditText editText, int cap) {
         editText.addTextChangedListener(new TextWatcher() {
             String oldValue = "";
@@ -2398,6 +2385,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         editText.setText(String.valueOf(val));
                     }
                 }
+
+                setValue = (editSetMinutes * 60) + editSetSeconds;
+                breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+                breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
             }
         });
     }
