@@ -366,19 +366,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     }
 
-    //Todo: Position may not be ideal to use for cycle reference. Consider using it initially, but then grabbing an instance of the row's ID so it will stay stable for any future references. Remember to include it in cycle deletes/additions/cycleSet etc. Must be set in a selected cycle before onCycleDelete can have a reference.
     //Todo: Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
     public void onCycleClick(int position) {
         setCycle(position);
     }
 
-    //Todo: CustomPos should only be set in one place: When selecting a cycle from recyclerView (setcycle()). This is then used to get the ID of that specific row. Anywhere else we should be able to just fetch the ID from that customPos. In the case of newly added cycles, we simply extract the ID from the most recently added row.
     @Override
     public void onCycleDelete(int position) {
         if (!breaksOnly) {
             AsyncTask.execute(() -> {
                 queryCycles();
+                int deletedID = cyclesList.get(position).getId();
+
                 Cycles removedCycle = cyclesList.get(position);
                 cyclesDatabase.cyclesDao().deleteCycle(removedCycle);
                 queryCycles();
@@ -391,21 +391,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breaksArray.add(cyclesList.get(i).getBreaks());
                         customTitleArray.add(cyclesList.get(i).getTitle());
                     }
-
-                    //Getting ID from cycle we have chosen to delete.
-                    int deletedID = cyclesList.get(position).getId();
-                    //Comparing this ID w/ one tied to cycle currently displayed.
-                    if (deletedID == customID) {
-                        customID = 0;
-                        clearArrays(false);
-                        setDefaultCustomCycle();
-                        resetTimer();
-                    }
-                    Log.i("testingPos", "deletedIDs are " + deletedID + " and " +  customID);
                     savedCycleAdapter.notifyDataSetChanged();
                 });
-            });
 
+                //Todo: id syncs currently work, but ui does not change.
+                //Todo: We still need to delete cycle if ids sync.
+                //Getting ID from cycle we have chosen to delete.
+                Log.i("idcheck", "deleted id is " + deletedID);
+                Log.i("idcheck", "customID id is " + customID);
+                //Comparing this ID w/ one tied to cycle currently displayed.
+                if (deletedID == customID) {
+                    customID = 0;
+                    prefEdit.putInt("customID", customID);
+                    prefEdit.apply();
+                    clearArrays(false);
+                    runOnUiThread(() -> {
+                        setDefaultCustomCycle();
+                        resetTimer();
+                    });
+                }
+            });
         } else {
             queryCycles();
             CyclesBO removedBOCycle = cyclesBOList.get(position);
@@ -683,7 +688,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
         prefEdit = sharedPreferences.edit();
 
-        //Todo: Careful if no rows exist and nothing to retrieve. This applies anywhere we are trying to get custom or breaksOnly IDs.
         AsyncTask.execute(() -> {
             mode = sharedPreferences.getInt("currentMode", 1);
             sortMode = sharedPreferences.getInt("sortMode", 1);
@@ -696,31 +700,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             queryCycles();
             pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
-            if (cyclesList.size()>0) {
-                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-                setsArray.add(cyclesList.get(0).getSets());
-                breaksArray.add(cyclesList.get(0).getBreaks());
+            //Todo: Setting customID to 0 is okay in app, but it gets reset to sharedPref value on next launch which then points to in invalid ID which crashes this.
+            if (appLaunchingCustom) {
+                if (cyclesList.size()>0 && customID>0) {
+                    cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
+                    setsArray.add(cyclesList.get(0).getSets());
+                    breaksArray.add(cyclesList.get(0).getBreaks());
+                    setCycle(0);
+                }
+            } else {
+                setDefaultCustomCycle();
             }
+
+
+//            if (cyclesList.size()>0) {
+//                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
+//                setsArray.add(cyclesList.get(0).getSets());
+//                breaksArray.add(cyclesList.get(0).getBreaks());
+//            }
             if (cyclesBOList.size()>0) {
                 cyclesBOList = cyclesDatabase.cyclesDao().loadSingleCycleBO(breaksOnlyID);
                 breaksOnlyArray.add(cyclesBOList.get(0).getBreaksOnly());
             }
-
-            if (cyclesList.size()>0) {
-                for (int i=0; i<cyclesList.size(); i++) {
-//                    setsArray.add(cyclesList.get(0).getSets());
-//                    breaksArray.add(cyclesList.get(0).getBreaks());
-                }
-            }
-            runOnUiThread(() -> {
-//                mode = sharedPreferences.getInt("currentMode", 1);
-//                breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
-//                customPos = sharedPreferences.getInt("customPos", 0);
-//                breaksOnlyPos = sharedPreferences.getInt("breaksOnlyPos", 0);
-//                if (cyclesList.size()>0) customID = cyclesList.get(customPos).getId();
-//                if (cyclesBOList.size()>0) breaksOnlyID = cyclesBOList.get(breaksOnlyPos).getId();
-//                Log.i("retrievedPos", "Retrieved pos and id are " + customPos + " and " + customID);
-            });
         });
 
         if (cyclesList.size()==0){
@@ -759,7 +760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setBreaksOnlyMode();
 
         //Retrieves the most recently viewed cycle.
-        //Since currentPos is never <0, lists must be at least 1 for this to trigger, so we will not get null exceptions.
+        //Todo: Since currentPos is never <0, lists must be at least 1 for this to trigger, so we will not get null exceptions.
         if (!breaksOnly && cyclesList.size()>0) setCycle(0);
         if (breaksOnly && cyclesBOList.size()>0) setCycle(0);
         if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
@@ -2656,7 +2657,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         existingCycle = false;
     }
 
-    //Todo: This is not reliable to call at app start because unlike IDs, our positionals are shifting.
     //Called when a saved cycle is clicked on.
     public void setCycle(int position) {
         AsyncTask.execute(() -> {
@@ -2664,16 +2664,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
 
-            //Todo: Remember to handle breaksOnly too, probably w/ a sep app launch boolean.
             //Getting instances of cycleLists. If app is launching for first time, we are retrieving the single row w/ the last used ID. Otherwise, retrieving all rows via queryCycles().
-            if (appLaunchingCustom) cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID); else {
+            if (!appLaunchingCustom) {
                 queryCycles();
-                //Setting position to 0 since we are only receving a single row in the case of app launch.
-                posHolder = 0;
                 appLaunchingCustom = false;
             }
             if (!breaksOnly) {
-//                customPos = posHolder;
                 customID = cyclesList.get(posHolder).getId();
                 //Getting instance of selected position of Cycle list entity. Also used in save_cycles.
                 cycles = cyclesList.get(posHolder);
@@ -2695,9 +2691,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 customID = cyclesList.get(posHolder).getId();
                 prefEdit.putInt("customID", customID);
-//                prefEdit.putInt("customPos", customPos);
+                Log.i("idcheck", "current id is " + customID);
             } else {
-//                breaksOnlyPos = posHolder;
                 breaksOnlyID = cyclesBOList.get(posHolder).getId();
                 //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
                 cyclesBO = cyclesBOList.get(posHolder);
@@ -2713,7 +2708,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 breaksOnlyID = cyclesBOList.get(posHolder).getId();
                 prefEdit.putInt("breaksOnlyID", breaksOnlyID);
-//                prefEdit.putInt("breaksOnlyPos", breaksOnlyPos);
             }
             runOnUiThread(() -> {
                 if (!breaksOnly) cycle_header_text.setText(cycles.getTitle()); else cycle_header_text.setText(cyclesBO.getTitle());
@@ -2777,9 +2771,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void setDefaultCustomCycle() {
+        startCustomSetTime.clear();
+        startCustomBreakTime.clear();
         for (int i = 0; i < 3; i++) {
-            customSetTime.add((long) 30 * 1000);
-            customBreakTime.add((long) 30 * 1000);
+//            customSetTime.add((long) 30 * 1000);
+//            customBreakTime.add((long) 30 * 1000);
             startCustomSetTime.add((long) 30 * 1000);
             startCustomBreakTime.add((long) 30 * 1000);
         }
