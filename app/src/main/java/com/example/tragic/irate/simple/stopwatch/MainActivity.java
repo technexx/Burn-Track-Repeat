@@ -285,11 +285,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
-    //Todo: Deleting sets from popup and then trying to update will likely crash since currentPos var has not changed.
     //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
     //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
     //Todo: Deactivate Update button if nothing is saved yet.
 
+    //Todo: Breaks only should not start new timer automatically, since there are still untimed sets between them.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Different layout (e.g. no increment rows) for Pom mode.
     //Todo: Recalled set/breaks should be re-saved instead of creating new saves.
@@ -796,9 +796,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
             });
 
-            Log.i("testID", "custom ID is " + customID + " and lastPos is " + lastDatabasePos + " and existingCycle is " + existingCycle);
 
-            //Todo: Set for breaksOnly as well.
             String oldTitle = edit_header.getText().toString();
             confirm_header_save.setOnClickListener(v2-> {
                 AsyncTask.execute(() -> {
