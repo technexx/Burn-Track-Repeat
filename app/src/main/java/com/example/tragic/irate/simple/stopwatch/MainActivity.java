@@ -275,8 +275,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     MaterialButton pauseResumeButton;
     int receivedPos;
     MotionEvent motionEvent;
-//    int customPos;
-//    int breaksOnlyPos;
     int customID;
     int breaksOnlyID;
     boolean canSaveOrUpdateCustom = true;
@@ -698,27 +696,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             queryCycles();
             pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
-            //Todo: Setting customID to 0 is okay in app, but it gets reset to sharedPref value on next launch which then points to in invalid ID which crashes this.
-            if (appLaunchingCustom) {
-                if (cyclesList.size()>0 && customID>0) {
-                    cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-                    setsArray.add(cyclesList.get(0).getSets());
-                    breaksArray.add(cyclesList.get(0).getBreaks());
-                    setCycle(0);
-                }
+            if (!breaksOnly) {
+                if (appLaunchingCustom) {
+                    if (cyclesList.size()>0 && customID>0) {
+                        cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
+                        setsArray.add(cyclesList.get(0).getSets());
+                        breaksArray.add(cyclesList.get(0).getBreaks());
+                        setCycle(0);
+                    }
+                } else setDefaultCustomCycle();
             } else {
-                setDefaultCustomCycle();
-            }
-
-
-//            if (cyclesList.size()>0) {
-//                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-//                setsArray.add(cyclesList.get(0).getSets());
-//                breaksArray.add(cyclesList.get(0).getBreaks());
-//            }
-            if (cyclesBOList.size()>0) {
-                cyclesBOList = cyclesDatabase.cyclesDao().loadSingleCycleBO(breaksOnlyID);
-                breaksOnlyArray.add(cyclesBOList.get(0).getBreaksOnly());
+                if (appLaunchingBO) {
+                    if (cyclesBOList.size()>0 && breaksOnlyID>0) {
+                        cyclesBOList = cyclesDatabase.cyclesDao().loadSingleCycleBO(breaksOnlyID);
+                        breaksOnlyArray.add(cyclesBOList.get(0).getBreaksOnly());
+                        setCycle(0);
+                    }
+                } else setDefaultCustomCycle();
             }
         });
 
@@ -758,7 +752,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setBreaksOnlyMode();
 
         //Retrieves the most recently viewed cycle.
-        //Todo: Since currentPos is never <0, lists must be at least 1 for this to trigger, so we will not get null exceptions.
         if (!breaksOnly && cyclesList.size()>0) setCycle(0);
         if (breaksOnly && cyclesBOList.size()>0) setCycle(0);
         if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
@@ -794,7 +787,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             confirm_header_save.setText(R.string.update_cycles);
             labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
-            int id = cycles.getId();
+//            int id = cycles.getId();
             //Called if we are editing a title from a recently added, but not selected, cycle entry.
             String titleText = cycles.getTitle();
             edit_header.setText(titleText);
@@ -804,13 +797,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
             });
 
-            //Todo: DAO method updateCustomTitle needs proper ID passed in, not position.
+            Log.i("testID", "custom ID is " + customID + " and lastPos is " + lastDatabasePos + " and existingCycle is " + existingCycle);
+
+            //Todo: Just ensure customID is always set correctly. lastPos was based on using a position to get row.
+            //Todo: Set for breaksOnly as well.
             String oldTitle = edit_header.getText().toString();
             confirm_header_save.setOnClickListener(v2-> {
                 AsyncTask.execute(() -> {
                     String newTitle = edit_header.getText().toString();
-                    //Using lastDatabasePos if we are editing a title from a recently added, but not selected, cycle entry. Otherwise using selected position.
-                    if (!existingCycle) cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, id); else cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, lastDatabasePos);
+                    cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, customID);
                     runOnUiThread(() -> {
                         if (!oldTitle.equals(newTitle)) {
                             Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
@@ -1152,7 +1147,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         update_cycles.setOnClickListener(v-> {
             confirmedSaveOrUpdate(UPDATING_CYCLES);
-//            saveAndUpdateCycles();
         });
 
         pauseResumeButton.setOnClickListener(v-> {
@@ -1669,16 +1663,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 prefEdit.putBoolean("currentBreaksOnly", true);
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
-                //Todo: Get title from row w/ customID..
-//                AsyncTask.execute(() -> {
-//                    queryCycles();
-//                    if (cyclesBOList.size()>0) {
-//                        String title = cyclesBOList.get(breaksOnlyPos).getTitle();
-//                        runOnUiThread(() -> {
-//                            cycle_header_text.setText(title);
-//                        });
-//                    } else cycle_header_text.setText(R.string.default_title);
-//                });
+                //Todo: Get title from row w/ customID.
+                if (!appLaunchingBO) {
+                    AsyncTask.execute(() -> {
+                        queryCycles();
+                        if (cyclesBOList.size()>0) {
+                            String title = cyclesBOList.get(breaksOnlyID).getTitle();
+                            runOnUiThread(() -> {
+                                cycle_header_text.setText(title);
+                            });
+                        } else cycle_header_text.setText(R.string.default_title);
+                    });
+                }
             } else {
                 s1.setAnimation(fadeIn);
                 first_value_textView.setText(convertSeconds(setValue));
@@ -1698,15 +1694,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 prefEdit.putBoolean("currentBreaksOnly", false);
                 canSaveOrUpdate(canSaveOrUpdateCustom);
-//                AsyncTask.execute(() -> {
-//                    queryCycles();
-//                    if (cyclesList.size() > 0) {
-//                        String title = cyclesList.get(customPos).getTitle();
-//                        runOnUiThread(() -> {
-//                            cycle_header_text.setText(title);
-//                        });
-//                    } else cycle_header_text.setText(R.string.default_title);
-//                });
+                if (!appLaunchingCustom) {
+                    AsyncTask.execute(() -> {
+                        queryCycles();
+                        if (cyclesList.size() > 0) {
+                            String title = cyclesList.get(customID).getTitle();
+                            runOnUiThread(() -> {
+                                cycle_header_text.setText(title);
+                            });
+                        } else cycle_header_text.setText(R.string.default_title);
+                    });
+                }
             }
             dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
             resetTimer();
@@ -2276,24 +2274,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 if (startCustomSetTime.size()>0) {
                     setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
-//                    setNewText(timePaused, timePaused, (setMillis+999)/1000);
-//                    setNewText(timeLeft, timeLeft, (setMillis+999)/1000);
                 }
                 if (!breaksOnly) {
                     if (startCustomBreakTime.size()>0) {
                         breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
                         timePaused.setText(convertSeconds((setMillis+999)/1000));
                         timeLeft2.setText(convertSeconds((setMillis+999)/1000));
-//                        setNewText(timePaused, timePaused,  (setMillis+999)/1000);
-//                        setNewText(timeLeft, timeLeft, (setMillis+999)/1000);
                     }
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breakMillis = startBreaksOnlyTime.get(startBreaksOnlyTime.size()-1);
                         timePaused2.setText(convertSeconds((breakMillis+999)/1000));
                         timeLeft2.setText(convertSeconds((breakMillis+999)/1000));
-//                        setNewText(timePaused, timePaused,  (breakMillis+999)/1000);
-//                        setNewText(timeLeft, timeLeft, (breakMillis+999)/1000);
                     }
                 }
                 numberOfSets = startCustomSetTime.size();
@@ -2529,7 +2521,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             prefEdit.putInt("sortMode", sortMode);
             prefEdit.apply();
         } else {
-//            if (!existingCycle) labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
             labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
             edit_header.setText("");
 
@@ -2659,6 +2650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void setCycle(int position) {
         AsyncTask.execute(() -> {
             int posHolder = position;
+
+            //Todo: This needs to not trigger on app start, but it is also used via canSaveOrUpdate() to grey out Save/Update buttons, so use caution.
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
 
@@ -2669,7 +2662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     appLaunchingCustom = false;
                 }
 
-                customID = cyclesList.get(posHolder).getId();
+//                customID = cyclesList.get(posHolder).getId();
                 //Getting instance of selected position of Cycle list entity. Also used in save_cycles.
                 cycles = cyclesList.get(posHolder);
                 String tempSets = cyclesList.get(posHolder).getSets();
@@ -2696,7 +2689,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     queryCycles();
                     appLaunchingBO = false;
                 }
-                breaksOnlyID = cyclesBOList.get(posHolder).getId();
+//                breaksOnlyID = cyclesBOList.get(posHolder).getId();
                 //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
                 cyclesBO = cyclesBOList.get(posHolder);
                 String tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
@@ -2716,7 +2709,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!breaksOnly) cycle_header_text.setText(cycles.getTitle()); else cycle_header_text.setText(cyclesBO.getTitle());
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
-//                savedCycleAdapter.notifyDataSetChanged();
             });
             prefEdit.commit();
         });
