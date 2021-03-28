@@ -394,15 +394,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     savedCycleAdapter.notifyDataSetChanged();
                 });
 
-                //Todo: id syncs currently work, but ui does not change.
-                //Todo: We still need to delete cycle if ids sync.
-                //Getting ID from cycle we have chosen to delete.
-                Log.i("idcheck", "deleted id is " + deletedID);
-                Log.i("idcheck", "customID id is " + customID);
                 //Comparing this ID w/ one tied to cycle currently displayed.
                 if (deletedID == customID) {
                     customID = 0;
-                    prefEdit.putInt("customID", customID);
+                    prefEdit.putInt("customID", 0);
                     prefEdit.apply();
                     clearArrays(false);
                     runOnUiThread(() -> {
@@ -410,9 +405,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         resetTimer();
                     });
                 }
+                Log.i("idcheck", "deleted id is " + deletedID);
             });
         } else {
             queryCycles();
+            int deletedID = cyclesBOList.get(position).getId();
+
             CyclesBO removedBOCycle = cyclesBOList.get(position);
             cyclesDatabase.cyclesDao().deleteBOCycle(removedBOCycle);
             queryCycles();
@@ -424,17 +422,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTitleArray.add(cyclesList.get(i).getTitle());
                 }
                 savedCycleAdapter.notifyDataSetChanged();
-                if (breaksOnlyArray.size()==0) {
-                    savedCyclePopupWindow.dismiss();
-                    save_cycles.setText(R.string.save_cycles);
-                }
             });
-//            if (position == breaksOnlyPos) {
-//                breaksOnlyPos = 0;
-//                clearArrays(false);
-//                setDefaultBOCycle();
-//                resetTimer();
-//            }
+
+            if (deletedID == breaksOnlyID) {
+                breaksOnlyID = 0;
+                prefEdit.putInt("breaksOnlyID", 0);
+                prefEdit.apply();
+                runOnUiThread(() -> {
+                    setDefaultCustomCycle();
+                    resetTimer();
+                });
+            }
         }
         Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
     }
@@ -2664,12 +2662,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
 
-            //Getting instances of cycleLists. If app is launching for first time, we are retrieving the single row w/ the last used ID. Otherwise, retrieving all rows via queryCycles().
-            if (!appLaunchingCustom) {
-                queryCycles();
-                appLaunchingCustom = false;
-            }
             if (!breaksOnly) {
+                //Getting a full list of cycles if app is NOT launching for first time, otherwise a single row is retrieved before this method is executed.
+                if (!appLaunchingCustom) {
+                    queryCycles();
+                    appLaunchingCustom = false;
+                }
+
                 customID = cyclesList.get(posHolder).getId();
                 //Getting instance of selected position of Cycle list entity. Also used in save_cycles.
                 cycles = cyclesList.get(posHolder);
@@ -2693,6 +2692,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 prefEdit.putInt("customID", customID);
                 Log.i("idcheck", "current id is " + customID);
             } else {
+                if (!appLaunchingBO) {
+                    queryCycles();
+                    appLaunchingBO = false;
+                }
                 breaksOnlyID = cyclesBOList.get(posHolder).getId();
                 //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
                 cyclesBO = cyclesBOList.get(posHolder);
@@ -2771,16 +2774,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void setDefaultCustomCycle() {
-        startCustomSetTime.clear();
-        startCustomBreakTime.clear();
-        for (int i = 0; i < 3; i++) {
-//            customSetTime.add((long) 30 * 1000);
-//            customBreakTime.add((long) 30 * 1000);
-            startCustomSetTime.add((long) 30 * 1000);
-            startCustomBreakTime.add((long) 30 * 1000);
+        if (!breaksOnly) {
+            startCustomSetTime.clear();
+            startCustomBreakTime.clear();
+            for (int i = 0; i < 3; i++) {
+                startCustomSetTime.add((long) 30 * 1000);
+                startCustomBreakTime.add((long) 30 * 1000);
+            }
+            setValue = 30;
+            breakValue = 30;
+        } else {
+            startBreaksOnlyTime.clear();
+            for (int i=0; i<3; i++) {
+                startBreaksOnlyTime.add((long) 30 * 1000);
+            }
+            breaksOnlyValue = 30;
         }
-        setValue = 30;
-        breakValue = 30;
         cycle_header_text.setText(R.string.default_title);
     }
 
