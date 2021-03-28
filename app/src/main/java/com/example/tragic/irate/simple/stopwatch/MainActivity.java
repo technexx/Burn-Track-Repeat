@@ -787,9 +787,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             confirm_header_save.setText(R.string.update_cycles);
             labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
-//            int id = cycles.getId();
-            //Called if we are editing a title from a recently added, but not selected, cycle entry.
-            String titleText = cycles.getTitle();
+            String titleText = "";
+            if (!breaksOnly) titleText = cycles.getTitle(); else titleText = cyclesBO.getTitle();
             edit_header.setText(titleText);
             edit_header.setSelection(titleText.length());
 
@@ -799,13 +798,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             Log.i("testID", "custom ID is " + customID + " and lastPos is " + lastDatabasePos + " and existingCycle is " + existingCycle);
 
-            //Todo: Just ensure customID is always set correctly. lastPos was based on using a position to get row.
             //Todo: Set for breaksOnly as well.
             String oldTitle = edit_header.getText().toString();
             confirm_header_save.setOnClickListener(v2-> {
                 AsyncTask.execute(() -> {
                     String newTitle = edit_header.getText().toString();
-                    cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, customID);
+                    if (!breaksOnly) cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, customID);
+                    else cyclesDatabase.cyclesDao().updateBOTitle(newTitle, breaksOnlyID);
                     runOnUiThread(() -> {
                         if (!oldTitle.equals(newTitle)) {
                             Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
