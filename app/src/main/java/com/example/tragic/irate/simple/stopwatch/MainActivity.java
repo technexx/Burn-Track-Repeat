@@ -1949,6 +1949,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDisabled = true;
         }
         if (!timerDisabled) {
+            add_cycle.setBackgroundColor(getResources().getColor(R.color.Gray));
+            sub_cycle.setBackgroundColor(getResources().getColor(R.color.Gray));
+            add_cycle.setEnabled(false);
+            sub_cycle.setEnabled(false);
             removeViews();
             if (fadeInObj!=null) fadeInObj.cancel();
             if (fadeOutObj!=null) fadeOutObj.cancel();
@@ -2258,6 +2262,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (endAnimation != null) endAnimation.cancel();
         switch (mode) {
             case 1:
+                add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
+                sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
+                add_cycle.setEnabled(true);
+                sub_cycle.setEnabled(true);
                 timePaused.setAlpha(1);
                 progressBar.setProgress(10000);
                 customProgressPause = maxProgress;
