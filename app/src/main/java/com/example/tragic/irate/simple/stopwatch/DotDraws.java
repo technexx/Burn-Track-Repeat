@@ -195,11 +195,11 @@ public class DotDraws extends View {
             mPaint.setStyle(Paint.Style.FILL);
             for (int i=0; i<mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
-                if (mSetReduce + i == mSetCount) {
+                if (mSetCount - mSetReduce == i) {
                     if (mFadeDone == 1) {
                         fadeDot();
                     }
-                } else if (mSetReduce + i >= mSetCount) {
+                } else if (mSetReduce + i < mSetCount) {
                     mPaint.setAlpha(100);
                 } else {
                     mPaint.setAlpha(255);
@@ -227,11 +227,11 @@ public class DotDraws extends View {
                 } else {
                     mPaint.setColor(Color.RED);
                 }
-                if (mBreakReduce + i == mBreakCount) {
+                if (mBreakCount - mBreakReduce == i) {
                     if (mFadeDone == 2) {
                         fadeDot();
                     }
-                } else if (mBreakReduce +i >= mBreakCount) {
+                } else if (mBreakReduce + i <  mBreakCount) {
                     mPaint.setAlpha(100);
                 }
                 else {

@@ -285,16 +285,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
-    //Todo: Possibly grey out add/subtract (right side) buttons when cycle is running, until reset is hit.
-    //Todo: Possibly switch order of sets/breaks (i.e. first one added is first one executed).
+
+    //Todo: Right now, last instance of a SAVED cycle is recalled at launch. Should instead be that cycle + any non-saved additions (simply save all vars on any A/S click).
+    //Todo: Some Update issues as well.
+    //Todo: Changing editText via numeric entry and not +/- does not change textView or save value.
+    //Todo: Options to delete individual set/break.
     //Todo: Deactivate Update button if nothing is saved yet.
 
+    //Todo: Pom re-do and order change.
     //Todo: Breaks only should not start new timer automatically, since there are still untimed sets between them.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Different layout (e.g. no increment rows) for Pom mode.
-    //Todo: Recalled set/breaks should be re-saved instead of creating new saves.
     //Todo: Any popup should disable main view buttons (true focuable?)
-    //Todo: Options to delete individual set/break.
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
     //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
     //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
@@ -1002,7 +1004,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     dotDraws.setTime(customSetTime);
                     dotDraws.breakTime(customBreakTime);
-                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    drawDots(0);
                     receivedPos -=1;
                     dotDraws.setCycle(receivedPos);
                 }
@@ -1015,7 +1017,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTime.set(receivedPos, holder);
 
                     dotDraws.breakTime(breaksOnlyTime);
-                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    drawDots(0);
                     receivedPos -=1;
                     dotDraws.setCycle(receivedPos);
                 }
@@ -1040,7 +1042,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     dotDraws.setTime(customSetTime);
                     dotDraws.breakTime(customBreakTime);
-                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    drawDots(0);
                     receivedPos +=1;
                     dotDraws.setCycle(receivedPos);
                 }
@@ -1054,7 +1056,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTime.set(receivedPos, holder);
 
                     dotDraws.breakTime(breaksOnlyTime);
-                    dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                    drawDots(0);
                     receivedPos +=1;
                     dotDraws.setCycle(receivedPos);
                 }
@@ -1077,7 +1079,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         mode=1;
                         switchTimer(1, customHalted);
                         dotDraws.setMode(1);
-                        if (!setBegun) dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                        if (!setBegun) drawDots(0);
                         prefEdit.putInt("currentMode", 1);
                         break;
                     case 1:
@@ -1207,26 +1209,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         if (!breaksOnly) {
                             if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
-                                customSetTime.remove(customSetTime.size()-1);
+                                customSetTime.remove(0);
                                 numberOfSets--;
                             }
                             if (customBreakTime.size() >0 && customBreakTime.size() != customSetTime.size()) {
-                                customBreakTime.remove(customBreakTime.size()-1);
+                                customBreakTime.remove(0);
                                 numberOfBreaks--;
                                 onBreak = false;
                                 oldCycle = customCyclesDone;
                             }
-                            if (customSetTime.size() >0) setNewText(timePaused, timePaused, (customSetTime.get(customSetTime.size()-1)+999)/1000);;
+                            if (customSetTime.size() >0) setNewText(timePaused, timePaused, (customSetTime.get(0)+999)/1000);;
                         } else {
                             if (breaksOnlyTime.size() >0) {
-                                breaksOnlyTime.remove(breaksOnlyTime.size()-1);
+                                breaksOnlyTime.remove(0);
                                 numberOfBreaks--;
                                 oldCycle2 = breaksOnlyCyclesDone;
                                 breakBegun = false;
                             }
                             if (breaksOnlyTime.size() >0) {
-                                setNewText(timeLeft, timeLeft,(breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000);
-                                setNewText(timePaused, timePaused, (breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000);
+                                setNewText(timeLeft, timeLeft,(breaksOnlyTime.get(0) +999) / 1000);
+                                setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
                             }
                         }
                     }
@@ -1259,7 +1261,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else{
                             dotDraws.breakTime(startBreaksOnlyTime);
                         }
-                        dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
+                        drawDots(0);
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
@@ -1334,7 +1336,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 fadeDone = 1;
                 if (!onBreak) {
                     if (!setBegun) {
-                        if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
+                        if (customSetTime.size()>0) setMillis = customSetTime.get(0);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(setMillis);
@@ -1347,15 +1349,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     fadeDone = 2;
                     if (!breakBegun) {
                         if (!breaksOnly) {
-                            if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
+                            if (customBreakTime.size()>0) breakMillis = customBreakTime.get(0);
                         } else {
-                            if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(breaksOnlyTime.size()-1);
+                            if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(0);
                         }
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(breakMillis);
                         objectAnimator.start();
-                        breakBegun = true;
+                        //Todo: Set to true here prevents this conditional from kicking in after first set/break and keeping breakMillis at 0.
+//                        breakBegun = true;
                     } else {
                         breakMillis = breakMillisUntilFinished;
                         if (objectAnimator!=null) objectAnimator.resume();
@@ -1397,9 +1400,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
 
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
-//                        setNewText(timeLeft, (setMillis + 999)/1000);
                         if (drawing) {
-                            dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
+                            drawDots(1);
                         }
                     }
 
@@ -1411,18 +1413,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft.setText("0");
                         customProgressPause = maxProgress;
                         if (customSetTime.size() > 0) {
-                            customSetTime.remove(customSetTime.size() - 1);
+                            customSetTime.remove(0);
                         }
-                        if (customSetTime.size()>0) setMillis = customSetTime.get(customSetTime.size() -1);
+                        if (customSetTime.size()>0) setMillis = customSetTime.get(0);
 
                         setBegun = false;
                         customTimerEnded = false;
                         endAnimation();
-                        mHandler.postDelayed((Runnable) () -> {
+                        mHandler.postDelayed(() -> {
                             startObjectAnimator();
                             breakStart();
                             endAnimation.cancel();
                             timerDisabled = false;
+
                         },750);
                         dotDraws.setTime(startCustomSetTime);
                         dotDraws.breakTime(startCustomBreakTime);
@@ -1488,6 +1491,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void breakStart() {
+        Log.i("startMillis", String.valueOf(breakMillis));
         timer = new CountDownTimer(breakMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -1502,9 +1506,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (customAlpha >=1) fadeCustomTimer = false;
 
                 timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
-//                setNewText(timeLeft, (millisUntilFinished +999) / 1000);
                 if (drawing) {
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 2);
+                    drawDots(2);
                 }
             }
 
@@ -1515,16 +1518,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timeLeft.setText("0");
                 if (!breaksOnly) {
                     if (customBreakTime.size() >0) {
-                        customBreakTime.remove(customBreakTime.size()-1);
+                        customBreakTime.remove(0);
                     }
-                    if (customBreakTime.size()>0) breakMillis = customBreakTime.get(customBreakTime.size() -1);
+                    if (customBreakTime.size()>0) breakMillis = customBreakTime.get(0);
                     dotDraws.setTime(startCustomSetTime);
                     dotDraws.breakTime(startCustomBreakTime);
                 } else {
                     if (breaksOnlyTime.size()>0) {
-                        breaksOnlyTime.remove(breaksOnlyTime.size()-1);
+                        breaksOnlyTime.remove(0);
                     }
-                    if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(breaksOnlyTime.size() -1);
+                    if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(0);
                     dotDraws.setTime(startBreaksOnlyTime);
                     dotDraws.breakTime(startBreaksOnlyTime);
                 }
@@ -1547,14 +1550,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     },750);
                 } else {
                     if (!breaksOnly) {
-                        customCyclesDone++;
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                    } else {
-                        breaksOnlyCyclesDone++;
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                    }
-                    endAnimation();
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 0);
+                    customCyclesDone++;
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                } else {
+                    breaksOnlyCyclesDone++;
+                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                }
+                    drawDots(0);
                     customTimerEnded = true;
 
                     setMillis = setStart;
@@ -1660,7 +1662,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 prefEdit.putBoolean("currentBreaksOnly", true);
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
-                //Todo: Get title from row w/ customID.
                 if (!appLaunchingBO) {
                     AsyncTask.execute(() -> {
                         queryCycles();
@@ -1703,7 +1704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     });
                 }
             }
-            dotDraws.newDraw(savedSets, savedBreaks, savedSets-(numberOfSets-1), savedBreaks-(numberOfBreaks-1), 1);
+            drawDots(1);
             resetTimer();
             prefEdit.apply();
         }
@@ -1728,12 +1729,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
     }
 
-    //Todo: setValue is solid w/ +/- buttons. Need to make sure editText value can also transfer. Probably need a listener on editText.
     public void adjustCustom(boolean adding) {
         if (adding) {
             if (!breaksOnly) {
                 if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
-//                    setValue = convertStringToLong(first_value_edit.getText().toString());
                     customSetTime.add(setValue * 1000);
                     startCustomSetTime.add(setValue * 1000);
                     canSaveOrUpdate(true);
@@ -1741,14 +1740,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                 }
                 if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
-//                    breakValue = convertStringToLong(second_value_edit.getText().toString());
                     customBreakTime.add(breakValue * 1000);
                     startCustomBreakTime.add(breakValue * 1000);
                     canSaveOrUpdate(true);
                 }
             } else {
                 if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
-//                    breaksOnlyValue = convertStringToLong(second_value_edit.getText().toString());
                     breaksOnlyTime.add(breaksOnlyValue * 1000);
                     startBreaksOnlyTime.add(breaksOnlyValue * 1000);
                     canSaveOrUpdate(true);
@@ -1785,17 +1782,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         }
         resetTimer();
-        dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
-
+        drawDots(0);
         if (!breaksOnly) {
             if (customSetTime.size()>0) {
-                setNewText(timePaused, timePaused, (customSetTime.get(customSetTime.size() - 1) +999) / 1000);
+                setNewText(timePaused, timePaused, (customSetTime.get(0) +999) / 1000);
             } else {
                 timePaused.setText("?");
             }
         } else {
             if (breaksOnlyTime.size()>0) {
-                setNewText(timePaused, timePaused2, (breaksOnlyTime.get(breaksOnlyTime.size() - 1) +999) / 1000);
+                setNewText(timePaused, timePaused2, (breaksOnlyTime.get(0) +999) / 1000);
             } else {
                 timePaused.setText("?");
             }
@@ -1903,7 +1899,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         setNewText(lastTextView, timePaused, (breakMillis + 999)/1000);
                     }
                     fadeTextIn(timePaused);
-                    dotDraws.newDraw(savedSets, savedBreaks, savedSets- (numberOfSets -1), savedBreaks- (numberOfBreaks-1), 1);
+                    drawDots(1);
                 } else {
                     if (!breaksOnly) {
                         setNewText(lastTextView, timeLeft, (setMillis + 999)/1000);
@@ -1945,7 +1941,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
-        if (setMillis <=500 || breakMillis <=500) {
+        if ( (setMillis <=500 || breakMillis <=500) && numberOfBreaks >0) {
             timerDisabled = true;
         }
         if (!timerDisabled) {
@@ -2120,16 +2116,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 second_value_edit.setVisibility(View.INVISIBLE);
                 second_value_edit_two.setVisibility(View.INVISIBLE);
                 second_value_sep.setVisibility(View.INVISIBLE);
-//                convertEditTime(setValue, 1);
                 convertEditTime();
                 if (!breaksOnly) {
-//                    s1.setVisibility(View.VISIBLE);
                     first_value_edit.setText(String.valueOf(editSetMinutes));
                     first_value_edit_two.setText(String.valueOf(editSetSeconds));
-                } else {
-//                    s1.setVisibility(View.INVISIBLE);
-//                    plus_first_value.setVisibility(View.INVISIBLE);
-//                    minus_first_value.setVisibility(View.INVISIBLE);
                 }
                 plus_first_value.setVisibility(View.VISIBLE);
                 minus_first_value.setVisibility(View.VISIBLE);
@@ -2145,9 +2135,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 first_value_textView.setText(convertSeconds(setValue));
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
-//                first_value_edit.setFilters(new InputFilter[]{
-//                        new NumberFilter(0, 60)
-//                });
                 break;
             case 2:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -2278,17 +2265,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (objectAnimator != null) objectAnimator.cancel();
 
                 if (startCustomSetTime.size()>0) {
-                    setMillis = startCustomSetTime.get(startCustomSetTime.size()-1);
+                    setMillis = startCustomSetTime.get(0);
                 }
                 if (!breaksOnly) {
                     if (startCustomBreakTime.size()>0) {
-                        breakMillis = startCustomBreakTime.get(startCustomBreakTime.size()-1);
+                        breakMillis = startCustomBreakTime.get(0);
                         timePaused.setText(convertSeconds((setMillis+999)/1000));
                         timeLeft2.setText(convertSeconds((setMillis+999)/1000));
                     }
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
-                        breakMillis = startBreaksOnlyTime.get(startBreaksOnlyTime.size()-1);
+                        breakMillis = startBreaksOnlyTime.get(0);
                         timePaused2.setText(convertSeconds((breakMillis+999)/1000));
                         timeLeft2.setText(convertSeconds((breakMillis+999)/1000));
                     }
@@ -2330,7 +2317,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //Always setting this to avoid null errors.
                 dotDraws.setTime(customSetTime);
                 dotDraws.setAlpha();
-                dotDraws.newDraw(savedSets, savedBreaks, 0, 0, 0);
+                drawDots(0);
                 break;
             case 2:
                 pomTimerEnded = false;
@@ -2581,7 +2568,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         //Re-instantiating cycleList with new row added.
                         queryCycles();
                         //Latest row entry.
-                        int lastPos = cyclesList.size()-1;
+//                        int lastPos = cyclesList.size()-1;
+                        int lastPos = cyclesBOList.get(0).getId();
                         //Getting ID of latest row entry.
                         customID = cyclesList.get(lastPos).getId();
                         //Saving ID to sharedPref.
@@ -2626,7 +2614,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (saveOrUpdate == SAVING_CYCLES) {
                         cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
                         queryCycles();
-                        int lastPos = cyclesBOList.size()-1;
+//                        int lastPos = cyclesBOList.size()-1;
+                        int lastPos = cyclesBOList.get(0).getId();
                         breaksOnlyID = cyclesBOList.get(lastPos).getId();
                         prefEdit.putInt("breaksOnlyID", breaksOnlyID);
                         runOnUiThread(() -> {
@@ -2797,5 +2786,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         breaksOnlyValue = 30;
         cycle_header_text.setText(R.string.default_title);
+    }
+
+    public void drawDots(int fadeVar) {
+        dotDraws.newDraw(savedSets, savedBreaks, numberOfSets, numberOfBreaks, fadeVar);
     }
 }
