@@ -325,7 +325,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 left_arrow.setVisibility(View.VISIBLE);
                 right_arrow.setVisibility(View.VISIBLE);
             }
-            Log.i("testcb", "pos is " + pos);
         }
     }
 
@@ -337,7 +336,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
             dotDraws.selectCycle(x, y, startCustomSetTime.size());
         }
-        Log.i("coords", "x and y are " + x + " and " + y);
 
         //This dismisses windows/views when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
@@ -407,7 +405,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         resetTimer();
                     });
                 }
-                Log.i("idcheck", "deleted id is " + deletedID);
             });
         } else {
             queryCycles();
@@ -463,7 +460,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 AsyncTask.execute(() -> {
                     queryCycles();
                     clearArrays(false);
-                    Log.i("testingPos", "customID is " + customID);
 
                     if (!breaksOnly) {
                             savedCycleAdapter.setBreaksOnly(false);
@@ -917,8 +913,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timeLeft2.setText(convertSeconds(pomValue1));
                     break;
             }
-            Log.i("testEdit", "set min and sec are " + editSetMinutes + " and " + editSetSeconds);
-            Log.i("testEdit", "setValue and breakValue are " + setValue + " and " + breakValue);
             return true;
         });
 
@@ -1257,7 +1251,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                             }
                         }
-                        Log.i("cycles", "custom are " + customCyclesDone + " and breaksOnly are " + breaksOnlyCyclesDone);
                         endAnimation();
                         progressBar.setProgress(0);
                         timeLeft.setText("0");
@@ -1501,7 +1494,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void breakStart() {
-        Log.i("startMillis", String.valueOf(breakMillis));
         timer = new CountDownTimer(breakMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -2411,46 +2403,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setText(String.valueOf(editBreakSeconds));
     }
 
-    //Listener for our editTexts. It a)Caps our values, b)sets each editValue to whatever has been entered into the editText field, c)passes these editText field values into our editValue longs, and d)set their sibling textViews to a converted string matching the editValues.
-//    public void capEditNumber(EditText editText, int cap) {
-//        editText.addTextChangedListener(new TextWatcher() {
-//            String oldValue = "";
-//            int val = 0;
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//            }
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            }
-//            @Override
-//            public void afterTextChanged(Editable s) {
-////                if (!editText.getText().toString().equals("")) {
-////                    String newValue = editText.getText().toString();
-////                    if (!oldValue.equals(newValue)) {
-////                        oldValue = newValue;
-////                        val = Integer.parseInt(newValue);
-////                        if (val>cap) val = cap;
-////                        editText.setText(String.valueOf(val));
-////                    }
-////                }
-//
-//                if (!first_value_edit.getText().toString().equals("")) editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
-//                if (!first_value_edit_two.getText().toString().equals("")) editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
-//                if (!second_value_edit.getText().toString().equals("")) editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
-//                if (!second_value_edit_two.getText().toString().equals("")) editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
-//
-//                if (!breaksOnly) {
-//                    setValue = (editSetMinutes * 60) + editSetSeconds;
-//                    breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-//                } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-//                setTimerValueBounds();
-//
-//                first_value_textView.setText(convertSeconds(setValue));
-//                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
-//            }
-//        });
-//    }
-
     //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
     public void setIncrements(MotionEvent event, Runnable runnable) {
         switch(event.getAction()) {
@@ -2697,7 +2649,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 customID = cyclesList.get(posHolder).getId();
                 prefEdit.putInt("customID", customID);
-                Log.i("idcheck", "current id is " + customID);
             } else {
                 if (!appLaunchingBO) {
                     queryCycles();
@@ -2824,6 +2775,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (editSetMinutes<0) editSetMinutes = 0;
             if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
             if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
+
             setValue = (editSetMinutes * 60) + editSetSeconds;
             first_value_textView.setText(convertSeconds(setValue));
         } else {
@@ -2854,3 +2806,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
     }
 }
+
+//            String oldValue = "";
+//            int val = 0;
+////                if (!editText.getText().toString().equals("")) {
+////                    String newValue = editText.getText().toString();
+////                    if (!oldValue.equals(newValue)) {
+////                        oldValue = newValue;
+////                        val = Integer.parseInt(newValue);
+////                        if (val>cap) val = cap;
+////                        editText.setText(String.valueOf(val));
+////                    }
