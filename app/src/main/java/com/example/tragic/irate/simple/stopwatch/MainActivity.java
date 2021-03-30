@@ -824,7 +824,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     first_value_edit_two.setVisibility(View.VISIBLE);
                     first_value_sep.setVisibility(View.VISIBLE);
                     if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
-                    if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else first_value_edit_two.setText("00");
+                    if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else {
+                        if (editSetMinutes==0) first_value_edit_two.setText("05"); else first_value_edit_two.setText("00");
+                    }
                 }
                 if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
                     second_value_textView.setVisibility(View.VISIBLE);
@@ -849,7 +851,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 first_value_sep.setVisibility(View.INVISIBLE);
             }
             if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
-            if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else second_value_edit_two.setText("00");
+            if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else {
+                if (editBreakMinutes==0) second_value_edit_two.setText("05"); else second_value_edit_two.setText("00");
+            }
         });
 
         changeFirstValue = new Runnable() {
