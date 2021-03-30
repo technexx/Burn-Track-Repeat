@@ -284,9 +284,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean appLaunchingBO = true;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
+    boolean editListener;
 
-
-    //Todo: Right now, last instance of a SAVED cycle is recalled at launch. Should instead be that cycle + any non-saved additions (simply save all vars on any A/S click).
     //Todo: Some Update issues as well.
     //Todo: Changing editText via numeric entry and not +/- does not change textView or save value.
     //Todo: Options to delete individual set/break.
@@ -824,6 +823,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     first_value_edit.setVisibility(View.VISIBLE);
                     first_value_edit_two.setVisibility(View.VISIBLE);
                     first_value_sep.setVisibility(View.VISIBLE);
+                    if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
+                    if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else first_value_edit_two.setText("00");
                 }
                 if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
                     second_value_textView.setVisibility(View.VISIBLE);
@@ -847,6 +848,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 first_value_edit_two.setVisibility(View.INVISIBLE);
                 first_value_sep.setVisibility(View.INVISIBLE);
             }
+            if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
+            if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else second_value_edit_two.setText("00");
         });
 
         changeFirstValue = new Runnable() {
@@ -1710,25 +1713,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    public void setIncrements(MotionEvent event, Runnable runnable) {
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
-                mHandler = new Handler();
-                mHandler.postDelayed(runnable,25);
-                mHandler.postDelayed(valueSpeed, 25);
-                break;
-            case MotionEvent.ACTION_UP:
-                mHandler.removeCallbacksAndMessages(null);
-                incrementTimer = 10;
-        }
-        if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
-        if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
-        if (pomValue1<10) pomValue1 = 10; if (pomValue1>120) pomValue1 = 120;
-        if (pomValue2<1) pomValue2 = 1; if (pomValue2>10) pomValue2 = 10;
-        if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
-    }
-
     public void adjustCustom(boolean adding) {
         if (adding) {
             if (!breaksOnly) {
@@ -2380,55 +2364,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else return Long.parseLong(time);
     }
 
-    public void convertEditTime() {
-        editSetSeconds = setValue%60;
-        editSetMinutes = setValue/60;
-        if (!breaksOnly) {
-            editBreakSeconds = breakValue%60;
-            editBreakMinutes = breakValue/60;
-            first_value_textView.setText(convertSeconds(setValue));
-            if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
-            if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else first_value_edit_two.setText("00");
-        } else {
-            editBreakSeconds = breaksOnlyValue%60;
-            editBreakMinutes = breaksOnlyValue/60;
-        }
-
-        second_value_textView.setText(convertSeconds(breakValue));
-        if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
-        if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else second_value_edit_two.setText("00");
-    }
-
-    //Todo: This is acting separately from changeFirst/changeSecond methods.
-    public void capEditNumber(EditText editText, int cap) {
-        editText.addTextChangedListener(new TextWatcher() {
-            String oldValue = "";
-            int val = 0;
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!first_value_edit.getText().toString().equals("")) {
-                    String newValue = first_value_edit.getText().toString();
-                    if (!oldValue.equals(newValue)) {
-                        oldValue = newValue;
-                        val = Integer.parseInt(newValue);
-                        if (val>cap) val = cap;
-                        editText.setText(String.valueOf(val));
-                    }
-                }
-
-                setValue = (editSetMinutes * 60) + editSetSeconds;
-                breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-                breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-            }
-        });
-    }
-
     public String convertStopwatch(long seconds) {
         long minutes;
         long roundedSeconds;
@@ -2443,6 +2378,77 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (timeLeft3.getTextSize() != 90f) timeLeft3.setTextSize(90f);
             return df.format(seconds);
         }
+    }
+
+    //Called on +/- buttons, which use runnables to change set/break value vars. This method a)sets editTexts to these changing values and b)sets the textView to reflect them.
+    public void convertEditTime() {
+        editSetSeconds = setValue%60;
+        editSetMinutes = setValue/60;
+        if (!breaksOnly) {
+            editBreakSeconds = breakValue%60;
+            editBreakMinutes = breakValue/60;
+            first_value_textView.setText(convertSeconds(setValue));
+        } else {
+            editBreakSeconds = breaksOnlyValue%60;
+            editBreakMinutes = breaksOnlyValue/60;
+        }
+        second_value_textView.setText(convertSeconds(breakValue));
+    }
+
+    //Listener for our editTexts. It a)Caps our values, b)sets each editValue to whatever has been entered into the editText field, c)passes these editText field values into our editValue longs, and d)set their sibling textViews to a converted string matching the editValues.
+    public void capEditNumber(EditText editText, int cap) {
+        editText.addTextChangedListener(new TextWatcher() {
+            String oldValue = "";
+            int val = 0;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+//                if (!editText.getText().toString().equals("")) {
+//                    String newValue = editText.getText().toString();
+//                    if (!oldValue.equals(newValue)) {
+//                        oldValue = newValue;
+//                        val = Integer.parseInt(newValue);
+//                        if (val>cap) val = cap;
+//                        editText.setText(String.valueOf(val));
+//                    }
+//                }
+
+                if (!first_value_edit.getText().toString().equals("")) editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
+                if (!first_value_edit_two.getText().toString().equals("")) editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
+                if (!second_value_edit.getText().toString().equals("")) editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
+                if (!second_value_edit_two.getText().toString().equals("")) editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
+
+                if (!breaksOnly) {
+                    setValue = (editSetMinutes * 60) + editSetSeconds;
+                    breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+                } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+                setTimerValueBounds();
+
+                first_value_textView.setText(convertSeconds(setValue));
+                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
+            }
+        });
+    }
+
+    //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
+    public void setIncrements(MotionEvent event, Runnable runnable) {
+        switch(event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
+                mHandler = new Handler();
+                mHandler.postDelayed(runnable,25);
+                mHandler.postDelayed(valueSpeed, 25);
+                break;
+            case MotionEvent.ACTION_UP:
+                mHandler.removeCallbacksAndMessages(null);
+                incrementTimer = 10;
+        }
+        setTimerValueBounds();
     }
 
     public void canSaveOrUpdate(boolean yesWeCan) {
@@ -2790,5 +2796,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void drawDots(int fadeVar) {
         dotDraws.newDraw(savedSets, savedBreaks, numberOfSets, numberOfBreaks, fadeVar);
+    }
+
+    public void setTimerValueBounds() {
+        if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
+        if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
+        if (pomValue1<10) pomValue1 = 10; if (pomValue1>120) pomValue1 = 120;
+        if (pomValue2<1) pomValue2 = 1; if (pomValue2>10) pomValue2 = 10;
+        if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
     }
 }
