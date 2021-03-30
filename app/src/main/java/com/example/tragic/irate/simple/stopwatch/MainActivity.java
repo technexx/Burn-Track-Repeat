@@ -349,12 +349,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             first_value_edit.setVisibility(View.INVISIBLE);
             first_value_edit_two.setVisibility(View.INVISIBLE);
             first_value_sep.setVisibility(View.INVISIBLE);
+            //onTouch is closing editText, converting its values to longs and then setting them to setValue.
+            setEditValueBounds(true);
         }
         if (second_value_edit.isShown()) {
             second_value_textView.setVisibility(View.VISIBLE);
             second_value_edit.setVisibility(View.INVISIBLE);
             second_value_edit_two.setVisibility(View.INVISIBLE);
             second_value_sep.setVisibility(View.INVISIBLE);
+            //onTouch is closing editText, converting its values to longs and then setting them to breakValue.
+            setEditValueBounds(false);
         }
         return false;
     }
@@ -817,8 +821,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         first_value_textView.setOnClickListener(v-> {
             if (!breaksOnly) {
-                Log.i("testEdit", "set min and sec are " + editSetMinutes + " and " + editSetSeconds);
-                //Todo: editSec/Min are being reset here, probably in listener.
                 if (first_value_textView.isShown()) {
                     first_value_textView.setVisibility(View.INVISIBLE);
                     first_value_edit.setVisibility(View.VISIBLE);
@@ -916,6 +918,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
             }
             Log.i("testEdit", "set min and sec are " + editSetMinutes + " and " + editSetSeconds);
+            Log.i("testEdit", "setValue and breakValue are " + setValue + " and " + breakValue);
             return true;
         });
 
@@ -944,7 +947,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2:
                     second_value_edit.setText(convertSeconds(pomValue2));
                     break;
-
             }
             return true;
         });
@@ -990,10 +992,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
-        capEditNumber(first_value_edit, 5);
-        capEditNumber(first_value_edit_two, 59);
-        capEditNumber(second_value_edit, 5);
-        capEditNumber(second_value_edit_two, 59);
+//        capEditNumber(first_value_edit, 5);
+//        capEditNumber(first_value_edit_two, 59);
+//        capEditNumber(second_value_edit, 5);
+//        capEditNumber(second_value_edit_two, 59);
 
         left_arrow.setOnClickListener(v-> {
             if (!breaksOnly) {
@@ -1719,6 +1721,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void adjustCustom(boolean adding) {
+        //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
+        if (first_value_edit.isShown()) setEditValueBounds(true);
+        if (second_value_edit.isShown()) setEditValueBounds(false);
+
         if (adding) {
             if (!breaksOnly) {
                 if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
@@ -2399,7 +2405,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         second_value_textView.setText(convertSeconds(breakValue));
 
-        //Todo: Just set this to change editText values w/ +/-. No looping errors. Check break edit/text switch though.
         first_value_edit.setText(String.valueOf(editSetMinutes));
         first_value_edit_two.setText(String.valueOf(editSetSeconds));
         second_value_edit.setText(String.valueOf(editBreakMinutes));
@@ -2407,44 +2412,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     //Listener for our editTexts. It a)Caps our values, b)sets each editValue to whatever has been entered into the editText field, c)passes these editText field values into our editValue longs, and d)set their sibling textViews to a converted string matching the editValues.
-    public void capEditNumber(EditText editText, int cap) {
-        editText.addTextChangedListener(new TextWatcher() {
-            String oldValue = "";
-            int val = 0;
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-//                if (!editText.getText().toString().equals("")) {
-//                    String newValue = editText.getText().toString();
-//                    if (!oldValue.equals(newValue)) {
-//                        oldValue = newValue;
-//                        val = Integer.parseInt(newValue);
-//                        if (val>cap) val = cap;
-//                        editText.setText(String.valueOf(val));
-//                    }
-//                }
-
-                if (!first_value_edit.getText().toString().equals("")) editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
-                if (!first_value_edit_two.getText().toString().equals("")) editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
-                if (!second_value_edit.getText().toString().equals("")) editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
-                if (!second_value_edit_two.getText().toString().equals("")) editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
-
-                if (!breaksOnly) {
-                    setValue = (editSetMinutes * 60) + editSetSeconds;
-                    breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-                } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-                setTimerValueBounds();
-
-                first_value_textView.setText(convertSeconds(setValue));
-                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
-            }
-        });
-    }
+//    public void capEditNumber(EditText editText, int cap) {
+//        editText.addTextChangedListener(new TextWatcher() {
+//            String oldValue = "";
+//            int val = 0;
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//            @Override
+//            public void afterTextChanged(Editable s) {
+////                if (!editText.getText().toString().equals("")) {
+////                    String newValue = editText.getText().toString();
+////                    if (!oldValue.equals(newValue)) {
+////                        oldValue = newValue;
+////                        val = Integer.parseInt(newValue);
+////                        if (val>cap) val = cap;
+////                        editText.setText(String.valueOf(val));
+////                    }
+////                }
+//
+//                if (!first_value_edit.getText().toString().equals("")) editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
+//                if (!first_value_edit_two.getText().toString().equals("")) editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
+//                if (!second_value_edit.getText().toString().equals("")) editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
+//                if (!second_value_edit_two.getText().toString().equals("")) editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
+//
+//                if (!breaksOnly) {
+//                    setValue = (editSetMinutes * 60) + editSetSeconds;
+//                    breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+//                } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+//                setTimerValueBounds();
+//
+//                first_value_textView.setText(convertSeconds(setValue));
+//                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
+//            }
+//        });
+//    }
 
     //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
     public void setIncrements(MotionEvent event, Runnable runnable) {
@@ -2653,7 +2658,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             prefEdit.apply();
         });
         cycle_header_text.setText(cycle_header_text.getText().toString());
-        //Todo: We may revisit this.
         existingCycle = false;
     }
 
@@ -2806,6 +2810,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void drawDots(int fadeVar) {
         dotDraws.newDraw(savedSets, savedBreaks, numberOfSets, numberOfBreaks, fadeVar);
+    }
+
+    public void setEditValueBounds(boolean onSets){
+        if (onSets) {
+            editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
+            editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
+
+            if (editSetSeconds>59) {
+                editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
+            }
+            if (editSetMinutes>5) editSetMinutes = 5;
+            if (editSetMinutes<0) editSetMinutes = 0;
+            if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
+            if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
+            setValue = (editSetMinutes * 60) + editSetSeconds;
+            first_value_textView.setText(convertSeconds(setValue));
+        } else {
+            editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
+            editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
+
+            if (editBreakSeconds>59) {
+                editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
+            }
+            if (editBreakMinutes>5) editBreakMinutes = 5;
+            if (editBreakMinutes<0) editBreakMinutes = 0;
+            if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
+            if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
+
+            if (!breaksOnly) {
+                breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+            } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+            second_value_textView.setText(convertSeconds(breakValue));
+        }
+        setTimerValueBounds();
     }
 
     public void setTimerValueBounds() {
