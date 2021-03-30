@@ -284,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean appLaunchingBO = true;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
-    boolean editListener;
 
     //Todo: Some Update issues as well.
     //Todo: Changing editText via numeric entry and not +/- does not change textView or save value.
@@ -818,15 +817,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         first_value_textView.setOnClickListener(v-> {
             if (!breaksOnly) {
+                Log.i("testEdit", "set min and sec are " + editSetMinutes + " and " + editSetSeconds);
+                //Todo: editSec/Min are being reset here, probably in listener.
                 if (first_value_textView.isShown()) {
                     first_value_textView.setVisibility(View.INVISIBLE);
                     first_value_edit.setVisibility(View.VISIBLE);
                     first_value_edit_two.setVisibility(View.VISIBLE);
                     first_value_sep.setVisibility(View.VISIBLE);
-                    if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
                     if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else {
                         if (editSetMinutes==0) first_value_edit_two.setText("05"); else first_value_edit_two.setText("00");
                     }
+                    if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
                 }
                 if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
                     second_value_textView.setVisibility(View.VISIBLE);
@@ -914,6 +915,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timeLeft2.setText(convertSeconds(pomValue1));
                     break;
             }
+            Log.i("testEdit", "set min and sec are " + editSetMinutes + " and " + editSetSeconds);
             return true;
         });
 
@@ -1364,7 +1366,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(breakMillis);
                         objectAnimator.start();
-                        //Todo: Set to true here prevents this conditional from kicking in after first set/break and keeping breakMillis at 0.
 //                        breakBegun = true;
                     } else {
                         breakMillis = breakMillisUntilFinished;
@@ -2397,6 +2398,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editBreakMinutes = breaksOnlyValue/60;
         }
         second_value_textView.setText(convertSeconds(breakValue));
+
+        //Todo: Just set this to change editText values w/ +/-. No looping errors. Check break edit/text switch though.
+        first_value_edit.setText(String.valueOf(editSetMinutes));
+        first_value_edit_two.setText(String.valueOf(editSetSeconds));
+        second_value_edit.setText(String.valueOf(editBreakMinutes));
+        second_value_edit_two.setText(String.valueOf(editBreakSeconds));
     }
 
     //Listener for our editTexts. It a)Caps our values, b)sets each editValue to whatever has been entered into the editText field, c)passes these editText field values into our editValue longs, and d)set their sibling textViews to a converted string matching the editValues.
@@ -2655,7 +2662,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(() -> {
             int posHolder = position;
 
-            //Todo: This needs to not trigger on app start, but it is also used via canSaveOrUpdate() to grey out Save/Update buttons, so use caution.
             //Used in save_cycles button to update our existing row instead of creating a new one.
             existingCycle = true;
 
