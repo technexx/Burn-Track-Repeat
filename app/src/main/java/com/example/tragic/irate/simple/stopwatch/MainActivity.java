@@ -52,7 +52,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onEditTitleListener, DotDraws.sendPosition {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onEditTitleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
 
     View mainView;
     Button breaks_only;
@@ -285,20 +285,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean appLaunchingBO = true;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
+    int receivedAlpha;
+    boolean stopAscent;
 
     //Todo: Some Update issues as well.
-    //Todo: Options to delete individual set/break. "Cycle completed" can be invisible unless active cycle. Use a delete button as placeholder.
     //Todo: Deactivate Update button if nothing is saved yet.
+    //Todo: Have dot fade move to min. alpha after set/break is done.
 
     //Todo: Pom re-do and order change.
     //Todo: Breaks only should not start new timer automatically, since there are still untimed sets between them.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
-    //Todo: Different layout (e.g. no increment rows) for Pom mode.
     //Todo: Any popup should disable main view buttons (true focuable?)
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
-    //Todo: Single break or break/set option, like Stopwatch but counting down on repeat.
-    //Todo: EditTexts w/ hints as default view. Make sure minute/hours difference in custom/pom are clear.
-    //Todo: Add/Remove cycle elements from individual places.
 
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
@@ -312,8 +310,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Repository for db. Look at Executor/other alternate thread methods.
     //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
 
-
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
+
+    @Override
+    public void sendAlphaValue(int alpha) {
+        receivedAlpha = alpha;;
+    }
+
     @Override
     public void sendPos(int pos) {
         if (mode==1) {
@@ -321,9 +324,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (pos <=0) {
                 left_arrow.setVisibility(View.INVISIBLE);
                 right_arrow.setVisibility(View.INVISIBLE);
+                cycles_completed.setVisibility(View.VISIBLE);
+                delete_sb.setVisibility(View.INVISIBLE);
             } else {
                 left_arrow.setVisibility(View.VISIBLE);
                 right_arrow.setVisibility(View.VISIBLE);
+                cycles_completed.setVisibility(View.INVISIBLE);
+                delete_sb.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -622,6 +629,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pauseResumeButton.setRippleColor(null);
 
         dotDraws.onPositionSelect(MainActivity.this);
+        dotDraws.onAlphaSend(MainActivity.this);
 
         s1.setText(R.string.set_time);
         s2.setText(R.string.break_time);
@@ -664,6 +672,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentLapList = new ArrayList<>();
         savedLapList = new ArrayList<>();
 
+        cycles_completed.setVisibility(View.INVISIBLE);
+        delete_sb.setVisibility(View.INVISIBLE);
         progressBar2.setVisibility(View.GONE);
         stopWatchView.setVisibility(View.GONE);
         newLap.setVisibility(View.GONE);
@@ -1428,27 +1438,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     public void onFinish() {
                         onBreak = true;
                         fadeDone = 0;
-                        numberOfSets--;
                         timeLeft.setText("0");
                         customProgressPause = maxProgress;
-                        if (customSetTime.size() > 0) {
-                            customSetTime.remove(0);
-                        }
-                        if (customSetTime.size()>0) setMillis = customSetTime.get(0);
 
                         setBegun = false;
                         customTimerEnded = false;
+                        fadeCustomTimer = false;
                         endAnimation();
+                        dotDraws.setTime(startCustomSetTime);
+                        dotDraws.breakTime(startCustomBreakTime);
+
                         mHandler.postDelayed(() -> {
                             startObjectAnimator();
                             breakStart();
                             endAnimation.cancel();
                             timerDisabled = false;
-
                         },750);
-                        dotDraws.setTime(startCustomSetTime);
-                        dotDraws.breakTime(startCustomBreakTime);
-                        fadeCustomTimer = false;
+
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                drawDots(1);
+                                if (receivedAlpha<=100) stopAscent = true;
+                                Log.i("testRunning", String.valueOf(receivedAlpha));
+
+                                if (stopAscent){
+                                    numberOfSets--;
+                                    if (customSetTime.size() > 0) {
+                                        customSetTime.remove(0);
+                                    }
+                                    if (customSetTime.size()>0) setMillis = customSetTime.get(0);
+                                    mHandler.removeCallbacks(this);
+                                }
+                                if (!stopAscent) mHandler.postDelayed(this, 50);
+                            }
+                        };
+                        mHandler.post(r);
+
                     }
                 }.start();
                 break;
@@ -1549,8 +1575,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.setTime(startBreaksOnlyTime);
                     dotDraws.breakTime(startBreaksOnlyTime);
                 }
-
                 endAnimation();
+
+
                 if (numberOfBreaks >0) {
                     customProgressPause = maxProgress;
                     customTimerEnded = false;
@@ -2254,8 +2281,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (endAnimation != null) endAnimation.cancel();
         switch (mode) {
             case 1:
-                cycles_completed.setVisibility(View.INVISIBLE);
-                delete_sb.setVisibility(View.VISIBLE);
                 add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
                 sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
                 add_cycle.setEnabled(true);

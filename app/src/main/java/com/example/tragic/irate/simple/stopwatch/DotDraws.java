@@ -40,7 +40,6 @@ public class DotDraws extends View {
     long mBreakCount;
     long mSetReduce;
     long mBreakReduce;
-    int mBlankCount;
 
     int mAlpha = 255;
     int mAlpha2 = 255;
@@ -64,13 +63,22 @@ public class DotDraws extends View {
     int currentPos = -1;
     int previousPos = -1;
     sendPosition mSendPosition;
+    sendAlpha mSendAlpha;
 
     public interface sendPosition {
         void sendPos(int pos);
     }
 
+    public interface sendAlpha {
+        void sendAlphaValue(int alpha);
+    }
+
     public void onPositionSelect(sendPosition xSendPosition) {
         this.mSendPosition = xSendPosition;
+    }
+
+    public void onAlphaSend(sendAlpha xSendAlpha) {
+        this.mSendAlpha = xSendAlpha;
     }
 
     public DotDraws(Context context, @Nullable AttributeSet attrs) {
@@ -209,6 +217,7 @@ public class DotDraws extends View {
                 mX += 108;
             }
         }
+        Log.i("testRunning", "mode is " + mMode + " and fadeDone is " + mFadeDone);
 
         if (mDrawBox) {
             selectionPaint();
@@ -273,17 +282,22 @@ public class DotDraws extends View {
     }
 
     public void fadeDot() {
+        boolean ascending = false;
         if (mAlpha >255) mAlpha = 255;
         mPaint.setAlpha(mAlpha);
         cycle++;
         if (cycle <10) {
             mAlpha -=25;
+            ascending = true;
         } else {
             mAlpha +=25;
             if (cycle >19) cycle = 0;
+            ascending = false;
         }
         savedCustomAlpha = mAlpha;
         savedCustomCycle = cycle;
+        mSendAlpha.sendAlphaValue(mAlpha);
+//        Log.i("testRunning", "from dotDraws is " + cycle);
     }
 
     public void fadeDot2() {
