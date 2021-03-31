@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
-    //Todo: <10 values show up as "5" in dots but correct value is everywhere else (including millis). Holder over from spinners in dotDraws when only value w/ 1 length was "5" and therefore we wanted to set it to "05".
+    //Todo: Issues w/ timing of --set/breaks and fade. Not consistent. Also doesn't work after reset.
     //Todo: Some Update issues as well.
     //Todo: Deactivate Update button if nothing is saved yet.
     //Todo: Have dot fade move to min. alpha after set/break is done.
@@ -1437,6 +1437,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     @Override
                     public void onFinish() {
+                        stopAscent = false;
                         onBreak = true;
                         fadeDone = 0;
                         timeLeft.setText("0");
@@ -1448,14 +1449,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         endAnimation();
                         dotDraws.setTime(startCustomSetTime);
                         dotDraws.breakTime(startCustomBreakTime);
-
-                        mHandler.postDelayed(() -> {
-                            startObjectAnimator();
-                            breakStart();
-                            endAnimation.cancel();
-                            timerDisabled = false;
-//                            stopAscent = false;
-                        },750);
 
                         Runnable r = new Runnable() {
                             @Override
@@ -1476,6 +1469,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         };
                         mHandler.post(r);
+
+                        mHandler.postDelayed(() -> {
+                            stopAscent = true;
+                            startObjectAnimator();
+                            breakStart();
+                            endAnimation.cancel();
+                            timerDisabled = false;
+                        },750);
                     }
                 }.start();
                 break;
@@ -1558,6 +1559,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             @Override
             public void onFinish() {
+                stopAscent = false;
                 breakBegun = false;
 //                numberOfBreaks--;
                 timeLeft.setText("0");
@@ -1598,6 +1600,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     customTimerEnded = false;
 
                     mHandler.postDelayed(() -> {
+                        stopAscent = true;
                         startObjectAnimator();
                         if (!breaksOnly) {
                             startTimer();

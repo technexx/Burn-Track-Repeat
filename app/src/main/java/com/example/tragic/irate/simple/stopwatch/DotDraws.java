@@ -282,22 +282,18 @@ public class DotDraws extends View {
     }
 
     public void fadeDot() {
-        boolean ascending = false;
         if (mAlpha >255) mAlpha = 255;
         mPaint.setAlpha(mAlpha);
         cycle++;
         if (cycle <10) {
             mAlpha -=25;
-            ascending = true;
         } else {
             mAlpha +=25;
             if (cycle >19) cycle = 0;
-            ascending = false;
         }
         savedCustomAlpha = mAlpha;
         savedCustomCycle = cycle;
         mSendAlpha.sendAlphaValue(mAlpha);
-//        Log.i("testRunning", "from dotDraws is " + cycle);
     }
 
     public void fadeDot2() {
