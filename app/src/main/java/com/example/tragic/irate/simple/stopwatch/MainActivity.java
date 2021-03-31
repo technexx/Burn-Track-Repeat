@@ -288,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
+    //Todo: <10 values show up as "5" in dots but correct value is everywhere else (including millis). Holder over from spinners in dotDraws when only value w/ 1 length was "5" and therefore we wanted to set it to "05".
     //Todo: Some Update issues as well.
     //Todo: Deactivate Update button if nothing is saved yet.
     //Todo: Have dot fade move to min. alpha after set/break is done.
@@ -1453,6 +1454,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breakStart();
                             endAnimation.cancel();
                             timerDisabled = false;
+//                            stopAscent = false;
                         },750);
 
                         Runnable r = new Runnable() {
@@ -1474,7 +1476,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         };
                         mHandler.post(r);
-
                     }
                 }.start();
                 break;
@@ -1558,25 +1559,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void onFinish() {
                 breakBegun = false;
-                numberOfBreaks--;
+//                numberOfBreaks--;
                 timeLeft.setText("0");
-                if (!breaksOnly) {
-                    if (customBreakTime.size() >0) {
-                        customBreakTime.remove(0);
-                    }
-                    if (customBreakTime.size()>0) breakMillis = customBreakTime.get(0);
-                    dotDraws.setTime(startCustomSetTime);
-                    dotDraws.breakTime(startCustomBreakTime);
-                } else {
-                    if (breaksOnlyTime.size()>0) {
-                        breaksOnlyTime.remove(0);
-                    }
-                    if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(0);
-                    dotDraws.setTime(startBreaksOnlyTime);
-                    dotDraws.breakTime(startBreaksOnlyTime);
-                }
                 endAnimation();
 
+                Runnable r = new Runnable() {
+                    @Override
+                    public void run() {
+                        drawDots(2);
+                        if (receivedAlpha<=100) stopAscent = true;
+                        Log.i("testRunning", String.valueOf(receivedAlpha));
+
+                        if (stopAscent){
+                            numberOfBreaks--;
+                            if (!breaksOnly) {
+                                if (customBreakTime.size() >0) {
+                                    customBreakTime.remove(0);
+                                }
+                                if (customBreakTime.size()>0) breakMillis = customBreakTime.get(0);
+                                dotDraws.setTime(startCustomSetTime);
+                                dotDraws.breakTime(startCustomBreakTime);
+                            } else {
+                                if (breaksOnlyTime.size()>0) {
+                                    breaksOnlyTime.remove(0);
+                                }
+                                if (breaksOnlyTime.size()>0) breakMillis = breaksOnlyTime.get(0);
+                                dotDraws.setTime(startBreaksOnlyTime);
+                                dotDraws.breakTime(startBreaksOnlyTime);
+                            }
+                        }
+                        if (!stopAscent) mHandler.postDelayed(this, 50);
+                    }
+                };
+                mHandler.post(r);
 
                 if (numberOfBreaks >0) {
                     customProgressPause = maxProgress;

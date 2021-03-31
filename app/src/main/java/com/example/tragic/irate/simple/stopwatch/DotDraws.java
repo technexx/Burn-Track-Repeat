@@ -353,7 +353,10 @@ public class DotDraws extends View {
             if (list.size() >0) {
                 if (list.get(i).length() <= 2) {
                     if (list.get(i).length() == 1) {
-                        list.set(i, "05");
+                        //Adds "0" to any single digit.
+                        String temp = list.get(i);
+                        temp = "0" + temp;
+                        list.set(i, temp);
                     }
                     if (!mBreaksOnly) {
                         mPaintText.setTextSize(60f);
