@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     EditText edit_header;
     Button confirm_header_save;
     Button cancel_header_save;
+    ImageButton delete_sb;
 
     ImageView sortCheckmark;
     TextView skip;
@@ -286,8 +287,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences.Editor prefEdit;
 
     //Todo: Some Update issues as well.
-    //Todo: Changing editText via numeric entry and not +/- does not change textView or save value.
-    //Todo: Options to delete individual set/break.
+    //Todo: Options to delete individual set/break. "Cycle completed" can be invisible unless active cycle. Use a delete button as placeholder.
     //Todo: Deactivate Update button if nothing is saved yet.
 
     //Todo: Pom re-do and order change.
@@ -595,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         newLap = findViewById(R.id.new_lap);
         left_arrow = findViewById(R.id.left_arrow);
         right_arrow = findViewById(R.id.right_arrow);
-
+        delete_sb = findViewById(R.id.delete_set_break);
 
         left_arrow.setVisibility(View.INVISIBLE);
         right_arrow.setVisibility(View.INVISIBLE);
@@ -986,11 +986,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
-//        capEditNumber(first_value_edit, 5);
-//        capEditNumber(first_value_edit_two, 59);
-//        capEditNumber(second_value_edit, 5);
-//        capEditNumber(second_value_edit_two, 59);
-
         left_arrow.setOnClickListener(v-> {
             if (!breaksOnly) {
                 if (startCustomSetTime.size()>=2 && receivedPos>0) {
@@ -1074,6 +1069,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         sub_cycle.setOnClickListener(v-> {
             adjustCustom(false);
+        });
+
+        //Todo: Cycling still uses original count.
+        delete_sb.setOnClickListener(v->{
+            startCustomSetTime.remove(receivedPos);
+            customSetTime.remove(receivedPos);
+            if (!breaksOnly) {
+                startCustomBreakTime.remove(receivedPos);
+                customBreakTime.remove(receivedPos);
+                dotDraws.setTime(customSetTime);
+                dotDraws.breakTime(customBreakTime);
+            } else {
+                startBreaksOnlyTime.remove(receivedPos);
+                breaksOnlyTime.remove(receivedPos);
+                dotDraws.breakTime(breaksOnlyTime);
+            }
+            savedSets-=1;
+            numberOfSets-=1;
+            savedBreaks-=1;
+            numberOfBreaks-=1;
+            drawDots(0);
         });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -1932,6 +1948,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDisabled = true;
         }
         if (!timerDisabled) {
+            cycles_completed.setVisibility(View.VISIBLE);
+            delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setBackgroundColor(getResources().getColor(R.color.Gray));
             sub_cycle.setBackgroundColor(getResources().getColor(R.color.Gray));
             add_cycle.setEnabled(false);
@@ -2236,6 +2254,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (endAnimation != null) endAnimation.cancel();
         switch (mode) {
             case 1:
+                cycles_completed.setVisibility(View.INVISIBLE);
+                delete_sb.setVisibility(View.VISIBLE);
                 add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
                 sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
                 add_cycle.setEnabled(true);
