@@ -292,7 +292,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
-    //Todo: Breaks only should not start new timer automatically, since there are still untimed sets between them. Use neg. values like google timer?
+    //Todo: Breaks only should not start new timer automatically. Have (over)timer apply at end of each.
+    //Todo: switches to breaksOnly and back don't save. We're calling reset, which is fine, if our db retrievals are working.
     //Todo: Some Update issues as well.
     //Todo: Have dot fade move to min. alpha after set/break is done.
 
@@ -1626,12 +1627,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
 
                     overtime.setVisibility(View.VISIBLE);
-                    //Todo: Not timing seconds correctly.
                     ot = new Runnable() {
                         @Override
                         public void run() {
                             overSeconds +=1;
-//                            overDisplay = overSeconds/1000;
                             overtime.setText(getString(R.string.overtime, String.valueOf(overSeconds)));
                             mHandler.postDelayed(this, 1000);
                         }
