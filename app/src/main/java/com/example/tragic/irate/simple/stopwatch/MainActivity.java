@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long editSetMinutes;
     long editBreakMinutes;
     long editBreakSeconds;
+    int overSeconds;
+    int overDisplay;
 
     TextView cycle_header_text;
     TextView cycles_completed;
@@ -118,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Button confirm_header_save;
     Button cancel_header_save;
     ImageButton delete_sb;
+    TextView overtime;
 
     ImageView sortCheckmark;
     TextView skip;
@@ -152,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Runnable changeSecondValue;
     Runnable changeThirdValue;
     Runnable valueSpeed;
+    Runnable ot;
 
     long pomMillis1;
     long pomMillis2;
@@ -288,13 +292,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
-    //Todo: Issues w/ timing of --set/breaks and fade. Not consistent. Also doesn't work after reset.
+    //Todo: Breaks only should not start new timer automatically, since there are still untimed sets between them. Use neg. values like google timer?
     //Todo: Some Update issues as well.
-    //Todo: Deactivate Update button if nothing is saved yet.
     //Todo: Have dot fade move to min. alpha after set/break is done.
 
     //Todo: Pom re-do and order change.
-    //Todo: Breaks only should not start new timer automatically, since there are still untimed sets between them.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Any popup should disable main view buttons (true focuable?)
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
@@ -625,6 +627,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         msTimePaused = findViewById(R.id.msTimePaused);
         dotDraws = findViewById(R.id.dotdraws);
         lapRecycler = findViewById(R.id.lap_recycler);
+        overtime = findViewById(R.id.overtime);
         pauseResumeButton = findViewById(R.id.pauseResumeButton);
         pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
         pauseResumeButton.setRippleColor(null);
@@ -679,6 +682,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchView.setVisibility(View.GONE);
         newLap.setVisibility(View.GONE);
         lapRecycler.setVisibility(View.GONE);
+        overtime.setVisibility(View.INVISIBLE);
 
         removeViews();
         timePaused.setAlpha(1);
@@ -1476,6 +1480,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breakStart();
                             endAnimation.cancel();
                             timerDisabled = false;
+                            dotDraws.setAlpha();
                         },750);
                     }
                 }.start();
@@ -1610,6 +1615,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         endAnimation.cancel();
                         timerDisabled = false;
+                        dotDraws.setAlpha();
                     },750);
                 } else {
                     if (!breaksOnly) {
@@ -1618,6 +1624,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else {
                     breaksOnlyCyclesDone++;
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+
+                    overtime.setVisibility(View.VISIBLE);
+                    //Todo: Not timing seconds correctly.
+                    ot = new Runnable() {
+                        @Override
+                        public void run() {
+                            overSeconds +=1;
+//                            overDisplay = overSeconds/1000;
+                            overtime.setText(getString(R.string.overtime, String.valueOf(overSeconds)));
+                            mHandler.postDelayed(this, 1000);
+                        }
+                    };
+                    mHandler.post(ot);
                 }
                     drawDots(0);
                     customTimerEnded = true;
@@ -2035,6 +2054,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else {
                         resetTimer();
                         if (endAnimation != null) endAnimation.cancel();
+                        if (breaksOnly) {
+                            mHandler.removeCallbacks(ot);
+                            overtime.setVisibility(View.INVISIBLE);
+                        }
                     }
                     break;
                 case 2:
@@ -2148,6 +2171,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timePaused3.setAlpha(0);
         msTime.setAlpha(0);
         msTimePaused.setAlpha(0);
+        overtime.setVisibility(View.INVISIBLE);
     }
 
     public void tabViews(){
