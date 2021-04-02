@@ -1201,8 +1201,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else {
                             pauseAndResumeTimer(RESUMING_TIMER);
                         }
-//                    } else if (!newBreak) pauseAndResumeTimer(RESETTING_TIMER); else pauseAndResumeTimer(RESTARTING_TIMER);
-                    }
+                    } else if (!newBreak) pauseAndResumeTimer(RESETTING_TIMER); else pauseAndResumeTimer(RESTARTING_TIMER);
                     break;
                 case 2:
                     if (!pomHalted) {
@@ -1636,7 +1635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                            breakStart();
                             breakEnded = true;
                         }
-                        endAnimation.cancel();
+//                        endAnimation.cancel();
                         timerDisabled = false;
                         dotDraws.setAlpha();
                     },750);
@@ -2063,22 +2062,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
                             mHandler.removeCallbacks(ot);
+                            overSeconds = 0;
                             overtime.setVisibility(View.INVISIBLE);
                             progressBar.setProgress(10000);
                             timePaused.setAlpha(1.0f);
-                            timeLeft.setAlpha(1.0f);
-                            timePaused.setText(convertSeconds((breakMillis+999)/1000));
-                            timeLeft.setText(convertSeconds((breakMillis+999)/1000));
+//                            timeLeft.setAlpha(1.0f);
+
+                            timePaused.setText(convertSeconds(((breaksOnlyTime.get(0)+999)) /1000));
+//                            timeLeft.setText(convertSeconds(((breaksOnlyTime.get(0)+999)) /1000));
                             newBreak = true;
                         } else if (pausing == RESTARTING_TIMER) {
                             breakEnded = false;
                             newBreak = false;
-                            //Todo: This should emulate an auto-switch from onFinish.
                             startObjectAnimator();
                             breakStart();
                             breakMillis = breakStart;
                             timerDisabled = false;
                             fadeCustomTimer = false;
+                            timePaused.setAlpha(1.0f);
+                            timeLeft.setAlpha(1.0f);
                         }
                     } else {
                         resetTimer();
