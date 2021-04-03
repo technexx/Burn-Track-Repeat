@@ -298,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
+    //Todo: DB errors: Duplicate saves triggering incorrectly and title update applying to multiple rows.
     //Todo: Pom re-do and order change.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Any popup should disable main view buttons (true focusable?)
@@ -316,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
 
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
+    //Todo: REMINDER, Try next app w/ Kotlin.
 
     @Override
     public void sendAlphaValue(int alpha) {
@@ -2805,10 +2807,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             convertedBreakList = convertedBreakList.replace("[", "");
             convertedBreakList = convertedBreakList.replace(",", " - ");
 
+            boolean endLoop = false;
             if (cyclesList.size()>0) {
                 for (int i=0; i<cyclesList.size(); i++) {
-                    if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString()))
-                        duplicateCycle = true;
+                    if (!endLoop) {
+                        if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
+                            duplicateCycle = true; endLoop = true;
+                        }
+                    }
+                    duplicateCycle = endLoop;
                 }
             }
         } else {
