@@ -218,7 +218,9 @@ public class DotDraws extends View {
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
                 drawText(mSetTime, mX, mY, i);
                 mX += 108;
+                Log.i("drawValues", "set Count is " + mSetCount + " and set Reduce is "  + mSetReduce + " and current pos is " + i);
             }
+
         }
 
         if (mDrawBox) {

@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
     int receivedAlpha;
-    boolean stopAscent;
+    boolean stopAscent = true;
 
     //Todo: Convert pomMillis to minutes, not seconds. Add HH:MM format for Pom strings.
     //Todo Fading issues in Custom.
@@ -1618,9 +1618,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
                         dotDraws.pomDraw(pomDotCounter, 1, pomValuesArray);
-//                        if (!drawing) {
-//                            dotDraws.pomDraw(pomDotCounter, 1, pomValuesArray);
-//                        }
+                        if (!drawing) {
+                            dotDraws.pomDraw(pomDotCounter, 1, pomValuesArray);
+                        }
                     }
 
                     @Override
@@ -2102,7 +2102,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
             case 2:
-//                drawing = false;
+                drawing = false;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
@@ -2150,6 +2150,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (!stopAscent) {
                             if (!onBreak) removeSetOrBreak(false); else removeSetOrBreak(true);
                             mHandler.removeCallbacks(endFade);
+                            stopAscent = true;
                         }
                         if (pausing == PAUSING_TIMER) {
                             timePaused.setAlpha(1);
