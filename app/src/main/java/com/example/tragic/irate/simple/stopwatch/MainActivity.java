@@ -20,7 +20,9 @@ import android.os.Handler;
 ;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -92,10 +94,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long editSetMinutes;
     long editBreakMinutes;
     long editBreakSeconds;
+    long editPomOne;
+    long editPomTwo;
+    long editPomThree;
+    long editPomOneMin;
+    long editPomOneHour;
+    long editPomTwoMin;
+    long editPomTwoHour;
+    long editPomThreeMin;
+    long editPomThreeHour;
     int overSeconds;
-    int overDisplay;
 
     TextView cycle_header_text;
+    TextView cycle_header_text_two;
     TextView cycles_completed;
     TextView cycle_reset;
     EditText first_value_edit;
@@ -106,7 +117,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     EditText second_value_edit_two;
     TextView second_value_sep;
     TextView second_value_textView;
-    EditText third_value_edit;
+    EditText first_value_single_edit;
+    EditText second_value_single_edit;
+    EditText third_value_single_edit;
+    TextView third_value_textView;
     ImageView plus_first_value;
     ImageView minus_first_value;
     ImageView plus_second_value;
@@ -298,8 +312,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
-    //Todo: DB errors: Duplicate saves triggering incorrectly and title update applying to multiple rows.
-    //Todo: Pom re-do and order change.
+    //Todo: Toast for trying in increment time past min/max values
+    //Todo: Format mode 1 <60 sec textViews as 0:XX
+    //Todo: Sep breakOnly timer.
+    //Todo: Pom re-do and order change. Add once, substract removes. Toast if already added. Same save options.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
     //Todo: Any popup should disable main view buttons (true focusable?)
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
@@ -353,25 +369,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //This dismisses windows/views when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
-            save_cycles.setText(R.string.save_cycles);
             savedCyclePopupWindow.dismiss();
         }
-        if (first_value_edit.isShown()) {
-            first_value_textView.setVisibility(View.VISIBLE);
-            first_value_edit.setVisibility(View.INVISIBLE);
-            first_value_edit_two.setVisibility(View.INVISIBLE);
-            first_value_sep.setVisibility(View.INVISIBLE);
-            //onTouch is closing editText, converting its values to longs and then setting them to setValue.
-            setEditValueBounds(true);
+        switch (mode) {
+            case 1:
+                if (first_value_edit.isShown()) {
+                    first_value_textView.setVisibility(View.VISIBLE);
+                    first_value_edit.setVisibility(View.INVISIBLE);
+                    first_value_edit_two.setVisibility(View.INVISIBLE);
+                    first_value_sep.setVisibility(View.INVISIBLE);
+                    //onTouch is closing editText, converting its values to longs and then setting them to setValue.
+                    setEditValueBounds(true);
+                }
+                if (second_value_edit.isShown()) {
+                    second_value_textView.setVisibility(View.VISIBLE);
+                    second_value_edit.setVisibility(View.INVISIBLE);
+                    second_value_edit_two.setVisibility(View.INVISIBLE);
+                    second_value_sep.setVisibility(View.INVISIBLE);
+                    //onTouch is closing editText, converting its values to longs and then setting them to breakValue.
+                    setEditValueBounds(false);
+                }
+                break;
+            case 2:
+                if (first_value_single_edit.isShown()) {
+                    first_value_single_edit.setVisibility(View.INVISIBLE);
+                    first_value_textView.setVisibility(View.VISIBLE);
+                }
+                    if (second_value_single_edit.isShown()) {
+                    second_value_single_edit.setVisibility(View.INVISIBLE);
+                    second_value_textView.setVisibility(View.VISIBLE);
+                }
+                    if (third_value_single_edit.isShown()) {
+                    third_value_single_edit.setVisibility(View.INVISIBLE);
+                    third_value_textView.setVisibility(View.VISIBLE);
+                }
+                    setEditValueBounds(true);
+                    break;
         }
-        if (second_value_edit.isShown()) {
-            second_value_textView.setVisibility(View.VISIBLE);
-            second_value_edit.setVisibility(View.INVISIBLE);
-            second_value_edit_two.setVisibility(View.INVISIBLE);
-            second_value_sep.setVisibility(View.INVISIBLE);
-            //onTouch is closing editText, converting its values to longs and then setting them to breakValue.
-            setEditValueBounds(false);
-        }
+        save_cycles.setText(R.string.save_cycles);
         return false;
     }
 
@@ -585,6 +620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s3 = findViewById(R.id.s3);
         reset = findViewById(R.id.reset);
         cycle_header_text = findViewById(R.id.cycle_header_text);
+        cycle_header_text_two = findViewById(R.id.cycle_header_text_2);
         first_value_edit = findViewById(R.id.first_value_edit);
         first_value_edit_two = findViewById(R.id.first_value_edit_two);
         first_value_sep = findViewById(R.id.first_value_sep);
@@ -593,13 +629,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two = findViewById(R.id.second_value_edit_two);
         second_value_sep = findViewById(R.id.second_value_sep);
         second_value_textView = findViewById(R.id.second_value_textView);
+        third_value_textView = findViewById(R.id.third_value_textView);
         plus_first_value = findViewById(R.id.plus_first_value);
         minus_first_value = findViewById(R.id.minus_first_value);
         plus_second_value = findViewById(R.id.plus_second_value);
         minus_second_value = findViewById(R.id.minus_second_value);
         plus_third_value = findViewById(R.id.plus_third_value);
         minus_third_value = findViewById(R.id.minus_third_value);
-        third_value_edit = findViewById(R.id.third_value_edit);
+        first_value_single_edit = findViewById(R.id.first_value_single_edit);
+        second_value_single_edit = findViewById(R.id.second_value_single_edit);
+        third_value_single_edit = findViewById(R.id.third_value_single_edit);
         delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_confirm_text);
         delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
         delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
@@ -718,6 +757,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             queryCycles();
             pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
+            //appLaunching is called if either breaksOnly or breaks/set mode are launched at app startup. If saved cycle(s) exist, it returns the most recently used. If not, a default UI is called.
             if (!breaksOnly) {
                 if (appLaunchingCustom) {
                     if (cyclesList.size()>0 && customID>0) {
@@ -841,42 +881,110 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         first_value_textView.setOnClickListener(v-> {
-            if (!breaksOnly) {
-                if (first_value_textView.isShown()) {
-                    first_value_textView.setVisibility(View.INVISIBLE);
-                    first_value_edit.setVisibility(View.VISIBLE);
-                    first_value_edit_two.setVisibility(View.VISIBLE);
-                    first_value_sep.setVisibility(View.VISIBLE);
-                    if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else {
-                        if (editSetMinutes==0) first_value_edit_two.setText("05"); else first_value_edit_two.setText("00");
+            switch (mode) {
+                case 1:
+                    if (!breaksOnly) {
+                        if (first_value_textView.isShown()) {
+                            first_value_textView.setVisibility(View.INVISIBLE);
+                            first_value_edit.setVisibility(View.VISIBLE);
+                            first_value_edit_two.setVisibility(View.VISIBLE);
+                            first_value_sep.setVisibility(View.VISIBLE);
+                            //Todo: We have sep vars. for editText so it can be called instantly anytime we switch from textView. Since pomMillis is consistent, we can probably just keep using that.
+                            if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else {
+                                if (editSetMinutes==0) first_value_edit_two.setText("05"); else first_value_edit_two.setText("00");
+                            }
+                            if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
+                        }
+                        if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
+                            second_value_textView.setVisibility(View.VISIBLE);
+                            second_value_edit.setVisibility(View.INVISIBLE);
+                            second_value_edit_two.setVisibility(View.INVISIBLE);
+                            second_value_sep.setVisibility(View.INVISIBLE);
+                        }
                     }
-                    if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
-                }
-                if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
-                    second_value_textView.setVisibility(View.VISIBLE);
-                    second_value_edit.setVisibility(View.INVISIBLE);
-                    second_value_edit_two.setVisibility(View.INVISIBLE);
-                    second_value_sep.setVisibility(View.INVISIBLE);
-                }
+                    break;
+                case 2:
+                    if (first_value_textView.isShown()) {
+                        first_value_textView.setVisibility(View.INVISIBLE);
+                        first_value_single_edit.setVisibility(View.VISIBLE);
+                    }
+                    if (second_value_single_edit.isShown()) {
+                        second_value_single_edit.setVisibility(View.INVISIBLE);
+                        second_value_textView.setVisibility(View.VISIBLE);
+                    }
+                    if (third_value_single_edit.isShown()){
+                        third_value_single_edit.setVisibility(View.INVISIBLE);
+                        third_value_textView.setVisibility(View.VISIBLE);
+                    }
             }
         });
 
         second_value_textView.setOnClickListener(v-> {
-            if (second_value_textView.isShown()) {
-                second_value_textView.setVisibility(View.INVISIBLE);
-                second_value_edit.setVisibility(View.VISIBLE);
-                second_value_edit_two.setVisibility(View.VISIBLE);
-                second_value_sep.setVisibility(View.VISIBLE);
+            switch (mode) {
+                case 1:
+                    if (second_value_textView.isShown()) {
+                        second_value_textView.setVisibility(View.INVISIBLE);
+                        second_value_edit.setVisibility(View.VISIBLE);
+                        second_value_edit_two.setVisibility(View.VISIBLE);
+                        second_value_sep.setVisibility(View.VISIBLE);
+                    }
+                    if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
+                        first_value_textView.setVisibility(View.VISIBLE);
+                        first_value_edit.setVisibility(View.INVISIBLE);
+                        first_value_edit_two.setVisibility(View.INVISIBLE);
+                        first_value_sep.setVisibility(View.INVISIBLE);
+                    }
+                    if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
+                    if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else {
+                        if (editBreakMinutes==0) second_value_edit_two.setText("05"); else second_value_edit_two.setText("00");
+                    }
+                    break;
+                case 2:
+                    if (first_value_single_edit.isShown()) {
+                        first_value_textView.setVisibility(View.VISIBLE);
+                        first_value_single_edit.setVisibility(View.INVISIBLE);
+                    }
+                    if (second_value_textView.isShown()) {
+                        second_value_single_edit.setVisibility(View.VISIBLE);
+                        second_value_textView.setVisibility(View.INVISIBLE);
+                    }
+                    if (third_value_single_edit.isShown()){
+                        third_value_single_edit.setVisibility(View.INVISIBLE);
+                        third_value_textView.setVisibility(View.VISIBLE);
+                    }
+                    break;
             }
-            if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
-                first_value_textView.setVisibility(View.VISIBLE);
-                first_value_edit.setVisibility(View.INVISIBLE);
-                first_value_edit_two.setVisibility(View.INVISIBLE);
-                first_value_sep.setVisibility(View.INVISIBLE);
-            }
-            if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
-            if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else {
-                if (editBreakMinutes==0) second_value_edit_two.setText("05"); else second_value_edit_two.setText("00");
+
+        });
+
+        third_value_textView.setOnClickListener(v->{
+            switch (mode) {
+                case 1:
+                    if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
+                        first_value_edit.setVisibility(View.INVISIBLE);
+                        first_value_edit_two.setVisibility(View.INVISIBLE);
+                        first_value_sep.setVisibility(View.INVISIBLE);
+                    }
+                    if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
+                        second_value_edit.setVisibility(View.INVISIBLE);
+                        second_value_edit_two.setVisibility(View.INVISIBLE);
+                        second_value_sep.setVisibility(View.INVISIBLE);
+                    }
+                     break;
+                case 2:
+                    if (first_value_single_edit.isShown()) {
+                        first_value_single_edit.setVisibility(View.INVISIBLE);
+                        first_value_textView.setVisibility(View.VISIBLE);
+                    }
+                    if (second_value_edit.isShown()){
+                        second_value_single_edit.setVisibility(View.INVISIBLE);
+                        second_value_textView.setVisibility(View.VISIBLE);
+                    }
+                    if (third_value_textView.isShown()) {
+                        third_value_textView.setVisibility(View.INVISIBLE);
+                        third_value_single_edit.setVisibility(View.VISIBLE);
+                    }
+                    break;
             }
         });
 
@@ -931,11 +1039,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
+                    if (!breaksOnly) first_value_textView.setText(convertSeconds(setValue));
                     break;
                 case 2:
-                    first_value_textView.setText(convertSeconds(pomValue1));
-                    timePaused2.setText(convertSeconds(pomValue1));
-                    timeLeft2.setText(convertSeconds(pomValue1));
+                    first_value_single_edit.setText(String.valueOf(pomValue1));
+                    first_value_textView.setText(String.valueOf(pomValue1));
                     break;
             }
             return true;
@@ -947,9 +1055,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
+                    if (!breaksOnly) first_value_textView.setText(convertSeconds(setValue));
                     break;
                 case 2:
-                    first_value_edit.setText(convertSeconds(pomValue1));
+                    first_value_single_edit.setText(String.valueOf(pomValue1));
+                    first_value_textView.setText(String.valueOf(pomValue1));
                     break;
             }
             return true;
@@ -964,7 +1074,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
                     break;
                 case 2:
-                    second_value_edit.setText(convertSeconds(pomValue2));
+                    second_value_single_edit.setText(String.valueOf(pomValue2));
+                    second_value_textView.setText(String.valueOf(pomValue2));
                     break;
             }
             return true;
@@ -979,33 +1090,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
                     break;
                 case 2:
-                    second_value_edit.setText(convertSeconds(pomValue2));
+                    second_value_single_edit.setText(String.valueOf(pomValue2));
+                    second_value_textView.setText(String.valueOf(pomValue2));
                     break;
             }
             return true;
         });
 
         plus_third_value.setOnTouchListener((v, event) -> {
+            setIncrements(event, changeThirdValue);
+            incrementValues = true;
             switch (mode) {
                 case 1:
 //                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(true);  break;
                 case 2:
-                    incrementValues = true;
-                    setIncrements(event, changeThirdValue);
-                    third_value_edit.setText(convertSeconds(pomValue3));
+                    third_value_single_edit.setText(String.valueOf(pomValue3));
+                    third_value_textView.setText(String.valueOf(pomValue3));
                     break;
             }
             return true;
         });
 
         minus_third_value.setOnTouchListener((v, event) -> {
+            incrementValues = false;
+            setIncrements(event, changeThirdValue);
             switch (mode) {
                 case 1:
-//                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(false);  break;
                 case 2:
-                    incrementValues = false;
-                    setIncrements(event, changeThirdValue);
-                    third_value_edit.setText(convertSeconds(pomValue3));
+                    third_value_single_edit.setText(String.valueOf(pomValue3));
+                    third_value_textView.setText(String.valueOf(pomValue3));
                     break;
             }
             return true;
@@ -1646,7 +1759,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }.start();
     }
 
-    //Todo: Need sep. progress for breaksOnly? Both use timeLeft/timePaused atm, causing our incorrect displays.
     public void setBreaksOnlyMode() {
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
             savedCyclePopupWindow.dismiss();
@@ -1783,6 +1895,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //Todo: Ensures we don't add anything outside of bounds. Remember for Pom, too.
     public void adjustCustom(boolean adding) {
         //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
         if (first_value_edit.isShown()) setEditValueBounds(true);
@@ -2204,25 +2317,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 second_value_edit.setVisibility(View.INVISIBLE);
                 second_value_edit_two.setVisibility(View.INVISIBLE);
                 second_value_sep.setVisibility(View.INVISIBLE);
-                convertEditTime();
-                if (!breaksOnly) {
-                    first_value_edit.setText(String.valueOf(editSetMinutes));
-                    first_value_edit_two.setText(String.valueOf(editSetSeconds));
-                }
-                plus_first_value.setVisibility(View.VISIBLE);
-                minus_first_value.setVisibility(View.VISIBLE);
-                plus_second_value.setVisibility(View.VISIBLE);
-                minus_second_value.setVisibility(View.VISIBLE);
+                first_value_single_edit.setVisibility(View.INVISIBLE);
+                second_value_single_edit.setVisibility(View.INVISIBLE);
+                third_value_single_edit.setVisibility(View.INVISIBLE);
                 plus_third_value.setVisibility(View.INVISIBLE);
                 minus_third_value.setVisibility(View.INVISIBLE);
-                third_value_edit.setVisibility(View.INVISIBLE);
+                third_value_textView.setVisibility(View.INVISIBLE);
+                first_value_textView.setVisibility(View.VISIBLE);
+                second_value_textView.setVisibility(View.VISIBLE);
+                first_value_textView.setText(convertSeconds(setValue));
+                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
+
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
-                first_value_textView.setText(convertSeconds(setValue));
+                cycle_header_text.setVisibility(View.VISIBLE);
+                cycle_header_text_two.setVisibility(View.INVISIBLE);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
+                s1.setTextSize(24f);
+                s2.setTextSize(24f);
+                s3.setTextSize(24f);
                 break;
             case 2:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -2237,16 +2353,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 minus_second_value.setVisibility(View.VISIBLE);
                 plus_third_value.setVisibility(View.VISIBLE);
                 minus_third_value.setVisibility(View.VISIBLE);
-                first_value_edit.setText(convertSeconds(pomValue1));
-                second_value_edit.setText(convertSeconds(pomValue2));
-                third_value_edit.setText(convertSeconds(pomValue3));
+                third_value_textView.setVisibility(View.VISIBLE);
+
+                first_value_edit.setVisibility(View.INVISIBLE);
+                first_value_edit_two.setVisibility(View.INVISIBLE);
+                second_value_edit.setVisibility(View.INVISIBLE);
+                second_value_edit_two.setVisibility(View.INVISIBLE);
+                first_value_sep.setVisibility(View.INVISIBLE);
+                second_value_sep.setVisibility(View.INVISIBLE);
+
+                first_value_textView.setVisibility(View.VISIBLE);
+                second_value_textView.setVisibility(View.VISIBLE);
+                third_value_textView.setVisibility(View.VISIBLE);
+                first_value_textView.setText(String.valueOf(pomValue1));
+                second_value_textView.setText(String.valueOf(pomValue2));
+                third_value_textView.setText(String.valueOf(pomValue3));
+
+                first_value_single_edit.setText(convertSeconds(pomValue1));
+                second_value_single_edit.setText(convertSeconds(pomValue2));
+                third_value_single_edit.setText(convertSeconds(pomValue3));
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
+                cycle_header_text.setVisibility(View.INVISIBLE);
+                cycle_header_text_two.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_cycles);
                 params2.width = 150;
+                s1.setTextSize(21f);
+                s2.setTextSize(21f);
+                s3.setTextSize(21f);
                 break;
             case 3:
                 progressBar.setVisibility(View.INVISIBLE);
@@ -2391,7 +2528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timerDisabled = true;
                     }
                     dotDraws.breakTime(customBreakTime);
-                    third_value_edit.setText(String.valueOf(customSetTime.size()));
+                    third_value_single_edit.setText(String.valueOf(customSetTime.size()));
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breaksOnlyTime.addAll(startBreaksOnlyTime);
@@ -2400,7 +2537,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timerDisabled = true;
                     }
                     dotDraws.breakTime(breaksOnlyTime);
-                    third_value_edit.setText(String.valueOf(breaksOnlyTime.size()));
+                    third_value_single_edit.setText(String.valueOf(breaksOnlyTime.size()));
                 }
                 //Always setting this to avoid null errors.
                 dotDraws.setTime(customSetTime);
@@ -2491,17 +2628,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!breaksOnly) {
             editBreakSeconds = breakValue%60;
             editBreakMinutes = breakValue/60;
-            first_value_textView.setText(convertSeconds(setValue));
+//            first_value_textView.setText(convertSeconds(setValue));
         } else {
             editBreakSeconds = breaksOnlyValue%60;
             editBreakMinutes = breaksOnlyValue/60;
         }
-        second_value_textView.setText(convertSeconds(breakValue));
+//        second_value_textView.setText(convertSeconds(breakValue));
 
         first_value_edit.setText(String.valueOf(editSetMinutes));
         first_value_edit_two.setText(String.valueOf(editSetSeconds));
         second_value_edit.setText(String.valueOf(editBreakMinutes));
         second_value_edit_two.setText(String.valueOf(editBreakSeconds));
+    }
+
+    //Todo: Millis actual ms, Value is long equivalent of textView.
+    public void convertPomTime() {
+        first_value_single_edit.setText(convertSeconds(pomValue1));
+        second_value_single_edit.setText(convertSeconds(pomValue2));
+        third_value_single_edit.setText(convertSeconds(pomValue3));
     }
 
     //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
@@ -2727,11 +2871,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     queryCycles();
                     appLaunchingCustom = false;
                 }
-
-//                customID = cyclesList.get(posHolder).getId();
                 //Getting instance  of selected position of Cycle list entity. Also used in save_cycles.
                 cycles = cyclesList.get(posHolder);
-                //Todo: Nothing saved in sets/breaks columns. Title IS saved.
                 String tempSets = cyclesList.get(posHolder).getSets();
                 String tempBreaks = cyclesList.get(posHolder).getBreaks();
                 String[] setSplit = tempSets.split(" - ", 0);
@@ -2755,7 +2896,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     queryCycles();
                     appLaunchingBO = false;
                 }
-//                breaksOnlyID = cyclesBOList.get(posHolder).getId();
                 //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
                 cyclesBO = cyclesBOList.get(posHolder);
                 String tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
@@ -2776,7 +2916,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
             });
-            prefEdit.commit();
+            prefEdit.apply();
         });
     }
 
@@ -2877,46 +3017,63 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void setEditValueBounds(boolean onSets){
-        if (onSets) {
-            editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
-            editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
+        switch (mode) {
+            case 1:
+                if (onSets) {
+                    editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
+                    editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
 
-            if (editSetSeconds>59) {
-                editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
-            }
-            if (editSetMinutes>5) editSetMinutes = 5;
-            if (editSetMinutes<0) editSetMinutes = 0;
-            if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
-            if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
+                    if (editSetSeconds>59) {
+                        editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
+                    }
+                    if (editSetMinutes>5) editSetMinutes = 5;
+                    if (editSetMinutes<0) editSetMinutes = 0;
+                    if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
+                    if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
 
-            setValue = (editSetMinutes * 60) + editSetSeconds;
-            first_value_textView.setText(convertSeconds(setValue));
-        } else {
-            editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
-            editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
+                    setValue = (editSetMinutes * 60) + editSetSeconds;
+                    first_value_textView.setText(convertSeconds(setValue));
+                } else {
+                    editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
+                    editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
 
-            if (editBreakSeconds>59) {
-                editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
-            }
-            if (editBreakMinutes>5) editBreakMinutes = 5;
-            if (editBreakMinutes<0) editBreakMinutes = 0;
-            if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
-            if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
+                    if (editBreakSeconds>59) {
+                        editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
+                    }
+                    if (editBreakMinutes>5) editBreakMinutes = 5;
+                    if (editBreakMinutes<0) editBreakMinutes = 0;
+                    if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
+                    if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
 
-            if (!breaksOnly) {
-                breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-            } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-            second_value_textView.setText(convertSeconds(breakValue));
+                    if (!breaksOnly) {
+                        breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+                    } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+                    second_value_textView.setText(convertSeconds(breakValue));
+                }
+                break;
+                //Todo: Pom value bounds.
+            case 2:
+                if (pomValue1>120) pomValue1=120; if (pomValue1<15) pomValue1 = 15;
+                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
+                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
+                break;
         }
+        //Todo: Redundant for POM only. Don't break mode 1.
         setTimerValueBounds();
     }
 
     public void setTimerValueBounds() {
-        if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
-        if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
-        if (pomValue1<10) pomValue1 = 10; if (pomValue1>120) pomValue1 = 120;
-        if (pomValue2<1) pomValue2 = 1; if (pomValue2>10) pomValue2 = 10;
-        if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
+        switch (mode) {
+            case 1:
+                if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
+                if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
+                break;
+            case 2:
+                if (pomValue1>120) pomValue1=120; if (pomValue1<15) pomValue1 = 15;
+                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
+                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
+                break;
+        }
     }
 
     public void removeSetOrBreak(boolean onBreak) {

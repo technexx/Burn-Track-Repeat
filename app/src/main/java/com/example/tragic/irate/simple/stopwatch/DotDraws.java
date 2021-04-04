@@ -317,14 +317,14 @@ public class DotDraws extends View {
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawCircle(mX, 540, 60, mPaint);
+                mCanvas.drawCircle(mX, 610, 60, mPaint);
                 break;
             case 2: case 4: case 6:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawCircle(mX2, 540, 30, mPaint);
+                mCanvas.drawCircle(mX2, 610, 30, mPaint);
                 mX+=230;
                 mX2=mX+115;
                 break;
@@ -333,7 +333,7 @@ public class DotDraws extends View {
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawRect(mX+110, 485, mX+220, 595, mPaint);
+                mCanvas.drawRect(mX+110, 555, mX+220, 665, mPaint);
         }
     }
 
