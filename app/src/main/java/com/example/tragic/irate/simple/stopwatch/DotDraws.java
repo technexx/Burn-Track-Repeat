@@ -226,6 +226,7 @@ public class DotDraws extends View {
                 previousPos = currentPos;
                 currentPos = -1;
             }
+            mPaint.setStyle(Paint.Style.FILL);
         }
 
         if (mMode == 1) {
@@ -259,7 +260,7 @@ public class DotDraws extends View {
         }
 
         if (mMode == 2) {
-            mX = 115; mX2=mX+115;
+            mX = 92; mX2=mX+125;
             //Fading last object drawn. Setting previous ones to "greyed out"
             for (int i=0; i<mPomDot; i++) {
                 if (i == mPomDot-1) {
@@ -324,16 +325,16 @@ public class DotDraws extends View {
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawCircle(mX2, 610, 30, mPaint);
-                mX+=230;
-                mX2=mX+115;
+                mCanvas.drawCircle(mX2, 610, 45 , mPaint);
+                mX+=250;
+                mX2=mX+125;
                 break;
             case 8:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
-                mCanvas.drawRect(mX+110, 555, mX+220, 665, mPaint);
+                mCanvas.drawRect(mX+90, 555, mX+200, 665, mPaint);
         }
     }
 
@@ -374,6 +375,8 @@ public class DotDraws extends View {
                     }
                 }
             }
+        } else if (mMode==2) {
+
         }
     }
 

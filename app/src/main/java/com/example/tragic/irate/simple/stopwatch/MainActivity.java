@@ -312,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
+    //Todo: Edit overlaps likely due to setting values which auto sets as Visible.
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Format mode 1 <60 sec textViews as 0:XX
     //Todo: Sep breakOnly timer.
@@ -2305,6 +2306,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ConstraintLayout.LayoutParams params2 = (ConstraintLayout.LayoutParams) cycle_reset.getLayoutParams();
         switch (mode) {
             case 1:
+                first_value_textView.setText(convertSeconds(setValue));
+                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
+
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
@@ -2325,8 +2329,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 third_value_textView.setVisibility(View.INVISIBLE);
                 first_value_textView.setVisibility(View.VISIBLE);
                 second_value_textView.setVisibility(View.VISIBLE);
-                first_value_textView.setText(convertSeconds(setValue));
-                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
 
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
@@ -2341,6 +2343,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setTextSize(24f);
                 break;
             case 2:
+                first_value_single_edit.setText(convertSeconds(pomValue1));
+                second_value_single_edit.setText(convertSeconds(pomValue2));
+                third_value_single_edit.setText(convertSeconds(pomValue3));
+
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.VISIBLE);
                 stopWatchView.setVisibility(View.GONE);
@@ -2369,9 +2375,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 second_value_textView.setText(String.valueOf(pomValue2));
                 third_value_textView.setText(String.valueOf(pomValue3));
 
-                first_value_single_edit.setText(convertSeconds(pomValue1));
-                second_value_single_edit.setText(convertSeconds(pomValue2));
-                third_value_single_edit.setText(convertSeconds(pomValue3));
                 skip.setVisibility(View.VISIBLE);
                 newLap.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
