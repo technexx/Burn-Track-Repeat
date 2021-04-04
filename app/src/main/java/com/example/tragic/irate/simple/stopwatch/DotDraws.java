@@ -50,6 +50,7 @@ public class DotDraws extends View {
     int mPomDot;
     ArrayList<String> mSetTime;
     ArrayList<String> mBreakTime;
+    ArrayList<String> mPomTime;
     boolean mBreaksOnly;
 
     int savedCustomAlpha;
@@ -125,7 +126,9 @@ public class DotDraws extends View {
         }
     }
 
-    public void pomDraw(int pomDot, int fadeDone) {
+    public void pomDraw(int pomDot, int fadeDone, ArrayList<Long> pomTime) {
+        mPomTime = new ArrayList<>();
+        for (int i=0; i<pomTime.size(); i++) mPomTime.add(String.valueOf(i));
         this.mPomDot = pomDot; this.mFadeDone = fadeDone;
         setupPaint();
         invalidate();
@@ -217,7 +220,6 @@ public class DotDraws extends View {
                 mX += 108;
             }
         }
-        Log.i("testRunning", "mode is " + mMode + " and fadeDone is " + mFadeDone);
 
         if (mDrawBox) {
             selectionPaint();
@@ -311,6 +313,7 @@ public class DotDraws extends View {
         savedPomCycle = cycle2;
     }
 
+    //Todo: drawText needs to go here, since this is where we are iterating up x/y coords, which is passed in to our mode 2 canvas draws.
     public void pomDraw(int i, boolean fade) {
         switch (i+1) {
             case 1: case 3: case 5: case 7:
@@ -319,6 +322,7 @@ public class DotDraws extends View {
                     fadeDot2();
                 }
                 mCanvas.drawCircle(mX, 610, 60, mPaint);
+                drawText(mPomTime, mX, mY, i);
                 break;
             case 2: case 4: case 6:
                 mPaint.setColor(Color.RED);
@@ -326,6 +330,7 @@ public class DotDraws extends View {
                     fadeDot2();
                 }
                 mCanvas.drawCircle(mX2, 610, 45 , mPaint);
+                drawText(mPomTime, mX2, mY, i);
                 mX+=250;
                 mX2=mX+125;
                 break;
@@ -362,7 +367,6 @@ public class DotDraws extends View {
                         mPaintText.setTextSize(90f);
                         mCanvas.drawText(list.get(i), x-44, y+28, mPaintText);
                     }
-
                 } else {
                     if (!mBreaksOnly) {
                         mPaintText.setTextSize(45f);
@@ -376,6 +380,7 @@ public class DotDraws extends View {
                 }
             }
         } else if (mMode==2) {
+            mPaintText.setTextSize(45f);
 
         }
     }

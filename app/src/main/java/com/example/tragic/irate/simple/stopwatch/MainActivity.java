@@ -94,15 +94,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long editSetMinutes;
     long editBreakMinutes;
     long editBreakSeconds;
-    long editPomOne;
-    long editPomTwo;
-    long editPomThree;
-    long editPomOneMin;
-    long editPomOneHour;
-    long editPomTwoMin;
-    long editPomTwoHour;
-    long editPomThreeMin;
-    long editPomThreeHour;
     int overSeconds;
 
     TextView cycle_header_text;
@@ -140,13 +131,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageView sortCheckmark;
     TextView skip;
     TextView newLap;
-
-    List<Long> setValueSaves;
-    List<Long> breakValueSaves;
-    List<Long> breaksOnlyValueSaves;
-    List<Long> pomOneSaves;
-    List<Long> pomTwoSaves;
-    List<Long> pomThreeSaves;
 
     int PAUSING_TIMER = 1;
     int RESUMING_TIMER = 2;
@@ -227,14 +211,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
 
-    public ArrayList<String> customTitleArray;
-    public ArrayList<String> breaksOnlyTitleArray;
-    public ArrayList<Long> customSetTime;
-    public ArrayList<Long> customBreakTime;
-    public ArrayList<Long> startCustomSetTime;
-    public ArrayList<Long> startCustomBreakTime;
-    public ArrayList<Long> startBreaksOnlyTime;
-    public ArrayList<Long> breaksOnlyTime;
+    ArrayList<String> customTitleArray;
+    ArrayList<String> breaksOnlyTitleArray;
+    ArrayList<Long> customSetTime;
+    ArrayList<Long> customBreakTime;
+    ArrayList<Long> startCustomSetTime;
+    ArrayList<Long> startCustomBreakTime;
+    ArrayList<Long> startBreaksOnlyTime;
+    ArrayList<Long> breaksOnlyTime;
+    ArrayList<Long> pomValuesArray;
     String convertedSetList;
     String convertedBreakList;
     String convertedBreakOnlyList;
@@ -312,6 +297,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent;
 
+    //Todo: Convert pomMillis to minutes, not seconds. Add HH:MM format for Pom strings.
+    //Todo Fading issues in Custom.
     //Todo: Edit overlaps likely due to setting values which auto sets as Visible.
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Format mode 1 <60 sec textViews as 0:XX
@@ -585,6 +572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breaksOnlyArray = new ArrayList<>();
         customTitleArray = new ArrayList<>();
         breaksOnlyTitleArray = new ArrayList<>();
+        pomValuesArray = new ArrayList<>();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
@@ -707,12 +695,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
         mHandler = new Handler();
-        setValueSaves = new ArrayList<>();
-        breakValueSaves = new ArrayList<>();
-        breaksOnlyValueSaves = new ArrayList<>();
-        pomOneSaves = new ArrayList<>();
-        pomTwoSaves = new ArrayList<>();
-        pomThreeSaves = new ArrayList<>();
 
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
@@ -798,6 +780,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValue3 = 15;
         setMillis = setValue;
         breakMillis = breakValue;
+        for (int i=0; i<3; i++) {
+            pomValuesArray.add(pomValue1);
+            pomValuesArray.add(pomValue2);
+        }
+        pomValuesArray.add(pomValue3);
 
         lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
@@ -996,7 +983,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 1:
                         if (incrementValues) setValue+=1; else setValue -=1; break;
                     case 2:
-                        if (incrementValues) pomValue1+=1; else pomValue1 -=1; break;
+                        if (incrementValues) pomValue1+=1; else pomValue1 -=1;
+                        //Minutes for Pom instead of seconds.
+                        pomMillis1 = (pomValue1*1000) * 60;
+                        break;
                 }
                 mHandler.postDelayed(this, incrementTimer*10);
             }
@@ -1012,7 +1002,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else
                         if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1; break;
                     case 2:
-                        if (incrementValues) pomValue2+=1; else pomValue2 -=1; break;
+                        if (incrementValues) pomValue2+=1; else pomValue2 -=1;
+                        pomMillis2 = (pomValue2*1000) * 60;
+                        break;
                 }
                 mHandler.postDelayed(this, incrementTimer*10);
             }
@@ -1022,6 +1014,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void run() {
                 if (incrementValues) pomValue3+=1; else pomValue3 -=1;
+                pomMillis3 = (pomValue3*1000) * 60;
                 mHandler.postDelayed(this, incrementTimer*10);
             }
         };
@@ -1246,7 +1239,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         mode=2;
                         switchTimer(2, pomHalted);
                         dotDraws.setMode(2);
-                        dotDraws.pomDraw(1, 0);
+                        dotDraws.pomDraw(1, 0, pomValuesArray);
                         prefEdit.putInt("currentMode", 2);
                         break;
                     case 2:
@@ -1623,10 +1616,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (pomAlpha >=1) fadePomTimer = false;
 
-                        timeLeft2.setText(convertSeconds((pomMillis + 999)/1000));
-                        if (!drawing) {
-                            dotDraws.pomDraw(pomDotCounter, 1);
-                        }
+                        timeLeft2.setText(convertSeconds((pomMillis+999)/1000));
+                        dotDraws.pomDraw(pomDotCounter, 1, pomValuesArray);
+//                        if (!drawing) {
+//                            dotDraws.pomDraw(pomDotCounter, 1, pomValuesArray);
+//                        }
                     }
 
                     @Override
@@ -1903,54 +1897,73 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (second_value_edit.isShown()) setEditValueBounds(false);
 
         if (adding) {
-            if (!breaksOnly) {
-                if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
-                    customSetTime.add(setValue * 1000);
-                    startCustomSetTime.add(setValue * 1000);
-                    canSaveOrUpdate(true);
-                } else {
-                    Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                }
-                if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
-                    customBreakTime.add(breakValue * 1000);
-                    startCustomBreakTime.add(breakValue * 1000);
-                    canSaveOrUpdate(true);
-                }
-            } else {
-                if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
-                    breaksOnlyTime.add(breaksOnlyValue * 1000);
-                    startBreaksOnlyTime.add(breaksOnlyValue * 1000);
-                    canSaveOrUpdate(true);
-                } else {
-                    Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                }
+            switch (mode) {
+                case 1:
+                    if (!breaksOnly) {
+                        if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
+                            customSetTime.add(setValue * 1000);
+                            startCustomSetTime.add(setValue * 1000);
+                            canSaveOrUpdate(true);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                        }
+                        if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
+                            customBreakTime.add(breakValue * 1000);
+                            startCustomBreakTime.add(breakValue * 1000);
+                            canSaveOrUpdate(true);
+                        }
+                    } else {
+                        if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
+                            breaksOnlyTime.add(breaksOnlyValue * 1000);
+                            startBreaksOnlyTime.add(breaksOnlyValue * 1000);
+                            canSaveOrUpdate(true);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    break;
+                case 2:
+                    if (pomValuesArray.size()!=0) pomValuesArray.clear();
+                    for (int i=0; i<3; i++)  {
+                        pomValuesArray.add(pomValue1); pomValuesArray.add(pomValue2);
+                    }
+                    pomValuesArray.add(pomValue3);
             }
+
         } else {
-            if (!breaksOnly) {
-                if (customSetTime.size() > 0 && startCustomSetTime.size() > 0) {
-                    customSetTime.remove(customSetTime.size() - 1);
-                    startCustomSetTime.remove(startCustomSetTime.size() - 1);
-                    canSaveOrUpdate(true);
-                } else {
-                    Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                }
-                if (customBreakTime.size() > 0 && startCustomBreakTime.size() > 0) {
-                    customBreakTime.remove(customBreakTime.size() - 1);
-                    startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
-                    canSaveOrUpdate(true);
-                }
-                //Used w/ arrows to switch set/break places.
-                if (customSetTime.size()-1<receivedPos) receivedPos = customSetTime.size()-1;
-            } else {
-                if (breaksOnlyTime.size() > 0 && startBreaksOnlyTime.size() > 0) {
-                    breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
-                    startBreaksOnlyTime.remove(startBreaksOnlyTime.size() - 1);
-                    //Used w/ arrows to switch  break places.
-                    if (breaksOnlyTime.size()-1<receivedPos) receivedPos = breaksOnlyTime.size()-1;
-                    canSaveOrUpdate(true);
-                } else {
-                    Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                }
+            switch (mode) {
+                case 1:
+                    if (!breaksOnly) {
+                        if (customSetTime.size() > 0 && startCustomSetTime.size() > 0) {
+                            customSetTime.remove(customSetTime.size() - 1);
+                            startCustomSetTime.remove(startCustomSetTime.size() - 1);
+                            canSaveOrUpdate(true);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
+                        if (customBreakTime.size() > 0 && startCustomBreakTime.size() > 0) {
+                            customBreakTime.remove(customBreakTime.size() - 1);
+                            startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
+                            canSaveOrUpdate(true);
+                        }
+                        //Used w/ arrows to switch set/break places.
+                        if (customSetTime.size() - 1 < receivedPos)
+                            receivedPos = customSetTime.size() - 1;
+                    } else {
+                        if (breaksOnlyTime.size() > 0 && startBreaksOnlyTime.size() > 0) {
+                            breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
+                            startBreaksOnlyTime.remove(startBreaksOnlyTime.size() - 1);
+                            //Used w/ arrows to switch  break places.
+                            if (breaksOnlyTime.size() - 1 < receivedPos)
+                                receivedPos = breaksOnlyTime.size() - 1;
+                            canSaveOrUpdate(true);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    break;
+                case 2:
+                    pomValuesArray.clear();
             }
         }
         resetTimer();
@@ -2089,12 +2102,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
             case 2:
-                drawing = false;
+//                drawing = false;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
                     fadeTextIn(timePaused2);
-                    dotDraws.pomDraw(pomDotCounter, 1);
+                    dotDraws.pomDraw(pomDotCounter, 1, pomValuesArray);
                     setNewText(lastTextView, timePaused2, (pomMillis + 999)/1000);
                 } else {
                     pomAlpha = 0;
@@ -2107,7 +2120,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //Same animation instance can't be used simultaneously for both TextViews.
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
                 dotDraws.setMode(3);
-                dotDraws.pomDraw(pomDotCounter, 1);
+                dotDraws.pomDraw(pomDotCounter, 1, pomValuesArray);
                 if (stopwatchHalted) {
                     fadeTextIn(timePaused3);
                 } else {
@@ -2554,14 +2567,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 pomProgressPause = maxProgress;
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
+                //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
+                pomMillis1 = (pomValue1*1000) * 60;
                 pomMillis = pomMillis1;
-                setNewText(timeLeft2, timeLeft2, (pomMillis + 999)/1000);
-                setNewText(timePaused2, timePaused2, (pomMillis + 999)/1000);
+                timePaused2.setText(convertSeconds((pomMillis+999)/1000));
                 timePaused2.setAlpha(1);
                 onBreak = false;
                 pomHalted = true;
                 pomProgressPause = maxProgress;
-                dotDraws.pomDraw(1, 0);
+                dotDraws.pomDraw(pomDotCounter, 0, pomValuesArray);
                 break;
             case 3:
                 stopwatchHalted = true;
@@ -2585,6 +2599,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //This works for Pom. Just *60 to have the value reflect each minute's seconds.
     private String convertSeconds(long totalSeconds) {
         DecimalFormat df = new DecimalFormat("00");
         long minutes;
@@ -2598,14 +2613,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (totalSeconds != 5) return String.valueOf(totalSeconds);
             else return "5";
         }
-    }
-
-    //Returns long of total seconds.
-    public long convertStringToLong(String time) {
-        if (time.length()>=3) {
-            String[] timeString = time.split(":");
-            return (Long.parseLong(timeString[0]) * 60) + Long.parseLong(timeString[1]);
-        } else return Long.parseLong(time);
     }
 
     public String convertStopwatch(long seconds) {
@@ -2899,6 +2906,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     queryCycles();
                     appLaunchingBO = false;
                 }
+                //Todo: Watch this.
                 //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
                 cyclesBO = cyclesBOList.get(posHolder);
                 String tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
@@ -2978,12 +2986,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
         }
-        runOnUiThread(()->{
-        });
-
-        AsyncTask.execute(() -> {
-
-        });
     }
 
     public void setDefaultCustomCycle() {
@@ -3054,14 +3056,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     second_value_textView.setText(convertSeconds(breakValue));
                 }
                 break;
-                //Todo: Pom value bounds.
             case 2:
-                if (pomValue1>120) pomValue1=120; if (pomValue1<15) pomValue1 = 15;
-                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
-                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
+//                if (pomValue1>120) pomValue1=120; if (pomValue1<15) pomValue1 = 15;
+//                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
+//                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
                 break;
         }
-        //Todo: Redundant for POM only. Don't break mode 1.
         setTimerValueBounds();
     }
 
@@ -3072,7 +3072,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
                 break;
             case 2:
-                if (pomValue1>120) pomValue1=120; if (pomValue1<15) pomValue1 = 15;
+                if (pomValue1>90) pomValue1=90; if (pomValue1<15) pomValue1 = 15;
                 if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
                 if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
                 break;
