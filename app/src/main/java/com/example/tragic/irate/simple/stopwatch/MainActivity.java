@@ -317,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
     //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
 
+    //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views.
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
     //Todo: REMINDER, Try next app w/ Kotlin.
 
@@ -2449,7 +2450,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksArray.add(cyclesList.get(i).getBreaks());
                     customTitleArray.add(cyclesList.get(i).getTitle());
                 }
-                if (setsArray.size()>0) savedCycleAdapter.notifyDataSetChanged();
+                runOnUiThread(() -> {
+                    if (setsArray.size()>0) savedCycleAdapter.notifyDataSetChanged();
+                });
             }
         } else {
             if (breaksOnlyArray!=null) breaksOnlyArray.clear();
@@ -2460,7 +2463,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
                     breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
                 }
-                if (breaksOnlyArray.size()>0) savedCycleAdapter.notifyDataSetChanged();
+                runOnUiThread(() -> {
+                    if (breaksOnlyArray.size()>0) savedCycleAdapter.notifyDataSetChanged();
+                });
             }
         }
     }
