@@ -297,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent = true;
 
-    //Todo: Edit overlaps may be due to setting values which auto sets as Visible OR more likelyApp defaulting to Mode 2 since it was last left on it, but w/ out tab switch.
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Format mode 1 <60 sec textViews as 0:XX
     //Todo: Sep breakOnly timer.
@@ -727,7 +726,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         prefEdit = sharedPreferences.edit();
 
         AsyncTask.execute(() -> {
-            mode = sharedPreferences.getInt("currentMode", 1);
+//            mode = sharedPreferences.getInt("currentMode", 1);
             sortMode = sharedPreferences.getInt("sortMode", 1);
             breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
             customID = sharedPreferences.getInt("customID", 0);
@@ -798,8 +797,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabViews();
         resetTimer();
         //This is done because we are calling the method which "switches" from one to the other, and we want the last one used.
-        breaksOnly = !breaksOnly;
-        setBreaksOnlyMode();
+//        breaksOnly = !breaksOnly;
+//        setBreaksOnlyMode();
 
         timePaused.getAlpha();
         timeLeft.getAlpha();
@@ -823,6 +822,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
         clearCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
         resetPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+
+        Log.i("modeTest", "on mode " + mode);
 
         delete_all_confirm.setOnClickListener(v-> {
             if (!breaksOnly) cyclesDatabase.cyclesDao().deleteAll(); else cyclesDatabase.cyclesDao().deleteAllBO();

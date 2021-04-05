@@ -388,7 +388,6 @@ public class DotDraws extends View {
                 }
             }
         } else if (mMode==2) {
-            mPaintText.setColor(Color.WHITE);
             switch (i) {
                 case 0: case 2: case 4: case 6:
                     mPaintText.setTextSize(70f);
