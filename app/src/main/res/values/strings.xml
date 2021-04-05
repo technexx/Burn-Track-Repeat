@@ -19,8 +19,8 @@
 
     <string name="pom_reset">Confirm Pomodoro Reset</string>
     <string name="pom_cycle_reset">Confirm Cycle Reset</string>
-    <string name="delete_all_custom">Are you sure? This will delete all SET-BREAK cycles.</string>
-    <string name="delete_all_BO">Are you sure? This will delete all BREAKS ONLY cycles.</string>
+    <string name="delete_all_custom">Are you sure? This will delete all listed cycles.</string>
+    <string name="delete_all_BO">Are you sure? This will delete all listed cycles.</string>
 
     <string name="lap">New Lap</string>
     <string name="clear_laps">Clear Laps</string>
@@ -36,4 +36,7 @@
     <string name="bullet">\u2022</string>
     <string name="cycle_name">Label (e.g. Squats, Rows)</string>
     <string name="default_title">My Uber Workout</string>
+
+    <string name="max_value_reached">Maximum value reached!</string>
+    <string name="min_value_reached">Minimum value reached!</string>
 </resources>

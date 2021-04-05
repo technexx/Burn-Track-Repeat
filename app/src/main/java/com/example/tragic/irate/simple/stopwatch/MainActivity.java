@@ -257,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     List<CyclesBO> cyclesBOList;
     List<PomCycles> pomCyclesList;
     boolean existingCycle;
-    int lastDatabasePos;
 
     ArrayList<String> setsArray;
     ArrayList<String> breaksArray;
@@ -297,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent = true;
 
+    //Todo: Delete All option only when popup is present.
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Format mode 1 <60 sec textViews as 0:XX
     //Todo: Sep breakOnly timer.
@@ -737,34 +737,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             queryCycles();
             pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
-            //appLaunching is called if either breaksOnly or breaks/set mode are launched at app startup. If saved cycle(s) exist, it returns the most recently used. If not, a default UI is called.
-            if (!breaksOnly) {
-                if (appLaunchingCustom) {
-                    if (cyclesList.size()>0 && customID>0) {
-                        cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-                        setsArray.add(cyclesList.get(0).getSets());
-                        breaksArray.add(cyclesList.get(0).getBreaks());
-                        setCycle(0);
-                    }
-                } else setDefaultCustomCycle();
-            } else {
-                if (appLaunchingBO) {
-                    if (cyclesBOList.size()>0 && breaksOnlyID>0) {
-                        cyclesBOList = cyclesDatabase.cyclesDao().loadSingleCycleBO(breaksOnlyID);
-                        breaksOnlyArray.add(cyclesBOList.get(0).getBreaksOnly());
-                        setCycle(0);
-                    }
-                } else setDefaultCustomCycle();
-            }
+            if (cyclesList.size()>0 && customID>0) {
+                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
+                setsArray.add(cyclesList.get(0).getSets());
+                breaksArray.add(cyclesList.get(0).getBreaks());
+                setCycle(0);
+            } else setDefaultCustomCycle();
+
+            //ON HOLD FOR NOW.
+        //appLaunching is called if either breaksOnly or breaks/set mode are launched at app startup. If saved cycle(s) exist, it returns the most recently used. If not, a default UI is called.
+//            if (!breaksOnly) {
+//                if (appLaunchingCustom) {
+//                    if (cyclesList.size()>0 && customID>0) {
+//                        cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
+//                        setsArray.add(cyclesList.get(0).getSets());
+//                        breaksArray.add(cyclesList.get(0).getBreaks());
+//                        setCycle(0);
+//                    }
+//                } else setDefaultCustomCycle();
+//            } else {
+//                if (appLaunchingBO) {
+//                    if (cyclesBOList.size()>0 && breaksOnlyID>0) {
+//                        cyclesBOList = cyclesDatabase.cyclesDao().loadSingleCycleBO(breaksOnlyID);
+//                        breaksOnlyArray.add(cyclesBOList.get(0).getBreaksOnly());
+//                        setCycle(0);
+//                    }
+//                } else setDefaultCustomCycle();
+//            }
         });
 
-        if (cyclesList.size()==0){
-            setDefaultCustomCycle();
-        }
-
-        if (cyclesBOList.size()==0) {
-            setDefaultBOCycle();
-        }
+//        if (cyclesList.size()==0){
+//            setDefaultCustomCycle();
+//        }
+//
+//        if (cyclesBOList.size()==0) {
+//            setDefaultBOCycle();
+//        }
 
         //Custom defaults
         savedSets = customSetTime.size();
@@ -1028,8 +1036,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         };
 
+
         plus_first_value.setOnTouchListener((v, event) -> {
             incrementValues = true;
+            //Todo: This is where values are capped, if we're going to add a Toast.
             setIncrements(event, changeFirstValue);
             switch (mode) {
                 case 1:
@@ -1983,11 +1993,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         }
         if (receivedPos >=0) dotDraws.setCycle(receivedPos);
-
-        //Doesn't sync w/ aSync check method yet. Leaving for now.
-//        retrieveAndCheckCycles();
-//        if (duplicateCycle) canSaveOrUpdate(false);
-//        else canSaveOrUpdate(true);
     }
 
     private void endAnimation() {
@@ -2640,24 +2645,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!breaksOnly) {
             editBreakSeconds = breakValue%60;
             editBreakMinutes = breakValue/60;
-//            first_value_textView.setText(convertSeconds(setValue));
         } else {
             editBreakSeconds = breaksOnlyValue%60;
             editBreakMinutes = breaksOnlyValue/60;
         }
-//        second_value_textView.setText(convertSeconds(breakValue));
-
         first_value_edit.setText(String.valueOf(editSetMinutes));
         first_value_edit_two.setText(String.valueOf(editSetSeconds));
         second_value_edit.setText(String.valueOf(editBreakMinutes));
         second_value_edit_two.setText(String.valueOf(editBreakSeconds));
-    }
-
-    //Todo: Millis actual ms, Value is long equivalent of textView.
-    public void convertPomTime() {
-        first_value_single_edit.setText(convertSeconds(pomValue1));
-        second_value_single_edit.setText(convertSeconds(pomValue2));
-        third_value_single_edit.setText(convertSeconds(pomValue3));
     }
 
     //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
@@ -2674,6 +2669,62 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 incrementTimer = 10;
         }
         setTimerValueBounds();
+    }
+
+    public void setEditValueBounds(boolean onSets){
+        switch (mode) {
+            case 1:
+                if (onSets) {
+                    editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
+                    editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
+
+                    if (editSetSeconds>59) {
+                        editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
+                    }
+                    if (editSetMinutes>5) editSetMinutes = 5;
+                    if (editSetMinutes<0) editSetMinutes = 0;
+                    if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
+                    if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
+
+                    setValue = (editSetMinutes * 60) + editSetSeconds;
+                    first_value_textView.setText(convertSeconds(setValue));
+                } else {
+                    editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
+                    editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
+
+                    if (editBreakSeconds>59) {
+                        editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
+                    }
+                    if (editBreakMinutes>5) editBreakMinutes = 5;
+                    if (editBreakMinutes<0) editBreakMinutes = 0;
+                    if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
+                    if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
+
+                    if (!breaksOnly) {
+                        breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+                    } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+                    second_value_textView.setText(convertSeconds(breakValue));
+                }
+                break;
+            case 2:
+                break;
+        }
+        setTimerValueBounds();
+    }
+
+    //This is called via setIncrements() is is called within plus/minus touch listeners.
+    public void setTimerValueBounds() {
+        switch (mode) {
+            case 1:
+                if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
+                if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
+                break;
+            case 2:
+                if (pomValue1>90) pomValue1=90; if (pomValue1<15) pomValue1 = 15;
+                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
+                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
+                break;
+        }
     }
 
     public void canSaveOrUpdate(boolean yesWeCan) {
@@ -3023,63 +3074,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.newDraw(savedSets, savedBreaks, numberOfSets, numberOfBreaks, fadeVar);
     }
 
-    public void setEditValueBounds(boolean onSets){
-        switch (mode) {
-            case 1:
-                if (onSets) {
-                    editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
-                    editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
 
-                    if (editSetSeconds>59) {
-                        editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
-                    }
-                    if (editSetMinutes>5) editSetMinutes = 5;
-                    if (editSetMinutes<0) editSetMinutes = 0;
-                    if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
-                    if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
-
-                    setValue = (editSetMinutes * 60) + editSetSeconds;
-                    first_value_textView.setText(convertSeconds(setValue));
-                } else {
-                    editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
-                    editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
-
-                    if (editBreakSeconds>59) {
-                        editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
-                    }
-                    if (editBreakMinutes>5) editBreakMinutes = 5;
-                    if (editBreakMinutes<0) editBreakMinutes = 0;
-                    if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
-                    if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
-
-                    if (!breaksOnly) {
-                        breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-                    } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-                    second_value_textView.setText(convertSeconds(breakValue));
-                }
-                break;
-            case 2:
-//                if (pomValue1>120) pomValue1=120; if (pomValue1<15) pomValue1 = 15;
-//                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
-//                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
-                break;
-        }
-        setTimerValueBounds();
-    }
-
-    public void setTimerValueBounds() {
-        switch (mode) {
-            case 1:
-                if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
-                if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
-                break;
-            case 2:
-                if (pomValue1>90) pomValue1=90; if (pomValue1<15) pomValue1 = 15;
-                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
-                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
-                break;
-        }
-    }
 
     public void removeSetOrBreak(boolean onBreak) {
         if (!onBreak) {
