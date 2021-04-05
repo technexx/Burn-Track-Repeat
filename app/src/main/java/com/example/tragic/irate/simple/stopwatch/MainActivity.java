@@ -297,9 +297,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent = true;
 
-    //Todo: Convert pomMillis to minutes, not seconds. Add HH:MM format for Pom strings.
-    //Todo Fading issues in Custom.
-    //Todo: Edit overlaps likely due to setting values which auto sets as Visible.
+    //Todo: Edit overlaps may be due to setting values which auto sets as Visible OR more likelyApp defaulting to Mode 2 since it was last left on it, but w/ out tab switch.
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Format mode 1 <60 sec textViews as 0:XX
     //Todo: Sep breakOnly timer.
@@ -2907,7 +2905,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     queryCycles();
                     appLaunchingBO = false;
                 }
-                //Todo: Watch this.
+                //Todo: This crashes.
                 //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
                 cyclesBO = cyclesBOList.get(posHolder);
                 String tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();

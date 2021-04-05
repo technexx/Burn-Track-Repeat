@@ -218,7 +218,6 @@ public class DotDraws extends View {
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
                 drawText(mSetTime, mX, mY, i);
                 mX += 108;
-                Log.i("drawValues", "set Count is " + mSetCount + " and set Reduce is "  + mSetReduce + " and current pos is " + i);
             }
 
         }
@@ -315,7 +314,6 @@ public class DotDraws extends View {
         savedPomCycle = cycle2;
     }
 
-    //Todo: drawText needs to go here, since this is where we are iterating up x/y coords, which is passed in to our mode 2 canvas draws.
     public void pomDraw(int i, boolean fade) {
         switch (i+1) {
             case 1: case 3: case 5: case 7:
@@ -382,8 +380,16 @@ public class DotDraws extends View {
                 }
             }
         } else if (mMode==2) {
-            mPaintText.setTextSize(45f);
-
+            switch (i) {
+                case 1: case 3: case 5: case 7: case 8:
+                    mPaintText.setTextSize(70f);
+                    mCanvas.drawText(list.get(i), x-145, y+147, mPaintText);
+                    break;
+                case 2: case 4: case 6:
+                    mPaintText.setTextSize(45f);
+                    mCanvas.drawText(list.get(i), x-140, y+135, mPaintText);
+                    break;
+            }
         }
     }
 
