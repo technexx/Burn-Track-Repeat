@@ -24,6 +24,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,9 +55,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onEditTitleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
 
+    Menu mMenu;
+    boolean defaultMenu = true;
     View mainView;
     Button breaks_only;
     TextView save_cycles;
@@ -305,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Any popup should disable main view buttons (true focusable?)
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
 
+    //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
@@ -319,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views.
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
+    //Todo: REMEMBER, any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     //Todo: REMINDER, Try next app w/ Kotlin.
 
     @Override
@@ -356,6 +362,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //This dismisses windows/views when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
             savedCyclePopupWindow.dismiss();
+            invalidateOptionsMenu();
+            defaultMenu = true;
         }
         switch (mode) {
             case 1:
@@ -401,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     }
 
-    //Todo: Remember that any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     @Override
     public void onCycleClick(int position) {
         setCycle(position);
@@ -475,14 +482,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
+        if (defaultMenu) {
+            mMenu = menu;
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.options_menu, menu);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(final Menu menu) {
+//        mMenu = menu;
+        menu.clear();
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        if (!defaultMenu) inflater.inflate(R.menu.revised_options_menu, menu);
+        else inflater.inflate(R.menu.options_menu, menu);
         return true;
     }
 
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
-        if (savedCyclePopupWindow != null && savedCyclePopupWindow.isShowing()) savedCyclePopupWindow.dismiss();
+        if (savedCyclePopupWindow != null && savedCyclePopupWindow.isShowing()) {
+            //This is for when the onCreateOptionsMenu is opened.
+//            savedCyclePopupWindow.dismiss();
+//            invalidateOptionsMenu();
+//            defaultMenu = true;
+        }
         return true;
     }
 
@@ -490,13 +515,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
-
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
                 AsyncTask.execute(() -> {
                     queryCycles();
                     clearArrays(false);
-
                     if (!breaksOnly) {
                             savedCycleAdapter.setBreaksOnly(false);
                             if (cyclesList.size()>0) {
@@ -531,7 +554,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
                             }
                         }
-                    });
+                    Runnable r = () -> {
+                        defaultMenu = false;
+                        invalidateOptionsMenu();
+                    };
+                    mHandler.postDelayed(r, 50);
+                });
                 break;
 
             case R.id.delete_all_cycles:
@@ -1209,6 +1237,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         add_cycle.setOnClickListener(v-> {
             adjustCustom(true);
+//            invalidateOptionsMenu();
         });
 
         sub_cycle.setOnClickListener(v-> {
@@ -1769,6 +1798,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void setBreaksOnlyMode() {
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
             savedCyclePopupWindow.dismiss();
+            invalidateOptionsMenu();
+            defaultMenu = true;
             return;
         }
         receivedPos = -1;
@@ -2984,6 +3015,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!breaksOnly) cycle_header_text.setText(cycles.getTitle()); else cycle_header_text.setText(cyclesBO.getTitle());
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
+                invalidateOptionsMenu();
+                defaultMenu = true;
             });
             prefEdit.apply();
         });
