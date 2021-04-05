@@ -782,7 +782,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomValuesArray.add(pomValue1);
             pomValuesArray.add(pomValue2);
         }
+        pomValuesArray.add(pomValue1);
         pomValuesArray.add(pomValue3);
+        Log.i("pomtest", String.valueOf(pomValuesArray));
 
         lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);

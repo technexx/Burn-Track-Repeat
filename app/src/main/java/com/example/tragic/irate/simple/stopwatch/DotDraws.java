@@ -128,10 +128,13 @@ public class DotDraws extends View {
 
     public void pomDraw(int pomDot, int fadeDone, ArrayList<Long> pomTime) {
         mPomTime = new ArrayList<>();
-        for (int i=0; i<pomTime.size(); i++) mPomTime.add(String.valueOf(i));
+        for (int i=0; i<pomTime.size(); i++) {
+            mPomTime.add(String.valueOf(pomTime.get(i)));
+        }
         this.mPomDot = pomDot; this.mFadeDone = fadeDone;
         setupPaint();
         invalidate();
+
     }
 
     public void breaksOnly(boolean breaksOnly) {
@@ -314,9 +317,11 @@ public class DotDraws extends View {
         savedPomCycle = cycle2;
     }
 
+    //Todo: Switching i+1 isn't compatible w/ our drawText. It uses 0-7 and any cases outside that range will not draw.
+    //Todo: Switching i+1, even w/ all cases included in drawText below, WILL skip first (i).
     public void pomDraw(int i, boolean fade) {
-        switch (i+1) {
-            case 1: case 3: case 5: case 7:
+        switch (i) {
+            case 0: case 2: case 4: case 6:
                 mPaint.setColor(Color.GREEN);
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
@@ -324,7 +329,7 @@ public class DotDraws extends View {
                 mCanvas.drawCircle(mX, 610, 60, mPaint);
                 drawText(mPomTime, mX, mY, i);
                 break;
-            case 2: case 4: case 6:
+            case 1: case 3: case 5:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
@@ -334,13 +339,16 @@ public class DotDraws extends View {
                 mX+=250;
                 mX2=mX+125;
                 break;
-            case 8:
+            case 7:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) {
                     fadeDot2();
                 }
                 mCanvas.drawRect(mX+90, 555, mX+200, 665, mPaint);
+                drawText(mPomTime, mX2, mY, i);
         }
+        Log.i("pomtest", "size in pomDraw is " + i);
+
     }
 
     private void drawText(ArrayList<String> list, float x, float y, int i) {
@@ -380,16 +388,21 @@ public class DotDraws extends View {
                 }
             }
         } else if (mMode==2) {
+            mPaintText.setColor(Color.WHITE);
             switch (i) {
-                case 1: case 3: case 5: case 7: case 8:
+                case 0: case 2: case 4: case 6:
                     mPaintText.setTextSize(70f);
-                    mCanvas.drawText(list.get(i), x-145, y+147, mPaintText);
+                    mCanvas.drawText(list.get(i), x-40, y+147, mPaintText);
                     break;
-                case 2: case 4: case 6:
+                case 1: case 3: case 5:
                     mPaintText.setTextSize(45f);
-                    mCanvas.drawText(list.get(i), x-140, y+135, mPaintText);
+                    mCanvas.drawText(list.get(i), x-12, y+135, mPaintText);
                     break;
+                case 7:
+//                    mPaintText.setTextSize(70f);
+                    mCanvas.drawText(list.get(i), x-23, y+147, mPaintText);
             }
+            Log.i("pomtest", "size in drawText is " + i);
         }
     }
 
