@@ -59,6 +59,7 @@ import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onEditTitleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
 
+    MenuInflater inflater;
     Menu mMenu;
     boolean defaultMenu = true;
     View mainView;
@@ -300,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int receivedAlpha;
     boolean stopAscent = true;
 
-    //Todo: Delete All option only when popup is present.
+
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Format mode 1 <60 sec textViews as 0:XX
     //Todo: Sep breakOnly timer.
@@ -365,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             invalidateOptionsMenu();
             defaultMenu = true;
         }
+        if (deleteAllPopupWindow!=null & deleteAllPopupWindow.isShowing()) deleteAllPopupWindow.dismiss();
         switch (mode) {
             case 1:
                 if (first_value_edit.isShown()) {
@@ -484,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onCreateOptionsMenu(final Menu menu) {
         if (defaultMenu) {
             mMenu = menu;
-            MenuInflater inflater = getMenuInflater();
+            inflater = getMenuInflater();
             inflater.inflate(R.menu.options_menu, menu);
         }
         return true;
@@ -494,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onPrepareOptionsMenu(final Menu menu) {
 //        mMenu = menu;
         menu.clear();
-        MenuInflater inflater = getMenuInflater();
+        inflater = getMenuInflater();
         if (!defaultMenu) inflater.inflate(R.menu.revised_options_menu, menu);
         else inflater.inflate(R.menu.options_menu, menu);
         return true;
@@ -514,7 +516,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
+        //Todo: This was invalidating our menus.
+//        if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
                 AsyncTask.execute(() -> {
