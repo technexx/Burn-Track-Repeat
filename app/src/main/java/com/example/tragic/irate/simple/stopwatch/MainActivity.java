@@ -1294,6 +1294,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         prefEdit.putInt("currentMode", 3);
                 }
                 prefEdit.apply();
+                Log.i("testFade", "set + break count and setReduce + breakReduce are " + savedSets + " " + savedBreaks  + " " + numberOfSets  + " " + numberOfBreaks);
             }
 
             @Override
@@ -1540,6 +1541,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(setMillis);
                         objectAnimator.start();
+                        setBegun = true;
                     } else {
                         setMillis = setMillisUntilFinished;
                         if (objectAnimator!=null) objectAnimator.resume();
@@ -1582,7 +1584,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void startTimer() {
         switch (mode) {
             case 1:
-                setBegun = true;
                 setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
                 timer = new CountDownTimer(setMillis, 50) {
                     @Override
@@ -1644,7 +1645,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                 }.start();
                 break;
-
             case 2:
                 pomBegun = true;
                 timer2 = new CountDownTimer(pomMillis, 50) {
@@ -1671,7 +1671,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     @Override
                     public void onFinish() {
                         pomBegun = false;
-                        numberOfSets--;
                         timeLeft2.setText("0");
                         pomProgressPause = maxProgress;
 
@@ -2123,7 +2122,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     onBreak = true;
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 }
-
                 if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
                 if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
                 if (halted) {

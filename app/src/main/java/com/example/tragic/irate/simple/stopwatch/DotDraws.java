@@ -238,11 +238,7 @@ public class DotDraws extends View {
         if (mMode == 1) {
             mPaint.setStyle(Paint.Style.FILL);
             for (int i=0; i<mBreakCount; i++) {
-                if (mMode == 2) {
-                    mPaint.setColor(Color.GREEN);
-                } else {
-                    mPaint.setColor(Color.RED);
-                }
+                mPaint.setColor(Color.RED);
                 if (mBreakCount - mBreakReduce == i) {
                     if (mFadeDone == 2) {
                         fadeDot();
@@ -321,17 +317,11 @@ public class DotDraws extends View {
         switch (i) {
             case 0: case 2: case 4: case 6:
                 mPaint.setColor(Color.GREEN);
-                if (fade && mFadeDone == 1) {
-                    fadeDot2();
-                }
                 mCanvas.drawCircle(mX, 610, 60, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
                 break;
             case 1: case 3: case 5:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 1) {
-                    fadeDot2();
-                }
                 mCanvas.drawCircle(mX2, 610, 45 , mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 mX+=250;
@@ -339,11 +329,11 @@ public class DotDraws extends View {
                 break;
             case 7:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 1) {
-                    fadeDot2();
-                }
                 mCanvas.drawRect(mX+90, 555, mX+200, 665, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
+        }
+        if (fade && mFadeDone == 1) {
+            fadeDot2();
         }
         Log.i("pomtest", "size in pomDraw is " + mPomTime.size());
 
