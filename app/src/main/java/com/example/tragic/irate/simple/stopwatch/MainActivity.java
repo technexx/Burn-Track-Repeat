@@ -770,13 +770,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 setCycle(0);
             } else runOnUiThread(() -> {
                 setDefaultCustomCycle();
-//                resetTimer();
+
                 //Custom defaults
                 savedSets = startCustomSetTime.size();
                 savedBreaks = startCustomBreakTime.size();
                 numberOfSets = savedSets;
                 numberOfBreaks = savedBreaks;
 
+                //Todo: Set pomMillis at beginning of app, since its mode won't be called in reset. Once DB is active for it, use a similar conditional as above.
                 pomValue1 = 25;
                 pomValue2 = 5;
                 pomValue3 = 15;
@@ -788,6 +789,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 pomValuesArray.add(pomValue1);
                 pomValuesArray.add(pomValue3);
+                pomMillis = pomValue1*1000*60;
+                pomMillis1 = pomValue1*1000*60;
+
+                Log.i("testPom", pomMillis + " " + pomMillis1);
 
                 lapLayout= new LinearLayoutManager(getApplicationContext());
                 lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
@@ -800,10 +805,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 incrementTimer = 10;
                 tabViews();
                 resetTimer();
-
-                //This is done because we are calling the method which "switches" from one to the other, and we want the last one used.
-//        breaksOnly = !breaksOnly;
-//        setBreaksOnlyMode();
 
                 timePaused.getAlpha();
                 timeLeft.getAlpha();
@@ -828,36 +829,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 clearCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
                 resetPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
             });
-
-            //ON HOLD FOR NOW.
-        //appLaunching is called if either breaksOnly or breaks/set mode are launched at app startup. If saved cycle(s) exist, it returns the most recently used. If not, a default UI is called.
-//            if (!breaksOnly) {
-//                if (appLaunchingCustom) {
-//                    if (cyclesList.size()>0 && customID>0) {
-//                        cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-//                        setsArray.add(cyclesList.get(0).getSets());
-//                        breaksArray.add(cyclesList.get(0).getBreaks());
-//                        setCycle(0);
-//                    }
-//                } else setDefaultCustomCycle();
-//            } else {
-//                if (appLaunchingBO) {
-//                    if (cyclesBOList.size()>0 && breaksOnlyID>0) {
-//                        cyclesBOList = cyclesDatabase.cyclesDao().loadSingleCycleBO(breaksOnlyID);
-//                        breaksOnlyArray.add(cyclesBOList.get(0).getBreaksOnly());
-//                        setCycle(0);
-//                    }
-//                } else setDefaultCustomCycle();
-//            }
         });
-
-//        if (cyclesList.size()==0){
-//            setDefaultCustomCycle();
-//        }
-//
-//        if (cyclesBOList.size()==0) {
-//            setDefaultBOCycle();
-//        }
 
         delete_all_confirm.setOnClickListener(v-> {
             if (!breaksOnly) {
@@ -2146,6 +2118,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
                 drawing = false;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
+                //Todo: This might be resetting pomMillis to 0.
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
                     fadeTextIn(timePaused2);
