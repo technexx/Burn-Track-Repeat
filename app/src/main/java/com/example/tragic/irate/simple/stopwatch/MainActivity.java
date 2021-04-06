@@ -59,8 +59,6 @@ import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onEditTitleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
 
-    MenuInflater inflater;
-    Menu mMenu;
     boolean defaultMenu = true;
     View mainView;
     Button breaks_only;
@@ -302,12 +300,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean stopAscent = true;
 
 
+    //Todo: Fade overlap issues between modes.
     //Todo: Toast for trying in increment time past min/max values
-    //Todo: Format mode 1 <60 sec textViews as 0:XX
     //Todo: Sep breakOnly timer.
-    //Todo: Pom re-do and order change. Add once, substract removes. Toast if already added. Same save options.
     //Todo: Need to figure out how changing pom values affects timer status (i.e. when it's running)
-    //Todo: Any popup should disable main view buttons (true focusable?)
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
 
     //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
@@ -439,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 });
 
                 //Comparing this ID w/ one tied to cycle currently displayed.
-                if (deletedID == customID) {
+                if (deletedID == customID || cyclesList.size()==0) {
                     customID = 0;
                     prefEdit.putInt("customID", 0);
                     prefEdit.apply();
@@ -485,8 +481,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         if (defaultMenu) {
-            mMenu = menu;
-            inflater = getMenuInflater();
+           MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.options_menu, menu);
         }
         return true;
@@ -494,9 +489,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-//        mMenu = menu;
         menu.clear();
-        inflater = getMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         if (!defaultMenu) inflater.inflate(R.menu.revised_options_menu, menu);
         else inflater.inflate(R.menu.options_menu, menu);
         return true;
@@ -516,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //Todo: This was invalidating our menus.
+        //Todo: This was invalidating our menu because it returned false when saved cycle menu was open.
 //        if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
         switch (item.getItemId()) {
             case R.id.saved_cycle_list:
@@ -754,10 +748,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesBO = new CyclesBO();
         pomCycles = new PomCycles();
 
-        sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
-        prefEdit = sharedPreferences.edit();
 
         AsyncTask.execute(() -> {
+            sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
+            prefEdit = sharedPreferences.edit();
 //            mode = sharedPreferences.getInt("currentMode", 1);
             sortMode = sharedPreferences.getInt("sortMode", 1);
             breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
@@ -774,7 +768,66 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 setsArray.add(cyclesList.get(0).getSets());
                 breaksArray.add(cyclesList.get(0).getBreaks());
                 setCycle(0);
-            } else setDefaultCustomCycle();
+            } else runOnUiThread(() -> {
+                setDefaultCustomCycle();
+//                resetTimer();
+                //Custom defaults
+                savedSets = startCustomSetTime.size();
+                savedBreaks = startCustomBreakTime.size();
+                numberOfSets = savedSets;
+                numberOfBreaks = savedBreaks;
+
+                pomValue1 = 25;
+                pomValue2 = 5;
+                pomValue3 = 15;
+                setMillis = setValue;
+                breakMillis = breakValue;
+                for (int i=0; i<3; i++) {
+                    pomValuesArray.add(pomValue1);
+                    pomValuesArray.add(pomValue2);
+                }
+                pomValuesArray.add(pomValue1);
+                pomValuesArray.add(pomValue3);
+
+                lapLayout= new LinearLayoutManager(getApplicationContext());
+                lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
+                lapRecycler.setAdapter(lapAdapter);
+                lapRecycler.setLayoutManager(lapLayout);
+
+                progressBar.setProgress(maxProgress);
+                progressBar2.setProgress(maxProgress);
+
+                incrementTimer = 10;
+                tabViews();
+                resetTimer();
+
+                //This is done because we are calling the method which "switches" from one to the other, and we want the last one used.
+//        breaksOnly = !breaksOnly;
+//        setBreaksOnlyMode();
+
+                timePaused.getAlpha();
+                timeLeft.getAlpha();
+
+                //Retrieves the most recently viewed cycle.
+                if (!breaksOnly && cyclesList.size()>0) setCycle(0);
+                if (breaksOnly && cyclesBOList.size()>0) setCycle(0);
+                if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
+                    canSaveOrUpdate(false);
+                } else canSaveOrUpdate(true);
+
+                savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+                deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, false);
+                labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
+                sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
+                clearCyclePopupWindow  = new PopupWindow(clearCyclePopupView, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
+                resetPopUpWindow  = new PopupWindow(clearCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
+                savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+                deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+                labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+                sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+                clearCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+                resetPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+            });
 
             //ON HOLD FOR NOW.
         //appLaunching is called if either breaksOnly or breaks/set mode are launched at app startup. If saved cycle(s) exist, it returns the most recently used. If not, a default UI is called.
@@ -806,67 +859,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //            setDefaultBOCycle();
 //        }
 
-        //Custom defaults
-        savedSets = customSetTime.size();
-        savedBreaks = customBreakTime.size();
-        numberOfSets = savedSets;
-        numberOfBreaks = savedBreaks;
-
-        pomValue1 = 25;
-        pomValue2 = 5;
-        pomValue3 = 15;
-        setMillis = setValue;
-        breakMillis = breakValue;
-        for (int i=0; i<3; i++) {
-            pomValuesArray.add(pomValue1);
-            pomValuesArray.add(pomValue2);
-        }
-        pomValuesArray.add(pomValue1);
-        pomValuesArray.add(pomValue3);
-        Log.i("pomtest", String.valueOf(pomValuesArray));
-
-        lapLayout= new LinearLayoutManager(getApplicationContext());
-        lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
-        lapRecycler.setAdapter(lapAdapter);
-        lapRecycler.setLayoutManager(lapLayout);
-
-        progressBar.setProgress(maxProgress);
-        progressBar2.setProgress(maxProgress);
-
-        incrementTimer = 10;
-        tabViews();
-        resetTimer();
-        //This is done because we are calling the method which "switches" from one to the other, and we want the last one used.
-//        breaksOnly = !breaksOnly;
-//        setBreaksOnlyMode();
-
-        timePaused.getAlpha();
-        timeLeft.getAlpha();
-
-        //Retrieves the most recently viewed cycle.
-        if (!breaksOnly && cyclesList.size()>0) setCycle(0);
-        if (breaksOnly && cyclesBOList.size()>0) setCycle(0);
-        if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
-            canSaveOrUpdate(false);
-        } else canSaveOrUpdate(true);
-
-        savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
-        deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, false);
-        labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
-        sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
-        clearCyclePopupWindow  = new PopupWindow(clearCyclePopupView, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
-        resetPopUpWindow  = new PopupWindow(clearCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, 75, false);
-        savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        clearCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        resetPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-
-        Log.i("modeTest", "on mode " + mode);
-
         delete_all_confirm.setOnClickListener(v-> {
-            if (!breaksOnly) cyclesDatabase.cyclesDao().deleteAll(); else cyclesDatabase.cyclesDao().deleteAllBO();
+            if (!breaksOnly) {
+                cyclesDatabase.cyclesDao().deleteAll();
+                prefEdit.putInt("customID", 0);
+            } else {
+                cyclesDatabase.cyclesDao().deleteAllBO();
+                prefEdit.putInt("breaksOnlyID", 0);
+            }
+            prefEdit.apply();
             runOnUiThread(() -> {
                 Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
                 deleteAllPopupWindow.dismiss();
@@ -1936,7 +1937,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    //Todo: Ensures we don't add anything outside of bounds. Remember for Pom, too.
     public void adjustCustom(boolean adding) {
         //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
         if (first_value_edit.isShown()) setEditValueBounds(true);
@@ -1969,13 +1969,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     break;
                 case 2:
-                    if (pomValuesArray.size()!=0) pomValuesArray.clear();
-                    for (int i=0; i<3; i++)  {
-                        pomValuesArray.add(pomValue1); pomValuesArray.add(pomValue2);
-                    }
-                    pomValuesArray.add(pomValue3);
-            }
+                    if (pomValuesArray.size()==0) {
+                        for (int i=0; i<3; i++)  {
+                            pomValuesArray.add(pomValue1); pomValuesArray.add(pomValue2);
+                        }
+                        pomValuesArray.add(pomValue1);
+                        pomValuesArray.add(pomValue3);
+                    } else Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
 
+            }
         } else {
             switch (mode) {
                 case 1:
@@ -2007,27 +2009,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                         }
                     }
+                    drawDots(0);
+                    if (!breaksOnly) {
+                        if (customSetTime.size()>0) {
+                            setNewText(timePaused, timePaused, (customSetTime.get(0) +999) / 1000);
+                        } else {
+                            timePaused.setText("?");
+                        }
+                    } else {
+                        if (breaksOnlyTime.size()>0) {
+                            setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
+                        } else {
+                            timePaused.setText("?");
+                        }
+                    }
+                    if (receivedPos >=0) dotDraws.setCycle(receivedPos);
                     break;
                 case 2:
-                    pomValuesArray.clear();
+                    if (pomValuesArray.size()!=0) pomValuesArray.clear();
+                    else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
             }
         }
         resetTimer();
-        drawDots(0);
-        if (!breaksOnly) {
-            if (customSetTime.size()>0) {
-                setNewText(timePaused, timePaused, (customSetTime.get(0) +999) / 1000);
-            } else {
-                timePaused.setText("?");
-            }
-        } else {
-            if (breaksOnlyTime.size()>0) {
-                setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
-            } else {
-                timePaused.setText("?");
-            }
-        }
-        if (receivedPos >=0) dotDraws.setCycle(receivedPos);
     }
 
     private void endAnimation() {

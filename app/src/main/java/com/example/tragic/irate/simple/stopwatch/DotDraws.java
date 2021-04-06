@@ -317,8 +317,6 @@ public class DotDraws extends View {
         savedPomCycle = cycle2;
     }
 
-    //Todo: Switching i+1 isn't compatible w/ our drawText. It uses 0-7 and any cases outside that range will not draw.
-    //Todo: Switching i+1, even w/ all cases included in drawText below, WILL skip first (i).
     public void pomDraw(int i, boolean fade) {
         switch (i) {
             case 0: case 2: case 4: case 6:
@@ -327,7 +325,7 @@ public class DotDraws extends View {
                     fadeDot2();
                 }
                 mCanvas.drawCircle(mX, 610, 60, mPaint);
-                drawText(mPomTime, mX, mY, i);
+                if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
                 break;
             case 1: case 3: case 5:
                 mPaint.setColor(Color.RED);
@@ -335,7 +333,7 @@ public class DotDraws extends View {
                     fadeDot2();
                 }
                 mCanvas.drawCircle(mX2, 610, 45 , mPaint);
-                drawText(mPomTime, mX2, mY, i);
+                if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 mX+=250;
                 mX2=mX+125;
                 break;
@@ -345,9 +343,9 @@ public class DotDraws extends View {
                     fadeDot2();
                 }
                 mCanvas.drawRect(mX+90, 555, mX+200, 665, mPaint);
-                drawText(mPomTime, mX2, mY, i);
+                if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
         }
-        Log.i("pomtest", "size in pomDraw is " + i);
+        Log.i("pomtest", "size in pomDraw is " + mPomTime.size());
 
     }
 
@@ -401,7 +399,6 @@ public class DotDraws extends View {
 //                    mPaintText.setTextSize(70f);
                     mCanvas.drawText(list.get(i), x-23, y+147, mPaintText);
             }
-            Log.i("pomtest", "size in drawText is " + i);
         }
     }
 
