@@ -8,9 +8,8 @@ public class PomCycles {
     @PrimaryKey (autoGenerate = true)
 
     public int id;
-    public long workTime;
-    public long miniBreak;
-    public long fullBreak;
+    public String title;
+    public String fullCycle;
     public long timeAdded;
 
     public PomCycles() {
@@ -24,28 +23,20 @@ public class PomCycles {
         this.id = id;
     }
 
-    public long getWorkTime() {
-        return workTime;
+    public String getTitle() {
+        return title;
     }
 
-    public void setWorkTime(long workTime) {
-        this.workTime = workTime;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public long getMiniBreak() {
-        return miniBreak;
+    public String getFullCycle() {
+        return fullCycle;
     }
 
-    public void setMiniBreak(long miniBreak) {
-        this.miniBreak = miniBreak;
-    }
-
-    public long getFullBreak() {
-        return fullBreak;
-    }
-
-    public void setFullBreak(long fullBreak) {
-        this.fullBreak = fullBreak;
+    public void setFullCycle(String fullCycle) {
+        this.fullCycle = fullCycle;
     }
 
     public long getTimeAdded() {

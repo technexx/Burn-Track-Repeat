@@ -56,10 +56,10 @@ public interface CyclesDao {
     List<CyclesBO> loadCyclesLeastItemsBO();
 
     @Query("SELECT * from POMCYCLES ORDER by timeAdded DESC")
-    List<PomCycles> loadPomCyclesMostItems();
+    List<PomCycles> loadPomCyclesMostRecent();
 
     @Query("SELECT * from POMCYCLES ORDER by timeAdded ASC")
-    List<PomCycles> loadPomCyclesLeastItems();
+    List<PomCycles> loadPomCyclesLeastRecent();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCycle(Cycles cycles);
@@ -81,6 +81,9 @@ public interface CyclesDao {
 
     @Update
     void updateBOCycles(CyclesBO cyclesBO);
+
+    @Update
+    void updatePomCycles(PomCycles pomCycles);
 
     @Delete
     void deleteCycle(Cycles cycles);

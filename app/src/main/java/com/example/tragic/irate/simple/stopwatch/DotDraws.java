@@ -222,7 +222,6 @@ public class DotDraws extends View {
                 drawText(mSetTime, mX, mY, i);
                 mX += 108;
             }
-
         }
 
         if (mDrawBox) {
@@ -335,8 +334,6 @@ public class DotDraws extends View {
         if (fade && mFadeDone == 1) {
             fadeDot2();
         }
-        Log.i("pomtest", "size in pomDraw is " + mPomTime.size());
-
     }
 
     private void drawText(ArrayList<String> list, float x, float y, int i) {
