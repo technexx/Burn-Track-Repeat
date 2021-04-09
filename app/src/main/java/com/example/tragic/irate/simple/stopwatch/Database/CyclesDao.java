@@ -25,6 +25,9 @@ public interface CyclesDao {
     @Query("SELECT * from CyclesBO where id=:listID")
     List<CyclesBO> loadSingleCycleBO(int listID);
 
+    @Query("SELECT * from PomCycles where id=:listID")
+    List<PomCycles> loadSinglePomCycle(int listID);
+
     @Query("SELECT * from CyclesBO")
     List<CyclesBO> loadAllBOCycles();
 

@@ -2,14 +2,10 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,8 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mContext;
@@ -27,12 +21,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     ArrayList<String> mBreaksOnlyList;
     ArrayList<String> mTitle;
     ArrayList<String> mBreaksOnlyTitle;
+    ArrayList<String> mPomList;
+    ArrayList<String> mPomTitle;
     boolean mBreaksOnly;
     onCycleClickListener mOnCycleClickListener;
     onDeleteCycleListener mOnDeleteCycleListener;
-    onEditTitleListener mOnEditTitleListener;
     public static final int SETS_AND_BREAKS = 0;
     public static final int BREAKS_ONLY = 1;
+    public static final int POMODORO = 2;
+    int mChosenView;
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
@@ -40,10 +37,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public interface onDeleteCycleListener {
         void onCycleDelete (int position);
-    }
-
-    public interface onEditTitleListener {
-        void onTitleEdit (String text, int position);
     }
 
     public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -54,16 +47,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.mOnDeleteCycleListener = xOnDeleteCycleListener;
     }
 
-    public void setTitleEdit(onEditTitleListener xOnEditTitleListener) {
-        this.mOnEditTitleListener = xOnEditTitleListener;
-    }
-
-    public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> title, ArrayList<String> breaksOnlyTitleArray) {
-        this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitleArray;
+    public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> title, ArrayList<String> breaksOnlyTitleArray, ArrayList<String> pomList, ArrayList<String> pomTitle) {
+        this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitleArray; this.mPomList = pomList; this.mPomTitle = pomTitle;
     }
 
     public void setBreaksOnly(boolean breaksOnly){
         mBreaksOnly = breaksOnly;
+    }
+
+    public void setView(int chosenView) {
+        this.mChosenView = chosenView;
     }
 
     @NonNull
@@ -73,10 +66,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (viewType == SETS_AND_BREAKS) {
             View view = LayoutInflater.from(context).inflate(R.layout.saved_cycles_views, parent, false);
             return new CustomHolder(view);
-        } else {
+        } else if (viewType == BREAKS_ONLY){
             View view = LayoutInflater.from(context).inflate(R.layout.saved_cycles_breaks_only_views, parent, false);
             return new BreaksOnlyHolder(view);
-        }
+        } else if (viewType == POMODORO) {
+            View view = LayoutInflater.from(context).inflate(R.layout.saved_pom_views, parent, false);
+            return new PomHolder(view);
+        } else return null;
     }
 
     @Override
@@ -87,10 +83,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             customHolder.customSet.setText(convertTime(mSetsList).get(position));
             customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
-//            customHolder.customName.setOnClickListener(v-> {
-//                mOnEditTitleListener.onTitleEdit(customHolder.customName.getText().toString(), position);
-//            });
-
             customHolder.fullView.setOnClickListener(v -> {
                 mOnCycleClickListener.onCycleClick(position);
             });
@@ -100,7 +92,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         } else if (holder instanceof BreaksOnlyHolder) {
             BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
-            breaksOnlyHolder.breaksOnlyTitleArray.setText(mBreaksOnlyTitle.get(position));
+            breaksOnlyHolder.breaksOnlyName.setText(mBreaksOnlyTitle.get(position));
             breaksOnlyHolder.breaksOnlyBreak.setText(convertTime(mBreaksOnlyList).get(position));
 
             breaksOnlyHolder.fullView.setOnClickListener(v -> {
@@ -109,23 +101,50 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             breaksOnlyHolder.breaksOnlyTrash.setOnClickListener(v-> {
                 mOnDeleteCycleListener.onCycleDelete(position);
             });
+
+        } else if (holder instanceof PomHolder) {
+            //Todo: Remember, it's a single position for an entire cycle row.
+
+            PomHolder pomHolder = (PomHolder) holder;
+            pomHolder.pomName.setText(mPomTitle.get(position));
+            if (position%2==0) pomHolder.pomView.setText(mPomList.get(position));
+            else pomHolder.pomView2.setText(mPomList.get(position));
+
+            pomHolder.fullView.setOnClickListener(v-> {
+                mOnCycleClickListener.onCycleClick(position);
+                mOnDeleteCycleListener.onCycleDelete(position);
+            });
         }
     }
 
+    //Todo: Watch default return here.
     @Override
     public int getItemViewType(int position) {
-        if (!mBreaksOnly) return SETS_AND_BREAKS; else return BREAKS_ONLY;
+        switch (mChosenView) {
+            case 1:
+                return SETS_AND_BREAKS;
+            case 2:
+                return BREAKS_ONLY;
+            case 3:
+                return POMODORO;
+        }
+        return 0;
     }
 
     @Override
     public int getItemCount() {
-        if (!mBreaksOnly && mSetsList.size() > 0) return mSetsList.size();
-        else if (mBreaksOnly && mBreaksOnlyList.size() > 0) return mBreaksOnlyList.size();
-        else return 0;
+        switch (mChosenView) {
+            case 1:
+                return mSetsList.size();
+            case 2:
+                return mBreaksOnlyList.size();
+            case 3:
+                return mPomList.size();
+        }
+        return 0;
     }
 
     public class CustomHolder extends RecyclerView.ViewHolder {
-//        public EditText editName;
         public TextView customName;
         public TextView customSet;
         public TextView customBreak;
@@ -135,7 +154,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         @SuppressLint("ResourceAsColor")
         public CustomHolder(@NonNull View itemView) {
             super(itemView) ;
-//            editName = itemView.findViewById(R.id.custom_header_edit);
             customName = itemView.findViewById(R.id.custom_name_header);
             customSet = itemView.findViewById(R.id.saved_custom_set_view);
             customBreak = itemView.findViewById(R.id.saved_custom_break_view);
@@ -145,16 +163,33 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public class BreaksOnlyHolder extends RecyclerView.ViewHolder {
-        public TextView breaksOnlyTitleArray;
+        public TextView breaksOnlyName;
         public TextView breaksOnlyBreak;
         public ImageButton breaksOnlyTrash;
         public View fullView;
 
         public BreaksOnlyHolder(@NonNull View itemView) {
             super(itemView);
-            breaksOnlyTitleArray = itemView.findViewById(R.id.breaks_only_header);
+            breaksOnlyName = itemView.findViewById(R.id.breaks_only_header);
             breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
             breaksOnlyTrash = itemView.findViewById(R.id.delete_cycle_bo);
+            fullView = itemView;
+        }
+    }
+
+    public class PomHolder extends RecyclerView.ViewHolder {
+        public TextView pomName;
+        public TextView pomView;
+        public TextView pomView2;
+        public ImageButton pomTrash;
+        public View fullView;
+
+        public PomHolder(@NonNull View itemView) {
+            super(itemView);
+            pomName = itemView.findViewById(R.id.pom_header);
+            pomView = itemView.findViewById(R.id.pom_view);
+            pomView2 = itemView.findViewById(R.id.pom_view2);
+            pomTrash = itemView.findViewById(R.id.delete_pom_cycle);
             fullView = itemView;
         }
     }
