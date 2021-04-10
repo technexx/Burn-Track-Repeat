@@ -1100,7 +1100,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) first_value_textView.setText(convertSeconds(setValue));
+                    if (!breaksOnly) first_value_textView.setText(convertCustomTextView(setValue));
                     break;
                 case 2:
                     first_value_single_edit.setText(String.valueOf(pomValue1));
@@ -1116,7 +1116,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) first_value_textView.setText(convertSeconds(setValue));
+                    if (!breaksOnly) first_value_textView.setText(convertCustomTextView(setValue));
                     break;
                 case 2:
                     first_value_single_edit.setText(String.valueOf(pomValue1));
@@ -1132,7 +1132,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
+                    if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                     break;
                 case 2:
                     second_value_single_edit.setText(String.valueOf(pomValue2));
@@ -1148,7 +1148,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
+                    if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                     break;
                 case 2:
                     second_value_single_edit.setText(String.valueOf(pomValue2));
@@ -1887,7 +1887,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (mode==1) {
             if (!breaksOnly) {
-                second_value_textView.setText(convertSeconds(breaksOnlyValue));
+                second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                 s1.setAnimation(fadeOut);
                 plus_first_value.setAnimation(fadeOut);
                 minus_first_value.setAnimation(fadeOut);
@@ -1920,8 +1920,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 });
             } else {
                 s1.setAnimation(fadeIn);
-                first_value_textView.setText(convertSeconds(setValue));
-                second_value_textView.setText(convertSeconds(breakValue));
+                first_value_textView.setText(convertCustomTextView(setValue));
+                second_value_textView.setText(convertCustomTextView(breakValue));
                 plus_first_value.setAnimation(fadeIn);
                 minus_first_value.setAnimation(fadeIn);
                 plus_first_value.setEnabled(true);
@@ -2395,8 +2395,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ConstraintLayout.LayoutParams params2 = (ConstraintLayout.LayoutParams) cycle_reset.getLayoutParams();
         switch (mode) {
             case 1:
-                first_value_textView.setText(convertSeconds(setValue));
-                if (!breaksOnly) second_value_textView.setText(convertSeconds(breakValue)); else second_value_textView.setText(convertSeconds(breaksOnlyValue));
+                first_value_textView.setText(convertCustomTextView(setValue));
+                if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
 
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
@@ -2736,6 +2736,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public String convertCustomTextView(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+
+        if (totalSeconds >=60) {
+            minutes = totalSeconds/60;
+            remainingSeconds = totalSeconds % 60;
+            String formattedSeconds = df.format(remainingSeconds);
+            if (formattedSeconds.length()>2) formattedSeconds = "0" + formattedSeconds;
+            return (minutes + " : " + formattedSeconds);
+        } else {
+            String totalStringSeconds = String.valueOf(totalSeconds);
+            if (totalStringSeconds.length()<2) totalStringSeconds = "0" + totalStringSeconds;
+            if (totalSeconds<5) return ("0 : 05");
+            else return "0 : " + totalStringSeconds;
+        }
+    }
+
     public String convertStopwatch(long seconds) {
         long minutes;
         long roundedSeconds;
@@ -2806,7 +2825,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
 
                     setValue = (editSetMinutes * 60) + editSetSeconds;
-                    first_value_textView.setText(convertSeconds(setValue));
+                    first_value_textView.setText(convertCustomTextView(setValue));
                     prefEdit.putLong("setValue", setValue);
                 } else {
                     editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
@@ -2827,7 +2846,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
                         prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
                     }
-                    second_value_textView.setText(convertSeconds(breakValue));
+                    second_value_textView.setText(convertCustomTextView(breakValue));
                 }
                 break;
             case 2:
