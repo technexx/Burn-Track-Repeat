@@ -304,7 +304,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean stopAscent = true;
 
 
-    //Todo: Identical cycle trigger for Pom w/ diff cycles.
+    //Todo: Preface <10 second values in edit_text_twos w/ "0".
+    //Todo: Edittext for Pom.
     //Todo: Fade issues w/ Pom.
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Sep breakOnly timer.
@@ -527,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return true;
     }
 
-    //Todo: Consoiidate >0 condition.
+    //Todo: Consolidate >0 condition.
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -795,6 +796,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
             prefEdit = sharedPreferences.edit();
 //            mode = sharedPreferences.getInt("currentMode", 1);
+            setValue = sharedPreferences.getLong("setValue", 30);
+            breakValue = sharedPreferences.getLong("breakValue", 30);
+            breaksOnlyValue = sharedPreferences.getLong("breaksOnlyValue", 30);
+            pomValue1 = sharedPreferences.getLong("pomValue1", 25);
+            pomValue2 = sharedPreferences.getLong("pomValue2", 5);
+            pomValue3 = sharedPreferences.getLong("pomValue3", 15);
+            //Call this on start to sync edit values w/ retrieved values from SharedPref.
+            convertEditTime();
+
             sortMode = sharedPreferences.getInt("sortMode", 1);
             sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
             sortModePom = sharedPreferences.getInt("sortModePom", 1);
@@ -807,7 +817,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //All db queries that fetch full lists should through queryCycles() to ensure sort order is correct.
             queryCycles();
 
-
             if (cyclesList.size()>0 && customID>0) {
                 cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
                 setsArray.add(cyclesList.get(0).getSets());
@@ -816,13 +825,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else runOnUiThread(() -> setDefaultCustomCycle());
 
             runOnUiThread(() -> {
-                //Custom defaults
                 savedSets = startCustomSetTime.size();
                 savedBreaks = startCustomBreakTime.size();
                 numberOfSets = savedSets;
                 numberOfBreaks = savedBreaks;
 
-                //Todo: Right now, our breaksOnly ui is populated via db entries from setBreaksOnlyMode. For Pom, we'll need to put it in the switchTimer() method. Since we are defaulting to !breaksOnly in custom on app launch, we can ignore initial population here and do it instead in switchTimer().
                 pomValue1 = 25;
                 pomValue2 = 5;
                 pomValue3 = 15;
@@ -931,7 +938,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             first_value_edit.setVisibility(View.VISIBLE);
                             first_value_edit_two.setVisibility(View.VISIBLE);
                             first_value_sep.setVisibility(View.VISIBLE);
-                            //Todo: We have sep vars. for editText so it can be called instantly anytime we switch from textView. Since pomMillis is consistent, we can probably just keep using that.
                             if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else {
                                 if (editSetMinutes==0) first_value_edit_two.setText("05"); else first_value_edit_two.setText("00");
                             }
@@ -1035,13 +1041,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             public void run() {
                 switch (mode) {
                     case 1:
-                        if (incrementValues) setValue+=1; else setValue -=1; break;
+                        if (incrementValues) setValue+=1; else setValue -=1;
+                        prefEdit.putLong("setValue", setValue);
+                        break;
                     case 2:
                         if (incrementValues) pomValue1+=1; else pomValue1 -=1;
+                        prefEdit.putLong("pomValue1", pomValue1);
                         //Minutes for Pom instead of seconds.
                         pomMillis1 = (pomValue1*1000) * 60;
                         break;
                 }
+                prefEdit.apply();
                 mHandler.postDelayed(this, incrementTimer*10);
             }
         };
@@ -1053,13 +1063,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 1:
                         if (!breaksOnly) {
                             if (incrementValues) breakValue+=1; else breakValue -=1;
-                        } else
-                        if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1; break;
+                            prefEdit.putLong("breakOnly", breakValue);
+                        } else{
+                            if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
+                            prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
+                        }
+                        break;
                     case 2:
                         if (incrementValues) pomValue2+=1; else pomValue2 -=1;
+                        prefEdit.putLong("pomValue2", pomValue2);
                         pomMillis2 = (pomValue2*1000) * 60;
                         break;
                 }
+                prefEdit.apply();
                 mHandler.postDelayed(this, incrementTimer*10);
             }
         };
@@ -1068,6 +1084,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void run() {
                 if (incrementValues) pomValue3+=1; else pomValue3 -=1;
+                prefEdit.putLong("pomValue3", pomValue3);
                 pomMillis3 = (pomValue3*1000) * 60;
                 mHandler.postDelayed(this, incrementTimer*10);
             }
@@ -2791,6 +2808,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     setValue = (editSetMinutes * 60) + editSetSeconds;
                     first_value_textView.setText(convertSeconds(setValue));
+                    prefEdit.putLong("setValue", setValue);
                 } else {
                     editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
                     editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
@@ -2805,13 +2823,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     if (!breaksOnly) {
                         breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-                    } else breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+                        prefEdit.putLong("breakValue", breakValue);
+                    } else {
+                        breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+                        prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
+                    }
                     second_value_textView.setText(convertSeconds(breakValue));
                 }
                 break;
             case 2:
                 break;
         }
+        prefEdit.apply();
         setTimerValueBounds();
     }
 
@@ -3190,30 +3213,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
             case 2:
-                //Todo: Should be converted back to these Strings, since they're the ones being saved.
                 convertedPomList = gson.toJson(pomValuesTime);
-//                convertedPomList = convertedPomList.replace("]", "");
-//                convertedPomList = convertedPomList.replace("[", "");
-//                convertedPomList = convertedPomList.replace(",", " - ");
 
                 String[] pomSplit = convertedPomList.split(",", 0);
                 convertedPomList = "";
                 for (int i=0; i<pomSplit.length; i++) {
                     if (pomSplit[i].length()<2) pomSplit[i] = "0" + pomSplit[i];
                 }
-                Log.i("testPom", Arrays.toString(pomSplit));
 
                 convertedPomList = Arrays.toString(pomSplit);
                 convertedPomList = convertedPomList.replace("]", "");
                 convertedPomList = convertedPomList.replace("[", "");
+
                 convertedPomList = convertedPomList.replace(",", " -");
-                Log.i("testPom", convertedPomList);
 
                 if (pomCyclesList.size()>0) {
                     for (int i=0; i<pomCyclesList.size(); i++) {
-                        if (pomCyclesList.get(i).getFullCycle().equals(convertedPomList) || pomCyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString()))
+                        if (pomCyclesList.get(i).getFullCycle().equals(convertedPomList) && pomCyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString()))
                             duplicateCycle = true;
                     }
+                    Log.i("testPom", convertedPomList + " " + cycle_header_text.getText());
+                    Log.i("testPom", pomCyclesList.get(0).getFullCycle() + " " + pomCyclesList.get(0).getTitle());
                 }
                 break;
         }

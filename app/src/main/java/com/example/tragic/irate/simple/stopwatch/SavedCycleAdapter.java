@@ -111,7 +111,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else if (holder instanceof PomHolder) {
             PomHolder pomHolder = (PomHolder) holder;
             pomHolder.pomName.setText(mPomTitle.get(position));
-//            pomHolder.pomView.setText(mPomList.get(position));
 
             String tempPom = mPomList.get(position);
             tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
@@ -119,14 +118,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             int moving = 0;
             for (int i=0; i<8; i++) {
-                if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                moving+=5;
+                //Todo: Check that it still works w/ conditional.
+                if (pomSpan.length()>=moving+2){
+                    if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    moving+=5;
+                }
             }
             pomHolder.pomView.setText(pomSpan);
 
             pomHolder.fullView.setOnClickListener(v-> {
                 mOnCycleClickListener.onCycleClick(position);
+            });
+
+            pomHolder.pomTrash.setOnClickListener(v-> {
                 mOnDeleteCycleListener.onCycleDelete(position);
             });
         }
