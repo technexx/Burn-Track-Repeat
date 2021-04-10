@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean onBreak;
     boolean pomEnded;
     boolean timerDisabled;
+    boolean pomTimerDisabled;
     boolean customHalted = true;
     boolean pomHalted = true;
     boolean stopwatchHalted = true;
@@ -304,7 +305,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean stopAscent = true;
 
 
-    //Todo: Custom is using Pom's single textview instead of MM:SS
     //Todo: Edittext for Pom.
     //Todo: Fade issues w/ Pom.
     //Todo: Toast for trying in increment time past min/max values
@@ -1271,7 +1271,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             adjustCustom(false);
         });
 
-        //Todo: Cycling still uses original count.
         delete_sb.setOnClickListener(v->{
             startCustomSetTime.remove(receivedPos);
             customSetTime.remove(receivedPos);
@@ -1319,7 +1318,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         prefEdit.putInt("currentMode", 3);
                 }
                 prefEdit.apply();
-                Log.i("testFade", "set + break count and setReduce + breakReduce are " + savedSets + " " + savedBreaks  + " " + numberOfSets  + " " + numberOfBreaks);
             }
 
             @Override
@@ -1966,20 +1964,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
                             customSetTime.add(setValue * 1000);
                             startCustomSetTime.add(setValue * 1000);
-                            canSaveOrUpdate(true);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                        }
-                        if (customBreakTime.size() < 10 && customBreakTime.size() >= 0) {
                             customBreakTime.add(breakValue * 1000);
                             startCustomBreakTime.add(breakValue * 1000);
                             canSaveOrUpdate(true);
+                            resetTimer();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
                             breaksOnlyTime.add(breaksOnlyValue * 1000);
                             startBreaksOnlyTime.add(breaksOnlyValue * 1000);
                             canSaveOrUpdate(true);
+                            resetTimer();
                         } else {
                             Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                         }
@@ -1992,6 +1989,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         pomValuesTime.add(pomValue1);
                         pomValuesTime.add(pomValue3);
+                        resetTimer();
                     } else Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
 
             }
@@ -2002,14 +2000,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (customSetTime.size() > 0 && startCustomSetTime.size() > 0) {
                             customSetTime.remove(customSetTime.size() - 1);
                             startCustomSetTime.remove(startCustomSetTime.size() - 1);
-                            canSaveOrUpdate(true);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                        }
-                        if (customBreakTime.size() > 0 && startCustomBreakTime.size() > 0) {
                             customBreakTime.remove(customBreakTime.size() - 1);
                             startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
                             canSaveOrUpdate(true);
+                            resetTimer();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                         }
                         //Used w/ arrows to switch set/break places.
                         if (customSetTime.size() - 1 < receivedPos)
@@ -2022,11 +2018,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             if (breaksOnlyTime.size() - 1 < receivedPos)
                                 receivedPos = breaksOnlyTime.size() - 1;
                             canSaveOrUpdate(true);
+                            resetTimer();
                         } else {
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                         }
                     }
                     drawDots(0);
+                    // Separate conditional because our list size is now one less than above.
                     if (!breaksOnly) {
                         if (customSetTime.size()>0) {
                             setNewText(timePaused, timePaused, (customSetTime.get(0) +999) / 1000);
@@ -2043,11 +2041,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (receivedPos >=0) dotDraws.setCycle(receivedPos);
                     break;
                 case 2:
-                    if (pomValuesTime.size()!=0) pomValuesTime.clear();
-                    else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+                    if (pomValuesTime.size()!=0) {
+                        pomValuesTime.clear();
+//                        timePaused2.setText("?");
+//                        dotDraws.pomDraw(pomDotCounter, 0, pomValuesTime);
+                        resetTimer();
+                    } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
-        resetTimer();
     }
 
     private void endAnimation() {
@@ -2164,9 +2166,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
             case 2:
-                //Todo: Retrieval of last accessed pom Values from DB, or default if none exist, goes here. Remember Async. Using activeX boolean in all cases.
-                //Todo: Might not need this since we're using current IDs for db rows.
-                //Todo: resetTimer() uses the values in the Arrays populated by the last called row from DB. This may be all we need.
                 savedCycleAdapter.setView(3);
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
@@ -2209,7 +2208,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if ( (setMillis <=500 || breakMillis <=500) && numberOfBreaks >0) {
             timerDisabled = true;
         }
-        if (!timerDisabled) {
+        if ( (!timerDisabled && mode==1) || (!pomTimerDisabled && mode==2) ){
             cycles_completed.setVisibility(View.VISIBLE);
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setBackgroundColor(getResources().getColor(R.color.Gray));
@@ -2354,9 +2353,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         reset.setVisibility(View.VISIBLE);
                     }
             }
-        } else if ( (!breaksOnly && customSetTime.size()==0) || (breaksOnly && breaksOnlyTime.size()==0)) {
-            Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
-        }
+        } else Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
     }
 
     public void clearCycles(int cycleCount) {
@@ -2608,10 +2605,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (endAnimation != null) endAnimation.cancel();
         switch (mode) {
             case 1:
-                add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
-                sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
-                add_cycle.setEnabled(true);
-                sub_cycle.setEnabled(true);
                 timePaused.setAlpha(1);
                 progressBar.setProgress(10000);
                 customProgressPause = maxProgress;
@@ -2658,9 +2651,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             customBreakTime.add(startCustomBreakTime.get(i));
                         }
                         timerDisabled = false;
-                    } else {
-                        timerDisabled = true;
-                    }
+                    } else timerDisabled = true;
                     dotDraws.breakTime(customBreakTime);
                     third_value_single_edit.setText(String.valueOf(customSetTime.size()));
                     activeCustomCycle = false;
@@ -2668,9 +2659,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (startBreaksOnlyTime.size()>0) {
                         breaksOnlyTime.addAll(startBreaksOnlyTime);
                         timerDisabled = false;
-                    } else {
-                        timerDisabled = true;
-                    }
+                    } else timerDisabled = true;
+
                     dotDraws.breakTime(breaksOnlyTime);
                     third_value_single_edit.setText(String.valueOf(breaksOnlyTime.size()));
                     activeCustomBOCycle = false;
@@ -2690,13 +2680,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
                 pomMillis1 = (pomValue1*1000) * 60;
                 pomMillis = pomMillis1;
-                timePaused2.setText(convertSeconds((pomMillis+999)/1000));
                 timePaused2.setAlpha(1);
                 onBreak = false;
                 pomHalted = true;
                 pomProgressPause = maxProgress;
                 dotDraws.pomDraw(pomDotCounter, 0, pomValuesTime);
                 activePomCycle = false;
+                if (pomValuesTime.size()==0) {
+                    pomTimerDisabled = true;
+                    timePaused2.setText("?");
+                } else {
+                    pomTimerDisabled = false;
+                    timePaused2.setText(convertSeconds((pomMillis+999)/1000));
+                }
                 break;
             case 3:
                 stopwatchHalted = true;
@@ -2718,6 +2714,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 lapAdapter.notifyDataSetChanged();
                 break;
         }
+        add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
+        sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
+        add_cycle.setEnabled(true);
+        sub_cycle.setEnabled(true);
     }
 
     //This works for Pom. Just *60 to have the value reflect each minute's seconds.
