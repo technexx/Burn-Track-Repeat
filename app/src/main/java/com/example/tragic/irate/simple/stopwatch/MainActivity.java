@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean stopAscent = true;
 
 
-    //Todo: Preface <10 second values in edit_text_twos w/ "0".
+    //Todo: Custom is using Pom's single textview instead of MM:SS
     //Todo: Edittext for Pom.
     //Todo: Fade issues w/ Pom.
     //Todo: Toast for trying in increment time past min/max values
@@ -808,7 +808,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             sortMode = sharedPreferences.getInt("sortMode", 1);
             sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
             sortModePom = sharedPreferences.getInt("sortModePom", 1);
-            breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
+//            breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
             customID = sharedPreferences.getInt("customID", 0);
             breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
             pomID = sharedPreferences.getInt("pomID", 0);
@@ -938,10 +938,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             first_value_edit.setVisibility(View.VISIBLE);
                             first_value_edit_two.setVisibility(View.VISIBLE);
                             first_value_sep.setVisibility(View.VISIBLE);
-                            if (editSetSeconds!=0) first_value_edit_two.setText(String.valueOf(editSetSeconds)); else {
-                                if (editSetMinutes==0) first_value_edit_two.setText("05"); else first_value_edit_two.setText("00");
-                            }
-                            if (editSetMinutes!=0) first_value_edit.setText(String.valueOf(editSetMinutes)); else first_value_edit.setText(("0"));
+                            convertEditTime();
                         }
                         if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
                             second_value_textView.setVisibility(View.VISIBLE);
@@ -982,10 +979,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         first_value_edit_two.setVisibility(View.INVISIBLE);
                         first_value_sep.setVisibility(View.INVISIBLE);
                     }
-                    if (editBreakMinutes!=0) second_value_edit.setText(String.valueOf(editBreakMinutes)); else second_value_edit.setText(("0"));
-                    if (editBreakSeconds!=0) second_value_edit_two.setText(String.valueOf(editBreakSeconds)); else {
-                        if (editBreakMinutes==0) second_value_edit_two.setText("05"); else second_value_edit_two.setText("00");
-                    }
+                    convertEditTime();
                     break;
                 case 2:
                     if (first_value_single_edit.isShown()) {
@@ -2769,10 +2763,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editBreakSeconds = breaksOnlyValue%60;
             editBreakMinutes = breaksOnlyValue/60;
         }
+
+        String fvSec = String.valueOf(editSetSeconds);
+        String svSec = String.valueOf(editBreakSeconds);
+        if (fvSec.length()<2) fvSec = "0" + fvSec;
+        if (svSec.length()<2) svSec = "0" + svSec;
         first_value_edit.setText(String.valueOf(editSetMinutes));
-        first_value_edit_two.setText(String.valueOf(editSetSeconds));
+        first_value_edit_two.setText(fvSec);
         second_value_edit.setText(String.valueOf(editBreakMinutes));
-        second_value_edit_two.setText(String.valueOf(editBreakSeconds));
+        second_value_edit_two.setText(svSec);
     }
 
     //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
