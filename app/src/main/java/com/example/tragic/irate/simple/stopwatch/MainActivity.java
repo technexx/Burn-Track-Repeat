@@ -17,6 +17,10 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 ;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,9 +47,11 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -298,8 +304,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean stopAscent = true;
 
 
+    //Todo: Identical cycle trigger for Pom w/ diff cycles.
     //Todo: Fade issues w/ Pom.
-    //Todo: DB entries for Pom.
     //Todo: Toast for trying in increment time past min/max values
     //Todo: Sep breakOnly timer.
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
@@ -3123,7 +3129,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
     }
 
-    //Make sure this is always run on a non-ui thread (for queryCycles()).
+    //All convertedLists are used in save/update method.
     private void retrieveAndCheckCycles() {
         queryCycles();
         Gson gson = new Gson();
@@ -3184,11 +3190,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
             case 2:
+                //Todo: Should be converted back to these Strings, since they're the ones being saved.
                 convertedPomList = gson.toJson(pomValuesTime);
+//                convertedPomList = convertedPomList.replace("]", "");
+//                convertedPomList = convertedPomList.replace("[", "");
+//                convertedPomList = convertedPomList.replace(",", " - ");
+
+                String[] pomSplit = convertedPomList.split(",", 0);
+                convertedPomList = "";
+                for (int i=0; i<pomSplit.length; i++) {
+                    if (pomSplit[i].length()<2) pomSplit[i] = "0" + pomSplit[i];
+                }
+                Log.i("testPom", Arrays.toString(pomSplit));
+
+                convertedPomList = Arrays.toString(pomSplit);
                 convertedPomList = convertedPomList.replace("]", "");
                 convertedPomList = convertedPomList.replace("[", "");
-                convertedPomList = convertedPomList.replace(",", " - ");
-                //Todo: List is populating even w/ empty db.
+                convertedPomList = convertedPomList.replace(",", " -");
+                Log.i("testPom", convertedPomList);
+
                 if (pomCyclesList.size()>0) {
                     for (int i=0; i<pomCyclesList.size(); i++) {
                         if (pomCyclesList.get(i).getFullCycle().equals(convertedPomList) || pomCyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString()))

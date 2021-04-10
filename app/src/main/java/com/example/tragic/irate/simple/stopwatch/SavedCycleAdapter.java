@@ -2,6 +2,12 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,12 +109,21 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
 
         } else if (holder instanceof PomHolder) {
-            //Todo: Remember, it's a single position for an entire cycle row.
-
             PomHolder pomHolder = (PomHolder) holder;
             pomHolder.pomName.setText(mPomTitle.get(position));
-            if (position%2==0) pomHolder.pomView.setText(mPomList.get(position));
-            else pomHolder.pomView2.setText(mPomList.get(position));
+//            pomHolder.pomView.setText(mPomList.get(position));
+
+            String tempPom = mPomList.get(position);
+            tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
+            Spannable pomSpan = new SpannableString(tempPom);
+
+            int moving = 0;
+            for (int i=0; i<8; i++) {
+                if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                moving+=5;
+            }
+            pomHolder.pomView.setText(pomSpan);
 
             pomHolder.fullView.setOnClickListener(v-> {
                 mOnCycleClickListener.onCycleClick(position);
@@ -180,7 +195,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public class PomHolder extends RecyclerView.ViewHolder {
         public TextView pomName;
         public TextView pomView;
-        public TextView pomView2;
         public ImageButton pomTrash;
         public View fullView;
 
@@ -188,7 +202,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             super(itemView);
             pomName = itemView.findViewById(R.id.pom_header);
             pomView = itemView.findViewById(R.id.pom_view);
-            pomView2 = itemView.findViewById(R.id.pom_view2);
             pomTrash = itemView.findViewById(R.id.delete_pom_cycle);
             fullView = itemView;
         }
@@ -217,6 +230,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             finalSplit = String.valueOf(newString);
             finalSplit = finalSplit.replace("[", "");
             finalSplit = finalSplit.replace("]", "");
+            //Todo: This is the bullet we're using.
             finalSplit = finalSplit.replace(",", " " + mContext.getString( R.string.bullet));
             finalList.add(finalSplit);
 
