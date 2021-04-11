@@ -303,15 +303,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences.Editor prefEdit;
     int receivedAlpha;
     boolean stopAscent = true;
+    boolean minReached;
+    boolean maxReached;
 
-    //Todo: Reset alpha on pomDots w/ cycle reset.
-    //Todo: Toast for trying in increment time past min/max values
     //Todo: Sep breakOnly timer.
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
     //Todo: Variable set only mode? Again, for TDEE.
     //Todo: Option to skip EITHER set or break. Option to undo skip.
+    //Todo: Text/Button long fade for value caps instead of Toast. Simply remove Toast and use present boolean.
 
     //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
     //Todo: Rippling for certain onClicks.
@@ -1093,7 +1094,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         plus_first_value.setOnTouchListener((v, event) -> {
             incrementValues = true;
-            //Todo: This is where values are capped, if we're going to add a Toast.
             setIncrements(event, changeFirstValue);
             switch (mode) {
                 case 1:
@@ -2111,7 +2111,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         fadeOutObj.start();
     }
 
-    //Todo: Adapter setView needs to be called anywhere we are switching access to a different recyclerView.
     public void switchTimer(int mode, boolean halted) {
         removeViews();
         tabViews();
@@ -2845,12 +2844,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
                 if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
                 if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
+                toastBounds(5, 300, setValue); toastBounds(5, 300, breakValue); toastBounds(5, 300, breaksOnlyValue);
                 break;
             case 2:
                 if (pomValue1>90) pomValue1=90; if (pomValue1<15) pomValue1 = 15;
                 if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
                 if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
+                toastBounds(15, 90, pomValue1); toastBounds(3, 10, pomValue2); toastBounds(10, 60, pomValue3);
                 break;
+        }
+    }
+
+    public void toastBounds(long min, long max, long value) {
+        if (value==min) {
+            minReached = true;
+            Toast.makeText(getApplicationContext(), "Minimum reached", Toast.LENGTH_SHORT).show();
+        } else if (value==max) {
+            maxReached = true;
+            Toast.makeText(getApplicationContext(), "Cap reached", Toast.LENGTH_SHORT).show();
         }
     }
 
