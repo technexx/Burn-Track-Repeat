@@ -2675,6 +2675,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     pomTimerDisabled = false;
                     timePaused2.setText(convertSeconds((pomMillis+999)/1000));
                 }
+                dotDraws.setAlpha();
                 break;
             case 3:
                 stopwatchHalted = true;
