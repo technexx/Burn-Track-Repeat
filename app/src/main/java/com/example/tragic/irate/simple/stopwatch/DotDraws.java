@@ -47,7 +47,7 @@ public class DotDraws extends View {
     int cycle2;
     int mFadeDone;
     int mMode;
-    int mPomDot;
+    int mPomDotCounter;
     ArrayList<String> mSetTime;
     ArrayList<String> mBreakTime;
     ArrayList<String> mPomTime;
@@ -126,12 +126,12 @@ public class DotDraws extends View {
         }
     }
 
-    public void pomDraw(int pomDot, int fadeDone, ArrayList<Long> pomTime) {
+    public void pomDraw(int pomDotCounter, int fadeDone, ArrayList<Long> pomTime) {
         mPomTime = new ArrayList<>();
         for (int i=0; i<pomTime.size(); i++) {
             mPomTime.add(String.valueOf(pomTime.get(i)));
         }
-        this.mPomDot = pomDot; this.mFadeDone = fadeDone;
+        this.mPomDotCounter = pomDotCounter; this.mFadeDone = fadeDone;
         setupPaint();
         invalidate();
 
@@ -263,16 +263,16 @@ public class DotDraws extends View {
         if (mMode == 2) {
             mX = 92; mX2=mX+125;
             //Fading last object drawn. Setting previous ones to "greyed out"
-            for (int i=0; i<mPomDot; i++) {
-                if (i == mPomDot-1) {
+            for (int i=0; i<mPomDotCounter; i++) {
+                if (i == mPomDotCounter-1) {
                     pomDraw(i, true);
                 } else {
                     mPaint.setAlpha(100);
                     pomDraw(i, false);
                 }
-                if (i+1 == mPomDot) {
+                if (i+1 == mPomDotCounter) {
                     //Drawing all non-greyed objects.
-                    for (int j=mPomDot; j<8; j++) {
+                    for (int j=mPomDotCounter; j<8; j++) {
                         mPaint.setAlpha(255);
                         pomDraw(j, false);
                     }
@@ -281,6 +281,31 @@ public class DotDraws extends View {
         }
 
         if (mMode==3) mCanvas.drawColor(Color.BLACK);
+    }
+
+    public void pomDraw(int i, boolean fade) {
+        switch (i) {
+            case 0: case 2: case 4: case 6:
+                mPaint.setColor(Color.GREEN);
+                //Must be called AFTER color is changed, otherwise alpha will reset to 255.
+                if (fade && mFadeDone == 1) fadeDot2();
+                mCanvas.drawCircle(mX, 610, 60, mPaint);
+                if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
+                break;
+            case 1: case 3: case 5:
+                mPaint.setColor(Color.RED);
+                if (fade && mFadeDone == 1) fadeDot2();
+                mCanvas.drawCircle(mX2, 610, 45 , mPaint);
+                if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
+                mX+=250;
+                mX2=mX+125;
+                break;
+            case 7:
+                mPaint.setColor(Color.RED);
+                if (fade && mFadeDone == 1) fadeDot2();
+                mCanvas.drawRect(mX+90, 555, mX+200, 665, mPaint);
+                if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
+        }
     }
 
     public void fadeDot() {
@@ -310,30 +335,6 @@ public class DotDraws extends View {
         }
         savedPomAlpha = mAlpha2;
         savedPomCycle = cycle2;
-    }
-
-    public void pomDraw(int i, boolean fade) {
-        switch (i) {
-            case 0: case 2: case 4: case 6:
-                mPaint.setColor(Color.GREEN);
-                mCanvas.drawCircle(mX, 610, 60, mPaint);
-                if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
-                break;
-            case 1: case 3: case 5:
-                mPaint.setColor(Color.RED);
-                mCanvas.drawCircle(mX2, 610, 45 , mPaint);
-                if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
-                mX+=250;
-                mX2=mX+125;
-                break;
-            case 7:
-                mPaint.setColor(Color.RED);
-                mCanvas.drawRect(mX+90, 555, mX+200, 665, mPaint);
-                if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
-        }
-        if (fade && mFadeDone == 1) {
-            fadeDot2();
-        }
     }
 
     private void drawText(ArrayList<String> list, float x, float y, int i) {
