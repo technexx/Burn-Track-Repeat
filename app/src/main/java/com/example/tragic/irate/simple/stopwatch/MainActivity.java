@@ -1038,12 +1038,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                     case 2:
                         if (incrementValues) pomValue1+=1; else pomValue1 -=1;
-                        //Minutes for Pom instead of seconds.
                         pomMillis1 = (pomValue1*1000) * 60;
                         break;
                 }
                 prefEdit.apply();
                 mHandler.postDelayed(this, incrementTimer*10);
+                setTimerValueBounds();
                 fadeCap(first_value_textView);
             }
         };
@@ -1066,6 +1066,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 prefEdit.apply();
                 mHandler.postDelayed(this, incrementTimer*10);
+                setTimerValueBounds();
                 fadeCap(second_value_textView);
             }
         };
@@ -1076,6 +1077,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (incrementValues) pomValue3+=1; else pomValue3 -=1;
                 pomMillis3 = (pomValue3*1000) * 60;
                 mHandler.postDelayed(this, incrementTimer*10);
+                setTimerValueBounds();
                 fadeCap(third_value_textView);
             }
         };
@@ -1171,7 +1173,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             incrementValues = false;
             setIncrements(event, changeThirdValue);
             switch (mode) {
-                case 1:
                 case 2:
                     third_value_single_edit.setText(String.valueOf(pomValue3));
                     third_value_textView.setText(String.valueOf(pomValue3));
@@ -2699,168 +2700,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sub_cycle.setEnabled(true);
     }
 
-    //This works for Pom. Just *60 to have the value reflect each minute's seconds.
-    private String convertSeconds(long totalSeconds) {
-        DecimalFormat df = new DecimalFormat("00");
-        long minutes;
-        long remainingSeconds;
-
-        if (totalSeconds >=60) {
-            minutes = totalSeconds/60;
-            remainingSeconds = totalSeconds % 60;
-            return (minutes + ":" + df.format(remainingSeconds));
-        } else {
-            if (totalSeconds != 5) return String.valueOf(totalSeconds);
-            else return "5";
-        }
-    }
-
-    public String convertCustomTextView(long totalSeconds) {
-        DecimalFormat df = new DecimalFormat("00");
-        long minutes;
-        long remainingSeconds;
-
-        if (totalSeconds >=60) {
-            minutes = totalSeconds/60;
-            remainingSeconds = totalSeconds % 60;
-            String formattedSeconds = df.format(remainingSeconds);
-            if (formattedSeconds.length()>2) formattedSeconds = "0" + formattedSeconds;
-            return (minutes + " : " + formattedSeconds);
-        } else {
-            String totalStringSeconds = String.valueOf(totalSeconds);
-            if (totalStringSeconds.length()<2) totalStringSeconds = "0" + totalStringSeconds;
-            if (totalSeconds<5) return ("0 : 05");
-            else return "0 : " + totalStringSeconds;
-        }
-    }
-
-    public String convertStopwatch(long seconds) {
-        long minutes;
-        long roundedSeconds;
-        DecimalFormat df = new DecimalFormat("0");
-        DecimalFormat df2 = new DecimalFormat("00");
-        if (seconds>=60) {
-            minutes = seconds/60;
-            roundedSeconds = seconds % 60;
-            if (minutes>=10 && timeLeft3.getTextSize() != 70f) timeLeft3.setTextSize(70f);
-            return (df.format(minutes) + ":" + df2.format(roundedSeconds));
-        } else {
-            if (timeLeft3.getTextSize() != 90f) timeLeft3.setTextSize(90f);
-            return df.format(seconds);
-        }
-    }
-
-    //Called on +/- buttons, which use runnables to change set/break value vars. This method a)sets editTexts to these changing values and b)sets the textView to reflect them.
-    public void convertEditTime() {
-        editSetSeconds = setValue%60;
-        editSetMinutes = setValue/60;
-        if (!breaksOnly) {
-            editBreakSeconds = breakValue%60;
-            editBreakMinutes = breakValue/60;
-        } else {
-            editBreakSeconds = breaksOnlyValue%60;
-            editBreakMinutes = breaksOnlyValue/60;
-        }
-
-        String fvSec = String.valueOf(editSetSeconds);
-        String svSec = String.valueOf(editBreakSeconds);
-        if (fvSec.length()<2) fvSec = "0" + fvSec;
-        if (svSec.length()<2) svSec = "0" + svSec;
-        first_value_edit.setText(String.valueOf(editSetMinutes));
-        first_value_edit_two.setText(fvSec);
-        second_value_edit.setText(String.valueOf(editBreakMinutes));
-        second_value_edit_two.setText(svSec);
-    }
-
-    //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
-    public void setIncrements(MotionEvent event, Runnable runnable) {
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
-                mHandler = new Handler();
-                mHandler.postDelayed(runnable,25);
-                mHandler.postDelayed(valueSpeed, 25);
-                break;
-            case MotionEvent.ACTION_UP:
-                mHandler.removeCallbacksAndMessages(null);
-                incrementTimer = 10;
-        }
-        setTimerValueBounds();
-        prefEdit.putLong("setValue", setValue);
-        prefEdit.putLong("breakValue", breakValue);
-        prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
-        prefEdit.putLong("pomValue1", pomValue1);
-        prefEdit.putLong("pomValue2", pomValue2);
-        prefEdit.putLong("pomValue3", pomValue3);
-        prefEdit.apply();
-    }
-
-    public void setEditValueBounds(boolean onSets){
-        switch (mode) {
-            case 1:
-                if (onSets) {
-                    editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
-                    editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
-
-                    if (editSetSeconds>59) {
-                        editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
-                    }
-                    if (editSetMinutes>5) editSetMinutes = 5;
-                    if (editSetMinutes<0) editSetMinutes = 0;
-                    if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
-                    if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
-
-                    setValue = (editSetMinutes * 60) + editSetSeconds;
-                    first_value_textView.setText(convertCustomTextView(setValue));
-                } else {
-                    editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
-                    editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
-
-                    if (editBreakSeconds>59) {
-                        editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
-                    }
-                    if (editBreakMinutes>5) editBreakMinutes = 5;
-                    if (editBreakMinutes<0) editBreakMinutes = 0;
-                    if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
-                    if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
-
-                    if (!breaksOnly) {
-                        breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-                    } else {
-                        breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-                    }
-                    second_value_textView.setText(convertCustomTextView(breakValue));
-                }
-                break;
-            case 2:
-                break;
-        }
-        setTimerValueBounds();
-    }
-
-    //This is called via setIncrements() is is called within plus/minus touch listeners.
-    public void setTimerValueBounds() {
-        switch (mode) {
-            case 1:
-                if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
-                if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
-                toastBounds(5, 300, setValue); toastBounds(5, 300, breakValue); toastBounds(5, 300, breaksOnlyValue);
-                break;
-            case 2:
-                if (pomValue1>90) pomValue1=90; if (pomValue1<15) pomValue1 = 15;
-                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
-                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
-                toastBounds(15, 90, pomValue1); toastBounds(3, 10, pomValue2); toastBounds(10, 60, pomValue3);
-                break;
-        }
-    }
-
-    //
-    public void toastBounds(long min, long max, long value) {
-        if (value==min) minReached = true;
-        if (value==max) maxReached = true;
-    }
-
     public void canSaveOrUpdate(boolean yesWeCan) {
         switch (mode) {
             case 1:
@@ -3299,6 +3138,80 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+
+    //This works for Pom. Just *60 to have the value reflect each minute's seconds.
+    private String convertSeconds(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+
+        if (totalSeconds >=60) {
+            minutes = totalSeconds/60;
+            remainingSeconds = totalSeconds % 60;
+            return (minutes + ":" + df.format(remainingSeconds));
+        } else {
+            if (totalSeconds != 5) return String.valueOf(totalSeconds);
+            else return "5";
+        }
+    }
+
+    public String convertCustomTextView(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+
+        if (totalSeconds >=60) {
+            minutes = totalSeconds/60;
+            remainingSeconds = totalSeconds % 60;
+            String formattedSeconds = df.format(remainingSeconds);
+            if (formattedSeconds.length()>2) formattedSeconds = "0" + formattedSeconds;
+            return (minutes + " : " + formattedSeconds);
+        } else {
+            String totalStringSeconds = String.valueOf(totalSeconds);
+            if (totalStringSeconds.length()<2) totalStringSeconds = "0" + totalStringSeconds;
+            if (totalSeconds<5) return ("0 : 05");
+            else return "0 : " + totalStringSeconds;
+        }
+    }
+
+    public String convertStopwatch(long seconds) {
+        long minutes;
+        long roundedSeconds;
+        DecimalFormat df = new DecimalFormat("0");
+        DecimalFormat df2 = new DecimalFormat("00");
+        if (seconds>=60) {
+            minutes = seconds/60;
+            roundedSeconds = seconds % 60;
+            if (minutes>=10 && timeLeft3.getTextSize() != 70f) timeLeft3.setTextSize(70f);
+            return (df.format(minutes) + ":" + df2.format(roundedSeconds));
+        } else {
+            if (timeLeft3.getTextSize() != 90f) timeLeft3.setTextSize(90f);
+            return df.format(seconds);
+        }
+    }
+
+    //Called on +/- buttons, which use runnables to change set/break value vars. This method a)sets editTexts to these changing values and b)sets the textView to reflect them.
+    public void convertEditTime() {
+        editSetSeconds = setValue%60;
+        editSetMinutes = setValue/60;
+        if (!breaksOnly) {
+            editBreakSeconds = breakValue%60;
+            editBreakMinutes = breakValue/60;
+        } else {
+            editBreakSeconds = breaksOnlyValue%60;
+            editBreakMinutes = breaksOnlyValue/60;
+        }
+
+        String fvSec = String.valueOf(editSetSeconds);
+        String svSec = String.valueOf(editBreakSeconds);
+        if (fvSec.length()<2) fvSec = "0" + fvSec;
+        if (svSec.length()<2) svSec = "0" + svSec;
+        first_value_edit.setText(String.valueOf(editSetMinutes));
+        first_value_edit_two.setText(fvSec);
+        second_value_edit.setText(String.valueOf(editBreakMinutes));
+        second_value_edit_two.setText(svSec);
+    }
+
     //Todo: No need for Arrays, since they are used to populate recyclerView (i.e. list of saved cycles).
     public void loadIDCycle() {
         switch (mode) {
@@ -3335,12 +3248,99 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.postDelayed(r, 50);
     }
 
+    //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
+    public void setIncrements(MotionEvent event, Runnable runnable) {
+        switch(event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
+                mHandler = new Handler();
+                mHandler.postDelayed(runnable,25);
+                mHandler.postDelayed(valueSpeed, 25);
+                break;
+            case MotionEvent.ACTION_UP:
+                mHandler.removeCallbacksAndMessages(null);
+                incrementTimer = 10;
+        }
+
+        prefEdit.putLong("setValue", setValue);
+        prefEdit.putLong("breakValue", breakValue);
+        prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
+        prefEdit.putLong("pomValue1", pomValue1);
+        prefEdit.putLong("pomValue2", pomValue2);
+        prefEdit.putLong("pomValue3", pomValue3);
+        prefEdit.apply();
+    }
+
+    public void setEditValueBounds(boolean onSets){
+        switch (mode) {
+            case 1:
+                if (onSets) {
+                    editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
+                    editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
+
+                    if (editSetSeconds>59) {
+                        editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
+                    }
+                    if (editSetMinutes>5) editSetMinutes = 5;
+                    if (editSetMinutes<0) editSetMinutes = 0;
+                    if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
+                    if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
+
+                    setValue = (editSetMinutes * 60) + editSetSeconds;
+                    first_value_textView.setText(convertCustomTextView(setValue));
+                } else {
+                    editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
+                    editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
+
+                    if (editBreakSeconds>59) {
+                        editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
+                    }
+                    if (editBreakMinutes>5) editBreakMinutes = 5;
+                    if (editBreakMinutes<0) editBreakMinutes = 0;
+                    if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
+                    if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
+
+                    if (!breaksOnly) {
+                        breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+                    } else {
+                        breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+                    }
+                    second_value_textView.setText(convertCustomTextView(breakValue));
+                }
+                break;
+            case 2:
+                break;
+        }
+        setTimerValueBounds();
+    }
+
+    //This is called via setIncrements() is is called within plus/minus touch listeners.
+    public void setTimerValueBounds() {
+        switch (mode) {
+            case 1:
+                toastBounds(5, 300, setValue); toastBounds(5, 300, breakValue); toastBounds(5, 300, breaksOnlyValue);
+                if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
+                if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
+                break;
+            case 2:
+                toastBounds(15, 90, pomValue1); toastBounds(3, 10, pomValue2); toastBounds(10, 60, pomValue3);
+                if (pomValue1>90) pomValue1=90; if (pomValue1<15) pomValue1 = 15;
+                if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
+                if (pomValue3<10) pomValue3 = 10; if (pomValue3>60) pomValue3 = 60;
+                break;
+        }
+    }
+
+    public void toastBounds(long min, long max, long value) {
+        if (value<min) minReached = true;
+        if (value>max) maxReached = true;;
+    }
+
     public void fadeCap(TextView textView) {
         if (minReached || maxReached) {
+            minReached = false; maxReached = false;
             Animation fadeCap = new AlphaAnimation(1.0f, 0.3f);
             fadeCap.setDuration(350);
-            first_value_textView.setAnimation(fadeCap);
-            minReached = false; maxReached = false;
             textView.setAnimation(fadeCap);
         }
     }
