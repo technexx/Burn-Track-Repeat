@@ -306,14 +306,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean minReached;
     boolean maxReached;
 
-    //Todo: App starting @ 5:01 set time if capped beforehand. Likely due to setValue being saved to SharedPPref before it's capped.
+    //Todo: Possible removal of +/- rows when timer started.
     //Todo: Sep breakOnly timer.
+    //Todo: Resetting in Pom uses AND replaces cycle dot values w/ ones in +/- lists.
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
+    //Todo: Remove boxes for Pom.
+    //Todo: Recall last modified UI on app launch instead of plucking from last used DB save.
+    //Todo: Fix title and saves for Pom.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
     //Todo: Variable set only mode? Again, for TDEE.
     //Todo: Option to skip EITHER set or break. Option to undo skip.
-    //Todo: Text/Button long fade for value caps instead of Toast. Simply remove Toast and use present boolean.
 
     //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
     //Todo: Rippling for certain onClicks.
@@ -2367,119 +2370,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         overtime.setVisibility(View.INVISIBLE);
     }
 
-    public void tabViews(){
-        ConstraintLayout.LayoutParams params2 = (ConstraintLayout.LayoutParams) cycle_reset.getLayoutParams();
-        switch (mode) {
-            case 1:
-                first_value_textView.setText(convertCustomTextView(setValue));
-                if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-
-                progressBar.setVisibility(View.VISIBLE);
-                progressBar2.setVisibility(View.INVISIBLE);
-                stopWatchView.setVisibility(View.GONE);
-                s1.setVisibility(View.VISIBLE);
-                s2.setVisibility(View.VISIBLE);
-                s3.setVisibility(View.INVISIBLE);
-                first_value_edit.setVisibility(View.INVISIBLE);
-                first_value_edit_two.setVisibility(View.INVISIBLE);
-                first_value_sep.setVisibility(View.INVISIBLE);
-                second_value_edit.setVisibility(View.INVISIBLE);
-                second_value_edit_two.setVisibility(View.INVISIBLE);
-                second_value_sep.setVisibility(View.INVISIBLE);
-                first_value_single_edit.setVisibility(View.INVISIBLE);
-                second_value_single_edit.setVisibility(View.INVISIBLE);
-                third_value_single_edit.setVisibility(View.INVISIBLE);
-                plus_third_value.setVisibility(View.INVISIBLE);
-                minus_third_value.setVisibility(View.INVISIBLE);
-                third_value_textView.setVisibility(View.INVISIBLE);
-                first_value_textView.setVisibility(View.VISIBLE);
-                second_value_textView.setVisibility(View.VISIBLE);
-
-                skip.setVisibility(View.VISIBLE);
-                newLap.setVisibility(View.GONE);
-                s1.setText(R.string.set_time);
-                s2.setText(R.string.break_time);
-                cycle_header_text.setVisibility(View.VISIBLE);
-                cycle_reset.setText(R.string.clear_cycles);
-                params2.width = 150;
-                s1.setTextSize(24f);
-                s2.setTextSize(24f);
-                s3.setTextSize(24f);
-                break;
-            case 2:
-                first_value_single_edit.setText(convertSeconds(pomValue1));
-                second_value_single_edit.setText(convertSeconds(pomValue2));
-                third_value_single_edit.setText(convertSeconds(pomValue3));
-
-                progressBar.setVisibility(View.INVISIBLE);
-                progressBar2.setVisibility(View.VISIBLE);
-                stopWatchView.setVisibility(View.GONE);
-                s1.setVisibility(View.VISIBLE);
-                s2.setVisibility(View.VISIBLE);
-                s3.setVisibility(View.VISIBLE);
-                plus_first_value.setVisibility(View.VISIBLE);
-                minus_first_value.setVisibility(View.VISIBLE);
-                plus_second_value.setVisibility(View.VISIBLE);
-                minus_second_value.setVisibility(View.VISIBLE);
-                plus_third_value.setVisibility(View.VISIBLE);
-                minus_third_value.setVisibility(View.VISIBLE);
-                third_value_textView.setVisibility(View.VISIBLE);
-
-                first_value_edit.setVisibility(View.INVISIBLE);
-                first_value_edit_two.setVisibility(View.INVISIBLE);
-                second_value_edit.setVisibility(View.INVISIBLE);
-                second_value_edit_two.setVisibility(View.INVISIBLE);
-                first_value_sep.setVisibility(View.INVISIBLE);
-                second_value_sep.setVisibility(View.INVISIBLE);
-
-                first_value_textView.setVisibility(View.VISIBLE);
-                second_value_textView.setVisibility(View.VISIBLE);
-                third_value_textView.setVisibility(View.VISIBLE);
-                first_value_textView.setText(String.valueOf(pomValue1));
-                second_value_textView.setText(String.valueOf(pomValue2));
-                third_value_textView.setText(String.valueOf(pomValue3));
-
-                skip.setVisibility(View.VISIBLE);
-                newLap.setVisibility(View.GONE);
-                s1.setText(R.string.work_time);
-                s2.setText(R.string.small_break);
-                s3.setText(R.string.long_break);
-                cycle_header_text.setVisibility(View.INVISIBLE);
-                cycle_reset.setText(R.string.clear_cycles);
-                params2.width = 150;
-                s1.setTextSize(21f);
-                s2.setTextSize(21f);
-                s3.setTextSize(21f);
-                break;
-            case 3:
-                progressBar.setVisibility(View.INVISIBLE);
-                progressBar2.setVisibility(View.INVISIBLE);
-                stopWatchView.setVisibility(View.VISIBLE);
-                plus_third_value.setVisibility(View.GONE);
-                s1.setVisibility(View.GONE);
-                s2.setVisibility(View.GONE);
-                s3.setVisibility(View.GONE);
-                plus_first_value.setVisibility(View.GONE);
-                minus_first_value.setVisibility(View.GONE);
-                plus_second_value.setVisibility(View.GONE);
-                minus_second_value.setVisibility(View.GONE);
-                plus_third_value.setVisibility(View.GONE);
-                minus_third_value.setVisibility(View.GONE);
-                skip.setVisibility(View.GONE);
-                newLap.setVisibility(View.VISIBLE);
-                cycle_reset.setText(R.string.clear_laps);
-                params2.width = 200;
-                msTime.setAlpha(1);
-                msTimePaused.setAlpha(1);
-
-                timeLeft3.setText(displayTime);
-                timePaused3.setText(displayTime);
-                msTime.setText(displayMs);
-                msTimePaused.setText(displayMs);
-        }
-        cycle_reset.setLayoutParams(params2);
-    }
-
     public void clearArrays(boolean populateList) {
         switch (mode) {
             case 1:
@@ -2576,128 +2466,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
         }
-    }
-
-    public void resetTimer() {
-        removeViews();
-        //Todo: Separate end animations, especially since adding stopwatch.
-        if (endAnimation != null) endAnimation.cancel();
-        switch (mode) {
-            case 1:
-                timePaused.setAlpha(1);
-                progressBar.setProgress(10000);
-                customProgressPause = maxProgress;
-                customTimerEnded = false;
-                setBegun = false;
-                breakBegun = false;
-                customHalted = true;
-                if (!breaksOnly) onBreak = false; else onBreak =true;
-                if (timer != null) timer.cancel();
-                if (objectAnimator != null) objectAnimator.cancel();
-
-                if (startCustomSetTime.size()>0) {
-                    setMillis = startCustomSetTime.get(0);
-                }
-                if (!breaksOnly) {
-                    if (startCustomBreakTime.size()>0) {
-                        breakMillis = startCustomBreakTime.get(0);
-                        timePaused.setText(convertSeconds((setMillis+999)/1000));
-                        timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                    }
-                } else {
-                    if (startBreaksOnlyTime.size()>0) {
-                        breakMillis = startBreaksOnlyTime.get(0);
-                        timePaused.setText(convertSeconds((breakMillis+999)/1000));
-                        timeLeft.setText(convertSeconds((breakMillis+999)/1000));
-                    }
-                }
-                numberOfSets = startCustomSetTime.size();
-                if (!breaksOnly) numberOfBreaks = startCustomBreakTime.size(); else numberOfBreaks = startBreaksOnlyTime.size();
-                savedSets = numberOfSets;
-                savedBreaks = numberOfBreaks;
-
-                if (!breaksOnly) {
-                    customSetTime = new ArrayList<>();
-                    customBreakTime = new ArrayList<>();
-                } else {
-                    breaksOnlyTime = new ArrayList<>();
-                }
-
-                if (!breaksOnly) {
-                    if (startCustomSetTime.size() >0) {
-                        for (int i=0; i<startCustomSetTime.size(); i++) {
-                            customSetTime.add(startCustomSetTime.get(i));
-                            customBreakTime.add(startCustomBreakTime.get(i));
-                        }
-                        timerDisabled = false;
-                    } else timerDisabled = true;
-                    dotDraws.breakTime(customBreakTime);
-                    third_value_single_edit.setText(String.valueOf(customSetTime.size()));
-                    activeCustomCycle = false;
-                } else {
-                    if (startBreaksOnlyTime.size()>0) {
-                        breaksOnlyTime.addAll(startBreaksOnlyTime);
-                        timerDisabled = false;
-                    } else timerDisabled = true;
-
-                    dotDraws.breakTime(breaksOnlyTime);
-                    third_value_single_edit.setText(String.valueOf(breaksOnlyTime.size()));
-                    activeCustomBOCycle = false;
-                }
-                //Always setting this to avoid null errors.
-                dotDraws.setTime(customSetTime);
-                dotDraws.setAlpha();
-                drawDots(0);
-                break;
-            case 2:
-                pomTimerEnded = false;
-                progressBar2.setProgress(10000);
-                pomBegun = false;
-                pomProgressPause = maxProgress;
-                if (timer2 != null) timer2.cancel();
-                if (objectAnimator2 != null) objectAnimator2.cancel();
-                //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
-                pomMillis1 = (pomValue1*1000) * 60;
-                pomMillis = pomMillis1;
-                timePaused2.setAlpha(1);
-                onBreak = false;
-                pomHalted = true;
-                pomProgressPause = maxProgress;
-                dotDraws.pomDraw(pomDotCounter, 0, pomValuesTime);
-                activePomCycle = false;
-                if (pomValuesTime.size()==0) {
-                    pomTimerDisabled = true;
-                    timePaused2.setText("?");
-                } else {
-                    pomTimerDisabled = false;
-                    timePaused2.setText(convertSeconds((pomMillis+999)/1000));
-                }
-                dotDraws.setAlpha();
-                break;
-            case 3:
-                stopwatchHalted = true;
-                ms = 0;
-                msConvert = 0;
-                msConvert2 = 0;
-                msDisplay = 0;
-                msReset = 0;
-                seconds = 0;
-                minutes = 0;
-                lapsNumber = 0;
-                timeLeft3.setAlpha(1);
-                msTime.setAlpha(1);
-                timeLeft3.setText("0");
-                msTime.setText("00");
-                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
-                if (currentLapList.size()>0) currentLapList.clear();
-                if (savedLapList.size()>0) savedLapList.clear();
-                lapAdapter.notifyDataSetChanged();
-                break;
-        }
-        add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
-        sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
-        add_cycle.setEnabled(true);
-        sub_cycle.setEnabled(true);
     }
 
     public void canSaveOrUpdate(boolean yesWeCan) {
@@ -3343,5 +3111,240 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             fadeCap.setDuration(350);
             textView.setAnimation(fadeCap);
         }
+    }
+
+    public void tabViews(){
+        ConstraintLayout.LayoutParams params2 = (ConstraintLayout.LayoutParams) cycle_reset.getLayoutParams();
+        switch (mode) {
+            case 1:
+                first_value_textView.setText(convertCustomTextView(setValue));
+                if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar2.setVisibility(View.INVISIBLE);
+                stopWatchView.setVisibility(View.GONE);
+                s1.setVisibility(View.VISIBLE);
+                s2.setVisibility(View.VISIBLE);
+                s3.setVisibility(View.INVISIBLE);
+                first_value_edit.setVisibility(View.INVISIBLE);
+                first_value_edit_two.setVisibility(View.INVISIBLE);
+                first_value_sep.setVisibility(View.INVISIBLE);
+                second_value_edit.setVisibility(View.INVISIBLE);
+                second_value_edit_two.setVisibility(View.INVISIBLE);
+                second_value_sep.setVisibility(View.INVISIBLE);
+                first_value_single_edit.setVisibility(View.INVISIBLE);
+                second_value_single_edit.setVisibility(View.INVISIBLE);
+                third_value_single_edit.setVisibility(View.INVISIBLE);
+                plus_third_value.setVisibility(View.INVISIBLE);
+                minus_third_value.setVisibility(View.INVISIBLE);
+                third_value_textView.setVisibility(View.INVISIBLE);
+                first_value_textView.setVisibility(View.VISIBLE);
+                second_value_textView.setVisibility(View.VISIBLE);
+
+                skip.setVisibility(View.VISIBLE);
+                newLap.setVisibility(View.GONE);
+                s1.setText(R.string.set_time);
+                s2.setText(R.string.break_time);
+                cycle_header_text.setVisibility(View.VISIBLE);
+                cycle_reset.setText(R.string.clear_cycles);
+                params2.width = 150;
+                s1.setTextSize(24f);
+                s2.setTextSize(24f);
+                s3.setTextSize(24f);
+                break;
+            case 2:
+                first_value_single_edit.setText(convertSeconds(pomValue1));
+                second_value_single_edit.setText(convertSeconds(pomValue2));
+                third_value_single_edit.setText(convertSeconds(pomValue3));
+
+                progressBar.setVisibility(View.INVISIBLE);
+                progressBar2.setVisibility(View.VISIBLE);
+                stopWatchView.setVisibility(View.GONE);
+                s1.setVisibility(View.VISIBLE);
+                s2.setVisibility(View.VISIBLE);
+                s3.setVisibility(View.VISIBLE);
+                plus_first_value.setVisibility(View.VISIBLE);
+                minus_first_value.setVisibility(View.VISIBLE);
+                plus_second_value.setVisibility(View.VISIBLE);
+                minus_second_value.setVisibility(View.VISIBLE);
+                plus_third_value.setVisibility(View.VISIBLE);
+                minus_third_value.setVisibility(View.VISIBLE);
+                third_value_textView.setVisibility(View.VISIBLE);
+
+                first_value_edit.setVisibility(View.INVISIBLE);
+                first_value_edit_two.setVisibility(View.INVISIBLE);
+                second_value_edit.setVisibility(View.INVISIBLE);
+                second_value_edit_two.setVisibility(View.INVISIBLE);
+                first_value_sep.setVisibility(View.INVISIBLE);
+                second_value_sep.setVisibility(View.INVISIBLE);
+
+                first_value_textView.setVisibility(View.VISIBLE);
+                second_value_textView.setVisibility(View.VISIBLE);
+                third_value_textView.setVisibility(View.VISIBLE);
+                first_value_textView.setText(String.valueOf(pomValue1));
+                second_value_textView.setText(String.valueOf(pomValue2));
+                third_value_textView.setText(String.valueOf(pomValue3));
+
+                skip.setVisibility(View.VISIBLE);
+                newLap.setVisibility(View.GONE);
+                s1.setText(R.string.work_time);
+                s2.setText(R.string.small_break);
+                s3.setText(R.string.long_break);
+                cycle_header_text.setVisibility(View.INVISIBLE);
+                cycle_reset.setText(R.string.clear_cycles);
+                params2.width = 150;
+                s1.setTextSize(21f);
+                s2.setTextSize(21f);
+                s3.setTextSize(21f);
+                break;
+            case 3:
+                progressBar.setVisibility(View.INVISIBLE);
+                progressBar2.setVisibility(View.INVISIBLE);
+                stopWatchView.setVisibility(View.VISIBLE);
+                plus_third_value.setVisibility(View.GONE);
+                s1.setVisibility(View.GONE);
+                s2.setVisibility(View.GONE);
+                s3.setVisibility(View.GONE);
+                plus_first_value.setVisibility(View.GONE);
+                minus_first_value.setVisibility(View.GONE);
+                plus_second_value.setVisibility(View.GONE);
+                minus_second_value.setVisibility(View.GONE);
+                plus_third_value.setVisibility(View.GONE);
+                minus_third_value.setVisibility(View.GONE);
+                skip.setVisibility(View.GONE);
+                newLap.setVisibility(View.VISIBLE);
+                cycle_reset.setText(R.string.clear_laps);
+                params2.width = 200;
+                msTime.setAlpha(1);
+                msTimePaused.setAlpha(1);
+
+                timeLeft3.setText(displayTime);
+                timePaused3.setText(displayTime);
+                msTime.setText(displayMs);
+                msTimePaused.setText(displayMs);
+        }
+        cycle_reset.setLayoutParams(params2);
+    }
+
+    public void resetTimer() {
+        removeViews();
+        //Todo: Separate end animations, especially since adding stopwatch.
+        if (endAnimation != null) endAnimation.cancel();
+        switch (mode) {
+            case 1:
+                timePaused.setAlpha(1);
+                progressBar.setProgress(10000);
+                customProgressPause = maxProgress;
+                customTimerEnded = false;
+                setBegun = false;
+                breakBegun = false;
+                customHalted = true;
+                if (!breaksOnly) onBreak = false; else onBreak =true;
+                if (timer != null) timer.cancel();
+                if (objectAnimator != null) objectAnimator.cancel();
+
+                if (startCustomSetTime.size()>0) {
+                    setMillis = startCustomSetTime.get(0);
+                }
+                if (!breaksOnly) {
+                    if (startCustomBreakTime.size()>0) {
+                        breakMillis = startCustomBreakTime.get(0);
+                        timePaused.setText(convertSeconds((setMillis+999)/1000));
+                        timeLeft.setText(convertSeconds((setMillis+999)/1000));
+                    }
+                } else {
+                    if (startBreaksOnlyTime.size()>0) {
+                        breakMillis = startBreaksOnlyTime.get(0);
+                        timePaused.setText(convertSeconds((breakMillis+999)/1000));
+                        timeLeft.setText(convertSeconds((breakMillis+999)/1000));
+                    }
+                }
+                numberOfSets = startCustomSetTime.size();
+                if (!breaksOnly) numberOfBreaks = startCustomBreakTime.size(); else numberOfBreaks = startBreaksOnlyTime.size();
+                savedSets = numberOfSets;
+                savedBreaks = numberOfBreaks;
+
+                if (!breaksOnly) {
+                    customSetTime = new ArrayList<>();
+                    customBreakTime = new ArrayList<>();
+                } else {
+                    breaksOnlyTime = new ArrayList<>();
+                }
+
+                if (!breaksOnly) {
+                    if (startCustomSetTime.size() >0) {
+                        for (int i=0; i<startCustomSetTime.size(); i++) {
+                            customSetTime.add(startCustomSetTime.get(i));
+                            customBreakTime.add(startCustomBreakTime.get(i));
+                        }
+                        timerDisabled = false;
+                    } else timerDisabled = true;
+                    dotDraws.breakTime(customBreakTime);
+                    third_value_single_edit.setText(String.valueOf(customSetTime.size()));
+                    activeCustomCycle = false;
+                } else {
+                    if (startBreaksOnlyTime.size()>0) {
+                        breaksOnlyTime.addAll(startBreaksOnlyTime);
+                        timerDisabled = false;
+                    } else timerDisabled = true;
+
+                    dotDraws.breakTime(breaksOnlyTime);
+                    third_value_single_edit.setText(String.valueOf(breaksOnlyTime.size()));
+                    activeCustomBOCycle = false;
+                }
+                //Always setting this to avoid null errors.
+                dotDraws.setTime(customSetTime);
+                dotDraws.setAlpha();
+                drawDots(0);
+                break;
+            case 2:
+                pomTimerEnded = false;
+                progressBar2.setProgress(10000);
+                pomBegun = false;
+                pomProgressPause = maxProgress;
+                if (timer2 != null) timer2.cancel();
+                if (objectAnimator2 != null) objectAnimator2.cancel();
+                //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
+                pomMillis1 = pomValuesTime.get(0)*1000*60;
+                pomMillis = pomMillis1;
+                timePaused2.setAlpha(1);
+                onBreak = false;
+                pomHalted = true;
+                pomProgressPause = maxProgress;
+                dotDraws.pomDraw(pomDotCounter, 0, pomValuesTime);
+                activePomCycle = false;
+                if (pomValuesTime.size()==0) {
+                    pomTimerDisabled = true;
+                    timePaused2.setText("?");
+                } else {
+                    pomTimerDisabled = false;
+                    timePaused2.setText(convertSeconds((pomMillis+999)/1000));
+                }
+                dotDraws.setAlpha();
+                break;
+            case 3:
+                stopwatchHalted = true;
+                ms = 0;
+                msConvert = 0;
+                msConvert2 = 0;
+                msDisplay = 0;
+                msReset = 0;
+                seconds = 0;
+                minutes = 0;
+                lapsNumber = 0;
+                timeLeft3.setAlpha(1);
+                msTime.setAlpha(1);
+                timeLeft3.setText("0");
+                msTime.setText("00");
+                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
+                if (currentLapList.size()>0) currentLapList.clear();
+                if (savedLapList.size()>0) savedLapList.clear();
+                lapAdapter.notifyDataSetChanged();
+                break;
+        }
+        add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
+        sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
+        add_cycle.setEnabled(true);
+        sub_cycle.setEnabled(true);
     }
 }
