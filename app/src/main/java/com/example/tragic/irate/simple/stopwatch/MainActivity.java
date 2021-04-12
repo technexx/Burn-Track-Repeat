@@ -776,7 +776,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesBO = new CyclesBO();
         pomCycles = new PomCycles();
 
-
         savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
         deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, false);
         labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
@@ -1046,6 +1045,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 prefEdit.apply();
                 mHandler.postDelayed(this, incrementTimer*10);
+                fadeCap(first_value_textView);
             }
         };
 
@@ -1070,6 +1070,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 prefEdit.apply();
                 mHandler.postDelayed(this, incrementTimer*10);
+                fadeCap(second_value_textView);
             }
         };
 
@@ -1080,6 +1081,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 prefEdit.putLong("pomValue3", pomValue3);
                 pomMillis3 = (pomValue3*1000) * 60;
                 mHandler.postDelayed(this, incrementTimer*10);
+                fadeCap(third_value_textView);
             }
         };
 
@@ -2855,14 +2857,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //
     public void toastBounds(long min, long max, long value) {
-        if (value==min) {
-            minReached = true;
-            Toast.makeText(getApplicationContext(), "Minimum reached", Toast.LENGTH_SHORT).show();
-        } else if (value==max) {
-            maxReached = true;
-            Toast.makeText(getApplicationContext(), "Cap reached", Toast.LENGTH_SHORT).show();
-        }
+        if (value==min) minReached = true;
+        if (value==max) maxReached = true;
     }
 
     public void canSaveOrUpdate(boolean yesWeCan) {
@@ -3337,5 +3335,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             invalidateOptionsMenu();
         };
         mHandler.postDelayed(r, 50);
+    }
+
+    public void fadeCap(TextView textView) {
+        if (minReached || maxReached) {
+            Animation fadeCap = new AlphaAnimation(1.0f, 0.3f);
+            fadeCap.setDuration(350);
+            first_value_textView.setAnimation(fadeCap);
+            minReached = false; maxReached = false;
+            textView.setAnimation(fadeCap);
+        }
     }
 }
