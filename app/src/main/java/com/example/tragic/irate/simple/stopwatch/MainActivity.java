@@ -306,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean minReached;
     boolean maxReached;
 
+    //Todo: App starting @ 5:01 set time if capped beforehand. Likely due to setValue being saved to SharedPPref before it's capped.
     //Todo: Sep breakOnly timer.
     //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
 
@@ -1034,11 +1035,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 switch (mode) {
                     case 1:
                         if (incrementValues) setValue+=1; else setValue -=1;
-                        prefEdit.putLong("setValue", setValue);
                         break;
                     case 2:
                         if (incrementValues) pomValue1+=1; else pomValue1 -=1;
-                        prefEdit.putLong("pomValue1", pomValue1);
                         //Minutes for Pom instead of seconds.
                         pomMillis1 = (pomValue1*1000) * 60;
                         break;
@@ -1056,15 +1055,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 1:
                         if (!breaksOnly) {
                             if (incrementValues) breakValue+=1; else breakValue -=1;
-                            prefEdit.putLong("breakOnly", breakValue);
                         } else{
                             if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
-                            prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
                         }
                         break;
                     case 2:
                         if (incrementValues) pomValue2+=1; else pomValue2 -=1;
-                        prefEdit.putLong("pomValue2", pomValue2);
                         pomMillis2 = (pomValue2*1000) * 60;
                         break;
                 }
@@ -1078,7 +1074,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void run() {
                 if (incrementValues) pomValue3+=1; else pomValue3 -=1;
-                prefEdit.putLong("pomValue3", pomValue3);
                 pomMillis3 = (pomValue3*1000) * 60;
                 mHandler.postDelayed(this, incrementTimer*10);
                 fadeCap(third_value_textView);
@@ -2791,6 +2786,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 incrementTimer = 10;
         }
         setTimerValueBounds();
+        prefEdit.putLong("setValue", setValue);
+        prefEdit.putLong("breakValue", breakValue);
+        prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
+        prefEdit.putLong("pomValue1", pomValue1);
+        prefEdit.putLong("pomValue2", pomValue2);
+        prefEdit.putLong("pomValue3", pomValue3);
+        prefEdit.apply();
     }
 
     public void setEditValueBounds(boolean onSets){
@@ -2810,7 +2812,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     setValue = (editSetMinutes * 60) + editSetSeconds;
                     first_value_textView.setText(convertCustomTextView(setValue));
-                    prefEdit.putLong("setValue", setValue);
                 } else {
                     editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
                     editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
@@ -2825,10 +2826,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     if (!breaksOnly) {
                         breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-                        prefEdit.putLong("breakValue", breakValue);
                     } else {
                         breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-                        prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
                     }
                     second_value_textView.setText(convertCustomTextView(breakValue));
                 }
@@ -2836,7 +2835,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
                 break;
         }
-        prefEdit.apply();
         setTimerValueBounds();
     }
 
