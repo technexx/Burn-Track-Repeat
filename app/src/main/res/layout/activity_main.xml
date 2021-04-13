@@ -152,7 +152,7 @@
         android:src="@drawable/add_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/tabLayout"
-        android:layout_marginTop="48.5dp"
+        android:layout_marginTop="78dp"
         android:layout_marginStart="125dp"
         android:backgroundTint="@color/black"
         android:background="@drawable/rounded">
@@ -165,7 +165,7 @@
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/tabLayout"
-        android:layout_marginTop="48.5dp"
+        android:layout_marginTop="78dp"
         android:layout_marginStart="250dp"
         android:backgroundTint="@color/black"
         android:background="@drawable/rounded">
@@ -228,10 +228,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_first_value"
-        app:layout_constraintEnd_toStartOf="@id/first_value_sep"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="33.5dp"
-        android:layout_marginStart="10dp"
+        app:layout_constraintTop_toTopOf="@id/plus_first_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="2dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -246,23 +246,23 @@
         android:id="@+id/first_value_sep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/first_value_edit"
-        app:layout_constraintEnd_toStartOf="@id/first_value_edit_two"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="39dp"
-        android:textStyle="bold"
-        android:textSize="28sp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/plus_first_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
+        android:layout_marginStart="193.5dp"
+        android:layout_marginBottom="3dp"
+        android:textSize="25sp">
     </TextView>
 
     <EditText
         android:id="@+id/first_value_edit_two"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/first_value_sep"
-        app:layout_constraintEnd_toStartOf="@id/minus_first_value"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="33dp"
-        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toStartOf="@id/minus_second_value"
+        app:layout_constraintTop_toTopOf="@id/plus_first_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="2dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -278,8 +278,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_first_value"
         app:layout_constraintEnd_toStartOf="@id/minus_first_value"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="33dp"
+        app:layout_constraintTop_toTopOf="@id/plus_first_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -295,8 +295,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_first_value"
         app:layout_constraintEnd_toStartOf="@id/minus_first_value"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="46.5dp"
+        app:layout_constraintTop_toTopOf="@id/plus_first_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
+        android:layout_marginBottom="3dp"
         android:textSize="25sp">
     </TextView>
 
@@ -305,10 +306,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_second_value"
-        app:layout_constraintEnd_toStartOf="@id/second_value_sep"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="77dp"
-        android:layout_marginStart="10dp"
+        app:layout_constraintTop_toTopOf="@id/plus_second_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="2dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -323,23 +324,23 @@
         android:id="@+id/second_value_sep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/second_value_edit"
-        app:layout_constraintEnd_toStartOf="@id/second_value_edit_two"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="84dp"
-        android:textStyle="bold"
-        android:textSize="28sp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/plus_second_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
+        android:textSize="25sp"
+        android:layout_marginStart="193.5dp"
+        android:layout_marginBottom="3dp">
     </TextView>
 
     <EditText
         android:id="@+id/second_value_edit_two"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/second_value_sep"
         app:layout_constraintEnd_toStartOf="@id/minus_second_value"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="77dp"
-        android:layout_marginEnd="10dp"
+        app:layout_constraintTop_toTopOf="@id/plus_second_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="12dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:inputType="number"
@@ -354,8 +355,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_second_value"
         app:layout_constraintEnd_toStartOf="@id/minus_second_value"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="77dp"
+        app:layout_constraintTop_toTopOf="@id/plus_second_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:inputType="number"
@@ -370,8 +371,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/plus_second_value"
         app:layout_constraintEnd_toStartOf="@id/minus_second_value"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="94dp"
+        app:layout_constraintTop_toTopOf="@id/plus_second_value"
+        app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
+        android:layout_marginBottom="3dp"
         android:textSize="25sp">
     </TextView>
 
@@ -410,12 +412,11 @@
         app:layout_constraintTop_toTopOf="@id/tabLayout"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="10dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="68dp"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:paddingEnd="-10dp"
-        android:paddingStart="-10dp"
-        android:backgroundTint="@color/light_grey">
+        android:paddingStart="-10dp">
     </Button>
 
     <Button
@@ -429,8 +430,7 @@
         android:textColor="@color/white"
         android:textSize="20sp"
         android:paddingEnd="-10dp"
-        android:paddingStart="-10dp"
-        android:backgroundTint="@color/light_grey">
+        android:paddingStart="-10dp">
     </Button>
 
     <ImageButton

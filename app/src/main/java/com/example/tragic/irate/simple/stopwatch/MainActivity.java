@@ -343,12 +343,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (pos <=0) {
                 left_arrow.setVisibility(View.INVISIBLE);
                 right_arrow.setVisibility(View.INVISIBLE);
-                cycles_completed.setVisibility(View.VISIBLE);
                 delete_sb.setVisibility(View.INVISIBLE);
             } else {
                 left_arrow.setVisibility(View.VISIBLE);
                 right_arrow.setVisibility(View.VISIBLE);
-                cycles_completed.setVisibility(View.INVISIBLE);
                 delete_sb.setVisibility(View.VISIBLE);
             }
         }
@@ -756,7 +754,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         mHandler = new Handler();
 
-        cycles_completed.setVisibility(View.VISIBLE);
         delete_sb.setVisibility(View.INVISIBLE);
         progressBar2.setVisibility(View.GONE);
         stopWatchView.setVisibility(View.GONE);
@@ -3371,8 +3368,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 lapAdapter.notifyDataSetChanged();
                 break;
         }
-        add_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
-        sub_cycle.setBackgroundColor(getResources().getColor(R.color.light_grey));
+        add_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
+        sub_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
     }
