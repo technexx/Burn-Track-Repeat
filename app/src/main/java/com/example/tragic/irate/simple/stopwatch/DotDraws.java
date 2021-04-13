@@ -176,7 +176,6 @@ public class DotDraws extends View {
             if (posX > 770 && posX <= 880 && mListSize >= 8) currentPos = 7;
             if (posX > 880 && posX <= 990 && mListSize >= 9) currentPos = 8;
             if (posX > 990 && mListSize >= 10) currentPos = 9;
-            Log.i("findpos", String.valueOf(posX));
             if (previousPos != currentPos) {
                 mDrawBox = true;
             }
@@ -218,7 +217,6 @@ public class DotDraws extends View {
         savedPomCycle = cycle2;
 
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
-        if (mBreaksOnly) mY2 = 535;
 
         if (mMode == 1) {
             encloseDots(mY-70, mY+200);
@@ -234,31 +232,26 @@ public class DotDraws extends View {
                 else {
                     mPaint.setAlpha(255);
                 }
-                if (!mBreaksOnly) {
-                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                    drawText(mBreakTime, mX2, mY2, i);
-                    mX2 += 107;
-                } else {
-                    mCanvas.drawRoundRect(mX2-40, mY2-75, mX2+48, mY2+80, 45, 45, mPaint);
-                    drawText(mBreakTime, mX2+5, mY2, i);
-                    mX2+=107;
-                }
+                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                drawText(mBreakTime, mX2, mY2, i);
+                mX2 += 107;
             }
-        }
 
-        if (mMode == 1 && !mBreaksOnly) {
             mPaint.setStyle(Paint.Style.FILL);
             for (int i=0; i<mSetCount; i++) {
                 mPaint.setColor(Color.GREEN);
-                if (mSetCount - mSetReduce == i) {
-                    if (mFadeDone == 1) {
-                        fadeDot();
+                if (!mBreaksOnly) {
+                    if (mSetCount - mSetReduce == i) {
+                        if (mFadeDone == 1) {
+                            fadeDot();
+                        }
+                    } else if (mSetReduce + i < mSetCount) {
+                        mPaint.setAlpha(100);
+                    } else {
+                        mPaint.setAlpha(255);
                     }
-                } else if (mSetReduce + i < mSetCount) {
-                    mPaint.setAlpha(100);
-                } else {
-                    mPaint.setAlpha(255);
-                }
+                } else mPaint.setAlpha(30);
+
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
                 drawText(mSetTime, mX, mY, i);
                 mX += 107;
@@ -356,12 +349,6 @@ public class DotDraws extends View {
     private void drawText(ArrayList<String> list, float x, float y, int i) {
         if (mMode == 1) {
             mPaintText.setColor(Color.BLACK);
-            if (!mBreaksOnly)  {
-                mPaintText.setTypeface(Typeface.DEFAULT);
-            } else {
-                Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
-                mPaintText.setTypeface(tf);
-            }
             if (list.size() >0) {
                 if (list.get(i).length() <= 2) {
                     if (list.get(i).length() == 1) {
@@ -370,23 +357,11 @@ public class DotDraws extends View {
                         temp = "0" + temp;
                         list.set(i, temp);
                     }
-                    if (!mBreaksOnly) {
-                        mPaintText.setTextSize(60f);
-                        mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
-                    } else {
-                        mPaintText.setTextSize(90f);
-                        mCanvas.drawText(list.get(i), x-44, y+28, mPaintText);
-                    }
+                    mPaintText.setTextSize(62f);
+                    mCanvas.drawText(list.get(i), x-38, y+22, mPaintText);
                 } else {
-                    if (!mBreaksOnly) {
-                        mPaintText.setTextSize(45f);
-                        mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
-                    } else {
-                        Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow_bold);
-                        mPaintText.setTypeface(tf);
-                        mPaintText.setTextSize(52f);
-                        mCanvas.drawText(list.get(i), x-45, y+17, mPaintText);
-                    }
+                    mPaintText.setTextSize(45f);
+                    mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
                 }
             }
         } else if (mMode==2) {

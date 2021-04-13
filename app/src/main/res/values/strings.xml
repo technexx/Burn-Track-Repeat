@@ -5,7 +5,7 @@
 
     <string name="no_sets">Breaks Only</string>
     <string name="reset">Reset</string>
-    <string name="clear_cycles">Clear Cycles</string>
+    <string name="clear_cycles">Reset Count</string>
     <string name="skip_round">Skip Round</string>
     <string name="set_time">Sets:</string>
     <string name="break_time">Breaks:</string>

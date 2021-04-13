@@ -300,8 +300,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: Possible separate menu for +/- options (i.e. not in default view). Could be a fading transition popup (would look better).
     //Todo: Sep breakOnly timer.
-    //Todo: First box selection should highlight. Only NOT highlight w/ 1 set/break listed.
-    //Todo: Remove boxes for Pom.
     //Todo: Recall last modified UI on app launch instead of plucking from last used DB save.
     //Todo: Fix title and saves for Pom.
     //Todo: "overtime" seconds are active for set/break, should be for breakOnly.
@@ -357,8 +355,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         motionEvent = event;
         int x = (int) event.getX();
         int y = (int) event.getY();
-        if (event.getAction()==MotionEvent.ACTION_DOWN) {
-            dotDraws.selectCycle(x, y, startCustomSetTime.size());
+
+        //Selects a set/break combo to move.
+        if (mode==1) {
+            if (event.getAction()==MotionEvent.ACTION_DOWN) {
+                dotDraws.selectCycle(x, y, startCustomSetTime.size());
+            }
         }
 
         //This dismisses windows/views when main layout (view) is clicked. We use it instead of using a clickable instance of our layout since that bugs.
@@ -1257,7 +1259,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         add_cycle.setOnClickListener(v-> {
             adjustCustom(true);
-//            invalidateOptionsMenu();
         });
 
         sub_cycle.setOnClickListener(v-> {
