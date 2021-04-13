@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="@id/tabLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="40dp"
         android:textColor="@color/teal_200"
         android:textSize="24sp">
     </TextView>
@@ -40,9 +40,70 @@
         app:layout_constraintTop_toTopOf="@id/tabLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="175dp"
+        android:layout_marginTop="50dp"
         android:textColor="@color/teal_200"
         android:textSize="24sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/cycles_completed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="80dp"
+        android:textColor="@color/white"
+        android:textSize="18sp">
+    </TextView>
+
+    <Button
+        android:id="@+id/skip"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/cycle_reset"
+        android:layout_marginTop="115dp"
+        android:textSize="15sp"
+        android:gravity="center_vertical"
+        android:backgroundTint="@color/black"
+        app:cornerRadius="50dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/dark_grey"
+        app:strokeWidth="1dp">
+    </Button>
+
+    <Button
+        android:id="@+id/cycle_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/skip"
+        android:layout_marginTop="115dp"
+        android:textSize="15sp"
+        android:gravity="center_vertical"
+        android:backgroundTint="@color/black"
+        app:cornerRadius="50dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/dark_grey"
+        app:strokeWidth="1dp">
+    </Button>
+
+    <TextView
+        android:id="@+id/new_lap"
+        android:textColor="@color/white"
+        android:layout_width="70dp"
+        android:layout_height="75dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="350dp"
+        android:layout_marginStart="33dp"
+        android:textSize="14sp"
+        android:gravity="center_vertical">
     </TextView>
 
     <TextView
@@ -404,18 +465,6 @@
         app:layout_constraintTop_toBottomOf="@id/tabLayout">
     </com.example.tragic.irate.simple.stopwatch.DotDraws>
 
-    <TextView
-        android:id="@+id/cycles_completed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="270dp"
-        android:textColor="@color/white"
-        android:textSize="14sp">
-    </TextView>
-
     <ImageButton
         android:id="@+id/delete_set_break"
         android:layout_width="wrap_content"
@@ -431,47 +480,6 @@
         android:src="@drawable/delete_sb"
         android:background="@color/black">
     </ImageButton>
-
-    <TextView
-        android:id="@+id/skip"
-        android:textColor="@color/white"
-        android:layout_width="50dp"
-        android:layout_height="75dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/progressBar"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="350dp"
-        android:layout_marginStart="30dp"
-        android:textSize="14sp"
-        android:gravity="center_vertical">
-    </TextView>
-
-    <TextView
-        android:id="@+id/new_lap"
-        android:textColor="@color/white"
-        android:layout_width="70dp"
-        android:layout_height="75dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/progressBar"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="350dp"
-        android:layout_marginStart="33dp"
-        android:textSize="14sp"
-        android:gravity="center_vertical">
-    </TextView>
-
-    <TextView
-        android:id="@+id/cycle_reset"
-        android:layout_width="50dp"
-        android:layout_height="75dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/progressBar"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="350dp"
-        android:layout_marginEnd="12dp"
-        android:textSize="14sp"
-        android:gravity="center_vertical">
-    </TextView>
 
     <TextView
         android:id="@+id/timeLeft"
@@ -579,8 +587,8 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="230dp"
-        android:layout_height="230dp"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -593,8 +601,8 @@
 
     <ProgressBar
         android:id="@+id/progressBar2"
-        android:layout_width="230dp"
-        android:layout_height="230dp"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -640,7 +648,6 @@
 
     <TextView
         android:id="@+id/reset"
-        android:text="Reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
