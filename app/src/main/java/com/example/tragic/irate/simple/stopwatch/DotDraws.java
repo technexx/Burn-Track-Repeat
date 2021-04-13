@@ -31,6 +31,7 @@ import java.util.ArrayList;
 public class DotDraws extends View {
     Canvas mCanvas;
     Paint mPaint;
+    Paint mPaint2;
     Paint mPaintText;
     float mX;
     float mX2;
@@ -95,6 +96,11 @@ public class DotDraws extends View {
         mPaint.setStrokeWidth(4);
         mPaintText = new Paint();
         mPaintText.setAntiAlias(true);
+
+        mPaint2 = new Paint();
+        mPaint2.setColor(Color.GRAY);
+        mPaint2.setStyle(Paint.Style.STROKE);
+        mPaint2.setStrokeWidth(6);
     }
 
     public void selectionPaint() {
@@ -202,8 +208,40 @@ public class DotDraws extends View {
         savedPomAlpha = mAlpha2;
         savedPomCycle = cycle2;
 
-        mX = 60; mY = 490; mX2 = 60; mY2 = 620;
+        mX = 58; mY = 490; mX2 = 58; mY2 = 620;
         if (mBreaksOnly) mY2 = 535;
+
+        if (mMode == 1) {
+            mPaint2.setStyle(Paint.Style.STROKE);
+            mPaint2.setColor(Color.WHITE);
+            mCanvas.drawRoundRect(3, mY-70, 1078, mY+200, 20, 20, mPaint2);
+            mPaint2.setStyle(Paint.Style.FILL);
+            mPaint2.setAlpha(35);
+            mCanvas.drawRoundRect(3, mY-70, 1078, mY+200, 20, 20, mPaint2);
+
+            for (int i=0; i<mBreakCount; i++) {
+                mPaint.setColor(Color.RED);
+                if (mBreakCount - mBreakReduce == i) {
+                    if (mFadeDone == 2) {
+                        fadeDot();
+                    }
+                } else if (mBreakReduce + i <  mBreakCount) {
+                    mPaint.setAlpha(100);
+                }
+                else {
+                    mPaint.setAlpha(255);
+                }
+                if (!mBreaksOnly) {
+                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                    drawText(mBreakTime, mX2, mY2, i);
+                    mX2 += 107;
+                } else {
+                    mCanvas.drawRoundRect(mX2-40, mY2-75, mX2+48, mY2+80, 45, 45, mPaint);
+                    drawText(mBreakTime, mX2+5, mY2, i);
+                    mX2+=107;
+                }
+            }
+        }
 
         if (mMode == 1 && !mBreaksOnly) {
             mPaint.setStyle(Paint.Style.FILL);
@@ -220,7 +258,7 @@ public class DotDraws extends View {
                 }
                 mCanvas.drawCircle(mX, mY, 45, mPaint);
                 drawText(mSetTime, mX, mY, i);
-                mX += 108;
+                mX += 107;
             }
         }
 
@@ -232,32 +270,6 @@ public class DotDraws extends View {
                 currentPos = -1;
             }
             mPaint.setStyle(Paint.Style.FILL);
-        }
-
-        if (mMode == 1) {
-            mPaint.setStyle(Paint.Style.FILL);
-            for (int i=0; i<mBreakCount; i++) {
-                mPaint.setColor(Color.RED);
-                if (mBreakCount - mBreakReduce == i) {
-                    if (mFadeDone == 2) {
-                        fadeDot();
-                    }
-                } else if (mBreakReduce + i <  mBreakCount) {
-                    mPaint.setAlpha(100);
-                }
-                else {
-                    mPaint.setAlpha(255);
-                }
-                if (!mBreaksOnly) {
-                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                    drawText(mBreakTime, mX2, mY2, i);
-                    mX2 += 108;
-                } else {
-                    mCanvas.drawRoundRect(mX2-40, mY2-75, mX2+48, mY2+80, 45, 45, mPaint);
-                    drawText(mBreakTime, mX2+5, mY2, i);
-                    mX2+=107;
-                }
-            }
         }
 
         if (mMode == 2) {
