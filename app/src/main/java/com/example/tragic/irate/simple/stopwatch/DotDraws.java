@@ -98,7 +98,7 @@ public class DotDraws extends View {
         mPaintText.setAntiAlias(true);
 
         mPaint2 = new Paint();
-        mPaint2.setColor(Color.GRAY);
+        mPaint2.setColor(Color.WHITE);
         mPaint2.setStyle(Paint.Style.STROKE);
         mPaint2.setStrokeWidth(6);
     }
@@ -199,6 +199,15 @@ public class DotDraws extends View {
         currentPos = pos;
     }
 
+    public void encloseDots(float topY, float botY) {
+        mPaint2.setStyle(Paint.Style.STROKE);
+        mPaint2.setAlpha(175);
+        mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaint2);
+        mPaint2.setStyle(Paint.Style.FILL);
+        mPaint2.setAlpha(35);
+        mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaint2);
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
@@ -212,13 +221,7 @@ public class DotDraws extends View {
         if (mBreaksOnly) mY2 = 535;
 
         if (mMode == 1) {
-            mPaint2.setStyle(Paint.Style.STROKE);
-            mPaint2.setColor(Color.WHITE);
-            mCanvas.drawRoundRect(3, mY-70, 1078, mY+200, 20, 20, mPaint2);
-            mPaint2.setStyle(Paint.Style.FILL);
-            mPaint2.setAlpha(35);
-            mCanvas.drawRoundRect(3, mY-70, 1078, mY+200, 20, 20, mPaint2);
-
+            encloseDots(mY-70, mY+200);
             for (int i=0; i<mBreakCount; i++) {
                 mPaint.setColor(Color.RED);
                 if (mBreakCount - mBreakReduce == i) {
@@ -273,6 +276,7 @@ public class DotDraws extends View {
         }
 
         if (mMode == 2) {
+            encloseDots(mY-30, mY+150);
             mX = 92; mX2=mX+125;
             //Fading last object drawn. Setting previous ones to "greyed out"
             for (int i=0; i<mPomDotCounter; i++) {
@@ -301,13 +305,13 @@ public class DotDraws extends View {
                 mPaint.setColor(Color.GREEN);
                 //Must be called AFTER color is changed, otherwise alpha will reset to 255.
                 if (fade && mFadeDone == 1) fadeDot2();
-                mCanvas.drawCircle(mX, 610, 60, mPaint);
+                mCanvas.drawCircle(mX, 550, 60, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
                 break;
             case 1: case 3: case 5:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) fadeDot2();
-                mCanvas.drawCircle(mX2, 610, 45 , mPaint);
+                mCanvas.drawCircle(mX2, 550, 45 , mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 mX+=250;
                 mX2=mX+125;
@@ -315,7 +319,7 @@ public class DotDraws extends View {
             case 7:
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 1) fadeDot2();
-                mCanvas.drawRect(mX+90, 555, mX+200, 665, mPaint);
+                mCanvas.drawRect(mX+90, 495, mX+200, 605, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
         }
     }
@@ -389,15 +393,14 @@ public class DotDraws extends View {
             switch (i) {
                 case 0: case 2: case 4: case 6:
                     mPaintText.setTextSize(70f);
-                    mCanvas.drawText(list.get(i), x-40, y+147, mPaintText);
+                    mCanvas.drawText(list.get(i), x-40, y+87, mPaintText);
                     break;
                 case 1: case 3: case 5:
                     mPaintText.setTextSize(45f);
-                    mCanvas.drawText(list.get(i), x-12, y+135, mPaintText);
+                    mCanvas.drawText(list.get(i), x-12, y+75, mPaintText);
                     break;
                 case 7:
-//                    mPaintText.setTextSize(70f);
-                    mCanvas.drawText(list.get(i), x-23, y+147, mPaintText);
+                    mCanvas.drawText(list.get(i), x-23, y+87, mPaintText);
             }
         }
     }

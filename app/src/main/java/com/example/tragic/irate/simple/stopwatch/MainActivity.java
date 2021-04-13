@@ -1814,56 +1814,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         receivedPos = -1;
 
-        Animation fadeIn = new AlphaAnimation(0.3f, 1.0f);
-        fadeIn.setDuration(100);
-
-        Animation fadeOut = new AlphaAnimation(1.0f, 0.3f);
-        fadeOut.setDuration(100);
-
-        fadeOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if (breaksOnly) {
-                    s1.setAlpha(0.3f);
-                    plus_first_value.setAlpha(0.3f);
-                    minus_first_value.setAlpha(0.3f);
-                    first_value_textView.setAlpha(0.3f);
-                }
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-
-        fadeIn.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if (!breaksOnly) {
-                    s1.setAlpha(1);
-                    plus_first_value.setAlpha(1.0f);
-                    minus_first_value.setAlpha(1.0f);
-                    first_value_textView.setAlpha(1.0f);
-                }
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-
-
         if (mode==1) {
             if (!breaksOnly) {
                 second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-                s1.setAnimation(fadeOut);
-                plus_first_value.setAnimation(fadeOut);
-                minus_first_value.setAnimation(fadeOut);
                 plus_first_value.setEnabled(false);
                 minus_first_value.setEnabled(false);
                 first_value_edit.setEnabled(false);
@@ -1892,11 +1845,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 });
             } else {
-                s1.setAnimation(fadeIn);
                 first_value_textView.setText(convertCustomTextView(setValue));
                 second_value_textView.setText(convertCustomTextView(breakValue));
-                plus_first_value.setAnimation(fadeIn);
-                minus_first_value.setAnimation(fadeIn);
                 plus_first_value.setEnabled(true);
                 minus_first_value.setEnabled(true);
                 first_value_edit.setEnabled(true);
@@ -1921,6 +1871,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 });
             }
+            activeTimerViews(true);
             drawDots(1);
             resetTimer();
             prefEdit.apply();
@@ -2938,7 +2889,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void tabViews(){
-//        ConstraintLayout.LayoutParams params2 = (ConstraintLayout.LayoutParams) cycle_reset.getLayoutParams();
         switch (mode) {
             case 1:
                 first_value_textView.setText(convertCustomTextView(setValue));
@@ -2947,30 +2897,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
-                s1.setVisibility(View.VISIBLE);
-                s2.setVisibility(View.VISIBLE);
-                s3.setVisibility(View.INVISIBLE);
-                first_value_edit.setVisibility(View.INVISIBLE);
-                first_value_edit_two.setVisibility(View.INVISIBLE);
-                first_value_sep.setVisibility(View.INVISIBLE);
-                second_value_edit.setVisibility(View.INVISIBLE);
-                second_value_edit_two.setVisibility(View.INVISIBLE);
-                second_value_sep.setVisibility(View.INVISIBLE);
-                first_value_single_edit.setVisibility(View.INVISIBLE);
-                second_value_single_edit.setVisibility(View.INVISIBLE);
-                third_value_single_edit.setVisibility(View.INVISIBLE);
-                plus_third_value.setVisibility(View.INVISIBLE);
-                minus_third_value.setVisibility(View.INVISIBLE);
-                third_value_textView.setVisibility(View.INVISIBLE);
-                first_value_textView.setVisibility(View.VISIBLE);
-                second_value_textView.setVisibility(View.VISIBLE);
-
-                newLap.setVisibility(View.GONE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
-                cycle_header_text.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_cycles);
-//                params2.width = 150;
                 s1.setTextSize(24f);
                 s2.setTextSize(24f);
                 s3.setTextSize(24f);
@@ -2983,27 +2912,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.VISIBLE);
                 stopWatchView.setVisibility(View.GONE);
-                s1.setVisibility(View.VISIBLE);
-                s2.setVisibility(View.VISIBLE);
-                s3.setVisibility(View.VISIBLE);
-                plus_first_value.setVisibility(View.VISIBLE);
-                minus_first_value.setVisibility(View.VISIBLE);
-                plus_second_value.setVisibility(View.VISIBLE);
-                minus_second_value.setVisibility(View.VISIBLE);
-                plus_third_value.setVisibility(View.VISIBLE);
-                minus_third_value.setVisibility(View.VISIBLE);
-                third_value_textView.setVisibility(View.VISIBLE);
 
-                first_value_edit.setVisibility(View.INVISIBLE);
-                first_value_edit_two.setVisibility(View.INVISIBLE);
-                second_value_edit.setVisibility(View.INVISIBLE);
-                second_value_edit_two.setVisibility(View.INVISIBLE);
-                first_value_sep.setVisibility(View.INVISIBLE);
-                second_value_sep.setVisibility(View.INVISIBLE);
-
-                first_value_textView.setVisibility(View.VISIBLE);
-                second_value_textView.setVisibility(View.VISIBLE);
-                third_value_textView.setVisibility(View.VISIBLE);
                 first_value_textView.setText(String.valueOf(pomValue1));
                 second_value_textView.setText(String.valueOf(pomValue2));
                 third_value_textView.setText(String.valueOf(pomValue3));
@@ -3014,7 +2923,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s3.setText(R.string.long_break);
                 cycle_header_text.setVisibility(View.INVISIBLE);
                 cycle_reset.setText(R.string.clear_cycles);
-//                params2.width = 150;
                 s1.setTextSize(21f);
                 s2.setTextSize(21f);
                 s3.setTextSize(21f);
@@ -3023,19 +2931,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.VISIBLE);
-                plus_third_value.setVisibility(View.GONE);
-                s1.setVisibility(View.GONE);
-                s2.setVisibility(View.GONE);
-                s3.setVisibility(View.GONE);
-                plus_first_value.setVisibility(View.GONE);
-                minus_first_value.setVisibility(View.GONE);
-                plus_second_value.setVisibility(View.GONE);
-                minus_second_value.setVisibility(View.GONE);
-                plus_third_value.setVisibility(View.GONE);
-                minus_third_value.setVisibility(View.GONE);
+                skip.setVisibility(View.GONE);
+                cycle_reset.setVisibility(View.GONE);
+
                 newLap.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
-//                params2.width = 200;
                 msTime.setAlpha(1);
                 msTimePaused.setAlpha(1);
 
@@ -3044,7 +2944,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 msTime.setText(displayMs);
                 msTimePaused.setText(displayMs);
         }
-//        cycle_reset.setLayoutParams(params2);
+        activeTimerViews(true);
     }
 
     public void activeTimerViews(boolean active) {
@@ -3077,6 +2977,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles_completed.setVisibility(View.VISIBLE);
             skip.setVisibility(View.VISIBLE);
             cycle_reset.setVisibility(View.VISIBLE);
+            cycle_header_text.setVisibility(View.VISIBLE);
         } else {
             s1.setVisibility(View.VISIBLE);
             s2.setVisibility(View.VISIBLE);
@@ -3107,8 +3008,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if ( (!timerDisabled && mode==1) || (!pomTimerDisabled && mode==2) ){
             activeTimerViews(true);
             delete_sb.setVisibility(View.INVISIBLE);
-//            add_cycle.setBackgroundColor(getResources().getColor(R.color.Gray));
-//            sub_cycle.setBackgroundColor(getResources().getColor(R.color.Gray));
             add_cycle.setEnabled(false);
             sub_cycle.setEnabled(false);
             removeViews();
@@ -3142,11 +3041,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timeLeft.setAlpha(1);
                             customHalted = false;
                             startObjectAnimator();
-                            if (onBreak) {
-                                breakStart();
-                            } else {
-                                startTimer();
-                            }
+                            if (onBreak) breakStart(); else startTimer();
                             reset.setVisibility(View.INVISIBLE);
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
