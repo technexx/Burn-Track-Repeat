@@ -219,7 +219,11 @@ public class DotDraws extends View {
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
 
         if (mMode == 1) {
-            encloseDots(mY-70, mY+200);
+            if (mBreaksOnly){
+                mX2 = 15;
+                encloseDots(mY-30, mY+160);
+            } else encloseDots(mY-70, mY+200);
+
             for (int i=0; i<mBreakCount; i++) {
                 mPaint.setColor(Color.RED);
                 if (mBreakCount - mBreakReduce == i) {
@@ -232,15 +236,22 @@ public class DotDraws extends View {
                 else {
                     mPaint.setAlpha(255);
                 }
-                mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                drawText(mBreakTime, mX2, mY2, i);
-                mX2 += 107;
+                if (!mBreaksOnly) {
+                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
+                    drawText(mBreakTime, mX2, mY2, i);
+                    mX2 += 107;
+                } else {
+                    mCanvas.drawRoundRect(mX2, mY2-120, mX2+95, mY2-5, 50, 50, mPaint);
+//                    mCanvas.drawCircle(mX2, mY2-60, 50, mPaint);
+                    drawText(mBreakTime, mX2+50, mY2-60, i);
+                    mX2 += 106;
+                }
             }
 
-            mPaint.setStyle(Paint.Style.FILL);
-            for (int i=0; i<mSetCount; i++) {
-                mPaint.setColor(Color.GREEN);
-                if (!mBreaksOnly) {
+            if (!mBreaksOnly) {
+                mPaint.setStyle(Paint.Style.FILL);
+                for (int i=0; i<mSetCount; i++) {
+                    mPaint.setColor(Color.GREEN);
                     if (mSetCount - mSetReduce == i) {
                         if (mFadeDone == 1) {
                             fadeDot();
@@ -250,11 +261,10 @@ public class DotDraws extends View {
                     } else {
                         mPaint.setAlpha(255);
                     }
-                } else mPaint.setAlpha(30);
-
-                mCanvas.drawCircle(mX, mY, 45, mPaint);
-                drawText(mSetTime, mX, mY, i);
-                mX += 107;
+                    mCanvas.drawCircle(mX, mY, 45, mPaint);
+                    drawText(mSetTime, mX, mY, i);
+                    mX += 107;
+                }
             }
         }
 
@@ -348,7 +358,12 @@ public class DotDraws extends View {
 
     private void drawText(ArrayList<String> list, float x, float y, int i) {
         if (mMode == 1) {
-            mPaintText.setColor(Color.BLACK);
+            if (!mBreaksOnly)  {
+                mPaintText.setTypeface(Typeface.DEFAULT);
+            } else {
+                Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+                mPaintText.setTypeface(tf);
+            }
             if (list.size() >0) {
                 if (list.get(i).length() <= 2) {
                     if (list.get(i).length() == 1) {
@@ -357,11 +372,23 @@ public class DotDraws extends View {
                         temp = "0" + temp;
                         list.set(i, temp);
                     }
-                    mPaintText.setTextSize(62f);
-                    mCanvas.drawText(list.get(i), x-38, y+22, mPaintText);
+                    if (!mBreaksOnly) {
+                        mPaintText.setTextSize(60f);
+                        mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
+                    } else {
+                        mPaintText.setTextSize(90f);
+                        mCanvas.drawText(list.get(i), x-44, y+28, mPaintText);
+                    }
                 } else {
-                    mPaintText.setTextSize(45f);
-                    mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
+                    if (!mBreaksOnly) {
+                        mPaintText.setTextSize(45f);
+                        mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
+                    } else {
+                        Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+                        mPaintText.setTypeface(tf);
+                        mPaintText.setTextSize(60f);
+                        mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
+                    }
                 }
             }
         } else if (mMode==2) {
