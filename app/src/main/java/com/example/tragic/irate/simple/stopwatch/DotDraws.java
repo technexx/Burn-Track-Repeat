@@ -237,14 +237,14 @@ public class DotDraws extends View {
                     mPaint.setAlpha(255);
                 }
                 if (!mBreaksOnly) {
-                    mCanvas.drawCircle(mX2, mY2, 45, mPaint);
-                    drawText(mBreakTime, mX2, mY2, i);
-                    mX2 += 107;
+                    mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
+                    drawText(mBreakTime, mX2+16, mY2+2, i);
+                    mX2 += 132;
                 } else {
-                    mCanvas.drawRoundRect(mX2, mY2-120, mX2+95, mY2-5, 50, 50, mPaint);
+                    mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
 //                    mCanvas.drawCircle(mX2, mY2-60, 50, mPaint);
-                    drawText(mBreakTime, mX2+50, mY2-60, i);
-                    mX2 += 106;
+                    drawText(mBreakTime, mX2+60, mY2-60, i);
+                    mX2 += 132;
                 }
             }
 
@@ -261,9 +261,9 @@ public class DotDraws extends View {
                     } else {
                         mPaint.setAlpha(255);
                     }
-                    mCanvas.drawCircle(mX, mY, 45, mPaint);
-                    drawText(mSetTime, mX, mY, i);
-                    mX += 107;
+                    mCanvas.drawCircle(mX+20, mY, 55, mPaint);
+                    drawText(mSetTime, mX+16, mY+2, i);
+                    mX += 132;
                 }
             }
         }
@@ -373,7 +373,7 @@ public class DotDraws extends View {
                         list.set(i, temp);
                     }
                     if (!mBreaksOnly) {
-                        mPaintText.setTextSize(60f);
+                        mPaintText.setTextSize(70f);
                         mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
                     } else {
                         mPaintText.setTextSize(90f);
@@ -381,12 +381,14 @@ public class DotDraws extends View {
                     }
                 } else {
                     if (!mBreaksOnly) {
-                        mPaintText.setTextSize(45f);
-                        mCanvas.drawText(list.get(i), x-44, y+17, mPaintText);
+                        Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+                        mPaintText.setTypeface(tf);
+                        mPaintText.setTextSize(58f);
+                        mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
                     } else {
                         Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
                         mPaintText.setTypeface(tf);
-                        mPaintText.setTextSize(60f);
+                        mPaintText.setTextSize(65f);
                         mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
                     }
                 }
