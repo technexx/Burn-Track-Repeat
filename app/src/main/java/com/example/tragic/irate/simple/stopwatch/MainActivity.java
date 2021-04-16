@@ -441,14 +441,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                             savedCycleAdapter.notifyDataSetChanged();
                             //Comparing this ID w/ one tied to cycle currently displayed.
-                            if (deletedID == customID || cyclesList.size()==0) {
-                                customID = 0;
-                                prefEdit.putInt("customID", 0);
-                                prefEdit.apply();
-                                clearArrays(false);
-                                setDefaultCustomCycle();
-                                resetTimer();
-                            }
+//                            if (deletedID == customID || cyclesList.size()==0) {
+//                                customID = 0;
+//                                prefEdit.putInt("customID", 0);
+//                                prefEdit.apply();
+//                                clearArrays(false);
+//                                setDefaultCustomCycle();
+//                                resetTimer();
+//                            }
                         });
                     } else {
                         int deletedID = cyclesBOList.get(position).getId();
@@ -464,13 +464,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 breaksOnlyTitleArray.add(cyclesList.get(i).getTitle());
                             }
                             savedCycleAdapter.notifyDataSetChanged();
-                            if (deletedID == breaksOnlyID) {
-                                breaksOnlyID = 0;
-                                prefEdit.putInt("breaksOnlyID", 0);
-                                prefEdit.apply();
-                                setDefaultCustomCycle();
-                                resetTimer();
-                            }
+//                            if (deletedID == breaksOnlyID) {
+//                                breaksOnlyID = 0;
+//                                prefEdit.putInt("breaksOnlyID", 0);
+//                                prefEdit.apply();
+//                                setDefaultCustomCycle();
+//                                resetTimer();
+//                            }
                         });
                     }
                     break;
@@ -484,13 +484,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     runOnUiThread(()-> {
                         pomArray.remove(position);
                         savedCycleAdapter.notifyDataSetChanged();
-                        if (deletedID == pomID) {
-                            pomID = 0;
-                            prefEdit.putInt("pomID", 0);
-                            prefEdit.apply();
-                            setDefaultCustomCycle();
-                            resetTimer();
-                        }
+//                        if (deletedID == pomID) {
+//                            pomID = 0;
+//                            prefEdit.putInt("pomID", 0);
+//                            prefEdit.apply();
+//                            setDefaultCustomCycle();
+//                            resetTimer();
+//                        }
                     });
                     break;
             }
@@ -816,7 +816,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //All db queries that fetch full lists should through queryCycles() to ensure sort order is correct.
 //            queryCycles();
 
-            //Todo: Right now, this is fetching a default db position if one exists. Instead, we want the last used versions of our Arrays. SharedPref may be best for this. Might be better to simply never call the db upon launch.
 //            if (cyclesList.size()>0 && customID>0) {
 //                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
 //                setsArray.add(cyclesList.get(0).getSets());
@@ -828,8 +827,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                resetTimer();
 //            });
 
-
-            //Todo: If we are not calling db, we need to make sure sharedPref are saved any time cycles are changed, including when a saved row is accessed.
+            //Todo: custom/break IDs may be obnolete now.
             startCustomSetTime.clear();
             startCustomBreakTime.clear();
             startBreaksOnlyTime.clear();
@@ -855,8 +853,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     startCustomSetTime.add(Long.parseLong(convSets[i]));
                     startCustomBreakTime.add(Long.parseLong(convBreaks[i]));
                 }
-            }
+            } else setDefaultCustomCycle(false);
             if (!retrievedBOArray.equals("")) for (int i=0; i<convBO.length; i++) startBreaksOnlyTime.add(Long.parseLong(convBO[i]));
+            else setDefaultCustomCycle(true);
 
             runOnUiThread(() -> {
                 cycle_header_text.setText(retrievedTitle);
@@ -937,7 +936,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
             String titleText = cycle_header_text.getText().toString();
-//            if (!breaksOnly) titleText = cycles.getTitle(); else titleText = cyclesBO.getTitle();
             edit_header.setText(titleText);
             edit_header.setSelection(titleText.length());
 
@@ -950,22 +948,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!titleText.equals(newTitle)) canSaveOrUpdate(true);
                 cycle_header_text.setText(newTitle);
             });
-
-//            confirm_header_save.setOnClickListener(v2-> {
-//                AsyncTask.execute(() -> {
-//                    String newTitle = edit_header.getText().toString();
-//                    if (!breaksOnly) cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, customID);
-//                    else cyclesDatabase.cyclesDao().updateBOTitle(newTitle, breaksOnlyID);
-//                    runOnUiThread(() -> {
-//                        if (!titleText.equals(newTitle)) {
-//                            Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
-//                            cycle_header_text.setText(newTitle);
-//                            canSaveOrUpdate(true);
-//                        }
-//                        labelSavePopupWindow.dismiss();
-//                    });
-//                });
-//            });
         });
 
         first_value_textView.setOnClickListener(v-> {
@@ -1847,7 +1829,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }.start();
     }
 
-    //Todo: Should default to last modified cycle instance, not one directly from database.
     public void setBreaksOnlyMode() {
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
             savedCyclePopupWindow.dismiss();
@@ -1868,15 +1849,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 prefEdit.putBoolean("currentBreaksOnly", true);
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
-                AsyncTask.execute(() -> {
-                    queryCycles();
-                    runOnUiThread(()-> {
-                        if (cyclesBOList.size()>0) {
-                            String title = cyclesBOList.get(0).getTitle();
-                            cycle_header_text.setText(title);
-                        } else cycle_header_text.setText(R.string.default_title);
-                    });
-                });
+//                AsyncTask.execute(() -> {
+//                    queryCycles();
+//                    runOnUiThread(()-> {
+//                        if (cyclesBOList.size()>0) {
+//                            String title = cyclesBOList.get(0).getTitle();
+//                            cycle_header_text.setText(title);
+//                        } else cycle_header_text.setText(R.string.default_title);
+//                    });
+//                });
             } else {
                 first_value_textView.setText(convertCustomTextView(setValue));
                 second_value_textView.setText(convertCustomTextView(breakValue));
@@ -1893,20 +1874,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 prefEdit.putBoolean("currentBreaksOnly", false);
                 canSaveOrUpdate(canSaveOrUpdateCustom);
-                AsyncTask.execute(() -> {
-                    queryCycles();
-                    runOnUiThread(()-> {
-                        if (cyclesList.size() > 0) {
-                            String title = cyclesList.get(0).getTitle();
-                            cycle_header_text.setText(title);
-                        } else cycle_header_text.setText(R.string.default_title);
-                    });
-
-                });
+//                AsyncTask.execute(() -> {
+//                    queryCycles();
+//                    runOnUiThread(()-> {
+//                        if (cyclesList.size() > 0) {
+//                            String title = cyclesList.get(0).getTitle();
+//                            cycle_header_text.setText(title);
+//                        } else cycle_header_text.setText(R.string.default_title);
+//                    });
+//
+//                });
             }
             activeTimerViews(true);
             drawDots(1);
-            resetTimer();
+            populateCycleUI();
             prefEdit.apply();
         }
     }
@@ -2667,8 +2648,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     //Todo: For Pom.
-    public void setDefaultCustomCycle() {
-        if (!breaksOnly) {
+    public void setDefaultCustomCycle(boolean forBreaksOnly) {
+        if (!forBreaksOnly) {
             startCustomSetTime.clear();
             startCustomBreakTime.clear();
             for (int i = 0; i < 3; i++) {
@@ -2684,9 +2665,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             breaksOnlyValue = 30;
         }
-        runOnUiThread(()-> {
-            cycle_header_text.setText(R.string.default_title);
-        });
     }
 
     public void drawDots(int fadeVar) {
