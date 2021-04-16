@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean minReached;
     boolean maxReached;
 
-    FloatingActionButton fab;
+    ImageButton fab;
 
     //Todo: Remove Set option from breaksOnly mode.
     //Todo: Possible separate menu for +/- options (i.e. not in default view). Could be a fading transition popup (would look better).
@@ -442,15 +442,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 customTitleArray.add(cyclesList.get(i).getTitle());
                             }
                             savedCycleAdapter.notifyDataSetChanged();
-                            //Comparing this ID w/ one tied to cycle currently displayed.
-//                            if (deletedID == customID || cyclesList.size()==0) {
-//                                customID = 0;
-//                                prefEdit.putInt("customID", 0);
-//                                prefEdit.apply();
-//                                clearArrays(false);
-//                                setDefaultCustomCycle();
-//                                resetTimer();
-//                            }
                         });
                     } else {
                         int deletedID = cyclesBOList.get(position).getId();
@@ -466,13 +457,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 breaksOnlyTitleArray.add(cyclesList.get(i).getTitle());
                             }
                             savedCycleAdapter.notifyDataSetChanged();
-//                            if (deletedID == breaksOnlyID) {
-//                                breaksOnlyID = 0;
-//                                prefEdit.putInt("breaksOnlyID", 0);
-//                                prefEdit.apply();
-//                                setDefaultCustomCycle();
-//                                resetTimer();
-//                            }
                         });
                     }
                     break;
@@ -486,13 +470,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     runOnUiThread(()-> {
                         pomArray.remove(position);
                         savedCycleAdapter.notifyDataSetChanged();
-//                        if (deletedID == pomID) {
-//                            pomID = 0;
-//                            prefEdit.putInt("pomID", 0);
-//                            prefEdit.apply();
-//                            setDefaultCustomCycle();
-//                            resetTimer();
-//                        }
                     });
                     break;
             }
@@ -704,11 +681,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         left_arrow = findViewById(R.id.left_arrow);
         right_arrow = findViewById(R.id.right_arrow);
         delete_sb = findViewById(R.id.delete_set_break);
-
-
-        left_arrow.setVisibility(View.INVISIBLE);
-        right_arrow.setVisibility(View.INVISIBLE);
-        reset.setVisibility(View.INVISIBLE);
+        fab = findViewById(R.id.fab);
 
         save_cycles = findViewById(R.id.save_cycles);
         update_cycles = findViewById(R.id.update_cycles);
@@ -729,6 +702,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pauseResumeButton = findViewById(R.id.pauseResumeButton);
         pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
         pauseResumeButton.setRippleColor(null);
+
+        left_arrow.setVisibility(View.INVISIBLE);
+        right_arrow.setVisibility(View.INVISIBLE);
+        reset.setVisibility(View.INVISIBLE);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -816,21 +793,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomID = sharedPreferences.getInt("pomID", 0);
 
             cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-            //All db queries that fetch full lists should through queryCycles() to ensure sort order is correct.
-//            queryCycles();
 
-//            if (cyclesList.size()>0 && customID>0) {
-//                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-//                setsArray.add(cyclesList.get(0).getSets());
-//                breaksArray.add(cyclesList.get(0).getBreaks());
-//                //This is populating our startCustom arrays.
-//                setCycle(0, false);
-//            } else runOnUiThread(() -> {
-//                setDefaultCustomCycle();
-//                resetTimer();
-//            });
-
-            //Todo: custom/break IDs may be obnolete now.
+            //Todo: custom/break IDs may be obsolete now.
             startCustomSetTime.clear();
             startCustomBreakTime.clear();
             startBreaksOnlyTime.clear();
@@ -1311,6 +1275,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             drawDots(0);
         });
 
+        fab.setOnClickListener(v-> {
+
+        });
+
         //Todo: Will need new halted vars etc. for breaksOnly mode.
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -1417,21 +1385,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         cycle_reset.setOnClickListener(v -> {
-            switch (mode) {
-                case 1:
-                    if (!breaksOnly) clearCycles(customCyclesDone); else clearCycles(breaksOnlyCyclesDone);
-                    break;
-                case 2:
-                    clearCycles(pomCyclesDone);
-                    break;
-                case 3:
-                    resetEntries = newEntries;
-                    currentLapList.clear();
-                    savedLapList.clear();
-                    lapAdapter.notifyDataSetChanged();
-                    lapsNumber = 0;
-                    msReset = 0;
-                    cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
+            boolean clearIt = false;
+            if (cycle_reset.getText().equals(getString(R.string.clear_cycles))) {
+                switch (mode) {
+                    case 1:
+                        if (!breaksOnly){
+                            if (customCyclesDone>0) clearIt = true;
+                        } else if (breaksOnlyCyclesDone>0) clearIt = true;
+                        break;
+                    case 2:
+                        if (pomCyclesDone>0) clearIt = true;
+                        break;
+                }
+                if (clearIt) cycle_reset.setText(R.string.confirm_cycle_reset);
+            } else if (cycle_reset.getText().equals(getString(R.string.confirm_cycle_reset))) {
+                switch (mode) {
+                    case 1:
+                        if (!breaksOnly) customCyclesDone = 0; else breaksOnlyCyclesDone = 0;
+                        break;
+                    case 2:
+                        pomCyclesDone = 0;
+                }
+                cycle_reset.setText(R.string.clear_cycles);
+                cycles_completed.setText(getString(R.string.cycles_done, "0"));
+            } else if (cycle_reset.getText().equals(getString(R.string.clear_laps)) && lapsNumber>0) {
+                resetEntries = newEntries;
+                currentLapList.clear();
+                savedLapList.clear();
+                lapAdapter.notifyDataSetChanged();
+                lapsNumber = 0;
+                msReset = 0;
+                cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
             }
         });
 
@@ -1522,7 +1506,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 activeTimerViews(false);
             } else {
                 if (reset.getText().equals(getString(R.string.reset))) {
-                    reset.setText(R.string.pom_cycle_reset);
+                    reset.setText(R.string.confirm_cycle_reset);
                 } else {
                     reset.setText(R.string.reset);
                     resetTimer();
@@ -2094,25 +2078,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.retrieveAlpha();
     }
 
-    public void clearCycles(int cycleCount) {
-        if (cycleCount>0) {
-            cycle_reset.setVisibility(View.GONE);
-            clearCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 400, 465);
-
-            TextView confirm_reset = clearCyclePopupView.findViewById(R.id.pom_reset_text);
-            confirm_reset.setGravity(Gravity.CENTER_HORIZONTAL);
-            confirm_reset.setText(R.string.pom_cycle_reset);
-
-            confirm_reset.setOnClickListener(v2-> {
-                if (mode==1) {
-                    if (!breaksOnly) customCyclesDone = 0; else breaksOnlyCyclesDone = 0;
-                } else if (mode==2) pomCyclesDone = 0;
-                cycle_reset.setVisibility(View.VISIBLE);
-                cycles_completed.setText(getString(R.string.cycles_done, "0"));
-                clearCyclePopupWindow.dismiss();;
-            });
-        }
-    }
 
     public void removeViews() {
         timePaused.setAlpha(0);
