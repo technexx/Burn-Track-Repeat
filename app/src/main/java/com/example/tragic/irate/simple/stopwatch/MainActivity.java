@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
@@ -296,6 +297,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean stopAscent = true;
     boolean minReached;
     boolean maxReached;
+
+    FloatingActionButton fab;
 
     //Todo: Remove Set option from breaksOnly mode.
     //Todo: Possible separate menu for +/- options (i.e. not in default view). Could be a fading transition popup (would look better).
@@ -701,6 +704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         left_arrow = findViewById(R.id.left_arrow);
         right_arrow = findViewById(R.id.right_arrow);
         delete_sb = findViewById(R.id.delete_set_break);
+
 
         left_arrow.setVisibility(View.INVISIBLE);
         right_arrow.setVisibility(View.INVISIBLE);
