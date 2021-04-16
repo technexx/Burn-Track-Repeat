@@ -298,6 +298,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean minReached;
     boolean maxReached;
 
+    //Todo: startBreaksOnlyTime is the empty array called on first switch. It is populated in setCycles(), which is likely not being called soon enough (perhaps a threading issue).
+    //Todo: Remove Set option from breaksOnly mode.
     //Todo: Possible separate menu for +/- options (i.e. not in default view). Could be a fading transition popup (would look better).
     //Todo: Sep breakOnly timer.
     //Todo: Recall last modified UI on app launch instead of plucking from last used DB save.
@@ -305,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: "overtime" seconds are active for set/break, should be for breakOnly.
     //Todo: "cycle completed" as a db entry for each separate cycle.
     //Todo: Add skip to Pom.
+    //Todo: Modify boxes for increased dot size.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
     //Todo: Variable set only mode? Again, for TDEE.
@@ -314,7 +317,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Rippling for certain onClicks.
     //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
-    //Todo: Have skip round reset dot alpha.
     //Todo: Add color scheme options.
     //Todo: Test all Pom cycles.
     //Todo: All DB calls in aSync.
@@ -411,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     @Override
     public void onCycleClick(int position) {
-        setCycle(position);
+        setCycle(position, true);
     }
 
     @Override
@@ -480,7 +482,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     queryCycles();
 
                     runOnUiThread(()-> {
-                        //Todo: Simple removal of received position should be sufficient for Array, since DB is already taken care of.
                         pomArray.remove(position);
                         savedCycleAdapter.notifyDataSetChanged();
                         if (deletedID == pomID) {
@@ -493,6 +494,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     });
                     break;
             }
+            saveArrays();
         });
         Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
     }
@@ -806,23 +808,60 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             sortMode = sharedPreferences.getInt("sortMode", 1);
             sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
             sortModePom = sharedPreferences.getInt("sortModePom", 1);
-//            breaksOnly = sharedPreferences.getBoolean("currentBreaksOnly", false);
             customID = sharedPreferences.getInt("customID", 0);
             breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
             pomID = sharedPreferences.getInt("pomID", 0);
 
             cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
             //All db queries that fetch full lists should through queryCycles() to ensure sort order is correct.
-            queryCycles();
+//            queryCycles();
 
-            if (cyclesList.size()>0 && customID>0) {
-                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-                setsArray.add(cyclesList.get(0).getSets());
-                breaksArray.add(cyclesList.get(0).getBreaks());
-                setCycle(0);
-            } else runOnUiThread(() -> setDefaultCustomCycle());
+            //Todo: Right now, this is fetching a default db position if one exists. Instead, we want the last used versions of our Arrays. SharedPref may be best for this. Might be better to simply never call the db upon launch.
+//            if (cyclesList.size()>0 && customID>0) {
+//                cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
+//                setsArray.add(cyclesList.get(0).getSets());
+//                breaksArray.add(cyclesList.get(0).getBreaks());
+//                //This is populating our startCustom arrays.
+//                setCycle(0, false);
+//            } else runOnUiThread(() -> {
+//                setDefaultCustomCycle();
+//                resetTimer();
+//            });
+
+
+            //Todo: If we are not calling db, we need to make sure sharedPref are saved any time cycles are changed, including when a saved row is accessed.
+            startCustomSetTime.clear();
+            startCustomBreakTime.clear();
+            startBreaksOnlyTime.clear();
+
+            String retrievedSetArray = sharedPreferences.getString("setArrays", "");
+            String retrievedBreakArray = sharedPreferences.getString("breakArrays", "");
+            String retrievedBOArray = sharedPreferences.getString("savedBOArrays", "");
+            String retrievedTitle = sharedPreferences.getString("savedTitle", "");
+
+            retrievedSetArray = retrievedSetArray.replace("[", "");
+            retrievedSetArray = retrievedSetArray.replace("]", "");
+            retrievedBreakArray = retrievedBreakArray.replace("[", "");
+            retrievedBreakArray = retrievedBreakArray.replace("]", "");
+            retrievedBOArray = retrievedBOArray.replace("[", "");
+            retrievedBOArray = retrievedBOArray.replace("]", "");
+
+            String[] convSets = retrievedSetArray.split(",");
+            String[] convBreaks = retrievedBreakArray.split(",");
+            String[] convBO = retrievedBOArray.split("");
+
+            if (!retrievedSetArray.equals("")) {
+                for (int i=0; i<convSets.length; i++) {
+                    startCustomSetTime.add(Long.parseLong(convSets[i]));
+                    startCustomBreakTime.add(Long.parseLong(convBreaks[i]));
+                }
+            }
+            if (!retrievedBOArray.equals("")) for (int i=0; i<convBO.length; i++) startBreaksOnlyTime.add(Long.parseLong(convBO[i]));
 
             runOnUiThread(() -> {
+                cycle_header_text.setText(retrievedTitle);
+                populateCycleUI();
+
                 savedSets = startCustomSetTime.size();
                 savedBreaks = startCustomBreakTime.size();
                 numberOfSets = savedSets;
@@ -831,8 +870,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 pomValue1 = 25;
                 pomValue2 = 5;
                 pomValue3 = 15;
-                setMillis = setValue;
-                breakMillis = breakValue;
                 for (int i=0; i<3; i++) {
                     pomValuesTime.add(pomValue1);
                     pomValuesTime.add(pomValue2);
@@ -852,14 +889,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 incrementTimer = 10;
                 tabViews();
-                resetTimer();
 
                 timePaused.getAlpha();
                 timeLeft.getAlpha();
 
                 //Retrieves the most recently viewed cycle.
-                if (!breaksOnly && cyclesList.size()>0) setCycle(0);
-                if (breaksOnly && cyclesBOList.size()>0) setCycle(0);
+//                if (!breaksOnly && cyclesList.size()>0) setCycle(0);
+//                if (breaksOnly && cyclesBOList.size()>0) setCycle(0);
+
                 if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
                     canSaveOrUpdate(false);
                 } else canSaveOrUpdate(true);
@@ -899,8 +936,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             confirm_header_save.setText(R.string.update_cycles);
             labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
 
-            String titleText = "";
-            if (!breaksOnly) titleText = cycles.getTitle(); else titleText = cyclesBO.getTitle();
+            String titleText = cycle_header_text.getText().toString();
+//            if (!breaksOnly) titleText = cycles.getTitle(); else titleText = cyclesBO.getTitle();
             edit_header.setText(titleText);
             edit_header.setSelection(titleText.length());
 
@@ -908,23 +945,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
             });
 
-
-            String oldTitle = edit_header.getText().toString();
-            confirm_header_save.setOnClickListener(v2-> {
-                AsyncTask.execute(() -> {
-                    String newTitle = edit_header.getText().toString();
-                    if (!breaksOnly) cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, customID);
-                    else cyclesDatabase.cyclesDao().updateBOTitle(newTitle, breaksOnlyID);
-                    runOnUiThread(() -> {
-                        if (!oldTitle.equals(newTitle)) {
-                            Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
-                            cycle_header_text.setText(newTitle);
-                            canSaveOrUpdate(true);
-                        }
-                        labelSavePopupWindow.dismiss();
-                    });
-                });
+            confirm_header_save.setOnClickListener(v2 -> {
+                String newTitle = edit_header.getText().toString();
+                if (!titleText.equals(newTitle)) canSaveOrUpdate(true);
+                cycle_header_text.setText(newTitle);
             });
+
+//            confirm_header_save.setOnClickListener(v2-> {
+//                AsyncTask.execute(() -> {
+//                    String newTitle = edit_header.getText().toString();
+//                    if (!breaksOnly) cyclesDatabase.cyclesDao().updateCustomTitle(newTitle, customID);
+//                    else cyclesDatabase.cyclesDao().updateBOTitle(newTitle, breaksOnlyID);
+//                    runOnUiThread(() -> {
+//                        if (!titleText.equals(newTitle)) {
+//                            Toast.makeText(getApplicationContext(), "Title updated", Toast.LENGTH_SHORT).show();
+//                            cycle_header_text.setText(newTitle);
+//                            canSaveOrUpdate(true);
+//                        }
+//                        labelSavePopupWindow.dismiss();
+//                    });
+//                });
+//            });
         });
 
         first_value_textView.setOnClickListener(v-> {
@@ -1806,6 +1847,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }.start();
     }
 
+    //Todo: Should default to last modified cycle instance, not one directly from database.
     public void setBreaksOnlyMode() {
         if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
             savedCyclePopupWindow.dismiss();
@@ -1818,13 +1860,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) {
             if (!breaksOnly) {
                 second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-                plus_first_value.setEnabled(false);
-                minus_first_value.setEnabled(false);
-                first_value_edit.setEnabled(false);
-                first_value_edit_two.setEnabled(false);
-                first_value_edit.setEnabled(false);
-                first_value_edit_two.setEnabled(false);
-
                 breaksOnly = true;
                 setBegun = true;
                 onBreak = true;
@@ -1833,17 +1868,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 prefEdit.putBoolean("currentBreaksOnly", true);
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
-                //Todo: These may be incorrect, fetching from a unique ID instead of a position.
                 AsyncTask.execute(() -> {
                     queryCycles();
-                    loadIDCycle();
                     runOnUiThread(()-> {
                         if (cyclesBOList.size()>0) {
                             String title = cyclesBOList.get(0).getTitle();
                             cycle_header_text.setText(title);
                         } else cycle_header_text.setText(R.string.default_title);
                     });
-
                 });
             } else {
                 first_value_textView.setText(convertCustomTextView(setValue));
@@ -1888,20 +1920,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     if (!breaksOnly) {
-                        if (customSetTime.size() < 10 && customSetTime.size() >= 0) {
-                            customSetTime.add(setValue * 1000);
+                        if (customSetTime.size() < 8 && customSetTime.size() >= 0) {
                             startCustomSetTime.add(setValue * 1000);
-                            customBreakTime.add(breakValue * 1000);
                             startCustomBreakTime.add(breakValue * 1000);
                             canSaveOrUpdate(true);
-                            resetTimer();
+                            populateCycleUI();
                         } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                     } else {
-                        if (breaksOnlyTime.size() < 10 && breaksOnlyTime.size() >= 0) {
-                            breaksOnlyTime.add(breaksOnlyValue * 1000);
+                        if (breaksOnlyTime.size() < 8 && breaksOnlyTime.size() >= 0) {
                             startBreaksOnlyTime.add(breaksOnlyValue * 1000);
                             canSaveOrUpdate(true);
-                            resetTimer();
+                            populateCycleUI();
                         } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -1912,55 +1941,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         pomValuesTime.add(pomValue1);
                         pomValuesTime.add(pomValue3);
-                        resetTimer();
+                        populateCycleUI();
                     } else Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
-
             }
         } else {
             switch (mode) {
                 case 1:
                     if (!breaksOnly) {
                         if (customSetTime.size() > 0 && startCustomSetTime.size() > 0) {
-                            customSetTime.remove(customSetTime.size() - 1);
                             startCustomSetTime.remove(startCustomSetTime.size() - 1);
-                            customBreakTime.remove(customBreakTime.size() - 1);
                             startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
                             canSaveOrUpdate(true);
-                            resetTimer();
+                            populateCycleUI();
                         } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                         //Used w/ arrows to switch set/break places.
-                        if (customSetTime.size() - 1 < receivedPos)
-                            receivedPos = customSetTime.size() - 1;
+                        if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
                     } else {
                         if (breaksOnlyTime.size() > 0 && startBreaksOnlyTime.size() > 0) {
-                            breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
                             startBreaksOnlyTime.remove(startBreaksOnlyTime.size() - 1);
                             //Used w/ arrows to switch  break places.
-                            if (breaksOnlyTime.size() - 1 < receivedPos)
-                                receivedPos = breaksOnlyTime.size() - 1;
+                            if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
                             canSaveOrUpdate(true);
-                            resetTimer();
+                            populateCycleUI();
                         } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                    }
-                    drawDots(0);
-                    // Separate conditional because our list size is now one less than above.
-                    if (!breaksOnly) {
-                        if (customSetTime.size()>0)setNewText(timePaused, timePaused, (customSetTime.get(0) +999) / 1000);
-                        else timePaused.setText("?");
-                    } else {
-                        if (breaksOnlyTime.size()>0) setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
-                        else timePaused.setText("?");
                     }
                     if (receivedPos >=0) dotDraws.setCycle(receivedPos);
                     break;
                 case 2:
                     if (pomValuesTime.size()!=0) {
                         pomValuesTime.clear();
-                        resetTimer();
+                        populateCycleUI();
                     } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
                     break;
             }
         }
+        saveArrays();
     }
 
     private void endAnimation() {
@@ -2040,6 +2055,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         fadeOutObj.start();
     }
 
+    //Todo: Removed defunct loadIDCycle from here. Replace w/ setCycle() @ true.
     public void switchTimer(int mode, boolean halted) {
         removeViews();
         tabViews();
@@ -2091,7 +2107,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 AsyncTask.execute(() -> {
                     queryCycles();
-                    loadIDCycle();
                     runOnUiThread(()-> {
                         if (pomCyclesList.size() > 0) {
                             String title = pomCyclesList.get(0).getTitle();
@@ -2470,23 +2485,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
     }
 
-    //Todo: Should we throw every tab/button switch into this method, since it is meant to populate our UI?
-    //Called when a saved cycle is clicked on.
-    public void setCycle(int position) {
+    //Used to retrieve a single cycle within our database. Calls populateUICycle() which sets the Array values into our timer millis values.
+    //When recall is TRUE, retrieves the last used ID instance, when recall is FALSE, Uses a positional input from our saved cycle list.
+    public void setCycle(int position, boolean recall) {
         AsyncTask.execute(() -> {
             int posHolder = position;
-            queryCycles();
             switch (mode) {
                 case 1:
                     if (!breaksOnly) {
-                        //Getting a full list of cycles if app is NOT launching for first time, otherwise a single row is retrieved before this method is executed.
-                        //Getting instance  of selected position of Cycle list entity. Also used in save_cycles.
-                        cycles = cyclesList.get(posHolder);
-                        String tempSets = cyclesList.get(posHolder).getSets();
-                        String tempBreaks = cyclesList.get(posHolder).getBreaks();
+                        String tempSets = "";
+                        String tempBreaks = "";
+                        if (recall) {
+                            cycles = cyclesList.get(customID);
+                            tempSets = cyclesList.get(0).getSets();
+                            tempBreaks = cyclesList.get(0).getBreaks();
+                        } else {
+                            queryCycles();
+                            cycles = cyclesList.get(posHolder);
+                            tempSets = cyclesList.get(posHolder).getSets();
+                            tempBreaks = cyclesList.get(posHolder).getBreaks();
+                            customID = cyclesList.get(posHolder).getId();
+                            prefEdit.putInt("customID", customID);
+                        }
+
                         String[] setSplit = tempSets.split(" - ", 0);
                         String[] breakSplit = tempBreaks.split(" - ", 0);
-
                         customSetTime.clear();
                         startCustomSetTime.clear();
                         customBreakTime.clear();
@@ -2498,15 +2521,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             customBreakTime.add(Long.parseLong(breakSplit[i])*1000);
                             startCustomBreakTime.add(Long.parseLong(breakSplit[i])*1000);
                         }
-                        customID = cyclesList.get(posHolder).getId();
-                        prefEdit.putInt("customID", customID);
                         runOnUiThread(() -> cycle_header_text.setText(cycles.getTitle()));
                     } else {
-                        //Getting instance of selected position of CycleBO list entity. Also used in save_cycles.
-                        cyclesBO = cyclesBOList.get(posHolder);
-                        String tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
-                        String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
+                        String tempBreaksOnly = "";
+                        if (recall) {
+                            cyclesBO = cyclesBOList.get(breaksOnlyID);
+                            tempBreaksOnly = cyclesBOList.get(0).getBreaksOnly();
+                        } else {
+                            queryCycles();
+                            cyclesBO = cyclesBOList.get(posHolder);
+                            tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
+                            breaksOnlyID = cyclesBOList.get(posHolder).getId();
+                            prefEdit.putInt("breaksOnlyID", breaksOnlyID);
+                        }
 
+                        String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
                         startBreaksOnlyTime.clear();
                         breaksOnlyTime.clear();
 
@@ -2514,26 +2543,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
                             startBreaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
                         }
-                        breaksOnlyID = cyclesBOList.get(posHolder).getId();
-                        prefEdit.putInt("breaksOnlyID", breaksOnlyID);
                         runOnUiThread(() -> cycle_header_text.setText(cyclesBO.getTitle()));
                     }
                     break;
                 case 2:
-                    pomCycles = pomCyclesList.get(posHolder);
-                    String tempPom = pomCyclesList.get(posHolder).getFullCycle();
+                    String tempPom = "";
+                    if (recall) {
+                        pomCycles = pomCyclesList.get(pomID);
+                        tempPom = pomCyclesList.get(0).getFullCycle();
+
+                    } else {
+                        queryCycles();
+                        pomCycles = pomCyclesList.get(posHolder);
+                        tempPom = pomCyclesList.get(posHolder).getFullCycle();
+                        pomID = pomCyclesList.get(posHolder).getId();
+                        prefEdit.putInt("pomID", pomID);
+                    }
+
                     String[] pomSplit = tempPom.split("-", 0);
-
                     pomValuesTime.clear();
-                    for (int i=0; i<pomSplit.length; i++) pomValuesTime.add(Long.parseLong(pomSplit[i]));
 
-                    pomID = pomCyclesList.get(posHolder).getId();
-                    prefEdit.putInt("pomID", pomID);
+                    for (int i=0; i<pomSplit.length; i++) pomValuesTime.add(Long.parseLong(pomSplit[i]));
                     runOnUiThread(() -> cycle_header_text.setText(pomCycles.getTitle()));
                     break;
             }
 
             runOnUiThread(() -> {
+                saveArrays();
                 resetTimer();
                 savedCyclePopupWindow.dismiss();
                 invalidateOptionsMenu();
@@ -2756,34 +2792,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setText(svSec);
     }
 
-    //Todo: No need for Arrays, since they are used to populate recyclerView (i.e. list of saved cycles).
-    public void loadIDCycle() {
-        switch (mode) {
-            case 1:
-                if (!breaksOnly) {
-                    if (cyclesList.size()>0 && customID>0) {
-                        cyclesList = cyclesDatabase.cyclesDao().loadSingleCycle(customID);
-//                        setsArray.add(cyclesList.get(0).getSets());
-//                        breaksArray.add(cyclesList.get(0).getBreaks());
-//                        customTitleArray.add(cyclesList.get(0).getTitle());
-                    } else setDefaultCustomCycle();
-                } else {
-                    if (cyclesBOList.size()>0 && breaksOnlyID>0) {
-                        cyclesBOList = cyclesDatabase.cyclesDao().loadSingleCycleBO(breaksOnlyID);
-//                        breaksOnlyArray.add(cyclesBOList.get(0).getBreaksOnly());
-                    } else {
-                        setDefaultCustomCycle();
-                    }
-                }
-                break;
-            case 2:
-                if (pomCyclesList.size()>0 && pomID>0) {
-                    pomCyclesList = cyclesDatabase.cyclesDao().loadSinglePomCycle(pomID);
-//                    pomArray.add(pomCyclesList.get(0).getFullCycle());
-                } else setDefaultCustomCycle();
-        }
-    }
-
     public void switchMenu() {
         Runnable r = () -> {
             defaultMenu = false;
@@ -3002,6 +3010,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public void saveArrays() {
+        Gson gson = new Gson();
+
+        String savedSetArrays = "";
+        String savedBreakArrays = "";
+        String savedBOArrays = "";
+        String savedTitle = "";
+        if (!edit_header.getText().toString().equals("")) savedTitle = edit_header.getText().toString(); else savedTitle = getString(R.string.default_title);
+        if (startCustomSetTime.size()>0){
+            savedSetArrays = gson.toJson(startCustomSetTime);
+            savedBreakArrays = gson.toJson(startCustomBreakTime);
+        }
+        if (startBreaksOnlyTime.size()>0) savedBOArrays = gson.toJson(startBreaksOnlyTime);
+
+        prefEdit.putString("setArrays", savedSetArrays);
+        prefEdit.putString("breakArrays", savedBreakArrays);
+        prefEdit.putString("savedBOArrays", savedBOArrays);
+        prefEdit.putString("savedTitle", savedTitle);
+        prefEdit.apply();
+        Log.i("testFormat", savedTitle);
+    }
+
     public void pauseAndResumeTimer(int pausing) {
         if ( (setMillis <=500 || breakMillis <=500) && numberOfBreaks >0) {
             timerDisabled = true;
@@ -3148,50 +3178,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
     }
 
-    public void resetTimer() {
-        removeViews();
-        //Todo: Separate end animations, especially since adding stopwatch.
-        if (endAnimation != null) endAnimation.cancel();
+    public void populateCycleUI() {
         switch (mode) {
             case 1:
-                timePaused.setAlpha(1);
-                progressBar.setProgress(10000);
-                customProgressPause = maxProgress;
-                customTimerEnded = false;
-                setBegun = false;
-                breakBegun = false;
-                customHalted = true;
-                if (!breaksOnly) onBreak = false; else onBreak =true;
-                if (timer != null) timer.cancel();
-                if (objectAnimator != null) objectAnimator.cancel();
-
-                if (startCustomSetTime.size()>0) {
-                    setMillis = startCustomSetTime.get(0);
-                }
                 if (!breaksOnly) {
+                    if (startCustomSetTime.size()>0) setMillis = startCustomSetTime.get(0);
                     if (startCustomBreakTime.size()>0) {
                         breakMillis = startCustomBreakTime.get(0);
                         timePaused.setText(convertSeconds((setMillis+999)/1000));
                         timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                    }
+                    } else timePaused.setText("?");
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breakMillis = startBreaksOnlyTime.get(0);
                         timePaused.setText(convertSeconds((breakMillis+999)/1000));
                         timeLeft.setText(convertSeconds((breakMillis+999)/1000));
-                    }
+                    } else timePaused.setText("?");
                 }
                 numberOfSets = startCustomSetTime.size();
-                if (!breaksOnly) numberOfBreaks = startCustomBreakTime.size(); else numberOfBreaks = startBreaksOnlyTime.size();
+                if (!breaksOnly) numberOfBreaks = startCustomBreakTime.size();
+                else numberOfBreaks = startBreaksOnlyTime.size();
+
                 savedSets = numberOfSets;
                 savedBreaks = numberOfBreaks;
 
                 if (!breaksOnly) {
                     customSetTime = new ArrayList<>();
                     customBreakTime = new ArrayList<>();
-                } else {
-                    breaksOnlyTime = new ArrayList<>();
-                }
+                } else breaksOnlyTime = new ArrayList<>();
 
                 if (!breaksOnly) {
                     if (startCustomSetTime.size() >0) {
@@ -3214,27 +3228,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     third_value_single_edit.setText(String.valueOf(breaksOnlyTime.size()));
                     activeCustomBOCycle = false;
                 }
+
                 //Always setting this to avoid null errors.
                 dotDraws.setTime(customSetTime);
                 dotDraws.setAlpha();
                 drawDots(0);
                 break;
             case 2:
-                pomTimerEnded = false;
-                progressBar2.setProgress(10000);
-                pomBegun = false;
-                pomProgressPause = maxProgress;
-                if (timer2 != null) timer2.cancel();
-                if (objectAnimator2 != null) objectAnimator2.cancel();
                 //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
                 pomMillis1 = pomValuesTime.get(0)*1000*60;
                 pomMillis = pomMillis1;
-                timePaused2.setAlpha(1);
-                onBreak = false;
-                pomHalted = true;
-                pomProgressPause = maxProgress;
                 dotDraws.pomDraw(pomDotCounter, 0, pomValuesTime);
-                activePomCycle = false;
                 if (pomValuesTime.size()==0) {
                     pomTimerDisabled = true;
                     timePaused2.setText("?");
@@ -3243,6 +3247,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timePaused2.setText(convertSeconds((pomMillis+999)/1000));
                 }
                 dotDraws.setAlpha();
+                break;
+        }
+
+    }
+
+    public void resetTimer() {
+        removeViews();
+        //Todo: Separate end animations, especially since adding stopwatch.
+        if (endAnimation != null) endAnimation.cancel();
+        switch (mode) {
+            case 1:
+                timePaused.setAlpha(1);
+                progressBar.setProgress(10000);
+                customProgressPause = maxProgress;
+                customTimerEnded = false;
+                setBegun = false;
+                breakBegun = false;
+                customHalted = true;
+                if (!breaksOnly) onBreak = false; else onBreak =true;
+                if (timer != null) timer.cancel();
+                if (objectAnimator != null) objectAnimator.cancel();
+                populateCycleUI();
+                break;
+            case 2:
+                timePaused2.setAlpha(1);
+                pomTimerEnded = false;
+                progressBar2.setProgress(10000);
+                pomBegun = false;
+                pomProgressPause = maxProgress;
+                onBreak = false;
+                pomHalted = true;
+                activePomCycle = false;
+                if (timer2 != null) timer2.cancel();
+                if (objectAnimator2 != null) objectAnimator2.cancel();
+                populateCycleUI();
                 break;
             case 3:
                 stopwatchHalted = true;
