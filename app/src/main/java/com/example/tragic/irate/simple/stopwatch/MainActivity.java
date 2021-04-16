@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     boolean defaultMenu = true;
     View mainView;
-    Button breaks_only;
     TextView save_cycles;
     TextView update_cycles;
     ProgressBar progressBar;
@@ -298,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean minReached;
     boolean maxReached;
 
-    //Todo: startBreaksOnlyTime is the empty array called on first switch. It is populated in setCycles(), which is likely not being called soon enough (perhaps a threading issue).
     //Todo: Remove Set option from breaksOnly mode.
     //Todo: Possible separate menu for +/- options (i.e. not in default view). Could be a fading transition popup (would look better).
     //Todo: Sep breakOnly timer.
@@ -325,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
     //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
     //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
+    //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode.
 
     //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
@@ -707,7 +706,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         right_arrow.setVisibility(View.INVISIBLE);
         reset.setVisibility(View.INVISIBLE);
 
-        breaks_only = findViewById(R.id.breaks_only);
         save_cycles = findViewById(R.id.save_cycles);
         update_cycles = findViewById(R.id.update_cycles);
         progressBar = findViewById(R.id.progressBar);
@@ -752,7 +750,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
-        tabLayout.addTab(tabLayout.newTab().setText("Custom"));
+        tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
+        tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
         tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
         tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
@@ -1308,31 +1307,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             drawDots(0);
         });
 
+        //Todo: Will need new halted vars etc. for breaksOnly mode.
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
                     case 0:
                         mode=1;
-                        if (!breaksOnly) savedCycleAdapter.setView(1); else savedCycleAdapter.setView(2);
+                        setBreaksOnlyMode(false);
+                        savedCycleAdapter.setView(1);
                         switchTimer(1, customHalted);
                         dotDraws.setMode(1);
                         if (!setBegun) drawDots(0);
-                        prefEdit.putInt("currentMode", 1);
                         break;
                     case 1:
+                        mode=1;
+                        setBreaksOnlyMode(true);
+                        savedCycleAdapter.setView(2);
+                        switchTimer(1, customHalted);
+                        dotDraws.setMode(1);
+                        if (!breakBegun) drawDots(0);
+                        break;
+                    case 2:
                         mode=2;
                         savedCycleAdapter.setView(3);
                         switchTimer(2, pomHalted);
                         dotDraws.setMode(2);
                         dotDraws.pomDraw(1, 0, pomValuesTime);
-                        prefEdit.putInt("currentMode", 2);
                         break;
-                    case 2:
+                    case 3:
                         mode=3;
                         switchTimer(3, stopwatchHalted);
                         lapRecycler.setVisibility(View.VISIBLE);
-                        prefEdit.putInt("currentMode", 3);
+                        break;
                 }
                 prefEdit.apply();
             }
@@ -1372,10 +1379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
             }
-        });
-
-        breaks_only.setOnClickListener(v-> {
-            setBreaksOnlyMode();
         });
 
         save_cycles.setOnClickListener(v->{
@@ -1829,67 +1832,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }.start();
     }
 
-    public void setBreaksOnlyMode() {
-        if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
-            savedCyclePopupWindow.dismiss();
-            invalidateOptionsMenu();
-            defaultMenu = true;
-            return;
-        }
+    public void setBreaksOnlyMode(boolean onlyBreaks) {
+//        if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()) {
+//            savedCyclePopupWindow.dismiss();
+//            invalidateOptionsMenu();
+//            defaultMenu = true;
+//            return;
+//        }
         receivedPos = -1;
+        if (onlyBreaks) {
+            second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+            breaksOnly = true;
+            setBegun = true;
+            onBreak = true;
+            dotDraws.breaksOnly(true);
+            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+            prefEdit.putBoolean("currentBreaksOnly", true);
+            canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
+        } else {
+            first_value_textView.setText(convertCustomTextView(setValue));
+            second_value_textView.setText(convertCustomTextView(breakValue));
+            plus_first_value.setEnabled(true);
+            minus_first_value.setEnabled(true);
+            first_value_edit.setEnabled(true);
+            first_value_edit_two.setEnabled(true);
+            first_value_edit.setEnabled(true);
+            first_value_edit_two.setEnabled(true);
+            breaksOnly = false;
+            setBegun = false;
 
-        if (mode==1) {
-            if (!breaksOnly) {
-                second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-                breaksOnly = true;
-                setBegun = true;
-                onBreak = true;
-                breaks_only.setBackgroundColor(getResources().getColor(R.color.light_grey));
-                dotDraws.breaksOnly(true);
-                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                prefEdit.putBoolean("currentBreaksOnly", true);
-                canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
-//                AsyncTask.execute(() -> {
-//                    queryCycles();
-//                    runOnUiThread(()-> {
-//                        if (cyclesBOList.size()>0) {
-//                            String title = cyclesBOList.get(0).getTitle();
-//                            cycle_header_text.setText(title);
-//                        } else cycle_header_text.setText(R.string.default_title);
-//                    });
-//                });
-            } else {
-                first_value_textView.setText(convertCustomTextView(setValue));
-                second_value_textView.setText(convertCustomTextView(breakValue));
-                plus_first_value.setEnabled(true);
-                minus_first_value.setEnabled(true);
-                first_value_edit.setEnabled(true);
-                first_value_edit_two.setEnabled(true);
-                first_value_edit.setEnabled(true);
-                first_value_edit_two.setEnabled(true);
-                breaksOnly = false;
-                setBegun = false;
-                breaks_only.setBackgroundColor(getResources().getColor(R.color.black));
-                dotDraws.breaksOnly(false);
-                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                prefEdit.putBoolean("currentBreaksOnly", false);
-                canSaveOrUpdate(canSaveOrUpdateCustom);
-//                AsyncTask.execute(() -> {
-//                    queryCycles();
-//                    runOnUiThread(()-> {
-//                        if (cyclesList.size() > 0) {
-//                            String title = cyclesList.get(0).getTitle();
-//                            cycle_header_text.setText(title);
-//                        } else cycle_header_text.setText(R.string.default_title);
-//                    });
-//
-//                });
-            }
-            activeTimerViews(true);
-            drawDots(1);
-            populateCycleUI();
-            prefEdit.apply();
+            dotDraws.breaksOnly(false);
+            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+            prefEdit.putBoolean("currentBreaksOnly", false);
+            canSaveOrUpdate(canSaveOrUpdateCustom);
         }
+        activeTimerViews(true);
+        drawDots(1);
+        populateCycleUI();
+        prefEdit.apply();
     }
 
     public void adjustCustom(boolean adding) {
