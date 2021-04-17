@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -232,11 +234,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean breakEnded;
     boolean newBreak;
 
-    PopupWindow clearCyclePopupWindow;
     PopupWindow sortPopupWindow;
     PopupWindow savedCyclePopupWindow;
     PopupWindow labelSavePopupWindow;
     PopupWindow deleteAllPopupWindow;
+    PopupWindow editCyclesPopupWindow;
 
     boolean fadeCustomTimer;
     boolean fadePomTimer;
@@ -264,11 +266,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     RecyclerView savedCycleRecycler;
     SavedCycleAdapter savedCycleAdapter;
 
-    View clearCyclePopupView;
     View deleteCyclePopupView;
     View sortCyclePopupView;
     View savedCyclePopupView;
     View cycleLabelView;
+    View editCyclePopupView;
 
     TextView sortRecent;
     TextView sortNotRecent;
@@ -309,6 +311,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: "cycle completed" as a db entry for each separate cycle.
     //Todo: Add skip to Pom.
     //Todo: Modify boxes for increased dot size.
+    //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
     //Todo: Variable set only mode? Again, for TDEE.
@@ -378,32 +381,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
                 if (first_value_edit.isShown()) {
                     first_value_textView.setVisibility(View.VISIBLE);
-                    first_value_edit.setVisibility(View.INVISIBLE);
-                    first_value_edit_two.setVisibility(View.INVISIBLE);
-                    first_value_sep.setVisibility(View.INVISIBLE);
+                    first_value_edit.setVisibility(View.GONE);
+                    first_value_edit_two.setVisibility(View.GONE);
+                    first_value_sep.setVisibility(View.GONE);
                     //onTouch is closing editText, converting its values to longs and then setting them to setValue.
                     setEditValueBounds(true);
                 }
                 if (second_value_edit.isShown()) {
                     second_value_textView.setVisibility(View.VISIBLE);
-                    second_value_edit.setVisibility(View.INVISIBLE);
-                    second_value_edit_two.setVisibility(View.INVISIBLE);
-                    second_value_sep.setVisibility(View.INVISIBLE);
+                    second_value_edit.setVisibility(View.GONE);
+                    second_value_edit_two.setVisibility(View.GONE);
+                    second_value_sep.setVisibility(View.GONE);
                     //onTouch is closing editText, converting its values to longs and then setting them to breakValue.
                     setEditValueBounds(false);
                 }
                 break;
             case 2:
                 if (first_value_single_edit.isShown()) {
-                    first_value_single_edit.setVisibility(View.INVISIBLE);
+                    first_value_single_edit.setVisibility(View.GONE);
                     first_value_textView.setVisibility(View.VISIBLE);
                 }
                     if (second_value_single_edit.isShown()) {
-                    second_value_single_edit.setVisibility(View.INVISIBLE);
+                    second_value_single_edit.setVisibility(View.GONE);
                     second_value_textView.setVisibility(View.VISIBLE);
                 }
                     if (third_value_single_edit.isShown()) {
-                    third_value_single_edit.setVisibility(View.INVISIBLE);
+                    third_value_single_edit.setVisibility(View.GONE);
                     third_value_textView.setVisibility(View.VISIBLE);
                 }
                     setEditValueBounds(true);
@@ -592,6 +595,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainView = findViewById(R.id.main_layout);
+//        ViewGroup blah = findViewById(R.id.main_layout);
 
         valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
         valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
@@ -616,12 +620,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomCyclesTitleArray = new ArrayList<>();
         pomValuesTime = new ArrayList<>();
 
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
+        tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
+        tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+        tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
+
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
         deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
         sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
         cycleLabelView = inflater.inflate(R.layout.label_cycle_popup, null);
-        clearCyclePopupView = inflater.inflate(R.layout.pom_reset_popup, null);
+        editCyclePopupView = inflater.inflate(R.layout.edit_cycle_popup, null);
+
+        savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
+        deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, false);
+        labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
+        sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
+        editCyclesPopupWindow = new PopupWindow(editCyclePopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, true);
+        savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        editCyclesPopupWindow .setAnimationStyle(R.style.WindowAnimation);
 
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -645,35 +666,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.custom_bar);
 
-        s1 = findViewById(R.id.s1);
-        s2 = findViewById(R.id.s2);
-        s3 = findViewById(R.id.s3);
+        s1 = editCyclePopupView.findViewById(R.id.s1);
+        s2 = editCyclePopupView.findViewById(R.id.s2);
+        s3 = editCyclePopupView.findViewById(R.id.s3);
+        first_value_edit = editCyclePopupView.findViewById(R.id.first_value_edit);
+        first_value_edit_two = editCyclePopupView.findViewById(R.id.first_value_edit_two);
+        first_value_sep = editCyclePopupView.findViewById(R.id.first_value_sep);
+        first_value_textView = editCyclePopupView.findViewById(R.id.first_value_textView);
+        second_value_edit = editCyclePopupView.findViewById(R.id.second_value_edit);
+        second_value_edit_two = editCyclePopupView.findViewById(R.id.second_value_edit_two);
+        second_value_sep = editCyclePopupView.findViewById(R.id.second_value_sep);
+        second_value_textView = editCyclePopupView.findViewById(R.id.second_value_textView);
+        third_value_textView = editCyclePopupView.findViewById(R.id.third_value_textView);
+        plus_first_value = editCyclePopupView.findViewById(R.id.plus_first_value);
+        minus_first_value = editCyclePopupView.findViewById(R.id.minus_first_value);
+        plus_second_value = editCyclePopupView.findViewById(R.id.plus_second_value);
+        minus_second_value = editCyclePopupView.findViewById(R.id.minus_second_value);
+        plus_third_value = editCyclePopupView.findViewById(R.id.plus_third_value);
+        minus_third_value = editCyclePopupView.findViewById(R.id.minus_third_value);
+        first_value_single_edit = editCyclePopupView.findViewById(R.id.first_value_single_edit);
+        second_value_single_edit = editCyclePopupView.findViewById(R.id.second_value_single_edit);
+        third_value_single_edit = editCyclePopupView.findViewById(R.id.third_value_single_edit);
+        add_cycle = editCyclePopupView.findViewById(R.id.add_cycle);
+        sub_cycle = editCyclePopupView.findViewById(R.id.subtract_cycle);
+
         reset = findViewById(R.id.reset);
         cycle_header_text = findViewById(R.id.cycle_header_text);
-        first_value_edit = findViewById(R.id.first_value_edit);
-        first_value_edit_two = findViewById(R.id.first_value_edit_two);
-        first_value_sep = findViewById(R.id.first_value_sep);
-        first_value_textView = findViewById(R.id.first_value_textView);
-        second_value_edit = findViewById(R.id.second_value_edit);
-        second_value_edit_two = findViewById(R.id.second_value_edit_two);
-        second_value_sep = findViewById(R.id.second_value_sep);
-        second_value_textView = findViewById(R.id.second_value_textView);
-        third_value_textView = findViewById(R.id.third_value_textView);
-        plus_first_value = findViewById(R.id.plus_first_value);
-        minus_first_value = findViewById(R.id.minus_first_value);
-        plus_second_value = findViewById(R.id.plus_second_value);
-        minus_second_value = findViewById(R.id.minus_second_value);
-        plus_third_value = findViewById(R.id.plus_third_value);
-        minus_third_value = findViewById(R.id.minus_third_value);
-        first_value_single_edit = findViewById(R.id.first_value_single_edit);
-        second_value_single_edit = findViewById(R.id.second_value_single_edit);
-        third_value_single_edit = findViewById(R.id.third_value_single_edit);
+
         delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_confirm_text);
         delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
         delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
 
-        add_cycle = findViewById(R.id.add_cycle);
-        sub_cycle = findViewById(R.id.subtract_cycle);
+
         cycles_completed = findViewById(R.id.cycles_completed);
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
@@ -706,6 +730,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         left_arrow.setVisibility(View.INVISIBLE);
         right_arrow.setVisibility(View.INVISIBLE);
         reset.setVisibility(View.INVISIBLE);
+        first_value_edit.setVisibility(View.GONE);
+        first_value_sep.setVisibility(View.GONE);
+        first_value_edit.setVisibility(View.GONE);
+        first_value_edit_two.setVisibility(View.GONE);
+        first_value_single_edit.setVisibility(View.GONE);
+        second_value_edit.setVisibility(View.GONE);
+        second_value_sep.setVisibility(View.GONE);
+        second_value_edit_two.setVisibility(View.GONE);
+        second_value_single_edit.setVisibility(View.GONE);
+        third_value_single_edit.setVisibility(View.GONE);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -730,12 +764,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles_completed.setText(R.string.cycles_done);
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
-        TabLayout tabLayout = findViewById(R.id.tabLayout);
-        tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
-        tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
-        tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-        tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
-
         mHandler = new Handler();
 
         delete_sb.setVisibility(View.INVISIBLE);
@@ -744,10 +772,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         newLap.setVisibility(View.GONE);
         lapRecycler.setVisibility(View.GONE);
         overtime.setVisibility(View.INVISIBLE);
-
-        cycles_completed.setVisibility(View.GONE);
-        cycle_reset.setVisibility(View.GONE);
-        skip.setVisibility(View.GONE);
 
         removeViews();
         timePaused.setAlpha(1);
@@ -761,112 +785,97 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesBO = new CyclesBO();
         pomCycles = new PomCycles();
 
-        savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
-        deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, false);
-        labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
-        sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
-        clearCyclePopupWindow  = new PopupWindow(clearCyclePopupView, 150, WindowManager.LayoutParams.WRAP_CONTENT, false);
-        savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-        clearCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+        sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
+        prefEdit = sharedPreferences.edit();
+//            mode = sharedPreferences.getInt("currentMode", 1);
+        setValue = sharedPreferences.getLong("setValue", 30);
+        breakValue = sharedPreferences.getLong("breakValue", 30);
+        breaksOnlyValue = sharedPreferences.getLong("breaksOnlyValue", 30);
+        pomValue1 = sharedPreferences.getLong("pomValue1", 25);
+        pomValue2 = sharedPreferences.getLong("pomValue2", 5);
+        pomValue3 = sharedPreferences.getLong("pomValue3", 15);
+        //Call this on start to sync edit values w/ retrieved values from SharedPref.
+        convertEditTime();
+
+        sortMode = sharedPreferences.getInt("sortMode", 1);
+        sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
+        sortModePom = sharedPreferences.getInt("sortModePom", 1);
+        customID = sharedPreferences.getInt("customID", 0);
+        breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
+        pomID = sharedPreferences.getInt("pomID", 0);
+
+        //Todo: custom/break IDs may be obsolete now.
+        startCustomSetTime.clear();
+        startCustomBreakTime.clear();
+        startBreaksOnlyTime.clear();
+
+        String retrievedSetArray = sharedPreferences.getString("setArrays", "");
+        String retrievedBreakArray = sharedPreferences.getString("breakArrays", "");
+        String retrievedBOArray = sharedPreferences.getString("savedBOArrays", "");
+        String retrievedTitle = sharedPreferences.getString("savedTitle", "");
+
+        retrievedSetArray = retrievedSetArray.replace("[", "");
+        retrievedSetArray = retrievedSetArray.replace("]", "");
+        retrievedBreakArray = retrievedBreakArray.replace("[", "");
+        retrievedBreakArray = retrievedBreakArray.replace("]", "");
+        retrievedBOArray = retrievedBOArray.replace("[", "");
+        retrievedBOArray = retrievedBOArray.replace("]", "");
+
+        String[] convSets = retrievedSetArray.split(",");
+        String[] convBreaks = retrievedBreakArray.split(",");
+        String[] convBO = retrievedBOArray.split(",");
+
+        if (!retrievedSetArray.equals("")) {
+            for (int i=0; i<convSets.length; i++) {
+                startCustomSetTime.add(Long.parseLong(convSets[i]));
+                startCustomBreakTime.add(Long.parseLong(convBreaks[i]));
+            }
+        } else setDefaultCustomCycle(false);
+        if (!retrievedBOArray.equals("")){
+            for (int i=0; i<convBO.length; i++) startBreaksOnlyTime.add(Long.parseLong(convBO[i]));
+        }
+        else setDefaultCustomCycle(true);
+
+        cycle_header_text.setText(retrievedTitle);
+        populateCycleUI();
+
+        savedSets = startCustomSetTime.size();
+        savedBreaks = startCustomBreakTime.size();
+        numberOfSets = savedSets;
+        numberOfBreaks = savedBreaks;
+
+        pomValue1 = 25;
+        pomValue2 = 5;
+        pomValue3 = 15;
+        for (int i=0; i<3; i++) {
+            pomValuesTime.add(pomValue1);
+            pomValuesTime.add(pomValue2);
+        }
+        pomValuesTime.add(pomValue1);
+        pomValuesTime.add(pomValue3);
+        pomMillis = pomValue1*1000*60;
+        pomMillis1 = pomValue1*1000*60;
+
+        lapLayout= new LinearLayoutManager(getApplicationContext());
+        lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
+        lapRecycler.setAdapter(lapAdapter);
+        lapRecycler.setLayoutManager(lapLayout);
+
+        progressBar.setProgress(maxProgress);
+        progressBar2.setProgress(maxProgress);
+
+        incrementTimer = 10;
+        tabViews();
+
+        timePaused.getAlpha();
+        timeLeft.getAlpha();
+
+        if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
+            canSaveOrUpdate(false);
+        } else canSaveOrUpdate(true);
 
         AsyncTask.execute(() -> {
-            sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
-            prefEdit = sharedPreferences.edit();
-//            mode = sharedPreferences.getInt("currentMode", 1);
-            setValue = sharedPreferences.getLong("setValue", 30);
-            breakValue = sharedPreferences.getLong("breakValue", 30);
-            breaksOnlyValue = sharedPreferences.getLong("breaksOnlyValue", 30);
-            pomValue1 = sharedPreferences.getLong("pomValue1", 25);
-            pomValue2 = sharedPreferences.getLong("pomValue2", 5);
-            pomValue3 = sharedPreferences.getLong("pomValue3", 15);
-            //Call this on start to sync edit values w/ retrieved values from SharedPref.
-            convertEditTime();
-
-            sortMode = sharedPreferences.getInt("sortMode", 1);
-            sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
-            sortModePom = sharedPreferences.getInt("sortModePom", 1);
-            customID = sharedPreferences.getInt("customID", 0);
-            breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
-            pomID = sharedPreferences.getInt("pomID", 0);
-
             cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-
-            //Todo: custom/break IDs may be obsolete now.
-            startCustomSetTime.clear();
-            startCustomBreakTime.clear();
-            startBreaksOnlyTime.clear();
-
-            String retrievedSetArray = sharedPreferences.getString("setArrays", "");
-            String retrievedBreakArray = sharedPreferences.getString("breakArrays", "");
-            String retrievedBOArray = sharedPreferences.getString("savedBOArrays", "");
-            String retrievedTitle = sharedPreferences.getString("savedTitle", "");
-
-            retrievedSetArray = retrievedSetArray.replace("[", "");
-            retrievedSetArray = retrievedSetArray.replace("]", "");
-            retrievedBreakArray = retrievedBreakArray.replace("[", "");
-            retrievedBreakArray = retrievedBreakArray.replace("]", "");
-            retrievedBOArray = retrievedBOArray.replace("[", "");
-            retrievedBOArray = retrievedBOArray.replace("]", "");
-
-            String[] convSets = retrievedSetArray.split(",");
-            String[] convBreaks = retrievedBreakArray.split(",");
-            String[] convBO = retrievedBOArray.split("");
-
-            if (!retrievedSetArray.equals("")) {
-                for (int i=0; i<convSets.length; i++) {
-                    startCustomSetTime.add(Long.parseLong(convSets[i]));
-                    startCustomBreakTime.add(Long.parseLong(convBreaks[i]));
-                }
-            } else setDefaultCustomCycle(false);
-            if (!retrievedBOArray.equals("")) for (int i=0; i<convBO.length; i++) startBreaksOnlyTime.add(Long.parseLong(convBO[i]));
-            else setDefaultCustomCycle(true);
-
-            runOnUiThread(() -> {
-                cycle_header_text.setText(retrievedTitle);
-                populateCycleUI();
-
-                savedSets = startCustomSetTime.size();
-                savedBreaks = startCustomBreakTime.size();
-                numberOfSets = savedSets;
-                numberOfBreaks = savedBreaks;
-
-                pomValue1 = 25;
-                pomValue2 = 5;
-                pomValue3 = 15;
-                for (int i=0; i<3; i++) {
-                    pomValuesTime.add(pomValue1);
-                    pomValuesTime.add(pomValue2);
-                }
-                pomValuesTime.add(pomValue1);
-                pomValuesTime.add(pomValue3);
-                pomMillis = pomValue1*1000*60;
-                pomMillis1 = pomValue1*1000*60;
-
-                lapLayout= new LinearLayoutManager(getApplicationContext());
-                lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
-                lapRecycler.setAdapter(lapAdapter);
-                lapRecycler.setLayoutManager(lapLayout);
-
-                progressBar.setProgress(maxProgress);
-                progressBar2.setProgress(maxProgress);
-
-                incrementTimer = 10;
-                tabViews();
-
-                timePaused.getAlpha();
-                timeLeft.getAlpha();
-
-                //Retrieves the most recently viewed cycle.
-//                if (!breaksOnly && cyclesList.size()>0) setCycle(0);
-//                if (breaksOnly && cyclesBOList.size()>0) setCycle(0);
-
-                if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
-                    canSaveOrUpdate(false);
-                } else canSaveOrUpdate(true);
-            });
         });
 
         delete_all_confirm.setOnClickListener(v-> {
@@ -922,7 +931,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 1:
                     if (!breaksOnly) {
                         if (first_value_textView.isShown()) {
-                            first_value_textView.setVisibility(View.INVISIBLE);
+                            first_value_textView.setVisibility(View.GONE);
                             first_value_edit.setVisibility(View.VISIBLE);
                             first_value_edit_two.setVisibility(View.VISIBLE);
                             first_value_sep.setVisibility(View.VISIBLE);
@@ -930,23 +939,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
                             second_value_textView.setVisibility(View.VISIBLE);
-                            second_value_edit.setVisibility(View.INVISIBLE);
-                            second_value_edit_two.setVisibility(View.INVISIBLE);
-                            second_value_sep.setVisibility(View.INVISIBLE);
+                            second_value_edit.setVisibility(View.GONE);
+                            second_value_edit_two.setVisibility(View.GONE);
+                            second_value_sep.setVisibility(View.GONE);
                         }
                     }
                     break;
                 case 2:
                     if (first_value_textView.isShown()) {
-                        first_value_textView.setVisibility(View.INVISIBLE);
+                        first_value_textView.setVisibility(View.GONE);
                         first_value_single_edit.setVisibility(View.VISIBLE);
                     }
                     if (second_value_single_edit.isShown()) {
-                        second_value_single_edit.setVisibility(View.INVISIBLE);
+                        second_value_single_edit.setVisibility(View.GONE);
                         second_value_textView.setVisibility(View.VISIBLE);
                     }
                     if (third_value_single_edit.isShown()){
-                        third_value_single_edit.setVisibility(View.INVISIBLE);
+                        third_value_single_edit.setVisibility(View.GONE);
                         third_value_textView.setVisibility(View.VISIBLE);
                     }
             }
@@ -963,23 +972,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
                         first_value_textView.setVisibility(View.VISIBLE);
-                        first_value_edit.setVisibility(View.INVISIBLE);
-                        first_value_edit_two.setVisibility(View.INVISIBLE);
-                        first_value_sep.setVisibility(View.INVISIBLE);
+                        first_value_edit.setVisibility(View.GONE);
+                        first_value_edit_two.setVisibility(View.GONE);
+                        first_value_sep.setVisibility(View.GONE);
                     }
                     convertEditTime();
                     break;
                 case 2:
                     if (first_value_single_edit.isShown()) {
                         first_value_textView.setVisibility(View.VISIBLE);
-                        first_value_single_edit.setVisibility(View.INVISIBLE);
+                        first_value_single_edit.setVisibility(View.GONE);
                     }
                     if (second_value_textView.isShown()) {
                         second_value_single_edit.setVisibility(View.VISIBLE);
-                        second_value_textView.setVisibility(View.INVISIBLE);
+                        second_value_textView.setVisibility(View.GONE);
                     }
                     if (third_value_single_edit.isShown()){
-                        third_value_single_edit.setVisibility(View.INVISIBLE);
+                        third_value_single_edit.setVisibility(View.GONE);
                         third_value_textView.setVisibility(View.VISIBLE);
                     }
                     break;
@@ -991,27 +1000,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
-                        first_value_edit.setVisibility(View.INVISIBLE);
-                        first_value_edit_two.setVisibility(View.INVISIBLE);
-                        first_value_sep.setVisibility(View.INVISIBLE);
+                        first_value_edit.setVisibility(View.GONE);
+                        first_value_edit_two.setVisibility(View.GONE);
+                        first_value_sep.setVisibility(View.GONE);
                     }
                     if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
-                        second_value_edit.setVisibility(View.INVISIBLE);
-                        second_value_edit_two.setVisibility(View.INVISIBLE);
-                        second_value_sep.setVisibility(View.INVISIBLE);
+                        second_value_edit.setVisibility(View.GONE);
+                        second_value_edit_two.setVisibility(View.GONE);
+                        second_value_sep.setVisibility(View.GONE);
                     }
                      break;
                 case 2:
                     if (first_value_single_edit.isShown()) {
-                        first_value_single_edit.setVisibility(View.INVISIBLE);
+                        first_value_single_edit.setVisibility(View.GONE);
                         first_value_textView.setVisibility(View.VISIBLE);
                     }
                     if (second_value_edit.isShown()){
-                        second_value_single_edit.setVisibility(View.INVISIBLE);
+                        second_value_single_edit.setVisibility(View.GONE);
                         second_value_textView.setVisibility(View.VISIBLE);
                     }
                     if (third_value_textView.isShown()) {
-                        third_value_textView.setVisibility(View.INVISIBLE);
+                        third_value_textView.setVisibility(View.GONE);
                         third_value_single_edit.setVisibility(View.VISIBLE);
                     }
                     break;
@@ -1276,7 +1285,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         fab.setOnClickListener(v-> {
-
+            editCyclesPopupWindow.showAsDropDown((View) tabLayout);
         });
 
         //Todo: Will need new halted vars etc. for breaksOnly mode.
@@ -1334,7 +1343,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else {
                             fadeOutText(timeLeft2); lastTextView = timeLeft2;
                         }
-                        if (clearCyclePopupWindow!=null) clearCyclePopupWindow.dismiss();
                         break;
                     case 2:
                         if (stopwatchHalted) {
@@ -1503,7 +1511,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         reset.setOnClickListener(v -> {
             if (mode!=2) {
                 resetTimer();
-                activeTimerViews(false);
             } else {
                 if (reset.getText().equals(getString(R.string.reset))) {
                     reset.setText(R.string.confirm_cycle_reset);
@@ -1854,7 +1861,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             prefEdit.putBoolean("currentBreaksOnly", false);
             canSaveOrUpdate(canSaveOrUpdateCustom);
         }
-        activeTimerViews(true);
+//        activeTimerViews(true);
         drawDots(1);
         populateCycleUI();
         prefEdit.apply();
@@ -2880,61 +2887,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 msTime.setText(displayMs);
                 msTimePaused.setText(displayMs);
         }
-        activeTimerViews(true);
-    }
-
-    public void activeTimerViews(boolean active) {
-        if (active) {
-            s1.setVisibility(View.GONE);
-            s2.setVisibility(View.GONE);
-            s3.setVisibility(View.GONE);
-            first_value_textView.setVisibility(View.GONE);
-            first_value_edit.setVisibility(View.GONE);
-            first_value_sep.setVisibility(View.GONE);
-            first_value_edit.setVisibility(View.GONE);
-            first_value_edit_two.setVisibility(View.GONE);
-            first_value_single_edit.setVisibility(View.GONE);
-            second_value_textView.setVisibility(View.GONE);
-            second_value_edit.setVisibility(View.GONE);
-            second_value_sep.setVisibility(View.GONE);
-            second_value_edit_two.setVisibility(View.GONE);
-            second_value_single_edit.setVisibility(View.GONE);
-            third_value_textView.setVisibility(View.GONE);
-            third_value_single_edit.setVisibility(View.GONE);
-            plus_first_value.setVisibility(View.GONE);
-            minus_first_value.setVisibility(View.GONE);
-            plus_second_value.setVisibility(View.GONE);
-            minus_second_value.setVisibility(View.GONE);
-            plus_third_value.setVisibility(View.GONE);
-            minus_third_value.setVisibility(View.GONE);
-            add_cycle.setVisibility(View.GONE);
-            sub_cycle.setVisibility(View.GONE);
-
-            cycles_completed.setVisibility(View.VISIBLE);
-            skip.setVisibility(View.VISIBLE);
-            cycle_reset.setVisibility(View.VISIBLE);
-            cycle_header_text.setVisibility(View.VISIBLE);
-        } else {
-            s1.setVisibility(View.VISIBLE);
-            s2.setVisibility(View.VISIBLE);
-            first_value_textView.setVisibility(View.VISIBLE);
-            second_value_textView.setVisibility(View.VISIBLE);
-            plus_first_value.setVisibility(View.VISIBLE);
-            minus_first_value.setVisibility(View.VISIBLE);
-            plus_second_value.setVisibility(View.VISIBLE);
-            minus_second_value.setVisibility(View.VISIBLE);
-            add_cycle.setVisibility(View.VISIBLE);
-            sub_cycle.setVisibility(View.VISIBLE);
-            cycles_completed.setVisibility(View.GONE);
-            skip.setVisibility(View.GONE);
-            cycle_reset.setVisibility(View.GONE);
-            if (mode==2) {
-                s3.setVisibility(View.VISIBLE);
-                third_value_textView.setVisibility(View.VISIBLE);
-                plus_third_value.setVisibility(View.VISIBLE);
-                minus_third_value.setVisibility(View.VISIBLE);
-            }
-        }
     }
 
     public void saveArrays() {
@@ -2964,7 +2916,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDisabled = true;
         }
         if ( (!timerDisabled && mode==1) || (!pomTimerDisabled && mode==2) ){
-            activeTimerViews(true);
+//            activeTimerViews(true);
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
             sub_cycle.setEnabled(false);
