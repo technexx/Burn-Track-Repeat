@@ -302,16 +302,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ImageButton fab;
 
-    //Todo: Remove Set option from breaksOnly mode.
-    //Todo: Possible separate menu for +/- options (i.e. not in default view). Could be a fading transition popup (would look better).
     //Todo: Sep breakOnly timer.
-    //Todo: Recall last modified UI on app launch instead of plucking from last used DB save.
-    //Todo: Fix title and saves for Pom.
     //Todo: "overtime" seconds are active for set/break, should be for breakOnly.
     //Todo: "cycle completed" as a db entry for each separate cycle.
     //Todo: Add skip to Pom.
     //Todo: Modify boxes for increased dot size.
-    //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer.
+    //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
     //Todo: Variable set only mode? Again, for TDEE.
@@ -746,7 +742,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         s1.setText(R.string.set_time);
         s2.setText(R.string.break_time);
-        s3.setText(R.string.set_number);
+        s3.setText(R.string.rounds);
         save_cycles.setText(R.string.save_cycles);
         update_cycles.setText(R.string.update_cycles);
         confirm_header_save.setText(R.string.save_cycles);
@@ -876,6 +872,86 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         AsyncTask.execute(() -> {
             cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+        });
+
+        //Todo: Will need new halted vars etc. for breaksOnly mode.
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        mode=1;
+                        setBreaksOnlyMode(false);
+                        savedCycleAdapter.setView(1);
+                        switchTimer(1, customHalted);
+                        dotDraws.setMode(1);
+                        if (!setBegun) drawDots(0);
+                        break;
+                    case 1:
+                        mode=1;
+                        setBreaksOnlyMode(true);
+                        savedCycleAdapter.setView(2);
+                        switchTimer(1, customHalted);
+                        dotDraws.setMode(1);
+                        if (!breakBegun) drawDots(0);
+                        break;
+                    case 2:
+                        mode=2;
+                        savedCycleAdapter.setView(3);
+                        switchTimer(2, pomHalted);
+                        dotDraws.setMode(2);
+                        dotDraws.pomDraw(1, 0, pomValuesTime);
+                        break;
+                    case 3:
+                        mode=3;
+                        switchTimer(3, stopwatchHalted);
+                        lapRecycler.setVisibility(View.VISIBLE);
+                        break;
+                }
+                prefEdit.apply();
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        left_arrow.setVisibility(View.INVISIBLE);
+                        right_arrow.setVisibility(View.INVISIBLE);
+                        if (customHalted) {
+                            fadeOutText(timePaused); lastTextView = timePaused;
+                        } else {
+                            fadeOutText(timeLeft); lastTextView = timeLeft;
+                        }
+                        break;
+                    case 1:
+                        if (pomHalted) {
+                            fadeOutText(timePaused2); lastTextView = timePaused2;
+                        } else {
+                            fadeOutText(timeLeft2); lastTextView = timeLeft2;
+                        }
+                        break;
+                    case 2:
+                        if (stopwatchHalted) {
+                            fadeOutText(timePaused3);
+//                            fadeOutText(msTimePaused);
+                        } else {
+                            fadeOutText(timeLeft3);
+//                            fadeOutText(msTime);
+                        }
+                        lapRecycler.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
+
+        fab.setOnClickListener(v-> {
+            if (mode==1) {
+                if (!breaksOnly) editCyclesPopupWindow.setHeight(380); else editCyclesPopupWindow.setHeight(275);
+            } else editCyclesPopupWindow.setHeight(455);
+            editCyclesPopupWindow.showAsDropDown((View) tabLayout);
         });
 
         delete_all_confirm.setOnClickListener(v-> {
@@ -1282,83 +1358,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedBreaks-=1;
             numberOfBreaks-=1;
             drawDots(0);
-        });
-
-        fab.setOnClickListener(v-> {
-            editCyclesPopupWindow.showAsDropDown((View) tabLayout);
-        });
-
-        //Todo: Will need new halted vars etc. for breaksOnly mode.
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (tab.getPosition()) {
-                    case 0:
-                        mode=1;
-                        setBreaksOnlyMode(false);
-                        savedCycleAdapter.setView(1);
-                        switchTimer(1, customHalted);
-                        dotDraws.setMode(1);
-                        if (!setBegun) drawDots(0);
-                        break;
-                    case 1:
-                        mode=1;
-                        setBreaksOnlyMode(true);
-                        savedCycleAdapter.setView(2);
-                        switchTimer(1, customHalted);
-                        dotDraws.setMode(1);
-                        if (!breakBegun) drawDots(0);
-                        break;
-                    case 2:
-                        mode=2;
-                        savedCycleAdapter.setView(3);
-                        switchTimer(2, pomHalted);
-                        dotDraws.setMode(2);
-                        dotDraws.pomDraw(1, 0, pomValuesTime);
-                        break;
-                    case 3:
-                        mode=3;
-                        switchTimer(3, stopwatchHalted);
-                        lapRecycler.setVisibility(View.VISIBLE);
-                        break;
-                }
-                prefEdit.apply();
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                switch (tab.getPosition()) {
-                    case 0:
-                        left_arrow.setVisibility(View.INVISIBLE);
-                        right_arrow.setVisibility(View.INVISIBLE);
-                        if (customHalted) {
-                            fadeOutText(timePaused); lastTextView = timePaused;
-                        } else {
-                            fadeOutText(timeLeft); lastTextView = timeLeft;
-                        }
-                        break;
-                    case 1:
-                        if (pomHalted) {
-                            fadeOutText(timePaused2); lastTextView = timePaused2;
-                        } else {
-                            fadeOutText(timeLeft2); lastTextView = timeLeft2;
-                        }
-                        break;
-                    case 2:
-                        if (stopwatchHalted) {
-                            fadeOutText(timePaused3);
-//                            fadeOutText(msTimePaused);
-                        } else {
-                            fadeOutText(timeLeft3);
-//                            fadeOutText(msTime);
-                        }
-                        lapRecycler.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
         });
 
         save_cycles.setOnClickListener(v->{
@@ -2835,27 +2834,59 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (mode) {
             case 1:
                 first_value_textView.setText(convertCustomTextView(setValue));
-                if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                if (!breaksOnly) {
+                    second_value_textView.setText(convertCustomTextView(breakValue));
+                    first_value_textView.setVisibility(View.VISIBLE);
+                    plus_first_value.setVisibility(View.VISIBLE);
+                    minus_first_value.setVisibility(View.VISIBLE);
+                    s1.setVisibility(View.VISIBLE);
+                } else {
+                    first_value_textView.setVisibility(View.GONE);
+                    plus_first_value.setVisibility(View.GONE);
+                    minus_first_value.setVisibility(View.GONE);
+                    s1.setVisibility(View.GONE);
+                    second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                }
 
                 progressBar.setVisibility(View.VISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
+                cycle_reset.setVisibility(View.VISIBLE);
+                skip.setVisibility(View.VISIBLE);
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
+//                s3.setText(R.string.rounds);
                 cycle_reset.setText(R.string.clear_cycles);
-                s1.setTextSize(24f);
-                s2.setTextSize(24f);
-                s3.setTextSize(24f);
+                s1.setTextSize(22f);
+                s2.setTextSize(22f);
+                first_value_textView.setTextSize(23f);
+                second_value_textView.setTextSize(23f);
+                s3.setVisibility(View.GONE);
+                third_value_textView.setVisibility(View.GONE);
+                third_value_single_edit.setVisibility(View.GONE);
+                plus_third_value.setVisibility(View.GONE);
+                minus_third_value.setVisibility(View.GONE);
                 break;
             case 2:
                 first_value_single_edit.setText(convertSeconds(pomValue1));
                 second_value_single_edit.setText(convertSeconds(pomValue2));
                 third_value_single_edit.setText(convertSeconds(pomValue3));
 
+                first_value_textView.setVisibility(View.VISIBLE);
+                plus_first_value.setVisibility(View.VISIBLE);
+                minus_first_value.setVisibility(View.VISIBLE);
+                s1.setVisibility(View.VISIBLE);
+
+                s3.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.VISIBLE);
                 stopWatchView.setVisibility(View.GONE);
+                cycle_reset.setVisibility(View.VISIBLE);
+                skip.setVisibility(View.VISIBLE);
+                plus_third_value.setVisibility(View.VISIBLE);
+                minus_third_value.setVisibility(View.VISIBLE);
 
+                third_value_textView.setVisibility(View.VISIBLE);
                 first_value_textView.setText(String.valueOf(pomValue1));
                 second_value_textView.setText(String.valueOf(pomValue2));
                 third_value_textView.setText(String.valueOf(pomValue3));
@@ -2864,7 +2895,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s1.setText(R.string.work_time);
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
-                cycle_header_text.setVisibility(View.INVISIBLE);
                 cycle_reset.setText(R.string.clear_cycles);
                 s1.setTextSize(21f);
                 s2.setTextSize(21f);
@@ -2916,7 +2946,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDisabled = true;
         }
         if ( (!timerDisabled && mode==1) || (!pomTimerDisabled && mode==2) ){
-//            activeTimerViews(true);
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
             sub_cycle.setEnabled(false);
@@ -3115,7 +3144,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 2:
                 //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
-                pomMillis1 = pomValuesTime.get(0)*1000*60;
+                if (pomValuesTime.size()!=0) pomMillis1 = pomValuesTime.get(0)*1000*60;
                 pomMillis = pomMillis1;
                 dotDraws.pomDraw(pomDotCounter, 0, pomValuesTime);
                 if (pomValuesTime.size()==0) {
