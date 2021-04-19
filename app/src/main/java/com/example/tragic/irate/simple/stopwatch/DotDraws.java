@@ -307,13 +307,13 @@ public class DotDraws extends View {
             case 0: case 2: case 4: case 6:
                 mPaint.setColor(Color.GREEN);
                 //Must be called AFTER color is changed, otherwise alpha will reset to 255.
-                if (fade && mFadeDone == 1) fadeDot2();
+                if (fade && mFadeDone == 4) fadeDot2();
                 mCanvas.drawCircle(mX, 550, 60, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
                 break;
             case 1: case 3: case 5:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 1) fadeDot2();
+                if (fade && mFadeDone == 4) fadeDot2();
                 mCanvas.drawCircle(mX2, 550, 45 , mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 mX+=250;
@@ -321,7 +321,7 @@ public class DotDraws extends View {
                 break;
             case 7:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 1) fadeDot2();
+                if (fade && mFadeDone == 4) fadeDot2();
                 mCanvas.drawRect(mX+90, 495, mX+200, 605, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
         }
@@ -342,6 +342,7 @@ public class DotDraws extends View {
         mSendAlpha.sendAlphaValue(mAlpha);
     }
 
+    //Todo: Probably want to smooth out the alpha transition here, too.
     public void fadeDot2() {
         if (mAlpha2 >255) mAlpha2 = 255;
         mPaint.setAlpha(mAlpha2);
