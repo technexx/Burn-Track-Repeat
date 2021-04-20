@@ -233,8 +233,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String convertedBreakOnlyList;
     String convertedPomList;
 
-    boolean activeCustomCycle;
-    boolean activeCustomBOCycle;
     boolean activePomCycle;
     boolean setBegun;
     boolean breakBegun;
@@ -312,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ImageButton fab;
 
-    //Todo: Sep breakOnly timer.
+    //Todo: Reset and Skip for new breaksOnly mode. textViews.
     //Todo: Need to fix fading so all modes fade separately.
     //Todo: "overtime" seconds are active for set/break, should be for breakOnly.
     //Todo: "cycle completed" as a db entry for each separate cycle.
@@ -336,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
     //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
     //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
-    //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode.
+    //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check lifecycle is stable.
 
     //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
@@ -927,38 +925,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         lapRecycler.setVisibility(View.VISIBLE);
                         break;
                 }
-                prefEdit.apply();
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
                     case 0:
-                        left_arrow.setVisibility(View.INVISIBLE);
-                        right_arrow.setVisibility(View.INVISIBLE);
                         if (customHalted) {
-                            fadeOutText(timePaused); lastTextView = timePaused;
-                        } else {
-                            fadeOutText(timeLeft); lastTextView = timeLeft;
-                        }
+                            fadeOutText(timePaused);
+                            lastTextView = timePaused;
+                        } else fadeOutText(timeLeft); lastTextView = timeLeft;
                         break;
                     case 1:
-                        if (pomHalted) {
-                            fadeOutText(timePaused3); lastTextView = timePaused3;
-                        } else {
-                            fadeOutText(timeLeft3); lastTextView = timeLeft3;
-                        }
+                        if (breaksOnlyHalted) {
+                            fadeOutText(timePaused2);
+                            lastTextView = timePaused2;
+                        } else fadeOutText(timeLeft2); lastTextView = timeLeft2;
                         break;
                     case 2:
-                        if (stopwatchHalted) {
-                            fadeOutText(timePaused4);
-//                            fadeOutText(msTimePaused);
-                        } else {
-                            fadeOutText(timeLeft4);
-//                            fadeOutText(msTime);
-                        }
+                        if (pomHalted) {
+                            fadeOutText(timePaused3);
+                            lastTextView = timePaused3;
+                        } else fadeOutText(timeLeft3); lastTextView = timeLeft3;
+                        break;
+                    case 3:
+                        if (stopwatchHalted) fadeOutText(timePaused4);
+                        else fadeOutText(timeLeft4);
                         lapRecycler.setVisibility(View.GONE);
+                        break;
                 }
+                left_arrow.setVisibility(View.INVISIBLE);
+                right_arrow.setVisibility(View.INVISIBLE);
             }
 
             @Override
@@ -1400,19 +1397,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     if (!breakEnded) {
-                        if ((!customHalted && !breaksOnly) || (!breaksOnlyHalted && breaksOnly)) {
-                            pauseAndResumeTimer(PAUSING_TIMER);
-                        } else {
-                            pauseAndResumeTimer(RESUMING_TIMER);
-                        }
+                        if ((!customHalted && !breaksOnly) || (!breaksOnlyHalted && breaksOnly)) pauseAndResumeTimer(PAUSING_TIMER);
+                        else pauseAndResumeTimer(RESUMING_TIMER);
                     } else if (!newBreak) pauseAndResumeTimer(RESETTING_TIMER); else pauseAndResumeTimer(RESTARTING_TIMER);
                     break;
                 case 2:
-                    if (!pomHalted) {
-                        pauseAndResumeTimer(PAUSING_TIMER);
-                    } else {
-                        pauseAndResumeTimer(RESUMING_TIMER);
-                    }
+                    if (!pomHalted) pauseAndResumeTimer(PAUSING_TIMER);
+                    else pauseAndResumeTimer(RESUMING_TIMER);
                     break;
                 case 3:
                     pauseAndResumeTimer(0);
@@ -1589,6 +1580,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
     }
 
+    //Todo: Issue not w/ progressBar2, but rather progressBar, its animator, and pause/resume. May be starting new object animator instead of resuming.
     public void startObjectAnimator() {
         switch (mode) {
             case 1:
@@ -1601,7 +1593,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             objectAnimator.setDuration(setMillis);
                             objectAnimator.start();
                             setBegun = true;
-                            activeCustomCycle = true;
                         } else {
                             setMillis = setMillisUntilFinished;
                             if (objectAnimator!=null) objectAnimator.resume();
@@ -1614,7 +1605,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             objectAnimator.setDuration(breakMillis);
                             objectAnimator.start();
                             breakBegun = true;
-                            activeCustomBOCycle = true;
                         } else {
                             breakMillis = breakMillisUntilFinished;
                             if (objectAnimator!=null) objectAnimator.resume();
@@ -1669,6 +1659,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                         drawDots(1);
+                        //0 vis, 4 invis.
+//                        Log.i("visTest", "p1 is " + progressBar.getVisibility() + " and p2 is " + progressBar2.getVisibility());
+                        Log.i("visTest", "obj 1 is " + objectAnimator.getAnimatedValue());
+                        Log.i("visTest", "timeLeft alpha is " + timeLeft.getAlpha());
                     }
 
                     @Override
@@ -1840,6 +1834,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (customAlpha >=1) fadeCustomTimer = false;
                     timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
                     drawDots(3);
+                    //0 vis, 4 invis.
                 }
 
                 @Override
@@ -2019,16 +2014,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
                     if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
+                    timeLeft.setAlpha(1);
                 } else {
                     savedCycleAdapter.setView(2);
                     onBreak = true;
                     if (breakOnlyMillisUntilFinished==0) breakOnlyMillisUntilFinished = breakOnlyMillis;
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                    timeLeft2.setAlpha(1);
                 }
                 if (halted) {
-                    if (!breaksOnly) setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
-                    else setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
-                    fadeTextIn(timePaused);
+                    if (!breaksOnly) {
+                        setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
+                        fadeInText(timePaused);
+                    }
+                    else {
+                        setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
+                        fadeInText(timePaused2);
+                    }
                     drawDots(1);
                 } else {
                     if (!breaksOnly) setNewText(lastTextView, timeLeft, (setMillis + 999)/1000);
@@ -2043,7 +2045,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
                 if (halted) {
-                    fadeTextIn(timePaused3);
+                    fadeInText(timePaused3);
                     dotDraws.pomDraw(pomDotCounter, 1, pomValuesTime);
                     setNewText(lastTextView, timePaused3, (pomMillis + 999)/1000);
                 } else {
@@ -2067,8 +2069,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
                 dotDraws.setMode(3);
                 dotDraws.pomDraw(pomDotCounter, 1, pomValuesTime);
-                if (stopwatchHalted) fadeTextIn(timePaused4);
-                else fadeTextIn(timeLeft4);
+                if (stopwatchHalted) fadeInText(timePaused4);
+                else fadeInText(timeLeft4);
         }
         dotDraws.retrieveAlpha();
     }
@@ -2105,7 +2107,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sizeAnimator.start();
     }
 
-    //Todo: timePaused2 is fine. timeLeft2 is b0rked somewhere.
     public void setNewText(TextView oldTextView, TextView currentTextView, long newTime) {
         boolean fadeTime = false;
         String oldText = (String) oldTextView.getText();
@@ -2141,19 +2142,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (fadeTime) {
             switch (mode) {
                 case 1:
-                    if (customHalted && !breaksOnly) fadeTextIn(timePaused); else fadeTextIn(timeLeft2);
-                    if (breaksOnlyHalted && breaksOnly) fadeTextIn(timePaused2); else fadeTextIn(timeLeft2);
+                    if (customHalted && !breaksOnly) fadeInText(timePaused); else fadeInText(timeLeft2);
+                    if (breaksOnlyHalted && breaksOnly) fadeInText(timePaused2); else fadeInText(timeLeft2);
                     break;
                 case 2:
-                    if (pomHalted) fadeTextIn(timePaused3); else fadeTextIn(timeLeft3); break;
+                    if (pomHalted) fadeInText(timePaused3); else fadeInText(timeLeft3); break;
                 case 3:
-                    if (stopwatchHalted) fadeTextIn(timePaused4); else fadeTextIn(timeLeft4); break;
+                    if (stopwatchHalted) fadeInText(timePaused4); else fadeInText(timeLeft4); break;
             }
         }
         currentTextView.setText(convertSeconds(newTime));
     }
 
-    public void fadeTextIn(TextView textView) {
+    public void fadeInText(TextView textView) {
         if (fadeInObj!=null) fadeInObj.cancel();
         fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
         fadeInObj.setDuration(1000);
@@ -2168,13 +2169,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void removeViews() {
-        timePaused.setAlpha(0);
         timeLeft.setAlpha(0);
         timeLeft2.setAlpha(0);
-        timePaused2.setAlpha(0);
-        timePaused3.setAlpha(0);
         timeLeft3.setAlpha(0);
         timeLeft4.setAlpha(0);
+        timePaused.setAlpha(0);
+        timePaused2.setAlpha(0);
+        timePaused3.setAlpha(0);
         timePaused4.setAlpha(0);
         msTime.setAlpha(0);
         msTimePaused.setAlpha(0);
@@ -3031,6 +3032,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Log.i("testFormat", savedTitle);
     }
 
+    //Todo: View issues since we are not switching tabs.
     public void pauseAndResumeTimer(int pausing) {
         if ( (setMillis <=500 || breakMillis <=500) && numberOfBreaks >0) {
             timerDisabled = true;
@@ -3077,9 +3079,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             reset.setVisibility(View.VISIBLE);
                         } else if (pausing == RESUMING_TIMER){
                             if (!breaksOnly) {
-                                timeLeft.setAlpha(1);
                                 customHalted = false;
                                 if (onBreak) breakStart(); else startTimer();
+                                timeLeft.setAlpha(1);
                             } else {
                                 timeLeft2.setAlpha(1);
                                 breaksOnlyHalted = false;
@@ -3230,14 +3232,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else timerDisabled = true;
                     dotDraws.setTime(customSetTime);
                     dotDraws.breakTime(customBreakTime);
-                    activeCustomCycle = false;
                 } else {
                     if (startBreaksOnlyTime.size()>0) {
                         breaksOnlyTime.addAll(startBreaksOnlyTime);
                         timerDisabled = false;
                     } else timerDisabled = true;
                     dotDraws.breakTime(breaksOnlyTime);
-                    activeCustomBOCycle = false;
                 }
                 //Always setting this to avoid null errors.
                 dotDraws.setAlpha();
