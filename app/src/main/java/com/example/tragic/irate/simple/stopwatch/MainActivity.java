@@ -202,7 +202,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean customTimerEnded;
     boolean breakOnlyTimerEnded;
     boolean pomTimerEnded;
-    boolean paused;
     boolean onBreak;
     boolean pomEnded;
     boolean timerDisabled;
@@ -383,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         if (deleteAllPopupWindow!=null & deleteAllPopupWindow.isShowing()) deleteAllPopupWindow.dismiss();
         switch (mode) {
-            case 1:
+            case 1: case 2:
                 if (first_value_edit.isShown()) {
                     first_value_textView.setVisibility(View.VISIBLE);
                     first_value_edit.setVisibility(View.GONE);
@@ -401,7 +400,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     setEditValueBounds(false);
                 }
                 break;
-            case 2:
+            case 3:
                 if (first_value_single_edit.isShown()) {
                     first_value_single_edit.setVisibility(View.GONE);
                     first_value_textView.setVisibility(View.VISIBLE);
@@ -414,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     third_value_single_edit.setVisibility(View.GONE);
                     third_value_textView.setVisibility(View.VISIBLE);
                 }
-                    setEditValueBounds(true);
                     break;
         }
         save_cycles.setText(R.string.save_cycles);
@@ -433,42 +431,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             queryCycles();
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) {
-                        int deletedID = cyclesList.get(position).getId();
+                    Cycles removedCycle = cyclesList.get(position);
+                    cyclesDatabase.cyclesDao().deleteCycle(removedCycle);
+                    //Second query, retrieving the new, post-modified entity.
+                    queryCycles();
 
-                        Cycles removedCycle = cyclesList.get(position);
-                        cyclesDatabase.cyclesDao().deleteCycle(removedCycle);
-                        //Second query, retrieving the new, post-modified entity.
-                        queryCycles();
-
-                        runOnUiThread(() -> {
-                            setsArray.clear();
-                            breaksArray.clear();
-                            for (int i=0; i<cyclesList.size(); i++) {
-                                setsArray.add(cyclesList.get(i).getSets());
-                                breaksArray.add(cyclesList.get(i).getBreaks());
-                                customTitleArray.add(cyclesList.get(i).getTitle());
-                            }
-                            savedCycleAdapter.notifyDataSetChanged();
-                        });
-                    } else {
-                        int deletedID = cyclesBOList.get(position).getId();
-
-                        CyclesBO removedBOCycle = cyclesBOList.get(position);
-                        cyclesDatabase.cyclesDao().deleteBOCycle(removedBOCycle);
-                        queryCycles();
-
-                        runOnUiThread(() -> {
-                            breaksOnlyArray.clear();
-                            for (int i=0; i<cyclesBOList.size(); i++) {
-                                breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-                                breaksOnlyTitleArray.add(cyclesList.get(i).getTitle());
-                            }
-                            savedCycleAdapter.notifyDataSetChanged();
-                        });
-                    }
+                    runOnUiThread(() -> {
+                        setsArray.clear();
+                        breaksArray.clear();
+                        for (int i=0; i<cyclesList.size(); i++) {
+                            setsArray.add(cyclesList.get(i).getSets());
+                            breaksArray.add(cyclesList.get(i).getBreaks());
+                            customTitleArray.add(cyclesList.get(i).getTitle());
+                        }
+                        savedCycleAdapter.notifyDataSetChanged();
+                    });
                     break;
                 case 2:
+                    CyclesBO removedBOCycle = cyclesBOList.get(position);
+                    cyclesDatabase.cyclesDao().deleteBOCycle(removedBOCycle);
+                    queryCycles();
+
+                    runOnUiThread(() -> {
+                        breaksOnlyArray.clear();
+                        for (int i=0; i<cyclesBOList.size(); i++) {
+                            breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+                            breaksOnlyTitleArray.add(cyclesList.get(i).getTitle());
+                        }
+                        savedCycleAdapter.notifyDataSetChanged();
+                    });
+                    break;
+                case 3:
                     int deletedID = pomCyclesList.get(position).getId();
 
                     PomCycles removedPom = pomCyclesList.get(position);
@@ -528,28 +521,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     clearArrays(false);
                     switch (mode) {
                         case 1:
-                            if (!breaksOnly) {
-                                savedCycleAdapter.setView(1);
-                                if (cyclesList.size()>0) {
-                                    for (int i=0; i<cyclesList.size(); i++) {
-                                        setsArray.add(cyclesList.get(i).getSets());
-                                        breaksArray.add(cyclesList.get(i).getBreaks());
-                                        customTitleArray.add(cyclesList.get(i).getTitle());
+                            savedCycleAdapter.setView(1);
+                            if (cyclesList.size()>0) {
+                                for (int i=0; i<cyclesList.size(); i++) {
+                                    setsArray.add(cyclesList.get(i).getSets());
+                                    breaksArray.add(cyclesList.get(i).getBreaks());
+                                    customTitleArray.add(cyclesList.get(i).getTitle());
                                     }
-                                    cyclesExist.set(true);
-                                }
-                            } else {
-                                savedCycleAdapter.setView(2);
-                                if (cyclesBOList.size()>0) {
-                                    for (int i=0; i<cyclesBOList.size(); i++) {
-                                        breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
-                                        breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-                                    }
-                                    cyclesExist.set(true);
-                                }
+                                cyclesExist.set(true);
                             }
                             break;
                         case 2:
+                            savedCycleAdapter.setView(2);
+                            if (cyclesBOList.size()>0) {
+                                for (int i=0; i<cyclesBOList.size(); i++) {
+                                    breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
+                                    breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+                                }
+                                cyclesExist.set(true);
+                            }
+                            break;
+                        case 3:
                             savedCycleAdapter.setView(3);
                             if (pomCyclesList.size()>0) {
                                 for (int i=0; i<pomCyclesList.size(); i++) {
@@ -578,13 +570,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case R.id.delete_all_cycles:
                 AsyncTask.execute(() -> {
                     queryCycles();
-                    if ((!breaksOnly && cyclesList.size()==0)|| (breaksOnly && cyclesBOList.size()==0)){
+                    if ((mode==1 && cyclesList.size()==0)|| (mode==2 && cyclesBOList.size()==0)){
                         runOnUiThread(()-> {
                             runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
                         });
                     } else {
                         runOnUiThread(()-> {
-                            if (!breaksOnly) delete_all_text.setText(R.string.delete_all_custom); else delete_all_text.setText(R.string.delete_all_BO);
+                            if (mode==1) delete_all_text.setText(R.string.delete_all_custom); else delete_all_text.setText(R.string.delete_all_BO);
                             deleteAllPopupWindow.showAtLocation(deleteCyclePopupView, Gravity.CENTER, 0, 0);
                         });
                       ;
@@ -883,7 +875,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timePaused.getAlpha();
         timeLeft.getAlpha();
 
-        if ((!breaksOnly && cyclesList.size()>0)  || (breaksOnly && cyclesBOList.size()>0)){
+        if ((mode==1 && cyclesList.size()>0)  || (mode==2 && cyclesBOList.size()>0)){
             canSaveOrUpdate(false);
         } else canSaveOrUpdate(true);
 
@@ -898,30 +890,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 switch (tab.getPosition()) {
                     case 0:
                         mode=1;
-                        setBreaksOnlyMode(false);
                         savedCycleAdapter.setView(1);
                         switchTimer(1, customHalted);
                         dotDraws.setMode(1);
                         if (!setBegun) drawDots(0);
                         break;
                     case 1:
-                        mode=1;
-                        setBreaksOnlyMode(true);
+                        mode=2;
                         savedCycleAdapter.setView(2);
-                        switchTimer(1, breaksOnlyHalted);
-                        dotDraws.setMode(1);
+                        switchTimer(2, breaksOnlyHalted);
+                        dotDraws.setMode(2);
                         if (!breakBegun) drawDots(0);
                         break;
                     case 2:
                         mode=2;
                         savedCycleAdapter.setView(3);
-                        switchTimer(2, pomHalted);
-                        dotDraws.setMode(2);
+                        switchTimer(3, pomHalted);
+                        dotDraws.setMode(3);
                         dotDraws.pomDraw(1, 0, pomValuesTime);
                         break;
                     case 3:
                         mode=3;
-                        switchTimer(3, stopwatchHalted);
+                        switchTimer(4, stopwatchHalted);
                         lapRecycler.setVisibility(View.VISIBLE);
                         break;
                 }
@@ -965,7 +955,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         fab.setOnClickListener(v-> {
             if (mode==1) {
-                if (!breaksOnly) editCyclesPopupWindow.setHeight(380); else editCyclesPopupWindow.setHeight(275);
+                if (mode==1) editCyclesPopupWindow.setHeight(380); else editCyclesPopupWindow.setHeight(275);
             } else editCyclesPopupWindow.setHeight(455);
             editCyclesPopupWindow.showAsDropDown((View) tabLayout);
         });
@@ -974,15 +964,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             AsyncTask.execute(() -> {
                 switch (mode) {
                     case 1:
-                        if (!breaksOnly) {
-                            cyclesDatabase.cyclesDao().deleteAll();
-                            prefEdit.putInt("customID", 0);
-                        } else {
-                            cyclesDatabase.cyclesDao().deleteAllBO();
-                            prefEdit.putInt("breaksOnlyID", 0);
-                        }
+                        cyclesDatabase.cyclesDao().deleteAll();
+                        prefEdit.putInt("customID", 0);
                         break;
                     case 2:
+                        cyclesDatabase.cyclesDao().deleteAllBO();
+                        prefEdit.putInt("breaksOnlyID", 0);
+                        break;
+                    case 3:
                         cyclesDatabase.cyclesDao().deleteAllPomCycles();
                         prefEdit.putInt("pomID", 0);
                         break;
@@ -1021,20 +1010,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         first_value_textView.setOnClickListener(v-> {
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) {
-                        if (first_value_textView.isShown()) {
-                            first_value_textView.setVisibility(View.GONE);
-                            first_value_edit.setVisibility(View.VISIBLE);
-                            first_value_edit_two.setVisibility(View.VISIBLE);
-                            first_value_sep.setVisibility(View.VISIBLE);
-                            convertEditTime();
-                        }
-                        if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
-                            second_value_textView.setVisibility(View.VISIBLE);
-                            second_value_edit.setVisibility(View.GONE);
-                            second_value_edit_two.setVisibility(View.GONE);
-                            second_value_sep.setVisibility(View.GONE);
-                        }
+                    if (first_value_textView.isShown()) {
+                        first_value_textView.setVisibility(View.GONE);
+                        first_value_edit.setVisibility(View.VISIBLE);
+                        first_value_edit_two.setVisibility(View.VISIBLE);
+                        first_value_sep.setVisibility(View.VISIBLE);
+                        convertEditTime();
+                    }
+                    if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
+                        second_value_textView.setVisibility(View.VISIBLE);
+                        second_value_edit.setVisibility(View.GONE);
+                        second_value_edit_two.setVisibility(View.GONE);
+                        second_value_sep.setVisibility(View.GONE);
                     }
                     break;
                 case 2:
@@ -1055,7 +1042,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         second_value_textView.setOnClickListener(v-> {
             switch (mode) {
-                case 1:
+                case 1: case 2:
                     if (second_value_textView.isShown()) {
                         second_value_textView.setVisibility(View.INVISIBLE);
                         second_value_edit.setVisibility(View.VISIBLE);
@@ -1070,7 +1057,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     convertEditTime();
                     break;
-                case 2:
+                case 3:
                     if (first_value_single_edit.isShown()) {
                         first_value_textView.setVisibility(View.VISIBLE);
                         first_value_single_edit.setVisibility(View.GONE);
@@ -1090,7 +1077,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         third_value_textView.setOnClickListener(v->{
             switch (mode) {
-                case 1:
+                case 1: case 2:
                     if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
                         first_value_edit.setVisibility(View.GONE);
                         first_value_edit_two.setVisibility(View.GONE);
@@ -1102,7 +1089,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         second_value_sep.setVisibility(View.GONE);
                     }
                      break;
-                case 2:
+                case 3:
                     if (first_value_single_edit.isShown()) {
                         first_value_single_edit.setVisibility(View.GONE);
                         first_value_textView.setVisibility(View.VISIBLE);
@@ -1143,19 +1130,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             public void run() {
                 switch (mode) {
                     case 1:
-                        if (!breaksOnly) {
-                            if (incrementValues) breakValue+=1; else breakValue -=1;
-                        } else{
-                            if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
-
-
-
-
-
-
-                        }
+                        if (incrementValues) breakValue+=1; else breakValue -=1;
                         break;
                     case 2:
+                        if (incrementValues) breaksOnlyValue+=1; else breaksOnlyValue -=1;
+                        break;
+                    case 3:
                         if (incrementValues) pomValue2+=1; else pomValue2 -=1;
                         pomMillis2 = (pomValue2*1000) * 60;
                         break;
@@ -1193,9 +1173,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) first_value_textView.setText(convertCustomTextView(setValue));
+                    first_value_textView.setText(convertCustomTextView(setValue));
                     break;
-                case 2:
+                case 3:
                     first_value_single_edit.setText(String.valueOf(pomValue1));
                     first_value_textView.setText(String.valueOf(pomValue1));
                     break;
@@ -1209,9 +1189,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) first_value_textView.setText(convertCustomTextView(setValue));
+                    first_value_textView.setText(convertCustomTextView(setValue));
                     break;
-                case 2:
+                case 3:
                     first_value_single_edit.setText(String.valueOf(pomValue1));
                     first_value_textView.setText(String.valueOf(pomValue1));
                     break;
@@ -1225,9 +1205,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                    second_value_textView.setText(convertCustomTextView(breakValue));
                     break;
                 case 2:
+                    convertEditTime();
+                    second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                    break;
+                case 3:
                     second_value_single_edit.setText(String.valueOf(pomValue2));
                     second_value_textView.setText(String.valueOf(pomValue2));
                     break;
@@ -1241,9 +1225,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     convertEditTime();
-                    if (!breaksOnly) second_value_textView.setText(convertCustomTextView(breakValue)); else second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                    second_value_textView.setText(convertCustomTextView(breakValue));
                     break;
                 case 2:
+                    convertEditTime();
+                    second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                    break;
+                case 3:
                     second_value_single_edit.setText(String.valueOf(pomValue2));
                     second_value_textView.setText(String.valueOf(pomValue2));
                     break;
@@ -1278,7 +1266,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         left_arrow.setOnClickListener(v-> {
-            if (!breaksOnly) {
+            if (mode==1) {
                 if (startCustomSetTime.size()>=2 && receivedPos>0) {
 
                     long holder = startCustomSetTime.get(receivedPos-1);
@@ -1299,7 +1287,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     receivedPos -=1;
                     dotDraws.setCycle(receivedPos);
                 }
-            } else {
+            } else if (mode==2) {
                 if (startBreaksOnlyTime.size()>=2 && receivedPos>0) {
                     long holder = startBreaksOnlyTime.get(receivedPos-1);
                     startBreaksOnlyTime.set(receivedPos-1, startBreaksOnlyTime.get(receivedPos));
@@ -1316,7 +1304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         right_arrow.setOnClickListener(v-> {
-            if (!breaksOnly) {
+            if (mode==1) {
                 if (startCustomSetTime.size()-1 > receivedPos && receivedPos>=0) {
 
                     long holder = startCustomSetTime.get(receivedPos+1);
@@ -1337,7 +1325,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     receivedPos +=1;
                     dotDraws.setCycle(receivedPos);
                 }
-            } else {
+            } else if (mode==2) {
                 if (startBreaksOnlyTime.size()-1 > receivedPos && receivedPos>=0) {
 
                     long holder = startBreaksOnlyTime.get(receivedPos+1);
@@ -1365,7 +1353,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         delete_sb.setOnClickListener(v->{
             startCustomSetTime.remove(receivedPos);
             customSetTime.remove(receivedPos);
-            if (!breaksOnly) {
+            if (mode==1) {
                 startCustomBreakTime.remove(receivedPos);
                 customBreakTime.remove(receivedPos);
                 dotDraws.setTime(customSetTime);
@@ -1374,7 +1362,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 numberOfSets-=1;
                 savedBreaks-=1;
                 numberOfBreaks-=1;
-            } else {
+            } else if (mode==2){
                 startBreaksOnlyTime.remove(receivedPos);
                 breaksOnlyTime.remove(receivedPos);
                 dotDraws.breakTime(breaksOnlyTime);
@@ -1397,7 +1385,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     if (!breakEnded) {
-                        if ((!customHalted && !breaksOnly) || (!breaksOnlyHalted && breaksOnly)) pauseAndResumeTimer(PAUSING_TIMER);
+                        if ((!customHalted && mode==1) || (!breaksOnlyHalted && mode==2)) pauseAndResumeTimer(PAUSING_TIMER);
                         else pauseAndResumeTimer(RESUMING_TIMER);
                     } else if (!newBreak) pauseAndResumeTimer(RESETTING_TIMER); else pauseAndResumeTimer(RESTARTING_TIMER);
                     break;
@@ -1415,11 +1403,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (cycle_reset.getText().equals(getString(R.string.clear_cycles))) {
                 switch (mode) {
                     case 1:
-                        if (!breaksOnly){
-                            if (customCyclesDone>0) clearIt = true;
-                        } else if (breaksOnlyCyclesDone>0) clearIt = true;
+                        if (customCyclesDone>0) clearIt = true;
                         break;
                     case 2:
+                        if (breaksOnlyCyclesDone>0) clearIt = true;
+                        break;
+                    case 3:
                         if (pomCyclesDone>0) clearIt = true;
                         break;
                 }
@@ -1427,10 +1416,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else if (cycle_reset.getText().equals(getString(R.string.confirm_cycle_reset))) {
                 switch (mode) {
                     case 1:
-                        if (!breaksOnly) customCyclesDone = 0; else breaksOnlyCyclesDone = 0;
+                        customCyclesDone = 0;
                         break;
                     case 2:
+                        breaksOnlyCyclesDone = 0;
+                        break;
+                    case 3:
                         pomCyclesDone = 0;
+                        break;
                 }
                 cycle_reset.setText(R.string.clear_cycles);
                 cycles_completed.setText(getString(R.string.cycles_done, "0"));
@@ -1447,79 +1440,92 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         skip.setOnClickListener(v -> {
             if (customSetTime.size()>0) {
-                customHalted = true;
                 int oldCycle = 0;
                 int oldCycle2 = 0;
-                if (mode == 1) {
-                    if (timer != null) timer.cancel();
-                    if (objectAnimator != null) objectAnimator.cancel();
-                    if (numberOfSets >0 && numberOfBreaks >0) {
-                        setBegun = false;
-                        customProgressPause = maxProgress;
-                        timePaused.setAlpha(1);
-                        timeLeft.setAlpha(0);
-                        progressBar.setProgress(10000);
+                int oldCycle3 = 0;
+                switch (mode) {
+                    case 1:
+                        customHalted = true;
+                        if (timer != null) timer.cancel();
+                        if (objectAnimator != null) objectAnimator.cancel();
 
-                        if (!breaksOnly) {
-                            if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
-                                customSetTime.remove(0);
-                                numberOfSets--;
-                            }
-                            if (customBreakTime.size() >0 && customBreakTime.size() != customSetTime.size()) {
-                                customBreakTime.remove(0);
-                                numberOfBreaks--;
-                                onBreak = false;
-                                oldCycle = customCyclesDone;
-                            }
-                            if (customSetTime.size() >0) setNewText(timePaused, timePaused, (customSetTime.get(0)+999)/1000);;
-                        } else {
-                            if (breaksOnlyTime.size() >0) {
-                                breaksOnlyTime.remove(0);
-                                numberOfBreaks--;
-                                oldCycle2 = breaksOnlyCyclesDone;
-                                breakBegun = false;
-                            }
-                            if (breaksOnlyTime.size() >0) {
-                                setNewText(timeLeft, timeLeft,(breaksOnlyTime.get(0) +999) / 1000);
-                                setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
-                            }
+                        if (numberOfSets >0 && numberOfBreaks >0) {
+                            setBegun = false;
+                            customProgressPause = maxProgress;
+                            timePaused.setAlpha(1);
+                            timeLeft.setAlpha(0);
+                            progressBar.setProgress(10000);
                         }
-                        dotDraws.setAlpha();
-                    }
-                    if (numberOfBreaks == 0) {
-                        timePaused.setAlpha(0);
-                        timeLeft.setAlpha(1);
-                        if (!breaksOnly) {
+                        if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
+                            customSetTime.remove(0);
+                            numberOfSets--;
+                        }
+                        if (customBreakTime.size() >0 && customBreakTime.size() != customSetTime.size()) {
+                            customBreakTime.remove(0);
+                            numberOfBreaks--;
+                            onBreak = false;
+                            oldCycle = customCyclesDone;
+                        }
+                        if (customSetTime.size() >0) setNewText(timePaused, timePaused, (customSetTime.get(0)+999)/1000);
+
+                        if (numberOfBreaks == 0) {
+                            timePaused.setAlpha(0);
+                            timeLeft.setAlpha(1);
                             if (oldCycle == customCyclesDone) {
                                 customCyclesDone++;
                                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                             }
-                        } else {
+                            animateEnding();
+                            progressBar.setProgress(0);
+                            timeLeft.setText("0");
+                            timePaused.setText("0");
+                            customTimerEnded = true;
+                        }
+                        if (numberOfBreaks >=0) {
+                            dotDraws.breakTime(startCustomBreakTime);
+                            dotDraws.setTime(startCustomSetTime);
+                            drawDots(0);
+                        }
+                        break;
+                    case 2:
+                        breaksOnlyHalted = true;
+                        if (timer2 != null) timer2.cancel();
+                        if (objectAnimator2 != null) objectAnimator2.cancel();
+
+                        if (breaksOnlyTime.size() >0) {
+                            breaksOnlyTime.remove(0);
+                            numberOfBreaks--;
+                            oldCycle2 = breaksOnlyCyclesDone;
+                            breakBegun = false;
+                        }
+                        if (breaksOnlyTime.size() >0) {
+                            setNewText(timeLeft, timeLeft,(breaksOnlyTime.get(0) +999) / 1000);
+                            setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
+                        }
+
+                        if (numberOfBreaksOnly==0) {
+                            timePaused2.setAlpha(0);
+                            timeLeft2.setAlpha(1);
                             if (oldCycle2 == breaksOnlyCyclesDone) {
                                 breaksOnlyCyclesDone++;
                                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                             }
+                            animateEnding();
+                            progressBar2.setProgress(0);
+                            timeLeft2.setText("0");
+                            timePaused2.setText("0");
+                            breakOnlyTimerEnded = true;
                         }
-                        animateEnding();
-                        progressBar.setProgress(0);
-                        timeLeft.setText("0");
-                        timePaused.setText("0");
-                        customTimerEnded = true;
-                        paused = false;
-                    }
-                    if (numberOfBreaks >=0) {
-                        if (!breaksOnly) {
-                            dotDraws.breakTime(startCustomBreakTime);
-                            dotDraws.setTime(startCustomSetTime);
-                        } else{
+                        if (numberOfBreaks >=0) {
                             dotDraws.breakTime(startBreaksOnlyTime);
+                            drawDots(0);
                         }
-                        drawDots(0);
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Cannot skip Pomodoro cycles!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 3:
+                        //Todo: Add pom here.
                 }
             }
+            dotDraws.setAlpha();
         });
 
         reset.setOnClickListener(v -> {
@@ -1584,47 +1590,46 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void startObjectAnimator() {
         switch (mode) {
             case 1:
-                if (!breaksOnly) {
-                    if (!onBreak) {
-                        if (!setBegun) {
-                            if (customSetTime.size()>0) setMillis = customSetTime.get(0);
-                            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
-                            objectAnimator.setInterpolator(new LinearInterpolator());
-                            objectAnimator.setDuration(setMillis);
-                            objectAnimator.start();
-                            setBegun = true;
-                        } else {
-                            setMillis = setMillisUntilFinished;
-                            if (objectAnimator!=null) objectAnimator.resume();
-                        }
+                if (!onBreak) {
+                    if (!setBegun) {
+                        if (customSetTime.size()>0) setMillis = customSetTime.get(0);
+                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
+                        objectAnimator.setInterpolator(new LinearInterpolator());
+                        objectAnimator.setDuration(setMillis);
+                        objectAnimator.start();
+                        setBegun = true;
                     } else {
-                        if (!breakBegun) {
-                            if (customBreakTime.size()>0) breakMillis = customBreakTime.get(0);
-                            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
-                            objectAnimator.setInterpolator(new LinearInterpolator());
-                            objectAnimator.setDuration(breakMillis);
-                            objectAnimator.start();
-                            breakBegun = true;
-                        } else {
-                            breakMillis = breakMillisUntilFinished;
-                            if (objectAnimator!=null) objectAnimator.resume();
-                        }
+                        setMillis = setMillisUntilFinished;
+                        if (objectAnimator!=null) objectAnimator.resume();
                     }
                 } else {
-                    if (!breakOnlyBegun) {
-                        if (breaksOnlyTime.size()>0) breakOnlyMillis = breaksOnlyTime.get(0);
-                        objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) breaksOnlyProgressPause, 0);
-                        objectAnimator2.setInterpolator(new LinearInterpolator());
-                        objectAnimator2.setDuration(breakOnlyMillis);
-                        objectAnimator2.start();
-                        breakOnlyBegun = true;
+                    if (!breakBegun) {
+                        if (customBreakTime.size()>0) breakMillis = customBreakTime.get(0);
+                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
+                        objectAnimator.setInterpolator(new LinearInterpolator());
+                        objectAnimator.setDuration(breakMillis);
+                        objectAnimator.start();
+                        breakBegun = true;
                     } else {
-                     breakOnlyMillis = breakOnlyMillisUntilFinished;
-                     if (objectAnimator2!=null) objectAnimator2.resume();
+                        breakMillis = breakMillisUntilFinished;
+                        if (objectAnimator!=null) objectAnimator.resume();
                     }
                 }
                 break;
             case 2:
+                if (!breakOnlyBegun) {
+                    if (breaksOnlyTime.size()>0) breakOnlyMillis = breaksOnlyTime.get(0);
+                    objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) breaksOnlyProgressPause, 0);
+                    objectAnimator2.setInterpolator(new LinearInterpolator());
+                    objectAnimator2.setDuration(breakOnlyMillis);
+                    objectAnimator2.start();
+                    breakOnlyBegun = true;
+                } else {
+                    breakOnlyMillis = breakOnlyMillisUntilFinished;
+                    if (objectAnimator2!=null) objectAnimator2.resume();
+                }
+                break;
+            case 3:
                 if (!pomBegun) {
                     objectAnimator3 = ObjectAnimator.ofInt(progressBar3, "progress", (int) pomProgressPause, 0);
                     objectAnimator3.setInterpolator(new LinearInterpolator());
@@ -1705,7 +1710,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                 }.start();
                 break;
-            case 2:
+            case 3:
                 pomBegun = true;
                 timer3 = new CountDownTimer(pomMillis, 50) {
                     @Override
@@ -1759,7 +1764,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void breakStart() {
-        if (!breaksOnly) {
+        if (mode==1) {
             timer = new CountDownTimer(breakMillis, 50) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -1819,7 +1824,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     mHandler.post(endFade);
                 }
             }.start();
-        } else {
+        } else if (mode==2) {
             timer2 = new CountDownTimer(breakOnlyMillis, 50) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -1895,45 +1900,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     }
 
-
 //      if (Build.VERSION.SDK_INT >= 26) {
 //      vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1));
 //      } else {
 //      vibrator.vibrate(pattern1, 0);
 //      }
-
-    public void setBreaksOnlyMode(boolean onlyBreaks) {
-        receivedPos = -1;
-        if (onlyBreaks) {
-            second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-            breaksOnly = true;
-            setBegun = true;
-            onBreak = true;
-            dotDraws.breaksOnly(true);
-            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-            prefEdit.putBoolean("currentBreaksOnly", true);
-            canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
-        } else {
-            first_value_textView.setText(convertCustomTextView(setValue));
-            second_value_textView.setText(convertCustomTextView(breakValue));
-            plus_first_value.setEnabled(true);
-            minus_first_value.setEnabled(true);
-            first_value_edit.setEnabled(true);
-            first_value_edit_two.setEnabled(true);
-            first_value_edit.setEnabled(true);
-            first_value_edit_two.setEnabled(true);
-            breaksOnly = false;
-            setBegun = false;
-
-            dotDraws.breaksOnly(false);
-            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-            prefEdit.putBoolean("currentBreaksOnly", false);
-            canSaveOrUpdate(canSaveOrUpdateCustom);
-        }
-        drawDots(1);
-        populateCycleUI();
-        prefEdit.apply();
-    }
 
     public void adjustCustom(boolean adding) {
         //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
@@ -1943,22 +1914,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (adding) {
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) {
-                        if (customSetTime.size() < 8 && customSetTime.size() >= 0) {
-                            startCustomSetTime.add(setValue * 1000);
-                            startCustomBreakTime.add(breakValue * 1000);
-                            canSaveOrUpdate(true);
-                            populateCycleUI();
-                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (breaksOnlyTime.size() < 8 && breaksOnlyTime.size() >= 0) {
-                            startBreaksOnlyTime.add(breaksOnlyValue * 1000);
-                            canSaveOrUpdate(true);
-                            populateCycleUI();
-                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                    }
+                    if (customSetTime.size() < 8 && customSetTime.size() >= 0) {
+                        startCustomSetTime.add(setValue * 1000);
+                        startCustomBreakTime.add(breakValue * 1000);
+                        canSaveOrUpdate(true);
+                        populateCycleUI();
+                    } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                     break;
                 case 2:
+                    if (breaksOnlyTime.size() < 8 && breaksOnlyTime.size() >= 0) {
+                        startBreaksOnlyTime.add(breaksOnlyValue * 1000);
+                        canSaveOrUpdate(true);
+                        populateCycleUI();
+                    } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
                     if (pomValuesTime.size()==0) {
                         for (int i=0; i<3; i++)  {
                             pomValuesTime.add(pomValue1); pomValuesTime.add(pomValue2);
@@ -1967,31 +1937,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         pomValuesTime.add(pomValue3);
                         populateCycleUI();
                     } else Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
+                    break;
             }
         } else {
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) {
-                        if (customSetTime.size() > 0 && startCustomSetTime.size() > 0) {
-                            startCustomSetTime.remove(startCustomSetTime.size() - 1);
-                            startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
-                            canSaveOrUpdate(true);
-                            populateCycleUI();
-                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                        //Used w/ arrows to switch set/break places.
-                        if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
-                    } else {
-                        if (breaksOnlyTime.size() > 0 && startBreaksOnlyTime.size() > 0) {
-                            startBreaksOnlyTime.remove(startBreaksOnlyTime.size() - 1);
-                            //Used w/ arrows to switch  break places.
-                            if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
-                            canSaveOrUpdate(true);
-                            populateCycleUI();
-                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                    }
+                    if (customSetTime.size() > 0 && startCustomSetTime.size() > 0) {
+                        startCustomSetTime.remove(startCustomSetTime.size() - 1);
+                        startCustomBreakTime.remove(startCustomBreakTime.size() - 1);
+                    } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                    //Used w/ arrows to switch set/break places.
+                    if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
                     if (receivedPos >=0) dotDraws.setCycle(receivedPos);
+                    canSaveOrUpdate(true);
+                    populateCycleUI();
                     break;
                 case 2:
+                    if (breaksOnlyTime.size() > 0 && startBreaksOnlyTime.size() > 0) {
+                        startBreaksOnlyTime.remove(startBreaksOnlyTime.size() - 1);
+                        //Used w/ arrows to switch  break places.
+                        if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
+                        if (receivedPos >=0) dotDraws.setCycle(receivedPos);
+                        canSaveOrUpdate(true);
+                        populateCycleUI();
+                    } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                    break;
+                case 3:
                     if (pomValuesTime.size()!=0) {
                         pomValuesTime.clear();
                         populateCycleUI();
@@ -2008,39 +1979,51 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabViews();
         switch (mode) {
             case 1:
-                if (!breaksOnly) {
-                    savedCycleAdapter.setView(1);
-                    onBreak = false;
-                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                    if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
-                    if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
-                    timeLeft.setAlpha(1);
-                } else {
-                    savedCycleAdapter.setView(2);
-                    onBreak = true;
-                    if (breakOnlyMillisUntilFinished==0) breakOnlyMillisUntilFinished = breakOnlyMillis;
-                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                    timeLeft2.setAlpha(1);
-                }
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
+                if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
+                timeLeft.setAlpha(1);
                 if (halted) {
-                    if (!breaksOnly) {
-                        setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
-                        fadeInText(timePaused);
-                    }
-                    else {
-                        setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
-                        fadeInText(timePaused2);
-                    }
-                    drawDots(1);
+                    setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
+                    fadeInText(timePaused);
                 } else {
-                    if (!breaksOnly) setNewText(lastTextView, timeLeft, (setMillis + 999)/1000);
-                     else setNewText(lastTextView, timeLeft2, (breakOnlyMillis + 999)/1000);
+                    setNewText(lastTextView, timeLeft, (setMillis + 999)/1000);
                     customAlpha = 0;
                     fadeCustomTimer = true;
                     startObjectAnimator();
                 }
+                savedCycleAdapter.setView(1);
+                first_value_textView.setText(convertCustomTextView(setValue));
+                second_value_textView.setText(convertCustomTextView(breakValue));
+                setBegun = false;
+                dotDraws.breaksOnly(false);
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                prefEdit.putBoolean("currentBreaksOnly", false);
+                canSaveOrUpdate(canSaveOrUpdateCustom);
                 break;
             case 2:
+                if (breakOnlyMillisUntilFinished==0) breakOnlyMillisUntilFinished = breakOnlyMillis;
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                timeLeft2.setAlpha(1);
+                if (halted) {
+                    setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
+                    fadeInText(timePaused2);
+                } else {
+                    setNewText(lastTextView, timeLeft2, (breakOnlyMillis + 999)/1000);
+                    customAlpha = 0;
+                    fadeCustomTimer = true;
+                    startObjectAnimator();
+                }
+                savedCycleAdapter.setView(2);
+                second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                setBegun = true;
+                onBreak = true;
+                dotDraws.breaksOnly(true);
+                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                prefEdit.putBoolean("currentBreaksOnly", true);
+                canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
+                break;
+            case 3:
                 savedCycleAdapter.setView(3);
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 if (pomMillisUntilFinished==0) pomMillisUntilFinished = pomMillis;
@@ -2064,15 +2047,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     });
                 });
                 break;
-            case 3:
+            case 4:
                 //Same animation instance can't be used simultaneously for both TextViews.
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
                 dotDraws.setMode(3);
                 dotDraws.pomDraw(pomDotCounter, 1, pomValuesTime);
                 if (stopwatchHalted) fadeInText(timePaused4);
                 else fadeInText(timeLeft4);
+                break;
         }
         dotDraws.retrieveAlpha();
+        drawDots(1);
+        populateCycleUI();
+        prefEdit.apply();
     }
 
     private void animateEnding() {
@@ -2082,17 +2069,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         endAnimation.setRepeatMode(Animation.REVERSE);
         endAnimation.setRepeatCount(Animation.INFINITE);
 
-        if (mode==1) {
-            if (!breaksOnly) {
+        switch (mode) {
+            case 1:
                 progressBar.setAnimation(endAnimation);
                 timeLeft.setAnimation(endAnimation);
-            } else {
+                break;
+            case 2:
                 progressBar2.setAnimation(endAnimation);
                 timeLeft2.setAnimation(endAnimation);
-            }
-        } else if (mode==2) {
-            progressBar3.setAnimation(endAnimation);
-            timeLeft3.setAnimation(endAnimation);
+                break;
+            case 3:
+                progressBar3.setAnimation(endAnimation);
+                timeLeft3.setAnimation(endAnimation);
+                break;
         }
     }
 
@@ -2117,24 +2106,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 fadeTime = true;
                 switch (mode) {
                     case 1:
-                        if (!breaksOnly) changeTextSize(valueAnimatorDown, timeLeft, timePaused);
-                        else changeTextSize(valueAnimatorDown, timeLeft2, timePaused2);
-                        break;
+                        changeTextSize(valueAnimatorDown, timeLeft, timePaused); break;
                     case 2:
-                        changeTextSize(valueAnimatorDown, timeLeft3, timePaused3); break;
+                        changeTextSize(valueAnimatorDown, timeLeft2, timePaused2); break;
                     case 3:
+                        changeTextSize(valueAnimatorDown, timeLeft3, timePaused3); break;
+                    case 4:
                         changeTextSize(valueAnimatorDown, timeLeft4,  timePaused4); break;
                 }
             } else if (oldTime>=60 && newTime<60) {
                 fadeTime = true;
                 switch (mode) {
                     case 1:
-                        if (!breaksOnly) changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-                        else changeTextSize(valueAnimatorUp, timeLeft2, timePaused2);
-                        break;
+                        changeTextSize(valueAnimatorUp, timeLeft, timePaused); break;
                     case 2:
-                        changeTextSize(valueAnimatorUp, timeLeft3, timePaused3); break;
+                        changeTextSize(valueAnimatorUp, timeLeft2, timePaused2); break;
                     case 3:
+                        changeTextSize(valueAnimatorUp, timeLeft3, timePaused3); break;
+                    case 4:
                         changeTextSize(valueAnimatorUp, timeLeft4,  timePaused4); break;
                 }
             }
@@ -2142,12 +2131,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (fadeTime) {
             switch (mode) {
                 case 1:
-                    if (customHalted && !breaksOnly) fadeInText(timePaused); else fadeInText(timeLeft2);
-                    if (breaksOnlyHalted && breaksOnly) fadeInText(timePaused2); else fadeInText(timeLeft2);
-                    break;
+                    if (customHalted) fadeInText(timePaused); else fadeInText(timeLeft); break;
                 case 2:
-                    if (pomHalted) fadeInText(timePaused3); else fadeInText(timeLeft3); break;
+                    if (breaksOnlyHalted) fadeInText(timePaused2); else fadeInText(timeLeft2); break;
                 case 3:
+                    if (pomHalted) fadeInText(timePaused3); else fadeInText(timeLeft3); break;
+                case 4:
                     if (stopwatchHalted) fadeInText(timePaused4); else fadeInText(timeLeft4); break;
             }
         }
@@ -2185,35 +2174,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void clearArrays(boolean populateList) {
         switch (mode) {
             case 1:
-                if (!breaksOnly) {
-                    if (setsArray!=null) setsArray.clear();
-                    if (breaksArray!=null) breaksArray.clear();
-                    if (customTitleArray!=null) customTitleArray.clear();
+                if (setsArray!=null) setsArray.clear();
+                if (breaksArray!=null) breaksArray.clear();
+                if (customTitleArray!=null) customTitleArray.clear();
 
-                    if (populateList) {
-                        for (int i=0; i<cyclesList.size(); i++) {
-                            setsArray.add(cyclesList.get(i).getSets());
-                            breaksArray.add(cyclesList.get(i).getBreaks());
-                            customTitleArray.add(cyclesList.get(i).getTitle());
-                        }
-                        if (setsArray.size()>0) runOnUiThread(() -> { savedCycleAdapter.notifyDataSetChanged();
-                        });
+                if (populateList) {
+                    for (int i=0; i<cyclesList.size(); i++) {
+                        setsArray.add(cyclesList.get(i).getSets());
+                        breaksArray.add(cyclesList.get(i).getBreaks());
+                        customTitleArray.add(cyclesList.get(i).getTitle());
                     }
-                } else {
-                    if (breaksOnlyArray!=null) breaksOnlyArray.clear();
-                    if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
-
-                    if (populateList) {
-                        for (int i=0; i<cyclesBOList.size(); i++) {
-                            breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-                            breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
-                        }
-                        if (breaksOnlyArray.size()>0) runOnUiThread(() -> { savedCycleAdapter.notifyDataSetChanged();
-                        });
-                    }
+                    if (setsArray.size()>0) runOnUiThread(() -> { savedCycleAdapter.notifyDataSetChanged();
+                    });
                 }
                 break;
             case 2:
+                if (breaksOnlyArray!=null) breaksOnlyArray.clear();
+                if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
+
+                if (populateList) {
+                    for (int i=0; i<cyclesBOList.size(); i++) {
+                        breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+                        breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
+                    }
+                    if (breaksOnlyArray.size()>0) runOnUiThread(() -> { savedCycleAdapter.notifyDataSetChanged();
+                    });
+                }
+                break;
+            case 3:
                 if (pomArray!=null) pomArray.clear();
                 if (populateList) {
                     for (int i=0; i<pomCyclesList.size(); i++) {
@@ -2228,52 +2216,53 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void queryCycles() {
         switch (mode) {
             case 1:
-                if (!breaksOnly) {
-                    switch (sortMode) {
-                        case 1:
-                            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
-                            sortCheckmark.setY(14);
-                            break;
-                        case 2:
-                            cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent();
-                            sortCheckmark.setY(110);
-                            break;
-                        case 3:
-                            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
-                            sortCheckmark.setY(206);
-                            break;
-                        case 4:
-                            cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
-                            sortCheckmark.setY(302);
-                            break;
-                    }
-                } else {
-                    switch (sortModeBO) {
-                        case 1:
-                            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
-                            sortCheckmark.setY(14);
-                            break;
-                        case 2:
-                            cyclesBOList = cyclesDatabase.cyclesDao().loadCycleLeastRecentBO();
-                            sortCheckmark.setY(110);
-                            break;
-                        case 3:
-                            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO();
-                            sortCheckmark.setY(206);
-                            break;
-                        case 4:
-                            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO();
-                            sortCheckmark.setY(302);
-                    }
+                switch (sortMode) {
+                    case 1:
+                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
+                        sortCheckmark.setY(14);
+                        break;
+                    case 2:
+                        cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent();
+                        sortCheckmark.setY(110);
+                        break;
+                    case 3:
+                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+                        sortCheckmark.setY(206);
+                        break;
+                    case 4:
+                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+                        sortCheckmark.setY(302);
+                        break;
                 }
                 break;
             case 2:
+                switch (sortModeBO) {
+                    case 1:
+                        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
+                        sortCheckmark.setY(14);
+                        break;
+                    case 2:
+                        cyclesBOList = cyclesDatabase.cyclesDao().loadCycleLeastRecentBO();
+                        sortCheckmark.setY(110);
+                        break;
+                    case 3:
+                        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO();
+                        sortCheckmark.setY(206);
+                        break;
+                    case 4:
+                        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO();
+                        sortCheckmark.setY(302);
+                }
+                break;
+            case 3:
                 switch (sortModePom) {
                     case 1:
                         pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+                        sortCheckmark.setY(14);
                         break;
                     case 2:
                         pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
+                        sortCheckmark.setY(110);
                         break;
                 }
                 break;
@@ -2283,18 +2272,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void canSaveOrUpdate(boolean yesWeCan) {
         switch (mode) {
             case 1:
-                if (!breaksOnly) {
-                    canSaveOrUpdateCustom = yesWeCan;
-                } else {
-                    canSaveOrUpdateBreaksOnly = yesWeCan;
-                }
-                break;
+                canSaveOrUpdateCustom = yesWeCan; break;
             case 2:
-                canSaveOrUpdatePom = yesWeCan;
-                break;
+                canSaveOrUpdateBreaksOnly = yesWeCan; break;
+            case 3:
+                canSaveOrUpdatePom = yesWeCan; break;
         }
 
-        if ( (!breaksOnly && canSaveOrUpdateCustom) || (breaksOnly && canSaveOrUpdateBreaksOnly) || (mode==2 && canSaveOrUpdatePom)) {
+        if ( (mode==1 && canSaveOrUpdateCustom) || (mode==2 && canSaveOrUpdateBreaksOnly) || (mode==3 && canSaveOrUpdatePom)) {
             save_cycles.setTextColor(getResources().getColor(R.color.white));
             update_cycles.setTextColor(getResources().getColor(R.color.white));
             save_cycles.setEnabled(true);
@@ -2313,56 +2298,70 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             sortPopupWindow.showAtLocation(mainView, Gravity.TOP, 325, 10);
 
             sortRecent.setOnClickListener(v1 -> {
-                sortCheckmark.setY(14);
-                switch (mode) {
-                    case 1:
-                        AsyncTask.execute(() -> {
-                            if (!breaksOnly) sortMode = 1; else sortModeBO = 1;
-                            queryCycles();
-                        });
-                        break;
-                    case 2:
-                        AsyncTask.execute(()-> {
-                            sortModePom = 1;
-                            queryCycles();
-                        });
-                        break;
-                }
-                clearArrays(true);
+                AsyncTask.execute(() -> {
+                    switch (mode) {
+                        case 1:
+                            sortMode = 1; break;
+                        case 2:
+                            sortModeBO = 1; break;
+                        case 3:
+                            sortModePom = 1; break;
+                    }
+                    queryCycles();
+                    runOnUiThread(()-> {
+                        sortCheckmark.setY(14);
+                        clearArrays(true);
+                    });
+                });
             });
 
             sortNotRecent.setOnClickListener(v2 ->{
-                sortCheckmark.setY(110);
-                switch (mode) {
-                    case 1:
-                        AsyncTask.execute(() -> {
-                            if (!breaksOnly) sortMode = 2; else sortModeBO = 2;
-                            queryCycles();
-                        });
-                        break;
-                    case 2:
-                        sortModePom = 2;
-                        queryCycles();
-                        break;
-                }
-                clearArrays(true);
+                AsyncTask.execute(() -> {
+                    switch (mode) {
+                        case 1:
+                            sortMode = 1; break;
+                        case 2:
+                            sortModeBO = 1; break;
+                        case 3:
+                            sortModePom = 1; break;
+                    }
+                    queryCycles();
+                    runOnUiThread(()-> {
+                        sortCheckmark.setY(110);
+                        clearArrays(true);
+                    });
+                });
             });
 
             sortHigh.setOnClickListener(v3 -> {
-                sortCheckmark.setY(206);
                 AsyncTask.execute(() -> {
-                    if (!breaksOnly) sortMode = 3; else sortModeBO = 3;
+                    switch (mode) {
+                        case 1:
+                            sortMode = 1; break;
+                        case 2:
+                            sortModeBO = 1; break;
+                    }
                     queryCycles();
-                    clearArrays(true);
+                    runOnUiThread(()-> {
+                        sortCheckmark.setY(206);
+                        clearArrays(true);
+                    });
                 });
             });
 
             sortLow.setOnClickListener(v4 -> {
-                sortCheckmark.setY(302);
                 AsyncTask.execute(() -> {
-                    if (!breaksOnly) sortMode = 4; else sortModeBO = 4;
+                    switch (mode) {
+                        case 1:
+                            sortMode = 1; break;
+                        case 2:
+                            sortModeBO = 1; break;
+                    }
                     queryCycles();
-                    clearArrays(true);
+                    runOnUiThread(()-> {
+                        sortCheckmark.setY(302);
+                        clearArrays(true);
+                    });
                 });
             });
             sortCheckmark.setY(0);
@@ -2387,7 +2386,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Actually saves or updates the cycle.
     public void confirmedSaveOrUpdate(int saveOrUpdate) {
-        if ((!breaksOnly && startCustomSetTime.size()==0) || (breaksOnly && startBreaksOnlyTime.size()==0) || (mode==2 && pomValuesTime.size()==0)) {
+        if ((mode==1 && startCustomSetTime.size()==0) || (mode==2 && startBreaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
             Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
             return;
         }
@@ -2404,71 +2403,69 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) {
-                        //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
-                        //Todo: Watch this. Updating correctly but the retrieval seems wrong. The call of setCycle() with the proper position based on ID happens before this call.
-                        if (saveOrUpdate == SAVING_CYCLES) cycles = new Cycles(); else cycles = cyclesList.get(cyclesList.size()-1);
+                    //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
+                    if (saveOrUpdate == SAVING_CYCLES) cycles = new Cycles(); else cycles = cyclesList.get(cyclesList.size()-1);
 
-                        if (!cycle_header_text.getText().toString().isEmpty()) {
-                            cycles.setTitle(cycle_header_text.getText().toString());
-                        } else {
-                            String newDate = dateFormat.format(calendar.getTime());
-                            cycles.setTitle(newDate);
-                        }
-                        customTitleArray.add(cycle_header_text.getText().toString());
-
-                        //If cycle is not duplicate OR size is 0 (nothing to duplicate), we proceed with insert/update.
-                        if (!duplicateCycle || cyclesList.size()==0) {
-                            cycles.setSets(convertedSetList);
-                            cycles.setBreaks(convertedBreakList);
-                            cycles.setTimeAdded(System.currentTimeMillis());
-                            cycles.setItemCount(startCustomSetTime.size());
-                            if (saveOrUpdate == SAVING_CYCLES){
-                                cyclesDatabase.cyclesDao().insertCycle(cycles);
-                                //Re-instantiating cycleList with new row added.
-                                queryCycles();
-                                //Getting ID of latest row entry.
-                                customID = cyclesList.get(0).getId();
-                                //Saving ID to sharedPref.
-                                prefEdit.putInt("customID", customID);
-                            } else cyclesDatabase.cyclesDao().updateCycles(cycles);
-                            runOnUiThread(() -> {
-                                if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-                                canSaveOrUpdate(false);
-                            });
-                            changeCycle = true;
-                        }
+                    if (!cycle_header_text.getText().toString().isEmpty()) {
+                        cycles.setTitle(cycle_header_text.getText().toString());
                     } else {
-                        //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
-                        if (saveOrUpdate == SAVING_CYCLES) cyclesBO = new CyclesBO(); else cyclesBO = cyclesBOList.get(cyclesBOList.size()-1);
+                        String newDate = dateFormat.format(calendar.getTime());
+                        cycles.setTitle(newDate);
+                    }
+                    customTitleArray.add(cycle_header_text.getText().toString());
 
-                        if (!cycle_header_text.getText().toString().isEmpty()) {
-                            cyclesBO.setTitle(cycle_header_text.getText().toString());
-                        } else {
-                            String newDate = dateFormat.format(calendar.getTime());
-                            cyclesBO.setTitle(newDate);
-                        }
-                        breaksOnlyTitleArray.add(cycle_header_text.getText().toString());
-
-                        if (!duplicateCycle || cyclesBOList.size()==0) {
-                            cyclesBO.setBreaksOnly(convertedBreakOnlyList);
-                            cyclesBO.setTimeAdded(System.currentTimeMillis());
-                            cyclesBO.setItemCount(startBreaksOnlyTime.size());
-                            if (saveOrUpdate == SAVING_CYCLES) {
-                                cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
-                                queryCycles();
-                                breaksOnlyID = cyclesBOList.get(0).getId();
-                                prefEdit.putInt("breaksOnlyID", breaksOnlyID);
-                            } else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-                            runOnUiThread(() -> {
-                                if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-                                canSaveOrUpdate(false);
-                            });
-                            changeCycle = true;
-                        }
+                    //If cycle is not duplicate OR size is 0 (nothing to duplicate), we proceed with insert/update.
+                    if (!duplicateCycle || cyclesList.size()==0) {
+                        cycles.setSets(convertedSetList);
+                        cycles.setBreaks(convertedBreakList);
+                        cycles.setTimeAdded(System.currentTimeMillis());
+                        cycles.setItemCount(startCustomSetTime.size());
+                        if (saveOrUpdate == SAVING_CYCLES){
+                            cyclesDatabase.cyclesDao().insertCycle(cycles);
+                            //Re-instantiating cycleList with new row added.
+                            queryCycles();
+                            //Getting ID of latest row entry.
+                            customID = cyclesList.get(0).getId();
+                            //Saving ID to sharedPref.
+                            prefEdit.putInt("customID", customID);
+                        } else cyclesDatabase.cyclesDao().updateCycles(cycles);
+                        runOnUiThread(() -> {
+                            if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                            canSaveOrUpdate(false);
+                        });
+                        changeCycle = true;
                     }
                     break;
                 case 2:
+                    //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
+                    if (saveOrUpdate == SAVING_CYCLES) cyclesBO = new CyclesBO(); else cyclesBO = cyclesBOList.get(cyclesBOList.size()-1);
+
+                    if (!cycle_header_text.getText().toString().isEmpty()) {
+                        cyclesBO.setTitle(cycle_header_text.getText().toString());
+                    } else {
+                        String newDate = dateFormat.format(calendar.getTime());
+                        cyclesBO.setTitle(newDate);
+                    }
+                    breaksOnlyTitleArray.add(cycle_header_text.getText().toString());
+
+                    if (!duplicateCycle || cyclesBOList.size()==0) {
+                        cyclesBO.setBreaksOnly(convertedBreakOnlyList);
+                        cyclesBO.setTimeAdded(System.currentTimeMillis());
+                        cyclesBO.setItemCount(startBreaksOnlyTime.size());
+                        if (saveOrUpdate == SAVING_CYCLES) {
+                            cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
+                            queryCycles();
+                            breaksOnlyID = cyclesBOList.get(0).getId();
+                            prefEdit.putInt("breaksOnlyID", breaksOnlyID);
+                        } else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+                        runOnUiThread(() -> {
+                            if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
+                            canSaveOrUpdate(false);
+                        });
+                        changeCycle = true;
+                    }
+                    break;
+                case 3:
                     if (saveOrUpdate == SAVING_CYCLES) pomCycles = new PomCycles(); else pomCycles = pomCyclesList.get(pomCyclesList.size()-1);
 
                     if (!cycle_header_text.getText().toString().isEmpty()) {
@@ -2513,61 +2510,60 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             int posHolder = position;
             switch (mode) {
                 case 1:
-                    if (!breaksOnly) {
-                        String tempSets = "";
-                        String tempBreaks = "";
-                        if (recall) {
-                            cycles = cyclesList.get(customID);
-                            tempSets = cyclesList.get(0).getSets();
-                            tempBreaks = cyclesList.get(0).getBreaks();
-                        } else {
-                            queryCycles();
-                            cycles = cyclesList.get(posHolder);
-                            tempSets = cyclesList.get(posHolder).getSets();
-                            tempBreaks = cyclesList.get(posHolder).getBreaks();
-                            customID = cyclesList.get(posHolder).getId();
-                            prefEdit.putInt("customID", customID);
-                        }
-
-                        String[] setSplit = tempSets.split(" - ", 0);
-                        String[] breakSplit = tempBreaks.split(" - ", 0);
-                        customSetTime.clear();
-                        startCustomSetTime.clear();
-                        customBreakTime.clear();
-                        startCustomBreakTime.clear();
-
-                        for (int i=0; i<setSplit.length; i++) {
-                            customSetTime.add(Long.parseLong(setSplit[i])*1000);
-                            startCustomSetTime.add(Long.parseLong(setSplit[i])*1000);
-                            customBreakTime.add(Long.parseLong(breakSplit[i])*1000);
-                            startCustomBreakTime.add(Long.parseLong(breakSplit[i])*1000);
-                        }
-                        runOnUiThread(() -> cycle_header_text.setText(cycles.getTitle()));
+                    String tempSets = "";
+                    String tempBreaks = "";
+                    if (recall) {
+                        cycles = cyclesList.get(customID);
+                        tempSets = cyclesList.get(0).getSets();
+                        tempBreaks = cyclesList.get(0).getBreaks();
                     } else {
-                        String tempBreaksOnly = "";
-                        if (recall) {
-                            cyclesBO = cyclesBOList.get(breaksOnlyID);
-                            tempBreaksOnly = cyclesBOList.get(0).getBreaksOnly();
-                        } else {
-                            queryCycles();
-                            cyclesBO = cyclesBOList.get(posHolder);
-                            tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
-                            breaksOnlyID = cyclesBOList.get(posHolder).getId();
-                            prefEdit.putInt("breaksOnlyID", breaksOnlyID);
-                        }
-
-                        String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
-                        startBreaksOnlyTime.clear();
-                        breaksOnlyTime.clear();
-
-                        for (int i=0; i<breaksOnlySplit.length; i++) {
-                            breaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
-                            startBreaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
-                        }
-                        runOnUiThread(() -> cycle_header_text.setText(cyclesBO.getTitle()));
+                        queryCycles();
+                        cycles = cyclesList.get(posHolder);
+                        tempSets = cyclesList.get(posHolder).getSets();
+                        tempBreaks = cyclesList.get(posHolder).getBreaks();
+                        customID = cyclesList.get(posHolder).getId();
+                        prefEdit.putInt("customID", customID);
                     }
+
+                    String[] setSplit = tempSets.split(" - ", 0);
+                    String[] breakSplit = tempBreaks.split(" - ", 0);
+                    customSetTime.clear();
+                    startCustomSetTime.clear();
+                    customBreakTime.clear();
+                    startCustomBreakTime.clear();
+
+                    for (int i=0; i<setSplit.length; i++) {
+                        customSetTime.add(Long.parseLong(setSplit[i])*1000);
+                        startCustomSetTime.add(Long.parseLong(setSplit[i])*1000);
+                        customBreakTime.add(Long.parseLong(breakSplit[i])*1000);
+                        startCustomBreakTime.add(Long.parseLong(breakSplit[i])*1000);
+                    }
+                    runOnUiThread(() -> cycle_header_text.setText(cycles.getTitle()));
                     break;
                 case 2:
+                    String tempBreaksOnly = "";
+                    if (recall) {
+                        cyclesBO = cyclesBOList.get(breaksOnlyID);
+                        tempBreaksOnly = cyclesBOList.get(0).getBreaksOnly();
+                    } else {
+                        queryCycles();
+                        cyclesBO = cyclesBOList.get(posHolder);
+                        tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
+                        breaksOnlyID = cyclesBOList.get(posHolder).getId();
+                        prefEdit.putInt("breaksOnlyID", breaksOnlyID);
+                    }
+
+                    String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
+                    startBreaksOnlyTime.clear();
+                    breaksOnlyTime.clear();
+
+                    for (int i=0; i<breaksOnlySplit.length; i++) {
+                        breaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
+                        startBreaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
+                    }
+                    runOnUiThread(() -> cycle_header_text.setText(cyclesBO.getTitle()));
+                    break;
+                case 3:
                     String tempPom = "";
                     if (recall) {
                         pomCycles = pomCyclesList.get(pomID);
@@ -2604,63 +2600,60 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     private void retrieveAndCheckCycles() {
         queryCycles();
         Gson gson = new Gson();
+        ArrayList<Long> tempSets = new ArrayList<>();
+        ArrayList<Long> tempBreaks = new ArrayList<>();
+        ArrayList<Long> tempBreaksOnly = new ArrayList<>();
 
         switch (mode) {
             case 1:
-                ArrayList<Long> tempSets = new ArrayList<>();
-                ArrayList<Long> tempBreaks = new ArrayList<>();
-                ArrayList<Long> tempBreaksOnly = new ArrayList<>();
+                for (int i=0; i<startCustomSetTime.size(); i++) {
+                    tempSets.add(startCustomSetTime.get(i) /1000);
+                }
+                for (int i=0; i<startCustomBreakTime.size(); i++){
+                    tempBreaks.add(startCustomBreakTime.get(i)/1000);
+                }
+                convertedSetList = gson.toJson(tempSets);
+                convertedBreakList = gson.toJson(tempBreaks);
 
-                //Getting current cycle, populated in UI but unsaved.
-                if (!breaksOnly) {
-                    for (int i=0; i<startCustomSetTime.size(); i++) {
-                        tempSets.add(startCustomSetTime.get(i) /1000);
-                    }
-                    for (int i=0; i<startCustomBreakTime.size(); i++){
-                        tempBreaks.add(startCustomBreakTime.get(i)/1000);
-                    }
-                    convertedSetList = gson.toJson(tempSets);
-                    convertedBreakList = gson.toJson(tempBreaks);
+                convertedSetList = convertedSetList.replace("\"", "");
+                convertedSetList = convertedSetList.replace("]", "");
+                convertedSetList = convertedSetList.replace("[", "");
+                convertedSetList = convertedSetList.replace(",", " - ");
+                convertedBreakList = convertedBreakList.replace("\"", "");
+                convertedBreakList = convertedBreakList.replace("]", "");
+                convertedBreakList = convertedBreakList.replace("[", "");
+                convertedBreakList = convertedBreakList.replace(",", " - ");
 
-                    convertedSetList = convertedSetList.replace("\"", "");
-                    convertedSetList = convertedSetList.replace("]", "");
-                    convertedSetList = convertedSetList.replace("[", "");
-                    convertedSetList = convertedSetList.replace(",", " - ");
-                    convertedBreakList = convertedBreakList.replace("\"", "");
-                    convertedBreakList = convertedBreakList.replace("]", "");
-                    convertedBreakList = convertedBreakList.replace("[", "");
-                    convertedBreakList = convertedBreakList.replace(",", " - ");
-
-                    boolean endLoop = false;
-                    if (cyclesList.size()>0) {
-                        for (int i=0; i<cyclesList.size(); i++) {
-                            if (!endLoop) {
-                                if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
-                                    duplicateCycle = true; endLoop = true;
-                                }
+                boolean endLoop = false;
+                if (cyclesList.size()>0) {
+                    for (int i=0; i<cyclesList.size(); i++) {
+                        if (!endLoop) {
+                            if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
+                                duplicateCycle = true; endLoop = true;
                             }
-                            duplicateCycle = endLoop;
                         }
-                    }
-                } else {
-                    for (int i=0; i<startBreaksOnlyTime.size(); i++) {
-                        tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
-                    }
-                    convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
-                    convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
-                    convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
-                    convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
-                    convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
-
-                    if (cyclesBOList.size()>0) {
-                        for (int i=0; i<cyclesBOList.size(); i++) {
-                            if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList) && cyclesBOList.get(i).getTitle().equals(cycle_header_text.getText().toString()))
-                                duplicateCycle = true;
-                        }
+                        duplicateCycle = endLoop;
                     }
                 }
                 break;
             case 2:
+                for (int i=0; i<startBreaksOnlyTime.size(); i++) {
+                    tempBreaksOnly.add(startBreaksOnlyTime.get(i)/1000);
+                }
+                convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
+                convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
+                convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
+                convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
+                convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
+
+                if (cyclesBOList.size()>0) {
+                    for (int i=0; i<cyclesBOList.size(); i++) {
+                        if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList) && cyclesBOList.get(i).getTitle().equals(cycle_header_text.getText().toString()))
+                            duplicateCycle = true;
+                    }
+                }
+                break;
+            case 3:
                 convertedPomList = gson.toJson(pomValuesTime);
 
                 String[] pomSplit = convertedPomList.split(",", 0);
@@ -2719,7 +2712,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             if (customSetTime.size()>0) setMillis = customSetTime.get(0);
         } else {
-            if (!breaksOnly) {
+            if (mode==1) {
                 numberOfBreaks--;
                 if (customBreakTime.size() >0) {
                     customBreakTime.remove(0);
@@ -2727,7 +2720,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (customBreakTime.size()>0) breakMillis = customBreakTime.get(0);
                 dotDraws.setTime(startCustomSetTime);
                 dotDraws.breakTime(startCustomBreakTime);
-            } else {
+            } else if (mode==2) {
                 numberOfBreaksOnly--;
                 if (breaksOnlyTime.size()>0) {
                     breaksOnlyTime.remove(0);
@@ -2793,10 +2786,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void convertEditTime() {
         editSetSeconds = setValue%60;
         editSetMinutes = setValue/60;
-        if (!breaksOnly) {
+        if (mode==1) {
             editBreakSeconds = breakValue%60;
             editBreakMinutes = breakValue/60;
-        } else {
+        } else if (mode==2) {
             editBreakSeconds = breaksOnlyValue%60;
             editBreakMinutes = breaksOnlyValue/60;
         }
@@ -2843,44 +2836,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void setEditValueBounds(boolean onSets){
-        switch (mode) {
-            case 1:
-                if (onSets) {
-                    editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
-                    editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
+        if (onSets) {
+            editSetMinutes = Integer.parseInt(first_value_edit.getText().toString());
+            editSetSeconds = Integer.parseInt(first_value_edit_two.getText().toString());
 
-                    if (editSetSeconds>59) {
-                        editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
-                    }
-                    if (editSetMinutes>5) editSetMinutes = 5;
-                    if (editSetMinutes<0) editSetMinutes = 0;
-                    if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
-                    if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
+            if (editSetSeconds>59) {
+                editSetMinutes+=1; editSetSeconds = editSetSeconds - 60;
+            }
+            if (editSetMinutes>5) editSetMinutes = 5;
+            if (editSetMinutes<0) editSetMinutes = 0;
+            if (editSetSeconds<0 && editSetMinutes>0) editSetSeconds = 0;
+            if (editSetSeconds<5 && editSetMinutes==0) editSetSeconds = 0;
 
-                    setValue = (editSetMinutes * 60) + editSetSeconds;
-                    first_value_textView.setText(convertCustomTextView(setValue));
-                } else {
-                    editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
-                    editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
+            setValue = (editSetMinutes * 60) + editSetSeconds;
+            first_value_textView.setText(convertCustomTextView(setValue));
+        } else {
+            editBreakMinutes = Integer.parseInt(second_value_edit.getText().toString());
+            editBreakSeconds = Integer.parseInt(second_value_edit_two.getText().toString());
 
-                    if (editBreakSeconds>59) {
-                        editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
-                    }
-                    if (editBreakMinutes>5) editBreakMinutes = 5;
-                    if (editBreakMinutes<0) editBreakMinutes = 0;
-                    if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
-                    if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
+            if (editBreakSeconds>59) {
+                editBreakMinutes+=1; editBreakSeconds = editBreakSeconds - 60;
+            }
+            if (editBreakMinutes>5) editBreakMinutes = 5;
+            if (editBreakMinutes<0) editBreakMinutes = 0;
+            if (editBreakSeconds<0 && editBreakMinutes>0) editBreakSeconds = 0;
+            if (editBreakSeconds<5 && editBreakMinutes==0) editBreakSeconds = 5;
 
-                    if (!breaksOnly) {
-                        breakValue = (editBreakMinutes * 60) + editBreakSeconds;
-                    } else {
-                        breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
-                    }
-                    second_value_textView.setText(convertCustomTextView(breakValue));
-                }
-                break;
-            case 2:
-                break;
+            if (mode==1) breakValue = (editBreakMinutes * 60) + editBreakSeconds;
+            else if (mode==2) breaksOnlyValue = (editBreakMinutes * 60) + editBreakSeconds;
+            second_value_textView.setText(convertCustomTextView(breakValue));
         }
         setTimerValueBounds();
     }
@@ -2918,9 +2902,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void tabViews(){
         switch (mode) {
-            case 1:
+            case 1: case 2:
                 first_value_textView.setText(convertCustomTextView(setValue));
-                if (!breaksOnly) {
+                if (mode==1) {
                     progressBar.setVisibility(View.VISIBLE);
                     progressBar2.setVisibility(View.INVISIBLE);
                     second_value_textView.setText(convertCustomTextView(breakValue));
@@ -2929,7 +2913,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     minus_first_value.setVisibility(View.VISIBLE);
                     s1.setVisibility(View.VISIBLE);
                     overtime.setVisibility(View.GONE);
-                } else {
+                } else if (mode==2) {
                     progressBar.setVisibility(View.INVISIBLE);
                     progressBar2.setVisibility(View.VISIBLE);
                     first_value_textView.setVisibility(View.GONE);
@@ -2955,7 +2939,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 plus_third_value.setVisibility(View.GONE);
                 minus_third_value.setVisibility(View.GONE);
                 break;
-            case 2:
+            case 3:
                 first_value_single_edit.setText(convertSeconds(pomValue1));
                 second_value_single_edit.setText(convertSeconds(pomValue2));
                 third_value_single_edit.setText(convertSeconds(pomValue3));
@@ -2989,7 +2973,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s2.setTextSize(21f);
                 s3.setTextSize(21f);
                 break;
-            case 3:
+            case 4:
                 progressBar.setVisibility(View.INVISIBLE);
                 progressBar2.setVisibility(View.INVISIBLE);
                 progressBar3.setVisibility(View.INVISIBLE);
@@ -3054,42 +3038,51 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (pausing == PAUSING_TIMER) {
                             String pausedTime = "";
-                            if (!breaksOnly) {
-                                timePaused.setAlpha(1);
-                                if (timer!=null) timer.cancel();
-                                if (objectAnimator!=null) objectAnimator.pause();
-                                if (!onBreak) {
-                                    setMillisUntilFinished = setMillis;
-                                    pausedTime = (convertSeconds((setMillis + 999)/1000));
-                                } else {
-                                    breakMillisUntilFinished = breakMillis;
-                                    pausedTime = (convertSeconds((breakMillis + 999)/1000));
-                                }
-                                timePaused.setText(pausedTime);
-                                customHalted = true;
+                            timePaused.setAlpha(1);
+                            if (timer!=null) timer.cancel();
+                            if (objectAnimator!=null) objectAnimator.pause();
+                            if (!onBreak) {
+                                setMillisUntilFinished = setMillis;
+                                pausedTime = (convertSeconds((setMillis + 999)/1000));
                             } else {
-                                timePaused2.setAlpha(1);
-                                if (timer2!=null) timer2.cancel();
-                                if (objectAnimator2!=null) objectAnimator2.pause();
-                                breakOnlyMillisUntilFinished = breakOnlyMillis;
-                                pausedTime = (convertSeconds((breakOnlyMillis + 999)/1000));
-                                timePaused2.setText(pausedTime);
-                                breaksOnlyHalted = true;
+                                breakMillisUntilFinished = breakMillis;
+                                pausedTime = (convertSeconds((breakMillis + 999)/1000));
                             }
+                            timePaused.setText(pausedTime);
+                            customHalted = true;
                             reset.setVisibility(View.VISIBLE);
                         } else if (pausing == RESUMING_TIMER){
-                            if (!breaksOnly) {
-                                customHalted = false;
-                                if (onBreak) breakStart(); else startTimer();
-                                timeLeft.setAlpha(1);
-                            } else {
-                                timeLeft2.setAlpha(1);
-                                breaksOnlyHalted = false;
-                                breakStart();
-                            }
+                            customHalted = false;
+                            if (onBreak) breakStart(); else startTimer();
+                            timeLeft.setAlpha(1);
                             startObjectAnimator();
                             reset.setVisibility(View.INVISIBLE);
-                            //These two conditions will only trigger if already in breaksOnly mode.
+                        } else resetTimer();
+                    }
+                    break;
+                case 2:
+                    if (!breakOnlyTimerEnded) {
+                        if (!stopAscent) {
+                            removeSetOrBreak(true);
+                            mHandler.removeCallbacks(endFade);
+                            stopAscent = true;
+                        }
+                        if (pausing == PAUSING_TIMER) {
+                            String pausedTime = "";
+                            timePaused2.setAlpha(1);
+                            if (timer2!=null) timer2.cancel();
+                            if (objectAnimator2!=null) objectAnimator2.pause();
+                            breakOnlyMillisUntilFinished = breakOnlyMillis;
+                            pausedTime = (convertSeconds((breakOnlyMillis + 999)/1000));
+                            timePaused2.setText(pausedTime);
+                            breaksOnlyHalted = true;
+                            reset.setVisibility(View.VISIBLE);
+                        } else if (pausing == RESUMING_TIMER){
+                            timeLeft2.setAlpha(1);
+                            breaksOnlyHalted = false;
+                            breakStart();
+                            startObjectAnimator();
+                            reset.setVisibility(View.INVISIBLE);
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
                             mHandler.removeCallbacks(ot);
@@ -3109,11 +3102,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timePaused2.setAlpha(0f);
                             timeLeft2.setAlpha(1.0f);
                         }
-                    } else {
-                        resetTimer();
-                    }
+                    } else resetTimer();
                     break;
-                case 2:
+                case 3:
                     if (!pomTimerEnded) {
                         if (pausing == PAUSING_TIMER) {
                             timePaused3.setAlpha(1);
@@ -3137,7 +3128,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         reset.setVisibility(View.INVISIBLE);
                     }
                     break;
-                case 3:
+                case 4:
                     DecimalFormat df2 = new DecimalFormat("00");
                     if (fadeInObj!=null) fadeInObj.cancel();
                     if (stopwatchHalted) {
@@ -3196,54 +3187,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void populateCycleUI() {
         switch (mode) {
             case 1:
-                if (!breaksOnly) {
-                    if (startCustomSetTime.size()>0) setMillis = startCustomSetTime.get(0);
-                    if (startCustomBreakTime.size()>0) {
-                        breakMillis = startCustomBreakTime.get(0);
-                        timePaused.setText(convertSeconds((setMillis+999)/1000));
-                        timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                    } else timePaused.setText("?");
-                    numberOfSets = startCustomSetTime.size();
-                    savedSets = numberOfSets;
-                    savedBreaks = numberOfBreaks;
-                } else {
-                    if (startBreaksOnlyTime.size()>0) {
-                        breakOnlyMillis = startBreaksOnlyTime.get(0);
-                        timePaused2.setText(convertSeconds((breakOnlyMillis+999)/1000));
-                        timeLeft2.setText(convertSeconds((breakOnlyMillis+999)/1000));
-                    } else timePaused2.setText("?");
-                    savedBreaksOnly = numberOfBreaksOnly;
-                }
-                if (!breaksOnly) numberOfBreaks = startCustomBreakTime.size();
-                else numberOfBreaksOnly = startBreaksOnlyTime.size();
+                if (startCustomSetTime.size()>0) setMillis = startCustomSetTime.get(0);
+                if (startCustomBreakTime.size()>0) {
+                    breakMillis = startCustomBreakTime.get(0);
+                    timePaused.setText(convertSeconds((setMillis+999)/1000));
+                    timeLeft.setText(convertSeconds((setMillis+999)/1000));
+                } else timePaused.setText("?");
+                numberOfSets = startCustomSetTime.size();
+                savedSets = numberOfSets;
+                savedBreaks = numberOfBreaks;
 
-                if (!breaksOnly) {
-                    customSetTime = new ArrayList<>();
-                    customBreakTime = new ArrayList<>();
-                } else breaksOnlyTime = new ArrayList<>();
+                numberOfBreaks = startCustomBreakTime.size();
+                customSetTime = new ArrayList<>();
+                customBreakTime = new ArrayList<>();
 
-                if (!breaksOnly) {
-                    if (startCustomSetTime.size() >0) {
-                        for (int i=0; i<startCustomSetTime.size(); i++) {
-                            customSetTime.add(startCustomSetTime.get(i));
-                            customBreakTime.add(startCustomBreakTime.get(i));
-                        }
-                        timerDisabled = false;
-                    } else timerDisabled = true;
-                    dotDraws.setTime(customSetTime);
-                    dotDraws.breakTime(customBreakTime);
-                } else {
-                    if (startBreaksOnlyTime.size()>0) {
-                        breaksOnlyTime.addAll(startBreaksOnlyTime);
-                        timerDisabled = false;
-                    } else timerDisabled = true;
-                    dotDraws.breakTime(breaksOnlyTime);
-                }
-                //Always setting this to avoid null errors.
-                dotDraws.setAlpha();
-                drawDots(0);
+                if (startCustomSetTime.size() >0) {
+                    for (int i=0; i<startCustomSetTime.size(); i++) {
+                        customSetTime.add(startCustomSetTime.get(i));
+                        customBreakTime.add(startCustomBreakTime.get(i));
+                    }
+                    timerDisabled = false;
+                } else timerDisabled = true;
+                dotDraws.setTime(customSetTime);
+                dotDraws.breakTime(customBreakTime);
                 break;
             case 2:
+                if (startBreaksOnlyTime.size()>0) {
+                    breakOnlyMillis = startBreaksOnlyTime.get(0);
+                    timePaused2.setText(convertSeconds((breakOnlyMillis+999)/1000));
+                    timeLeft2.setText(convertSeconds((breakOnlyMillis+999)/1000));
+                } else timePaused2.setText("?");
+
+                savedBreaksOnly = numberOfBreaksOnly;
+                numberOfBreaksOnly = startBreaksOnlyTime.size();
+                breaksOnlyTime = new ArrayList<>();
+
+                if (startBreaksOnlyTime.size()>0) {
+                    breaksOnlyTime.addAll(startBreaksOnlyTime);
+                    timerDisabled = false;
+                } else timerDisabled = true;
+                dotDraws.breakTime(breaksOnlyTime);
+                break;
+            case 3:
                 //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
                 if (pomValuesTime.size()!=0) pomMillis1 = pomValuesTime.get(0)*1000*60;
                 pomMillis = pomMillis1;
@@ -3255,10 +3240,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     pomTimerDisabled = false;
                     timePaused3.setText(convertSeconds((pomMillis+999)/1000));
                 }
-                dotDraws.setAlpha();
                 break;
         }
-
+        dotDraws.setAlpha();
+        drawDots(0);
     }
 
     public void resetTimer() {
@@ -3266,31 +3251,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (endAnimation != null) endAnimation.cancel();
         switch (mode) {
             case 1:
-                if (!breaksOnly) {
-                    onBreak = false;
-                    timePaused.setAlpha(1);
-                    progressBar.setProgress(10000);
-                    if (timer != null) timer.cancel();
-                    if (objectAnimator != null) objectAnimator.cancel();
-                    customProgressPause = maxProgress;
-                    customTimerEnded = false;
-                    setBegun = false;
-                    breakBegun = false;
-                    customHalted = true;
-                } else {
-                    onBreak = true;
-                    timePaused2.setAlpha(1);
-                    progressBar2.setProgress(10000);
-                    if (timer2 != null) timer2.cancel();
-                    if (objectAnimator2 != null) objectAnimator2.cancel();
-                    breaksOnlyProgressPause = maxProgress;
-                    breakOnlyTimerEnded = false;
-                    breakOnlyBegun = false;
-                    breaksOnlyHalted = true;
-                }
-                populateCycleUI();
+                onBreak = false;
+                timePaused.setAlpha(1);
+                progressBar.setProgress(10000);
+                if (timer != null) timer.cancel();
+                if (objectAnimator != null) objectAnimator.cancel();
+                customProgressPause = maxProgress;
+                customTimerEnded = false;
+                setBegun = false;
+                breakBegun = false;
+                customHalted = true;
                 break;
             case 2:
+                onBreak = true;
+                timePaused2.setAlpha(1);
+                progressBar2.setProgress(10000);
+                if (timer2 != null) timer2.cancel();
+                if (objectAnimator2 != null) objectAnimator2.cancel();
+                breaksOnlyProgressPause = maxProgress;
+                breakOnlyTimerEnded = false;
+                breakOnlyBegun = false;
+                breaksOnlyHalted = true;
+                break;
+            case 3:
                 timePaused3.setAlpha(1);
                 pomTimerEnded = false;
                 progressBar3.setProgress(10000);
@@ -3301,9 +3284,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 activePomCycle = false;
                 if (timer3 != null) timer3.cancel();
                 if (objectAnimator3 != null) objectAnimator3.cancel();
-                populateCycleUI();
                 break;
-            case 3:
+            case 4:
                 stopwatchHalted = true;
                 ms = 0;
                 msConvert = 0;
@@ -3327,5 +3309,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sub_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
+        populateCycleUI();
     }
 }
