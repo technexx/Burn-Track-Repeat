@@ -1,30 +1,16 @@
 package com.example.tragic.irate.simple.stopwatch;
-
-import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PathDashPathEffect;
-import android.graphics.PathEffect;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
-import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -118,6 +104,7 @@ public class DotDraws extends View {
 
     public void breaksOnlyDraw(long breakOnlyCount, long breakOnlyReduce, int fadeDone) {
         this.mBreakOnlyCount = breakOnlyCount; this.mBreakOnlyReduce = breakOnlyReduce; this.mFadeDone = fadeDone;
+        invalidate();
     }
 
     public void pomDraw(int pomDotCounter, ArrayList<Long> pomTime, int fadeDone) {
@@ -151,7 +138,7 @@ public class DotDraws extends View {
     public void breakOnlyTime(ArrayList<Long> breakOnlyTime) {
         mBreakOnlyTime = new ArrayList<>();
         for (int i=0; i<breakOnlyTime.size(); i++) {
-            mBreakTime.add(convertSeconds(breakOnlyTime.get(i)/1000));
+            mBreakOnlyTime.add(convertSeconds(breakOnlyTime.get(i)/1000));
         }
     }
 
@@ -215,6 +202,7 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaint2);
     }
 
+    //Todo: breaksOnly list coming in empty/
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
@@ -321,6 +309,54 @@ public class DotDraws extends View {
         }
     }
 
+    private void drawText(ArrayList<String> list, float x, float y, int i) {
+        Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+
+        if (mMode == 1 || mMode == 2) {
+            if (list.size() >0) {
+                if (list.get(i).length() <= 2) {
+                    if (list.get(i).length() == 1) {
+                        //Adds "0" to any single digit.
+                        String temp = list.get(i);
+                        temp = "0" + temp;
+                        list.set(i, temp);
+                    }
+
+                    mPaintText.setTypeface(Typeface.DEFAULT);
+                    if (mMode==1) {
+                        mPaintText.setTextSize(70f);
+                        mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
+                    } else if (mMode==2){
+                        mPaintText.setTextSize(90f);
+                        mCanvas.drawText(list.get(i), x-52, y+28, mPaintText);
+                    }
+                } else {
+                    mPaintText.setTypeface(narrow);
+                    if (mMode==1) {
+                        mPaintText.setTextSize(58f);
+                        mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
+                    } else if (mMode==2) {
+                        mPaintText.setTextSize(65f);
+                        mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
+                    }
+                }
+            }
+        } else if (mMode==3) {
+            switch (i) {
+                case 0: case 2: case 4: case 6:
+                    mPaintText.setTextSize(70f);
+                    mCanvas.drawText(list.get(i), x-40, y+87, mPaintText);
+                    break;
+                case 1: case 3: case 5:
+                    mPaintText.setTextSize(45f);
+                    mCanvas.drawText(list.get(i), x-12, y+75, mPaintText);
+                    break;
+                case 7:
+                    mCanvas.drawText(list.get(i), x-23, y+87, mPaintText);
+            }
+        }
+    }
+
     public void fadeDot() {
         if (mAlpha >255) mAlpha = 255;
         mPaint.setAlpha(mAlpha);
@@ -349,54 +385,6 @@ public class DotDraws extends View {
         }
         savedPomAlpha = mAlpha2;
         savedPomCycle = cycle2;
-    }
-
-    private void drawText(ArrayList<String> list, float x, float y, int i) {
-        Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
-
-        if (mMode == 1) {
-            if (list.size() >0) {
-                if (list.get(i).length() <= 2) {
-                    if (list.get(i).length() == 1) {
-                        //Adds "0" to any single digit.
-                        String temp = list.get(i);
-                        temp = "0" + temp;
-                        list.set(i, temp);
-                    }
-
-                    mPaintText.setTypeface(Typeface.DEFAULT);
-                    if (mMode==1) {
-                        mPaintText.setTextSize(70f);
-                        mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
-                    } else if (mMode==2){
-                        mPaintText.setTextSize(90f);
-                        mCanvas.drawText(list.get(i), x-44, y+28, mPaintText);
-                    }
-                } else {
-                    mPaintText.setTypeface(narrow);
-                    if (mMode==1) {
-                        mPaintText.setTextSize(58f);
-                        mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
-                    } else if (mMode==2) {
-                        mPaintText.setTextSize(65f);
-                        mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
-                    }
-                }
-            }
-        } else if (mMode==3) {
-            switch (i) {
-                case 0: case 2: case 4: case 6:
-                    mPaintText.setTextSize(70f);
-                    mCanvas.drawText(list.get(i), x-40, y+87, mPaintText);
-                    break;
-                case 1: case 3: case 5:
-                    mPaintText.setTextSize(45f);
-                    mCanvas.drawText(list.get(i), x-12, y+75, mPaintText);
-                    break;
-                case 7:
-                    mCanvas.drawText(list.get(i), x-23, y+87, mPaintText);
-            }
-        }
     }
 
     public String convertSeconds(long totalSeconds) {
