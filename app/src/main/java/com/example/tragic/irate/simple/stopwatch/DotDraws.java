@@ -41,6 +41,8 @@ public class DotDraws extends View {
     long mBreakCount;
     long mSetReduce;
     long mBreakReduce;
+    long mBreakOnlyCount;
+    long mBreakOnlyReduce;
 
     int mAlpha = 255;
     int mAlpha2 = 255;
@@ -51,8 +53,8 @@ public class DotDraws extends View {
     int mPomDotCounter;
     ArrayList<String> mSetTime;
     ArrayList<String> mBreakTime;
+    ArrayList<String> mBreakOnlyTime;
     ArrayList<String> mPomTime;
-    boolean mBreaksOnly;
 
     int savedCustomAlpha;
     int savedCustomCycle;
@@ -109,8 +111,22 @@ public class DotDraws extends View {
         mPaint.setColor(Color.GRAY);
     }
 
-    public void newDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
+    public void customDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
         this.mSetCount = setCount; this.mBreakCount = breakCount; this.mSetReduce = setReduce; this.mBreakReduce = breakReduce; this.mFadeDone = fadeDone;
+        invalidate();
+    }
+
+    public void breaksOnlyDraw(long breakOnlyCount, long breakOnlyReduce, int fadeDone) {
+        this.mBreakOnlyCount = breakOnlyCount; this.mBreakOnlyReduce = breakOnlyReduce; this.mFadeDone = fadeDone;
+    }
+
+    public void pomDraw(int pomDotCounter, ArrayList<Long> pomTime, int fadeDone) {
+        mPomTime = new ArrayList<>();
+        for (int i=0; i<pomTime.size(); i++) {
+            mPomTime.add(String.valueOf(pomTime.get(i)));
+        }
+        this.mPomDotCounter = pomDotCounter; this.mFadeDone = fadeDone;
+        setupPaint();
         invalidate();
     }
 
@@ -132,19 +148,11 @@ public class DotDraws extends View {
         }
     }
 
-    public void pomDraw(int pomDotCounter, int fadeDone, ArrayList<Long> pomTime) {
-        mPomTime = new ArrayList<>();
-        for (int i=0; i<pomTime.size(); i++) {
-            mPomTime.add(String.valueOf(pomTime.get(i)));
+    public void breakOnlyTime(ArrayList<Long> breakOnlyTime) {
+        mBreakOnlyTime = new ArrayList<>();
+        for (int i=0; i<breakOnlyTime.size(); i++) {
+            mBreakTime.add(convertSeconds(breakOnlyTime.get(i)/1000));
         }
-        this.mPomDotCounter = pomDotCounter; this.mFadeDone = fadeDone;
-        setupPaint();
-        invalidate();
-
-    }
-
-    public void breaksOnly(boolean breaksOnly) {
-        this.mBreaksOnly = breaksOnly;
     }
 
     public void setAlpha() {
@@ -218,54 +226,62 @@ public class DotDraws extends View {
 
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
 
-        if (mMode == 1) {
-            if (mBreaksOnly){
-                mX2 = 15;
-                encloseDots(mY-30, mY+160);
-            } else encloseDots(mY-70, mY+200);
+        switch (mMode) {
+            case 1:
+                encloseDots(mY-70, mY+200);
 
-            for (int i=0; i<mBreakCount; i++) {
-                mPaint.setColor(Color.RED);
-                if (mBreakCount - mBreakReduce == i) {
-                    if (mFadeDone == 2) {
-                        fadeDot();
-                    }
-                } else if (mBreakReduce + i <  mBreakCount) {
-                    mPaint.setAlpha(100);
-                }
-                else {
-                    mPaint.setAlpha(255);
-                }
-                if (!mBreaksOnly) {
-                    mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
-                    drawText(mBreakTime, mX2+16, mY2+2, i);
-                    mX2 += 132;
-                } else {
-                    mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
-//                    mCanvas.drawCircle(mX2, mY2-60, 50, mPaint);
-                    drawText(mBreakTime, mX2+60, mY2-60, i);
-                    mX2 += 132;
-                }
-            }
-
-            if (!mBreaksOnly) {
-                mPaint.setStyle(Paint.Style.FILL);
                 for (int i=0; i<mSetCount; i++) {
                     mPaint.setColor(Color.GREEN);
                     if (mSetCount - mSetReduce == i) {
-                        if (mFadeDone == 1) {
-                            fadeDot();
-                        }
-                    } else if (mSetReduce + i < mSetCount) {
-                        mPaint.setAlpha(100);
-                    } else {
-                        mPaint.setAlpha(255);
+                        if (mFadeDone == 1) fadeDot(); else if (mSetReduce + i < mSetCount) mPaint.setAlpha(100);
+                        else mPaint.setAlpha(255);
                     }
                     mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                     drawText(mSetTime, mX+16, mY+2, i);
                     mX += 132;
                 }
-            }
+
+                for (int i=0; i<mBreakCount; i++) {
+                    mPaint.setColor(Color.RED);
+                    if (mBreakCount - mBreakReduce == i) if (mFadeDone == 2) fadeDot(); else if (mBreakReduce + i <  mBreakCount) mPaint.setAlpha(100);
+                    else mPaint.setAlpha(255);
+                    mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
+                    drawText(mBreakTime, mX2+16, mY2+2, i);
+                    mX2 += 132;
+                }
+                break;
+            case 2:
+                mX2 = 15;
+                encloseDots(mY-30, mY+160);
+
+                for (int i=0; i<mBreakOnlyCount; i++) {
+                    mPaint.setColor(Color.RED);
+                    if (mBreakOnlyCount - mBreakOnlyReduce == i) if (mFadeDone == 3) fadeDot(); else if (mBreakOnlyReduce + i <  mBreakOnlyCount) mPaint.setAlpha(100);
+                    else mPaint.setAlpha(255);
+                    mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
+                    drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
+                    mX2 += 132;
+                }
+                break;
+            case 3:
+                mX = 92; mX2=mX+125;
+                encloseDots(mY-30, mY+150);
+                //Fading last object drawn. Setting previous ones to "greyed out"
+                for (int i=0; i<mPomDotCounter; i++) {
+                    if (i == mPomDotCounter-1) pomFill(i, true);
+                     else {
+                        mPaint.setAlpha(100);
+                        pomFill(i, false);
+                    }
+                    if (i+1 == mPomDotCounter) {
+                        //Drawing all non-greyed objects.
+                        for (int j=mPomDotCounter; j<8; j++) {
+                            mPaint.setAlpha(255);
+                            pomFill(j, false);
+                        }
+                    }
+                }
+                break;
         }
 
         if (mDrawBox) {
@@ -275,34 +291,12 @@ public class DotDraws extends View {
                 previousPos = currentPos;
                 currentPos = -1;
             }
-            mPaint.setStyle(Paint.Style.FILL);
         }
 
-        if (mMode == 2) {
-            encloseDots(mY-30, mY+150);
-            mX = 92; mX2=mX+125;
-            //Fading last object drawn. Setting previous ones to "greyed out"
-            for (int i=0; i<mPomDotCounter; i++) {
-                if (i == mPomDotCounter-1) {
-                    pomDraw(i, true);
-                } else {
-                    mPaint.setAlpha(100);
-                    pomDraw(i, false);
-                }
-                if (i+1 == mPomDotCounter) {
-                    //Drawing all non-greyed objects.
-                    for (int j=mPomDotCounter; j<8; j++) {
-                        mPaint.setAlpha(255);
-                        pomDraw(j, false);
-                    }
-                }
-            }
-        }
-
-        if (mMode==3) mCanvas.drawColor(Color.BLACK);
+        if (mMode==4) mCanvas.drawColor(Color.BLACK);
     }
 
-    public void pomDraw(int i, boolean fade) {
+    public void pomFill(int i, boolean fade) {
         switch (i) {
             case 0: case 2: case 4: case 6:
                 mPaint.setColor(Color.GREEN);
@@ -358,13 +352,9 @@ public class DotDraws extends View {
     }
 
     private void drawText(ArrayList<String> list, float x, float y, int i) {
+        Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+
         if (mMode == 1) {
-            if (!mBreaksOnly)  {
-                mPaintText.setTypeface(Typeface.DEFAULT);
-            } else {
-                Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
-                mPaintText.setTypeface(tf);
-            }
             if (list.size() >0) {
                 if (list.get(i).length() <= 2) {
                     if (list.get(i).length() == 1) {
@@ -373,28 +363,27 @@ public class DotDraws extends View {
                         temp = "0" + temp;
                         list.set(i, temp);
                     }
-                    if (!mBreaksOnly) {
+
+                    mPaintText.setTypeface(Typeface.DEFAULT);
+                    if (mMode==1) {
                         mPaintText.setTextSize(70f);
                         mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
-                    } else {
+                    } else if (mMode==2){
                         mPaintText.setTextSize(90f);
                         mCanvas.drawText(list.get(i), x-44, y+28, mPaintText);
                     }
                 } else {
-                    if (!mBreaksOnly) {
-                        Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
-                        mPaintText.setTypeface(tf);
+                    mPaintText.setTypeface(narrow);
+                    if (mMode==1) {
                         mPaintText.setTextSize(58f);
                         mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
-                    } else {
-                        Typeface tf = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
-                        mPaintText.setTypeface(tf);
+                    } else if (mMode==2) {
                         mPaintText.setTextSize(65f);
                         mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
                     }
                 }
             }
-        } else if (mMode==2) {
+        } else if (mMode==3) {
             switch (i) {
                 case 0: case 2: case 4: case 6:
                     mPaintText.setTextSize(70f);
