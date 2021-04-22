@@ -314,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
     //Todo: Variable set only mode? Again, for TDEE.
     //Todo: Option to skip EITHER set or break. Option to undo skip.
+    //Todo: Reset vis/not vis depending on mode timer status.
 
     //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
     //Todo: Rippling for certain onClicks.
@@ -1595,6 +1596,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void startTimer() {
         switch (mode) {
             case 1:
+                //Todo: Timers continue to run and draw canvas, even when mode is switched. Since they are passing the fade var in, we get the double flicker.
                 setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
                 timer = new CountDownTimer(setMillis, 50) {
                     @Override
@@ -1609,8 +1611,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             else if (customAlpha>=1) fadeCustomTimer = false;
                         }
 
-                        timeLeft.setText(convertSeconds((setMillis + 999)/1000));
-                        drawDots(1);
+                        if (mode==1) {
+                            timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+                            drawDots(1);
+                        }
                     }
 
                     @Override
@@ -1667,8 +1671,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (pomAlpha >=1) fadePomTimer = false;
 
-                        timeLeft3.setText(convertSeconds((pomMillis+999)/1000));
-                        drawDots(4);
+                        if (mode==3) {
+                            timeLeft3.setText(convertSeconds((pomMillis+999)/1000));
+                            drawDots(4);
+                        }
                     }
 
                     @Override
@@ -1717,8 +1723,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     if (customAlpha >=1) fadeCustomTimer = false;
 
-                    timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
-                    drawDots(2);
+                    if (mode==1) {
+                        timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
+                        drawDots(2);
+                    }
                 }
 
                 @Override
@@ -1775,9 +1783,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         else timeLeft2.setAlpha(customAlpha+=.12);
                     }
                     if (customAlpha >=1) fadeCustomTimer = false;
-                    timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
-                    drawDots(3);
-                    //0 vis, 4 invis.
+                    if (mode==2) {
+                        timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
+                        drawDots(3);
+                    }
                 }
 
                 @Override
@@ -1809,7 +1818,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     endFade = new Runnable() {
                         @Override
                         public void run() {
-                            drawDots(2);
+                            drawDots(3);
                             if (receivedAlpha<=100) stopAscent = true;
 
                             if (stopAscent){
@@ -1979,7 +1988,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         //Todo: Need to populate new timers, but do not want to reset millis values.
         dotDraws.retrieveAlpha();
-        drawDots(1);
+        drawDots(0);
 //        populateCycleUI();
     }
 

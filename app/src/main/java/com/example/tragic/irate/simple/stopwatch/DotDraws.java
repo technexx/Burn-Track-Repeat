@@ -18,6 +18,8 @@ public class DotDraws extends View {
     Canvas mCanvas;
     Paint mPaint;
     Paint mPaint2;
+    Paint mPaint3;
+    Paint mPaintBox;
     Paint mPaintText;
     float mX;
     float mX2;
@@ -32,8 +34,10 @@ public class DotDraws extends View {
 
     int mAlpha = 255;
     int mAlpha2 = 255;
+    int mAlpha3 = 255;
     int cycle;
     int cycle2;
+    int cycle3;
     int mFadeDone;
     int mMode;
     int mPomDotCounter;
@@ -44,6 +48,8 @@ public class DotDraws extends View {
 
     int savedCustomAlpha;
     int savedCustomCycle;
+    int savedBOAlpha;
+    int savedBOCycle;
     int savedPomAlpha;
     int savedPomCycle;
     int mPosX;
@@ -54,6 +60,8 @@ public class DotDraws extends View {
     int previousPos = -1;
     sendPosition mSendPosition;
     sendAlpha mSendAlpha;
+    int mOldMode;
+    int testCount;
 
     public interface sendPosition {
         void sendPos(int pos);
@@ -82,13 +90,24 @@ public class DotDraws extends View {
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setStrokeWidth(4);
+
+        mPaint2 = new Paint();
+        mPaint2.setAntiAlias(true);
+        mPaint2.setStyle(Paint.Style.FILL);
+        mPaint2.setStrokeWidth(4);
+
+        mPaint3 = new Paint();
+        mPaint3.setAntiAlias(true);
+        mPaint3.setStyle(Paint.Style.FILL);
+        mPaint3.setStrokeWidth(4);
+
         mPaintText = new Paint();
         mPaintText.setAntiAlias(true);
 
-        mPaint2 = new Paint();
-        mPaint2.setColor(Color.WHITE);
-        mPaint2.setStyle(Paint.Style.STROKE);
-        mPaint2.setStrokeWidth(6);
+        mPaintBox = new Paint();
+        mPaintBox.setColor(Color.WHITE);
+        mPaintBox.setStyle(Paint.Style.STROKE);
+        mPaintBox.setStrokeWidth(6);
     }
 
     public void selectionPaint() {
@@ -118,6 +137,7 @@ public class DotDraws extends View {
     }
 
     public void setMode(int mode) {
+        mOldMode = mMode;
         mMode = mode;
     }
 
@@ -154,8 +174,10 @@ public class DotDraws extends View {
     public void retrieveAlpha() {
         mAlpha = savedCustomAlpha;
         cycle = savedCustomCycle;
-        mAlpha2 = savedPomAlpha;
-        cycle2 = savedPomCycle;
+        mAlpha2 = savedBOAlpha;
+        cycle2 = savedBOCycle;
+        mAlpha3 = savedPomAlpha;
+        cycle3 = savedPomCycle;
     }
 
     public void selectCycle(int posX, int posY, int size) {
@@ -194,23 +216,24 @@ public class DotDraws extends View {
     }
 
     public void encloseDots(float topY, float botY) {
-        mPaint2.setStyle(Paint.Style.STROKE);
-        mPaint2.setAlpha(175);
-        mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaint2);
-        mPaint2.setStyle(Paint.Style.FILL);
-        mPaint2.setAlpha(35);
-        mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaint2);
+        mPaintBox.setStyle(Paint.Style.STROKE);
+        mPaintBox.setAlpha(175);
+        mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
+        mPaintBox.setStyle(Paint.Style.FILL);
+        mPaintBox.setAlpha(35);
+        mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
-    //Todo: breaksOnly list coming in empty/
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
         this.mCanvas = canvas;
         savedCustomAlpha = mAlpha;
         savedCustomCycle = cycle;
-        savedPomAlpha = mAlpha2;
-        savedPomCycle = cycle2;
+        savedBOAlpha = mAlpha2;
+        savedBOCycle = cycle2;
+        savedPomAlpha = mAlpha3;
+        savedPomCycle = cycle3;
 
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
 
@@ -243,10 +266,10 @@ public class DotDraws extends View {
                 encloseDots(mY-30, mY+160);
 
                 for (int i=0; i<mBreakOnlyCount; i++) {
-                    mPaint.setColor(Color.RED);
-                    if (mBreakOnlyCount - mBreakOnlyReduce == i) if (mFadeDone == 3) fadeDot(); else if (mBreakOnlyReduce + i <  mBreakOnlyCount) mPaint.setAlpha(100);
-                    else mPaint.setAlpha(255);
-                    mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
+                    mPaint2.setColor(Color.RED);
+                    if (mBreakOnlyCount - mBreakOnlyReduce == i) if (mFadeDone == 3) fadeDot2(); else if (mBreakOnlyReduce + i <  mBreakOnlyCount) mPaint2.setAlpha(100);
+                    else mPaint2.setAlpha(255);
+                    mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint2);
                     drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
                     mX2 += 132;
                 }
@@ -282,6 +305,9 @@ public class DotDraws extends View {
         }
 
         if (mMode==4) mCanvas.drawColor(Color.BLACK);
+
+        Log.i("testFade", "alpha1 is " + mAlpha+ " and alpha2 is " + mAlpha2);
+
     }
 
     public void pomFill(int i, boolean fade) {
@@ -289,13 +315,13 @@ public class DotDraws extends View {
             case 0: case 2: case 4: case 6:
                 mPaint.setColor(Color.GREEN);
                 //Must be called AFTER color is changed, otherwise alpha will reset to 255.
-                if (fade && mFadeDone == 4) fadeDot2();
+                if (fade && mFadeDone == 4) fadeDot3();
                 mCanvas.drawCircle(mX, 550, 60, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
                 break;
             case 1: case 3: case 5:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 4) fadeDot2();
+                if (fade && mFadeDone == 4) fadeDot3();
                 mCanvas.drawCircle(mX2, 550, 45 , mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 mX+=250;
@@ -303,7 +329,7 @@ public class DotDraws extends View {
                 break;
             case 7:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 4) fadeDot2();
+                if (fade && mFadeDone == 4) fadeDot3();
                 mCanvas.drawRect(mX+90, 495, mX+200, 605, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
         }
@@ -372,10 +398,9 @@ public class DotDraws extends View {
         mSendAlpha.sendAlphaValue(mAlpha);
     }
 
-    //Todo: Probably want to smooth out the alpha transition here, too.
     public void fadeDot2() {
         if (mAlpha2 >255) mAlpha2 = 255;
-        mPaint.setAlpha(mAlpha2);
+        mPaint2.setAlpha(mAlpha2);
         cycle2++;
         if (cycle2 <10) {
             mAlpha2 -=25;
@@ -383,8 +408,24 @@ public class DotDraws extends View {
             mAlpha2 +=25;
             if (cycle2 >19) cycle2 = 0;
         }
-        savedPomAlpha = mAlpha2;
-        savedPomCycle = cycle2;
+        savedBOAlpha = mAlpha2;
+        savedBOCycle = cycle2;
+    }
+
+    public void fadeDot3() {
+        if (mAlpha3 >255) mAlpha3 = 255;
+        mPaint3.setAlpha(mAlpha3);
+        cycle3++;
+        if (cycle3 <10) {
+            mAlpha3 -=25;
+        } else {
+            mAlpha3 +=25;
+            if (cycle3 >19) cycle3 = 0;
+        }
+        savedPomAlpha = mAlpha3;
+        savedPomCycle = cycle3;
+//        Log.i("testFade", "alpha is " + mAlpha3+ " and count is " + testCount);
+
     }
 
     public String convertSeconds(long totalSeconds) {
