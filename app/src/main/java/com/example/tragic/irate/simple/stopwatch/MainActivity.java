@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long breakOnlyMillisUntilFinished;
     long pomMillisUntilFinished;
     boolean incrementValues;
-    int incrementTimer;
+    int incrementTimer = 10;
     Runnable changeFirstValue;
     Runnable changeSecondValue;
     Runnable changeThirdValue;
@@ -799,7 +799,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
         pomID = sharedPreferences.getInt("pomID", 0);
 
-        //Todo: custom/break IDs may be obsolete now.
         customSetTime.clear();
         customBreakTime.clear();
         breaksOnlyTime.clear();
@@ -826,17 +825,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 customBreakTime.add(Long.parseLong(convBreaks[i]));
             }
         } else setDefaultCustomCycle(false);
-        if (!retrievedBOArray.equals("")){
-            for (int i=0; i<convBO.length; i++) breaksOnlyTime.add(Long.parseLong(convBO[i]));
-        }
+        if (!retrievedBOArray.equals("")) for (int i=0; i<convBO.length; i++) breaksOnlyTime.add(Long.parseLong(convBO[i]));
         else setDefaultCustomCycle(true);
-
-        cycle_header_text.setText(retrievedTitle);
 
         numberOfSets = customSetTime.size();
         numberOfBreaks = customBreakTime.size();
         numberOfBreaksOnly = breaksOnlyTime.size();
-        populateCycleUI();
+
+        setMillis = customSetTime.get(0);
+        breakOnlyMillis = breaksOnlyTime.get(0);
 
         pomValue1 = 25;
         pomValue2 = 5;
@@ -859,21 +856,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar2.setProgress(maxProgress);
         progressBar3.setProgress(maxProgress);
 
-        incrementTimer = 10;
-        tabViews();
-
+        cycle_header_text.setText(retrievedTitle);
         timePaused.getAlpha();
         timeLeft.getAlpha();
+        tabViews();
+        populateCycleUI();
 
-        if ((mode==1 && cyclesList.size()>0)  || (mode==2 && cyclesBOList.size()>0)){
-            canSaveOrUpdate(false);
-        } else canSaveOrUpdate(true);
+        if ((mode==1 && cyclesList.size()>0)  || (mode==2 && cyclesBOList.size()>0)) canSaveOrUpdate(false); else canSaveOrUpdate(true);
 
         AsyncTask.execute(() -> {
             cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
         });
 
-        //Todo: Will need new halted vars etc. for breaksOnly mode.
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -883,14 +877,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         savedCycleAdapter.setView(1);
                         switchTimer(1, customHalted);
                         dotDraws.setMode(1);
-                        if (!setBegun) drawDots(0);
                         break;
                     case 1:
                         mode=2;
                         savedCycleAdapter.setView(2);
                         switchTimer(2, breaksOnlyHalted);
                         dotDraws.setMode(2);
-                        if (!breakBegun) drawDots(0);
                         break;
                     case 2:
                         mode=2;
@@ -905,7 +897,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                 }
                 drawDots(0);
-
             }
 
             @Override
@@ -1454,7 +1445,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyTime.remove(0);
                             numberOfBreaks--;
                             oldCycle2 = breaksOnlyCyclesDone;
-                            breakBegun = false;
+                            breakOnlyBegun = false;
                         }
                         if (breaksOnlyTime.size() >0) {
                             setNewText(timeLeft, timeLeft,(breaksOnlyTime.get(0) +999) / 1000);
@@ -1914,7 +1905,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveArrays();
     }
 
-    //Todo: Removed defunct loadIDCycle from here. Replace w/ setCycle() @ true.
     public void switchTimer(int mode, boolean halted) {
         removeViews();
         tabViews();
@@ -1936,7 +1926,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 savedCycleAdapter.setView(1);
                 first_value_textView.setText(convertCustomTextView(setValue));
                 second_value_textView.setText(convertCustomTextView(breakValue));
-                setBegun = false;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateCustom);
                 break;
@@ -1955,8 +1944,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 savedCycleAdapter.setView(2);
                 second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-                setBegun = true;
-                onBreak = true;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
                 break;
@@ -1990,10 +1977,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 else fadeInText(timeLeft4);
                 break;
         }
+        //Todo: Need to populate new timers, but do not want to reset millis values.
         dotDraws.retrieveAlpha();
         drawDots(1);
-        populateCycleUI();
-        prefEdit.apply();
+//        populateCycleUI();
     }
 
     private void animateEnding() {
@@ -2627,26 +2614,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void removeSetOrBreak(boolean onBreak) {
-        if (!onBreak) {
-            numberOfSets--;
-            if (customSetTime.size() > 0) {
-                customSetTime.remove(0);
-                setMillis = customSetTime.get(0);
-            }
-        } else {
-            if (mode==1) {
-                numberOfBreaks--;
-                if (customBreakTime.size() >0) {
-                    customBreakTime.remove(0);
-                    breakMillis = customBreakTime.get(0);
+        switch (mode) {
+            case 1:
+                if (!onBreak) {
+                    numberOfSets--;
+                    if (customSetTime.size() > 0) {
+                        customSetTime.remove(0);
+                        setMillis = customSetTime.get(0);
+                    }
+                } else {
+                    numberOfBreaks--;
+                    if (customBreakTime.size() > 0) {
+                        customBreakTime.remove(0);
+                        breakMillis = customBreakTime.get(0);
+                    }
                 }
-            } else if (mode==2) {
+                break;
+            case 2:
                 numberOfBreaksOnly--;
-                if (breaksOnlyTime.size()>0) {
+                if (breaksOnlyTime.size() > 0) {
                     breaksOnlyTime.remove(0);
                     breakOnlyMillis = breaksOnlyTime.get(0);
                 }
-            }
+                break;
         }
         drawDots(0);
     }
@@ -3173,7 +3163,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (endAnimation != null) endAnimation.cancel();
         switch (mode) {
             case 1:
-                onBreak = false;
                 timePaused.setAlpha(1);
                 progressBar.setProgress(10000);
                 if (timer != null) timer.cancel();
@@ -3183,9 +3172,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 setBegun = false;
                 breakBegun = false;
                 customHalted = true;
+                onBreak = false;
                 break;
             case 2:
-                onBreak = true;
                 timePaused2.setAlpha(1);
                 progressBar2.setProgress(10000);
                 if (timer2 != null) timer2.cancel();
@@ -3201,7 +3190,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 progressBar3.setProgress(10000);
                 pomBegun = false;
                 pomProgressPause = maxProgress;
-                onBreak = false;
                 pomHalted = true;
                 activePomCycle = false;
                 if (timer3 != null) timer3.cancel();
