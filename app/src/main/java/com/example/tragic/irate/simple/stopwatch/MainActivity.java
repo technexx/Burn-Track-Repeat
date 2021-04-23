@@ -835,6 +835,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setMillis = customSetTime.get(0);
         breakOnlyMillis = breaksOnlyTime.get(0);
+        Log.i("testBreak", "value is " + breaksOnlyTime);
 
         pomValue1 = 25;
         pomValue2 = 5;
@@ -897,7 +898,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         dotDraws.setMode(4);
                         break;
                 }
-                drawDots(0);
             }
 
             @Override
@@ -1559,14 +1559,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         objectAnimator.start();
                         breakBegun = true;
                     } else {
-                        Log.i("testBreak", "ok");
                         breakMillis = breakMillisUntilFinished;
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 }
-                Log.i("testBreak", String.valueOf(breakBegun));
-
-                Log.i("testObj", "setMillis is " + setMillis + " and breakMillis is " + breakMillis);
                 break;
             case 2:
                 if (!breakOnlyBegun) {
@@ -2827,7 +2823,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
                 dotDraws.customDraw(startSets, startSets, numberOfSets, numberOfBreaks, fadeVar);
-//                Log.i("testBreak", "passing in " + numberOfBreaks);
                 break;
             case 2:
                 dotDraws.breakOnlyTime(breaksOnlyTime);
@@ -3142,7 +3137,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 numberOfBreaks = customBreakTime.size();
 
                 if (customSetTime.size() >0) timerDisabled = false; else timerDisabled = true;
-                startSets = customSetTime.size();
                 break;
             case 2:
                 if (breaksOnlyTime.size()>0) {
@@ -3153,7 +3147,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 numberOfBreaksOnly = breaksOnlyTime.size();
 
                 if (breaksOnlyTime.size()>0) boTimerDisabled = false; else boTimerDisabled = true;
-                startBreaksOnly = breaksOnlyTime.size();
                 break;
             case 3:
                 //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
@@ -3168,6 +3161,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
         }
+        startSets = customSetTime.size();
+        startBreaksOnly = breaksOnlyTime.size();
         dotDraws.setAlpha();
         drawDots(0);
     }

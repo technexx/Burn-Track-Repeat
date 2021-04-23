@@ -247,11 +247,11 @@ public class DotDraws extends View {
                         if (mFadeDone == 3) fadeDot();
                     } else if (mBreakOnlyReduce + i <  mBreakOnlyCount) {
                         mPaint.setAlpha(100);
-                    }
-                    else mPaint.setAlpha(255);
+                    } else mPaint.setAlpha(255);
                     mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
                     drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
                     mX2 += 132;
+                    Log.i("testCount", "break count is " + mBreakOnlyCount + " and reduce is " + mBreakOnlyReduce);
                 }
                 break;
             case 3:
