@@ -303,8 +303,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     ImageButton fab;
 
-    //Todo: Reset and Skip for new breaksOnly mode. textViews.
-    //Todo: Need to fix fading so all modes fade separately.
+    //Todo: Smoother alpha transition between modes.
     //Todo: "overtime" seconds are active for set/break, should be for breakOnly.
     //Todo: "cycle completed" as a db entry for each separate cycle.
     //Todo: Add skip to Pom.
@@ -1986,10 +1985,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 else fadeInText(timeLeft4);
                 break;
         }
-        //Todo: Need to populate new timers, but do not want to reset millis values.
-        dotDraws.retrieveAlpha();
+        dotDraws.setAlpha();
         drawDots(0);
-//        populateCycleUI();
     }
 
     private void animateEnding() {
