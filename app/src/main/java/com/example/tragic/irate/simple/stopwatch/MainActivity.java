@@ -1536,7 +1536,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
     }
 
-    //Todo: This is trying to fetch setMillis from a reduced list, when we are currently not reducing it.
     public void startObjectAnimator() {
         switch (mode) {
             case 1:
@@ -1568,7 +1567,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 2:
                 if (!breakOnlyBegun) {
-                    if (breaksOnlyTime.size()>0) breakOnlyMillis = breaksOnlyTime.get(0);
+                    if (breaksOnlyTime.size()>0) breakOnlyMillis = breaksOnlyTime.get((int) (breaksOnlyTime.size()-numberOfBreaksOnly));
                     objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) breaksOnlyProgressPause, 0);
                     objectAnimator2.setInterpolator(new LinearInterpolator());
                     objectAnimator2.setDuration(breakOnlyMillis);

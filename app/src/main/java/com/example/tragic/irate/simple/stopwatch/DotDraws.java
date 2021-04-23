@@ -202,6 +202,7 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
+    //Todo: Set alpha @ 50 @ end of set/break.
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
@@ -216,17 +217,18 @@ public class DotDraws extends View {
                 for (int i=0; i<mSetCount; i++) {
                     mPaint.setColor(Color.GREEN);
                     if (mSetCount - mSetReduce == i) {
-                        if (mFadeDone == 1) fadeDot(); else if (mSetReduce + i < mSetCount) mPaint.setAlpha(100);
-                        else mPaint.setAlpha(255);
-                    }
+                        if (mFadeDone == 1) fadeDot();
+                    } else if (mSetReduce + i < mSetCount){
+                        mPaint.setAlpha(100);
+                    } else mPaint.setAlpha(255);
                     mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                     drawText(mSetTime, mX+16, mY+2, i);
                     mX += 132;
                 }
-
                 for (int i=0; i<mBreakCount; i++) {
                     mPaint.setColor(Color.RED);
-                    if (mBreakCount - mBreakReduce == i) if (mFadeDone == 2) fadeDot(); else if (mBreakReduce + i <  mBreakCount) mPaint.setAlpha(100);
+                    if (mBreakCount - mBreakReduce == i) if (mFadeDone == 2) fadeDot();
+                    else if (mBreakReduce + i <  mBreakCount) mPaint.setAlpha(100);
                     else mPaint.setAlpha(255);
                     mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
                     drawText(mBreakTime, mX2+16, mY2+2, i);
@@ -239,7 +241,11 @@ public class DotDraws extends View {
 
                 for (int i=0; i<mBreakOnlyCount; i++) {
                     mPaint.setColor(Color.RED);
-                    if (mBreakOnlyCount - mBreakOnlyReduce == i) if (mFadeDone == 3) fadeDot(); else if (mBreakOnlyReduce + i <  mBreakOnlyCount) mPaint.setAlpha(100);
+                    if (mBreakOnlyCount - mBreakOnlyReduce == i) {
+                        if (mFadeDone == 3) fadeDot();
+                    } else if (mBreakOnlyReduce + i <  mBreakOnlyCount) {
+                        mPaint.setAlpha(100);
+                    }
                     else mPaint.setAlpha(255);
                     mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
                     drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
