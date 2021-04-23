@@ -835,7 +835,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setMillis = customSetTime.get(0);
         breakOnlyMillis = breaksOnlyTime.get(0);
-        Log.i("testBreak", "value is " + breaksOnlyTime);
 
         pomValue1 = 25;
         pomValue2 = 5;
@@ -887,13 +886,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         dotDraws.setMode(2);
                         break;
                     case 2:
-                        mode=2;
+                        mode=3;
                         savedCycleAdapter.setView(3);
                         switchTimer(3, pomHalted);
                         dotDraws.setMode(3);
                         break;
                     case 3:
-                        mode=3;
+                        mode=4;
                         switchTimer(4, stopwatchHalted);
                         dotDraws.setMode(4);
                         break;
