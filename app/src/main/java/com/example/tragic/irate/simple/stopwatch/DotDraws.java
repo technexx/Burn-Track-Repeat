@@ -206,8 +206,6 @@ public class DotDraws extends View {
     public void onDraw(Canvas canvas) {
         setupPaint();
         this.mCanvas = canvas;
-//        savedCustomAlpha = mAlpha;
-//        savedCustomCycle = cycle;
 
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
 
