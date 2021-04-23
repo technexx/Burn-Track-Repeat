@@ -227,9 +227,11 @@ public class DotDraws extends View {
                 }
                 for (int i=0; i<mBreakCount; i++) {
                     mPaint.setColor(Color.RED);
-                    if (mBreakCount - mBreakReduce == i) if (mFadeDone == 2) fadeDot();
-                    else if (mBreakReduce + i <  mBreakCount) mPaint.setAlpha(100);
-                    else mPaint.setAlpha(255);
+                    if (mBreakCount - mBreakReduce == i) {
+                        if (mFadeDone == 2) fadeDot();
+                    } else if (mBreakReduce + i <  mBreakCount) {
+                        mPaint.setAlpha(100);
+                    } else mPaint.setAlpha(255);
                     mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
                     drawText(mBreakTime, mX2+16, mY2+2, i);
                     mX2 += 132;

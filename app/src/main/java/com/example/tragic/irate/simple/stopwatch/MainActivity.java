@@ -305,8 +305,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     ImageButton fab;
 
-    //Todo: Smoother alpha transition between modes.
-    //Todo: "overtime" seconds are active for set/break, should be for breakOnly.
+    //Todo: Issues w/ trying to pause timer @ <500ms and it being disabled after.
     //Todo: "cycle completed" as a db entry for each separate cycle.
     //Todo: Add skip to Pom.
     //Todo: Modify boxes for increased dot size.
@@ -1315,7 +1314,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 numberOfBreaks-=1;
             } else if (mode==2){
                 breaksOnlyTime.remove(receivedPos);
-                numberOfBreaksOnly--;
+                numberOfBreaksOnly-=1;
             }
 
             drawDots(0);
@@ -1542,7 +1541,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!onBreak) {
                     if (!setBegun) {
                         if (numberOfSets>0) setMillis = customSetTime.get((int) (customSetTime.size()-numberOfSets));
-                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
+                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(setMillis);
                         objectAnimator.start();
@@ -1554,16 +1553,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else {
                     if (!breakBegun) {
                         if (numberOfBreaks>0) breakMillis = customBreakTime.get((int) (customBreakTime.size()-numberOfBreaks));
-                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) customProgressPause, 0);
+                        objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(breakMillis);
                         objectAnimator.start();
                         breakBegun = true;
                     } else {
+                        Log.i("testBreak", "ok");
                         breakMillis = breakMillisUntilFinished;
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 }
+                Log.i("testBreak", String.valueOf(breakBegun));
+
+                Log.i("testObj", "setMillis is " + setMillis + " and breakMillis is " + breakMillis);
                 break;
             case 2:
                 if (!breakOnlyBegun) {
@@ -1619,12 +1622,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     @Override
                     public void onFinish() {
-                        stopAscent = false;
+                        //Used in startObjectAnimator, and dictates if we are on a set or break.
                         onBreak = true;
+                        //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
+                        setBegun = false;
+                        stopAscent = false;
                         timeLeft.setText("0");
                         customProgressPause = maxProgress;
 
-                        setBegun = false;
                         customTimerEnded = false;
                         fadeCustomTimer = false;
                         animateEnding();
@@ -1646,11 +1651,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         mHandler.postDelayed(() -> {
                             stopAscent = true;
-                            startObjectAnimator();
-                            breakStart();
                             endAnimation.cancel();
                             timerDisabled = false;
                             dotDraws.setAlpha();
+                            startObjectAnimator();
+                            breakStart();
                         },750);
                     }
                 }.start();
@@ -1699,7 +1704,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             pomCyclesDone +=1;
                             animateEnding();
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
-
                             animateEnding();
                         }
                     }
@@ -1731,18 +1735,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 @Override
                 public void onFinish() {
+                    //Used in startObjectAnimator, and dictates if we are on a set or break.
+                    onBreak = false;
+                    //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
                     breakBegun = false;
-                    Log.i("testCount", String.valueOf(numberOfBreaks));
+                    stopAscent = false;
                     timeLeft.setText("0");
-                    if (numberOfBreaks >1) {
+
+                    if (numberOfBreaks >0) {
                         customProgressPause = maxProgress;
                         customTimerEnded = false;
+
+                        endFade = new Runnable() {
+                            @Override
+                            public void run() {
+                                drawDots(2);
+                                if (receivedAlpha<=100) stopAscent = true;
+
+                                if (stopAscent){
+                                    removeSetOrBreak(true);
+                                    mHandler.removeCallbacks(this);
+                                }
+                                if (!stopAscent) mHandler.postDelayed(this, 50);
+                            }
+                        };
+                        mHandler.post(endFade);
 
                         mHandler.postDelayed(() -> {
                             stopAscent = true;
                             startTimer();
                             startObjectAnimator();
-                            onBreak = false;
                             dotDraws.setAlpha();
                             endAnimation.cancel();
                         },750);
@@ -1754,23 +1776,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         fadeCustomTimer = false;
                     }
                     boTimerDisabled = false;
-                    stopAscent = false;
                     animateEnding();
-
-                    endFade = new Runnable() {
-                        @Override
-                        public void run() {
-                            drawDots(2);
-                            if (receivedAlpha<=100) stopAscent = true;
-
-                            if (stopAscent){
-                                removeSetOrBreak(true);
-                                mHandler.removeCallbacks(this);
-                            }
-                            if (!stopAscent) mHandler.postDelayed(this, 50);
-                        }
-                    };
-                    mHandler.post(endFade);
                 }
             }.start();
         } else if (mode==2) {
@@ -1797,7 +1803,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakOnlyBegun = false;
                     timeLeft2.setText("0");
 
-                    if (numberOfBreaksOnly>1) {
+                    if (numberOfBreaksOnly>0) {
                         breaksOnlyProgressPause = maxProgress;
                         breakOnlyTimerEnded = false;
 
@@ -2628,16 +2634,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
                 if (!onBreak) {
                     numberOfSets--;
-                    if (customSetTime.size() > 0) {
-//                        customSetTime.remove(0);
-                        setMillis = customSetTime.get(0);
-                    }
+                    if (customSetTime.size() > 0)  setMillis = customSetTime.get(0);
                 } else {
                     numberOfBreaks--;
-                    if (customBreakTime.size() > 0) {
-//                        customBreakTime.remove(0);
-                        breakMillis = customBreakTime.get(0);
-                    }
+                    if (customBreakTime.size() > 0) breakMillis = customBreakTime.get(0);
                 }
                 break;
             case 2:
@@ -2827,6 +2827,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
                 dotDraws.customDraw(startSets, startSets, numberOfSets, numberOfBreaks, fadeVar);
+//                Log.i("testBreak", "passing in " + numberOfBreaks);
                 break;
             case 2:
                 dotDraws.breakOnlyTime(breaksOnlyTime);
@@ -2959,6 +2960,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDisabled = true;
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
 
+        //Todo: Toast pops up if trying to pause when timer at <500 ms.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3)) {
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
@@ -3124,8 +3126,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         reset.setVisibility(View.VISIBLE);
                     }
             }
-        } else
-            Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
     }
 
     public void populateCycleUI() {
