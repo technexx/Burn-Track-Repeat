@@ -1006,7 +1006,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         second_value_sep.setVisibility(View.GONE);
                     }
                     break;
-                case 2:
+                case 3:
                     if (first_value_textView.isShown()) {
                         first_value_textView.setVisibility(View.GONE);
                         first_value_single_edit.setVisibility(View.VISIBLE);
@@ -2788,12 +2788,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //This is called via setIncrements() is is called within plus/minus touch listeners.
     public void setTimerValueBounds() {
         switch (mode) {
-            case 1:
+            case 1: case 2:
                 toastBounds(5, 300, setValue); toastBounds(5, 300, breakValue); toastBounds(5, 300, breaksOnlyValue);
                 if (setValue<5) setValue = 5; if (breakValue<5) breakValue = 5; if (breaksOnlyValue <5) breaksOnlyValue = 5;
                 if (setValue>300) setValue = 300; if (breakValue>300) breakValue =300; if (breaksOnlyValue>300) breaksOnlyValue = 300;
                 break;
-            case 2:
+            case 3:
                 toastBounds(15, 90, pomValue1); toastBounds(3, 10, pomValue2); toastBounds(10, 60, pomValue3);
                 if (pomValue1>90) pomValue1=90; if (pomValue1<15) pomValue1 = 15;
                 if (pomValue2>10) pomValue2=10; if (pomValue2<3) pomValue2=3;
@@ -2850,10 +2850,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     progressBar.setVisibility(View.INVISIBLE);
                     progressBar2.setVisibility(View.VISIBLE);
                     first_value_textView.setVisibility(View.GONE);
-                    plus_first_value.setVisibility(View.GONE);
-                    minus_first_value.setVisibility(View.GONE);
+                    plus_first_value.setVisibility(View.INVISIBLE);
+                    minus_first_value.setVisibility(View.INVISIBLE);
                     s1.setVisibility(View.GONE);
                     second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                    second_value_textView.setVisibility(View.VISIBLE);
                 }
                 progressBar3.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
@@ -2864,13 +2865,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycle_reset.setText(R.string.clear_cycles);
                 s1.setTextSize(22f);
                 s2.setTextSize(22f);
-                first_value_textView.setTextSize(23f);
-                second_value_textView.setTextSize(23f);
                 s3.setVisibility(View.GONE);
-                third_value_textView.setVisibility(View.GONE);
-                third_value_single_edit.setVisibility(View.GONE);
-                plus_third_value.setVisibility(View.GONE);
-                minus_third_value.setVisibility(View.GONE);
+                third_value_textView.setVisibility(View.INVISIBLE);
+                third_value_single_edit.setVisibility(View.INVISIBLE);
+                plus_third_value.setVisibility(View.INVISIBLE);
+                minus_third_value.setVisibility(View.INVISIBLE);
                 break;
             case 3:
                 first_value_single_edit.setText(convertSeconds(pomValue1));
@@ -2926,6 +2925,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 msTime.setText(displayMs);
                 msTimePaused.setText(displayMs);
         }
+        first_value_edit.setVisibility(View.GONE);
+        first_value_sep.setVisibility(View.GONE);
+        first_value_edit_two.setVisibility(View.GONE);
+        second_value_edit.setVisibility(View.GONE);
+        second_value_sep.setVisibility(View.GONE);
+        second_value_edit_two.setVisibility(View.GONE);
+        first_value_single_edit.setVisibility(View.GONE);
+        second_value_single_edit.setVisibility(View.GONE);
+        third_value_single_edit.setVisibility(View.GONE);
     }
 
     public void saveArrays() {
