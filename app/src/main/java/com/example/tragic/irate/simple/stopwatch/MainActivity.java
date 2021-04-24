@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     ImageButton fab;
 
-    //Todo: endAnimation "restarts" if pressing Skip @ 0 list size. Add skip to Pom.
+    //Todo: Add skip to Pom.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
 
@@ -780,6 +780,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles = new Cycles();
         cyclesBO = new CyclesBO();
         pomCycles = new PomCycles();
+
+        endAnimation = new AlphaAnimation(1.0f, 0.0f);
+        endAnimation.setDuration(300);
+        endAnimation.setStartOffset(20);
+        endAnimation.setRepeatMode(Animation.REVERSE);
+        endAnimation.setRepeatCount(Animation.INFINITE);
 
         sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
         prefEdit = sharedPreferences.edit();
@@ -1871,7 +1877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             customCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         }
-                        animateEnding();
+                        if (!endAnimation.isInitialized()) animateEnding();
                         progressBar.setProgress(0);
                         timeLeft.setText("0");
                         timePaused.setText("0");
@@ -1900,7 +1906,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                         }
-                        animateEnding();
+                        if (!endAnimation.isInitialized()) animateEnding();
                         progressBar2.setProgress(0);
                         timeLeft2.setText("0");
                         timePaused2.setText("0");
@@ -1992,12 +1998,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     private void animateEnding() {
-        endAnimation = new AlphaAnimation(1.0f, 0.0f);
-        endAnimation.setDuration(300);
-        endAnimation.setStartOffset(20);
-        endAnimation.setRepeatMode(Animation.REVERSE);
-        endAnimation.setRepeatCount(Animation.INFINITE);
-
         switch (mode) {
             case 1:
                 progressBar.setAnimation(endAnimation);
