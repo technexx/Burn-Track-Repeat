@@ -306,8 +306,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     ImageButton fab;
 
-    //Todo: "cycle completed" as a db entry for each separate cycle.
-    //Todo: Add skip to Pom.
+    //Todo: Fix Skip for Mode 2. Add skip to Pom.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
 
@@ -315,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Variable set only mode? Again, for TDEE.
     //Todo: Option to skip EITHER set or break. Option to undo skip.
     //Todo: Reset vis/not vis depending on mode timer status.
+    //Todo: Maybe: "cycle completed" as a db entry for each separate cycle.
 
     //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
     //Todo: Rippling for certain onClicks.
@@ -1390,90 +1390,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         skip.setOnClickListener(v -> {
-            if (customSetTime.size()>0) {
-                int oldCycle = 0;
-                int oldCycle2 = 0;
-                int oldCycle3 = 0;
-                switch (mode) {
-                    case 1:
-                        customHalted = true;
-                        if (timer != null) timer.cancel();
-                        if (objectAnimator != null) objectAnimator.cancel();
-
-                        if (numberOfSets >0 && numberOfBreaks >0) {
-                            setBegun = false;
-                            customProgressPause = maxProgress;
-                            timePaused.setAlpha(1);
-                            timeLeft.setAlpha(0);
-                            progressBar.setProgress(10000);
-                        }
-                        if (customSetTime.size() >0 && customSetTime.size() == customBreakTime.size()) {
-//                            customSetTime.remove(0);
-                            numberOfSets--;
-                        }
-                        if (customBreakTime.size() >0 && customBreakTime.size() != customSetTime.size()) {
-                            customBreakTime.remove(0);
-                            numberOfBreaks--;
-                            onBreak = false;
-                            oldCycle = customCyclesDone;
-                        }
-                        if (customSetTime.size() >0) setNewText(timePaused, timePaused, (customSetTime.get(0)+999)/1000);
-
-                        if (numberOfBreaks == 0) {
-                            timePaused.setAlpha(0);
-                            timeLeft.setAlpha(1);
-                            if (oldCycle == customCyclesDone) {
-                                customCyclesDone++;
-                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                            }
-                            animateEnding();
-                            progressBar.setProgress(0);
-                            timeLeft.setText("0");
-                            timePaused.setText("0");
-                            customTimerEnded = true;
-                        }
-                        if (numberOfBreaks >=0) {
-                            drawDots(0);
-                        }
-                        break;
-                    case 2:
-                        breaksOnlyHalted = true;
-                        if (timer2 != null) timer2.cancel();
-                        if (objectAnimator2 != null) objectAnimator2.cancel();
-
-                        if (breaksOnlyTime.size() >0) {
-//                            breaksOnlyTime.remove(0);
-                            numberOfBreaks--;
-                            oldCycle2 = breaksOnlyCyclesDone;
-                            breakOnlyBegun = false;
-                        }
-                        if (breaksOnlyTime.size() >0) {
-                            setNewText(timeLeft, timeLeft,(breaksOnlyTime.get(0) +999) / 1000);
-                            setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
-                        }
-
-                        if (numberOfBreaksOnly==0) {
-                            timePaused2.setAlpha(0);
-                            timeLeft2.setAlpha(1);
-                            if (oldCycle2 == breaksOnlyCyclesDone) {
-                                breaksOnlyCyclesDone++;
-                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                            }
-                            animateEnding();
-                            progressBar2.setProgress(0);
-                            timeLeft2.setText("0");
-                            timePaused2.setText("0");
-                            breakOnlyTimerEnded = true;
-                        }
-                        if (numberOfBreaks >=0) {
-                            drawDots(0);
-                        }
-                        break;
-                    case 3:
-                        //Todo: Add pom here.
-                }
-            }
-            dotDraws.setAlpha();
+            skipRound();
         });
 
         reset.setOnClickListener(v -> {
@@ -1752,25 +1669,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     mHandler.removeCallbacks(this);
                                 }
                                 if (!stopAscent) mHandler.postDelayed(this, 50);
+                                Log.i("testAlpha", "value is " + receivedAlpha);
                             }
                         };
                         mHandler.post(endFade);
 
                         mHandler.postDelayed(() -> {
                             stopAscent = true;
-                            startTimer();
-                            startObjectAnimator();
-                            dotDraws.setAlpha();
-                            endAnimation.cancel();
+                            if (numberOfBreaks>0) {
+                                startTimer();
+                                startObjectAnimator();
+                                dotDraws.setAlpha();
+                                endAnimation.cancel();
+                            } else {
+                                customCyclesDone++;
+                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                                drawDots(0);
+                                customTimerEnded = true;
+                                fadeCustomTimer = false;
+                            }
                         },750);
-                    } else {
-                        customCyclesDone++;
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                        drawDots(0);
-                        customTimerEnded = true;
-                        fadeCustomTimer = false;
                     }
-                    boTimerDisabled = false;
+                    timerDisabled = false;
                     animateEnding();
                 }
             }.start();
@@ -1916,6 +1836,88 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         populateCycleUI();
         saveArrays();
+    }
+
+    public void skipRound() {
+        if (customSetTime.size()>0) {
+            int oldCycle = 0;
+            int oldCycle2 = 0;
+            int oldCycle3 = 0;
+            switch (mode) {
+                case 1:
+                    customHalted = true;
+                    if (timer != null) timer.cancel();
+                    if (objectAnimator != null) objectAnimator.cancel();
+
+                    if (numberOfSets >0 && numberOfBreaks >0) {
+                        setBegun = false;
+                        customProgressPause = maxProgress;
+                        timePaused.setAlpha(1);
+                        timeLeft.setAlpha(0);
+                        progressBar.setProgress(10000);
+                    }
+                    if (numberOfSets >0 && numberOfSets == numberOfBreaks) numberOfSets--;
+                    if (numberOfBreaks >0 && numberOfBreaks != numberOfSets) {
+                        numberOfBreaks--;
+                        onBreak = false;
+                        oldCycle = customCyclesDone;
+                    }
+                    if (numberOfSets >0) setNewText(timePaused, timePaused, (customSetTime.get(0)+999)/1000);
+
+                    if (numberOfBreaks == 0) {
+                        timePaused.setAlpha(0);
+                        timeLeft.setAlpha(1);
+                        if (oldCycle == customCyclesDone) {
+                            customCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                        }
+                        animateEnding();
+                        progressBar.setProgress(0);
+                        timeLeft.setText("0");
+                        timePaused.setText("0");
+                        customTimerEnded = true;
+                    }
+                    if (numberOfBreaks >=0) {
+                        drawDots(0);
+                    }
+                    break;
+                case 2:
+                    breaksOnlyHalted = true;
+                    if (timer2 != null) timer2.cancel();
+                    if (objectAnimator2 != null) objectAnimator2.cancel();
+
+                    if (numberOfBreaksOnly >0) {
+                        numberOfBreaks--;
+                        oldCycle2 = breaksOnlyCyclesDone;
+                        breakOnlyBegun = false;
+                    }
+                    if (numberOfBreaksOnly >0) {
+                        setNewText(timeLeft, timeLeft,(breaksOnlyTime.get(0) +999) / 1000);
+                        setNewText(timePaused, timePaused, (breaksOnlyTime.get(0) +999) / 1000);
+                    }
+
+                    if (numberOfBreaksOnly==0) {
+                        timePaused2.setAlpha(0);
+                        timeLeft2.setAlpha(1);
+                        if (oldCycle2 == breaksOnlyCyclesDone) {
+                            breaksOnlyCyclesDone++;
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                        }
+                        animateEnding();
+                        progressBar2.setProgress(0);
+                        timeLeft2.setText("0");
+                        timePaused2.setText("0");
+                        breakOnlyTimerEnded = true;
+                    }
+                    if (numberOfBreaks >=0) {
+                        drawDots(0);
+                    }
+                    break;
+                case 3:
+                    //Todo: Add pom here.
+            }
+        }
+        dotDraws.setAlpha();
     }
 
     public void switchTimer(int mode, boolean halted) {
@@ -2961,6 +2963,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show(); return;
         }
+
         if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
             timerDisabled = true;
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
@@ -2976,10 +2979,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 1:
                     if (!customTimerEnded) {
                         if (!stopAscent) {
-                            if (!onBreak) {
-                                removeSetOrBreak(false);
-                            }
-                            else removeSetOrBreak(true);
+                            if (!onBreak)removeSetOrBreak(false); else removeSetOrBreak(true);
                             mHandler.removeCallbacks(endFade);
                             stopAscent = true;
                         }
@@ -3239,5 +3239,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
+//        if (endAnimation!=null) endAnimation.cancel();
     }
 }
