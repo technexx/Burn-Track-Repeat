@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean pomTimerEnded;
     boolean onBreak;
     boolean pomEnded;
+    boolean emptyCycle;
     boolean timerDisabled;
     boolean boTimerDisabled;
     boolean pomTimerDisabled;
@@ -305,7 +306,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     ImageButton fab;
 
-    //Todo: Issues w/ trying to pause timer @ <500ms and it being disabled after.
     //Todo: "cycle completed" as a db entry for each separate cycle.
     //Todo: Add skip to Pom.
     //Todo: Modify boxes for increased dot size.
@@ -2958,11 +2958,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
+        if (emptyCycle) {
+            Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show(); return;
+        }
         if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
             timerDisabled = true;
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
 
-        //Todo: Toast pops up if trying to pause when timer at <500 ms.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3)) {
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
@@ -3128,7 +3130,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         reset.setVisibility(View.VISIBLE);
                     }
             }
-        } else Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void populateCycleUI() {
@@ -3143,7 +3145,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 numberOfSets = customSetTime.size();
                 numberOfBreaks = customBreakTime.size();
 
-                if (customSetTime.size() >0) timerDisabled = false; else timerDisabled = true;
+                if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 2:
                 if (breaksOnlyTime.size()>0) {
@@ -3153,7 +3155,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else timePaused2.setText("?");
                 numberOfBreaksOnly = breaksOnlyTime.size();
 
-                if (breaksOnlyTime.size()>0) boTimerDisabled = false; else boTimerDisabled = true;
+                if (breaksOnlyTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 3:
                 //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
@@ -3166,6 +3168,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     pomTimerDisabled = false;
                     timePaused3.setText(convertSeconds((pomMillis+999)/1000));
                 }
+                if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
         }
         startSets = customSetTime.size();
