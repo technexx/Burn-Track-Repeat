@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     ImageButton fab;
 
-    //Todo: Fix Skip for Mode 2. Add skip to Pom.
+    //Todo: endAnimation "restarts" if pressing Skip @ 0 list size. Add skip to Pom.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
 
@@ -1877,9 +1877,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused.setText("0");
                         customTimerEnded = true;
                     }
-                    if (numberOfBreaks >=0) {
-                        drawDots(0);
-                    }
                     break;
                 case 2:
                     breaksOnlyHalted = true;
@@ -1887,7 +1884,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (objectAnimator2 != null) objectAnimator2.cancel();
 
                     if (numberOfBreaksOnly >0) {
-                        numberOfBreaks--;
+                        numberOfBreaksOnly--;
                         oldCycle2 = breaksOnlyCyclesDone;
                         breakOnlyBegun = false;
                     }
@@ -1909,15 +1906,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused2.setText("0");
                         breakOnlyTimerEnded = true;
                     }
-                    if (numberOfBreaks >=0) {
-                        drawDots(0);
-                    }
                     break;
                 case 3:
                     //Todo: Add pom here.
             }
         }
         dotDraws.setAlpha();
+        drawDots(0);
     }
 
     public void switchTimer(int mode, boolean halted) {
