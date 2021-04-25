@@ -160,6 +160,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Runnable changeThirdValue;
     Runnable valueSpeed;
     Runnable endFade;
+    Runnable endFade2;
+    Runnable endFade3;
     Runnable ot;
 
     long pomMillis1;
@@ -198,9 +200,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long startSets;
     long startBreaksOnly;
 
-    boolean customTimerEnded;
-    boolean breakOnlyTimerEnded;
-    boolean pomTimerEnded;
+    boolean modeOneTimerEnded;
+    boolean modeTwoTimerEnded;
+    boolean modeThreeTimerEnded;
     boolean onBreak;
     boolean pomEnded;
     boolean emptyCycle;
@@ -403,15 +405,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     first_value_single_edit.setVisibility(View.GONE);
                     first_value_textView.setVisibility(View.VISIBLE);
                 }
-                    if (second_value_single_edit.isShown()) {
+                if (second_value_single_edit.isShown()) {
                     second_value_single_edit.setVisibility(View.GONE);
                     second_value_textView.setVisibility(View.VISIBLE);
                 }
-                    if (third_value_single_edit.isShown()) {
+                if (third_value_single_edit.isShown()) {
                     third_value_single_edit.setVisibility(View.GONE);
                     third_value_textView.setVisibility(View.VISIBLE);
                 }
-                    break;
+                break;
         }
         save_cycles.setText(R.string.save_cycles);
         return false;
@@ -480,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         if (defaultMenu) {
-           MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.options_menu, menu);
         }
         return true;
@@ -525,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     setsArray.add(cyclesList.get(i).getSets());
                                     breaksArray.add(cyclesList.get(i).getBreaks());
                                     customTitleArray.add(cyclesList.get(i).getTitle());
-                                    }
+                                }
                                 cyclesExist.set(true);
                             }
                             break;
@@ -577,7 +579,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             if (mode==1) delete_all_text.setText(R.string.delete_all_custom); else delete_all_text.setText(R.string.delete_all_BO);
                             deleteAllPopupWindow.showAtLocation(deleteCyclePopupView, Gravity.CENTER, 0, 0);
                         });
-                      ;
+                        ;
                     }
                 });
         }
@@ -1078,7 +1080,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         second_value_edit_two.setVisibility(View.GONE);
                         second_value_sep.setVisibility(View.GONE);
                     }
-                     break;
+                    break;
                 case 3:
                     if (first_value_single_edit.isShown()) {
                         first_value_single_edit.setVisibility(View.GONE);
@@ -1552,7 +1554,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timeLeft.setText("0");
                 customProgressPause = maxProgress;
 
-                customTimerEnded = false;
+                modeOneTimerEnded = false;
                 fadeCustomTimer = false;
                 animateEnding();
 
@@ -1577,7 +1579,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timerDisabled = false;
                     dotDraws.setAlpha();
                     startObjectAnimator();
-                    startBreakTimer();
                 },750);
             }
         }.start();
@@ -1615,7 +1616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     if (numberOfBreaks >0) {
                         customProgressPause = maxProgress;
-                        customTimerEnded = false;
+                        modeOneTimerEnded = false;
 
                         endFade = new Runnable() {
                             @Override
@@ -1635,7 +1636,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         mHandler.postDelayed(() -> {
                             stopAscent = true;
                             if (numberOfBreaks>0) {
-                                startSetTimer();
                                 startObjectAnimator();
                                 dotDraws.setAlpha();
                                 endAnimation.cancel();
@@ -1643,7 +1643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 customCyclesDone++;
                                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                                 drawDots(0);
-                                customTimerEnded = true;
+                                modeOneTimerEnded = true;
                                 fadeCustomTimer = false;
                             }
                         },750);
@@ -1678,7 +1678,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     if (numberOfBreaksOnly>0) {
                         breaksOnlyProgressPause = maxProgress;
-                        breakOnlyTimerEnded = false;
+                        modeTwoTimerEnded = false;
 
                         //stopAscent keeps our fades consistent. breakEnded is used for RESETTING and RESTARTING timer (separate clicks).
                         mHandler.postDelayed(() -> {
@@ -1690,14 +1690,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breaksOnlyCyclesDone++;
                         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                         drawDots(0);
-                        breakOnlyTimerEnded = true;
+                        modeTwoTimerEnded = true;
                         fadeCustomTimer = false;
                     }
                     boTimerDisabled = false;
                     stopAscent = false;
                     animateEnding();
 
-                    endFade = new Runnable() {
+                    endFade2 = new Runnable() {
                         @Override
                         public void run() {
                             drawDots(3);
@@ -1710,7 +1710,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             if (!stopAscent) mHandler.postDelayed(this, 50);
                         }
                     };
-                    mHandler.post(endFade);
+                    mHandler.post(endFade2);
 
                     overtime.setVisibility(View.VISIBLE);
                     ot = new Runnable() {
@@ -1886,11 +1886,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             customCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         }
-                        if (!customTimerEnded) animateEnding();
+                        if (!modeOneTimerEnded) animateEnding();
                         progressBar.setProgress(0);
                         timeLeft.setText("0");
                         timePaused.setText("0");
-                        customTimerEnded = true;
+                        modeOneTimerEnded = true;
                     }
                     break;
                 case 2:
@@ -1912,11 +1912,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                         }
-                        if (!breakOnlyTimerEnded) animateEnding();
+                        if (!modeTwoTimerEnded) animateEnding();
                         progressBar2.setProgress(0);
                         timeLeft2.setText("0");
                         timePaused2.setText("0");
-                        breakOnlyTimerEnded = true;
+                        modeTwoTimerEnded = true;
                     }
                     break;
                 case 3:
@@ -1938,12 +1938,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             pomCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                         }
-                        if (pomTimerEnded) animateEnding();
+                        if (modeThreeTimerEnded) animateEnding();
                         progressBar3.setProgress(0);
                         timeLeft3.setText("0");
 
                         timePaused3.setText("0");
-                        pomTimerEnded = true;
+                        modeThreeTimerEnded = true;
                     }
                     break;
             }
@@ -3021,7 +3021,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (fadeOutObj != null) fadeOutObj.cancel();
             switch (mode) {
                 case 1:
-                    if (!customTimerEnded) {
+                    if (!modeOneTimerEnded) {
                         if (!stopAscent) {
                             if (!onBreak)removeSetOrBreak(false); else removeSetOrBreak(true);
                             mHandler.removeCallbacks(endFade);
@@ -3045,18 +3045,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else if (pausing == RESUMING_TIMER) {
                             customHalted = false;
                             startObjectAnimator();
-//                            if (onBreak) startBreakTimer();
-//                            else startSetTimer();
                             timeLeft.setAlpha(1);
                             reset.setVisibility(View.INVISIBLE);
                         }
                     } else resetTimer();
                     break;
                 case 2:
-                    if (!breakOnlyTimerEnded) {
+                    if (!modeTwoTimerEnded) {
                         if (!stopAscent) {
                             removeSetOrBreak(true);
-                            mHandler.removeCallbacks(endFade);
+                            mHandler.removeCallbacks(endFade2);
                             stopAscent = true;
                         }
                         if (pausing == PAUSING_TIMER) {
@@ -3088,7 +3086,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breakEnded = false;
                             newBreak = false;
                             startObjectAnimator();
-//                            startBreakTimer();
                             timerDisabled = false;
                             fadeCustomTimer = false;
                             timePaused2.setAlpha(0f);
@@ -3097,7 +3094,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else resetTimer();
                     break;
                 case 3:
-                    if (!pomTimerEnded) {
+                    if (!modeThreeTimerEnded) {
                         if (pausing == PAUSING_TIMER) {
                             timePaused3.setAlpha(1);
                             pomHalted = true;
@@ -3230,7 +3227,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (timer != null) timer.cancel();
                 if (objectAnimator != null) objectAnimator.cancel();
                 customProgressPause = maxProgress;
-                customTimerEnded = false;
+                modeOneTimerEnded = false;
                 setBegun = false;
                 breakBegun = false;
                 customHalted = true;
@@ -3242,13 +3239,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (timer2 != null) timer2.cancel();
                 if (objectAnimator2 != null) objectAnimator2.cancel();
                 breaksOnlyProgressPause = maxProgress;
-                breakOnlyTimerEnded = false;
+                modeTwoTimerEnded = false;
                 breakOnlyBegun = false;
                 breaksOnlyHalted = true;
                 break;
             case 3:
                 timePaused3.setAlpha(1);
-                pomTimerEnded = false;
+                modeThreeTimerEnded = false;
                 progressBar3.setProgress(10000);
                 pomBegun = false;
                 pomProgressPause = maxProgress;
