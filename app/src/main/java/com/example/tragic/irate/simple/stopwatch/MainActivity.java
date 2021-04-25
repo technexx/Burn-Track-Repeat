@@ -306,9 +306,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean stopAscent = true;
     boolean minReached;
     boolean maxReached;
+    int fadeVar;
     ImageButton fab;
 
-    //Todo: Fix Pom mode. Add/fix skip for Pom.
+    //Todo: Test full skip/run of pom cycles. Add ascent runnable and end animation.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
     //Todo: Add/Sub layout.
@@ -399,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     //onTouch is closing editText, converting its values to longs and then setting them to breakValue.
                     setEditValueBounds(false);
                 }
+                if (cycle_reset.getText().equals(getString(R.string.confirm_cycle_reset))) cycle_reset.setText(R.string.clear_cycles);
                 break;
             case 3:
                 if (first_value_single_edit.isShown()) {
@@ -872,6 +874,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.getAlpha();
         tabViews();
         populateCycleUI();
+
+        //Used in all timers to smooth out end fade.
+        endFade = new Runnable() {
+            @Override
+            public void run() {
+                drawDots(fadeVar);
+                if (receivedAlpha<=100) stopAscent = true;
+                if (stopAscent) mHandler.removeCallbacks(this); else mHandler.postDelayed(this, 50);
+            }
+        };
 
         if ((mode==1 && cyclesList.size()>0)  || (mode==2 && cyclesBOList.size()>0)) canSaveOrUpdate(false); else canSaveOrUpdate(true);
 
@@ -1460,6 +1472,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void startObjectAnimator() {
+        //Always set to false before new round begins, so fade smooth resets. May cause super rare overlap in fade out dot alphas, but this can be solved by just using separate ascent variables.
+        stopAscent = false;
         switch (mode) {
             case 1:
                 if (!onBreak) {
@@ -1550,7 +1564,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 onBreak = true;
                 //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
                 setBegun = false;
-                stopAscent = false;
                 timeLeft.setText("0");
                 customProgressPause = maxProgress;
 
@@ -1558,25 +1571,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 fadeCustomTimer = false;
                 animateEnding();
 
-                endFade = new Runnable() {
-                    @Override
-                    public void run() {
-                        drawDots(1);
-                        if (receivedAlpha<=100) stopAscent = true;
+                //Disabling pause/resume clicks until animation finishes.
+                timerDisabled = true;
 
-                        if (stopAscent){
-                            removeSetOrBreak(false);
-                            mHandler.removeCallbacks(this);
-                        }
-                        if (!stopAscent) mHandler.postDelayed(this, 50);
-                    }
-                };
+                //Smooths out end fade.
+                fadeVar = 1;
                 mHandler.post(endFade);
 
+                //No >0 conditional needed here, since method will never execute if setCount is less than 1.
                 mHandler.postDelayed(() -> {
+                    //Re-enabling timer clicks.
+                    timerDisabled = false;
+                    //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
+                    removeSetOrBreak(false);
                     stopAscent = true;
                     endAnimation.cancel();
-                    timerDisabled = false;
                     dotDraws.setAlpha();
                     startObjectAnimator();
                 },750);
@@ -1611,44 +1620,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     onBreak = false;
                     //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
                     breakBegun = false;
-                    stopAscent = false;
                     timeLeft.setText("0");
 
                     if (numberOfBreaks >0) {
                         customProgressPause = maxProgress;
                         modeOneTimerEnded = false;
-
-                        endFade = new Runnable() {
-                            @Override
-                            public void run() {
-                                drawDots(2);
-                                if (receivedAlpha<=100) stopAscent = true;
-
-                                if (stopAscent){
-                                    removeSetOrBreak(true);
-                                    mHandler.removeCallbacks(this);
-                                }
-                                if (!stopAscent) mHandler.postDelayed(this, 50);
-                            }
-                        };
+                        //Disabling pause/resume clicks until animation finishes.
+                        timerDisabled = true;
+                        //Smooths out end fade.
+                        fadeVar = 2;
                         mHandler.post(endFade);
 
                         mHandler.postDelayed(() -> {
+                            //Re-enabling timer clicks. Used regardless of numberOfBreaks.
+                            timerDisabled = false;
+                            //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
+                            removeSetOrBreak(true);
                             stopAscent = true;
-                            if (numberOfBreaks>0) {
-                                startObjectAnimator();
-                                dotDraws.setAlpha();
-                                endAnimation.cancel();
-                            } else {
-                                customCyclesDone++;
-                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-                                drawDots(0);
-                                modeOneTimerEnded = true;
-                                fadeCustomTimer = false;
-                            }
+                            startObjectAnimator();
+                            endAnimation.cancel();
+                            dotDraws.setAlpha();
                         },750);
+                    } else {
+                        customCyclesDone++;
+                        drawDots(0);
+                        modeOneTimerEnded = true;
+                        fadeCustomTimer = false;
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     }
-                    timerDisabled = false;
                     animateEnding();
                 }
             }.start();
@@ -1676,12 +1675,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakOnlyBegun = false;
                     timeLeft2.setText("0");
 
+                    animateEnding();
                     if (numberOfBreaksOnly>0) {
                         breaksOnlyProgressPause = maxProgress;
                         modeTwoTimerEnded = false;
 
-                        //stopAscent keeps our fades consistent. breakEnded is used for RESETTING and RESTARTING timer (separate clicks).
+                        //Disabling pause/resume clicks until animation finishes.
+                        boTimerDisabled = true;
+                        //Smooths out end fade.
+                        fadeVar = 3;
+                        mHandler.post(endFade);
+
                         mHandler.postDelayed(() -> {
+                            //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
+                            removeSetOrBreak(true);
+                            boTimerDisabled = false;
                             stopAscent = true;
                             breakEnded = true;
                             dotDraws.setAlpha();
@@ -1693,24 +1701,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         modeTwoTimerEnded = true;
                         fadeCustomTimer = false;
                     }
-                    boTimerDisabled = false;
-                    stopAscent = false;
-                    animateEnding();
-
-                    endFade2 = new Runnable() {
-                        @Override
-                        public void run() {
-                            drawDots(3);
-                            if (receivedAlpha<=100) stopAscent = true;
-
-                            if (stopAscent){
-                                removeSetOrBreak(true);
-                                mHandler.removeCallbacks(this);
-                            }
-                            if (!stopAscent) mHandler.postDelayed(this, 50);
-                        }
-                    };
-                    mHandler.post(endFade2);
 
                     overtime.setVisibility(View.VISIBLE);
                     ot = new Runnable() {
@@ -1766,14 +1756,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         pomMillis = pomMillis3;
                         break;
                 }
-                pomDotCounter++;
-                if (pomDotCounter <=8) {
-                    startObjectAnimator();
+
+                animateEnding();
+                if (pomDotCounter<=8) {
+                    //Disabling pause/resume clicks until animation finishes.
+                    pomTimerDisabled = true;
+                    //Smooths out end fade.
+                    fadeVar = 4;
+                    mHandler.post(endFade);
+
+                    mHandler.postDelayed(() ->{
+                        //Re-enabling timer clicks. Used regardless of numberOfBreaks.
+                        pomTimerDisabled = false;
+                        stopAscent = true;
+                        startObjectAnimator();
+                        pomDotCounter++;
+                    }, 750);
                 } else {
                     pomEnded = true;
                     pomDotCounter = 1;
                     pomCyclesDone +=1;
-                    animateEnding();
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 }
             }
@@ -1924,14 +1926,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (timer3!=null) timer3.cancel();
                     if (objectAnimator3!=null) objectAnimator3.cancel();
 
-                    if (pomDotCounter<8) {
+                    if (pomDotCounter<9) {
                         pomDotCounter++;
                         oldCycle3 = pomCyclesDone;
                         pomBegun = false;
                     }
                     if (pomDotCounter<8) setNewText(timePaused3, timePaused3,(newMillis(false) +999) / 1000);
 
-                    if (pomDotCounter==8) {
+                    if (pomDotCounter==9) {
                         timePaused3.setAlpha(0);
                         timeLeft3.setAlpha(1);
                         if (oldCycle3 == pomCyclesDone) {
@@ -1945,6 +1947,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused3.setText("0");
                         modeThreeTimerEnded = true;
                     }
+                    Log.i("pomCount", String.valueOf(pomDotCounter));
+
                     break;
             }
         }
@@ -3022,11 +3026,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             switch (mode) {
                 case 1:
                     if (!modeOneTimerEnded) {
-                        if (!stopAscent) {
-                            if (!onBreak)removeSetOrBreak(false); else removeSetOrBreak(true);
-                            mHandler.removeCallbacks(endFade);
-                            stopAscent = true;
-                        }
                         if (pausing == PAUSING_TIMER) {
                             String pausedTime = "";
                             timePaused.setAlpha(1);
@@ -3052,11 +3051,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
                 case 2:
                     if (!modeTwoTimerEnded) {
-                        if (!stopAscent) {
-                            removeSetOrBreak(true);
-                            mHandler.removeCallbacks(endFade2);
-                            stopAscent = true;
-                        }
                         if (pausing == PAUSING_TIMER) {
                             String pausedTime = "";
                             timePaused2.setAlpha(1);
@@ -3071,7 +3065,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timeLeft2.setAlpha(1);
                             breaksOnlyHalted = false;
                             startObjectAnimator();
-                            startBreakTimer();
                             reset.setVisibility(View.INVISIBLE);
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
