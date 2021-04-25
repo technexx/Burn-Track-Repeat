@@ -306,9 +306,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     ImageButton fab;
 
-    //Todo: Add skip to Pom.
+    //Todo: Fix Pom mode. Add/fix skip for Pom.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
+    //Todo: Add/Sub layout.
+    //Todo: Test all db stuff.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
     //Todo: Variable set only mode? Again, for TDEE.
@@ -1501,7 +1503,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 3:
                 if (!pomBegun) {
-                    pomMillis = newMillis(true);
+                    //Todo: Remove 5k and uncomment.
+//                    pomMillis = newMillis(true);
+                    pomMillis = 5000;
                     objectAnimator3 = ObjectAnimator.ofInt(progressBar3, "progress", (int) pomProgressPause, 0);
                     objectAnimator3.setInterpolator(new LinearInterpolator());
                     objectAnimator3.setDuration(pomMillis);
@@ -1624,7 +1628,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     mHandler.removeCallbacks(this);
                                 }
                                 if (!stopAscent) mHandler.postDelayed(this, 50);
-                                Log.i("testAlpha", "value is " + receivedAlpha);
                             }
                         };
                         mHandler.post(endFade);
@@ -1753,18 +1756,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 pomProgressPause = maxProgress;
 
                 switch (pomDotCounter) {
-                    case 1: case 3: case 5:
+                    case 1: case 3: case 5: case 7:
                         pomMillis = pomMillis1;
                         break;
                     case 2: case 4: case 6:
                         pomMillis = pomMillis2;
                         break;
-                    case 7:
+                    case 8:
                         pomMillis = pomMillis3;
                         break;
                 }
                 pomDotCounter++;
-                if (pomDotCounter <=7) {
+                if (pomDotCounter <=8) {
                     startObjectAnimator();
                 } else {
                     pomEnded = true;
@@ -1921,14 +1924,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (timer3!=null) timer3.cancel();
                     if (objectAnimator3!=null) objectAnimator3.cancel();
 
-                    if (pomDotCounter<7) {
+                    if (pomDotCounter<8) {
                         pomDotCounter++;
                         oldCycle3 = pomCyclesDone;
                         pomBegun = false;
                     }
-                    if (pomDotCounter<7) setNewText(timePaused3, timePaused3,(newMillis(false) +999) / 1000);
+                    if (pomDotCounter<8) setNewText(timePaused3, timePaused3,(newMillis(false) +999) / 1000);
 
-                    if (pomDotCounter==7) {
+                    if (pomDotCounter==8) {
                         timePaused3.setAlpha(0);
                         timeLeft3.setAlpha(1);
                         if (oldCycle3 == pomCyclesDone) {
@@ -1938,6 +1941,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (pomTimerEnded) animateEnding();
                         progressBar3.setProgress(0);
                         timeLeft3.setText("0");
+
                         timePaused3.setText("0");
                         pomTimerEnded = true;
                     }
@@ -2874,7 +2878,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
                 return breaksOnlyTime.get((int) (breaksOnlyTime.size()-numberOfBreaksOnly));
             case 3:
-                return pomValuesTime.get(pomDotCounter-1);
+                return pomValuesTime.get(pomDotCounter-1) * 1000 * 60;
             default: return 0;
         }
     }

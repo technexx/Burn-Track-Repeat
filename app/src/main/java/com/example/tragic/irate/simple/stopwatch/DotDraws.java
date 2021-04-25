@@ -123,7 +123,6 @@ public class DotDraws extends View {
             mPomTime.add(String.valueOf(pomTime.get(i)));
         }
         this.mPomDotCounter = pomDotCounter; this.mFadeDone = fadeDone;
-        Log.i("pomTest", "value is " + mPomDotCounter);
         setupPaint();
         invalidate();
     }
@@ -203,7 +202,6 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
-    //Todo: Set alpha @ 50 @ end of set/break.
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
@@ -258,18 +256,15 @@ public class DotDraws extends View {
                 mX = 92; mX2=mX+125;
                 encloseDots(mY-30, mY+150);
                 //Fading last object drawn. Setting previous ones to "greyed out"
-                for (int i=0; i<mPomDotCounter; i++) {
-                    if (i == mPomDotCounter-1) pomFill(i, true);
-                     else {
-                        mPaint.setAlpha(100);
-                        pomFill(i, false);
-                    }
-                    if (i+1 == mPomDotCounter) {
+                for (int i=0; i<8; i++) {
+                    if (mPomDotCounter - 1 == i) pomFill(i, true, 255);
+                    else if (i - mPomDotCounter <=-2){
+//                        mPaint.setAlpha(100);
+                        pomFill(i, false, 100);
+                    } else {
                         //Drawing all non-greyed objects.
-                        for (int j=mPomDotCounter; j<8; j++) {
-                            mPaint.setAlpha(255);
-                            pomFill(j, false);
-                        }
+//                        mPaint.setAlpha(255);
+                        pomFill(i, false, 255);
                     }
                 }
                 break;
@@ -287,18 +282,18 @@ public class DotDraws extends View {
         if (mMode==4) mCanvas.drawColor(Color.BLACK);
     }
 
-    public void pomFill(int i, boolean fade) {
+    public void pomFill(int i, boolean fade, int alpha) {
         switch (i) {
             case 0: case 2: case 4: case 6:
                 mPaint.setColor(Color.GREEN);
                 //Must be called AFTER color is changed, otherwise alpha will reset to 255.
-                if (fade && mFadeDone == 4) fadeDot();
+                if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
                 mCanvas.drawCircle(mX, 550, 60, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
                 break;
             case 1: case 3: case 5:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 4) fadeDot();
+                if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
                 mCanvas.drawCircle(mX2, 550, 45 , mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 mX+=250;
@@ -306,7 +301,7 @@ public class DotDraws extends View {
                 break;
             case 7:
                 mPaint.setColor(Color.RED);
-                if (fade && mFadeDone == 4) fadeDot();
+                if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
                 mCanvas.drawRect(mX+90, 495, mX+200, 605, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
         }
