@@ -258,14 +258,7 @@ public class DotDraws extends View {
                 //Fading last object drawn. Setting previous ones to "greyed out"
                 for (int i=0; i<8; i++) {
                     if (mPomDotCounter - 1 == i) pomFill(i, true, 255);
-                    else if (i - mPomDotCounter <=-2){
-//                        mPaint.setAlpha(100);
-                        pomFill(i, false, 100);
-                    } else {
-                        //Drawing all non-greyed objects.
-//                        mPaint.setAlpha(255);
-                        pomFill(i, false, 255);
-                    }
+                    else if (i - mPomDotCounter <=-2) pomFill(i, false, 100); else pomFill(i, false, 255);
                 }
                 break;
         }

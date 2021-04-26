@@ -309,7 +309,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int fadeVar;
     ImageButton fab;
 
-    //Todo: Test full skip/run of pom cycles. Add ascent runnable and end animation.
+    //Todo: breaksOnly crash.
+    //Todo: (1)End animation on pom doesn't cancel onClick at cycle end. (2)Extra cycling in mode 1. (3)Default greyed pom is slightly lower than ascent altered values.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
     //Todo: Add/Sub layout.
@@ -870,8 +871,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar3.setProgress(maxProgress);
 
         cycle_header_text.setText(retrievedTitle);
-        timePaused.getAlpha();
-        timeLeft.getAlpha();
+//        timePaused.getAlpha();
+//        timeLeft.getAlpha();
         tabViews();
         populateCycleUI();
 
@@ -887,9 +888,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if ((mode==1 && cyclesList.size()>0)  || (mode==2 && cyclesBOList.size()>0)) canSaveOrUpdate(false); else canSaveOrUpdate(true);
 
-        AsyncTask.execute(() -> {
-            cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-        });
+        AsyncTask.execute(() -> cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext()));
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -1478,18 +1477,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
                 if (!onBreak) {
                     if (!setBegun) {
+                        //Ensures each new dot fade begins @ full alpha.
+                        dotDraws.setAlpha();
                         if (numberOfSets>0) setMillis = newMillis(true);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
                         objectAnimator.setDuration(setMillis);
                         objectAnimator.start();
                         setBegun = true;
+                        modeOneTimerEnded = false;
                     } else {
                         setMillis = setMillisUntilFinished;
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 } else {
                     if (!breakBegun) {
+                        dotDraws.setAlpha();
                         if (numberOfBreaks>0) breakMillis = newMillis(false);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
@@ -1505,12 +1508,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 2:
                 if (!breakOnlyBegun) {
+                    dotDraws.setAlpha();
                     if (breaksOnlyTime.size()>0) breakOnlyMillis = newMillis(true);
                     objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) breaksOnlyProgressPause, 0);
                     objectAnimator2.setInterpolator(new LinearInterpolator());
                     objectAnimator2.setDuration(breakOnlyMillis);
                     objectAnimator2.start();
                     breakOnlyBegun = true;
+                    modeTwoTimerEnded = false;
                 } else {
                     breakOnlyMillis = breakOnlyMillisUntilFinished;
                     if (objectAnimator2!=null) objectAnimator2.resume();
@@ -1522,12 +1527,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     //Todo: Remove 5k and uncomment.
 //                    pomMillis = newMillis(true);
                     pomMillis = 5000;
+                    dotDraws.setAlpha();
                     objectAnimator3 = ObjectAnimator.ofInt(progressBar3, "progress", (int) pomProgressPause, 0);
                     objectAnimator3.setInterpolator(new LinearInterpolator());
                     objectAnimator3.setDuration(pomMillis);
                     objectAnimator3.start();
                     pomBegun = true;
                     activePomCycle = true;
+                    modeThreeTimerEnded = false;
                 } else {
                     pomMillis = pomMillisUntilFinished;
                     if (objectAnimator3!=null) objectAnimator3.resume();
@@ -1567,7 +1574,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timeLeft.setText("0");
                 customProgressPause = maxProgress;
 
-                modeOneTimerEnded = false;
                 fadeCustomTimer = false;
                 animateEnding();
 
@@ -1622,9 +1628,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakBegun = false;
                     timeLeft.setText("0");
 
+                    animateEnding();
                     if (numberOfBreaks >0) {
                         customProgressPause = maxProgress;
-                        modeOneTimerEnded = false;
                         //Disabling pause/resume clicks until animation finishes.
                         timerDisabled = true;
                         //Smooths out end fade.
@@ -1632,23 +1638,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         mHandler.post(endFade);
 
                         mHandler.postDelayed(() -> {
+                            //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
+                            //Must execute here for conditional below to work.
+                            removeSetOrBreak(true);
                             //Re-enabling timer clicks. Used regardless of numberOfBreaks.
                             timerDisabled = false;
-                            //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
-                            removeSetOrBreak(true);
                             stopAscent = true;
-                            startObjectAnimator();
-                            endAnimation.cancel();
-                            dotDraws.setAlpha();
+
+                            //If numberOfBreaks has not been reduced to 0 within this runnable, begin our next set. Otherwise, do end cycle stuff.
+                            if (numberOfBreaks!=0) {
+                                startObjectAnimator();
+                                endAnimation.cancel();
+                            } else {
+                                //Used to call resetTimer() in pause/resume method. Separate than our disable method.
+                                modeOneTimerEnded = true;
+                                customCyclesDone++;
+                                drawDots(0);
+                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+                            }
                         },750);
-                    } else {
-                        customCyclesDone++;
-                        drawDots(0);
-                        modeOneTimerEnded = true;
-                        fadeCustomTimer = false;
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     }
-                    animateEnding();
                 }
             }.start();
         } else if (mode==2) {
@@ -1678,8 +1687,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     animateEnding();
                     if (numberOfBreaksOnly>0) {
                         breaksOnlyProgressPause = maxProgress;
-                        modeTwoTimerEnded = false;
-
                         //Disabling pause/resume clicks until animation finishes.
                         boTimerDisabled = true;
                         //Smooths out end fade.
@@ -1688,19 +1695,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         mHandler.postDelayed(() -> {
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
+                            //Must execute here for conditional below to work.
                             removeSetOrBreak(true);
                             boTimerDisabled = false;
                             stopAscent = true;
-                            breakEnded = true;
-                            dotDraws.setAlpha();
+
+                            //If numberOfBreaksOnly has been reduced to 0 in this runnable, do end cycle stuff. Since we are pausing between breaks in this mode anyway, we are doing less than the set/break combos.
+                            if (numberOfBreaksOnly==0){
+                                //Used to call resetTimer() in pause/resume method. Separate than our disable method.
+                                modeTwoTimerEnded = true;
+                                breaksOnlyCyclesDone++;
+                                cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
+                                drawDots(0);
+                                modeTwoTimerEnded = true;
+                                fadeCustomTimer = false;
+                            }
                         },750);
-                    } else {
-                        breaksOnlyCyclesDone++;
-                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                        drawDots(0);
-                        modeTwoTimerEnded = true;
-                        fadeCustomTimer = false;
-                    }
+                    };
 
                     overtime.setVisibility(View.VISIBLE);
                     ot = new Runnable() {
@@ -1758,19 +1769,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
 
                 animateEnding();
-                if (pomDotCounter<=8) {
+                if (pomDotCounter<8) {
                     //Disabling pause/resume clicks until animation finishes.
                     pomTimerDisabled = true;
                     //Smooths out end fade.
                     fadeVar = 4;
                     mHandler.post(endFade);
 
+                    //Todo: For all modes, need disabled on TRUE if at last round, so that pause/resume can call reset().
                     mHandler.postDelayed(() ->{
+                        //Counter must increase here for conditional below to work.
+                        pomDotCounter++;
                         //Re-enabling timer clicks. Used regardless of numberOfBreaks.
-                        pomTimerDisabled = false;
+                        if (pomDotCounter==8) pomTimerDisabled = false; else pomTimerDisabled = true;
                         stopAscent = true;
                         startObjectAnimator();
-                        pomDotCounter++;
+                        endAnimation.cancel();
                     }, 750);
                 } else {
                     pomEnded = true;
@@ -1931,7 +1945,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         oldCycle3 = pomCyclesDone;
                         pomBegun = false;
                     }
-                    if (pomDotCounter<8) setNewText(timePaused3, timePaused3,(newMillis(false) +999) / 1000);
+                    if (pomDotCounter<9) setNewText(timePaused3, timePaused3,(newMillis(false) +999) / 1000);
 
                     if (pomDotCounter==9) {
                         timePaused3.setAlpha(0);
@@ -1940,10 +1954,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             pomCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                         }
-                        if (modeThreeTimerEnded) animateEnding();
+                        if (!modeThreeTimerEnded) animateEnding();
                         progressBar3.setProgress(0);
                         timeLeft3.setText("0");
-
                         timePaused3.setText("0");
                         modeThreeTimerEnded = true;
                     }
@@ -3009,13 +3022,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void pauseAndResumeTimer(int pausing) {
         if (emptyCycle) {
-            Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show(); return;
+            Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        //Disables pause/resume if <500 ms left.
         if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
             timerDisabled = true;
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
 
+        //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3)) {
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
@@ -3238,8 +3254,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 3:
                 timePaused3.setAlpha(1);
-                modeThreeTimerEnded = false;
+                pomDotCounter = 1;
                 progressBar3.setProgress(10000);
+                modeThreeTimerEnded = false;
                 pomBegun = false;
                 pomProgressPause = maxProgress;
                 pomHalted = true;
