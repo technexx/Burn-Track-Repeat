@@ -203,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean modeTwoTimerEnded;
     boolean modeThreeTimerEnded;
     boolean onBreak;
-    boolean pomEnded;
     boolean emptyCycle;
     boolean timerDisabled;
     boolean boTimerDisabled;
@@ -304,7 +303,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int fadeVar;
     ImageButton fab;
 
-    //Todo: (1)End animation on pom doesn't cancel onClick at cycle end.
     // Todo: Default greyed pom is slightly lower than ascent altered values.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
@@ -1538,8 +1536,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!pomBegun) {
                     //Ensures any features meant for running timer cannot be executed here.
                     pomHalted = false;
-                    pomMillis = newMillis(true);
-//                    pomMillis = 5000; (Testing)
+//                    pomMillis = newMillis(true);
+                    pomMillis = 5000;
                     dotDraws.setAlpha();
                     objectAnimator3 = ObjectAnimator.ofInt(progressBar3, "progress", (int) pomProgressPause, 0);
                     objectAnimator3.setInterpolator(new LinearInterpolator());
@@ -1628,6 +1626,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     if (customAlpha >=1) fadeCustomTimer = false;
 
+                    //Prevents overlap once timer has begin, since conditional only needs to be true to start the series of ticks.
                     if (mode==1) {
                         timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
                         drawDots(2);
@@ -1689,8 +1688,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         else timeLeft2.setAlpha(customAlpha+=.12);
                     }
                     if (customAlpha >=1) fadeCustomTimer = false;
-                    timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
-                    drawDots(3);
+
+                    if (mode==2) {
+                        timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
+                        drawDots(3);
+                    }
                 }
 
                 @Override
@@ -1787,7 +1789,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
 
                 animateEnding();
-                if (pomDotCounter<8) {
+                if (pomDotCounter<9) {
+                    //Ensures any features meant for a running timer cannot be executed here.
+                    customHalted = true;
                     //Disabling pause/resume clicks until animation finishes.
                     pomTimerDisabled = true;
                     //Smooths out end fade.
@@ -1797,17 +1801,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     mHandler.postDelayed(() ->{
                         //Counter must increase here for conditional below to work.
                         pomDotCounter++;
-                        //Re-enabling timer clicks. Used regardless of numberOfBreaks.
-                        if (pomDotCounter==8) pomTimerDisabled = false; else pomTimerDisabled = true;
+                        //Re-enabling timer clicks. Used regardless of number of rounds left.
+                        pomTimerDisabled = false;
                         stopAscent = true;
-                        startObjectAnimator();
-                        endAnimation.cancel();
+
+                        if (pomDotCounter!=9) {
+                            startObjectAnimator();
+                            endAnimation.cancel();
+                        } else {
+                            modeThreeTimerEnded = true;
+                            pomCyclesDone +=1;
+                            drawDots(0);
+                            cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
+                        }
                     }, 750);
-                } else {
-                    pomEnded = true;
-                    pomDotCounter = 1;
-                    pomCyclesDone +=1;
-                    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                 }
             }
         }.start();
@@ -1986,7 +1993,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(0);
     }
 
-    //Todo: Unless we set halted to true at end of timers, this will likely start in instance of objectAnimator if switching from a "round completed" tab to another.
     public void switchTimer(int mode, boolean halted) {
         removeViews();
         tabViews();
@@ -3133,7 +3139,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                     } else {
                         resetTimer();
-                        if (endAnimation != null) endAnimation.cancel();
                         reset.setVisibility(View.INVISIBLE);
                     }
                     break;
@@ -3299,7 +3304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
-        //Todo: We do want separate ones in case multiple are running at once.
+        //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all.
         if (endAnimation!=null) endAnimation.cancel();
     }
 }
