@@ -159,21 +159,18 @@ public class DotDraws extends View {
     }
 
     public void selectCycle(int posX, int posY, int size) {
+        int base = 140;
         mPosX = posX; mPosY = posY; mListSize = size;
         if (posY >= 810 && posY <= 1000) {
-            if (posX <= 110) currentPos = 0;
-            if (posX > 110 && posX <= 220 && mListSize >= 2) currentPos = 1;
-            if (posX > 220 && posX <= 330 && mListSize >= 3) currentPos = 2;
-            if (posX > 330 && posX <= 440 && mListSize >= 4) currentPos = 3;
-            if (posX > 440 && posX <= 550 && mListSize >= 5) currentPos = 4;
-            if (posX > 550 && posX <= 660 && mListSize >= 6) currentPos = 5;
-            if (posX > 660 && posX <= 770 && mListSize >= 7) currentPos = 6;
-            if (posX > 770 && posX <= 880 && mListSize >= 8) currentPos = 7;
-            if (posX > 880 && posX <= 990 && mListSize >= 9) currentPos = 8;
-            if (posX > 990 && mListSize >= 10) currentPos = 9;
-            if (previousPos != currentPos) {
-                mDrawBox = true;
-            }
+            if (posX <= base) currentPos = 0;
+            if (posX > base && posX <= base*2 && mListSize >= 2) currentPos = 1;
+            if (posX > base*2 && posX <= base*3 && mListSize >= 3) currentPos = 2;
+            if (posX > base*3 && posX <= base*4 && mListSize >= 4) currentPos = 3;
+            if (posX > base*4 && posX <= base*5 && mListSize >= 5) currentPos = 4;
+            if (posX > base*5 && posX <= base*6 && mListSize >= 6) currentPos = 5;
+            if (posX > base*6 && posX <= base*7 && mListSize >= 7) currentPos = 6;
+            if (posX > base*7 && posX <= base*8 && mListSize >= 8) currentPos = 7;
+            if (previousPos != currentPos) mDrawBox = true;
             else {
                 mDrawBox = false;
                 currentPos = -1;
@@ -264,9 +261,17 @@ public class DotDraws extends View {
         }
 
         if (mDrawBox) {
-            selectionPaint();
+            int start = 10 + (currentPos*133);
+            int end = 145 + (currentPos*132);
+            if (currentPos>3) {
+                start = start - (currentPos/2);
+                end = end - (currentPos/2);
+            }
+            mPaintBox.setColor(Color.WHITE);
+            mPaintBox.setStyle(Paint.Style.STROKE);
+            mPaintBox.setStrokeWidth(8);
             if (mListSize>0 && currentPos>=0) {
-                mCanvas.drawRect((100*currentPos) +(8*currentPos) + 10, 425, (100*currentPos)+ 100 + (8*currentPos) + 10, 685, mPaint);
+                mCanvas.drawRect(start, 425, end, 685, mPaintBox);
                 previousPos = currentPos;
                 currentPos = -1;
             }

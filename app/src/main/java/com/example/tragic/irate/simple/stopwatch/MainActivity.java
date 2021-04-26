@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int fadeVar;
     ImageButton fab;
 
-    // Todo: Default greyed pom is slightly lower than ascent altered values.
+    //Todo: Default greyed pom is slightly lower than ascent altered values.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
     //Todo: Add/Sub layout.
@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Selects a set/break combo to move.
         if (mode==1) {
             if (event.getAction()==MotionEvent.ACTION_DOWN) {
-                dotDraws.selectCycle(x, y, customSetTime.size());
+                dotDraws.selectCycle(x, y, (int) numberOfSets);
             }
         }
 
