@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int RESTARTING_TIMER = 4;
     int SAVING_CYCLES = 1;
     int UPDATING_CYCLES = 2;
+    int movingBOCycle;
 
     long setMillis;
     long breakMillis;
@@ -160,8 +161,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Runnable changeThirdValue;
     Runnable valueSpeed;
     Runnable endFade;
-    Runnable endFade2;
-    Runnable endFade3;
     Runnable ot;
 
     long pomMillis1;
@@ -237,9 +236,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean breakBegun;
     boolean breakOnlyBegun;
     boolean pomBegun;
-    boolean breaksOnly;
-    boolean breakEnded;
-    boolean newBreak;
 
     PopupWindow sortPopupWindow;
     PopupWindow savedCyclePopupWindow;
@@ -248,7 +244,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     PopupWindow editCyclesPopupWindow;
 
     boolean fadeCustomTimer;
-    boolean fadePomTimer;
     float customAlpha;
     float pomAlpha;
     ObjectAnimator fadeInObj;
@@ -309,8 +304,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int fadeVar;
     ImageButton fab;
 
-    //Todo: breaksOnly crash.
-    //Todo: (1)End animation on pom doesn't cancel onClick at cycle end. (2)Extra cycling in mode 1. (3)Default greyed pom is slightly lower than ascent altered values.
+    //Todo: (1)End animation on pom doesn't cancel onClick at cycle end.
+    // Todo: Default greyed pom is slightly lower than ascent altered values.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
     //Todo: Add/Sub layout.
@@ -1354,9 +1349,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (!customHalted) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
                     break;
                 case 2:
-                    if (!breakEnded) {
-                        if ((!breaksOnlyHalted)) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
-                    } else if (!newBreak) pauseAndResumeTimer(RESETTING_TIMER); else pauseAndResumeTimer(RESTARTING_TIMER);
+                    if (!breaksOnlyHalted) pauseAndResumeTimer(PAUSING_TIMER); else {
+                        switch (movingBOCycle) {
+                            case 0:
+                                pauseAndResumeTimer(RESUMING_TIMER);
+                                break;
+                            case 1:
+                                pauseAndResumeTimer(RESETTING_TIMER); movingBOCycle++;
+                                break;
+                            case 2:
+                                pauseAndResumeTimer(RESTARTING_TIMER);
+                                movingBOCycle = 0;
+                                break;
+                        }
+                    }
                     break;
                 case 3:
                     if (!pomHalted) pauseAndResumeTimer(PAUSING_TIMER);
@@ -1477,6 +1483,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
                 if (!onBreak) {
                     if (!setBegun) {
+                        //Ensures any features meant for running timer cannot be executed here.
+                        customHalted = false;
                         //Ensures each new dot fade begins @ full alpha.
                         dotDraws.setAlpha();
                         if (numberOfSets>0) setMillis = newMillis(true);
@@ -1492,6 +1500,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                 } else {
                     if (!breakBegun) {
+                        //Ensures any features meant for running timer cannot be executed here.
+                        customHalted = false;
                         dotDraws.setAlpha();
                         if (numberOfBreaks>0) breakMillis = newMillis(false);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
@@ -1508,6 +1518,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 2:
                 if (!breakOnlyBegun) {
+                    //Ensures any features meant for running timer cannot be executed here.
+                    breaksOnlyHalted = false;
                     dotDraws.setAlpha();
                     if (breaksOnlyTime.size()>0) breakOnlyMillis = newMillis(true);
                     objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) breaksOnlyProgressPause, 0);
@@ -1524,9 +1536,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 3:
                 if (!pomBegun) {
-                    //Todo: Remove 5k and uncomment.
-//                    pomMillis = newMillis(true);
-                    pomMillis = 5000;
+                    //Ensures any features meant for running timer cannot be executed here.
+                    pomHalted = false;
+                    pomMillis = newMillis(true);
+//                    pomMillis = 5000; (Testing)
                     dotDraws.setAlpha();
                     objectAnimator3 = ObjectAnimator.ofInt(progressBar3, "progress", (int) pomProgressPause, 0);
                     objectAnimator3.setInterpolator(new LinearInterpolator());
@@ -1552,6 +1565,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 customProgressPause = (int) objectAnimator.getAnimatedValue();
                 setMillis = millisUntilFinished;
 
+                //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
                 if (fadeCustomTimer) {
                     if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
                     else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
@@ -1567,14 +1581,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             @Override
             public void onFinish() {
+                //Ensures any features meant for a running timer cannot be executed here.
+                customHalted = true;
                 //Used in startObjectAnimator, and dictates if we are on a set or break.
                 onBreak = true;
                 //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
                 setBegun = false;
                 timeLeft.setText("0");
                 customProgressPause = maxProgress;
-
-                fadeCustomTimer = false;
                 animateEnding();
 
                 //Disabling pause/resume clicks until animation finishes.
@@ -1622,6 +1636,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 @Override
                 public void onFinish() {
+                    //Ensures any features meant for a running timer cannot be executed here.
+                    customHalted = true;
                     //Used in startObjectAnimator, and dictates if we are on a set or break.
                     onBreak = false;
                     //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
@@ -1673,14 +1689,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         else timeLeft2.setAlpha(customAlpha+=.12);
                     }
                     if (customAlpha >=1) fadeCustomTimer = false;
-                    if (mode==2) {
-                        timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
-                        drawDots(3);
-                    }
+                    timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
+                    drawDots(3);
                 }
 
                 @Override
                 public void onFinish() {
+                    //Ensures any features meant for a running timer cannot be executed here.
+                    breaksOnlyHalted = true;
                     breakOnlyBegun = false;
                     timeLeft2.setText("0");
 
@@ -1692,6 +1708,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         //Smooths out end fade.
                         fadeVar = 3;
                         mHandler.post(endFade);
+                        //Activates RESETTING_TIMER in pauseAndResume. Var gets set to 2 on next click in pauseAndResume, and then resets to 0.
+                        movingBOCycle=1;
 
                         mHandler.postDelayed(() -> {
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
@@ -1707,8 +1725,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 breaksOnlyCyclesDone++;
                                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                                 drawDots(0);
-                                modeTwoTimerEnded = true;
-                                fadeCustomTimer = false;
                             }
                         },750);
                     };
@@ -1736,13 +1752,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 pomProgressPause = (int) objectAnimator3.getAnimatedValue();
                 pomMillis = millisUntilFinished;
 
-                if (fadePomTimer) {
+                if (fadeCustomTimer) {
                     if (pomAlpha<0.25) timeLeft3.setAlpha(pomAlpha+=0.04);
                     else if (pomAlpha<0.5) timeLeft3.setAlpha(pomAlpha+=.08);
                     else if (pomAlpha<1) timeLeft3.setAlpha(pomAlpha+=.12);
-                    else if (pomAlpha>=1) fadePomTimer = false;
+                    else if (pomAlpha>=1) fadeCustomTimer = false;
                 }
-                if (pomAlpha >=1) fadePomTimer = false;
+                if (pomAlpha >=1) fadeCustomTimer = false;
 
                 if (mode==3) {
                     timeLeft3.setText(convertSeconds((pomMillis+999)/1000));
@@ -1752,6 +1768,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             @Override
             public void onFinish() {
+                //Ensures any features meant for a running timer cannot be executed here.
+                pomHalted = true;
                 pomBegun = false;
                 timeLeft3.setText("0");
                 pomProgressPause = maxProgress;
@@ -1776,7 +1794,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     fadeVar = 4;
                     mHandler.post(endFade);
 
-                    //Todo: For all modes, need disabled on TRUE if at last round, so that pause/resume can call reset().
                     mHandler.postDelayed(() ->{
                         //Counter must increase here for conditional below to work.
                         pomDotCounter++;
@@ -1969,6 +1986,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(0);
     }
 
+    //Todo: Unless we set halted to true at end of timers, this will likely start in instance of objectAnimator if switching from a "round completed" tab to another.
     public void switchTimer(int mode, boolean halted) {
         removeViews();
         tabViews();
@@ -2020,7 +2038,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     setNewText(lastTextView, timePaused3, (pomMillis + 999)/1000);
                 } else {
                     pomAlpha = 0;
-                    fadePomTimer = true;
+                    fadeCustomTimer = true;
                     startObjectAnimator();
                     setNewText(lastTextView, timeLeft3, (pomMillis + 999)/1000);
                 }
@@ -2688,10 +2706,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 2:
                 numberOfBreaksOnly--;
-                if (breaksOnlyTime.size() > 0) {
-                    breaksOnlyTime.remove(0);
-                    breakOnlyMillis = breaksOnlyTime.get(0);
-                }
+                if (breaksOnlyTime.size() > 0) breakOnlyMillis = breaksOnlyTime.get(0);
                 break;
         }
         drawDots(0);
@@ -3090,13 +3105,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             progressBar2.setProgress(10000);
                             timePaused2.setAlpha(1.0f);
                             timePaused2.setText(convertSeconds(((breaksOnlyTime.get(0) + 999)) / 1000));
-                            newBreak = true;
                         } else if (pausing == RESTARTING_TIMER) {
-                            breakEnded = false;
-                            newBreak = false;
                             startObjectAnimator();
-                            timerDisabled = false;
-                            fadeCustomTimer = false;
+                            boTimerDisabled = false;
                             timePaused2.setAlpha(0f);
                             timeLeft2.setAlpha(1.0f);
                         }
@@ -3118,7 +3129,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timeLeft3.setAlpha(1);
                             pomHalted = false;
                             startObjectAnimator();
-//                            startPomTimer();
                             reset.setVisibility(View.INVISIBLE);
                         }
                     } else {
