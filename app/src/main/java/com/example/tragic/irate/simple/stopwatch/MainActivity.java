@@ -303,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int fadeVar;
     ImageButton fab;
 
+    //Todo: Tab switching errors. Have reset visible on any given tab if (a) timer is active or (b) skip has greyed out one or more rounds.
     //Todo: Default greyed pom is slightly lower than ascent altered values.
     //Todo: Modify boxes for increased dot size.
     //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
@@ -361,11 +362,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int x = (int) event.getX();
         int y = (int) event.getY();
 
-        //Todo: For Mode 2.
-        //Selects a set/break combo to move.
-        if (mode==1) {
-            if (event.getAction()==MotionEvent.ACTION_DOWN) {
-                dotDraws.selectCycle(x, y, (int) numberOfSets);
+        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+            switch (mode) {
+                case 1:
+                    dotDraws.selectCycle(x, y, (int) numberOfSets); break;
+                case 2:
+                    dotDraws.selectCycle(x, y, (int) numberOfBreaksOnly); break;
+                case 3:
+                    dotDraws.selectCycle(x, y, (int) 8); break;
+
             }
         }
 
@@ -417,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     @Override
     public void onCycleClick(int position) {
-        setCycle(position, true);
+        selectRound(position, true);
     }
 
     @Override
@@ -1282,7 +1287,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
             receivedPos -=1;
-            dotDraws.setCycle(receivedPos);
+            dotDraws.selectRound(receivedPos);
             drawDots(0);
         });
 
@@ -1308,7 +1313,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             drawDots(0);
             receivedPos +=1;
-            dotDraws.setCycle(receivedPos);
+            dotDraws.selectRound(receivedPos);
         });
 
         add_cycle.setOnClickListener(v-> {
@@ -1865,7 +1870,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                     //Used w/ arrows to switch set/break places.
                     if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
-                    if (receivedPos >=0) dotDraws.setCycle(receivedPos);
+                    if (receivedPos >=0) dotDraws.selectRound(receivedPos);
                     canSaveOrUpdate(true);
                     break;
                 case 2:
@@ -1873,7 +1878,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
                         //Used w/ arrows to switch  break places.
                         if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
-                        if (receivedPos >=0) dotDraws.setCycle(receivedPos);
+                        if (receivedPos >=0) dotDraws.selectRound(receivedPos);
                         canSaveOrUpdate(true);
                     } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                     break;
@@ -2399,7 +2404,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         AsyncTask.execute(() -> {
-            //Defaulting to unique cycle unless otherwise set by retrieveAndSetCycles();
+            //Defaulting to unique cycle unless otherwise set by retrieveAndselectRounds();
             duplicateCycle = false;
             boolean changeCycle = false;
             Calendar calendar = Calendar.getInstance();
@@ -2512,7 +2517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Used to retrieve a single cycle within our database. Calls populateUICycle() which sets the Array values into our timer millis values.
     //When recall is TRUE, retrieves the last used ID instance, when recall is FALSE, Uses a positional input from our saved cycle list.
-    public void setCycle(int position, boolean recall) {
+    public void selectRound(int position, boolean recall) {
         AsyncTask.execute(() -> {
             int posHolder = position;
             switch (mode) {

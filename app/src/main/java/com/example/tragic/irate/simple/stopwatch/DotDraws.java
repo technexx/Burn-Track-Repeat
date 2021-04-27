@@ -101,12 +101,6 @@ public class DotDraws extends View {
         mPaintBox.setStrokeWidth(6);
     }
 
-    public void selectionPaint() {
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(3);
-        mPaint.setColor(Color.GRAY);
-    }
-
     public void customDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
         this.mSetCount = setCount; this.mBreakCount = breakCount; this.mSetReduce = setReduce; this.mBreakReduce = breakReduce; this.mFadeDone = fadeDone;
         invalidate();
@@ -159,9 +153,15 @@ public class DotDraws extends View {
     }
 
     public void selectCycle(int posX, int posY, int size) {
-        int base = 140;
+        int base = 0;
+        switch (mMode) {
+            case 1:
+                base = 140; break;
+            case 2:
+                base = 132; break;
+        }
         mPosX = posX; mPosY = posY; mListSize = size;
-        if (posY >= 810 && posY <= 1000) {
+        if (posY >= 750 && posY <= 1050) {
             if (posX <= base) currentPos = 0;
             if (posX > base && posX <= base*2 && mListSize >= 2) currentPos = 1;
             if (posX > base*2 && posX <= base*3 && mListSize >= 3) currentPos = 2;
@@ -185,7 +185,7 @@ public class DotDraws extends View {
         invalidate();
     }
 
-    public void setCycle(int pos) {
+    public void selectRound(int pos) {
         mDrawBox = true;
         currentPos = pos;
     }
@@ -261,17 +261,33 @@ public class DotDraws extends View {
         }
 
         if (mDrawBox) {
-            int start = 10 + (currentPos*133);
-            int end = 145 + (currentPos*132);
-            if (currentPos>3) {
-                start = start - (currentPos/2);
-                end = end - (currentPos/2);
+            int start = 0;
+            int end = 0;
+            int top = 0;
+            int bottom = 0;
+            switch (mMode) {
+                case 1:
+                    start = 10 + (currentPos*133); end = 145 + (currentPos*132); top = 425; bottom = 685;
+                    if (currentPos>3) {
+                        start = start - (currentPos/2);
+                        end = end - (currentPos/2);
+                    }
+                    break;
+                case 2:
+                    start = 10 + (currentPos*135); end = 140 + (currentPos*135); top = 460; bottom = 650;
+                    if (currentPos>1) {
+                        start = start - (currentPos*3);
+                        end = end - (currentPos*3);
+                    }
+                    break;
+                case 3:
+
             }
             mPaintBox.setColor(Color.WHITE);
             mPaintBox.setStyle(Paint.Style.STROKE);
             mPaintBox.setStrokeWidth(8);
             if (mListSize>0 && currentPos>=0) {
-                mCanvas.drawRect(start, 425, end, 685, mPaintBox);
+                mCanvas.drawRect(start, top, end, bottom, mPaintBox);
                 previousPos = currentPos;
                 currentPos = -1;
             }
