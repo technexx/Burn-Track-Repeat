@@ -303,11 +303,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int fadeVar;
     ImageButton fab;
 
-    //Todo: Tab switching errors. Have reset visible on any given tab if (a) timer is active or (b) skip has greyed out one or more rounds.
-    //Todo: Default greyed pom is slightly lower than ascent altered values.
-    //Todo: Modify boxes for increased dot size.
-    //Todo: "Reset" -> "Confirm Reset" does not go back to "Reset" if resuming timer. For reset cycles AND reset timer.
     //Todo: Add/Sub layout.
+    //Todo: Move round (arrows) layout.
     //Todo: Test all db stuff.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
@@ -1422,12 +1419,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         reset.setOnClickListener(v -> {
-            if (mode!=3) {
-                resetTimer();
-            } else {
-                if (reset.getText().equals(getString(R.string.reset))) {
-                    reset.setText(R.string.confirm_cycle_reset);
-                } else {
+            if (mode!=3) resetTimer(); else {
+                if (reset.getText().equals(getString(R.string.reset))) reset.setText(R.string.confirm_cycle_reset);
+                 else {
                     reset.setText(R.string.reset);
                     resetTimer();
                 }
@@ -2002,8 +1996,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void switchTimer(int mode, boolean halted) {
-        removeViews();
-        tabViews();
+        //Sets views for respective tab each time one is switched.
+        removeViews(); tabViews();
+        //If a given timer is halted, sets the reset button to visible.
+        if (halted) reset.setVisibility(View.VISIBLE);
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -3052,9 +3048,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void pauseAndResumeTimer(int pausing) {
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+            return; }
         //Disables pause/resume if <500 ms left.
         if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
             timerDisabled = true;
@@ -3097,6 +3091,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
                 case 2:
                     if (!modeTwoTimerEnded) {
+                        reset.setVisibility(View.INVISIBLE);
                         if (pausing == PAUSING_TIMER) {
                             String pausedTime = "";
                             timePaused2.setAlpha(1);
@@ -3112,7 +3107,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyHalted = false;
                             startObjectAnimator();
                             startBreakTimer();
-                            reset.setVisibility(View.INVISIBLE);
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
                             mHandler.removeCallbacks(ot);
@@ -3130,6 +3124,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else resetTimer();
                     break;
                 case 3:
+                    if (reset.getText().equals(getString(R.string.confirm_cycle_reset))) reset.setText(R.string.reset);
                     if (!modeThreeTimerEnded) {
                         if (pausing == PAUSING_TIMER) {
                             timePaused3.setAlpha(1);
@@ -3148,10 +3143,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             startPomTimer();
                             reset.setVisibility(View.INVISIBLE);
                         }
-                    } else {
-                        resetTimer();
-                        reset.setVisibility(View.INVISIBLE);
-                    }
+                    } else resetTimer();
                     break;
                 case 4:
                     DecimalFormat df2 = new DecimalFormat("00");
@@ -3315,6 +3307,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
+        reset.setVisibility(View.INVISIBLE);
         //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all.
         if (endAnimation!=null) endAnimation.cancel();
     }
