@@ -1517,7 +1517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 }
-                if (!onBreak) startSetTimer(); else startBreakTimer();
+//                if (!onBreak) startSetTimer(); else startBreakTimer();
                 break;
             case 2:
                 if (!breakOnlyBegun) {
@@ -1535,7 +1535,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakOnlyMillis = breakOnlyMillisUntilFinished;
                     if (objectAnimator2!=null) objectAnimator2.resume();
                 }
-                startBreakTimer();
+//                startBreakTimer();
                 break;
             case 3:
                 if (!pomBegun) {
@@ -1555,7 +1555,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     pomMillis = pomMillisUntilFinished;
                     if (objectAnimator3!=null) objectAnimator3.resume();
                 }
-                startPomTimer();
+//                startPomTimer();
                 break;
         }
     }
@@ -1611,6 +1611,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     endAnimation.cancel();
                     dotDraws.setAlpha();
                     startObjectAnimator();
+                    startBreakTimer();
                 },750);
             }
         }.start();
@@ -1668,6 +1669,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //If numberOfBreaks has not been reduced to 0 within this runnable, begin our next set. Otherwise, do end cycle stuff.
                             if (numberOfBreaks!=0) {
                                 startObjectAnimator();
+                                startSetTimer();
                                 endAnimation.cancel();
                             } else {
                                 //Used to call resetTimer() in pause/resume method. Separate than our disable method.
@@ -1812,6 +1814,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                         if (pomDotCounter!=9) {
                             startObjectAnimator();
+                            startPomTimer();
                             endAnimation.cancel();
                         } else {
                             modeThreeTimerEnded = true;
@@ -3086,6 +3089,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else if (pausing == RESUMING_TIMER) {
                             customHalted = false;
                             startObjectAnimator();
+                            if (!onBreak) startSetTimer(); else startBreakTimer();
                             timeLeft.setAlpha(1);
                             reset.setVisibility(View.INVISIBLE);
                         }
@@ -3107,6 +3111,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timeLeft2.setAlpha(1);
                             breaksOnlyHalted = false;
                             startObjectAnimator();
+                            startBreakTimer();
                             reset.setVisibility(View.INVISIBLE);
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
@@ -3140,6 +3145,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timeLeft3.setAlpha(1);
                             pomHalted = false;
                             startObjectAnimator();
+                            startPomTimer();
                             reset.setVisibility(View.INVISIBLE);
                         }
                     } else {

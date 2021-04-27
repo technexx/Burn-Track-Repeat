@@ -318,6 +318,7 @@ public class DotDraws extends View {
                 if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
                 mCanvas.drawRect(mX+90, 495, mX+200, 605, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
+                break;
         }
     }
 
@@ -365,6 +366,7 @@ public class DotDraws extends View {
                     break;
                 case 7:
                     mCanvas.drawText(list.get(i), x-23, y+87, mPaintText);
+                    break;
             }
         }
     }
