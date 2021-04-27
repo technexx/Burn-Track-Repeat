@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="25dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginBottom="2dp"
         android:textSize="24sp"
         android:textColor="@color/white"/>
 
@@ -282,7 +282,6 @@
         app:layout_constraintEnd_toStartOf="@id/minus_third_value"
         app:layout_constraintTop_toTopOf="@id/plus_third_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
-        android:layout_marginTop="6dp"
         android:textSize="25sp">
     </TextView>
 

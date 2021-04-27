@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -302,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     int fadeVar;
     ImageButton fab;
+    ConstraintLayout.LayoutParams lp;
 
     //Todo: Add/Sub layout.
     //Todo: Move round (arrows) layout.
@@ -762,6 +764,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
         mHandler = new Handler();
+        lp = (ConstraintLayout.LayoutParams) s2.getLayoutParams();
 
         delete_sb.setVisibility(View.INVISIBLE);
         progressBar2.setVisibility(View.GONE);
@@ -952,9 +955,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         fab.setOnClickListener(v-> {
-            if (mode==1) {
-                if (mode==1) editCyclesPopupWindow.setHeight(380); else editCyclesPopupWindow.setHeight(275);
-            } else editCyclesPopupWindow.setHeight(455);
+            switch (mode) {
+                case 1:
+                    editCyclesPopupWindow.setHeight(365); break;
+                case 2:
+                    editCyclesPopupWindow.setHeight(255); break;
+                case 3:
+                    editCyclesPopupWindow.setHeight(460); break;
+            }
             editCyclesPopupWindow.showAsDropDown((View) tabLayout);
         });
 
@@ -1986,8 +1994,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused3.setText("0");
                         modeThreeTimerEnded = true;
                     }
-                    Log.i("pomCount", String.valueOf(pomDotCounter));
-
                     break;
             }
         }
@@ -2959,8 +2965,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     progressBar.setVisibility(View.INVISIBLE);
                     progressBar2.setVisibility(View.VISIBLE);
                     first_value_textView.setVisibility(View.GONE);
-                    plus_first_value.setVisibility(View.INVISIBLE);
-                    minus_first_value.setVisibility(View.INVISIBLE);
+                    plus_first_value.setVisibility(View.GONE);
+                    minus_first_value.setVisibility(View.GONE);
                     s1.setVisibility(View.GONE);
                     second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                     second_value_textView.setVisibility(View.VISIBLE);
