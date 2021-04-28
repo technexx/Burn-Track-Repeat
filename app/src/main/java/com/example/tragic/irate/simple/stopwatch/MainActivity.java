@@ -303,9 +303,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     int fadeVar;
     ImageButton fab;
+    ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
-    //Todo: Add/Sub layout.
     //Todo: Move round (arrows) layout.
     //Todo: Test all db stuff.
 
@@ -341,16 +341,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     @Override
     public void sendPos(int pos) {
-        if (mode==1) {
+        if (mode==1 || mode==2) {
             receivedPos = pos;
             if (pos <=0) {
                 left_arrow.setVisibility(View.INVISIBLE);
                 right_arrow.setVisibility(View.INVISIBLE);
                 delete_sb.setVisibility(View.INVISIBLE);
+                circle_reset.setVisibility(View.INVISIBLE);
+                fab.setVisibility(View.VISIBLE);
             } else {
                 left_arrow.setVisibility(View.VISIBLE);
                 right_arrow.setVisibility(View.VISIBLE);
                 delete_sb.setVisibility(View.VISIBLE);
+
             }
         }
     }
@@ -700,6 +703,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         right_arrow = findViewById(R.id.right_arrow);
         delete_sb = findViewById(R.id.delete_set_break);
         fab = findViewById(R.id.fab);
+        circle_reset = findViewById(R.id.circle_reset);
 
         save_cycles = findViewById(R.id.save_cycles);
         update_cycles = findViewById(R.id.update_cycles);
@@ -737,6 +741,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setVisibility(View.GONE);
         second_value_single_edit.setVisibility(View.GONE);
         third_value_single_edit.setVisibility(View.GONE);
+        fab.setVisibility(View.VISIBLE);
+        circle_reset.setVisibility(View.INVISIBLE);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -1352,6 +1358,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         pauseResumeButton.setOnClickListener(v-> {
+            fab.setVisibility(View.INVISIBLE);
             switch (mode) {
                 case 1:
                     if (!customHalted) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
@@ -1426,10 +1433,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             skipRound();
         });
 
-        reset.setOnClickListener(v -> {
+        circle_reset.setOnClickListener(v-> {
             if (mode!=3) resetTimer(); else {
                 if (reset.getText().equals(getString(R.string.reset))) reset.setText(R.string.confirm_cycle_reset);
-                 else {
+                else {
                     reset.setText(R.string.reset);
                     resetTimer();
                 }
@@ -1941,7 +1948,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft.setText("0");
                         timePaused.setText("0");
                         modeOneTimerEnded = true;
-                    }
+                        switchReset(false);
+                    } else switchReset(true);
                     break;
                 case 2:
                     breaksOnlyHalted = true;
@@ -1967,7 +1975,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft2.setText("0");
                         timePaused2.setText("0");
                         modeTwoTimerEnded = true;
-                    }
+                        switchReset(false);
+                    } else switchReset(true);
                     break;
                 case 3:
                     pomHalted = true;
@@ -1993,7 +2002,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft3.setText("0");
                         timePaused3.setText("0");
                         modeThreeTimerEnded = true;
-                    }
+                        switchReset(false);
+                    } else switchReset(true);
                     break;
             }
         }
@@ -2005,7 +2015,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Sets views for respective tab each time one is switched.
         removeViews(); tabViews();
         //If a given timer is halted, sets the reset button to visible.
-        if (halted) reset.setVisibility(View.VISIBLE);
+        if (halted) switchReset(true); else switchReset(false);
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2948,6 +2958,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public void switchReset(boolean enable) {
+        circle_reset.setVisibility(View.VISIBLE);
+        if (enable) {
+            circle_reset.setAlpha(1.0f);
+            circle_reset.setEnabled(true);
+        }
+        else {
+            circle_reset.setAlpha(0.3f);
+            circle_reset.setEnabled(false);
+        }
+    }
+
     public void tabViews(){
         switch (mode) {
             case 1: case 2:
@@ -3062,6 +3084,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3)) {
+
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
             sub_cycle.setEnabled(false);
@@ -3085,19 +3108,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                             timePaused.setText(pausedTime);
                             customHalted = true;
-                            reset.setVisibility(View.VISIBLE);
+                            switchReset(true);
                         } else if (pausing == RESUMING_TIMER) {
                             customHalted = false;
                             startObjectAnimator();
                             if (!onBreak) startSetTimer(); else startBreakTimer();
                             timeLeft.setAlpha(1);
-                            reset.setVisibility(View.INVISIBLE);
+                            switchReset(false);
                         }
                     } else resetTimer();
                     break;
                 case 2:
                     if (!modeTwoTimerEnded) {
-                        reset.setVisibility(View.INVISIBLE);
+                        switchReset(false);
                         if (pausing == PAUSING_TIMER) {
                             String pausedTime = "";
                             timePaused2.setAlpha(1);
@@ -3107,7 +3130,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             pausedTime = (convertSeconds((breakOnlyMillis + 999) / 1000));
                             timePaused2.setText(pausedTime);
                             breaksOnlyHalted = true;
-                            reset.setVisibility(View.VISIBLE);
+                            switchReset(true);
                         } else if (pausing == RESUMING_TIMER) {
                             timeLeft2.setAlpha(1);
                             breaksOnlyHalted = false;
@@ -3141,13 +3164,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             ;
                             String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999) / 1000));
                             timePaused3.setText(pausedTime2);
-                            reset.setVisibility(View.VISIBLE);
+                            switchReset(true);
                         } else if (pausing == RESUMING_TIMER) {
+                            switchReset(false);
                             timeLeft3.setAlpha(1);
                             pomHalted = false;
                             startObjectAnimator();
                             startPomTimer();
-                            reset.setVisibility(View.INVISIBLE);
                         }
                     } else resetTimer();
                     break;
@@ -3191,7 +3214,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         };
                         mHandler.post(stopWatchRunnable);
                         stopwatchHalted = false;
-                        reset.setVisibility(View.INVISIBLE);
+                        switchReset(false);
                     } else {
                         timeLeft4.setAlpha(0);
                         timePaused4.setAlpha(1);
@@ -3201,7 +3224,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         msTimePaused.setText(msTime.getText());
                         mHandler.removeCallbacksAndMessages(null);
                         stopwatchHalted = true;
-                        reset.setVisibility(View.VISIBLE);
+                        switchReset(true);
                     }
             }
         }
@@ -3313,7 +3336,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
-        reset.setVisibility(View.INVISIBLE);
+        fab.setVisibility(View.VISIBLE);
+        circle_reset.setVisibility(View.INVISIBLE);
         //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all.
         if (endAnimation!=null) endAnimation.cancel();
     }

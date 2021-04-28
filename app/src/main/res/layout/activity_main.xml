@@ -381,4 +381,17 @@
         app:elevation="8dp">
     </ImageButton>
 
+    <ImageButton
+        android:id="@+id/circle_reset"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="6dp"
+        android:src="@drawable/restart_48"
+        android:background="@color/black"
+        app:elevation="8dp">
+    </ImageButton>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
