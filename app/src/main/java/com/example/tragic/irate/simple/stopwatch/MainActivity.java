@@ -3363,10 +3363,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         circle_reset.clearAnimation();
 
         callButtonAnimation(0.0f, 1.0f, 300);
+        fab.setAnimation(buttonAnimIn);
+        callButtonAnimation(0.0f, 1.0f, 600);
+        circle_reset.setAnimation(buttonAnimOut);
 
-
-        fab.setVisibility(View.VISIBLE);
-        circle_reset.setVisibility(View.INVISIBLE);
         //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all.
         if (endAnimation!=null) endAnimation.cancel();
     }
