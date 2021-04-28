@@ -239,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean breakBegun;
     boolean breakOnlyBegun;
     boolean pomBegun;
+    boolean selectingRounds;
 
     PopupWindow sortPopupWindow;
     PopupWindow savedCyclePopupWindow;
@@ -309,8 +310,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
-    //Todo: Smooth animation in fab/reset switch.
+    //Todo: Generic removal keeping box, while specific removes it.
     //Todo: Move round (arrows) layout.
+    //Todo: fab/reset on tab switch.
     //Todo: Test all db stuff.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
@@ -338,26 +340,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: REMEMBER, any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
     //Todo: REMINDER, Try next app w/ Kotlin.
 
+    //Receives the current alpha value of our paint object in dotDraws.
     @Override
     public void sendAlphaValue(int alpha) {
         receivedAlpha = alpha;;
     }
 
+    //Receives a position of 0-7 from dotDraws, based upon which range of X coordinates we have clicked on (each tied to a specific round).
     @Override
     public void sendPos(int pos) {
-        if (mode==1 || mode==2) {
-            receivedPos = pos;
-            if (pos <=0) {
-                left_arrow.setVisibility(View.INVISIBLE);
-                right_arrow.setVisibility(View.INVISIBLE);
-                delete_sb.setVisibility(View.INVISIBLE);
-                circle_reset.setVisibility(View.INVISIBLE);
-                fab.setVisibility(View.VISIBLE);
-            } else {
-                left_arrow.setVisibility(View.VISIBLE);
-                right_arrow.setVisibility(View.VISIBLE);
-                delete_sb.setVisibility(View.VISIBLE);
-
+        //Only allowing selection of rounds w/ add/subtract popup in view.
+        if (editCyclePopupView.isShown()) {
+            if (mode==1 || mode==2) {
+                receivedPos = pos;
+                if (pos <=0) {
+                    left_arrow.setVisibility(View.INVISIBLE);
+                    right_arrow.setVisibility(View.INVISIBLE);
+                    selectingRounds = false;
+                } else {
+                    left_arrow.setVisibility(View.VISIBLE);
+                    right_arrow.setVisibility(View.VISIBLE);
+                    selectingRounds = true;
+                }
             }
         }
     }
@@ -368,15 +372,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int x = (int) event.getX();
         int y = (int) event.getY();
 
-        if (event.getAction()==MotionEvent.ACTION_DOWN) {
-            switch (mode) {
-                case 1:
-                    dotDraws.selectCycle(x, y, (int) numberOfSets); break;
-                case 2:
-                    dotDraws.selectCycle(x, y, (int) numberOfBreaksOnly); break;
-                case 3:
-                    dotDraws.selectCycle(x, y, (int) 8); break;
-
+        if (editCyclePopupView.isShown()) {
+            if (event.getAction()==MotionEvent.ACTION_DOWN) {
+                switch (mode) {
+                    case 1:
+                        dotDraws.selectCycle(x, y, (int) numberOfSets); break;
+                    case 2:
+                        dotDraws.selectCycle(x, y, (int) numberOfBreaksOnly); break;
+                    case 3:
+                        dotDraws.selectCycle(x, y, (int) 8); break;
+                }
             }
         }
 
@@ -634,15 +639,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleLabelView = inflater.inflate(R.layout.label_cycle_popup, null);
         editCyclePopupView = inflater.inflate(R.layout.edit_cycle_popup, null);
 
-        savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, false);
-        deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, false);
+        savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
+        deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
         labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
         sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
-        editCyclesPopupWindow = new PopupWindow(editCyclePopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, true);
         savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
         deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
         labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
         sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+
+        //Focus set to false so we can access rest of UI.
+        editCyclesPopupWindow = new PopupWindow(editCyclePopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, false);
         editCyclesPopupWindow .setAnimationStyle(R.style.WindowAnimation);
 
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
@@ -1302,7 +1309,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     long holder = breaksOnlyTime.get(receivedPos-1);
                     breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
-
                 }
             }
             receivedPos -=1;
@@ -1335,26 +1341,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.selectRound(receivedPos);
         });
 
+        delete_sb.setOnClickListener(v->{
+            deleteSelectedRound();
+            drawDots(0);
+        });
+
         add_cycle.setOnClickListener(v-> {
             adjustCustom(true);
         });
 
         sub_cycle.setOnClickListener(v-> {
             adjustCustom(false);
-        });
-
-        delete_sb.setOnClickListener(v->{
-            customSetTime.remove(receivedPos);
-            if (mode==1) {
-                customBreakTime.remove(receivedPos);
-                numberOfSets-=1;
-                numberOfBreaks-=1;
-            } else if (mode==2){
-                breaksOnlyTime.remove(receivedPos);
-                numberOfBreaksOnly-=1;
-            }
-
-            drawDots(0);
         });
 
         save_cycles.setOnClickListener(v->{
@@ -1534,7 +1531,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 }
-//                if (!onBreak) startSetTimer(); else startBreakTimer();
                 break;
             case 2:
                 if (!breakOnlyBegun) {
@@ -1552,7 +1548,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakOnlyMillis = breakOnlyMillisUntilFinished;
                     if (objectAnimator2!=null) objectAnimator2.resume();
                 }
-//                startBreakTimer();
                 break;
             case 3:
                 if (!pomBegun) {
@@ -1572,7 +1567,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     pomMillis = pomMillisUntilFinished;
                     if (objectAnimator3!=null) objectAnimator3.resume();
                 }
-//                startPomTimer();
                 break;
         }
     }
@@ -1882,31 +1876,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
             }
         } else {
-            switch (mode) {
-                case 1:
-                    if (customSetTime.size() > 0) {
-                        customSetTime.remove(customSetTime.size() - 1);
-                        customBreakTime.remove(customBreakTime.size() - 1);
-                    } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                    //Used w/ arrows to switch set/break places.
-                    if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
-                    if (receivedPos >=0) dotDraws.selectRound(receivedPos);
-                    canSaveOrUpdate(true);
-                    break;
-                case 2:
-                    if (breaksOnlyTime.size() > 0) {
-                        breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
-                        //Used w/ arrows to switch  break places.
-                        if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
+            //Using a specific position to delete round if one is selected, otherwise deleting the most recently added.
+            if (selectingRounds) {
+                deleteSelectedRound();
+                selectingRounds = false;
+            } else {
+                switch (mode) {
+                    case 1:
+                        if (customSetTime.size() > 0) {
+                            customSetTime.remove(customSetTime.size() - 1);
+                            customBreakTime.remove(customBreakTime.size() - 1);
+                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        //Used w/ arrows to switch set/break places.
+                        if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
                         if (receivedPos >=0) dotDraws.selectRound(receivedPos);
                         canSaveOrUpdate(true);
-                    } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                    break;
-                case 3:
-                    if (pomValuesTime.size()!=0) {
-                        pomValuesTime.clear();
-                    } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
-                    break;
+                        break;
+                    case 2:
+                        if (breaksOnlyTime.size() > 0) {
+                            breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
+                            //Used w/ arrows to switch  break places.
+                            if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
+                            if (receivedPos >=0) dotDraws.selectRound(receivedPos);
+                            canSaveOrUpdate(true);
+                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 3:
+                        if (pomValuesTime.size()!=0) {
+                            pomValuesTime.clear();
+                        } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+                        break;
+                }
             }
         }
         populateCycleUI();
@@ -2975,8 +2975,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         buttonAnimOut.setFillAfter(true);
         buttonAnimIn.setRepeatCount(0);
         buttonAnimOut.setRepeatCount(0);
-//        buttonAnimIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
-//        buttonAnimOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
     }
 
     public void switchReset(boolean enable) {
@@ -2992,6 +2990,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             circle_reset.setAnimation(buttonAnimOut);
             circle_reset.setEnabled(false);
         }
+    }
+
+    //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
+    public void deleteSelectedRound() {
+        if (mode==1) {
+            customSetTime.remove(receivedPos);
+            customBreakTime.remove(receivedPos);
+            numberOfSets-=1;
+            numberOfBreaks-=1;
+            dotDraws.setTime(customSetTime);
+            dotDraws.breakTime(customBreakTime);
+        } else if (mode==2){
+            breaksOnlyTime.remove(receivedPos);
+            numberOfBreaksOnly-=1;
+            dotDraws.breakOnlyTime(breaksOnlyTime);
+        }
+        canSaveOrUpdate(true);
+//        drawDots(0);
     }
 
     public void tabViews(){
@@ -3367,7 +3383,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         callButtonAnimation(0.0f, 1.0f, 600);
         circle_reset.setAnimation(buttonAnimOut);
 
-        //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all.
+        //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all. Test before we change.
         if (endAnimation!=null) endAnimation.cancel();
     }
 }

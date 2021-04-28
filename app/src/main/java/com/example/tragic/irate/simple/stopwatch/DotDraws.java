@@ -170,23 +170,25 @@ public class DotDraws extends View {
             if (posX > base*5 && posX <= base*6 && mListSize >= 6) currentPos = 5;
             if (posX > base*6 && posX <= base*7 && mListSize >= 7) currentPos = 6;
             if (posX > base*7 && posX <= base*8 && mListSize >= 8) currentPos = 7;
-            if (previousPos != currentPos) mDrawBox = true;
-            else {
-                mDrawBox = false;
-                currentPos = -1;
-            }
+//            if (previousPos != currentPos) {
+//                mDrawBox = true;
+//            }
+//            else {
+//                mDrawBox = false;
+//                currentPos = -1;
+//            }
+            mDrawBox = true;
             previousPos = -1;
             mSendPosition.sendPos(currentPos);
         } else {
             currentPos = -1;
             mSendPosition.sendPos(currentPos);
         }
-
         invalidate();
     }
 
     public void selectRound(int pos) {
-        mDrawBox = true;
+//        mDrawBox = true;
         currentPos = pos;
     }
 
@@ -261,6 +263,8 @@ public class DotDraws extends View {
         }
 
         if (mDrawBox) {
+            //Setting to false so that the selection box is always removed after a deletion.
+            mDrawBox = false;
             int start = 0;
             int end = 0;
             int top = 0;
