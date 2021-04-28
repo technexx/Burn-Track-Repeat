@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
@@ -218,6 +219,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ValueAnimator sizeAnimator;
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
+    Animation buttonAnimIn;
+    Animation buttonAnimOut;
 
     ArrayList<String> customTitleArray;
     ArrayList<String> breaksOnlyTitleArray;
@@ -306,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
+    //Todo: Smooth animation in fab/reset switch.
     //Todo: Move round (arrows) layout.
     //Todo: Test all db stuff.
 
@@ -704,6 +708,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         delete_sb = findViewById(R.id.delete_set_break);
         fab = findViewById(R.id.fab);
         circle_reset = findViewById(R.id.circle_reset);
+        buttonAnimIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
+        buttonAnimIn.setFillAfter(true);
+        buttonAnimOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
+        buttonAnimOut.setFillAfter(true);
 
         save_cycles = findViewById(R.id.save_cycles);
         update_cycles = findViewById(R.id.update_cycles);
@@ -2958,14 +2966,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public void callButtonAnimation(float min, float max, int duration) {
+        buttonAnimIn = new AlphaAnimation(min, max);
+        buttonAnimOut = new AlphaAnimation(max, min);
+        buttonAnimIn.setDuration(duration);
+        buttonAnimOut.setDuration(duration);
+        buttonAnimIn.setFillAfter(true);
+        buttonAnimOut.setFillAfter(true);
+        buttonAnimIn.setRepeatCount(0);
+        buttonAnimOut.setRepeatCount(0);
+//        buttonAnimIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
+//        buttonAnimOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
+    }
+
     public void switchReset(boolean enable) {
+        callButtonAnimation(0.3f, 1.0f, 300);
+
         circle_reset.setVisibility(View.VISIBLE);
+        circle_reset.animate();
         if (enable) {
-            circle_reset.setAlpha(1.0f);
+            circle_reset.setAnimation(buttonAnimIn);
             circle_reset.setEnabled(true);
         }
         else {
-            circle_reset.setAlpha(0.3f);
+            circle_reset.setAnimation(buttonAnimOut);
             circle_reset.setEnabled(false);
         }
     }
@@ -3336,6 +3360,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
+        circle_reset.clearAnimation();
+
+        callButtonAnimation(0.0f, 1.0f, 300);
+
+
         fab.setVisibility(View.VISIBLE);
         circle_reset.setVisibility(View.INVISIBLE);
         //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all.
