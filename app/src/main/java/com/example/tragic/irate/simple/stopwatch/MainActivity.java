@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
 
     boolean defaultMenu = true;
@@ -310,7 +311,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
-    //Todo: Generic removal keeping box, while specific removes it.
     //Todo: Move round (arrows) layout.
     //Todo: fab/reset on tab switch.
     //Todo: Test all db stuff.
@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editCyclePopupView.isShown()) {
             if (mode==1 || mode==2) {
                 receivedPos = pos;
-                if (pos <=0) {
+                if (pos <0) {
                     left_arrow.setVisibility(View.INVISIBLE);
                     right_arrow.setVisibility(View.INVISIBLE);
                     selectingRounds = false;
@@ -890,8 +890,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar3.setProgress(maxProgress);
 
         cycle_header_text.setText(retrievedTitle);
-//        timePaused.getAlpha();
-//        timeLeft.getAlpha();
         tabViews();
         populateCycleUI();
 
@@ -1269,29 +1267,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         plus_third_value.setOnTouchListener((v, event) -> {
             setIncrements(event, changeThirdValue);
             incrementValues = true;
-            switch (mode) {
-                case 1:
-//                    if (event.getAction()==MotionEvent.ACTION_DOWN) adjustCustom(true);  break;
-                case 2:
-                    third_value_single_edit.setText(String.valueOf(pomValue3));
-                    third_value_textView.setText(String.valueOf(pomValue3));
-                    break;
-            }
+            third_value_single_edit.setText(String.valueOf(pomValue3));
+            third_value_textView.setText(String.valueOf(pomValue3));
             return true;
         });
 
         minus_third_value.setOnTouchListener((v, event) -> {
             incrementValues = false;
             setIncrements(event, changeThirdValue);
-            switch (mode) {
-                case 2:
-                    third_value_single_edit.setText(String.valueOf(pomValue3));
-                    third_value_textView.setText(String.valueOf(pomValue3));
-                    break;
-            }
+            third_value_single_edit.setText(String.valueOf(pomValue3));
+            third_value_textView.setText(String.valueOf(pomValue3));
             return true;
         });
 
+        //Todo: OOB exceptions. Arrows don't stop @ end of round #.
         left_arrow.setOnClickListener(v-> {
             if (mode==1) {
                 if (customSetTime.size()>=2 && receivedPos>0) {
@@ -1303,15 +1292,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     holder = customBreakTime.get(receivedPos-1);
                     customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
+                    receivedPos -=1;
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()>=2 && receivedPos>0) {
                     long holder = breaksOnlyTime.get(receivedPos-1);
                     breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
+                    receivedPos -=1;
                 }
             }
-            receivedPos -=1;
+//            receivedPos -=1;
             dotDraws.selectRound(receivedPos);
             drawDots(0);
         });
@@ -1327,6 +1318,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     holder = customBreakTime.get(receivedPos+1);
                     customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
+                    receivedPos +=1;
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()-1 > receivedPos && receivedPos>=0) {
@@ -1334,10 +1326,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     long holder = breaksOnlyTime.get(receivedPos+1);
                     breaksOnlyTime.set(receivedPos+1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
+                    receivedPos +=1;
                 }
             }
             drawDots(0);
-            receivedPos +=1;
+//            receivedPos +=1;
             dotDraws.selectRound(receivedPos);
         });
 

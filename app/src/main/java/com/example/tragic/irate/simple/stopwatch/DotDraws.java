@@ -149,8 +149,12 @@ public class DotDraws extends View {
 
     public void setAlpha() {
         mAlpha = 255; cycle = 0;
-
     }
+
+    //Todo: Using this now.
+//    public boolean drawBox(boolean drawing) {
+//        return mDrawBox = drawing;
+//    }
 
     public void selectCycle(int posX, int posY, int size) {
         int base = 0;
@@ -170,14 +174,14 @@ public class DotDraws extends View {
             if (posX > base*5 && posX <= base*6 && mListSize >= 6) currentPos = 5;
             if (posX > base*6 && posX <= base*7 && mListSize >= 7) currentPos = 6;
             if (posX > base*7 && posX <= base*8 && mListSize >= 8) currentPos = 7;
-//            if (previousPos != currentPos) {
-//                mDrawBox = true;
-//            }
-//            else {
-//                mDrawBox = false;
-//                currentPos = -1;
-//            }
-            mDrawBox = true;
+            if (previousPos != currentPos) {
+                mDrawBox = true;
+            }
+            else {
+                mDrawBox = false;
+                currentPos = -1;
+            }
+//            mDrawBox = true;
             previousPos = -1;
             mSendPosition.sendPos(currentPos);
         } else {
@@ -188,7 +192,7 @@ public class DotDraws extends View {
     }
 
     public void selectRound(int pos) {
-//        mDrawBox = true;
+        mDrawBox = true;
         currentPos = pos;
     }
 
