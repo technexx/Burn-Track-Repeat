@@ -3,7 +3,6 @@ package com.example.tragic.irate.simple.stopwatch;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -42,7 +39,6 @@ import android.widget.Toast;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
@@ -310,6 +306,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton fab;
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
+    Animation fadeIn;
+    Animation fadeOut;
+    boolean alphaStart;
 
     //Todo: Move round (arrows) layout.
     //Todo: fab/reset on tab switch.
@@ -756,8 +755,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setVisibility(View.GONE);
         second_value_single_edit.setVisibility(View.GONE);
         third_value_single_edit.setVisibility(View.GONE);
-        fab.setVisibility(View.VISIBLE);
-        circle_reset.setVisibility(View.INVISIBLE);
+
+        Animation startAlpha = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_instant);
+        startAlpha.setFillAfter(true);
+        circle_reset.setAnimation(startAlpha);
+//        circle_reset.setAlpha(0.3f);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -799,6 +801,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timePaused.setAlpha(1);
         mode = 1;
         dotDraws.setMode(1);
+
+        fadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
+        fadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
+        fadeIn.setFillAfter(true);
+        fadeOut.setFillAfter(true);
 
         cyclesList = new ArrayList<>();
         cyclesBOList = new ArrayList<>();
@@ -1356,7 +1363,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         pauseResumeButton.setOnClickListener(v-> {
-            fab.setVisibility(View.INVISIBLE);
             switch (mode) {
                 case 1:
                     if (!customHalted) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
@@ -2012,6 +2018,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(0);
     }
 
+    //Todo: Fix for alpha movement
     public void switchTimer(int mode, boolean halted) {
         //Sets views for respective tab each time one is switched.
         removeViews(); tabViews();
@@ -2971,18 +2978,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void switchReset(boolean enable) {
-        callButtonAnimation(0.3f, 1.0f, 300);
-
-        circle_reset.setVisibility(View.VISIBLE);
-        circle_reset.animate();
-        if (enable) {
-            circle_reset.setAnimation(buttonAnimIn);
-            circle_reset.setEnabled(true);
+        if (alphaStart) {
+            callButtonAnimation(0.3f, 1.0f, 300);
+            if (enable) circle_reset.setAnimation(buttonAnimIn); else circle_reset.setAnimation(buttonAnimOut);
         }
-        else {
-            circle_reset.setAnimation(buttonAnimOut);
-            circle_reset.setEnabled(false);
-        }
+        if (!alphaStart) alphaStart = true;
     }
 
     //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
@@ -3000,7 +3000,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.breakOnlyTime(breaksOnlyTime);
         }
         canSaveOrUpdate(true);
-//        drawDots(0);
     }
 
     public void tabViews(){
@@ -3107,6 +3106,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
+        if ((mode==1 && !setBegun) || (mode==2 && !breakOnlyBegun) || (mode==3 && !pomBegun)) {
+            callButtonAnimation(0.3f, 1.0f, 300);
+            fab.setAnimation(buttonAnimOut);
+        }
+
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
@@ -3371,10 +3375,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         populateCycleUI();
         circle_reset.clearAnimation();
 
-        callButtonAnimation(0.0f, 1.0f, 300);
-        fab.setAnimation(buttonAnimIn);
-        callButtonAnimation(0.0f, 1.0f, 600);
-        circle_reset.setAnimation(buttonAnimOut);
+        callButtonAnimation(0.3f, 1.0f, 300);
+        fab.setAnimation(fadeIn);
+        callButtonAnimation(0.3f, 1.0f, 600);
+        circle_reset.setAnimation(fadeOut);
 
         //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all. Test before we change.
         if (endAnimation!=null) endAnimation.cancel();
