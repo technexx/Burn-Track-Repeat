@@ -309,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Animation fadeIn;
     Animation fadeOut;
     boolean alphaStart;
+    boolean skipResetFade;
 
     //Todo: Move round (arrows) layout.
     //Todo: fab/reset on tab switch.
@@ -2966,23 +2967,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    public void callButtonAnimation(float min, float max, int duration) {
-        buttonAnimIn = new AlphaAnimation(min, max);
-        buttonAnimOut = new AlphaAnimation(max, min);
-        buttonAnimIn.setDuration(duration);
-        buttonAnimOut.setDuration(duration);
+    public void setButtonAnimation() {
+        buttonAnimIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
         buttonAnimIn.setFillAfter(true);
+        buttonAnimOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
         buttonAnimOut.setFillAfter(true);
-        buttonAnimIn.setRepeatCount(0);
-        buttonAnimOut.setRepeatCount(0);
     }
 
     public void switchReset(boolean enable) {
-        if (alphaStart) {
-            callButtonAnimation(0.3f, 1.0f, 300);
+        if (alphaStart && !skipResetFade) {
             if (enable) circle_reset.setAnimation(buttonAnimIn); else circle_reset.setAnimation(buttonAnimOut);
         }
         if (!alphaStart) alphaStart = true;
+        skipResetFade = false;
     }
 
     //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
@@ -3106,9 +3103,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
+        setButtonAnimation();
         if ((mode==1 && !setBegun) || (mode==2 && !breakOnlyBegun) || (mode==3 && !pomBegun)) {
-            callButtonAnimation(0.3f, 1.0f, 300);
+            //Greys out FAB button if we have started a new cycle.
             fab.setAnimation(buttonAnimOut);
+            //Used to in switchReset(), called below, to skip the alpha transition of our reset button here, since it is already greyed out.
+            skipResetFade = true;
         }
 
         if (emptyCycle) {
@@ -3373,14 +3373,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
-        circle_reset.clearAnimation();
 
-        callButtonAnimation(0.3f, 1.0f, 300);
-        fab.setAnimation(fadeIn);
-        callButtonAnimation(0.3f, 1.0f, 600);
-        circle_reset.setAnimation(fadeOut);
+        setButtonAnimation();
 
-        //Todo: We do want separate ones in case multiple are running at once, we do not want to invalidate all. Test before we change.
+        fab.setAnimation(buttonAnimIn);
+        circle_reset.setAnimation(buttonAnimOut);
+
+        //Todo: We do want separate animations in case multiples are running at once, we do not want to invalidate all. Test before we change.
         if (endAnimation!=null) endAnimation.cancel();
     }
 }
