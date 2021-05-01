@@ -308,9 +308,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
+    //Todo: Retrieving next round's millis via removeSetOrBreak is using 0 index from STATIC list, so it will always retrieve the first place.
+    //Todo: Click out of breaksOnly rounds bug(s).
+    //Todo: FAB should toggle popupView, and onTouchEvent should remove it.
     //Todo: Test all db stuff.
 
-    //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
+    //Todo: Variable set count-up timer, for use w/ TDEE.
     //Todo: Variable set only mode? Again, for TDEE.
     //Todo: Option to skip EITHER set or break. Option to undo skip.
     //Todo: Reset vis/not vis depending on mode timer status.
@@ -384,7 +387,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             invalidateOptionsMenu();
             defaultMenu = true;
         }
-        if (deleteAllPopupWindow!=null & deleteAllPopupWindow.isShowing()) deleteAllPopupWindow.dismiss();
+        if (deleteAllPopupWindow.isShowing()) deleteAllPopupWindow.dismiss();
+        if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         switch (mode) {
             case 1: case 2:
                 if (first_value_edit.isShown()) {
@@ -962,15 +966,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         fab.setOnClickListener(v-> {
-            switch (mode) {
-                case 1:
-                    editCyclesPopupWindow.setHeight(365); break;
-                case 2:
-                    editCyclesPopupWindow.setHeight(255); break;
-                case 3:
-                    editCyclesPopupWindow.setHeight(460); break;
+            if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss(); else {
+                switch (mode) {
+                    case 1:
+                        editCyclesPopupWindow.setHeight(365); break;
+                    case 2:
+                        editCyclesPopupWindow.setHeight(255); break;
+                    case 3:
+                        editCyclesPopupWindow.setHeight(460); break;
+                }
+                editCyclesPopupWindow.showAsDropDown((View) tabLayout);
             }
-            editCyclesPopupWindow.showAsDropDown((View) tabLayout);
         });
 
         delete_all_confirm.setOnClickListener(v-> {
@@ -1738,6 +1744,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         movingBOCycle=1;
 
                         mHandler.postDelayed(() -> {
+                            //Todo: Delayed removeSetOrBreak may cause issue if tried to reset via pauseResume too quickly.
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
                             removeSetOrBreak(true);
@@ -2963,9 +2970,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             circle_reset.setAlpha(0.3f); circle_reset.setEnabled(false);
         }
         if (fabOn) {
-            fab.setAlpha(1.0f); fab.setEnabled(true);
+            fab.setAlpha(1.0f); fab.setEnabled(true); add_cycle.setEnabled(true); sub_cycle.setEnabled(true);
         } else {
-            fab.setAlpha(0.3f); fab.setEnabled(false);
+            fab.setAlpha(0.3f); fab.setEnabled(false); add_cycle.setEnabled(false); sub_cycle.setEnabled(false);
         }
     }
 
@@ -3108,9 +3115,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
+        //Dismisses our add/subtract round menu once timer has begun.
+        if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Controls the alpha/enabled status of reset and FAB buttons.
         if (pausing==PAUSING_TIMER) resetAndFabToggle(true, false); else resetAndFabToggle(false, false);
-
         //Toasts empty cycle message and exits out of method.
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
@@ -3170,6 +3178,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyHalted = false;
                             startObjectAnimator();
                             startBreakTimer();
+                            //Todo: Need to get/set new millis value.
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
                             mHandler.removeCallbacks(ot);
@@ -3177,7 +3186,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             overtime.setVisibility(View.INVISIBLE);
                             progressBar2.setProgress(10000);
                             timePaused2.setAlpha(1.0f);
-                            timePaused2.setText(convertSeconds(((breaksOnlyTime.get(0) + 999)) / 1000));
+                            timeLeft2.setText(convertSeconds((breakOnlyMillis + 999) / 1000));
+                            timePaused2.setText(convertSeconds((breakOnlyMillis + 999) / 1000));
                         } else if (pausing == RESTARTING_TIMER) {
                             startObjectAnimator();
                             boTimerDisabled = false;

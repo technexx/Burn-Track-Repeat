@@ -11,7 +11,7 @@
     </style>
 
     <style name="WindowAnimation">
-        <item name="android:windowEnterAnimation">@anim/fade_in_anim</item>
-        <item name="android:windowExitAnimation">@anim/fade_out_anim</item>
+        <item name="android:windowEnterAnimation">@anim/fade_in_short</item>
+        <item name="android:windowExitAnimation">@anim/fade_out_short</item>
     </style>
 </resources>
