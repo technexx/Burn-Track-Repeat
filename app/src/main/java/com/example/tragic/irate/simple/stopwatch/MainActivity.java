@@ -308,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
+    //Todo: Text should change size on active timer when moving below 60.
     //Todo: Test all db stuff.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
@@ -601,8 +602,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
         valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
-        valueAnimatorDown.setDuration(1000);
-        valueAnimatorUp.setDuration(1000);
+        valueAnimatorDown.setDuration(2000);
+        valueAnimatorUp.setDuration(2000);
 
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
@@ -2030,7 +2031,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 if (setMillisUntilFinished==0) setMillisUntilFinished = setMillis;
                 if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
-                timeLeft.setAlpha(1);
                 if (halted) {
                     setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
                     fadeInText(timePaused);
@@ -2049,7 +2049,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
                 if (breakOnlyMillisUntilFinished==0) breakOnlyMillisUntilFinished = breakOnlyMillis;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-                timeLeft2.setAlpha(1);
                 if (halted) {
                     setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
                     fadeInText(timePaused2);
