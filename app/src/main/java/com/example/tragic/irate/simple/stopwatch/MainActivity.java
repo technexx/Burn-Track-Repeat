@@ -308,7 +308,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
-    //Todo: Text should change size on active timer when moving below 60.
     //Todo: Test all db stuff.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
@@ -758,6 +757,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         confirm_header_save.setText(R.string.save_cycles);
         reset.setText(R.string.reset);
 
+        //Todo: Launch size text here.
         timeLeft.setTextSize(90f);
         timePaused.setTextSize(90f);
         timeLeft2.setTextSize(90f);
@@ -1573,6 +1573,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void startSetTimer() {
+        AtomicBoolean textSizeReduced = new AtomicBoolean(false);
         setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
         timer = new CountDownTimer(setMillis, 50) {
             @Override
@@ -1589,6 +1590,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
 
                 if (mode==1) {
+                    if (!textSizeReduced.get()) if (setMillis<59000) {
+                        changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+                        textSizeReduced.set(true);
+                    }
                     timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                     drawDots(1);
                 }
@@ -3268,6 +3273,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 numberOfBreaks = customBreakTime.size();
 
                 if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
+                if (setMillis>=60000) {
+                    timePaused.setTextSize(70f); timeLeft.setTextSize(70f);
+                } else {
+                    timePaused.setTextSize(90f); timeLeft.setTextSize(90f);
+                }
                 break;
             case 2:
                 if (breaksOnlyTime.size()>0) {
