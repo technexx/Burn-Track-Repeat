@@ -306,8 +306,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton fab;
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
-    //Todo: Move round (arrows) layout.
-    //Todo: fab/reset on tab switch.
+
+    //Todo: If new round moved to start, set timer textView to it.
     //Todo: Test all db stuff.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
@@ -317,8 +317,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Maybe: "cycle completed" as a db entry for each separate cycle.
 
     //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
-    //Todo: Rippling for certain onClicks.
-    //Todo: Inconsistencies w/ fading.
     //Todo: Add taskbar notification for timers.
     //Todo: Add color scheme options.
     //Todo: Test all Pom cycles.
@@ -2004,7 +2002,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (halted) resetAndFabToggle(true, false);
         if ((mode==1 && !setBegun) || (mode==2 && !breakOnlyBegun) || (mode==3 && !pomBegun)) {
             resetAndFabToggle(false, true);
-        } else resetAndFabToggle(false, false);
+        } else if (!halted) resetAndFabToggle(false, false);
 
         switch (mode) {
             case 1:
@@ -2115,6 +2113,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void setNewText(TextView oldTextView, TextView currentTextView, long newTime) {
         boolean fadeTime = false;
+        //Converts and compares the previous timer's textView with the current one. If one is <60 seconds and the other is >=60 seconds, we change the text size to reflect the increased or decreased digits used.
         String oldText = (String) oldTextView.getText();
         if (!oldText.equals("") && !oldText.equals("?")) {
             oldText = oldText.replace(":", "");
@@ -2145,6 +2144,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
         }
+        //If the timer is HALTED, use our Value Animator. If not, we have a separate method within the timer. This is necessary because our active timer textView is constantly updating, and thus overwrites any new alpha we are trying to set.
         if (fadeTime) {
             switch (mode) {
                 case 1:
