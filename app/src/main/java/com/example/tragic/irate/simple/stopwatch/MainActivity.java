@@ -308,8 +308,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
-    //Todo: Retrieving next round's millis via removeSetOrBreak is using 0 index from STATIC list, so it will always retrieve the first place.
-    //Todo: Click out of breaksOnly rounds bug(s).
+    //Todo: timer not starting after breaksOnly round, just objectAnimator.
+    //Todo: postDelay at end of breaksOnly rounds will b0rk us unless we disable the timer until its completion.
     //Todo: FAB should toggle popupView, and onTouchEvent should remove it.
     //Todo: Test all db stuff.
 
@@ -1629,7 +1629,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     //Re-enabling timer clicks.
                     timerDisabled = false;
                     //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
-                    removeSetOrBreak(false);
+                    removeSetOrBreak(true);
                     stopAscent = true;
                     endAnimation.cancel();
                     dotDraws.setAlpha();
@@ -1684,7 +1684,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         mHandler.postDelayed(() -> {
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
-                            removeSetOrBreak(true);
+                            removeSetOrBreak(false);
                             //Re-enabling timer clicks. Used regardless of numberOfBreaks.
                             timerDisabled = false;
                             stopAscent = true;
@@ -1747,9 +1747,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //Todo: Delayed removeSetOrBreak may cause issue if tried to reset via pauseResume too quickly.
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
-                            removeSetOrBreak(true);
+                            removeSetOrBreak(false);
                             boTimerDisabled = false;
                             stopAscent = true;
+                            Log.i("testCount", "number is " + numberOfBreaksOnly);
 
                             //If numberOfBreaksOnly has been reduced to 0 in this runnable, do end cycle stuff. Since we are pausing between breaks in this mode anyway, we are doing less than the set/break combos.
                             if (numberOfBreaksOnly==0){
@@ -2741,20 +2742,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    public void removeSetOrBreak(boolean onBreak) {
+    //Removes a set or break and calls function to update the millis value.
+    public void removeSetOrBreak(boolean onSet) {
         switch (mode) {
             case 1:
-                if (!onBreak) {
-                    numberOfSets--;
-                    if (customSetTime.size() > 0)  setMillis = customSetTime.get(0);
+                if (onSet) {
+                    numberOfSets--; setMillis = newMillis(true);
                 } else {
-                    numberOfBreaks--;
-                    if (customBreakTime.size() > 0) breakMillis = customBreakTime.get(0);
+                    numberOfBreaks--; breakMillis = newMillis(false);
                 }
                 break;
-            case 2:
-                numberOfBreaksOnly--;
-                if (breaksOnlyTime.size() > 0) breakOnlyMillis = breaksOnlyTime.get(0);
+            case 2: numberOfBreaksOnly--; breakOnlyMillis = newMillis(false);
                 break;
         }
         drawDots(0);
@@ -2950,6 +2948,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         prefEdit.apply();
     }
 
+    //Sets millis values based on which round we are on (list size minus number of non-completed rounds).
+    //REMEMBER, this is not a void method and we need to do something with its return. If we do not, whatever method we are currently in will RETURN itself.
     public long newMillis(boolean onSets) {
         switch (mode) {
             case 1:
@@ -3128,6 +3128,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDisabled = true;
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
 
+        //Todo: boTimer getting set to disabled.
         //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3)) {
 
@@ -3190,6 +3191,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timePaused2.setText(convertSeconds((breakOnlyMillis + 999) / 1000));
                         } else if (pausing == RESTARTING_TIMER) {
                             startObjectAnimator();
+                            startBreakTimer();
                             boTimerDisabled = false;
                             timePaused2.setAlpha(0f);
                             timeLeft2.setAlpha(1.0f);
