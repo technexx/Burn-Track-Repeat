@@ -1997,11 +1997,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(0);
     }
 
-    //Todo: Fix for alpha movement
     public void switchTimer(int mode, boolean halted) {
         //Sets views for respective tab each time one is switched.
         removeViews(); tabViews();
         //If a given timer is halted, sets the reset button to visible.
+        if (halted) resetAndFabToggle(true, false);
+        if ((mode==1 && !setBegun) || (mode==2 && !breakOnlyBegun) || (mode==3 && !pomBegun)) {
+            resetAndFabToggle(false, true);
+        } else resetAndFabToggle(false, false);
+
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2927,6 +2931,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public void resetAndFabToggle(boolean resetOn, boolean fabOn) {
+        if (resetOn) {
+            circle_reset.setAlpha(1.0f); circle_reset.setEnabled(true);
+        } else {
+            circle_reset.setAlpha(0.3f); circle_reset.setEnabled(false);
+        }
+        if (fabOn) {
+            fab.setAlpha(1.0f); fab.setEnabled(true);
+        } else {
+            fab.setAlpha(0.3f); fab.setEnabled(false);
+        }
+    }
+
+
     public void drawDots(int fadeVar) {
         switch (mode) {
             case 1:
@@ -3065,6 +3083,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
+        if (pausing==PAUSING_TIMER) resetAndFabToggle(true, false); else resetAndFabToggle(false, false);
+
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
@@ -3318,6 +3338,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sub_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
+        resetAndFabToggle(false, true);
         populateCycleUI();
 
         //Todo: We do want separate animations in case multiples are running at once, we do not want to invalidate all. Test before we change.
