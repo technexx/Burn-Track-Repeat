@@ -306,11 +306,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton fab;
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
-    Animation fadeIn;
-    Animation fadeOut;
-    boolean alphaStart;
-    boolean skipResetFade;
-
     //Todo: Move round (arrows) layout.
     //Todo: fab/reset on tab switch.
     //Todo: Test all db stuff.
@@ -715,10 +710,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         delete_sb = findViewById(R.id.delete_set_break);
         fab = findViewById(R.id.fab);
         circle_reset = findViewById(R.id.circle_reset);
-        buttonAnimIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
-        buttonAnimIn.setFillAfter(true);
-        buttonAnimOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
-        buttonAnimOut.setFillAfter(true);
 
         save_cycles = findViewById(R.id.save_cycles);
         update_cycles = findViewById(R.id.update_cycles);
@@ -756,11 +747,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setVisibility(View.GONE);
         second_value_single_edit.setVisibility(View.GONE);
         third_value_single_edit.setVisibility(View.GONE);
-
-        Animation startAlpha = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_instant);
-        startAlpha.setFillAfter(true);
-        circle_reset.setAnimation(startAlpha);
-//        circle_reset.setAlpha(0.3f);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -802,11 +788,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timePaused.setAlpha(1);
         mode = 1;
         dotDraws.setMode(1);
-
-        fadeIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
-        fadeOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
-        fadeIn.setFillAfter(true);
-        fadeOut.setFillAfter(true);
 
         cyclesList = new ArrayList<>();
         cyclesBOList = new ArrayList<>();
@@ -1956,8 +1937,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft.setText("0");
                         timePaused.setText("0");
                         modeOneTimerEnded = true;
-                        switchReset(false);
-                    } else switchReset(true);
+                    }
                     break;
                 case 2:
                     breaksOnlyHalted = true;
@@ -1983,8 +1963,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft2.setText("0");
                         timePaused2.setText("0");
                         modeTwoTimerEnded = true;
-                        switchReset(false);
-                    } else switchReset(true);
+                    }
                     break;
                 case 3:
                     pomHalted = true;
@@ -2010,8 +1989,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft3.setText("0");
                         timePaused3.setText("0");
                         modeThreeTimerEnded = true;
-                        switchReset(false);
-                    } else switchReset(true);
+                    }
                     break;
             }
         }
@@ -2024,7 +2002,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Sets views for respective tab each time one is switched.
         removeViews(); tabViews();
         //If a given timer is halted, sets the reset button to visible.
-        if (halted) switchReset(true); else switchReset(false);
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2967,21 +2944,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    public void setButtonAnimation() {
-        buttonAnimIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
-        buttonAnimIn.setFillAfter(true);
-        buttonAnimOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim);
-        buttonAnimOut.setFillAfter(true);
-    }
-
-    public void switchReset(boolean enable) {
-        if (alphaStart && !skipResetFade) {
-            if (enable) circle_reset.setAnimation(buttonAnimIn); else circle_reset.setAnimation(buttonAnimOut);
-        }
-        if (!alphaStart) alphaStart = true;
-        skipResetFade = false;
-    }
-
     //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
     public void deleteSelectedRound() {
         if (mode==1) {
@@ -3103,14 +3065,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
-        setButtonAnimation();
-        if ((mode==1 && !setBegun) || (mode==2 && !breakOnlyBegun) || (mode==3 && !pomBegun)) {
-            //Greys out FAB button if we have started a new cycle.
-            fab.setAnimation(buttonAnimOut);
-            //Used to in switchReset(), called below, to skip the alpha transition of our reset button here, since it is already greyed out.
-            skipResetFade = true;
-        }
-
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
@@ -3145,19 +3099,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                             timePaused.setText(pausedTime);
                             customHalted = true;
-                            switchReset(true);
                         } else if (pausing == RESUMING_TIMER) {
                             customHalted = false;
                             startObjectAnimator();
                             if (!onBreak) startSetTimer(); else startBreakTimer();
                             timeLeft.setAlpha(1);
-                            switchReset(false);
                         }
                     } else resetTimer();
                     break;
                 case 2:
                     if (!modeTwoTimerEnded) {
-                        switchReset(false);
                         if (pausing == PAUSING_TIMER) {
                             String pausedTime = "";
                             timePaused2.setAlpha(1);
@@ -3167,7 +3118,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             pausedTime = (convertSeconds((breakOnlyMillis + 999) / 1000));
                             timePaused2.setText(pausedTime);
                             breaksOnlyHalted = true;
-                            switchReset(true);
                         } else if (pausing == RESUMING_TIMER) {
                             timeLeft2.setAlpha(1);
                             breaksOnlyHalted = false;
@@ -3201,9 +3151,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             ;
                             String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999) / 1000));
                             timePaused3.setText(pausedTime2);
-                            switchReset(true);
                         } else if (pausing == RESUMING_TIMER) {
-                            switchReset(false);
                             timeLeft3.setAlpha(1);
                             pomHalted = false;
                             startObjectAnimator();
@@ -3251,7 +3199,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         };
                         mHandler.post(stopWatchRunnable);
                         stopwatchHalted = false;
-                        switchReset(false);
                     } else {
                         timeLeft4.setAlpha(0);
                         timePaused4.setAlpha(1);
@@ -3261,7 +3208,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         msTimePaused.setText(msTime.getText());
                         mHandler.removeCallbacksAndMessages(null);
                         stopwatchHalted = true;
-                        switchReset(true);
                     }
             }
         }
@@ -3373,11 +3319,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
-
-        setButtonAnimation();
-
-        fab.setAnimation(buttonAnimIn);
-        circle_reset.setAnimation(buttonAnimOut);
 
         //Todo: We do want separate animations in case multiples are running at once, we do not want to invalidate all. Test before we change.
         if (endAnimation!=null) endAnimation.cancel();
