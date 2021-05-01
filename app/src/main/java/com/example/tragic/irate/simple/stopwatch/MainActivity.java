@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -307,7 +308,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton circle_reset;
     ConstraintLayout.LayoutParams lp;
 
-    //Todo: If new round moved to start, set timer textView to it.
     //Todo: Test all db stuff.
 
     //Todo: Variable set count-up timer, for use w/ TDEE. Possibly replace empty space in breaksOnly mode.
@@ -1280,6 +1280,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
                     receivedPos -=1;
+                    if (receivedPos==0) {
+                        setMillis = newMillis(true);
+                        setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    }
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()>=2 && receivedPos>0) {
@@ -1287,11 +1291,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
                     receivedPos -=1;
+                    if (receivedPos==0) {
+                        breakOnlyMillis = newMillis(false);
+                        setNewText(timePaused3, timePaused2, (breakOnlyMillis+999)/1000);
+                    }
                 }
             }
 //            receivedPos -=1;
             dotDraws.selectRound(receivedPos);
             drawDots(0);
+            saveArrays();
         });
 
         right_arrow.setOnClickListener(v-> {
@@ -1306,6 +1315,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
                     receivedPos +=1;
+                    if (receivedPos==0) {
+                        setMillis = newMillis(true);
+                        setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    }
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()-1 > receivedPos && receivedPos>=0) {
@@ -1314,11 +1327,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTime.set(receivedPos+1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
                     receivedPos +=1;
+                    if (receivedPos==0) {
+                        breakOnlyMillis = newMillis(false);
+                        setNewText(timePaused3, timePaused2, (breakOnlyMillis+999)/1000);
+                    }
                 }
             }
             drawDots(0);
 //            receivedPos +=1;
             dotDraws.selectRound(receivedPos);
+            saveArrays();
         });
 
         delete_sb.setOnClickListener(v->{
@@ -1483,6 +1501,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         customHalted = false;
                         //Ensures each new dot fade begins @ full alpha.
                         dotDraws.setAlpha();
+                        //Returns and sets our setMillis value to the first position in our Array.
                         if (numberOfSets>0) setMillis = newMillis(true);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
@@ -1499,6 +1518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         //Ensures any features meant for running timer cannot be executed here.
                         customHalted = false;
                         dotDraws.setAlpha();
+                        //Returns and sets our breakMillis value to the first position in our Array.
                         if (numberOfBreaks>0) breakMillis = newMillis(false);
                         objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
                         objectAnimator.setInterpolator(new LinearInterpolator());
@@ -1516,6 +1536,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     //Ensures any features meant for running timer cannot be executed here.
                     breaksOnlyHalted = false;
                     dotDraws.setAlpha();
+                    //Returns and sets our breakOnlyMillis value to the first position in our Array.
                     if (breaksOnlyTime.size()>0) breakOnlyMillis = newMillis(true);
                     objectAnimator2 = ObjectAnimator.ofInt(progressBar2, "progress", (int) breaksOnlyProgressPause, 0);
                     objectAnimator2.setInterpolator(new LinearInterpolator());
@@ -3083,8 +3104,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
+        //Controls the alpha/enabled status of reset and FAB buttons.
         if (pausing==PAUSING_TIMER) resetAndFabToggle(true, false); else resetAndFabToggle(false, false);
 
+        //Toasts empty cycle message and exits out of method.
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
