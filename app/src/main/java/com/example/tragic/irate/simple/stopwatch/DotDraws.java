@@ -151,11 +151,6 @@ public class DotDraws extends View {
         mAlpha = 255; cycle = 0;
     }
 
-    //Todo: Using this now.
-//    public boolean drawBox(boolean drawing) {
-//        return mDrawBox = drawing;
-//    }
-
     public void selectCycle(int posX, int posY, int size) {
         int base = 0;
         switch (mMode) {
@@ -167,21 +162,17 @@ public class DotDraws extends View {
         mPosX = posX; mPosY = posY; mListSize = size;
         if (posY >= 750 && posY <= 1050) {
             if (posX <= base) currentPos = 0;
-            if (posX > base && posX <= base*2 && mListSize >= 2) currentPos = 1;
-            if (posX > base*2 && posX <= base*3 && mListSize >= 3) currentPos = 2;
-            if (posX > base*3 && posX <= base*4 && mListSize >= 4) currentPos = 3;
-            if (posX > base*4 && posX <= base*5 && mListSize >= 5) currentPos = 4;
-            if (posX > base*5 && posX <= base*6 && mListSize >= 6) currentPos = 5;
-            if (posX > base*6 && posX <= base*7 && mListSize >= 7) currentPos = 6;
-            if (posX > base*7 && posX <= base*8 && mListSize >= 8) currentPos = 7;
-            if (previousPos != currentPos) {
-                mDrawBox = true;
-            }
-            else {
-                mDrawBox = false;
-                currentPos = -1;
-            }
-//            mDrawBox = true;
+            else if (posX > base && posX <= base*2 && mListSize >= 2) currentPos = 1;
+            else if (posX > base*2 && posX <= base*3 && mListSize >= 3) currentPos = 2;
+            else if (posX > base*3 && posX <= base*4 && mListSize >= 4) currentPos = 3;
+            else if (posX > base*4 && posX <= base*5 && mListSize >= 5) currentPos = 4;
+            else if (posX > base*5 && posX <= base*6 && mListSize >= 6) currentPos = 5;
+            else if (posX > base*6 && posX <= base*7 && mListSize >= 7) currentPos = 6;
+            else if (posX > base*7 && posX <= base*8 && mListSize >= 8) currentPos = 7;
+            //Used to reference the entire box.
+            else currentPos = 100;
+            //Only drawing new box if selected position (box) is different than current.
+            if (previousPos != currentPos && currentPos!=100) mDrawBox = true; else mDrawBox = false;
             previousPos = -1;
             mSendPosition.sendPos(currentPos);
         } else {

@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View sortCyclePopupView;
     View savedCyclePopupView;
     View cycleLabelView;
-    View editCyclePopupView;
+    View editCyclesPopupView;
 
     TextView sortRecent;
     TextView sortNotRecent;
@@ -348,19 +348,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public void sendPos(int pos) {
         //Only allowing selection of rounds w/ add/subtract popup in view.
-        if (editCyclePopupView.isShown()) {
+        if (editCyclesPopupView.isShown()) {
             if (mode==1 || mode==2) {
                 receivedPos = pos;
+                //If clicking outside our dot box, dismiss the add/sub popup.
                 if (pos <0) {
-                    left_arrow.setVisibility(View.INVISIBLE);
-                    right_arrow.setVisibility(View.INVISIBLE);
+                    editCyclesPopupWindow.dismiss();
                     selectingRounds = false;
                 } else {
                     left_arrow.setVisibility(View.VISIBLE);
                     right_arrow.setVisibility(View.VISIBLE);
                     selectingRounds = true;
                 }
+                //If not clicking on an existing round (i.e. a blank space in box), remove arrow visibility.
+                if (pos<0 || pos==100) {
+                    left_arrow.setVisibility(View.INVISIBLE);
+                    right_arrow.setVisibility(View.INVISIBLE);
+                }
             }
+            Log.i("testPos", String.valueOf(pos));
         }
     }
 
@@ -370,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int x = (int) event.getX();
         int y = (int) event.getY();
 
-        if (editCyclePopupView.isShown()) {
+        if (editCyclesPopupView.isShown()) {
             if (event.getAction()==MotionEvent.ACTION_DOWN) {
                 switch (mode) {
                     case 1:
@@ -390,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             defaultMenu = true;
         }
         if (deleteAllPopupWindow.isShowing()) deleteAllPopupWindow.dismiss();
-        if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
+//        if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         switch (mode) {
             case 1: case 2:
                 if (first_value_edit.isShown()) {
@@ -637,7 +643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
         sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
         cycleLabelView = inflater.inflate(R.layout.label_cycle_popup, null);
-        editCyclePopupView = inflater.inflate(R.layout.edit_cycle_popup, null);
+        editCyclesPopupView = inflater.inflate(R.layout.edit_cycle_popup, null);
 
         savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
         deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -649,7 +655,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
         //Focus set to false so we can access rest of UI.
-        editCyclesPopupWindow = new PopupWindow(editCyclePopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, false);
+        editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, false);
         editCyclesPopupWindow .setAnimationStyle(R.style.WindowAnimation);
 
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
@@ -674,29 +680,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.custom_bar);
 
-        s1 = editCyclePopupView.findViewById(R.id.s1);
-        s2 = editCyclePopupView.findViewById(R.id.s2);
-        s3 = editCyclePopupView.findViewById(R.id.s3);
-        first_value_edit = editCyclePopupView.findViewById(R.id.first_value_edit);
-        first_value_edit_two = editCyclePopupView.findViewById(R.id.first_value_edit_two);
-        first_value_sep = editCyclePopupView.findViewById(R.id.first_value_sep);
-        first_value_textView = editCyclePopupView.findViewById(R.id.first_value_textView);
-        second_value_edit = editCyclePopupView.findViewById(R.id.second_value_edit);
-        second_value_edit_two = editCyclePopupView.findViewById(R.id.second_value_edit_two);
-        second_value_sep = editCyclePopupView.findViewById(R.id.second_value_sep);
-        second_value_textView = editCyclePopupView.findViewById(R.id.second_value_textView);
-        third_value_textView = editCyclePopupView.findViewById(R.id.third_value_textView);
-        plus_first_value = editCyclePopupView.findViewById(R.id.plus_first_value);
-        minus_first_value = editCyclePopupView.findViewById(R.id.minus_first_value);
-        plus_second_value = editCyclePopupView.findViewById(R.id.plus_second_value);
-        minus_second_value = editCyclePopupView.findViewById(R.id.minus_second_value);
-        plus_third_value = editCyclePopupView.findViewById(R.id.plus_third_value);
-        minus_third_value = editCyclePopupView.findViewById(R.id.minus_third_value);
-        first_value_single_edit = editCyclePopupView.findViewById(R.id.first_value_single_edit);
-        second_value_single_edit = editCyclePopupView.findViewById(R.id.second_value_single_edit);
-        third_value_single_edit = editCyclePopupView.findViewById(R.id.third_value_single_edit);
-        add_cycle = editCyclePopupView.findViewById(R.id.add_cycle);
-        sub_cycle = editCyclePopupView.findViewById(R.id.subtract_cycle);
+        s1 = editCyclesPopupView.findViewById(R.id.s1);
+        s2 = editCyclesPopupView.findViewById(R.id.s2);
+        s3 = editCyclesPopupView.findViewById(R.id.s3);
+        first_value_edit = editCyclesPopupView.findViewById(R.id.first_value_edit);
+        first_value_edit_two = editCyclesPopupView.findViewById(R.id.first_value_edit_two);
+        first_value_sep = editCyclesPopupView.findViewById(R.id.first_value_sep);
+        first_value_textView = editCyclesPopupView.findViewById(R.id.first_value_textView);
+        second_value_edit = editCyclesPopupView.findViewById(R.id.second_value_edit);
+        second_value_edit_two = editCyclesPopupView.findViewById(R.id.second_value_edit_two);
+        second_value_sep = editCyclesPopupView.findViewById(R.id.second_value_sep);
+        second_value_textView = editCyclesPopupView.findViewById(R.id.second_value_textView);
+        third_value_textView = editCyclesPopupView.findViewById(R.id.third_value_textView);
+        plus_first_value = editCyclesPopupView.findViewById(R.id.plus_first_value);
+        minus_first_value = editCyclesPopupView.findViewById(R.id.minus_first_value);
+        plus_second_value = editCyclesPopupView.findViewById(R.id.plus_second_value);
+        minus_second_value = editCyclesPopupView.findViewById(R.id.minus_second_value);
+        plus_third_value = editCyclesPopupView.findViewById(R.id.plus_third_value);
+        minus_third_value = editCyclesPopupView.findViewById(R.id.minus_third_value);
+        first_value_single_edit = editCyclesPopupView.findViewById(R.id.first_value_single_edit);
+        second_value_single_edit = editCyclesPopupView.findViewById(R.id.second_value_single_edit);
+        third_value_single_edit = editCyclesPopupView.findViewById(R.id.third_value_single_edit);
+        add_cycle = editCyclesPopupView.findViewById(R.id.add_cycle);
+        sub_cycle = editCyclesPopupView.findViewById(R.id.subtract_cycle);
 
         reset = findViewById(R.id.reset);
         cycle_header_text = findViewById(R.id.cycle_header_text);
