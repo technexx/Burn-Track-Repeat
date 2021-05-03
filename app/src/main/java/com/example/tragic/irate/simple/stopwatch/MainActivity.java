@@ -312,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
+    //Todo: editText should -> textView when using +/- buttons.
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
@@ -1038,102 +1039,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         first_value_textView.setOnClickListener(v-> {
-            switch (mode) {
-                case 1:
-                    if (first_value_textView.isShown()) {
-                        first_value_textView.setVisibility(View.GONE);
-                        first_value_edit.setVisibility(View.VISIBLE);
-                        first_value_edit_two.setVisibility(View.VISIBLE);
-                        first_value_sep.setVisibility(View.VISIBLE);
-                        convertEditTime();
-                    }
-                    if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
-                        second_value_textView.setVisibility(View.VISIBLE);
-                        second_value_edit.setVisibility(View.GONE);
-                        second_value_edit_two.setVisibility(View.GONE);
-                        second_value_sep.setVisibility(View.GONE);
-                    }
-                    break;
-                case 3:
-                    if (first_value_textView.isShown()) {
-                        first_value_textView.setVisibility(View.GONE);
-                        first_value_single_edit.setVisibility(View.VISIBLE);
-                    }
-                    if (second_value_single_edit.isShown()) {
-                        second_value_single_edit.setVisibility(View.GONE);
-                        second_value_textView.setVisibility(View.VISIBLE);
-                    }
-                    if (third_value_single_edit.isShown()){
-                        third_value_single_edit.setVisibility(View.GONE);
-                        third_value_textView.setVisibility(View.VISIBLE);
-                    }
-            }
+            editAndTextSwitch(true, 1);
         });
 
         second_value_textView.setOnClickListener(v-> {
-            switch (mode) {
-                case 1: case 2:
-                    if (second_value_textView.isShown()) {
-                        second_value_textView.setVisibility(View.INVISIBLE);
-                        second_value_edit.setVisibility(View.VISIBLE);
-                        second_value_edit_two.setVisibility(View.VISIBLE);
-                        second_value_sep.setVisibility(View.VISIBLE);
-                    }
-                    if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
-                        first_value_textView.setVisibility(View.VISIBLE);
-                        first_value_edit.setVisibility(View.GONE);
-                        first_value_edit_two.setVisibility(View.GONE);
-                        first_value_sep.setVisibility(View.GONE);
-                    }
-                    convertEditTime();
-                    break;
-                case 3:
-                    if (first_value_single_edit.isShown()) {
-                        first_value_textView.setVisibility(View.VISIBLE);
-                        first_value_single_edit.setVisibility(View.GONE);
-                    }
-                    if (second_value_textView.isShown()) {
-                        second_value_single_edit.setVisibility(View.VISIBLE);
-                        second_value_textView.setVisibility(View.GONE);
-                    }
-                    if (third_value_single_edit.isShown()){
-                        third_value_single_edit.setVisibility(View.GONE);
-                        third_value_textView.setVisibility(View.VISIBLE);
-                    }
-                    break;
-            }
-
+            editAndTextSwitch(true, 2);
         });
 
         third_value_textView.setOnClickListener(v->{
-            switch (mode) {
-                case 1: case 2:
-                    if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
-                        first_value_edit.setVisibility(View.GONE);
-                        first_value_edit_two.setVisibility(View.GONE);
-                        first_value_sep.setVisibility(View.GONE);
-                    }
-                    if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
-                        second_value_edit.setVisibility(View.GONE);
-                        second_value_edit_two.setVisibility(View.GONE);
-                        second_value_sep.setVisibility(View.GONE);
-                    }
-                    break;
-                case 3:
-                    if (first_value_single_edit.isShown()) {
-                        first_value_single_edit.setVisibility(View.GONE);
-                        first_value_textView.setVisibility(View.VISIBLE);
-                    }
-                    if (second_value_edit.isShown()){
-                        second_value_single_edit.setVisibility(View.GONE);
-                        second_value_textView.setVisibility(View.VISIBLE);
-                    }
-                    if (third_value_textView.isShown()) {
-                        third_value_textView.setVisibility(View.GONE);
-                        third_value_single_edit.setVisibility(View.VISIBLE);
-                    }
-                    break;
-            }
+            editAndTextSwitch(true, 3);
         });
 
         changeFirstValue = new Runnable() {
@@ -2227,6 +2141,106 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         msTime.setAlpha(0);
         msTimePaused.setAlpha(0);
         overtime.setVisibility(View.INVISIBLE);
+    }
+
+    public void editAndTextSwitch(boolean removeTextView, int viewRemoved) {
+        if (removeTextView) {
+            if (viewRemoved == 1) {
+                switch (mode) {
+                    case 1:
+                        if (first_value_textView.isShown()) {
+                            first_value_textView.setVisibility(View.GONE);
+                            first_value_edit.setVisibility(View.VISIBLE);
+                            first_value_edit_two.setVisibility(View.VISIBLE);
+                            first_value_sep.setVisibility(View.VISIBLE);
+                            convertEditTime();
+                        }
+                        if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
+                            second_value_textView.setVisibility(View.VISIBLE);
+                            second_value_edit.setVisibility(View.GONE);
+                            second_value_edit_two.setVisibility(View.GONE);
+                            second_value_sep.setVisibility(View.GONE);
+                        }
+                        break;
+                    case 3:
+                        if (first_value_textView.isShown()) {
+                            first_value_textView.setVisibility(View.GONE);
+                            first_value_single_edit.setVisibility(View.VISIBLE);
+                        }
+                        if (second_value_single_edit.isShown()) {
+                            second_value_single_edit.setVisibility(View.GONE);
+                            second_value_textView.setVisibility(View.VISIBLE);
+                        }
+                        if (third_value_single_edit.isShown()){
+                            third_value_single_edit.setVisibility(View.GONE);
+                            third_value_textView.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                }
+            } else if (viewRemoved == 2) {
+                switch (mode) {
+                    case 1: case 2:
+                        if (second_value_textView.isShown()) {
+                            second_value_textView.setVisibility(View.INVISIBLE);
+                            second_value_edit.setVisibility(View.VISIBLE);
+                            second_value_edit_two.setVisibility(View.VISIBLE);
+                            second_value_sep.setVisibility(View.VISIBLE);
+                        }
+                        if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
+                            first_value_textView.setVisibility(View.VISIBLE);
+                            first_value_edit.setVisibility(View.GONE);
+                            first_value_edit_two.setVisibility(View.GONE);
+                            first_value_sep.setVisibility(View.GONE);
+                        }
+                        convertEditTime();
+                        break;
+                    case 3:
+                        if (first_value_single_edit.isShown()) {
+                            first_value_textView.setVisibility(View.VISIBLE);
+                            first_value_single_edit.setVisibility(View.GONE);
+                        }
+                        if (second_value_textView.isShown()) {
+                            second_value_single_edit.setVisibility(View.VISIBLE);
+                            second_value_textView.setVisibility(View.GONE);
+                        }
+                        if (third_value_single_edit.isShown()){
+                            third_value_single_edit.setVisibility(View.GONE);
+                            third_value_textView.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                }
+            } else if (viewRemoved == 3) {
+                switch (mode) {
+                    case 1: case 2:
+                        if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
+                            first_value_edit.setVisibility(View.GONE);
+                            first_value_edit_two.setVisibility(View.GONE);
+                            first_value_sep.setVisibility(View.GONE);
+                        }
+                        if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
+                            second_value_edit.setVisibility(View.GONE);
+                            second_value_edit_two.setVisibility(View.GONE);
+                            second_value_sep.setVisibility(View.GONE);
+                        }
+                        break;
+                    case 3:
+                        if (first_value_single_edit.isShown()) {
+                            first_value_single_edit.setVisibility(View.GONE);
+                            first_value_textView.setVisibility(View.VISIBLE);
+                        }
+                        if (second_value_edit.isShown()){
+                            second_value_single_edit.setVisibility(View.GONE);
+                            second_value_textView.setVisibility(View.VISIBLE);
+                        }
+                        if (third_value_textView.isShown()) {
+                            third_value_textView.setVisibility(View.GONE);
+                            third_value_single_edit.setVisibility(View.VISIBLE);
+                        }
+                        break;
+                }
+            }
+
+        }
     }
 
     public void clearArrays(boolean populateList) {

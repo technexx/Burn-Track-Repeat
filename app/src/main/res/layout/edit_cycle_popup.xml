@@ -12,7 +12,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
-        android:layout_marginStart="25dp"
+        android:layout_marginStart="4dp"
         android:layout_marginBottom="2dp"
         android:textSize="24sp"
         android:textColor="@color/white"/>
@@ -24,7 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/minus_second_value"
-        android:layout_marginStart="25dp"
+        android:layout_marginStart="4dp"
         android:layout_marginBottom="6dp"
         android:textSize="24sp"
         android:textColor="@color/white"
@@ -49,7 +49,7 @@
         android:src="@drawable/add_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="150dp"
+        android:layout_marginStart="100dp"
         android:layout_marginTop="6dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
@@ -62,7 +62,7 @@
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="300dp"
+        android:layout_marginStart="250dp"
         android:layout_marginTop="6dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
@@ -75,7 +75,7 @@
         android:src="@drawable/add_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/plus_first_value"
-        android:layout_marginStart="150dp"
+        android:layout_marginStart="100dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -88,7 +88,7 @@
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/minus_first_value"
-        android:layout_marginStart="300dp"
+        android:layout_marginStart="250dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -158,7 +158,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
-        android:layout_marginStart="232dp"
+        android:layout_marginStart="182dp"
         android:layout_marginBottom="3dp"
         android:textSize="25sp">
     </TextView>
@@ -237,7 +237,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:textSize="25sp"
-        android:layout_marginStart="232dp"
+        android:layout_marginStart="182dp"
         android:layout_marginBottom="3dp">
     </TextView>
 
