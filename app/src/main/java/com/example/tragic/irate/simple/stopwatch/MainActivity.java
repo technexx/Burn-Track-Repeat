@@ -312,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
 
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
+    //Todo: No rounds added defaults to a default Cycle instead of staying blank.
     //Todo: TDEE in sep popup w/ tabs.
     //Todo: Drag round move?
     //Todo: Variable set count-up timer, for use w/ TDEE.
@@ -2074,6 +2075,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 second_value_textView.setText(convertCustomTextView(breakValue));
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateCustom);
+                if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 2:
                 if (breakOnlyMillisUntilFinished==0) breakOnlyMillisUntilFinished = breakOnlyMillis;
@@ -2091,6 +2093,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
+                if (breaksOnlyTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 3:
                 savedCycleAdapter.setView(3);
@@ -2105,15 +2108,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     startObjectAnimator();
                     setNewText(lastTextView, timeLeft3, (pomMillis + 999)/1000);
                 }
-                AsyncTask.execute(() -> {
-                    queryCycles();
-                    runOnUiThread(()-> {
-                        if (pomCyclesList.size() > 0) {
-                            String title = pomCyclesList.get(0).getTitle();
-                            cycle_header_text.setText(title);
-                        } else cycle_header_text.setText(R.string.default_title);
-                    });
-                });
+                if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 4:
                 //Same animation instance can't be used simultaneously for both TextViews.
