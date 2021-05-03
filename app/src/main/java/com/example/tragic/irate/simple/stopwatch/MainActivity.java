@@ -312,7 +312,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: New round text doesn't appear if moving right.
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
@@ -1299,11 +1298,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     holder = customBreakTime.get(receivedPos-1);
                     customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
-                    receivedPos -=1;
-                    if (receivedPos==0) {
-                        setMillis = newMillis(true);
-                        setNewText(timePaused, timePaused, (setMillis+999)/1000);
-                    }
+                    setMillis = newMillis(true);
+                    setNewText(timePaused, timePaused, (setMillis+999)/1000);
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()>=2 && receivedPos>0) {
@@ -1311,13 +1307,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
                     receivedPos -=1;
-                    if (receivedPos==0) {
-                        breakOnlyMillis = newMillis(false);
-                        setNewText(timePaused3, timePaused2, (breakOnlyMillis+999)/1000);
-                    }
+                    breakOnlyMillis = newMillis(false);
+                    setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
                 }
             }
-//            receivedPos -=1;
             dotDraws.selectRound(receivedPos);
             drawDots(0);
             saveArrays();
@@ -1335,10 +1328,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
                     receivedPos +=1;
-                    if (receivedPos==0) {
-                        setMillis = newMillis(true);
-                        setNewText(timePaused, timePaused, (setMillis+999)/1000);
-                    }
+                    setMillis = newMillis(true);
+                    setNewText(timePaused, timePaused, (setMillis+999)/1000);
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()-1 > receivedPos && receivedPos>=0) {
@@ -1347,14 +1338,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breaksOnlyTime.set(receivedPos+1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
                     receivedPos +=1;
-                    if (receivedPos==0) {
-                        breakOnlyMillis = newMillis(false);
-                        setNewText(timePaused3, timePaused2, (breakOnlyMillis+999)/1000);
-                    }
+                    breakOnlyMillis = newMillis(false);
+                    setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
                 }
             }
             drawDots(0);
-//            receivedPos +=1;
             dotDraws.selectRound(receivedPos);
             saveArrays();
         });
@@ -1573,7 +1561,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!pomBegun) {
                     //Ensures any features meant for running timer cannot be executed here.
                     pomHalted = false;
-//                    pomMillis = newMillis(true);
                     pomMillis = 5000;
                     dotDraws.setAlpha();
                     objectAnimator3 = ObjectAnimator.ofInt(progressBar3, "progress", (int) pomProgressPause, 0);
