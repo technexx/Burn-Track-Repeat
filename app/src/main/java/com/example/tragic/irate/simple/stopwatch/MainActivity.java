@@ -635,8 +635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
         tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
-        tabLayout.addTab(tabLayout.newTab().setText("Variable"));
-//        tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+        tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
         tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -1298,18 +1297,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     holder = customBreakTime.get(receivedPos-1);
                     customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
-                    receivedPos-=1;
                     setMillis = newMillis(true);
                     setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    receivedPos-=1;
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()>=2 && receivedPos>0) {
                     long holder = breaksOnlyTime.get(receivedPos-1);
                     breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
-                    receivedPos -=1;
                     breakOnlyMillis = newMillis(false);
                     setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
+                    receivedPos-=1;
                 }
             }
             dotDraws.selectRound(receivedPos);
@@ -1328,9 +1327,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     holder = customBreakTime.get(receivedPos+1);
                     customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
-                    receivedPos +=1;
                     setMillis = newMillis(true);
                     setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    receivedPos +=1;
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()-1 > receivedPos && receivedPos>=0) {
@@ -1338,9 +1337,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     long holder = breaksOnlyTime.get(receivedPos+1);
                     breaksOnlyTime.set(receivedPos+1, breaksOnlyTime.get(receivedPos));
                     breaksOnlyTime.set(receivedPos, holder);
-                    receivedPos +=1;
                     breakOnlyMillis = newMillis(false);
                     setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
+                    receivedPos +=1;
                 }
             }
             drawDots(0);
