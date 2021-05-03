@@ -310,8 +310,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
     //Todo: Test all db stuff.
+    //Todo: "Update" will crash if nothing is saved.
 
+    //Todo: New round text doesn't appear if moving right.
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
+    //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
     //Todo: TDEE in sep popup w/ tabs.
     //Todo: Drag round move?
@@ -396,7 +399,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             defaultMenu = true;
         }
         if (deleteAllPopupWindow.isShowing()) deleteAllPopupWindow.dismiss();
-//        if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         switch (mode) {
             case 1: case 2:
                 if (first_value_edit.isShown()) {
@@ -986,6 +988,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 editCyclesPopupWindow.showAsDropDown((View) tabLayout);
             }
+            left_arrow.setVisibility(View.INVISIBLE);
+            right_arrow.setVisibility(View.INVISIBLE);
         });
 
         delete_all_confirm.setOnClickListener(v-> {
@@ -3132,8 +3136,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void pauseAndResumeTimer(int pausing) {
-        //Dismisses our add/subtract round menu once timer has begun.
+        //Dismisses our add/subtract round menu and arrows once timer has begun.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
+        left_arrow.setVisibility(View.INVISIBLE);
+        right_arrow.setVisibility(View.INVISIBLE);
         //Controls the alpha/enabled status of reset and FAB buttons.
         if (pausing==PAUSING_TIMER) resetAndFabToggle(true, false); else resetAndFabToggle(false, false);
         //Toasts empty cycle message and exits out of method.
