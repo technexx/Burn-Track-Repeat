@@ -926,10 +926,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         dotDraws.setMode(2);
                         break;
                     case 2:
-                        mode=5;
-//                        savedCycleAdapter.setView(3);
-//                        switchTimer(3, pomHalted);
-//                        dotDraws.setMode(3);
+                        mode=3;
+                        savedCycleAdapter.setView(3);
+                        switchTimer(3, pomHalted);
+                        dotDraws.setMode(3);
                         break;
                     case 3:
                         mode=4;
@@ -955,10 +955,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else fadeOutText(timeLeft2); lastTextView = timeLeft2;
                         break;
                     case 2:
-//                        if (pomHalted) {
-//                            fadeOutText(timePaused3);
-//                            lastTextView = timePaused3;
-//                        } else fadeOutText(timeLeft3); lastTextView = timeLeft3;
+                        if (pomHalted) {
+                            fadeOutText(timePaused3);
+                            lastTextView = timePaused3;
+                        } else fadeOutText(timeLeft3); lastTextView = timeLeft3;
                         break;
                     case 3:
                         if (stopwatchHalted) fadeOutText(timePaused4);
@@ -1298,6 +1298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     holder = customBreakTime.get(receivedPos-1);
                     customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
                     customBreakTime.set(receivedPos, holder);
+                    receivedPos-=1;
                     setMillis = newMillis(true);
                     setNewText(timePaused, timePaused, (setMillis+999)/1000);
                 }
