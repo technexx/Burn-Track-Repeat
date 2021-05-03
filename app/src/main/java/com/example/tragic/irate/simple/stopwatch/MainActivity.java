@@ -55,6 +55,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
 
+    ConstraintLayout.LayoutParams lp;
     boolean defaultMenu = true;
     View mainView;
     TextView save_cycles;
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long editBreakSeconds;
     int overSeconds;
 
+    ImageButton fab;
+    ImageButton circle_reset;
     TextView cycle_header_text;
     TextView cycles_completed;
     Button cycle_reset;
@@ -304,15 +307,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean minReached;
     boolean maxReached;
     int fadeVar;
-    ImageButton fab;
-    ImageButton circle_reset;
-    ConstraintLayout.LayoutParams lp;
 
-    //Todo: timer not starting after breaksOnly round, just objectAnimator.
-    //Todo: postDelay at end of breaksOnly rounds will b0rk us unless we disable the timer until its completion.
-    //Todo: FAB should toggle popupView, and onTouchEvent should remove it.
+
     //Todo: Test all db stuff.
 
+    //Todo: Add textReduce to Pom mode using minutes instead of seconds.
+    //Todo: TDEE in sep popup w/ tabs.
+    //Todo: Drag round move?
     //Todo: Variable set count-up timer, for use w/ TDEE.
     //Todo: Variable set only mode? Again, for TDEE.
     //Todo: Option to skip EITHER set or break. Option to undo skip.
@@ -329,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
     //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
     //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
-    //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check lifecycle is stable.
+    //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
 
     //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
     //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
@@ -626,7 +627,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
         tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
-        tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+        tabLayout.addTab(tabLayout.newTab().setText("Variable"));
+//        tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
         tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -916,10 +918,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         dotDraws.setMode(2);
                         break;
                     case 2:
-                        mode=3;
-                        savedCycleAdapter.setView(3);
-                        switchTimer(3, pomHalted);
-                        dotDraws.setMode(3);
+                        mode=5;
+//                        savedCycleAdapter.setView(3);
+//                        switchTimer(3, pomHalted);
+//                        dotDraws.setMode(3);
                         break;
                     case 3:
                         mode=4;
@@ -945,10 +947,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         } else fadeOutText(timeLeft2); lastTextView = timeLeft2;
                         break;
                     case 2:
-                        if (pomHalted) {
-                            fadeOutText(timePaused3);
-                            lastTextView = timePaused3;
-                        } else fadeOutText(timeLeft3); lastTextView = timeLeft3;
+//                        if (pomHalted) {
+//                            fadeOutText(timePaused3);
+//                            lastTextView = timePaused3;
+//                        } else fadeOutText(timeLeft3); lastTextView = timeLeft3;
                         break;
                     case 3:
                         if (stopwatchHalted) fadeOutText(timePaused4);
@@ -1580,6 +1582,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void startSetTimer() {
         AtomicBoolean textSizeReduced = new AtomicBoolean(false);
+        if (setMillis >= 59000) textSizeReduced.set(true);
+
         setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
         timer = new CountDownTimer(setMillis, 50) {
             @Override
@@ -1596,9 +1600,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
 
                 if (mode==1) {
-                    if (!textSizeReduced.get()) if (setMillis<59000) {
+                    if (textSizeReduced.get()) if (setMillis<59000) {
                         changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-                        textSizeReduced.set(true);
+                        textSizeReduced.set(false);
                     }
                     timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                     drawDots(1);
@@ -1642,6 +1646,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void startBreakTimer() {
         if (mode==1) {
+            AtomicBoolean textSizeReduced = new AtomicBoolean(false);
+            if (breakMillis >= 59000) textSizeReduced.set(true);
+
             timer = new CountDownTimer(breakMillis, 50) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -1657,6 +1664,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                     //Prevents overlap once timer has begin, since conditional only needs to be true to start the series of ticks.
                     if (mode==1) {
+                        if (textSizeReduced.get()) if (breakMillis<59000) {
+                            changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+                            textSizeReduced.set(false);
+                        }
                         timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
                         drawDots(2);
                     }
@@ -1706,6 +1717,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }.start();
         } else if (mode==2) {
+            AtomicBoolean textSizeReduced = new AtomicBoolean(false);
+            if (breakOnlyMillis >= 59000) textSizeReduced.set(true);
+
             timer2 = new CountDownTimer(breakOnlyMillis, 50) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -1720,6 +1734,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (customAlpha >=1) fadeCustomTimer = false;
 
                     if (mode==2) {
+                        if (textSizeReduced.get()) if (breakOnlyMillis<59000) {
+                            changeTextSize(valueAnimatorUp, timeLeft2, timePaused2);
+                            textSizeReduced.set(false);
+                        }
                         timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
                         drawDots(3);
                     }
@@ -1744,13 +1762,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         movingBOCycle=1;
 
                         mHandler.postDelayed(() -> {
-                            //Todo: Delayed removeSetOrBreak may cause issue if tried to reset via pauseResume too quickly.
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
                             removeSetOrBreak(false);
                             boTimerDisabled = false;
                             stopAscent = true;
-                            Log.i("testCount", "number is " + numberOfBreaksOnly);
 
                             //If numberOfBreaksOnly has been reduced to 0 in this runnable, do end cycle stuff. Since we are pausing between breaks in this mode anyway, we are doing less than the set/break combos.
                             if (numberOfBreaksOnly==0){
@@ -3179,7 +3195,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyHalted = false;
                             startObjectAnimator();
                             startBreakTimer();
-                            //Todo: Need to get/set new millis value.
+                            //Todo: skips pauses 3/4 (resetting/restarting) if pressed very quickly post-round.
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
                             mHandler.removeCallbacks(ot);
@@ -3196,6 +3212,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timePaused2.setAlpha(0f);
                             timeLeft2.setAlpha(1.0f);
                         }
+                        Log.i("testCount", "pausing var is " + pausing);
                     } else resetTimer();
                     break;
                 case 3:

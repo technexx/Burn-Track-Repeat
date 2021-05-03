@@ -288,8 +288,6 @@ public class DotDraws extends View {
                         end = end - (currentPos*3);
                     }
                     break;
-                case 3:
-
             }
             mPaintBox.setColor(Color.WHITE);
             mPaintBox.setStyle(Paint.Style.STROKE);
