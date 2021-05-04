@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ImageButton fab;
     ImageButton circle_reset;
+    ImageButton lap_icon;
     TextView cycle_header_text;
     TextView cycles_completed;
     Button cycle_reset;
@@ -138,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ImageView sortCheckmark;
     Button skip;
-    TextView newLap;
 
     int PAUSING_TIMER = 1;
     int RESUMING_TIMER = 2;
@@ -718,12 +718,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles_completed = findViewById(R.id.cycles_completed);
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
-        newLap = findViewById(R.id.new_lap);
         left_arrow = findViewById(R.id.left_arrow);
         right_arrow = findViewById(R.id.right_arrow);
         delete_sb = findViewById(R.id.delete_set_break);
         fab = findViewById(R.id.fab);
         circle_reset = findViewById(R.id.circle_reset);
+        lap_icon = findViewById(R.id.lap_icon);
 
         save_cycles = findViewById(R.id.save_cycles);
         update_cycles = findViewById(R.id.update_cycles);
@@ -761,6 +761,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setVisibility(View.GONE);
         second_value_single_edit.setVisibility(View.GONE);
         third_value_single_edit.setVisibility(View.GONE);
+        lap_icon.setVisibility(View.INVISIBLE);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -783,7 +784,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft4.setTextSize(90f);
         timePaused4.setTextSize(90f);
         skip.setText(R.string.skip_round);
-        newLap.setText(R.string.lap);
         cycle_reset.setText(R.string.clear_cycles);
         cycles_completed.setText(R.string.cycles_done);
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -795,7 +795,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar2.setVisibility(View.GONE);
         progressBar3.setVisibility(View.GONE);
         stopWatchView.setVisibility(View.GONE);
-        newLap.setVisibility(View.GONE);
         lapRecycler.setVisibility(View.GONE);
         overtime.setVisibility(View.INVISIBLE);
 
@@ -1399,7 +1398,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        newLap.setOnClickListener(v -> {
+        lap_icon.setOnClickListener(v -> {
             double newSeconds = msReset/60;
             double newMinutes = newSeconds/60;
 
@@ -1999,6 +1998,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resetAndFabToggle(false, true);
         } else if (!halted) resetAndFabToggle(false, false);
 
+        fab.setVisibility(View.VISIBLE);
+        lap_icon.setVisibility(View.INVISIBLE);
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2030,7 +2031,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     setNewText(lastTextView, timeLeft2, (breakOnlyMillis + 999)/1000);
                     customAlpha = 0;
                     fadeCustomTimer = true;
-                    fadeCustomTimer = true;
                     startObjectAnimator();
                 }
                 savedCycleAdapter.setView(2);
@@ -2059,6 +2059,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
                 if (stopwatchHalted) fadeInText(timePaused4);
                 else fadeInText(timeLeft4);
+                fab.setVisibility(View.INVISIBLE);
+                lap_icon.setVisibility(View.VISIBLE);
+                if (halted) {
+                    lap_icon.setAlpha(0.3f);
+                    lap_icon.setEnabled(false);
+                } else {
+                    lap_icon.setAlpha(1.0f);
+                    lap_icon.setEnabled(true);
+                }
                 break;
         }
         dotDraws.setAlpha();
@@ -3140,7 +3149,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 second_value_textView.setText(String.valueOf(pomValue2));
                 third_value_textView.setText(String.valueOf(pomValue3));
 
-                newLap.setVisibility(View.GONE);
                 s1.setText(R.string.work_time);
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
@@ -3158,7 +3166,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycle_reset.setVisibility(View.GONE);
                 overtime.setVisibility(View.GONE);
 
-                newLap.setVisibility(View.VISIBLE);
                 lapRecycler.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
                 msTime.setAlpha(1);
@@ -3326,6 +3333,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         };
                         mHandler.post(stopWatchRunnable);
                         stopwatchHalted = false;
+                        lap_icon.setAlpha(1.0f);
+                        lap_icon.setEnabled(true);
                     } else if (pausing == PAUSING_TIMER) {
                         timeLeft4.setAlpha(0);
                         timePaused4.setAlpha(1);
@@ -3335,6 +3344,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         msTimePaused.setText(msTime.getText());
                         mHandler.removeCallbacksAndMessages(null);
                         stopwatchHalted = true;
+                        lap_icon.setAlpha(0.3f);
+                        lap_icon.setEnabled(false);
                     }
             }
         }
@@ -3403,6 +3414,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 breakBegun = false;
                 customHalted = true;
                 onBreak = false;
+                resetAndFabToggle(false, true);
                 break;
             case 2:
                 timePaused2.setAlpha(1);
@@ -3413,6 +3425,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 modeTwoTimerEnded = false;
                 breakOnlyBegun = false;
                 breaksOnlyHalted = true;
+                resetAndFabToggle(false, true);
                 break;
             case 3:
                 timePaused3.setAlpha(1);
@@ -3425,6 +3438,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 activePomCycle = false;
                 if (timer3 != null) timer3.cancel();
                 if (objectAnimator3 != null) objectAnimator3.cancel();
+                resetAndFabToggle(false, true);
                 break;
             case 4:
                 stopwatchHalted = true;
@@ -3444,13 +3458,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (currentLapList.size()>0) currentLapList.clear();
                 if (savedLapList.size()>0) savedLapList.clear();
                 lapAdapter.notifyDataSetChanged();
+                resetAndFabToggle(false, false);
                 break;
         }
         add_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
         sub_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
-        resetAndFabToggle(false, true);
         populateCycleUI();
 
         //Todo: We do want separate animations in case multiples are running at once, we do not want to invalidate all. Test before we change.
