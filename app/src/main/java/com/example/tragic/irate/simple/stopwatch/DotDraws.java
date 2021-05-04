@@ -124,6 +124,7 @@ public class DotDraws extends View {
     public void setMode(int mode) {
         mOldMode = mMode;
         mMode = mode;
+        if (mMode==4) invalidate();
     }
 
     public void setTime(ArrayList<Long> setTime) {

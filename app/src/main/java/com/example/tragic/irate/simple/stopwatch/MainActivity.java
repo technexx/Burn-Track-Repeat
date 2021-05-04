@@ -1040,27 +1040,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             });
         });
 
-        upDown_arrow_one.setImageResource(R.drawable.arrow_up);
+        upDown_arrow_one.setImageResource(R.drawable.arrow_down);
         upDown_arrow_one.setTag(1);
-        upDown_arrow_two.setImageResource(R.drawable.arrow_up);
+        upDown_arrow_two.setImageResource(R.drawable.arrow_down);
         upDown_arrow_two.setTag(1);
 
         upDown_arrow_one.setOnClickListener(v-> {
             if (upDown_arrow_one.getTag().equals(1)) {
-                upDown_arrow_one.setImageResource(R.drawable.arrow_down);
+                upDown_arrow_one.setImageResource(R.drawable.arrow_up);
                 upDown_arrow_one.setTag(2);
             } else {
-                upDown_arrow_one.setImageResource(R.drawable.arrow_up);
+                upDown_arrow_one.setImageResource(R.drawable.arrow_down);
                 upDown_arrow_one.setTag(1);
             }
         });
 
         upDown_arrow_two.setOnClickListener(v -> {
             if (upDown_arrow_two.getTag().equals(1)) {
-                upDown_arrow_two.setImageResource(R.drawable.arrow_down);
+                upDown_arrow_two.setImageResource(R.drawable.arrow_up);
                 upDown_arrow_two.setTag(2);
             } else {
-                upDown_arrow_two.setImageResource(R.drawable.arrow_up);
+                upDown_arrow_two.setImageResource(R.drawable.arrow_down);
                 upDown_arrow_two.setTag(1);
             }
         });
@@ -1339,7 +1339,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     else pauseAndResumeTimer(RESUMING_TIMER);
                     break;
                 case 4:
-                    pauseAndResumeTimer(0);
+                    if (stopwatchHalted) pauseAndResumeTimer(RESUMING_TIMER); else pauseAndResumeTimer(PAUSING_TIMER);
+//                    pauseAndResumeTimer(0);
                     break;
             }
         });
@@ -2028,6 +2029,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else {
                     setNewText(lastTextView, timeLeft2, (breakOnlyMillis + 999)/1000);
                     customAlpha = 0;
+                    fadeCustomTimer = true;
                     fadeCustomTimer = true;
                     startObjectAnimator();
                 }
@@ -3196,7 +3198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //Todo: boTimer getting set to disabled.
         //disabledTimer booleans are to prevent ANY action being taken.
-        if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3)) {
+        if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
 
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
@@ -3245,7 +3247,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyHalted = false;
                             startObjectAnimator();
                             startBreakTimer();
-                            //Todo: skips pauses 3/4 (resetting/restarting) if pressed very quickly post-round.
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
                             mHandler.removeCallbacks(ot);
@@ -3288,7 +3289,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 4:
                     DecimalFormat df2 = new DecimalFormat("00");
                     if (fadeInObj != null) fadeInObj.cancel();
-                    if (stopwatchHalted) {
+                    if (pausing == RESUMING_TIMER) {
                         timeLeft4.setAlpha(1);
                         timePaused4.setAlpha(0);
                         msTime.setAlpha(1);
@@ -3325,7 +3326,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         };
                         mHandler.post(stopWatchRunnable);
                         stopwatchHalted = false;
-                    } else {
+                    } else if (pausing == PAUSING_TIMER) {
                         timeLeft4.setAlpha(0);
                         timePaused4.setAlpha(1);
                         msTime.setAlpha(0);
