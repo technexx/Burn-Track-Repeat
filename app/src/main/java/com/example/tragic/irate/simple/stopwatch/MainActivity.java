@@ -3165,7 +3165,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 plus_third_value.setVisibility(View.VISIBLE);
                 minus_third_value.setVisibility(View.VISIBLE);
                 overtime.setVisibility(View.GONE);
-                cycle_header_text.setVisibility(View.INVISIBLE);
+                cycle_header_text.setVisibility(View.VISIBLE);
 
                 third_value_textView.setVisibility(View.VISIBLE);
                 first_value_textView.setText(String.valueOf(pomValue1));
