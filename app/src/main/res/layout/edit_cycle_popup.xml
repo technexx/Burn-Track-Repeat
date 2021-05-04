@@ -62,7 +62,7 @@
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="250dp"
+        android:layout_marginStart="235dp"
         android:layout_marginTop="6dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
@@ -88,7 +88,7 @@
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/minus_first_value"
-        android:layout_marginStart="250dp"
+        android:layout_marginStart="235dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -101,7 +101,7 @@
         android:src="@drawable/add_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/plus_second_value"
-        android:layout_marginStart="150dp"
+        android:layout_marginStart="100dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -114,7 +114,7 @@
         android:src="@drawable/subtract_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/minus_second_value"
-        android:layout_marginStart="300dp"
+        android:layout_marginStart="235dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -301,6 +301,30 @@
         android:minWidth="35dp"
         android:gravity="center_horizontal">
     </EditText>
+
+    <ImageButton
+        android:id="@+id/s1_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/arrow_up_2"
+        android:background="@drawable/rectangle_shape_2">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/s2_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="48dp"
+        android:src="@drawable/arrow_up_2"
+        android:background="@drawable/rectangle_shape_2">
+    </ImageButton>
 
     <Button
         android:text="Add"
