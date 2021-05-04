@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -132,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Button cancel_header_save;
     ImageButton delete_sb;
     TextView overtime;
+    ImageButton upDown_arrow_one;
+    ImageButton upDown_arrow_two;
 
     ImageView sortCheckmark;
     Button skip;
@@ -220,8 +223,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ValueAnimator sizeAnimator;
     ValueAnimator valueAnimatorDown;
     ValueAnimator valueAnimatorUp;
-    Animation buttonAnimIn;
-    Animation buttonAnimOut;
 
     ArrayList<String> customTitleArray;
     ArrayList<String> breaksOnlyTitleArray;
@@ -703,6 +704,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_single_edit = editCyclesPopupView.findViewById(R.id.third_value_single_edit);
         add_cycle = editCyclesPopupView.findViewById(R.id.add_cycle);
         sub_cycle = editCyclesPopupView.findViewById(R.id.subtract_cycle);
+        upDown_arrow_one  = editCyclesPopupView.findViewById(R.id.s1_up);
+        upDown_arrow_two  = editCyclesPopupView.findViewById(R.id.s2_up);
 
         reset = findViewById(R.id.reset);
         cycle_header_text = findViewById(R.id.cycle_header_text);
@@ -1035,6 +1038,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!titleText.equals(newTitle)) canSaveOrUpdate(true);
                 cycle_header_text.setText(newTitle);
             });
+        });
+
+        upDown_arrow_one.setImageResource(R.drawable.arrow_up);
+        upDown_arrow_one.setTag(1);
+        upDown_arrow_two.setImageResource(R.drawable.arrow_up);
+        upDown_arrow_two.setTag(1);
+
+        upDown_arrow_one.setOnClickListener(v-> {
+            if (upDown_arrow_one.getTag().equals(1)) {
+                upDown_arrow_one.setImageResource(R.drawable.arrow_down);
+                upDown_arrow_one.setTag(2);
+            } else {
+                upDown_arrow_one.setImageResource(R.drawable.arrow_up);
+                upDown_arrow_one.setTag(1);
+            }
+        });
+
+        upDown_arrow_two.setOnClickListener(v -> {
+            if (upDown_arrow_two.getTag().equals(1)) {
+                upDown_arrow_two.setImageResource(R.drawable.arrow_down);
+                upDown_arrow_two.setTag(2);
+            } else {
+                upDown_arrow_two.setImageResource(R.drawable.arrow_up);
+                upDown_arrow_two.setTag(1);
+            }
         });
 
         first_value_textView.setOnClickListener(v-> {

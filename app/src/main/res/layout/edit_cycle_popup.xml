@@ -310,7 +310,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="4dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/arrow_up_2"
+        android:src="@drawable/arrow_up"
         android:background="@drawable/rectangle_shape_2">
     </ImageButton>
 
@@ -322,7 +322,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="4dp"
         android:layout_marginTop="48dp"
-        android:src="@drawable/arrow_up_2"
+        android:src="@drawable/arrow_up"
         android:background="@drawable/rectangle_shape_2">
     </ImageButton>
 
