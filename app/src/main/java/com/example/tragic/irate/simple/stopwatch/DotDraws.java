@@ -53,6 +53,7 @@ public class DotDraws extends View {
     sendPosition mSendPosition;
     sendAlpha mSendAlpha;
     int mOldMode;
+    boolean mGoingUp;
 
     public interface sendPosition {
         void sendPos(int pos);
@@ -99,6 +100,10 @@ public class DotDraws extends View {
         mPaintBox.setColor(Color.WHITE);
         mPaintBox.setStyle(Paint.Style.STROKE);
         mPaintBox.setStrokeWidth(6);
+    }
+
+    public void countingUp(boolean goingUp) {
+        mGoingUp = goingUp;
     }
 
     public void customDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {

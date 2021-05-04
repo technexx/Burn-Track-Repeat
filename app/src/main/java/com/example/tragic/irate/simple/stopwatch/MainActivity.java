@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ImageButton fab;
     ImageButton circle_reset;
-    ImageButton lap_icon;
+    ImageButton new_lap;
     TextView cycle_header_text;
     TextView cycles_completed;
     Button cycle_reset;
@@ -723,7 +723,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         delete_sb = findViewById(R.id.delete_set_break);
         fab = findViewById(R.id.fab);
         circle_reset = findViewById(R.id.circle_reset);
-        lap_icon = findViewById(R.id.lap_icon);
+        new_lap = findViewById(R.id.new_lap);
 
         save_cycles = findViewById(R.id.save_cycles);
         update_cycles = findViewById(R.id.update_cycles);
@@ -761,7 +761,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setVisibility(View.GONE);
         second_value_single_edit.setVisibility(View.GONE);
         third_value_single_edit.setVisibility(View.GONE);
-        lap_icon.setVisibility(View.INVISIBLE);
+        new_lap.setVisibility(View.INVISIBLE);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -1048,9 +1048,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (upDown_arrow_one.getTag().equals(1)) {
                 upDown_arrow_one.setImageResource(R.drawable.arrow_up);
                 upDown_arrow_one.setTag(2);
+                dotDraws.countingUp(true);
             } else {
                 upDown_arrow_one.setImageResource(R.drawable.arrow_down);
                 upDown_arrow_one.setTag(1);
+                dotDraws.countingUp(false);
             }
         });
 
@@ -1058,9 +1060,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (upDown_arrow_two.getTag().equals(1)) {
                 upDown_arrow_two.setImageResource(R.drawable.arrow_up);
                 upDown_arrow_two.setTag(2);
+                dotDraws.countingUp(true);
             } else {
                 upDown_arrow_two.setImageResource(R.drawable.arrow_down);
                 upDown_arrow_two.setTag(1);
+                dotDraws.countingUp(false);
             }
         });
 
@@ -1398,7 +1402,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        lap_icon.setOnClickListener(v -> {
+        new_lap.setOnClickListener(v -> {
             double newSeconds = msReset/60;
             double newMinutes = newSeconds/60;
 
@@ -1999,7 +2003,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (!halted) resetAndFabToggle(false, false);
 
         fab.setVisibility(View.VISIBLE);
-        lap_icon.setVisibility(View.INVISIBLE);
+        new_lap.setVisibility(View.INVISIBLE);
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2060,13 +2064,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (stopwatchHalted) fadeInText(timePaused4);
                 else fadeInText(timeLeft4);
                 fab.setVisibility(View.INVISIBLE);
-                lap_icon.setVisibility(View.VISIBLE);
+                new_lap.setVisibility(View.VISIBLE);
                 if (halted) {
-                    lap_icon.setAlpha(0.3f);
-                    lap_icon.setEnabled(false);
+                    new_lap.setAlpha(0.3f);
+                    new_lap.setEnabled(false);
                 } else {
-                    lap_icon.setAlpha(1.0f);
-                    lap_icon.setEnabled(true);
+                    new_lap.setAlpha(1.0f);
+                    new_lap.setEnabled(true);
                 }
                 break;
         }
@@ -3176,15 +3180,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 msTime.setText(displayMs);
                 msTimePaused.setText(displayMs);
         }
-        first_value_edit.setVisibility(View.GONE);
-        first_value_sep.setVisibility(View.GONE);
-        first_value_edit_two.setVisibility(View.GONE);
-        second_value_edit.setVisibility(View.GONE);
-        second_value_sep.setVisibility(View.GONE);
-        second_value_edit_two.setVisibility(View.GONE);
-        first_value_single_edit.setVisibility(View.GONE);
-        second_value_single_edit.setVisibility(View.GONE);
-        third_value_single_edit.setVisibility(View.GONE);
     }
 
     public void pauseAndResumeTimer(int pausing) {
@@ -3203,7 +3198,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDisabled = true;
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
 
-        //Todo: boTimer getting set to disabled.
         //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
 
@@ -3270,7 +3264,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timePaused2.setAlpha(0f);
                             timeLeft2.setAlpha(1.0f);
                         }
-                        Log.i("testCount", "pausing var is " + pausing);
                     } else resetTimer();
                     break;
                 case 3:
@@ -3333,8 +3326,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         };
                         mHandler.post(stopWatchRunnable);
                         stopwatchHalted = false;
-                        lap_icon.setAlpha(1.0f);
-                        lap_icon.setEnabled(true);
+                        new_lap.setAlpha(1.0f);
+                        new_lap.setEnabled(true);
                     } else if (pausing == PAUSING_TIMER) {
                         timeLeft4.setAlpha(0);
                         timePaused4.setAlpha(1);
@@ -3344,8 +3337,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         msTimePaused.setText(msTime.getText());
                         mHandler.removeCallbacksAndMessages(null);
                         stopwatchHalted = true;
-                        lap_icon.setAlpha(0.3f);
-                        lap_icon.setEnabled(false);
+                        new_lap.setAlpha(0.3f);
+                        new_lap.setEnabled(false);
                     }
             }
         }

@@ -92,20 +92,6 @@
         app:strokeWidth="1dp">
     </Button>
 
-    <TextView
-        android:id="@+id/new_lap"
-        android:textColor="@color/white"
-        android:layout_width="70dp"
-        android:layout_height="75dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/progressBar"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="350dp"
-        android:layout_marginStart="33dp"
-        android:textSize="14sp"
-        android:gravity="center_vertical">
-    </TextView>
-
     <ImageButton
         android:id="@+id/left_arrow"
         android:src="@drawable/arrow_left_2"
@@ -389,7 +375,7 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/lap_icon"
+        android:id="@+id/new_lap"
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
