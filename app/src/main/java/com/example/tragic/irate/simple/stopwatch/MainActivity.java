@@ -527,7 +527,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return true;
     }
 
-    //Todo: Consolidate >0 condition.
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -1050,6 +1049,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editAndTextSwitch(true, 3);
         });
 
+        //Todo: editTextSwitch here.
         changeFirstValue = new Runnable() {
             @Override
             public void run() {
@@ -1066,6 +1066,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 mHandler.postDelayed(this, incrementTimer*10);
                 setTimerValueBounds();
                 fadeCap(first_value_textView);
+                editAndTextSwitch(false, 1);
             }
         };
 
@@ -1088,6 +1089,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 mHandler.postDelayed(this, incrementTimer*10);
                 setTimerValueBounds();
                 fadeCap(second_value_textView);
+                editAndTextSwitch(false, 2);
             }
         };
 
@@ -1099,6 +1101,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 mHandler.postDelayed(this, incrementTimer*10);
                 setTimerValueBounds();
                 fadeCap(third_value_textView);
+                editAndTextSwitch(false, 3);
             }
         };
 
@@ -2210,36 +2213,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                 }
             } else if (viewRemoved == 3) {
-                switch (mode) {
-                    case 1: case 2:
-                        if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
-                            first_value_edit.setVisibility(View.GONE);
-                            first_value_edit_two.setVisibility(View.GONE);
-                            first_value_sep.setVisibility(View.GONE);
-                        }
-                        if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
-                            second_value_edit.setVisibility(View.GONE);
-                            second_value_edit_two.setVisibility(View.GONE);
-                            second_value_sep.setVisibility(View.GONE);
-                        }
-                        break;
-                    case 3:
-                        if (first_value_single_edit.isShown()) {
-                            first_value_single_edit.setVisibility(View.GONE);
-                            first_value_textView.setVisibility(View.VISIBLE);
-                        }
-                        if (second_value_edit.isShown()){
-                            second_value_single_edit.setVisibility(View.GONE);
-                            second_value_textView.setVisibility(View.VISIBLE);
-                        }
-                        if (third_value_textView.isShown()) {
-                            third_value_textView.setVisibility(View.GONE);
-                            third_value_single_edit.setVisibility(View.VISIBLE);
-                        }
-                        break;
+                if (first_value_single_edit.isShown()) {
+                    first_value_single_edit.setVisibility(View.GONE);
+                    first_value_textView.setVisibility(View.VISIBLE);
                 }
+                if (second_value_edit.isShown()){
+                    second_value_single_edit.setVisibility(View.GONE);
+                    second_value_textView.setVisibility(View.VISIBLE);
+                }
+                third_value_textView.setVisibility(View.GONE);
+                third_value_single_edit.setVisibility(View.VISIBLE);
             }
 
+        } else {
+            switch (mode) {
+                case 1: case 2:
+                    if (viewRemoved == 1) {
+                        //If first is shown, second and separator are also shown.
+                        if (first_value_edit.isShown()) {
+                            first_value_edit.setVisibility(View.GONE);
+                            first_value_sep.setVisibility(View.GONE);
+                            first_value_edit_two.setVisibility(View.GONE);
+                            first_value_textView.setVisibility(View.VISIBLE);
+                        }
+                    } else if (viewRemoved == 2) {
+                        if (second_value_edit.isShown()) {
+                            second_value_edit.setVisibility(View.GONE);
+                            second_value_sep.setVisibility(View.GONE);
+                            second_value_edit_two.setVisibility(View.GONE);
+                            second_value_textView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    break;
+                case 3:
+                    if (viewRemoved == 3) {
+                        if (third_value_single_edit.isShown()) {
+                            third_value_single_edit.setVisibility(View.GONE);
+                            third_value_textView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    break;
+            }
         }
     }
 
