@@ -202,6 +202,7 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
+    //Todo: For counting up cycles: Use setList, but pass in a different list from Main, and just switch as necessary.
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();

@@ -231,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<Long> customBreakTime;
     ArrayList<Long> breaksOnlyTime;
     ArrayList<Long> pomValuesTime;
+    ArrayList<Long> customSetTimeUP;
+    ArrayList<Long> customBreakTimeUP;
+    ArrayList<Long> breaksOnlyTimeUP;
     String convertedSetList;
     String convertedBreakList;
     String convertedBreakOnlyList;
@@ -313,8 +316,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: editText should -> textView when using +/- buttons.
+    //Todo: Change as little as possible for counting up cycles. Use separate long arrays, but pass those in for everything else that uses our lists.
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
+    //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
     //Todo: TDEE in sep popup w/ tabs.
@@ -621,6 +625,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         customSetTime = new ArrayList<>();
         customBreakTime = new ArrayList<>();
         breaksOnlyTime = new ArrayList<>();
+        customSetTimeUP = new ArrayList<>();
+        customBreakTimeUP = new ArrayList<>();
+        breaksOnlyTimeUP = new ArrayList<>();
         currentLapList = new ArrayList<>();
         savedLapList = new ArrayList<>();
 
@@ -832,6 +839,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         customSetTime.clear();
         customBreakTime.clear();
         breaksOnlyTime.clear();
+        customSetTimeUP.clear();
+        customBreakTimeUP.clear();
+        breaksOnlyTimeUP.clear();
 
         String retrievedSetArray = sharedPreferences.getString("setArrays", "");
         String retrievedBreakArray = sharedPreferences.getString("breakArrays", "");
@@ -1080,7 +1090,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editAndTextSwitch(true, 3);
         });
 
-        //Todo: editTextSwitch here.
         changeFirstValue = new Runnable() {
             @Override
             public void run() {
@@ -1233,7 +1242,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
-        //Todo: OOB exceptions. Arrows don't stop @ end of round #.
+        //Todo: No need to switch counting up here.
         left_arrow.setOnClickListener(v-> {
             if (mode==1) {
                 if (customSetTime.size()>=2 && receivedPos>0) {
@@ -1822,6 +1831,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //      vibrator.vibrate(pattern1, 0);
 //      }
 
+    //Todo: Emtpy adds for counting up here  (i.e. list size w/ no values).
     public void adjustCustom(boolean adding) {
         //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
         if (first_value_edit.isShown()) setEditValueBounds(true);
@@ -1890,6 +1900,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveArrays();
     }
 
+    //Todo: No need for skip in counting up.
     public void skipRound() {
         if (customSetTime.size()>0) {
             int oldCycle = 0;
@@ -2023,6 +2034,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 second_value_textView.setText(convertCustomTextView(breakValue));
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateCustom);
+                //Todo: emptyCycle disables pause/resume. Watch w/ counting up on different list.
                 if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 2:
@@ -2513,6 +2525,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //Todo: Change for counting up.
     //Actually saves or updates the cycle.
     public void confirmedSaveOrUpdate(int saveOrUpdate) {
         if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
@@ -2548,6 +2561,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         cycles.setSets(convertedSetList);
                         cycles.setBreaks(convertedBreakList);
                         cycles.setTimeAdded(System.currentTimeMillis());
+                        //Todo: Can simply disable cycle count for counting up.
                         cycles.setItemCount(customSetTime.size());
                         if (saveOrUpdate == SAVING_CYCLES){
                             cyclesDatabase.cyclesDao().insertCycle(cycles);
@@ -2632,6 +2646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
     }
 
+    //Todo: Change for counting up.
     //Used to retrieve a single cycle within our database. Calls populateUICycle() which sets the Array values into our timer millis values.
     //When recall is TRUE, retrieves the last used ID instance, when recall is FALSE, Uses a positional input from our saved cycle list.
     public void selectRound(int position, boolean recall) {
@@ -2719,6 +2734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
     }
 
+    //Todo: Change for counting up.
     //All convertedLists are used in save/update method.
     private void retrieveAndCheckCycles() {
         queryCycles();
@@ -3073,6 +3089,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //Todo: Change for counting up.
     //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
     public void deleteSelectedRound() {
         if (mode==1) {
@@ -3127,6 +3144,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 third_value_single_edit.setVisibility(View.INVISIBLE);
                 plus_third_value.setVisibility(View.INVISIBLE);
                 minus_third_value.setVisibility(View.INVISIBLE);
+                cycle_header_text.setVisibility(View.VISIBLE);
                 break;
             case 3:
                 first_value_single_edit.setText(convertSeconds(pomValue1));
@@ -3147,6 +3165,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 plus_third_value.setVisibility(View.VISIBLE);
                 minus_third_value.setVisibility(View.VISIBLE);
                 overtime.setVisibility(View.GONE);
+                cycle_header_text.setVisibility(View.INVISIBLE);
 
                 third_value_textView.setVisibility(View.VISIBLE);
                 first_value_textView.setText(String.valueOf(pomValue1));
@@ -3169,6 +3188,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 skip.setVisibility(View.GONE);
                 cycle_reset.setVisibility(View.GONE);
                 overtime.setVisibility(View.GONE);
+                cycle_header_text.setVisibility(View.INVISIBLE);
 
                 lapRecycler.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
