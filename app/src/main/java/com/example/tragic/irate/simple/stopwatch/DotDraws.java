@@ -112,7 +112,8 @@ public class DotDraws extends View {
     }
 
     public void customDrawBreak(long breakCount, long breakReduce) {
-        this.mBreakOnlyCount = breakCount; this.mBreakOnlyReduce = breakReduce;
+        this.mBreakCount = breakCount; this.mBreakReduce = breakReduce;
+        invalidate();
     }
 
     public void breaksOnlyDraw(long breakOnlyCount, long breakOnlyReduce, int fadeDone) {

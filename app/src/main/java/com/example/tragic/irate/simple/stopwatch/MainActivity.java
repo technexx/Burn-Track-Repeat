@@ -877,7 +877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         for (int i=0; i<3; i++) {
             customSetTimeUP.add((long) 0);
-            customBreakTime.add((long) 0);
+            customBreakTimeUP.add((long) 0);
             breaksOnlyTimeUP.add((long) 0);
         }
 
@@ -2737,7 +2737,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (recall) {
                         pomCycles = pomCyclesList.get(pomID);
                         tempPom = pomCyclesList.get(0).getFullCycle();
-
                     } else {
                         queryCycles();
                         pomCycles = pomCyclesList.get(posHolder);
@@ -3108,6 +3107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void countUpMode(boolean onSet) {
         if (mode==1) {
             if (onSet) {
+                //Moving to COUNT UP mode.
                 if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
                     upDown_arrow_one.setTag(COUNtING_UP);
                     upDown_arrow_one.setImageResource(R.drawable.arrow_up);
@@ -3115,6 +3115,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.setTime(customSetTimeUP);
                     dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSetsUP, fadeVar);
                 } else {
+                    //Moving to COUNT DOWN mdde.
                     upDown_arrow_one.setTag(COUNTING_DOWN);
                     upDown_arrow_one.setImageResource(R.drawable.arrow_down);
                     upDown_arrow_one.setTag(1);
@@ -3123,6 +3124,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.customDrawSet(customSetTime.size(), numberOfSets, fadeVar);
                 }
             } else {
+                //Moving to COUNT UP mode.
                 if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
                     upDown_arrow_two.setTag(COUNtING_UP);
                     upDown_arrow_two.setImageResource(R.drawable.arrow_up);
@@ -3130,6 +3132,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.breakTime(customBreakTimeUP);
                     dotDraws.customDrawBreak(customBreakTimeUP.size(), numberOfBreaksUP);
                 } else {
+                    //Moving to COUNT DOWN mode.
                     upDown_arrow_two.setTag(COUNTING_DOWN);
                     upDown_arrow_two.setImageResource(R.drawable.arrow_down);
                     upDown_arrow_two.setTag(1);
