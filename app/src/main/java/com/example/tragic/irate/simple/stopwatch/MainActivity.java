@@ -812,7 +812,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         lapRecycler.setVisibility(View.GONE);
         overtime.setVisibility(View.INVISIBLE);
 
+        //Sets all timerText alphas 0, so that we can then set to 1 whichever one we want to use.
         removeViews();
+        //Since we launch our app to Sets+ default, its paused timer should always default to visible. Same w/ mode being 1.
         timePaused.setAlpha(1);
         mode = 1;
         dotDraws.setMode(1);
@@ -843,6 +845,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
         pomID = sharedPreferences.getInt("pomID", 0);
 
+        //Clears all lists so they can be populated using saved data.
         customSetTime.clear();
         customBreakTime.clear();
         breaksOnlyTime.clear();
@@ -866,6 +869,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String[] convBreaks = retrievedBreakArray.split(",");
         String[] convBO = retrievedBOArray.split(",");
 
+        //Starting list for Sets+, counting down. Recalls previously entered rounds. If no rounds exist, populates using default.
         if (!retrievedSetArray.equals("")) {
             for (int i=0; i<convSets.length; i++) {
                 customSetTime.add(Long.parseLong(convSets[i]));
@@ -875,28 +879,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!retrievedBOArray.equals("")) for (int i=0; i<convBO.length; i++) breaksOnlyTime.add(Long.parseLong(convBO[i]));
         else setDefaultCustomCycle(true);
 
+        //Starting lists for Sets+ and Breaks, counting up. Defaulting to 3 rounds for now.
         for (int i=0; i<3; i++) {
             customSetTimeUP.add((long) 0);
             customBreakTimeUP.add((long) 0);
             breaksOnlyTimeUP.add((long) 0);
         }
 
-        endAnimation = new AlphaAnimation(1.0f, 0.0f);
-        endAnimation.setDuration(300);
-        endAnimation.setStartOffset(20);
-        endAnimation.setRepeatMode(Animation.REVERSE);
-        endAnimation.setRepeatCount(Animation.INFINITE);
-
-        numberOfSets = customSetTime.size();
-        numberOfBreaks = customBreakTime.size();
-        numberOfBreaksOnly = breaksOnlyTime.size();
-
-        setMillis = customSetTime.get(0);
-        breakOnlyMillis = breaksOnlyTime.get(0);
-
-        pomValue1 = 25;
-        pomValue2 = 5;
-        pomValue3 = 15;
+        //Starting Pomodoro values. Defaults are set within sharedPref, and called if none are saved.
         for (int i=0; i<3; i++) {
             pomValuesTime.add(pomValue1);
             pomValuesTime.add(pomValue2);
@@ -906,17 +896,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomMillis = pomValue1*1000*60;
         pomMillis1 = pomValue1*1000*60;
 
+        //Sets number of rounds to size of round list.
+        numberOfSets = customSetTime.size();
+        numberOfBreaks = customBreakTime.size();
+        numberOfBreaksOnly = breaksOnlyTime.size();
+
+        //Sets initial millis values to first round value.
+        setMillis = customSetTime.get(0);
+        breakOnlyMillis = breaksOnlyTime.get(0);
+
+        //Animation that plays when round completes.
+        endAnimation = new AlphaAnimation(1.0f, 0.0f);
+        endAnimation.setDuration(300);
+        endAnimation.setStartOffset(20);
+        endAnimation.setRepeatMode(Animation.REVERSE);
+        endAnimation.setRepeatCount(Animation.INFINITE);
+
+        //Recycler view for our stopwatch laps.
         lapLayout= new LinearLayoutManager(getApplicationContext());
         lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
         lapRecycler.setAdapter(lapAdapter);
         lapRecycler.setLayoutManager(lapLayout);
 
+        //Sets all progress bars to their start value.
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
         progressBar3.setProgress(maxProgress);
 
+        //Sets our saved title.
         cycle_header_text.setText(retrievedTitle);
+        //Sets xml views.
         tabViews();
+        //Populates UI elements at app start.
         populateCycleUI();
 
         //Used in all timers to smooth out end fade.
@@ -929,6 +940,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         };
 
+        //Todo: Save should always exist, but Update should not.
+        //If one or more cycles exist in our db, gives an option to save or update.
         if ((mode==1 && cyclesList.size()>0)  || (mode==2 && cyclesBOList.size()>0)) canSaveOrUpdate(false); else canSaveOrUpdate(true);
 
         AsyncTask.execute(() -> cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext()));
