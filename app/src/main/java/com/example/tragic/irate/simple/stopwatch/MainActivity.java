@@ -202,6 +202,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long numberOfSets;
     long numberOfBreaks;
     long numberOfBreaksOnly;
+    long numberOfSetsUP;
+    long numberOfBreaksUP;
+    long numberofBreaksOnlyUP;
     long startSets;
     long startBreaksOnly;
 
@@ -312,11 +315,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     int fadeVar;
 
+    int COUNTING_DOWN = 1;
+    int COUNtING_UP = 2;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
+    //Todo: Use Stopwatch mode as a count up, and have a toggle for just the stopwatch.
     //Todo: Change as little as possible for counting up cycles. Use separate long arrays, but pass those in for everything else that uses our lists.
+
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
@@ -868,6 +875,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!retrievedBOArray.equals("")) for (int i=0; i<convBO.length; i++) breaksOnlyTime.add(Long.parseLong(convBO[i]));
         else setDefaultCustomCycle(true);
 
+        for (int i=0; i<3; i++) {
+            customSetTimeUP.add((long) 0);
+            customBreakTime.add((long) 0);
+            breaksOnlyTimeUP.add((long) 0);
+        }
+
         endAnimation = new AlphaAnimation(1.0f, 0.0f);
         endAnimation.setDuration(300);
         endAnimation.setStartOffset(20);
@@ -1055,27 +1068,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_two.setTag(1);
 
         upDown_arrow_one.setOnClickListener(v-> {
-            if (upDown_arrow_one.getTag().equals(1)) {
-                upDown_arrow_one.setImageResource(R.drawable.arrow_up);
-                upDown_arrow_one.setTag(2);
-                dotDraws.countingUp(true);
-            } else {
-                upDown_arrow_one.setImageResource(R.drawable.arrow_down);
-                upDown_arrow_one.setTag(1);
-                dotDraws.countingUp(false);
-            }
+            countUpMode(true);
         });
 
         upDown_arrow_two.setOnClickListener(v -> {
-            if (upDown_arrow_two.getTag().equals(1)) {
-                upDown_arrow_two.setImageResource(R.drawable.arrow_up);
-                upDown_arrow_two.setTag(2);
-                dotDraws.countingUp(true);
-            } else {
-                upDown_arrow_two.setImageResource(R.drawable.arrow_down);
-                upDown_arrow_two.setTag(1);
-                dotDraws.countingUp(false);
-            }
+            countUpMode(false);
         });
 
         first_value_textView.setOnClickListener(v-> {
@@ -1831,7 +1828,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //      vibrator.vibrate(pattern1, 0);
 //      }
 
-    //Todo: Emtpy adds for counting up here  (i.e. list size w/ no values).
     public void adjustCustom(boolean adding) {
         //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
         if (first_value_edit.isShown()) setEditValueBounds(true);
@@ -1840,14 +1836,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (adding) {
             switch (mode) {
                 case 1:
-                    if (customSetTime.size() < 8 && customSetTime.size() >= 0) {
-                        customSetTime.add(setValue * 1000);
-                        customBreakTime.add(breakValue * 1000);
-                        canSaveOrUpdate(true);
-                    } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                    if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+                        if (customSetTime.size() <8) {
+                            customSetTime.add(setValue * 1000);
+                            customBreakTime.add(breakValue * 1000);
+                            canSaveOrUpdate(true);
+                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                    }
+                    if (upDown_arrow_one.getTag().equals(COUNtING_UP)) {
+                        if (customSetTimeUP.size()<8) {
+                            customSetTimeUP.add((long) 0);
+                            customBreakTimeUP.add((long) 0);
+                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                    }
+                    if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
+                        if (customSetTime.size() <8) {
+                            customSetTime.add(setValue * 1000);
+                            customBreakTime.add(breakValue * 1000);
+                            canSaveOrUpdate(true);
+                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                    }
+                    if (upDown_arrow_two.getTag().equals(COUNtING_UP)) {
+                        if (customSetTimeUP.size()<8) {
+                            customSetTimeUP.add((long) 0);
+                            customBreakTimeUP.add((long) 0);
+                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case 2:
-                    if (breaksOnlyTime.size() < 8 && breaksOnlyTime.size() >= 0) {
+                    if (breaksOnlyTime.size() < 8) {
                         breaksOnlyTime.add(breaksOnlyValue * 1000);
                         canSaveOrUpdate(true);
                     } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
@@ -1870,14 +1887,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else {
                 switch (mode) {
                     case 1:
-                        if (customSetTime.size() > 0) {
-                            customSetTime.remove(customSetTime.size() - 1);
-                            customBreakTime.remove(customBreakTime.size() - 1);
-                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                        //Used w/ arrows to switch set/break places.
-                        if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
+                        if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+                            if (customSetTime.size() > 0) {
+                                customSetTime.remove(customSetTime.size() - 1);
+                                //Used w/ arrows to switch set/break places.
+                                if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
+                            } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
+                        if (upDown_arrow_one.getTag().equals(COUNtING_UP)) {
+                            if (customSetTimeUP.size()>0) {
+                                customSetTimeUP.remove(customSetTimeUP.size() -1);
+                                if (customSetTimeUP.size() - 1 < receivedPos) receivedPos = customSetTimeUP.size() - 1;
+                            } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
+                        if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
+                            if (customBreakTime.size() > 0) customBreakTime.remove(customBreakTime.size() - 1);
+                            else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
+                        if (upDown_arrow_two.getTag().equals(COUNtING_UP)) {
+                            if (customBreakTimeUP.size()>0) customBreakTimeUP.remove(customBreakTimeUP.size() -1);
+                            else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
                         if (receivedPos >=0) dotDraws.selectRound(receivedPos);
-                        canSaveOrUpdate(true);
                         break;
                     case 2:
                         if (breaksOnlyTime.size() > 0) {
@@ -2842,12 +2873,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (mode) {
             case 1:
                 if (onSet) {
-                    numberOfSets--; setMillis = newMillis(true);
+                    numberOfSets--;
+                    setMillis = newMillis(true);
                 } else {
-                    numberOfBreaks--; breakMillis = newMillis(false);
+                    numberOfBreaks--;
+                    breakMillis = newMillis(false);
                 }
                 break;
-            case 2: numberOfBreaksOnly--; breakOnlyMillis = newMillis(false);
+            case 2: numberOfBreaksOnly--;
+                    breakOnlyMillis = newMillis(false);
                 break;
         }
         drawDots(0);
@@ -3071,13 +3105,50 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public void countUpMode(boolean onSet) {
+        if (mode==1) {
+            if (onSet) {
+                if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+                    upDown_arrow_one.setTag(COUNtING_UP);
+                    upDown_arrow_one.setImageResource(R.drawable.arrow_up);
+                    dotDraws.countingUp(true);
+                    dotDraws.setTime(customSetTimeUP);
+                    dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSetsUP, fadeVar);
+                } else {
+                    upDown_arrow_one.setTag(COUNTING_DOWN);
+                    upDown_arrow_one.setImageResource(R.drawable.arrow_down);
+                    upDown_arrow_one.setTag(1);
+                    dotDraws.countingUp(false);
+                    dotDraws.setTime(customSetTime);
+                    dotDraws.customDrawSet(customSetTime.size(), numberOfSets, fadeVar);
+                }
+            } else {
+                if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
+                    upDown_arrow_two.setTag(COUNtING_UP);
+                    upDown_arrow_two.setImageResource(R.drawable.arrow_up);
+                    dotDraws.countingUp(true);
+                    dotDraws.breakTime(customBreakTimeUP);
+                    dotDraws.customDrawBreak(customBreakTimeUP.size(), numberOfBreaksUP);
+                } else {
+                    upDown_arrow_two.setTag(COUNTING_DOWN);
+                    upDown_arrow_two.setImageResource(R.drawable.arrow_down);
+                    upDown_arrow_two.setTag(1);
+                    dotDraws.countingUp(false);
+                    dotDraws.breakTime(customBreakTime);
+                    dotDraws.customDrawBreak(customBreakTime.size(), numberOfBreaks);
+                }
+            }
+        }
+    }
 
     public void drawDots(int fadeVar) {
         switch (mode) {
             case 1:
                 dotDraws.setTime(customSetTime);
                 dotDraws.breakTime(customBreakTime);
-                dotDraws.customDraw(startSets, startSets, numberOfSets, numberOfBreaks, fadeVar);
+                //Sets and breaks here are always the same, so we use startSets for both.
+                dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
+                dotDraws.customDrawBreak(startSets, numberOfBreaks);
                 break;
             case 2:
                 dotDraws.breakOnlyTime(breaksOnlyTime);
@@ -3375,6 +3446,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else timePaused.setText("?");
                 numberOfSets = customSetTime.size();
                 numberOfBreaks = customBreakTime.size();
+                numberOfSetsUP = customSetTimeUP.size();
+                numberOfBreaksUP = customBreakTimeUP.size();
 
                 if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
                 if (setMillis>=60000) {
@@ -3390,6 +3463,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timeLeft2.setText(convertSeconds((breakOnlyMillis+999)/1000));
                 } else timePaused2.setText("?");
                 numberOfBreaksOnly = breaksOnlyTime.size();
+                numberofBreaksOnlyUP = breaksOnlyTimeUP.size();
 
                 if (breaksOnlyTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
@@ -3407,6 +3481,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
         }
+        //Todo: Watch this for Count Up.
         startSets = customSetTime.size();
         startBreaksOnly = breaksOnlyTime.size();
         dotDraws.setAlpha();

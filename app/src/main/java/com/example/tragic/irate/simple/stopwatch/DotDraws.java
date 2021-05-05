@@ -106,9 +106,13 @@ public class DotDraws extends View {
         mGoingUp = goingUp;
     }
 
-    public void customDraw(long setCount, long breakCount, long setReduce, long breakReduce, int fadeDone) {
-        this.mSetCount = setCount; this.mBreakCount = breakCount; this.mSetReduce = setReduce; this.mBreakReduce = breakReduce; this.mFadeDone = fadeDone;
+    public void customDrawSet(long setCount, long setReduce, int fadeDone) {
+        this.mSetCount = setCount; this.mSetReduce = setReduce; this.mFadeDone = fadeDone;
         invalidate();
+    }
+
+    public void customDrawBreak(long breakCount, long breakReduce) {
+        this.mBreakOnlyCount = breakCount; this.mBreakOnlyReduce = breakReduce;
     }
 
     public void breaksOnlyDraw(long breakOnlyCount, long breakOnlyReduce, int fadeDone) {
@@ -202,7 +206,7 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
-    //Todo: For counting up cycles: Use setList, but pass in a different list from Main, and just switch as necessary.
+    //Todo: Constructor list gets replaced for countUp mode. Replace drawText for this.
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
