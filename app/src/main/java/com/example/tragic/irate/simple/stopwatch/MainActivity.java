@@ -1475,13 +1475,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void run() {
                 countUpMillisSets +=50;
-                if (countUpMillisSets>=1000) {
-                    countUpMillisSets = 0;
-                    countUpSecondsSets+=1;
-                }
-                timeLeft.setText(String.valueOf(countUpSecondsSets));
-                timePaused.setText(String.valueOf(countUpSecondsSets));
 
+                timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
+                timePaused.setText(convertSeconds((countUpMillisSets) /1000));
+                customSetTimeUP.set(0, countUpMillisSets);
                 drawDots(1);
                 mHandler.postDelayed(this, 50);
             }
@@ -1635,7 +1632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }.start();
             //Counting UP.
         } else {
-            //Todo: We already have countUp long lists. We need to replace the "00" default w/ whatever our current Count Up seconds value is, and then pass that in using the SAME constructor as Count Down for sets. Should happen in runnable.
         }
     }
 
