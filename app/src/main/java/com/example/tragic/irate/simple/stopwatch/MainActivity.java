@@ -324,7 +324,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int COUNTING_DOWN = 1;
     int COUNtING_UP = 2;
     Runnable secondsUpRunnable;
-    Runnable drawUpRunnable;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
@@ -1107,29 +1106,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editAndTextSwitch(true, 3);
         });
 
-        secondsUpRunnable = new Runnable() {
-            @Override
-            public void run() {
-                countUpMillisSets +=50;
-                if (countUpMillisSets>=1000) {
-                    countUpMillisSets = 0;
-                    countUpSecondsSets+=1;
-                }
-                setMillis = countUpSecondsSets*1000;
-                timeLeft.setText(String.valueOf(countUpSecondsSets));
-                timePaused.setText(String.valueOf(countUpSecondsSets));
-                mHandler.postDelayed(this, 50);
-            }
-        };
-
-        drawUpRunnable = new Runnable() {
-            @Override
-            public void run() {
-                drawDots(1);
-                mHandler.postDelayed(this, 50);
-            }
-        };
-
         changeFirstValue = new Runnable() {
             @Override
             public void run() {
@@ -1494,6 +1470,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 msConvert2 = 0;
             }
         });
+
+        secondsUpRunnable = new Runnable() {
+            @Override
+            public void run() {
+                countUpMillisSets +=50;
+                if (countUpMillisSets>=1000) {
+                    countUpMillisSets = 0;
+                    countUpSecondsSets+=1;
+                }
+                timeLeft.setText(String.valueOf(countUpSecondsSets));
+                timePaused.setText(String.valueOf(countUpSecondsSets));
+
+                drawDots(1);
+                mHandler.postDelayed(this, 50);
+            }
+        };
     }
 
     public void startObjectAnimator() {
@@ -1643,9 +1635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }.start();
             //Counting UP.
         } else {
-            //Todo: Should probably still use millis values, since fast pause/resumes wouldn't move timer.
-            //No need for countUpRunnables here, since it executes on first click w/ resume.
-
+            //Todo: We already have countUp long lists. We need to replace the "00" default w/ whatever our current Count Up seconds value is, and then pass that in using the SAME constructor as Count Down for sets. Should happen in runnable.
         }
     }
 
@@ -3383,10 +3373,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             timePaused.setAlpha(1);
                             customHalted = true;
                             mHandler.removeCallbacks(secondsUpRunnable);
-                            mHandler.removeCallbacks(drawUpRunnable);
                         } else if (pausing == RESUMING_TIMER) {
                             mHandler.post(secondsUpRunnable);
-                            mHandler.post(drawUpRunnable);
                             timeLeft.setAlpha(1);
                             customHalted = false;
                         }

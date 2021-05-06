@@ -137,6 +137,7 @@ public class DotDraws extends View {
         if (mMode==4) invalidate();
     }
 
+    //Updates list every time it is called w/ a String conversion of our long millis value.
     public void setTime(ArrayList<Long> setTime) {
         mSetTime = new ArrayList<>();
         for (int i=0; i<setTime.size(); i++) {
@@ -207,7 +208,6 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
-    //Todo: Constructor list gets replaced for countUp mode. Replace drawText for this.
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
