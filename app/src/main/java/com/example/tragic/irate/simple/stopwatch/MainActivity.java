@@ -316,6 +316,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     int fadeVar;
 
+    long countUpMillisSets;
+    long countUpMillisBreaksOnly;
     int countUpSecondsSets;
     int countUpSecondsBreaks;
     int countUpSecondsBreaksOnly;
@@ -1105,6 +1107,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editAndTextSwitch(true, 3);
         });
 
+        secondsUpRunnable = new Runnable() {
+            @Override
+            public void run() {
+                countUpMillisSets +=50;
+                if (countUpMillisSets>=1000) {
+                    countUpMillisSets = 0;
+                    countUpSecondsSets+=1;
+                }
+                setMillis = countUpSecondsSets*1000;
+                timeLeft.setText(String.valueOf(countUpSecondsSets));
+                timePaused.setText(String.valueOf(countUpSecondsSets));
+                mHandler.postDelayed(this, 50);
+            }
+        };
+
+        drawUpRunnable = new Runnable() {
+            @Override
+            public void run() {
+                drawDots(1);
+                mHandler.postDelayed(this, 50);
+            }
+        };
+
         changeFirstValue = new Runnable() {
             @Override
             public void run() {
@@ -1618,9 +1643,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }.start();
             //Counting UP.
         } else {
+            //Todo: Should probably still use millis values, since fast pause/resumes wouldn't move timer.
             //No need for countUpRunnables here, since it executes on first click w/ resume.
-        }
 
+        }
     }
 
     public void startBreakTimer() {
@@ -3170,31 +3196,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    public void countUpRunnables() {
-        secondsUpRunnable = new Runnable() {
-            @Override
-            public void run() {
-                countUpSecondsSets+=1;
-                setMillis = countUpSecondsSets*1000;
-                timeLeft.setText(String.valueOf(countUpSecondsSets));
-                timePaused.setText(String.valueOf(countUpSecondsSets));
-                mHandler.postDelayed(this, 1000);
-                Log.i("testval", String.valueOf(countUpSecondsSets));
-            }
-        };
-
-        drawUpRunnable = new Runnable() {
-            @Override
-            public void run() {
-                drawDots(1);
-                mHandler.postDelayed(this, 50);
-            }
-        };
-
-        mHandler.post(secondsUpRunnable);
-        mHandler.post(drawUpRunnable);
-    }
-
     public void drawDots(int fadeVar) {
         switch (mode) {
             case 1:
@@ -3380,12 +3381,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else {
                         if (pausing == PAUSING_TIMER) {
                             timePaused.setAlpha(1);
+                            customHalted = true;
                             mHandler.removeCallbacks(secondsUpRunnable);
                             mHandler.removeCallbacks(drawUpRunnable);
-                            customHalted = true;
                         } else if (pausing == RESUMING_TIMER) {
+                            mHandler.post(secondsUpRunnable);
+                            mHandler.post(drawUpRunnable);
                             timeLeft.setAlpha(1);
-                            countUpRunnables();
                             customHalted = false;
                         }
                     }
