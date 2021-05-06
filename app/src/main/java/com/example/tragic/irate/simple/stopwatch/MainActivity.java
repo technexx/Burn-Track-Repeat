@@ -52,6 +52,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
@@ -315,8 +316,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean maxReached;
     int fadeVar;
 
+    int countUpSecondsSets;
+    int countUpSecondsBreaks;
+    int countUpSecondsBreaksOnly;
     int COUNTING_DOWN = 1;
     int COUNtING_UP = 2;
+    Runnable secondsUpRunnable;
+    Runnable drawUpRunnable;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
@@ -788,7 +794,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         confirm_header_save.setText(R.string.save_cycles);
         reset.setText(R.string.reset);
 
-        //Todo: Launch size text here.
         timeLeft.setTextSize(90f);
         timePaused.setTextSize(90f);
         timeLeft2.setTextSize(90f);
@@ -922,6 +927,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar.setProgress(maxProgress);
         progressBar2.setProgress(maxProgress);
         progressBar3.setProgress(maxProgress);
+
+        upDown_arrow_one.setImageResource(R.drawable.arrow_down);
+        upDown_arrow_one.setTag(1);
+        upDown_arrow_two.setImageResource(R.drawable.arrow_down);
+        upDown_arrow_two.setTag(1);
 
         //Sets our saved title.
         cycle_header_text.setText(retrievedTitle);
@@ -1074,11 +1084,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycle_header_text.setText(newTitle);
             });
         });
-
-        upDown_arrow_one.setImageResource(R.drawable.arrow_down);
-        upDown_arrow_one.setTag(1);
-        upDown_arrow_two.setImageResource(R.drawable.arrow_down);
-        upDown_arrow_two.setTag(1);
 
         upDown_arrow_one.setOnClickListener(v-> {
             countUpMode(true);
@@ -1550,64 +1555,72 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AtomicBoolean textSizeReduced = new AtomicBoolean(false);
         if (setMillis >= 59000) textSizeReduced.set(true);
 
-        setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
-        timer = new CountDownTimer(setMillis, 50) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                customProgressPause = (int) objectAnimator.getAnimatedValue();
-                setMillis = millisUntilFinished;
+        //Counting DOWN.
+        if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+            setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
+            timer = new CountDownTimer(setMillis, 50) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    customProgressPause = (int) objectAnimator.getAnimatedValue();
+                    setMillis = millisUntilFinished;
 
-                //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
-                if (fadeCustomTimer) {
-                    if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
-                    else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
-                    else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.12);
-                    else if (customAlpha>=1) fadeCustomTimer = false;
-                }
-
-                if (mode==1) {
-                    if (textSizeReduced.get()) if (setMillis<59000) {
-                        changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-                        textSizeReduced.set(false);
+                    //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
+                    if (fadeCustomTimer) {
+                        if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
+                        else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
+                        else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.12);
+                        else if (customAlpha>=1) fadeCustomTimer = false;
                     }
-                    timeLeft.setText(convertSeconds((setMillis + 999)/1000));
-                    drawDots(1);
+
+                    //Todo: This should apply to Count Up as well.
+                    if (mode==1) {
+                        if (textSizeReduced.get()) if (setMillis<59000) {
+                            changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+                            textSizeReduced.set(false);
+                        }
+                        timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+                        drawDots(1);
+                    }
                 }
-            }
 
-            @Override
-            public void onFinish() {
-                //Ensures any features meant for a running timer cannot be executed here.
-                customHalted = true;
-                //Used in startObjectAnimator, and dictates if we are on a set or break.
-                onBreak = true;
-                //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
-                setBegun = false;
-                timeLeft.setText("0");
-                customProgressPause = maxProgress;
-                animateEnding();
+                @Override
+                public void onFinish() {
+                    //Ensures any features meant for a running timer cannot be executed here.
+                    customHalted = true;
+                    //Used in startObjectAnimator, and dictates if we are on a set or break.
+                    onBreak = true;
+                    //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
+                    setBegun = false;
+                    timeLeft.setText("0");
+                    customProgressPause = maxProgress;
+                    animateEnding();
 
-                //Disabling pause/resume clicks until animation finishes.
-                timerDisabled = true;
+                    //Disabling pause/resume clicks until animation finishes.
+                    timerDisabled = true;
 
-                //Smooths out end fade.
-                fadeVar = 1;
-                mHandler.post(endFade);
+                    //Smooths out end fade.
+                    fadeVar = 1;
+                    mHandler.post(endFade);
 
-                //No >0 conditional needed here, since method will never execute if setCount is less than 1.
-                mHandler.postDelayed(() -> {
-                    //Re-enabling timer clicks.
-                    timerDisabled = false;
-                    //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
-                    removeSetOrBreak(true);
-                    stopAscent = true;
-                    endAnimation.cancel();
-                    dotDraws.setAlpha();
-                    startObjectAnimator();
-                    startBreakTimer();
-                },750);
-            }
-        }.start();
+                    //No >0 conditional needed here, since method will never execute if setCount is less than 1.
+                    mHandler.postDelayed(() -> {
+                        //Re-enabling timer clicks.
+                        timerDisabled = false;
+                        //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
+                        removeSetOrBreak(true);
+                        stopAscent = true;
+                        endAnimation.cancel();
+                        dotDraws.setAlpha();
+                        startObjectAnimator();
+                        startBreakTimer();
+                    },750);
+                }
+            }.start();
+            //Counting UP.
+        } else {
+            //No need for countUpRunnables here, since it executes on first click w/ resume.
+        }
+
     }
 
     public void startBreakTimer() {
@@ -3157,11 +3170,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public void countUpRunnables() {
+        secondsUpRunnable = new Runnable() {
+            @Override
+            public void run() {
+                countUpSecondsSets+=1;
+                setMillis = countUpSecondsSets*1000;
+                timeLeft.setText(String.valueOf(countUpSecondsSets));
+                timePaused.setText(String.valueOf(countUpSecondsSets));
+                mHandler.postDelayed(this, 1000);
+                Log.i("testval", String.valueOf(countUpSecondsSets));
+            }
+        };
+
+        drawUpRunnable = new Runnable() {
+            @Override
+            public void run() {
+                drawDots(1);
+                mHandler.postDelayed(this, 50);
+            }
+        };
+
+        mHandler.post(secondsUpRunnable);
+        mHandler.post(drawUpRunnable);
+    }
+
     public void drawDots(int fadeVar) {
         switch (mode) {
             case 1:
-                dotDraws.setTime(customSetTime);
-                dotDraws.breakTime(customBreakTime);
+                if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) dotDraws.setTime(customSetTime); else dotDraws.setTime(customSetTimeUP);
+                if (upDown_arrow_two.getTag().equals(COUNTING_DOWN) )dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
                 //Sets and breaks here are always the same, so we use startSets for both.
                 dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
                 dotDraws.customDrawBreak(startSets, numberOfBreaks);
@@ -3316,28 +3354,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (fadeOutObj != null) fadeOutObj.cancel();
             switch (mode) {
                 case 1:
-                    if (!modeOneTimerEnded) {
-                        if (pausing == PAUSING_TIMER) {
-                            String pausedTime = "";
-                            timePaused.setAlpha(1);
-                            if (timer != null) timer.cancel();
-                            if (objectAnimator != null) objectAnimator.pause();
-                            if (!onBreak) {
-                                setMillisUntilFinished = setMillis;
-                                pausedTime = (convertSeconds((setMillis + 999) / 1000));
-                            } else {
-                                breakMillisUntilFinished = breakMillis;
-                                pausedTime = (convertSeconds((breakMillis + 999) / 1000));
+                    if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+                        if (!modeOneTimerEnded) {
+                            if (pausing == PAUSING_TIMER) {
+                                String pausedTime = "";
+                                timePaused.setAlpha(1);
+                                if (timer != null) timer.cancel();
+                                if (objectAnimator != null) objectAnimator.pause();
+                                if (!onBreak) {
+                                    setMillisUntilFinished = setMillis;
+                                    pausedTime = (convertSeconds((setMillis + 999) / 1000));
+                                } else {
+                                    breakMillisUntilFinished = breakMillis;
+                                    pausedTime = (convertSeconds((breakMillis + 999) / 1000));
+                                }
+                                timePaused.setText(pausedTime);
+                                customHalted = true;
+                            } else if (pausing == RESUMING_TIMER) {
+                                customHalted = false;
+                                startObjectAnimator();
+                                if (!onBreak) startSetTimer(); else startBreakTimer();
+                                timeLeft.setAlpha(1);
                             }
-                            timePaused.setText(pausedTime);
+                        } else resetTimer();
+                    } else {
+                        if (pausing == PAUSING_TIMER) {
+                            timePaused.setAlpha(1);
+                            mHandler.removeCallbacks(secondsUpRunnable);
+                            mHandler.removeCallbacks(drawUpRunnable);
                             customHalted = true;
                         } else if (pausing == RESUMING_TIMER) {
-                            customHalted = false;
-                            startObjectAnimator();
-                            if (!onBreak) startSetTimer(); else startBreakTimer();
                             timeLeft.setAlpha(1);
+                            countUpRunnables();
+                            customHalted = false;
                         }
-                    } else resetTimer();
+                    }
+
                     break;
                 case 2:
                     if (!modeTwoTimerEnded) {
