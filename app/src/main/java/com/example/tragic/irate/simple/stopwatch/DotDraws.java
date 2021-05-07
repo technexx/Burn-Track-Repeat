@@ -141,7 +141,7 @@ public class DotDraws extends View {
     public void setTime(ArrayList<Long> setTime) {
         mSetTime = new ArrayList<>();
         for (int i=0; i<setTime.size(); i++) {
-            mSetTime.add(convertSeconds(setTime.get(i)/1000));
+            mSetTime.add(convertSeconds((setTime.get(i)+999)/1000));
         }
     }
 

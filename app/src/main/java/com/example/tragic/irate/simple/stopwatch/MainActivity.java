@@ -1586,13 +1586,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         else if (customAlpha>=1) fadeCustomTimer = false;
                     }
 
-                    //Todo: This should apply to Count Up as well.
                     if (mode==1) {
                         if (textSizeReduced.get()) if (setMillis<59000) {
                             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
                             textSizeReduced.set(false);
                         }
+                        //Displays Long->String conversion of time left every tick.
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+                        //Passes in updated list every tick, with current fading dot decreasing as timer does.
+                        customSetTime.set((int) (customSetTime.size()-numberOfSets), setMillis);
                         drawDots(1);
                     }
                 }
