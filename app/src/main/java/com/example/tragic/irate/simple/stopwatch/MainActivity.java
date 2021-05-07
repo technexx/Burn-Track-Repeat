@@ -328,8 +328,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Use Stopwatch mode as a count up, and have a toggle for just the stopwatch.
-    //Todo: Change as little as possible for counting up cycles. Use separate long arrays, but pass those in for everything else that uses our lists.
+    //Todo: Add marker to show if we're in count up/down mode for sets or breaks.
 
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
@@ -1593,8 +1592,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         //Displays Long->String conversion of time left every tick.
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+
                         //Passes in updated list every tick, with current fading dot decreasing as timer does.
-                        customSetTime.set((int) (customSetTime.size()-numberOfSets), setMillis);
+//                        customSetTime.set((int) (customSetTime.size()-numberOfSets), setMillis);
                         drawDots(1);
                     }
                 }
@@ -3151,15 +3151,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
                     upDown_arrow_one.setTag(COUNtING_UP);
                     upDown_arrow_one.setImageResource(R.drawable.arrow_up);
-                    dotDraws.countingUp(true);
+                    dotDraws.countingUpSets(true);
                     dotDraws.setTime(customSetTimeUP);
                     dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSetsUP, fadeVar);
                 } else {
-                    //Moving to COUNT DOWN mdde.
+                    //Moving to COUNT DOWN mode.
                     upDown_arrow_one.setTag(COUNTING_DOWN);
                     upDown_arrow_one.setImageResource(R.drawable.arrow_down);
                     upDown_arrow_one.setTag(1);
-                    dotDraws.countingUp(false);
+                    dotDraws.countingUpSets(false);
                     dotDraws.setTime(customSetTime);
                     dotDraws.customDrawSet(customSetTime.size(), numberOfSets, fadeVar);
                 }
@@ -3168,7 +3168,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
                     upDown_arrow_two.setTag(COUNtING_UP);
                     upDown_arrow_two.setImageResource(R.drawable.arrow_up);
-                    dotDraws.countingUp(true);
+                    dotDraws.countingUpBreaks(true);
                     dotDraws.breakTime(customBreakTimeUP);
                     dotDraws.customDrawBreak(customBreakTimeUP.size(), numberOfBreaksUP);
                 } else {
@@ -3176,7 +3176,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     upDown_arrow_two.setTag(COUNTING_DOWN);
                     upDown_arrow_two.setImageResource(R.drawable.arrow_down);
                     upDown_arrow_two.setTag(1);
-                    dotDraws.countingUp(false);
+                    dotDraws.countingUpBreaks(false);
                     dotDraws.breakTime(customBreakTime);
                     dotDraws.customDrawBreak(customBreakTime.size(), numberOfBreaks);
                 }

@@ -53,7 +53,8 @@ public class DotDraws extends View {
     sendPosition mSendPosition;
     sendAlpha mSendAlpha;
     int mOldMode;
-    boolean mGoingUp;
+    boolean mGoingUpSets;
+    boolean mGoingUpBreaks;
 
     public interface sendPosition {
         void sendPos(int pos);
@@ -102,8 +103,12 @@ public class DotDraws extends View {
         mPaintBox.setStrokeWidth(6);
     }
 
-    public void countingUp(boolean goingUp) {
-        mGoingUp = goingUp;
+    public void countingUpSets(boolean goingUpSets) {
+        mGoingUpSets = goingUpSets;
+    }
+
+    public void countingUpBreaks(boolean goingUpBreaks) {
+        mGoingUpBreaks = goingUpBreaks;
     }
 
     public void customDrawSet(long setCount, long setReduce, int fadeDone) {
@@ -141,7 +146,7 @@ public class DotDraws extends View {
     public void setTime(ArrayList<Long> setTime) {
         mSetTime = new ArrayList<>();
         for (int i=0; i<setTime.size(); i++) {
-            mSetTime.add(convertSeconds((setTime.get(i)+999)/1000));
+            mSetTime.add(convertSeconds(setTime.get(i)/1000));
         }
     }
 
@@ -208,6 +213,16 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
+    public void setDotStyle(boolean countingUp) {
+        if (countingUp) {
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaintText.setColor(Color.WHITE);
+        } else {
+            mPaint.setStyle(Paint.Style.FILL);
+            mPaintText.setColor(Color.BLACK);
+        }
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
@@ -221,6 +236,7 @@ public class DotDraws extends View {
 
                 for (int i=0; i<mSetCount; i++) {
                     mPaint.setColor(Color.GREEN);
+                    if (mGoingUpSets) setDotStyle(true); else setDotStyle(false);
                     if (mSetCount - mSetReduce == i) {
                         if (mFadeDone == 1) fadeDot();
                     } else if (mSetReduce + i < mSetCount){
@@ -232,6 +248,7 @@ public class DotDraws extends View {
                 }
                 for (int i=0; i<mBreakCount; i++) {
                     mPaint.setColor(Color.RED);
+                    if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
                     if (mBreakCount - mBreakReduce == i) {
                         if (mFadeDone == 2) fadeDot();
                     } else if (mBreakReduce + i <  mBreakCount) {
