@@ -324,6 +324,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int COUNTING_DOWN = 1;
     int COUNtING_UP = 2;
     Runnable secondsUpRunnable;
+    boolean setsAreCountingUp;
+    boolean breaksAreCountingUp;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
@@ -2142,7 +2144,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 4:
-                //Same animation instance can't be used simultaneously for both TextViews.
+                //Same animfzsation instance can't be used simultaneously for both TextViews.
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
                 if (stopwatchHalted) fadeInText(timePaused4);
                 else fadeInText(timeLeft4);
@@ -3149,23 +3151,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (onSet) {
                 //Moving to COUNT UP mode.
                 if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+                    setsAreCountingUp = true;
                     upDown_arrow_one.setTag(COUNtING_UP);
                     upDown_arrow_one.setImageResource(R.drawable.arrow_up);
                     dotDraws.countingUpSets(true);
                     dotDraws.setTime(customSetTimeUP);
                     dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSetsUP, fadeVar);
+                    timeLeft.setText("0");
+                    timePaused.setText("0");
                 } else {
                     //Moving to COUNT DOWN mode.
+                    setsAreCountingUp = false;
                     upDown_arrow_one.setTag(COUNTING_DOWN);
                     upDown_arrow_one.setImageResource(R.drawable.arrow_down);
                     upDown_arrow_one.setTag(1);
                     dotDraws.countingUpSets(false);
                     dotDraws.setTime(customSetTime);
                     dotDraws.customDrawSet(customSetTime.size(), numberOfSets, fadeVar);
+                    timePaused.setText(convertSeconds((setMillis+999)/1000));
+                    timeLeft.setText(convertSeconds((setMillis+999)/1000));
                 }
             } else {
                 //Moving to COUNT UP mode.
                 if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
+                    breaksAreCountingUp = true;
                     upDown_arrow_two.setTag(COUNtING_UP);
                     upDown_arrow_two.setImageResource(R.drawable.arrow_up);
                     dotDraws.countingUpBreaks(true);
@@ -3173,6 +3182,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.customDrawBreak(customBreakTimeUP.size(), numberOfBreaksUP);
                 } else {
                     //Moving to COUNT DOWN mode.
+                    breaksAreCountingUp = false;
                     upDown_arrow_two.setTag(COUNTING_DOWN);
                     upDown_arrow_two.setImageResource(R.drawable.arrow_down);
                     upDown_arrow_two.setTag(1);
@@ -3494,23 +3504,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void populateCycleUI() {
         switch (mode) {
             case 1:
-                if (customSetTime.size()>0) setMillis = customSetTime.get(0);
-                if (customBreakTime.size()>0) {
-                    breakMillis = customBreakTime.get(0);
-                    timePaused.setText(convertSeconds((setMillis+999)/1000));
-                    timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                } else timePaused.setText("?");
+                if (!setsAreCountingUp) {
+                    if (customSetTime.size()>0) setMillis = customSetTime.get(0);
+                    if (customBreakTime.size()>0) {
+                        breakMillis = customBreakTime.get(0);
+                        timePaused.setText(convertSeconds((setMillis+999)/1000));
+                        timeLeft.setText(convertSeconds((setMillis+999)/1000));
+                    } else timePaused.setText("?");
+
+                    if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
+                    if (setMillis>=60000) {
+                        timePaused.setTextSize(70f);
+                        timeLeft.setTextSize(70f);
+                    } else {
+                        timePaused.setTextSize(90f);
+                        timeLeft.setTextSize(90f);
+                    }
+                } else {
+                    timeLeft.setText("0");
+                    timePaused.setText("0");
+                    //Sets all longs in list to "0" since we are restarting a Count Up cycle.
+                    for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, (long) 0);
+                }
+
+                //Since sets/breaks will always have same number regardless of counting up/down, this can always execute.
                 numberOfSets = customSetTime.size();
                 numberOfBreaks = customBreakTime.size();
                 numberOfSetsUP = customSetTimeUP.size();
                 numberOfBreaksUP = customBreakTimeUP.size();
 
-                if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
-                if (setMillis>=60000) {
-                    timePaused.setTextSize(70f); timeLeft.setTextSize(70f);
-                } else {
-                    timePaused.setTextSize(90f); timeLeft.setTextSize(90f);
-                }
                 break;
             case 2:
                 if (breaksOnlyTime.size()>0) {
@@ -3548,16 +3570,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         removeViews();
         switch (mode) {
             case 1:
+                //Since Reset brings us back to SET values, we only need to check if those are counting up.
+                if (!setsAreCountingUp) {
+                    progressBar.setProgress(10000);
+                    if (timer != null) timer.cancel();
+                    if (objectAnimator != null) objectAnimator.cancel();
+                    customProgressPause = maxProgress;
+                    modeOneTimerEnded = false;
+                    setBegun = false;
+                    breakBegun = false;
+                    customHalted = true;
+                    onBreak = false;
+                }
                 timePaused.setAlpha(1);
-                progressBar.setProgress(10000);
-                if (timer != null) timer.cancel();
-                if (objectAnimator != null) objectAnimator.cancel();
-                customProgressPause = maxProgress;
-                modeOneTimerEnded = false;
-                setBegun = false;
-                breakBegun = false;
-                customHalted = true;
-                onBreak = false;
                 resetAndFabToggle(false, true);
                 break;
             case 2:

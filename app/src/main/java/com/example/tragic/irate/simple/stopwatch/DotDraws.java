@@ -103,10 +103,12 @@ public class DotDraws extends View {
         mPaintBox.setStrokeWidth(6);
     }
 
+    //Called from Main and determines whether we are counting up or down.
     public void countingUpSets(boolean goingUpSets) {
         mGoingUpSets = goingUpSets;
     }
 
+    //Called from Main and determines whether we are counting up or down.
     public void countingUpBreaks(boolean goingUpBreaks) {
         mGoingUpBreaks = goingUpBreaks;
     }
@@ -213,6 +215,7 @@ public class DotDraws extends View {
         mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
     }
 
+    //Used w/ mGoingUpSets and mGoingUpBreaks w/ in Canvas to change dot/dot text based on count up/ count down mode.
     public void setDotStyle(boolean countingUp) {
         if (countingUp) {
             mPaint.setStyle(Paint.Style.STROKE);
