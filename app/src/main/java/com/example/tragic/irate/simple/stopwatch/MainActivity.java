@@ -318,13 +318,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int fadeVar;
 
     long countUpMillisSets;
-    long countUpMillisBreaksOnly;
-    int countUpSecondsSets;
-    int countUpSecondsBreaks;
-    int countUpSecondsBreaksOnly;
+    long countUpMillisBreaks;
     int COUNTING_DOWN = 1;
     int COUNtING_UP = 2;
-    Runnable secondsUpRunnable;
+    Runnable secondsUpSetRunnable;
+    Runnable secondsUpBreakRunnable;
     boolean setsAreCountingUp;
     boolean breaksAreCountingUp;
 
@@ -1475,19 +1473,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         next_round.setOnClickListener(v-> {
+            timeLeft.setAlpha(1);
+            timePaused.setAlpha(0);
             animateEnding();
-
+            if (!onBreak) {
+                mHandler.postDelayed(() -> {
+                    endAnimation.cancel();
+                    mHandler.removeCallbacks(secondsUpSetRunnable);
+                    onBreak = true;
+                    startObjectAnimator();
+                    startBreakTimer();
+                }, 1000);
+            } else {
+                mHandler.postDelayed(() -> {
+                    endAnimation.cancel();
+                    mHandler.removeCallbacks(secondsUpBreakRunnable);
+                    onBreak = false;
+                    startObjectAnimator();
+                    startSetTimer();
+                }, 1000);
+            }
         });
 
-        secondsUpRunnable = new Runnable() {
+        secondsUpSetRunnable = new Runnable() {
             @Override
             public void run() {
                 countUpMillisSets +=50;
-
                 timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
                 timePaused.setText(convertSeconds((countUpMillisSets) /1000));
                 customSetTimeUP.set(0, countUpMillisSets);
                 drawDots(1);
+                mHandler.postDelayed(this, 50);
+            }
+        };
+
+        secondsUpBreakRunnable = new Runnable() {
+            @Override
+            public void run() {
+                countUpMillisBreaks +=50;
+
+                timeLeft.setText(convertSeconds((countUpMillisBreaks) /1000));
+                timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
+                customBreakTimeUP.set(0, countUpMillisBreaks);
+                drawDots(2);
                 mHandler.postDelayed(this, 50);
             }
         };
@@ -1517,6 +1545,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 } else {
+                    Log.i("testMil", String.valueOf(breakBegun));
                     if (!breakBegun) {
                         //Ensures any features meant for running timer cannot be executed here.
                         customHalted = false;
@@ -1601,6 +1630,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         //Displays Long->String conversion of time left every tick.
                         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+                        timePaused.setText(convertSeconds((setMillis + 999)/1000));
 
                         //Passes in updated list every tick, with current fading dot decreasing as timer does.
 //                        customSetTime.set((int) (customSetTime.size()-numberOfSets), setMillis);
@@ -1671,6 +1701,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             textSizeReduced.set(false);
                         }
                         timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
+                        timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
                         drawDots(2);
                     }
                 }
@@ -1741,6 +1772,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             textSizeReduced.set(false);
                         }
                         timeLeft2.setText(convertSeconds((millisUntilFinished +999) / 1000));
+                        timePaused2.setText(convertSeconds((millisUntilFinished +999) / 1000));
                         drawDots(3);
                     }
                 }
@@ -3350,6 +3382,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
             timerDisabled = true;
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
+        if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) fab.setVisibility(View.INVISIBLE); next_round.setVisibility(View.VISIBLE);
 
         //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
@@ -3362,43 +3395,57 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (fadeOutObj != null) fadeOutObj.cancel();
             switch (mode) {
                 case 1:
-                    if (!setsAreCountingUp) {
-                        if (!modeOneTimerEnded) {
-                            if (pausing == PAUSING_TIMER) {
-                                String pausedTime = "";
-                                timePaused.setAlpha(1);
-                                if (timer != null) timer.cancel();
-                                if (objectAnimator != null) objectAnimator.pause();
+                    if (!modeOneTimerEnded) {
+                        if (pausing == PAUSING_TIMER) {
+                            String pausedTime = "";
+                            customHalted = true;
+                            timePaused.setAlpha(1);
+                            if (timer != null) timer.cancel();
+                            if (objectAnimator != null) objectAnimator.pause();
+                            //If sets are counting down, do the following.
+                            if (!setsAreCountingUp) {
+                                timePaused.setText(pausedTime);
                                 if (!onBreak) {
                                     setMillisUntilFinished = setMillis;
                                     pausedTime = (convertSeconds((setMillis + 999) / 1000));
-                                } else {
+                                    //If on Breaks Mode and sets are counting down, while breaks are also counting down, do the following.
+                                } else if (!breaksAreCountingUp) {
                                     breakMillisUntilFinished = breakMillis;
                                     pausedTime = (convertSeconds((breakMillis + 999) / 1000));
+                                    //If in Breaks Mode and sets are counting down, but breaks are counting up, do the following.
+                                } else {
+                                    mHandler.removeCallbacks(secondsUpBreakRunnable);
                                 }
-                                timePaused.setText(pausedTime);
-                                customHalted = true;
-                            } else if (pausing == RESUMING_TIMER) {
-                                customHalted = false;
-                                startObjectAnimator();
-                                if (!onBreak) startSetTimer(); else startBreakTimer();
-                                timeLeft.setAlpha(1);
+                            } else {
+                                if (!onBreak) mHandler.removeCallbacks(secondsUpSetRunnable);
+                                else if (!breaksAreCountingUp) {
+                                    breakMillisUntilFinished = breakMillis;
+                                    pausedTime = (convertSeconds((breakMillis + 999) / 1000));
+                                } else mHandler.removeCallbacks(secondsUpBreakRunnable);
                             }
-                        } else resetTimer();
-                    } else {
-                        fab.setVisibility(View.INVISIBLE);
-                        next_round.setVisibility(View.VISIBLE);
-                        if (pausing == PAUSING_TIMER) {
-                            timePaused.setAlpha(1);
-                            customHalted = true;
-                            mHandler.removeCallbacks(secondsUpRunnable);
                         } else if (pausing == RESUMING_TIMER) {
-                            mHandler.post(secondsUpRunnable);
-                            timeLeft.setAlpha(1);
                             customHalted = false;
+                            timeLeft.setAlpha(1);
+                            if (!setsAreCountingUp) {
+                                //If on Sets Mode and sets are counting down, do the following.
+                                if (!onBreak) {
+                                    startObjectAnimator();
+                                    startSetTimer();
+                                    //If on Breaks Mode and sets are counting down, while breaks are also counting down, do the following.
+                                } else if (!breaksAreCountingUp) {
+                                    startObjectAnimator();
+                                    startBreakTimer();
+                                } else mHandler.post(secondsUpBreakRunnable);
+                            } else {
+                                if (!onBreak) mHandler.post(secondsUpSetRunnable); else {
+                                    if (!breaksAreCountingUp) {
+                                        startObjectAnimator();
+                                        startBreakTimer();
+                                    } else mHandler.post(secondsUpBreakRunnable);
+                                }
+                            }
                         }
-                    }
-
+                    } else resetTimer();
                     break;
                 case 2:
                     if (!modeTwoTimerEnded) {
@@ -3535,8 +3582,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timeLeft.setText("0");
                     timePaused.setText("0");
                     countUpMillisSets = 0;
+                    countUpMillisBreaks = 0;
                     //Sets all longs in list to "0" since we are restarting a Count Up cycle.
                     for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, (long) 0);
+                    for (int i=0; i<customBreakTimeUP.size(); i++) customBreakTimeUP.set(i, (long) 0);
                 }
 
                 //Since sets/breaks will always have same number regardless of counting up/down, this can always execute.
@@ -3582,18 +3631,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         removeViews();
         switch (mode) {
             case 1:
-                //Since Reset brings us back to SET values, we only need to check if those are counting up.
-                if (!setsAreCountingUp) {
-                    progressBar.setProgress(10000);
-                    if (timer != null) timer.cancel();
-                    if (objectAnimator != null) objectAnimator.cancel();
-                    customProgressPause = maxProgress;
-                    modeOneTimerEnded = false;
-                    setBegun = false;
-                    breakBegun = false;
-                    customHalted = true;
-                    onBreak = false;
-                }
+                progressBar.setProgress(10000);
+                if (timer != null) timer.cancel();
+                if (objectAnimator != null) objectAnimator.cancel();
+                customProgressPause = maxProgress;
+                modeOneTimerEnded = false;
+                setBegun = false;
+                breakBegun = false;
+                customHalted = true;
+                onBreak = false;
                 timePaused.setAlpha(1);
                 resetAndFabToggle(false, true);
                 break;
