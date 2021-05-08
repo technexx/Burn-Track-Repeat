@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton fab;
     ImageButton circle_reset;
     ImageButton new_lap;
+    ImageButton next_round;
     TextView cycle_header_text;
     TextView cycles_completed;
     Button cycle_reset;
@@ -330,8 +331,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Add marker to show if we're in count up/down mode for sets or breaks.
-
+    //Todo: Option to disable pause so sets/breaks run uninterupted?
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
@@ -736,7 +736,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
         delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
 
-
         cycles_completed = findViewById(R.id.cycles_completed);
         cycle_reset = findViewById(R.id.cycle_reset);
         skip = findViewById(R.id.skip);
@@ -745,6 +744,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         delete_sb = findViewById(R.id.delete_set_break);
         fab = findViewById(R.id.fab);
         circle_reset = findViewById(R.id.circle_reset);
+        next_round = findViewById(R.id.next_round);
         new_lap = findViewById(R.id.new_lap);
 
         save_cycles = findViewById(R.id.save_cycles);
@@ -783,7 +783,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setVisibility(View.GONE);
         second_value_single_edit.setVisibility(View.GONE);
         third_value_single_edit.setVisibility(View.GONE);
+        delete_sb.setVisibility(View.INVISIBLE);
+        progressBar2.setVisibility(View.GONE);
+        progressBar3.setVisibility(View.GONE);
+        stopWatchView.setVisibility(View.GONE);
+        lapRecycler.setVisibility(View.GONE);
+        overtime.setVisibility(View.INVISIBLE);
         new_lap.setVisibility(View.INVISIBLE);
+        next_round.setVisibility(View.INVISIBLE);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -812,12 +819,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler = new Handler();
         lp = (ConstraintLayout.LayoutParams) s2.getLayoutParams();
 
-        delete_sb.setVisibility(View.INVISIBLE);
-        progressBar2.setVisibility(View.GONE);
-        progressBar3.setVisibility(View.GONE);
-        stopWatchView.setVisibility(View.GONE);
-        lapRecycler.setVisibility(View.GONE);
-        overtime.setVisibility(View.INVISIBLE);
+
 
         //Sets all timerText alphas 0, so that we can then set to 1 whichever one we want to use.
         removeViews();
@@ -1472,6 +1474,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
+        next_round.setOnClickListener(v-> {
+            animateEnding();
+
+        });
+
         secondsUpRunnable = new Runnable() {
             @Override
             public void run() {
@@ -2077,6 +2084,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(0);
     }
 
+    //Todo: Fab and Next Round button toggle depending on if Count Up cycle is started.
     public void switchTimer(int mode, boolean halted) {
         //Sets views for respective tab each time one is switched.
         removeViews(); tabViews();
@@ -2149,6 +2157,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (stopwatchHalted) fadeInText(timePaused4);
                 else fadeInText(timeLeft4);
                 fab.setVisibility(View.INVISIBLE);
+                next_round.setVisibility(View.INVISIBLE);
                 new_lap.setVisibility(View.VISIBLE);
                 if (halted) {
                     new_lap.setAlpha(0.3f);
@@ -3353,7 +3362,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (fadeOutObj != null) fadeOutObj.cancel();
             switch (mode) {
                 case 1:
-                    if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+                    if (!setsAreCountingUp) {
                         if (!modeOneTimerEnded) {
                             if (pausing == PAUSING_TIMER) {
                                 String pausedTime = "";
@@ -3377,6 +3386,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         } else resetTimer();
                     } else {
+                        fab.setVisibility(View.INVISIBLE);
+                        next_round.setVisibility(View.VISIBLE);
                         if (pausing == PAUSING_TIMER) {
                             timePaused.setAlpha(1);
                             customHalted = true;
@@ -3523,6 +3534,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else {
                     timeLeft.setText("0");
                     timePaused.setText("0");
+                    countUpMillisSets = 0;
                     //Sets all longs in list to "0" since we are restarting a Count Up cycle.
                     for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, (long) 0);
                 }
