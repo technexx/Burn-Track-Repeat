@@ -3379,7 +3379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 1:
                     if (!modeOneTimerEnded) {
                         if (pausing == PAUSING_TIMER) {
-                            String pausedTime = "";
                             customHalted = true;
                             timePaused.setAlpha(1);
                             if (timer != null) timer.cancel();
@@ -3388,21 +3387,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             if (!setsAreCountingUp) {
                                 if (!onBreak) {
                                     setMillisUntilFinished = setMillis;
-                                    pausedTime = (convertSeconds((setMillis + 999) / 1000));
+                                    timePaused.setText(convertSeconds((setMillis + 999) / 1000));
                                     //If on Breaks Mode and sets are counting down, while breaks are also counting down, do the following.
                                 } else if (!breaksAreCountingUp) {
                                     breakMillisUntilFinished = breakMillis;
-                                    pausedTime = (convertSeconds((breakMillis + 999) / 1000));
+                                    timePaused.setText(convertSeconds((breakMillis + 999) / 1000));
                                     //If in Breaks Mode and sets are counting down, but breaks are counting up, do the following.
                                 } else mHandler.removeCallbacks(secondsUpBreakRunnable);
                             } else {
                                 if (!onBreak) mHandler.removeCallbacks(secondsUpSetRunnable);
                                 else if (!breaksAreCountingUp) {
                                     breakMillisUntilFinished = breakMillis;
-                                    pausedTime = (convertSeconds((breakMillis + 999) / 1000));
+                                    timePaused.setText(convertSeconds((breakMillis + 999) / 1000));
                                 } else mHandler.removeCallbacks(secondsUpBreakRunnable);
                             }
-                            timePaused.setText(pausedTime);
                         } else if (pausing == RESUMING_TIMER) {
                             customHalted = false;
                             timeLeft.setAlpha(1);
