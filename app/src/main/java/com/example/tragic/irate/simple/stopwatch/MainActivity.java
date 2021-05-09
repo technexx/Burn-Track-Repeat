@@ -204,9 +204,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long numberOfSets;
     long numberOfBreaks;
     long numberOfBreaksOnly;
-    long numberOfSetsUP;
-    long numberOfBreaksUP;
-    long numberofBreaksOnlyUP;
     long startSets;
     long startBreaksOnly;
 
@@ -332,6 +329,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Option to disable pause so sets/breaks run uninterupted?
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
+    //Todo: Dot fade when adding/subtracting?
+    //Todo: Single editText for seconds instead of m:ss?
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
     //Todo: TDEE in sep popup w/ tabs.
@@ -1472,36 +1471,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
+        //Todo: This can run in onFinished since it's essentially the same thing.
+        //Todo: startTimers only if next part is counting down.
         next_round.setOnClickListener(v-> {
-            timeLeft.setAlpha(1);
-            timePaused.setAlpha(0);
-            animateEnding();
-            if (!onBreak) {
-                mHandler.postDelayed(() -> {
-                    endAnimation.cancel();
-                    mHandler.removeCallbacks(secondsUpSetRunnable);
-                    onBreak = true;
-                    startObjectAnimator();
-                    startBreakTimer();
-                }, 1000);
-            } else {
-                mHandler.postDelayed(() -> {
-                    endAnimation.cancel();
-                    mHandler.removeCallbacks(secondsUpBreakRunnable);
-                    onBreak = false;
-                    startObjectAnimator();
-                    startSetTimer();
-                }, 1000);
-            }
+            nextCountUpRound();
         });
 
+        //Todo: (set) method in count arrays here needs its index changed.
         secondsUpSetRunnable = new Runnable() {
             @Override
             public void run() {
                 countUpMillisSets +=50;
                 timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
                 timePaused.setText(convertSeconds((countUpMillisSets) /1000));
-                customSetTimeUP.set(0, countUpMillisSets);
+                customSetTimeUP.set((int) (customSetTimeUP.size()-numberOfSets), countUpMillisSets);
                 drawDots(1);
                 mHandler.postDelayed(this, 50);
             }
@@ -1511,10 +1494,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void run() {
                 countUpMillisBreaks +=50;
-
                 timeLeft.setText(convertSeconds((countUpMillisBreaks) /1000));
                 timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
-                customBreakTimeUP.set(0, countUpMillisBreaks);
+                customBreakTimeUP.set((int) (customBreakTimeUP.size()-numberOfBreaks), countUpMillisBreaks);
                 drawDots(2);
                 mHandler.postDelayed(this, 50);
             }
@@ -1606,57 +1588,54 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AtomicBoolean textSizeReduced = new AtomicBoolean(false);
         if (setMillis >= 59000) textSizeReduced.set(true);
 
-        //Counting DOWN.
-        if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
-            setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
-            timer = new CountDownTimer(setMillis, 50) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    customProgressPause = (int) objectAnimator.getAnimatedValue();
-                    setMillis = millisUntilFinished;
+        setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
+        timer = new CountDownTimer(setMillis, 50) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                customProgressPause = (int) objectAnimator.getAnimatedValue();
+                setMillis = millisUntilFinished;
 
-                    //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
-                    if (fadeCustomTimer) {
-                        if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
-                        else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
-                        else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.12);
-                        else if (customAlpha>=1) fadeCustomTimer = false;
-                    }
-
-                    if (mode==1) {
-                        if (textSizeReduced.get()) if (setMillis<59000) {
-                            changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-                            textSizeReduced.set(false);
-                        }
-                        //Displays Long->String conversion of time left every tick.
-                        timeLeft.setText(convertSeconds((setMillis + 999)/1000));
-                        timePaused.setText(convertSeconds((setMillis + 999)/1000));
-
-                        //Passes in updated list every tick, with current fading dot decreasing as timer does.
-//                        customSetTime.set((int) (customSetTime.size()-numberOfSets), setMillis);
-                        drawDots(1);
-                    }
+                //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
+                if (fadeCustomTimer) {
+                    if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
+                    else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
+                    else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.12);
+                    else if (customAlpha>=1) fadeCustomTimer = false;
                 }
 
-                @Override
-                public void onFinish() {
-                    //Ensures any features meant for a running timer cannot be executed here.
-                    customHalted = true;
-                    //Used in startObjectAnimator, and dictates if we are on a set or break.
-                    onBreak = true;
-                    //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
-                    setBegun = false;
+                if (mode==1) {
+                    if (textSizeReduced.get()) if (setMillis<59000) {
+                        changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+                        textSizeReduced.set(false);
+                    }
+                    //Displays Long->String conversion of time left every tick.
+                    timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+                    timePaused.setText(convertSeconds((setMillis + 999)/1000));
+
+                    //Passes in updated list every tick, with current fading dot decreasing as timer does.
+//                        customSetTime.set((int) (customSetTime.size()-numberOfSets), setMillis);
+                    drawDots(1);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                //Ensures any features meant for a running timer cannot be executed here.
+                customHalted = true;
+                //Used in startObjectAnimator, and dictates if we are on a set or break.
+                onBreak = true;
+                //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
+                setBegun = false;
+                animateEnding();
+                //Disabling pause/resume clicks until animation finishes.
+                timerDisabled = true;
+                //Smooths out end fade.
+                fadeVar = 1;
+                mHandler.post(endFade);
+
+                if (!setsAreCountingUp) {
                     timeLeft.setText("0");
                     customProgressPause = maxProgress;
-                    animateEnding();
-
-                    //Disabling pause/resume clicks until animation finishes.
-                    timerDisabled = true;
-
-                    //Smooths out end fade.
-                    fadeVar = 1;
-                    mHandler.post(endFade);
-
                     //No >0 conditional needed here, since method will never execute if setCount is less than 1.
                     mHandler.postDelayed(() -> {
                         //Re-enabling timer clicks.
@@ -1667,13 +1646,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         endAnimation.cancel();
                         dotDraws.setAlpha();
                         startObjectAnimator();
-                        startBreakTimer();
+                        if (!breaksAreCountingUp) startBreakTimer(); else mHandler.post(secondsUpBreakRunnable);
                     },750);
                 }
-            }.start();
-            //Counting UP.
-        } else {
-        }
+            }
+        }.start();
     }
 
     public void startBreakTimer() {
@@ -1909,45 +1886,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //      vibrator.vibrate(pattern1, 0);
 //      }
 
+    //Todo: List sizes are out of sync because set/breaks can have different sizes in different modes.
     public void adjustCustom(boolean adding) {
         //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
         if (first_value_edit.isShown()) setEditValueBounds(true);
         if (second_value_edit.isShown()) setEditValueBounds(false);
-
+        canSaveOrUpdate(true);
         if (adding) {
             switch (mode) {
                 case 1:
-                    if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
-                        if (customSetTime.size() <8) {
-                            customSetTime.add(setValue * 1000);
-                            customBreakTime.add(breakValue * 1000);
-                            canSaveOrUpdate(true);
-                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                    }
-                    if (upDown_arrow_one.getTag().equals(COUNtING_UP)) {
-                        if (customSetTimeUP.size()<8) {
-                            customSetTimeUP.add((long) 0);
-                            customBreakTimeUP.add((long) 0);
-                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                    }
-                    if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
-                        if (customSetTime.size() <8) {
-                            customSetTime.add(setValue * 1000);
-                            customBreakTime.add(breakValue * 1000);
-                            canSaveOrUpdate(true);
-                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                    }
-                    if (upDown_arrow_two.getTag().equals(COUNtING_UP)) {
-                        if (customSetTimeUP.size()<8) {
-                            customSetTimeUP.add((long) 0);
-                            customBreakTimeUP.add((long) 0);
-                        } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-                    }
+                    if (customSetTime.size() <8) {
+                        customSetTime.add(setValue * 1000);
+                        customSetTimeUP.add((long) 0);
+                        customBreakTime.add(breakValue * 1000);
+                        customBreakTimeUP.add((long) 0);
+                        canSaveOrUpdate(true);
+                    } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                     break;
                 case 2:
                     if (breaksOnlyTime.size() < 8) {
                         breaksOnlyTime.add(breaksOnlyValue * 1000);
-                        canSaveOrUpdate(true);
                     } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
@@ -1968,28 +1926,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else {
                 switch (mode) {
                     case 1:
-                        if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
-                            if (customSetTime.size() > 0) {
-                                customSetTime.remove(customSetTime.size() - 1);
-                                //Used w/ arrows to switch set/break places.
-                                if (customSetTime.size() - 1 < receivedPos) receivedPos = customSetTime.size() - 1;
-                            } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                        }
-                        if (upDown_arrow_one.getTag().equals(COUNtING_UP)) {
-                            if (customSetTimeUP.size()>0) {
-                                customSetTimeUP.remove(customSetTimeUP.size() -1);
-                                if (customSetTimeUP.size() - 1 < receivedPos) receivedPos = customSetTimeUP.size() - 1;
-                            } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                        }
-                        if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
-                            if (customBreakTime.size() > 0) customBreakTime.remove(customBreakTime.size() - 1);
-                            else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                        }
-                        if (upDown_arrow_two.getTag().equals(COUNtING_UP)) {
-                            if (customBreakTimeUP.size()>0) customBreakTimeUP.remove(customBreakTimeUP.size() -1);
-                            else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-                        }
-                        if (receivedPos >=0) dotDraws.selectRound(receivedPos);
+                        if (customSetTime.size()>0) {
+                            customSetTime.remove(customSetTime.size() - 1);
+                            customSetTimeUP.remove(customSetTimeUP.size() -1);
+                            customBreakTime.remove(customBreakTime.size() - 1);
+                            customBreakTimeUP.remove(customBreakTimeUP.size() -1);
+                            canSaveOrUpdate(true);
+                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
                         if (breaksOnlyTime.size() > 0) {
@@ -3187,6 +3130,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    public void nextCountUpRound() {
+        timeLeft.setAlpha(1);
+        timePaused.setAlpha(0);
+        animateEnding();
+
+        if (!onBreak) {
+            mHandler.postDelayed(() -> {
+                endAnimation.cancel();
+                mHandler.removeCallbacks(secondsUpSetRunnable);
+                onBreak = true;
+                startObjectAnimator();
+                startBreakTimer();
+            }, 1000);
+        } else {
+            mHandler.postDelayed(() -> {
+                endAnimation.cancel();
+                mHandler.removeCallbacks(secondsUpBreakRunnable);
+                onBreak = false;
+                startObjectAnimator();
+                startSetTimer();
+            }, 1000);
+        }
+    }
+
     public void countUpMode(boolean onSet) {
         if (mode==1) {
             if (onSet) {
@@ -3197,7 +3164,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     upDown_arrow_one.setImageResource(R.drawable.arrow_up);
                     dotDraws.countingUpSets(true);
                     dotDraws.setTime(customSetTimeUP);
-                    dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSetsUP, fadeVar);
+                    dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSets, fadeVar);
                     timeLeft.setText("0");
                     timePaused.setText("0");
                 } else {
@@ -3220,7 +3187,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     upDown_arrow_two.setImageResource(R.drawable.arrow_up);
                     dotDraws.countingUpBreaks(true);
                     dotDraws.breakTime(customBreakTimeUP);
-                    dotDraws.customDrawBreak(customBreakTimeUP.size(), numberOfBreaksUP);
+                    dotDraws.customDrawBreak(customBreakTimeUP.size(), numberOfBreaks);
                 } else {
                     //Moving to COUNT DOWN mode.
                     breaksAreCountingUp = false;
@@ -3238,11 +3205,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void drawDots(int fadeVar) {
         switch (mode) {
             case 1:
-                if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) dotDraws.setTime(customSetTime); else dotDraws.setTime(customSetTimeUP);
-                if (upDown_arrow_two.getTag().equals(COUNTING_DOWN) )dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
-                //Sets and breaks here are always the same, so we use startSets for both.
-                dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
-                dotDraws.customDrawBreak(startSets, numberOfBreaks);
+                if (!setsAreCountingUp) {
+                    dotDraws.setTime(customSetTime);
+                    dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
+                } else {
+                    dotDraws.setTime(customSetTimeUP);
+                    dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
+                }
+                if (!breaksAreCountingUp) {
+                    dotDraws.breakTime(customBreakTime);
+                    dotDraws.customDrawBreak(startSets, numberOfBreaks);
+                } else {
+                    dotDraws.breakTime(customBreakTimeUP);
+                    dotDraws.customDrawBreak(startSets, numberOfBreaks);
+                }
                 break;
             case 2:
                 dotDraws.breakOnlyTime(breaksOnlyTime);
@@ -3404,7 +3380,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             if (objectAnimator != null) objectAnimator.pause();
                             //If sets are counting down, do the following.
                             if (!setsAreCountingUp) {
-                                timePaused.setText(pausedTime);
                                 if (!onBreak) {
                                     setMillisUntilFinished = setMillis;
                                     pausedTime = (convertSeconds((setMillis + 999) / 1000));
@@ -3413,9 +3388,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     breakMillisUntilFinished = breakMillis;
                                     pausedTime = (convertSeconds((breakMillis + 999) / 1000));
                                     //If in Breaks Mode and sets are counting down, but breaks are counting up, do the following.
-                                } else {
-                                    mHandler.removeCallbacks(secondsUpBreakRunnable);
-                                }
+                                } else mHandler.removeCallbacks(secondsUpBreakRunnable);
                             } else {
                                 if (!onBreak) mHandler.removeCallbacks(secondsUpSetRunnable);
                                 else if (!breaksAreCountingUp) {
@@ -3423,6 +3396,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     pausedTime = (convertSeconds((breakMillis + 999) / 1000));
                                 } else mHandler.removeCallbacks(secondsUpBreakRunnable);
                             }
+                            timePaused.setText(pausedTime);
                         } else if (pausing == RESUMING_TIMER) {
                             customHalted = false;
                             timeLeft.setAlpha(1);
@@ -3578,7 +3552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused.setTextSize(90f);
                         timeLeft.setTextSize(90f);
                     }
+                    startSets = customSetTime.size();
                 } else {
+                    startSets = customSetTimeUP.size();
                     timeLeft.setText("0");
                     timePaused.setText("0");
                     countUpMillisSets = 0;
@@ -3591,8 +3567,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //Since sets/breaks will always have same number regardless of counting up/down, this can always execute.
                 numberOfSets = customSetTime.size();
                 numberOfBreaks = customBreakTime.size();
-                numberOfSetsUP = customSetTimeUP.size();
-                numberOfBreaksUP = customBreakTimeUP.size();
 
                 break;
             case 2:
@@ -3602,7 +3576,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timeLeft2.setText(convertSeconds((breakOnlyMillis+999)/1000));
                 } else timePaused2.setText("?");
                 numberOfBreaksOnly = breaksOnlyTime.size();
-                numberofBreaksOnlyUP = breaksOnlyTimeUP.size();
 
                 if (breaksOnlyTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
@@ -3620,9 +3593,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
         }
-        //Todo: Watch this for Count Up.
-        startSets = customSetTime.size();
-        startBreaksOnly = breaksOnlyTime.size();
+        next_round.setVisibility(View.INVISIBLE);
+        fab.setVisibility(View.VISIBLE);
         dotDraws.setAlpha();
         drawDots(0);
     }
