@@ -12,7 +12,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -28,7 +27,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,7 +37,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
+import com.example.tragic.irate.simple.stopwatch.Database.CyclesBO;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
+import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
@@ -52,12 +53,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, DotDraws.sendPosition, DotDraws.sendAlpha {
 
-    ConstraintLayout.LayoutParams lp;
     boolean defaultMenu = true;
     View mainView;
     TextView save_cycles;
@@ -321,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Runnable secondsUpSetRunnable;
     Runnable secondsUpBreakRunnable;
     boolean setsAreCountingUp;
-    boolean breaksAreCountingUp;
+    public boolean breaksAreCountingUp;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
@@ -386,7 +385,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     right_arrow.setVisibility(View.INVISIBLE);
                 }
             }
-            Log.i("testPos", String.valueOf(pos));
         }
     }
 
@@ -814,9 +812,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
         mHandler = new Handler();
-        lp = (ConstraintLayout.LayoutParams) s2.getLayoutParams();
-
-
 
         //Sets all timerText alphas 0, so that we can then set to 1 whichever one we want to use.
         removeViews();
@@ -1471,13 +1466,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
-        //Todo: This can run in onFinished since it's essentially the same thing.
-        //Todo: startTimers only if next part is counting down.
         next_round.setOnClickListener(v-> {
             nextCountUpRound();
         });
 
-        //Todo: (set) method in count arrays here needs its index changed.
         secondsUpSetRunnable = new Runnable() {
             @Override
             public void run() {
@@ -1527,7 +1519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 } else {
-                    Log.i("testMil", String.valueOf(breakBegun));
                     if (!breakBegun) {
                         //Ensures any features meant for running timer cannot be executed here.
                         customHalted = false;
@@ -1633,22 +1624,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 fadeVar = 1;
                 mHandler.post(endFade);
 
-                if (!setsAreCountingUp) {
-                    timeLeft.setText("0");
-                    customProgressPause = maxProgress;
-                    //No >0 conditional needed here, since method will never execute if setCount is less than 1.
-                    mHandler.postDelayed(() -> {
-                        //Re-enabling timer clicks.
-                        timerDisabled = false;
-                        //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
-                        removeSetOrBreak(true);
-                        stopAscent = true;
-                        endAnimation.cancel();
-                        dotDraws.setAlpha();
+                timeLeft.setText("0");
+                customProgressPause = maxProgress;
+                mHandler.postDelayed(() -> {
+                    //Re-enabling timer clicks.
+                    timerDisabled = false;
+                    //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
+                    removeSetOrBreak(true);
+                    stopAscent = true;
+                    endAnimation.cancel();
+                    dotDraws.setAlpha();
+                    if (!breaksAreCountingUp) {
                         startObjectAnimator();
-                        if (!breaksAreCountingUp) startBreakTimer(); else mHandler.post(secondsUpBreakRunnable);
-                    },750);
-                }
+                        startBreakTimer();
+                    } else {
+                        progressBar.setProgress(10000);
+                        mHandler.post(secondsUpBreakRunnable);
+                    }
+                },750);
             }
         }.start();
     }
@@ -1709,12 +1702,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //Re-enabling timer clicks. Used regardless of numberOfBreaks.
                             timerDisabled = false;
                             stopAscent = true;
+                            endAnimation.cancel();
 
                             //If numberOfBreaks has not been reduced to 0 within this runnable, begin our next set. Otherwise, do end cycle stuff.
                             if (numberOfBreaks!=0) {
-                                startObjectAnimator();
-                                startSetTimer();
-                                endAnimation.cancel();
+                                if (!setsAreCountingUp) {
+                                    startObjectAnimator();
+                                    startSetTimer();
+                                } else {
+                                    progressBar.setProgress(10000);
+                                    mHandler.post(secondsUpSetRunnable);
+                                }
                             } else {
                                 //Used to call resetTimer() in pause/resume method. Separate than our disable method.
                                 modeOneTimerEnded = true;
@@ -3083,7 +3081,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void saveArrays() {
         Gson gson = new Gson();
-
         String savedSetArrays = "";
         String savedBreakArrays = "";
         String savedBOArrays = "";
@@ -3130,26 +3127,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //Todo: Disable button after press.
     public void nextCountUpRound() {
         timeLeft.setAlpha(1);
         timePaused.setAlpha(0);
         animateEnding();
-
         if (!onBreak) {
             mHandler.postDelayed(() -> {
+                removeSetOrBreak(true);
                 endAnimation.cancel();
                 mHandler.removeCallbacks(secondsUpSetRunnable);
                 onBreak = true;
-                startObjectAnimator();
-                startBreakTimer();
+                countUpMillisSets = 0;
+                if (!breaksAreCountingUp) {
+                    startObjectAnimator();
+                    startBreakTimer();
+                } else mHandler.post(secondsUpBreakRunnable);
             }, 1000);
         } else {
             mHandler.postDelayed(() -> {
+                removeSetOrBreak(false);
                 endAnimation.cancel();
                 mHandler.removeCallbacks(secondsUpBreakRunnable);
                 onBreak = false;
-                startObjectAnimator();
-                startSetTimer();
+                countUpMillisBreaks = 0;
+                if (!setsAreCountingUp) {
+                    startObjectAnimator();
+                    startSetTimer();
+                } else mHandler.post(secondsUpSetRunnable);
             }, 1000);
         }
     }
@@ -3228,6 +3233,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.pomDraw(pomDotCounter, pomValuesTime, fadeVar);
                 break;
         }
+        Log.i("testPos", "first size is " + numberOfSets);
     }
 
     //Todo: Change for counting up.

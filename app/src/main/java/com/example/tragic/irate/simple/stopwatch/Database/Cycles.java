@@ -1,19 +1,24 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.Database;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity (tableName = "CyclesBO")
-public class CyclesBO {
+@Entity (tableName = "Cycles")
+public class Cycles {
     @PrimaryKey (autoGenerate = true)
 
     public int id;
     public String title;
-    public String breaksOnly;
+    public String sets;
+    public String breaks;
     public long timeAdded;
     public int itemCount;
 
-    public CyclesBO() {
+    public Cycles() {
+    }
+
+    public Cycles(String sets, String breaks) {
+        this.sets = sets; this.breaks = breaks;
     }
 
     public String getTitle() {
@@ -24,10 +29,6 @@ public class CyclesBO {
         this.title = title;
     }
 
-    public CyclesBO(String breaksOnly) {
-        this.breaksOnly = breaksOnly;
-    }
-
     public int getId() {
         return id;
     }
@@ -36,12 +37,20 @@ public class CyclesBO {
         this.id = id;
     }
 
-    public String getBreaksOnly() {
-        return breaksOnly;
+    public String getSets() {
+        return sets;
     }
 
-    public void setBreaksOnly(String breaksOnly) {
-        this.breaksOnly = breaksOnly;
+    public void setSets(String sets) {
+        this.sets = sets;
+    }
+
+    public String getBreaks() {
+        return breaks;
+    }
+
+    public void setBreaks(String breaks) {
+        this.breaks = breaks;
     }
 
     public long getTimeAdded() {

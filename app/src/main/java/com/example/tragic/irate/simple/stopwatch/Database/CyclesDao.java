@@ -7,10 +7,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.tragic.irate.simple.stopwatch.Cycles;
-import com.example.tragic.irate.simple.stopwatch.CyclesBO;
-import com.example.tragic.irate.simple.stopwatch.PomCycles;
-
 import java.util.List;
 
 @Dao

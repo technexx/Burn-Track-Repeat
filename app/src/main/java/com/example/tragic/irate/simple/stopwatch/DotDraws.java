@@ -232,7 +232,6 @@ public class DotDraws extends View {
         this.mCanvas = canvas;
 
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
-
         switch (mMode) {
             case 1:
                 encloseDots(mY-70, mY+200);
