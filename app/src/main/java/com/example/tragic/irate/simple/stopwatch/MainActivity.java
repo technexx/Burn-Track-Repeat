@@ -317,14 +317,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long countUpMillisBreaks;
     int COUNTING_DOWN = 1;
     int COUNtING_UP = 2;
-    Runnable secondsUpSetRunnable;
-    Runnable secondsUpBreakRunnable;
+    public Runnable secondsUpSetRunnable;
+    public Runnable secondsUpBreakRunnable;
     boolean setsAreCountingUp;
     public boolean breaksAreCountingUp;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
+    //Todo: saved sets/breaks in sharedPref do not apply to count up.
+    //Todo: countUp keeps going up while post-delayed handler is waiting to execute.
     //Todo: Option to disable pause so sets/breaks run uninterupted?
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
@@ -625,7 +627,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainView = findViewById(R.id.main_layout);
-//        ViewGroup blah = findViewById(R.id.main_layout);
 
         valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
         valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
@@ -875,17 +876,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             for (int i=0; i<convSets.length; i++) {
                 customSetTime.add(Long.parseLong(convSets[i]));
                 customBreakTime.add(Long.parseLong(convBreaks[i]));
+                customSetTimeUP.add((long) 0);
+                customBreakTimeUP.add((long) 0);
             }
         } else setDefaultCustomCycle(false);
-        if (!retrievedBOArray.equals("")) for (int i=0; i<convBO.length; i++) breaksOnlyTime.add(Long.parseLong(convBO[i]));
-        else setDefaultCustomCycle(true);
-
-        //Starting lists for Sets+ and Breaks, counting up. Defaulting to 3 rounds for now.
-        for (int i=0; i<3; i++) {
-            customSetTimeUP.add((long) 0);
-            customBreakTimeUP.add((long) 0);
-            breaksOnlyTimeUP.add((long) 0);
-        }
+        if (!retrievedBOArray.equals("")){
+            for (int i=0; i<convBO.length; i++) {
+                breaksOnlyTime.add(Long.parseLong(convBO[i]));
+            }
+        } else setDefaultCustomCycle(true);
 
         //Starting Pomodoro values. Defaults are set within sharedPref, and called if none are saved.
         for (int i=0; i<3; i++) {
@@ -1467,7 +1466,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         next_round.setOnClickListener(v-> {
-            nextCountUpRound();
+            if (next_round.getAlpha()==1.0f) {
+                nextCountUpRound();
+                next_round.setAlpha(0.3f);
+                next_round.setEnabled(false);
+            }
         });
 
         secondsUpSetRunnable = new Runnable() {
@@ -1502,7 +1505,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
                 if (!onBreak) {
                     if (!setBegun) {
-                        //Ensures any features meant for running timer cannot be executed here.
+                        //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
                         customHalted = false;
                         //Ensures each new dot fade begins @ full alpha.
                         dotDraws.setAlpha();
@@ -1520,7 +1523,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                 } else {
                     if (!breakBegun) {
-                        //Ensures any features meant for running timer cannot be executed here.
+                        //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
                         customHalted = false;
                         dotDraws.setAlpha();
                         //Returns and sets our breakMillis value to the first position in our Array.
@@ -1602,16 +1605,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     //Displays Long->String conversion of time left every tick.
                     timeLeft.setText(convertSeconds((setMillis + 999)/1000));
                     timePaused.setText(convertSeconds((setMillis + 999)/1000));
-
-                    //Passes in updated list every tick, with current fading dot decreasing as timer does.
-//                        customSetTime.set((int) (customSetTime.size()-numberOfSets), setMillis);
                     drawDots(1);
                 }
             }
 
             @Override
             public void onFinish() {
-                //Ensures any features meant for a running timer cannot be executed here.
+                //Used for pause/resume and fading text in (i.e. timeLeft or timePaused). We set it here so that when we switch tabs, the correct textView is shown.
                 customHalted = true;
                 //Used in startObjectAnimator, and dictates if we are on a set or break.
                 onBreak = true;
@@ -1640,6 +1640,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else {
                         progressBar.setProgress(10000);
                         mHandler.post(secondsUpBreakRunnable);
+                        next_round.setAlpha(1.0f);
+                        next_round.setEnabled(true);
                     }
                 },750);
             }
@@ -1678,7 +1680,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 @Override
                 public void onFinish() {
-                    //Ensures any features meant for a running timer cannot be executed here.
+                    //Used for pause/resume and fading text in (i.e. timeLeft or timePaused). We set it here so that when we switch tabs, the correct textView is shown.
                     customHalted = true;
                     //Used in startObjectAnimator, and dictates if we are on a set or break.
                     onBreak = false;
@@ -1712,6 +1714,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 } else {
                                     progressBar.setProgress(10000);
                                     mHandler.post(secondsUpSetRunnable);
+                                    next_round.setAlpha(1.0f);
+                                    next_round.setEnabled(true);
                                 }
                             } else {
                                 //Used to call resetTimer() in pause/resume method. Separate than our disable method.
@@ -2028,6 +2032,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 3:
                     pomHalted = true;
                     if (timer3!=null) timer3.cancel();
+
                     if (objectAnimator3!=null) objectAnimator3.cancel();
 
                     if (pomDotCounter<9) {
@@ -2879,6 +2884,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             for (int i = 0; i < 3; i++) {
                 customSetTime.add((long) 30 * 1000);
                 customBreakTime.add((long) 30 * 1000);
+                customSetTimeUP.add((long) 0);
+                customBreakTimeUP.add((long) 0);
             }
             setValue = 30;
             breakValue = 30;
@@ -2886,6 +2893,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             breaksOnlyTime.clear();
             for (int i=0; i<3; i++) {
                 breaksOnlyTime.add((long) 30 * 1000);
+                breaksOnlyTimeUP.add((long) 0);
             }
             breaksOnlyValue = 30;
         }
@@ -2896,15 +2904,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (mode) {
             case 1:
                 if (onSet) {
-                    numberOfSets--;
                     setMillis = newMillis(true);
+                    numberOfSets--;
                 } else {
-                    numberOfBreaks--;
                     breakMillis = newMillis(false);
+                    numberOfBreaks--;
                 }
                 break;
-            case 2: numberOfBreaksOnly--;
-                    breakOnlyMillis = newMillis(false);
+            case 2:
+                breakOnlyMillis = newMillis(false);
+                numberOfBreaksOnly--;
                 break;
         }
         drawDots(0);
@@ -3127,35 +3136,52 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    //Todo: Disable button after press.
     public void nextCountUpRound() {
-        timeLeft.setAlpha(1);
-        timePaused.setAlpha(0);
+        //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
+        timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
+        timePaused.setText(convertSeconds((countUpMillisSets) /1000));
         animateEnding();
         if (!onBreak) {
+            mHandler.removeCallbacks(secondsUpSetRunnable);
+            //For pause/resume and tab switches.
+            customHalted = false;
             mHandler.postDelayed(() -> {
                 removeSetOrBreak(true);
                 endAnimation.cancel();
-                mHandler.removeCallbacks(secondsUpSetRunnable);
                 onBreak = true;
+                mHandler.removeCallbacks(secondsUpSetRunnable);
                 countUpMillisSets = 0;
                 if (!breaksAreCountingUp) {
                     startObjectAnimator();
                     startBreakTimer();
-                } else mHandler.post(secondsUpBreakRunnable);
+                } else {
+                    mHandler.post(secondsUpBreakRunnable);
+                    next_round.setAlpha(1.0f);
+                    next_round.setEnabled(true);
+                }
             }, 1000);
         } else {
-            mHandler.postDelayed(() -> {
-                removeSetOrBreak(false);
-                endAnimation.cancel();
+            if (mode==1) {
+                //For pause/resume and tab switches.
+                customHalted = false;
                 mHandler.removeCallbacks(secondsUpBreakRunnable);
-                onBreak = false;
-                countUpMillisBreaks = 0;
-                if (!setsAreCountingUp) {
-                    startObjectAnimator();
-                    startSetTimer();
-                } else mHandler.post(secondsUpSetRunnable);
-            }, 1000);
+                mHandler.postDelayed(() -> {
+                    removeSetOrBreak(false);
+                    endAnimation.cancel();
+                    onBreak = false;
+                    countUpMillisBreaks = 0;
+                    if (!setsAreCountingUp) {
+                        startObjectAnimator();
+                        startSetTimer();
+                    } else {
+                        mHandler.post(secondsUpSetRunnable);
+                        next_round.setAlpha(1.0f);
+                        next_round.setEnabled(true);
+                    }
+                }, 1000);
+            } else if (mode==2) {
+                breaksOnlyHalted = false;
+            }
         }
     }
 
