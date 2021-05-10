@@ -829,7 +829,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
         prefEdit = sharedPreferences.edit();
-//            mode = sharedPreferences.getInt("currentMode", 1);
         setValue = sharedPreferences.getLong("setValue", 30);
         breakValue = sharedPreferences.getLong("breakValue", 30);
         breaksOnlyValue = sharedPreferences.getLong("breaksOnlyValue", 30);
@@ -845,6 +844,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         customID = sharedPreferences.getInt("customID", 0);
         breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
         pomID = sharedPreferences.getInt("pomID", 0);
+
+        //Setting count up/down mode to last used, then calling method that sets their values. We use the inverse on our sharedPref retrieval because the method we are calling assumes we are in the previous mode.
+        setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
+        breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
+        countUpMode(true); countUpMode(false);
 
         //Clears all lists so they can be populated using saved data.
         customSetTime.clear();
@@ -3201,7 +3205,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) {
             if (onSet) {
                 //Moving to COUNT UP mode.
-                if (upDown_arrow_one.getTag().equals(COUNTING_DOWN)) {
+                if (!setsAreCountingUp) {
                     setsAreCountingUp = true;
                     upDown_arrow_one.setTag(COUNtING_UP);
                     upDown_arrow_one.setImageResource(R.drawable.arrow_up);
@@ -3210,6 +3214,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSets, fadeVar);
                     timeLeft.setText("0");
                     timePaused.setText("0");
+                    prefEdit.putBoolean("setCountUpMode", true);
                 } else {
                     //Moving to COUNT DOWN mode.
                     setsAreCountingUp = false;
@@ -3221,16 +3226,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.customDrawSet(customSetTime.size(), numberOfSets, fadeVar);
                     timePaused.setText(convertSeconds((setMillis+999)/1000));
                     timeLeft.setText(convertSeconds((setMillis+999)/1000));
+                    prefEdit.putBoolean("setCountUpMode", false);
                 }
             } else {
                 //Moving to COUNT UP mode.
-                if (upDown_arrow_two.getTag().equals(COUNTING_DOWN)) {
+                if (!breaksAreCountingUp) {
                     breaksAreCountingUp = true;
                     upDown_arrow_two.setTag(COUNtING_UP);
                     upDown_arrow_two.setImageResource(R.drawable.arrow_up);
                     dotDraws.countingUpBreaks(true);
                     dotDraws.breakTime(customBreakTimeUP);
                     dotDraws.customDrawBreak(customBreakTimeUP.size(), numberOfBreaks);
+                    prefEdit.putBoolean("breakCountUpMode", true);
                 } else {
                     //Moving to COUNT DOWN mode.
                     breaksAreCountingUp = false;
@@ -3240,9 +3247,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.countingUpBreaks(false);
                     dotDraws.breakTime(customBreakTime);
                     dotDraws.customDrawBreak(customBreakTime.size(), numberOfBreaks);
+                    prefEdit.putBoolean("breakCountUpMode", false);
                 }
             }
         }
+        prefEdit.apply();
     }
 
     public void drawDots(int fadeVar) {
