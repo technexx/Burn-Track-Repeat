@@ -308,7 +308,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
     int receivedAlpha;
-    boolean stopAscent = true;
     boolean minReached;
     boolean maxReached;
     int fadeVar;
@@ -943,8 +942,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             @Override
             public void run() {
                 drawDots(fadeVar);
-                if (receivedAlpha<=100) stopAscent = true;
-                if (stopAscent) mHandler.removeCallbacks(this); else mHandler.postDelayed(this, 50);
+                if (receivedAlpha<=100) mHandler.removeCallbacks(this); else mHandler.postDelayed(this, 50);
             }
         };
 
@@ -1503,7 +1501,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void startObjectAnimator() {
         //Always set to false before new round begins, so fade smooth resets. May cause super rare overlap in fade out dot alphas, but this can be solved by just using separate ascent variables.
-        stopAscent = false;
         switch (mode) {
             case 1:
                 if (!onBreak) {
@@ -1634,7 +1631,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timerDisabled = false;
                     //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                     removeSetOrBreak(true);
-                    stopAscent = true;
                     endAnimation.cancel();
                     dotDraws.setAlpha();
                     if (!breaksAreCountingUp) {
@@ -1706,8 +1702,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             removeSetOrBreak(false);
                             //Re-enabling timer clicks. Used regardless of numberOfBreaks.
                             timerDisabled = false;
-                            stopAscent = true;
-                            endAnimation.cancel();
 
                             //If numberOfBreaks has not been reduced to 0 within this runnable, begin our next set. Otherwise, do end cycle stuff.
                             if (numberOfBreaks!=0) {
@@ -1720,6 +1714,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     next_round.setAlpha(1.0f);
                                     next_round.setEnabled(true);
                                 }
+                                endAnimation.cancel();
                             } else {
                                 //Used to call resetTimer() in pause/resume method. Separate than our disable method.
                                 modeOneTimerEnded = true;
@@ -1782,7 +1777,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //Must execute here for conditional below to work.
                             removeSetOrBreak(false);
                             boTimerDisabled = false;
-                            stopAscent = true;
 
                             //If numberOfBreaksOnly has been reduced to 0 in this runnable, do end cycle stuff. Since we are pausing between breaks in this mode anyway, we are doing less than the set/break combos.
                             if (numberOfBreaksOnly==0){
@@ -1867,7 +1861,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         pomDotCounter++;
                         //Re-enabling timer clicks. Used regardless of number of rounds left.
                         pomTimerDisabled = false;
-                        stopAscent = true;
 
                         if (pomDotCounter!=9) {
                             startObjectAnimator();
