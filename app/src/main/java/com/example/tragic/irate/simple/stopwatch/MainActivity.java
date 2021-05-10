@@ -325,8 +325,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: saved sets/breaks in sharedPref do not apply to count up.
-    //Todo: countUp keeps going up while post-delayed handler is waiting to execute.
+    //Todo: Add end-of-round fade to grey for count up.
     //Todo: Option to disable pause so sets/breaks run uninterupted?
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
@@ -3136,6 +3135,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
+    //Todo: CountUp timer textView at end should not be 0.
     public void nextCountUpRound() {
         //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
         timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
@@ -3161,22 +3161,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }, 1000);
         } else {
+            //On last break, before we remove its count instance, set the timer text to its stopped value.
+            if (numberOfBreaks==1) {
+                timeLeft.setText(convertSeconds((countUpMillisBreaks) /1000));
+                timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
+            }
             if (mode==1) {
                 //For pause/resume and tab switches.
                 customHalted = false;
                 mHandler.removeCallbacks(secondsUpBreakRunnable);
                 mHandler.postDelayed(() -> {
                     removeSetOrBreak(false);
-                    endAnimation.cancel();
                     onBreak = false;
-                    countUpMillisBreaks = 0;
-                    if (!setsAreCountingUp) {
-                        startObjectAnimator();
-                        startSetTimer();
+                    if (numberOfBreaks>0) {
+                        countUpMillisBreaks = 0;
+                        if (!setsAreCountingUp) {
+                            startObjectAnimator();
+                            startSetTimer();
+                        } else {
+                            mHandler.post(secondsUpSetRunnable);
+                            next_round.setAlpha(1.0f);
+                            next_round.setEnabled(true);
+                        }
+                        endAnimation.cancel();
                     } else {
-                        mHandler.post(secondsUpSetRunnable);
-                        next_round.setAlpha(1.0f);
-                        next_round.setEnabled(true);
+                        modeOneTimerEnded = true;
+                        customCyclesDone++;
+                        drawDots(0);
+                        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                     }
                 }, 1000);
             } else if (mode==2) {
@@ -3587,11 +3599,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     startSets = customSetTimeUP.size();
                     timeLeft.setText("0");
                     timePaused.setText("0");
-                    countUpMillisSets = 0;
-                    countUpMillisBreaks = 0;
-                    //Sets all longs in list to "0" since we are restarting a Count Up cycle.
-                    for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, (long) 0);
-                    for (int i=0; i<customBreakTimeUP.size(); i++) customBreakTimeUP.set(i, (long) 0);
                 }
 
                 //Since sets/breaks will always have same number regardless of counting up/down, this can always execute.
@@ -3644,6 +3651,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 onBreak = false;
                 timePaused.setAlpha(1);
                 resetAndFabToggle(false, true);
+                //Sets all longs in list to "0" since we are restarting a Count Up cycle.
+                for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, (long) 0);
+                for (int i=0; i<customBreakTimeUP.size(); i++) customBreakTimeUP.set(i, (long) 0);
+                //Resetting millis values of count up mode to 0.
+                countUpMillisSets = 0;
+                countUpMillisBreaks = 0;
                 break;
             case 2:
                 timePaused2.setAlpha(1);
