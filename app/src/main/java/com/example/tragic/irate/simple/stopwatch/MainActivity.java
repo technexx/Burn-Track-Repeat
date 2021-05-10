@@ -943,6 +943,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             public void run() {
                 drawDots(fadeVar);
                 if (receivedAlpha<=100) mHandler.removeCallbacks(this); else mHandler.postDelayed(this, 50);
+                Log.i("testFade", "alpha is " + receivedAlpha);
             }
         };
 
@@ -3134,6 +3135,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: CountUp timer textView at end should not be 0.
     public void nextCountUpRound() {
+        mHandler.post(endFade);
         //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
         timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
         timePaused.setText(convertSeconds((countUpMillisSets) /1000));
@@ -3400,9 +3402,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
+        //Todo: breakMillis sets to 0 and triggers timerDisabled.
+        Log.i("testDis", "timer disabled is " + timerDisabled);
+        Log.i("testDis", "millis values are " + setMillis + " and " + breakMillis);
         //Disables pause/resume if <500 ms left.
         if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
             timerDisabled = true;
+        Log.i("testDis", "timer disabled is " + timerDisabled);
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
         if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) fab.setVisibility(View.INVISIBLE); next_round.setVisibility(View.VISIBLE);
 
@@ -3580,15 +3586,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void populateCycleUI() {
         switch (mode) {
             case 1:
+                //Todo: Conditional to set millis values unnecessary since we are replacing blank cycles w/ our default. We may want to change if they are replaced, in which case our DISABLED timer in pause/resume will also need to change, since it triggers @ <500ms.
+                if (customSetTime.size()>0) {
+                    setMillis = customSetTime.get(0);
+                    breakMillis = customBreakTime.get(0);
+                }
                 if (!setsAreCountingUp) {
-                    if (customSetTime.size()>0) setMillis = customSetTime.get(0);
-                    if (customBreakTime.size()>0) {
-                        breakMillis = customBreakTime.get(0);
+                    if (customSetTime.size()>0) {
                         timePaused.setText(convertSeconds((setMillis+999)/1000));
                         timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                    } else timePaused.setText("?");
+                        emptyCycle = false;
+                    } else {
+                        timePaused.setText("?");
+                        emptyCycle = true;
+                    }
 
-                    if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
                     if (setMillis>=60000) {
                         timePaused.setTextSize(70f);
                         timeLeft.setTextSize(70f);
