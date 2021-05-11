@@ -324,6 +324,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
+    //Todo: count up mode changes for breaksOnly mode.
+    //Todo: Database saves for count up mode.
     //Todo: Go over other methods for Count Up changes
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
@@ -832,9 +834,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setValue = sharedPreferences.getLong("setValue", 30);
         breakValue = sharedPreferences.getLong("breakValue", 30);
         breaksOnlyValue = sharedPreferences.getLong("breaksOnlyValue", 30);
-        pomValue1 = sharedPreferences.getLong("pomValue1", 25);
-        pomValue2 = sharedPreferences.getLong("pomValue2", 5);
-        pomValue3 = sharedPreferences.getLong("pomValue3", 15);
         //Call this on start to sync edit values w/ retrieved values from SharedPref.
         convertEditTime();
 
@@ -860,6 +859,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         String retrievedSetArray = sharedPreferences.getString("setArrays", "");
         String retrievedBreakArray = sharedPreferences.getString("breakArrays", "");
+        String retrievedPomArray = sharedPreferences.getString("savedPomArrays", "");
         String retrievedBOArray = sharedPreferences.getString("savedBOArrays", "");
         String retrievedTitle = sharedPreferences.getString("savedTitle", "");
 
@@ -867,11 +867,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrievedSetArray = retrievedSetArray.replace("]", "");
         retrievedBreakArray = retrievedBreakArray.replace("[", "");
         retrievedBreakArray = retrievedBreakArray.replace("]", "");
+        retrievedPomArray = retrievedPomArray.replace("]", "");
+        retrievedPomArray = retrievedPomArray.replace("[", "");
         retrievedBOArray = retrievedBOArray.replace("[", "");
         retrievedBOArray = retrievedBOArray.replace("]", "");
 
         String[] convSets = retrievedSetArray.split(",");
         String[] convBreaks = retrievedBreakArray.split(",");
+        String[] convPom = retrievedPomArray.split(",");
         String[] convBO = retrievedBOArray.split(",");
 
         //Starting list for Sets+, counting down. Recalls previously entered rounds. If no rounds exist, populates using default.
@@ -889,15 +892,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         } else setDefaultCustomCycle(true);
 
-        //Starting Pomodoro values. Defaults are set within sharedPref, and called if none are saved.
-        for (int i=0; i<3; i++) {
-            pomValuesTime.add(pomValue1);
-            pomValuesTime.add(pomValue2);
-        }
-        pomValuesTime.add(pomValue1);
-        pomValuesTime.add(pomValue3);
-        pomMillis = pomValue1*1000*60;
-        pomMillis1 = pomValue1*1000*60;
+        //Retrieves the last entered Pom cycle, or default if none. Converts default millis to its first round.
+        if (!retrievedPomArray.equals("")) for (int i=0; i<8; i++) pomValuesTime.add(Long.parseLong(convPom[i])); else setDefaultPomCycle();
+        pomMillis = pomValuesTime.get(0) * 1000 * 60;
+        pomMillis1 = pomMillis;
 
         //Sets number of rounds to size of round list.
         numberOfSets = customSetTime.size();
@@ -1898,7 +1896,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //      vibrator.vibrate(pattern1, 0);
 //      }
 
-    //Todo: List sizes are out of sync because set/breaks can have different sizes in different modes.
     public void adjustCustom(boolean adding) {
         //Converts editText to long and then convert+sets these values to setValue/breakValue depending on which editTexts are being used.
         if (first_value_edit.isShown()) setEditValueBounds(true);
@@ -1967,7 +1964,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveArrays();
     }
 
-    //Todo: No need for skip in counting up.
     public void skipRound() {
         if (customSetTime.size()>0) {
             int oldCycle = 0;
@@ -1996,7 +1992,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         oldCycle = customCyclesDone;
                     }
                     //If, AFTER removing the last round, we still have a set/break combo remaining, we set a new textView w/ new millis value.
-                    if (numberOfSets >0) setNewText(timePaused, timePaused, (newMillis(true)+999)/1000);
+                    if (numberOfSets >0) {
+                        if (!setsAreCountingUp) setNewText(timePaused, timePaused, (newMillis(true)+999)/1000);
+                        else setNewText(timePaused, timePaused, 0);
+                    }
 
                     //If we have reduced the last round's break count (above) to 0, we have skipped the last round in this cycle. Setting our end animation, and the timer text to "0". Essentially duplicating a naturally ended cycle.
                     if (numberOfBreaks == 0) {
@@ -2023,7 +2022,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         oldCycle2 = breaksOnlyCyclesDone;
                         breakOnlyBegun = false;
                     }
-                    if (numberOfBreaksOnly >0) setNewText(timePaused2, timePaused2, (newMillis(false) +999) / 1000);
+                    if (numberOfBreaksOnly >0) {
+                        if (!breaksAreCountingUp) setNewText(timePaused2, timePaused2, (newMillis(false) +999) / 1000);
+                        else setNewText(timePaused2, timePaused2, 0);
+                    }
 
                     if (numberOfBreaksOnly==0) {
                         timePaused2.setAlpha(0);
@@ -2072,7 +2074,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(0);
     }
 
-    //Todo: Fab and Next Round button toggle depending on if Count Up cycle is started.
+    //Todo: Fab and Next Round button toggle depending on if Count Up cycle is started. Need sep !goingup boolean for breaksOnly?
     public void switchTimer(int mode, boolean halted) {
         //Sets views for respective tab each time one is switched.
         removeViews(); tabViews();
@@ -2886,7 +2888,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    //Todo: For Pom.
     public void setDefaultCustomCycle(boolean forBreaksOnly) {
         if (!forBreaksOnly) {
             customSetTime.clear();
@@ -2907,6 +2908,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             breaksOnlyValue = 30;
         }
+    }
+
+    public void setDefaultPomCycle() {
+        pomValuesTime.clear();
+        for (int i=0; i<3; i++) {
+            pomValuesTime.add(pomValue1);
+            pomValuesTime.add(pomValue2);
+        }
+        pomValuesTime.add(pomValue1);
+        pomValuesTime.add(pomValue3);
+        pomMillis = pomValue1*1000*60;
+        pomMillis1 = pomValue1*1000*60;
     }
 
     //Removes a set or break and calls function to update the millis value.
@@ -3027,9 +3040,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         prefEdit.putLong("setValue", setValue);
         prefEdit.putLong("breakValue", breakValue);
         prefEdit.putLong("breaksOnlyValue", breaksOnlyValue);
-        prefEdit.putLong("pomValue1", pomValue1);
-        prefEdit.putLong("pomValue2", pomValue2);
-        prefEdit.putLong("pomValue3", pomValue3);
         prefEdit.apply();
     }
 
@@ -3103,6 +3113,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String savedSetArrays = "";
         String savedBreakArrays = "";
         String savedBOArrays = "";
+        String savedPomArrays = "";
         String savedTitle = "";
         if (!edit_header.getText().toString().equals("")) savedTitle = edit_header.getText().toString(); else savedTitle = getString(R.string.default_title);
         if (customSetTime.size()>0){
@@ -3110,10 +3121,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedBreakArrays = gson.toJson(customBreakTime);
         }
         if (breaksOnlyTime.size()>0) savedBOArrays = gson.toJson(breaksOnlyTime);
+        savedPomArrays = gson.toJson((pomValuesTime));
 
         prefEdit.putString("setArrays", savedSetArrays);
         prefEdit.putString("breakArrays", savedBreakArrays);
         prefEdit.putString("savedBOArrays", savedBOArrays);
+        prefEdit.putString("savedPomArrays", savedPomArrays);
         prefEdit.putString("savedTitle", savedTitle);
         prefEdit.apply();
     }
