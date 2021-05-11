@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Option to disable pause so sets/breaks run uninterupted?
+    //Todo: Go over other methods for Count Up changes
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
     //Todo: Dot fade when adding/subtracting?
@@ -374,9 +374,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     editCyclesPopupWindow.dismiss();
                     selectingRounds = false;
                 } else {
-                    left_arrow.setVisibility(View.VISIBLE);
-                    right_arrow.setVisibility(View.VISIBLE);
-                    selectingRounds = true;
+                    if (!setsAreCountingUp || !breaksAreCountingUp) {
+                        left_arrow.setVisibility(View.VISIBLE);
+                        right_arrow.setVisibility(View.VISIBLE);
+                        selectingRounds = true;
+                    }
                 }
                 //If not clicking on an existing round (i.e. a blank space in box), remove arrow visibility.
                 if (pos<0 || pos==100) {
@@ -1253,32 +1255,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return true;
         });
 
-        //Todo: No need to switch counting up here.
         left_arrow.setOnClickListener(v-> {
             if (mode==1) {
                 if (customSetTime.size()>=2 && receivedPos>0) {
-
-                    long holder = customSetTime.get(receivedPos-1);
-                    customSetTime.set(receivedPos-1, customSetTime.get(receivedPos));
-                    customSetTime.set(receivedPos, holder);
-
-                    holder = customBreakTime.get(receivedPos-1);
-                    customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
-                    customBreakTime.set(receivedPos, holder);
-                    setMillis = newMillis(true);
-                    setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    long holder = 0;
+                    if (!setsAreCountingUp) {
+                        holder = customSetTime.get(receivedPos-1);
+                        customSetTime.set(receivedPos-1, customSetTime.get(receivedPos));
+                        customSetTime.set(receivedPos, holder);
+                        setMillis = newMillis(true);
+                        setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    } else setNewText(timePaused, timePaused, 0);
+                    if (!breaksAreCountingUp) {
+                        holder = customBreakTime.get(receivedPos-1);
+                        customBreakTime.set(receivedPos-1, customBreakTime.get(receivedPos));
+                        customBreakTime.set(receivedPos, holder);
+                    }
+                    //Moving receivedPos one place left.
                     receivedPos-=1;
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()>=2 && receivedPos>0) {
-                    long holder = breaksOnlyTime.get(receivedPos-1);
-                    breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
-                    breaksOnlyTime.set(receivedPos, holder);
-                    breakOnlyMillis = newMillis(false);
-                    setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
-                    receivedPos-=1;
+                    if (!breaksAreCountingUp) {
+                        long holder = breaksOnlyTime.get(receivedPos-1);
+                        breaksOnlyTime.set(receivedPos-1, breaksOnlyTime.get(receivedPos));
+                        breaksOnlyTime.set(receivedPos, holder);
+                        breakOnlyMillis = newMillis(false);
+                        setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
+                        //Moving receivedPos one place right.
+                        receivedPos-=1;
+                    } else setNewText(timePaused2, timePaused2, 0);
                 }
             }
+            //Sending new receivedPos var to dotDraws class, which moves our selection box.
             dotDraws.selectRound(receivedPos);
             drawDots(0);
             saveArrays();
@@ -1287,27 +1296,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         right_arrow.setOnClickListener(v-> {
             if (mode==1) {
                 if (customSetTime.size()-1 > receivedPos && receivedPos>=0) {
+                    long holder = 0;
+                    if (!setsAreCountingUp) {
+                        holder = customSetTime.get(receivedPos+1);
+                        customSetTime.set(receivedPos+1, customSetTime.get(receivedPos));
+                        customSetTime.set(receivedPos, holder);
+                        setMillis = newMillis(true);
+                        setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    } else setNewText(timePaused, timePaused, 0);
 
-                    long holder = customSetTime.get(receivedPos+1);
-                    customSetTime.set(receivedPos+1, customSetTime.get(receivedPos));
-                    customSetTime.set(receivedPos, holder);
-
-                    holder = customBreakTime.get(receivedPos+1);
-                    customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
-                    customBreakTime.set(receivedPos, holder);
-                    setMillis = newMillis(true);
-                    setNewText(timePaused, timePaused, (setMillis+999)/1000);
+                    if (!breaksAreCountingUp) {
+                        holder = customBreakTime.get(receivedPos+1);
+                        customBreakTime.set(receivedPos+1, customBreakTime.get(receivedPos));
+                        customBreakTime.set(receivedPos, holder);
+                    }
                     receivedPos +=1;
                 }
             } else if (mode==2) {
                 if (breaksOnlyTime.size()-1 > receivedPos && receivedPos>=0) {
-
-                    long holder = breaksOnlyTime.get(receivedPos+1);
-                    breaksOnlyTime.set(receivedPos+1, breaksOnlyTime.get(receivedPos));
-                    breaksOnlyTime.set(receivedPos, holder);
-                    breakOnlyMillis = newMillis(false);
-                    setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
-                    receivedPos +=1;
+                    if (!breaksAreCountingUp) {
+                        long holder = breaksOnlyTime.get(receivedPos+1);
+                        breaksOnlyTime.set(receivedPos+1, breaksOnlyTime.get(receivedPos));
+                        breaksOnlyTime.set(receivedPos, holder);
+                        breakOnlyMillis = newMillis(false);
+                        setNewText(timePaused2, timePaused2, (breakOnlyMillis+999)/1000);
+                        receivedPos +=1;
+                    } else setNewText(timePaused2, timePaused2, 0);
                 }
             }
             drawDots(0);
