@@ -324,7 +324,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Add end-of-round fade to grey for count up.
     //Todo: Option to disable pause so sets/breaks run uninterupted?
     //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
@@ -3133,9 +3132,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    //Todo: CountUp timer textView at end should not be 0.
     public void nextCountUpRound() {
-        mHandler.post(endFade);
         //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
         timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
         timePaused.setText(convertSeconds((countUpMillisSets) /1000));
@@ -3144,6 +3141,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             mHandler.removeCallbacks(secondsUpSetRunnable);
             //For pause/resume and tab switches.
             customHalted = false;
+            dotDraws.setAlpha();
             mHandler.postDelayed(() -> {
                 removeSetOrBreak(true);
                 endAnimation.cancel();
@@ -3159,6 +3157,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     next_round.setEnabled(true);
                 }
             }, 1000);
+            fadeVar = 1;
+            mHandler.post(endFade);
         } else {
             //On last break, before we remove its count instance, set the timer text to its stopped value.
             if (numberOfBreaks==1) {
@@ -3166,9 +3166,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
             }
             if (mode==1) {
+                mHandler.removeCallbacks(secondsUpBreakRunnable);
                 //For pause/resume and tab switches.
                 customHalted = false;
-                mHandler.removeCallbacks(secondsUpBreakRunnable);
+                dotDraws.setAlpha();
                 mHandler.postDelayed(() -> {
                     removeSetOrBreak(false);
                     onBreak = false;
@@ -3193,6 +3194,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else if (mode==2) {
                 breaksOnlyHalted = false;
             }
+            fadeVar = 2;
+            mHandler.post(endFade);
         }
     }
 
@@ -3402,14 +3405,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
-        //Todo: breakMillis sets to 0 and triggers timerDisabled.
-        Log.i("testDis", "timer disabled is " + timerDisabled);
-        Log.i("testDis", "millis values are " + setMillis + " and " + breakMillis);
         //Disables pause/resume if <500 ms left.
         if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
             timerDisabled = true;
-        Log.i("testDis", "timer disabled is " + timerDisabled);
         if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
+        //Todo: Default round up button not always enabled, and its toggle is only based on its onClick.
         if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) fab.setVisibility(View.INVISIBLE); next_round.setVisibility(View.VISIBLE);
 
         //disabledTimer booleans are to prevent ANY action being taken.
@@ -3461,11 +3461,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                     startBreakTimer();
                                 } else mHandler.post(secondsUpBreakRunnable);
                             } else {
-                                if (!onBreak) mHandler.post(secondsUpSetRunnable); else {
+                                if (!onBreak) {
+                                    mHandler.post(secondsUpSetRunnable);
+                                    next_round.setAlpha(1.0f);
+                                    next_round.setEnabled(true);
+                                } else {
                                     if (!breaksAreCountingUp) {
                                         startObjectAnimator();
                                         startBreakTimer();
-                                    } else mHandler.post(secondsUpBreakRunnable);
+                                    } else {
+                                        mHandler.post(secondsUpBreakRunnable);
+                                        next_round.setAlpha(1.0f);
+                                        next_round.setEnabled(true);
+                                    }
                                 }
                             }
                         }
@@ -3671,6 +3679,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //Resetting millis values of count up mode to 0.
                 countUpMillisSets = 0;
                 countUpMillisBreaks = 0;
+                //Removing timer callbacks for count up mode.
+                mHandler.removeCallbacks(secondsUpSetRunnable);
+                mHandler.removeCallbacks(secondsUpBreakRunnable);
                 break;
             case 2:
                 timePaused2.setAlpha(1);
