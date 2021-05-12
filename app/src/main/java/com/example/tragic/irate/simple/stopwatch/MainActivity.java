@@ -1524,7 +1524,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 timeLeft2.setText(convertSeconds((countUpMillisBO) /1000));
                 timePaused2.setText(convertSeconds((countUpMillisBO) /1000));
                 breaksOnlyTimeUP.set((int) (breaksOnlyTimeUP.size()-numberOfBreaksOnly), countUpMillisBO);
-                drawDots(2);
+                drawDots(3);
                 mHandler.postDelayed(this, 50);
             }
         };
@@ -2183,8 +2183,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
         }
+        Log.i("testFade", "value is " + fadeVar);
+
         dotDraws.setAlpha();
-        drawDots(0);
+        drawDots(fadeVar);
     }
 
     private void animateEnding() {
@@ -3263,7 +3265,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 }
             }, 1000);
-            fadeVar = 2;
+            fadeVar = 3;
         }
         mHandler.post(endFade);
         dotDraws.setAlpha();
@@ -3279,7 +3281,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     upDown_arrow_one.setImageResource(R.drawable.arrow_up);
                     dotDraws.countingUpSets(true);
                     dotDraws.setTime(customSetTimeUP);
-                    dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSets, fadeVar);
+                    dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSets, 1);
                     timeLeft.setText("0");
                     timePaused.setText("0");
                     prefEdit.putBoolean("setCountUpMode", true);
@@ -3291,7 +3293,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     upDown_arrow_one.setTag(1);
                     dotDraws.countingUpSets(false);
                     dotDraws.setTime(customSetTime);
-                    dotDraws.customDrawSet(customSetTime.size(), numberOfSets, fadeVar);
+                    dotDraws.customDrawSet(customSetTime.size(), numberOfSets, 1);
                     timePaused.setText(convertSeconds((setMillis+999)/1000));
                     timeLeft.setText(convertSeconds((setMillis+999)/1000));
                     prefEdit.putBoolean("setCountUpMode", false);
@@ -3325,7 +3327,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 upDown_arrow_one.setImageResource(R.drawable.arrow_up);
                 dotDraws.countingUpBreaks(true);
                 dotDraws.breakOnlyTime(breaksOnlyTimeUP);
-                dotDraws.breaksOnlyDraw(breaksOnlyTimeUP.size(), numberOfBreaksOnly, fadeVar);
+                dotDraws.breaksOnlyDraw(breaksOnlyTimeUP.size(), numberOfBreaksOnly, 3);
                 timeLeft2.setText("0");
                 timePaused2.setText("0");
                 prefEdit.putBoolean("breakOnlyCountUpMode", true);
@@ -3335,7 +3337,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 upDown_arrow_one.setImageResource(R.drawable.arrow_down);
                 dotDraws.countingUpBreaks(false);
                 dotDraws.breakOnlyTime(breaksOnlyTime);
-                dotDraws.breaksOnlyDraw(breaksOnlyTime.size(), numberOfBreaksOnly, fadeVar);
+                dotDraws.breaksOnlyDraw(breaksOnlyTime.size(), numberOfBreaksOnly, 3);
                 timePaused2.setText(convertSeconds((breakOnlyMillis+999)/1000));
                 timeLeft2.setText(convertSeconds((breakOnlyMillis+999)/1000));
                 prefEdit.putBoolean("breakOnlyCountUpMode", false);
@@ -3362,7 +3364,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.pomDraw(pomDotCounter, pomValuesTime, fadeVar);
                 break;
         }
-        Log.i("blah", "values are " + breaksOnlyTime.size() + " and " + startBreaksOnly);
+        Log.i("testFade", "value is " + fadeVar);
     }
 
     //Todo: For breaksOnly counting up.

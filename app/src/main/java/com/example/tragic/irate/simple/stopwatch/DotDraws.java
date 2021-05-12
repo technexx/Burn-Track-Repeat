@@ -235,10 +235,10 @@ public class DotDraws extends View {
         switch (mMode) {
             case 1:
                 encloseDots(mY-70, mY+200);
+                if (mGoingUpSets) setDotStyle(true); else setDotStyle(false);
 
                 for (int i=0; i<mSetCount; i++) {
                     mPaint.setColor(Color.GREEN);
-                    if (mGoingUpSets) setDotStyle(true); else setDotStyle(false);
                     if (mSetCount - mSetReduce == i) {
                         if (mFadeDone == 1) fadeDot();
                     } else if (mSetReduce + i < mSetCount){
@@ -264,9 +264,9 @@ public class DotDraws extends View {
             case 2:
                 mX2 = 15;
                 encloseDots(mY-30, mY+160);
+                if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
 
                 for (int i=0; i<mBreakOnlyCount; i++) {
-                    if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
                     mPaint.setColor(Color.RED);
                     if (mBreakOnlyCount - mBreakOnlyReduce == i) {
                         if (mFadeDone == 3) fadeDot();
