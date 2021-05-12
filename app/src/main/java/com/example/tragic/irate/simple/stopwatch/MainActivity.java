@@ -327,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: count up mode changes for breaksOnly mode.
     //Todo: Reintroduce delete round imageButton and test.
     //Todo: Database saves for count up mode.
     //Todo: Go over other methods for Count Up changes
@@ -949,7 +948,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             public void run() {
                 drawDots(fadeVar);
                 if (receivedAlpha<=100) mHandler.removeCallbacks(this); else mHandler.postDelayed(this, 50);
-                Log.i("testFade", "alpha is " + receivedAlpha);
             }
         };
 
@@ -1298,6 +1296,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             saveArrays();
         });
 
+        //Switching order of sets/breaks only if in count down mode (where preset values exist).
         right_arrow.setOnClickListener(v-> {
             if (mode==1) {
                 if (customSetTime.size()-1 > receivedPos && receivedPos>=0) {
@@ -2014,7 +2013,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     //If, AFTER removing the last round, we still have a set/break combo remaining, we set a new textView w/ new millis value.
                     if (numberOfSets >0) {
                         if (!setsAreCountingUp) setNewText(timePaused, timePaused, (newMillis(true)+999)/1000);
-                        else setNewText(timePaused, timePaused, 0);
+                        else {
+                            setNewText(timePaused, timePaused, 0);
+                            setNewText(timeLeft, timeLeft, 0);
+                        }
                     }
 
                     //If we have reduced the last round's break count (above) to 0, we have skipped the last round in this cycle. Setting our end animation, and the timer text to "0". Essentially duplicating a naturally ended cycle.
@@ -2031,6 +2033,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused.setText("0");
                         modeOneTimerEnded = true;
                     }
+                    if (setsAreCountingUp) {
+                        mHandler.removeCallbacks(secondsUpSetRunnable);
+                        countUpMillisSets = 0;
+                    }
+                    if (breaksOnlyAreCountingUp) {
+                        mHandler.removeCallbacks(secondsUpBreakRunnable);
+                        countUpMillisBreaks = 0;
+                    }
                     break;
                 case 2:
                     breaksOnlyHalted = true;
@@ -2043,8 +2053,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         breakOnlyBegun = false;
                     }
                     if (numberOfBreaksOnly >0) {
-                        if (!breaksAreCountingUp) setNewText(timePaused2, timePaused2, (newMillis(false) +999) / 1000);
-                        else setNewText(timePaused2, timePaused2, 0);
+                        if (!breaksOnlyAreCountingUp) setNewText(timePaused2, timePaused2, (newMillis(false) +999) / 1000);
+                        else {
+                            setNewText(timeLeft2, timeLeft2, 0);
+                            setNewText(timePaused2, timePaused2, 0);
+                        }
                     }
 
                     if (numberOfBreaksOnly==0) {
@@ -2059,6 +2072,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timeLeft2.setText("0");
                         timePaused2.setText("0");
                         modeTwoTimerEnded = true;
+                    }
+                    if (breaksOnlyAreCountingUp) {
+                        mHandler.removeCallbacks(secondsUpBORunnable);
+                        countUpMillisBO = 0;
                     }
                     break;
                 case 3:
@@ -2090,6 +2107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     break;
             }
         }
+        resetAndFabToggle(true, false);
         dotDraws.setAlpha();
         drawDots(0);
     }
@@ -2183,8 +2201,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 break;
         }
-        Log.i("testFade", "value is " + fadeVar);
-
         dotDraws.setAlpha();
         drawDots(fadeVar);
     }
@@ -3364,10 +3380,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.pomDraw(pomDotCounter, pomValuesTime, fadeVar);
                 break;
         }
-        Log.i("testFade", "value is " + fadeVar);
     }
 
-    //Todo: For breaksOnly counting up.
     //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
     public void deleteSelectedRound() {
         if (mode==1) {
@@ -3381,8 +3395,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
         } else if (mode==2){
             breaksOnlyTime.remove(receivedPos);
+            breaksOnlyTimeUP.remove(receivedPos);
             numberOfBreaksOnly-=1;
-            dotDraws.breakOnlyTime(breaksOnlyTime);
+            if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(breaksOnlyTimeUP);
         }
         canSaveOrUpdate(true);
     }
@@ -3494,15 +3509,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
         //Disables pause/resume if <500 ms left.
-        if (mode == 1) if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
-            timerDisabled = true;
-        if (mode == 2) if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
+        if (mode == 1) {
+            if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
+                timerDisabled = true;
+            if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) {
+                next_round.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.INVISIBLE);
+            }
+        }
+        if (mode == 2) {
+            if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
+            if (breaksOnlyAreCountingUp) {
+                next_round.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.INVISIBLE);
+            }
+        }
         //Todo: Default round up button not always enabled, and its toggle is only based on its onClick.
-        if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) fab.setVisibility(View.INVISIBLE); next_round.setVisibility(View.VISIBLE);
 
         //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
-
             delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
             sub_cycle.setEnabled(false);
