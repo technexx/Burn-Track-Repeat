@@ -266,6 +266,7 @@ public class DotDraws extends View {
                 encloseDots(mY-30, mY+160);
 
                 for (int i=0; i<mBreakOnlyCount; i++) {
+                    if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
                     mPaint.setColor(Color.RED);
                     if (mBreakOnlyCount - mBreakOnlyReduce == i) {
                         if (mFadeDone == 3) fadeDot();
