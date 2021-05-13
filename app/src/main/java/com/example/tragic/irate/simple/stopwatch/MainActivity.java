@@ -384,13 +384,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (!setsAreCountingUp || !breaksAreCountingUp) {
                         left_arrow.setVisibility(View.VISIBLE);
                         right_arrow.setVisibility(View.VISIBLE);
+                        delete_sb.setVisibility(View.VISIBLE);
+                        circle_reset.setVisibility(View.INVISIBLE);
                         selectingRounds = true;
+                        if (mode==1 && customSetTime.size()==0) {
+                            delete_sb.setAlpha(0.3f);
+                            delete_sb.setEnabled(false);
+                        } else {
+                            delete_sb.setAlpha(1.0f);
+                            delete_sb.setEnabled(true);
+                        }
                     }
                 }
                 //If not clicking on an existing round (i.e. a blank space in box), remove arrow visibility.
                 if (pos<0 || pos==100) {
                     left_arrow.setVisibility(View.INVISIBLE);
                     right_arrow.setVisibility(View.INVISIBLE);
+                    delete_sb.setVisibility(View.INVISIBLE);
+                    circle_reset.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -935,6 +946,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_two.setImageResource(R.drawable.arrow_down);
         upDown_arrow_two.setTag(1);
 
+        //Start mode of reset and fab buttons.
+        resetAndFabToggle(false, true);
+
         //Sets our saved title.
         cycle_header_text.setText(retrievedTitle);
         //Sets xml views.
@@ -1035,8 +1049,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
                 editCyclesPopupWindow.showAsDropDown((View) tabLayout);
             }
-            left_arrow.setVisibility(View.INVISIBLE);
-            right_arrow.setVisibility(View.INVISIBLE);
         });
 
         delete_all_confirm.setOnClickListener(v-> {
@@ -3393,11 +3405,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             numberOfBreaks-=1;
             if (!setsAreCountingUp) dotDraws.setTime(customSetTime); else dotDraws.setTime(customSetTimeUP);
             if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
+            if (numberOfSets==0) {
+                delete_sb.setAlpha(0.3f);
+                delete_sb.setEnabled(false);
+            }
         } else if (mode==2){
             breaksOnlyTime.remove(receivedPos);
             breaksOnlyTimeUP.remove(receivedPos);
             numberOfBreaksOnly-=1;
             if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(breaksOnlyTimeUP);
+            if (numberOfBreaksOnly==0) {
+                delete_sb.setAlpha(0.3f);
+                delete_sb.setEnabled(false);
+            }
         }
         canSaveOrUpdate(true);
     }
@@ -3500,8 +3520,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void pauseAndResumeTimer(int pausing) {
         //Dismisses our add/subtract round menu and arrows once timer has begun.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
-        left_arrow.setVisibility(View.INVISIBLE);
-        right_arrow.setVisibility(View.INVISIBLE);
+//        left_arrow.setVisibility(View.INVISIBLE);
+//        right_arrow.setVisibility(View.INVISIBLE);
         //Controls the alpha/enabled status of reset and FAB buttons.
         if (pausing==PAUSING_TIMER) resetAndFabToggle(true, false); else resetAndFabToggle(false, false);
         //Toasts empty cycle message and exits out of method.
@@ -3524,8 +3544,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 fab.setVisibility(View.INVISIBLE);
             }
         }
-        //Todo: Default round up button not always enabled, and its toggle is only based on its onClick.
-
         //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
             delete_sb.setVisibility(View.INVISIBLE);
@@ -3561,7 +3579,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 } else mHandler.removeCallbacks(secondsUpBreakRunnable);
                             }
                         } else if (pausing == RESUMING_TIMER) {
-                            customHalted = false;
+                            if (!circle_reset.isShown()) {
+                                circle_reset.setVisibility(View.VISIBLE);
+                                circle_reset.setAlpha(0.3f);
+                            }
+                             customHalted = false;
                             timeLeft.setAlpha(1);
                             if (!setsAreCountingUp) {
                                 //If on Sets Mode and sets are counting down, do the following.
@@ -3604,6 +3626,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 timePaused2.setText(convertSeconds((breakOnlyMillis + 999) / 1000));
                             } else mHandler.removeCallbacks(secondsUpBORunnable);
                         } else if (pausing == RESUMING_TIMER) {
+                            if (!circle_reset.isShown()) {
+                                circle_reset.setVisibility(View.VISIBLE);
+                                circle_reset.setAlpha(0.3f);
+                            }
                             timeLeft2.setAlpha(1);
                             breaksOnlyHalted = false;
                             if (!breaksOnlyAreCountingUp) {

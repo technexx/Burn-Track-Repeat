@@ -237,23 +237,24 @@ public class DotDraws extends View {
                 encloseDots(mY-70, mY+200);
                 if (mGoingUpSets) setDotStyle(true); else setDotStyle(false);
 
-                for (int i=0; i<mSetCount; i++) {
+                //Using mSetTime array size for loop instead of int constructor value.
+                for (int i=0; i<mSetTime.size(); i++) {
                     mPaint.setColor(Color.GREEN);
-                    if (mSetCount - mSetReduce == i) {
+                    if (mSetTime.size() - mSetReduce == i) {
                         if (mFadeDone == 1) fadeDot();
-                    } else if (mSetReduce + i < mSetCount){
+                    } else if (mSetReduce + i < mSetTime.size()){
                         mPaint.setAlpha(100);
                     } else mPaint.setAlpha(255);
                     mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                     drawText(mSetTime, mX+16, mY+2, i);
                     mX += 132;
                 }
-                for (int i=0; i<mBreakCount; i++) {
+                for (int i=0; i<mBreakTime.size(); i++) {
                     mPaint.setColor(Color.RED);
                     if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
-                    if (mBreakCount - mBreakReduce == i) {
+                    if (mBreakTime.size() - mBreakReduce == i) {
                         if (mFadeDone == 2) fadeDot();
-                    } else if (mBreakReduce + i <  mBreakCount) {
+                    } else if (mBreakReduce + i <  mBreakTime.size()) {
                         mPaint.setAlpha(100);
                     } else mPaint.setAlpha(255);
                     mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
