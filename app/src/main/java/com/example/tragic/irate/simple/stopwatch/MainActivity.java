@@ -320,9 +320,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public Runnable secondsUpSetRunnable;
     public Runnable secondsUpBreakRunnable;
     public Runnable secondsUpBORunnable;
+    public Runnable fadeInDot;
     boolean setsAreCountingUp;
     boolean breaksAreCountingUp;
     boolean breaksOnlyAreCountingUp;
+    int dotAlpha;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
@@ -1504,6 +1506,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         });
 
+        fadeInDot = new Runnable() {
+            @Override
+            public void run() {
+                if (dotAlpha+25 <=255) {
+                    dotAlpha+=25;
+                    mHandler.postDelayed(this, 30);
+                    dotDraws.fadeDotDraw(dotAlpha);
+                } else {
+                    dotAlpha = 0;
+                    mHandler.removeCallbacks(this);
+                }
+            }
+        };
+
         secondsUpSetRunnable = new Runnable() {
             @Override
             public void run() {
@@ -1957,6 +1973,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
                     break;
             }
+            //Resetting the "add/subtract fade" alpha to 0 to ensure we always fade in from black.
+            dotDraws.fadeDotDraw(0);
+            mHandler.post(fadeInDot);
         } else {
             //Using a specific position to delete round if one is selected, otherwise deleting the most recently added.
             if (selectingRounds) {

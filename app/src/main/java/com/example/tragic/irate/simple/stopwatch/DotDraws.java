@@ -13,6 +13,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.logging.Handler;
 
 public class DotDraws extends View {
     Canvas mCanvas;
@@ -33,6 +34,7 @@ public class DotDraws extends View {
     long mBreakOnlyReduce;
 
     int mAlpha = 255;
+    int mAlpha2;
     int cycle;
     int mFadeDone;
     int mMode;
@@ -55,6 +57,7 @@ public class DotDraws extends View {
     int mOldMode;
     boolean mGoingUpSets;
     boolean mGoingUpBreaks;
+    boolean mDotsAreDrawn;
 
     public interface sendPosition {
         void sendPos(int pos);
@@ -244,11 +247,12 @@ public class DotDraws extends View {
                         if (mFadeDone == 1) fadeDot();
                     } else if (mSetReduce + i < mSetTime.size()){
                         mPaint.setAlpha(100);
-                    } else mPaint.setAlpha(255);
+                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn) mPaint.setAlpha(mAlpha2);
                     mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                     drawText(mSetTime, mX+16, mY+2, i);
                     mX += 132;
                 }
+
                 for (int i=0; i<mBreakTime.size(); i++) {
                     mPaint.setColor(Color.RED);
                     if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
@@ -414,6 +418,13 @@ public class DotDraws extends View {
         savedCustomAlpha = mAlpha;
         savedCustomCycle = cycle;
         mSendAlpha.sendAlphaValue(mAlpha);
+    }
+
+    public void fadeDotDraw(int alpha) {
+        mAlpha2 = alpha;
+        mDotsAreDrawn = true;
+//        mPaint.setAlpha(mAlpha2);
+        invalidate();
     }
 
     public String convertSeconds(long totalSeconds) {
