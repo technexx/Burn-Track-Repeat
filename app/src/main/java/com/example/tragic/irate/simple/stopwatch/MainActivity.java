@@ -321,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public Runnable secondsUpBreakRunnable;
     public Runnable secondsUpBORunnable;
     public Runnable fadeInDot;
+    public Runnable fadeOutDot;
     boolean setsAreCountingUp;
     boolean breaksAreCountingUp;
     boolean breaksOnlyAreCountingUp;
@@ -1511,10 +1512,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             public void run() {
                 if (dotAlpha+25 <=255) {
                     dotAlpha+=25;
-                    mHandler.postDelayed(this, 30);
-                    dotDraws.fadeDotDraw(dotAlpha);
+                    mHandler.postDelayed(this, 15);
+                    dotDraws.fadeDotDraw(dotAlpha, true);
+                } else mHandler.removeCallbacks(this);
+            }
+        };
+
+        fadeOutDot = new Runnable() {
+            @Override
+            public void run() {
+                if (dotAlpha-25 >=0) {
+                    dotAlpha-=25;
+                    mHandler.postDelayed(this, 15);
+                    dotDraws.fadeDotDraw(dotAlpha, false);
                 } else {
-                    dotAlpha = 0;
+                    dotDraws.fadeDotDraw(-1, false);
                     mHandler.removeCallbacks(this);
                 }
             }
@@ -1973,8 +1985,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     } else Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
                     break;
             }
-            //Resetting the "add/subtract fade" alpha to 0 to ensure we always fade in from black.
-            dotDraws.fadeDotDraw(0);
+            dotAlpha = 5;
+            //Resetting the "add/subtract fade" alpha to 5 to ensure we always fade in from black.
+            dotDraws.fadeDotDraw(5, true);
             mHandler.post(fadeInDot);
         } else {
             //Using a specific position to delete round if one is selected, otherwise deleting the most recently added.
@@ -2009,6 +2022,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                 }
             }
+            dotAlpha = 255;
+            dotDraws.fadeDotDraw(255, false);
+            mHandler.post(fadeOutDot);
         }
         populateCycleUI();
         saveArrays();

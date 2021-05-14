@@ -58,6 +58,7 @@ public class DotDraws extends View {
     boolean mGoingUpSets;
     boolean mGoingUpBreaks;
     boolean mDotsAreDrawn;
+    boolean mFadingIn;
 
     public interface sendPosition {
         void sendPos(int pos);
@@ -238,7 +239,8 @@ public class DotDraws extends View {
         switch (mMode) {
             case 1:
                 encloseDots(mY-70, mY+200);
-                if (mGoingUpSets) setDotStyle(true); else setDotStyle(false);
+                //Filled or stroked dots depending on count up/down.
+                setDotStyle(mGoingUpSets);
 
                 //Using mSetTime array size for loop instead of int constructor value.
                 for (int i=0; i<mSetTime.size(); i++) {
@@ -247,10 +249,21 @@ public class DotDraws extends View {
                         if (mFadeDone == 1) fadeDot();
                     } else if (mSetReduce + i < mSetTime.size()){
                         mPaint.setAlpha(100);
-                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn) mPaint.setAlpha(mAlpha2);
+                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn && mFadingIn) mPaint.setAlpha(mAlpha2);
                     mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                     drawText(mSetTime, mX+16, mY+2, i);
                     mX += 132;
+
+                    //Todo: Background of box is WHITE @ 35 alpha. Is not flush because we are drawing OVER a black canvas @ 35 with circle @ 35.
+                    //Subtracting dot.
+                    if (mDotsAreDrawn && !mFadingIn && (mSetTime.size()-1==i)) {
+                        //Blacks out our subtracted dot, since we no longer want it to display. Otherwise, keep it green and draw text in that position.
+                        if (mAlpha2!=-1) {
+                            mPaint.setAlpha(mAlpha2);
+                            mCanvas.drawCircle(mX+20, mY, 55, mPaint);
+                        }
+                    }
+//                    Log.i("testFade", "value is " + mAlpha2);
                 }
 
                 for (int i=0; i<mBreakTime.size(); i++) {
@@ -420,10 +433,10 @@ public class DotDraws extends View {
         mSendAlpha.sendAlphaValue(mAlpha);
     }
 
-    public void fadeDotDraw(int alpha) {
+    public void fadeDotDraw(int alpha, boolean fadingIn) {
         mAlpha2 = alpha;
+        mFadingIn = fadingIn;
         mDotsAreDrawn = true;
-//        mPaint.setAlpha(mAlpha2);
         invalidate();
     }
 
