@@ -249,17 +249,21 @@ public class DotDraws extends View {
                         if (mFadeDone == 1) fadeDot();
                     } else if (mSetReduce + i < mSetTime.size()){
                         mPaint.setAlpha(100);
-                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn && mFadingIn) mPaint.setAlpha(mAlpha2);
+                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn && mFadingIn) {
+                        mPaint.setAlpha(mAlpha2);
+                        mPaintText.setAlpha(mAlpha2);
+                    }
                     mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                     drawText(mSetTime, mX+16, mY+2, i);
                     mX += 132;
 
-                    //Todo: Background of box is WHITE @ 35 alpha. Is not flush because we are drawing OVER a black canvas @ 35 with circle @ 35.
-                    //Subtracting dot.
+                    //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
                     if (mDotsAreDrawn && !mFadingIn && (mSetTime.size()-1==i)) {
-                        //Blacks out our subtracted dot, since we no longer want it to display. Otherwise, keep it green and draw text in that position.
+                        //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
                         if (mAlpha2!=-1) {
                             mPaint.setAlpha(mAlpha2);
+                            mPaintText.setAlpha(mAlpha2);
+                            drawText(mSetTime, mX+16, mY+2, i);
                             mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                         }
                     }
@@ -273,10 +277,24 @@ public class DotDraws extends View {
                         if (mFadeDone == 2) fadeDot();
                     } else if (mBreakReduce + i <  mBreakTime.size()) {
                         mPaint.setAlpha(100);
-                    } else mPaint.setAlpha(255);
+                    } else if (mBreakTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn && mFadingIn) {
+                        mPaint.setAlpha(mAlpha2);
+                        mPaintText.setAlpha(mAlpha2);
+                    }
                     mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
                     drawText(mBreakTime, mX2+16, mY2+2, i);
                     mX2 += 132;
+
+                    //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
+                    if (mDotsAreDrawn && !mFadingIn && (mBreakTime.size()-1==i)) {
+                        //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
+                        if (mAlpha2!=-1) {
+                            mPaint.setAlpha(mAlpha2);
+                            mPaintText.setAlpha(mAlpha2);
+                            drawText(mBreakTime, mX2+16, mY2+2, i);
+                            mCanvas.drawCircle(mX2+20, mY2, 55, mPaint);
+                        }
+                    }
                 }
                 break;
             case 2:

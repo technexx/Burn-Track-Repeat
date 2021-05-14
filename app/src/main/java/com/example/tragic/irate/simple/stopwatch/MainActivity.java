@@ -1512,7 +1512,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             public void run() {
                 if (dotAlpha+25 <=255) {
                     dotAlpha+=25;
-                    mHandler.postDelayed(this, 15);
+                    mHandler.postDelayed(this, 35);
                     dotDraws.fadeDotDraw(dotAlpha, true);
                 } else mHandler.removeCallbacks(this);
             }
@@ -1523,7 +1523,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             public void run() {
                 if (dotAlpha-25 >=0) {
                     dotAlpha-=25;
-                    mHandler.postDelayed(this, 15);
+                    mHandler.postDelayed(this, 35);
                     dotDraws.fadeDotDraw(dotAlpha, false);
                 } else {
                     dotDraws.fadeDotDraw(-1, false);
