@@ -329,7 +329,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean breaksAreCountingUp;
     boolean breaksOnlyAreCountingUp;
     int dotAlpha;
-    boolean appHasLaunched;
+
+    boolean modeOneBetweenRounds;
+    boolean modeTwoBetweenRounds;
+    boolean modeThreeBetweenRounds;
+
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
@@ -957,8 +961,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabViews();
         //Populates UI elements at app start.
         populateCycleUI();
-        //Used to restrict certain functions until true;
-        appHasLaunched = true;
 
         //Used in all timers to smooth out end fade.
         endFade = new Runnable() {
@@ -1609,6 +1611,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         if (objectAnimator!=null) objectAnimator.resume();
                     }
                 }
+                //If true, triggers an animation on tab switch. Used since we disable any mode's animations if not tabbed in (to prevent overlap).
+                modeOneBetweenRounds = false;
                 break;
             case 2:
                 if (!breakOnlyBegun) {
@@ -1627,6 +1631,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakOnlyMillis = breakOnlyMillisUntilFinished;
                     if (objectAnimator2!=null) objectAnimator2.resume();
                 }
+                modeTwoBetweenRounds = false;
                 break;
             case 3:
                 if (!pomBegun) {
@@ -1645,6 +1650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     pomMillis = pomMillisUntilFinished;
                     if (objectAnimator3!=null) objectAnimator3.resume();
                 }
+                modeThreeBetweenRounds = false;
                 break;
         }
     }
@@ -1682,6 +1688,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             @Override
             public void onFinish() {
+                //Open to animations during tab switches until next Object Animator begins.
+                modeOneBetweenRounds = true;
                 //Used for pause/resume and fading text in (i.e. timeLeft or timePaused). We set it here so that when we switch tabs, the correct textView is shown.
                 customHalted = true;
                 //Used in startObjectAnimator, and dictates if we are on a set or break.
@@ -1755,6 +1763,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 @Override
                 public void onFinish() {
+                    modeOneBetweenRounds = true;
                     //Used for pause/resume and fading text in (i.e. timeLeft or timePaused). We set it here so that when we switch tabs, the correct textView is shown.
                     customHalted = true;
                     //Used in startObjectAnimator, and dictates if we are on a set or break.
@@ -1836,6 +1845,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 @Override
                 public void onFinish() {
+                    modeTwoBetweenRounds = true;
                     //Ensures any features meant for a running timer cannot be executed here.
                     breaksOnlyHalted = true;
                     breakOnlyBegun = false;
@@ -1911,6 +1921,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             @Override
             public void onFinish() {
+                modeThreeBetweenRounds = true;
                 //Ensures any features meant for a running timer cannot be executed here.
                 pomHalted = true;
                 pomBegun = false;
@@ -2188,7 +2199,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(0);
     }
 
-    //Todo: Fab and Next Round button toggle depending on if Count Up cycle is started. Need sep !goingup boolean for breaksOnly?
     public void switchTimer(int mode, boolean halted) {
         //Sets views for respective tab each time one is switched.
         removeViews(); tabViews();
@@ -2224,6 +2234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateCustom);
                 if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
+                if (modeOneBetweenRounds) animateEnding(true);
                 if (endAnimation2!=null && !endAnimation2.hasEnded()) endAnimation2.cancel();
                 break;
             case 2:
@@ -2245,7 +2256,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
                 if (breaksOnlyTime.size()>0) emptyCycle = false; else emptyCycle = true;
-                if (isOvertimeRunning) animateEnding(true);
+                //Begins end cycle animation if cycle has ended on the mode being switched to. This animation does not trigger if we are in a different mode, because of the overlap that animates the current (non-ended) mode.
+                if (modeTwoBetweenRounds) animateEnding(true);
                 break;
             case 3:
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
@@ -2264,6 +2276,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     setNewText(lastTextView, timeLeft3, (pomMillis + 999)/1000);
                 }
                 if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
+                if (modeThreeBetweenRounds) animateEnding(true);
                 break;
             case 4:
                 //Same animation instance can't be used simultaneously for both TextViews.
