@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ObjectAnimator objectAnimator2;
     ObjectAnimator objectAnimator3;
     Animation endAnimation;
+    Animation endAnimation2;
+    Animation endAnimation3;
     public Handler mHandler;
     TextView lastTextView;
 
@@ -246,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean breakOnlyBegun;
     boolean pomBegun;
     boolean selectingRounds;
+    boolean isOvertimeRunning;
 
     PopupWindow sortPopupWindow;
     PopupWindow savedCyclePopupWindow;
@@ -326,21 +329,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean breaksAreCountingUp;
     boolean breaksOnlyAreCountingUp;
     int dotAlpha;
+    boolean appHasLaunched;
 
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Reintroduce delete round imageButton and test.
+    //Todo: Issues with multiple timers at once.
+    //Todo:     (B) End of breaksOmly timer fades out breaks in Custom. (D) Pause/resume button in wrong mode for breaksOnly after switching tabs.
     //Todo: Database saves for count up mode.
-    //Todo: Go over other methods for Count Up changes
-    //Todo: Add textReduce to Pom mode using minutes instead of seconds.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
     //Todo: Blank title at fresh app launch.
-    //Todo: Dot fade when adding/subtracting?
     //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
+    //Todo: Fade in dots for add/sub pom.
     //Todo: TDEE in sep popup w/ tabs.
     //Todo: Drag round move?
     //Todo: Variable set count-up timer, for use w/ TDEE.
@@ -926,12 +929,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = customSetTime.get(0);
         breakOnlyMillis = breaksOnlyTime.get(0);
 
-        //Animation that plays when round completes.
-        endAnimation = new AlphaAnimation(1.0f, 0.0f);
-        endAnimation.setDuration(300);
-        endAnimation.setStartOffset(20);
-        endAnimation.setRepeatMode(Animation.REVERSE);
-        endAnimation.setRepeatCount(Animation.INFINITE);
+        //Animation that plays when round completes. Creating one for initial use.
+        animateEnding(false);
 
         //Recycler view for our stopwatch laps.
         lapLayout= new LinearLayoutManager(getApplicationContext());
@@ -958,6 +957,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabViews();
         //Populates UI elements at app start.
         populateCycleUI();
+        //Used to restrict certain functions until true;
+        appHasLaunched = true;
 
         //Used in all timers to smooth out end fade.
         endFade = new Runnable() {
@@ -1631,7 +1632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (!pomBegun) {
                     //Ensures any features meant for running timer cannot be executed here.
                     pomHalted = false;
-                    pomMillis = 5000;
+//                    pomMillis = 5000;
                     dotDraws.setAlpha();
                     objectAnimator3 = ObjectAnimator.ofInt(progressBar3, "progress", (int) pomProgressPause, 0);
                     objectAnimator3.setInterpolator(new LinearInterpolator());
@@ -1687,7 +1688,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 onBreak = true;
                 //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
                 setBegun = false;
-                animateEnding();
+                //Creates a new alpha animation, and sets this timer's progress bar/text on it.
+                if (mode==1) {
+                    animateEnding(false);
+                    progressBar.setAnimation(endAnimation);
+                    timeLeft.setAnimation(endAnimation);
+                }
                 //Disabling pause/resume clicks until animation finishes.
                 timerDisabled = true;
                 //Smooths out end fade.
@@ -1757,7 +1763,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakBegun = false;
                     timeLeft.setText("0");
 
-                    animateEnding();
+                    if (mode==1) {
+                        animateEnding(false);
+                        progressBar.setAnimation(endAnimation);
+                        timeLeft.setAnimation(endAnimation);
+                    }
                     if (numberOfBreaks >0) {
                         customProgressPause = maxProgress;
                         //Disabling pause/resume clicks until animation finishes.
@@ -1831,7 +1841,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakOnlyBegun = false;
                     timeLeft2.setText("0");
 
-                    animateEnding();
+                    if (mode==2) {
+                        animateEnding(false);
+                        progressBar2.setAnimation(endAnimation2);
+                        timeLeft2.setAnimation(endAnimation2);
+                    }
                     if (numberOfBreaksOnly>0) {
                         breaksOnlyProgressPause = maxProgress;
                         //Disabling pause/resume clicks until animation finishes.
@@ -1857,7 +1871,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         },750);
                     };
-                    overtime.setVisibility(View.VISIBLE);
+                    if (mode==2) overtime.setVisibility(View.VISIBLE);
+                    isOvertimeRunning = true;
                     ot = new Runnable() {
                         @Override
                         public void run() {
@@ -1874,7 +1889,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void startPomTimer() {
-        pomBegun = true;
         timer3 = new CountDownTimer(pomMillis, 50) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -1915,7 +1929,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                 }
 
-                animateEnding();
+                if (mode==3) {
+                    animateEnding(false);
+                    progressBar3.setAnimation(endAnimation3);
+                    timeLeft3.setAnimation(endAnimation3);
+                }
                 if (pomDotCounter<9) {
                     //Ensures any features meant for a running timer cannot be executed here.
                     customHalted = true;
@@ -1989,6 +2007,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Resetting the "add/subtract fade" alpha to 5 to ensure we always fade in from black.
             dotDraws.fadeDotDraw(5, true);
             mHandler.post(fadeInDot);
+            //emptyCycle toggles to true if we switch tab into a timer w/ no rounds. This turns it false if we've added one.
+            emptyCycle = false;
         } else {
             //Using a specific position to delete round if one is selected, otherwise deleting the most recently added.
             if (selectingRounds) {
@@ -2003,7 +2023,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             customBreakTime.remove(customBreakTime.size() - 1);
                             customBreakTimeUP.remove(customBreakTimeUP.size() -1);
                             canSaveOrUpdate(true);
-                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            emptyCycle = true;
+                            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 2:
                         if (breaksOnlyTime.size() > 0) {
@@ -2013,12 +2036,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //Used w/ arrows to switch break places.
 //                            if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
 //                            if (receivedPos >=0) dotDraws.selectRound(receivedPos);
-                        } else Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            emptyCycle = true;
+                            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 3:
                         if (pomValuesTime.size()!=0) {
                             pomValuesTime.clear();
-                        } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            emptyCycle = true;
+                            Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                 }
             }
@@ -2074,7 +2103,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             customCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                         }
-                        if (!modeOneTimerEnded) animateEnding();
+                        if (!modeOneTimerEnded) animateEnding(true);
                         progressBar.setProgress(0);
                         timeLeft.setText("0");
                         timePaused.setText("0");
@@ -2114,7 +2143,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             breaksOnlyCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                         }
-                        if (!modeTwoTimerEnded) animateEnding();
+                        if (!modeTwoTimerEnded) animateEnding(true);
                         progressBar2.setProgress(0);
                         timeLeft2.setText("0");
                         timePaused2.setText("0");
@@ -2145,7 +2174,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             pomCyclesDone++;
                             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
                         }
-                        if (!modeThreeTimerEnded) animateEnding();
+                        if (!modeThreeTimerEnded) animateEnding(true);
                         progressBar3.setProgress(0);
                         timeLeft3.setText("0");
                         timePaused3.setText("0");
@@ -2181,6 +2210,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (halted) {
                     setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
                     fadeInText(timePaused);
+                    if (setMillis<100) timePaused.setText("0");
                 } else {
                     setNewText(lastTextView, timeLeft, (setMillis + 999)/1000);
                     customAlpha = 0;
@@ -2188,12 +2218,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     startObjectAnimator();
                 }
                 savedCycleAdapter.setView(1);
+                //The current values to be added in our add/subtract menu.
                 first_value_textView.setText(convertCustomTextView(setValue));
                 second_value_textView.setText(convertCustomTextView(breakValue));
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateCustom);
-                //Todo: emptyCycle disables pause/resume. Watch w/ counting up on different list.
                 if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
+                if (endAnimation2!=null && !endAnimation2.hasEnded()) endAnimation2.cancel();
                 break;
             case 2:
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
@@ -2202,6 +2233,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (halted) {
                     setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
                     fadeInText(timePaused2);
+                    if (breakOnlyMillis<100)  timePaused2.setText("0");
                 } else {
                     setNewText(lastTextView, timeLeft2, (breakOnlyMillis + 999)/1000);
                     customAlpha = 0;
@@ -2213,6 +2245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
                 if (breaksOnlyTime.size()>0) emptyCycle = false; else emptyCycle = true;
+                if (isOvertimeRunning) animateEnding(true);
                 break;
             case 3:
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
@@ -2223,6 +2256,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (halted) {
                     fadeInText(timePaused3);
                     setNewText(lastTextView, timePaused3, (pomMillis + 999)/1000);
+                    if (pomMillis<100) timePaused3.setText("0");
                 } else {
                     pomAlpha = 0;
                     fadeCustomTimer = true;
@@ -2232,7 +2266,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
             case 4:
-                //Same animfzsation instance can't be used simultaneously for both TextViews.
+                //Same animation instance can't be used simultaneously for both TextViews.
                 cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
                 if (stopwatchHalted) fadeInText(timePaused4);
                 else fadeInText(timeLeft4);
@@ -2252,27 +2286,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         drawDots(fadeVar);
     }
 
-    private void animateEnding() {
+    //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
+    private void animateEnding(boolean setAnimation) {
         endAnimation = new AlphaAnimation(1.0f, 0.0f);
         endAnimation.setDuration(300);
         endAnimation.setStartOffset(20);
         endAnimation.setRepeatMode(Animation.REVERSE);
         endAnimation.setRepeatCount(Animation.INFINITE);
 
-        switch (mode) {
-            case 1:
-                progressBar.setAnimation(endAnimation);
-                timeLeft.setAnimation(endAnimation);
-                break;
-            case 2:
-                progressBar2.setAnimation(endAnimation);
-                timeLeft2.setAnimation(endAnimation);
-                break;
-            case 3:
-                progressBar3.setAnimation(endAnimation);
-                timeLeft3.setAnimation(endAnimation);
-                break;
+        endAnimation2 = new AlphaAnimation(1.0f, 0.0f);
+        endAnimation2.setDuration(300);
+        endAnimation2.setStartOffset(20);
+        endAnimation2.setRepeatMode(Animation.REVERSE);
+        endAnimation2.setRepeatCount(Animation.INFINITE);
+
+        endAnimation3 = new AlphaAnimation(1.0f, 0.0f);
+        endAnimation3.setDuration(300);
+        endAnimation3.setStartOffset(20);
+        endAnimation3.setRepeatMode(Animation.REVERSE);
+        endAnimation3.setRepeatCount(Animation.INFINITE);
+
+        if (setAnimation) {
+            switch (mode) {
+                case 1:
+                    if (mode==1) {
+                        progressBar.setAnimation(endAnimation);
+                        timeLeft.setAnimation(endAnimation);
+                    }
+                    break;
+                case 2:
+                    if (mode==2) {
+                        progressBar2.setAnimation(endAnimation2);
+                        timeLeft2.setAnimation(endAnimation2);
+                    }
+                    break;
+                case 3:
+                    if (mode==3) {
+                        progressBar3.setAnimation(endAnimation3);
+                        timeLeft3.setAnimation(endAnimation3);
+                    }
+                    break;
+            }
         }
+
     }
 
     public void changeTextSize(ValueAnimator va, TextView textView, TextView textViewPaused) {
@@ -2347,20 +2403,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         fadeOutObj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
         fadeOutObj.setDuration(750);
         fadeOutObj.start();
-    }
-
-    public void removeViews() {
-        timeLeft.setAlpha(0);
-        timeLeft2.setAlpha(0);
-        timeLeft3.setAlpha(0);
-        timeLeft4.setAlpha(0);
-        timePaused.setAlpha(0);
-        timePaused2.setAlpha(0);
-        timePaused3.setAlpha(0);
-        timePaused4.setAlpha(0);
-        msTime.setAlpha(0);
-        msTimePaused.setAlpha(0);
-        overtime.setVisibility(View.INVISIBLE);
     }
 
     public void editAndTextSwitch(boolean removeTextView, int viewRemoved) {
@@ -3254,7 +3296,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
         timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
         timePaused.setText(convertSeconds((countUpMillisSets) /1000));
-        animateEnding();
+        animateEnding(true);
         if (mode==1) {
             if (!onBreak) {
                 mHandler.removeCallbacks(secondsUpSetRunnable);
@@ -3457,6 +3499,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         canSaveOrUpdate(true);
     }
 
+    public void removeViews() {
+        timeLeft.setAlpha(0);
+        timeLeft2.setAlpha(0);
+        timeLeft3.setAlpha(0);
+        timeLeft4.setAlpha(0);
+        timePaused.setAlpha(0);
+        timePaused2.setAlpha(0);
+        timePaused3.setAlpha(0);
+        timePaused4.setAlpha(0);
+        msTime.setAlpha(0);
+        msTimePaused.setAlpha(0);
+        overtime.setVisibility(View.INVISIBLE);
+    }
+
     public void tabViews(){
         switch (mode) {
             case 1: case 2:
@@ -3479,6 +3535,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     s1.setVisibility(View.GONE);
                     second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                     second_value_textView.setVisibility(View.VISIBLE);
+                    if (isOvertimeRunning) overtime.setVisibility(View.VISIBLE); else overtime.setVisibility(View.INVISIBLE);
                 }
                 progressBar3.setVisibility(View.INVISIBLE);
                 stopWatchView.setVisibility(View.GONE);
@@ -3677,6 +3734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             }
                         } else if (pausing == RESETTING_TIMER) {
                             if (endAnimation != null) endAnimation.cancel();
+                            isOvertimeRunning = false;
                             mHandler.removeCallbacks(ot);
                             overSeconds = 0;
                             overtime.setVisibility(View.INVISIBLE);
@@ -3932,7 +3990,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sub_cycle.setEnabled(true);
         populateCycleUI();
 
-        //Todo: We do want separate animations in case multiples are running at once, we do not want to invalidate all. Test before we change.
-        if (endAnimation!=null) endAnimation.cancel();
+        endAnimation.cancel();
+        endAnimation2.cancel();
+        endAnimation3.cancel();
     }
 }

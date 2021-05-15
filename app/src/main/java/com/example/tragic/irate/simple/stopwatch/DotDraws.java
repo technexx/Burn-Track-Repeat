@@ -267,7 +267,6 @@ public class DotDraws extends View {
                             mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                         }
                     }
-//                    Log.i("testFade", "value is " + mAlpha2);
                 }
 
                 for (int i=0; i<mBreakTime.size(); i++) {
