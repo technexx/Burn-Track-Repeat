@@ -307,10 +307,24 @@ public class DotDraws extends View {
                         if (mFadeDone == 3) fadeDot();
                     } else if (mBreakOnlyReduce + i <  mBreakOnlyCount) {
                         mPaint.setAlpha(100);
-                    } else mPaint.setAlpha(255);
+                    } else if (mBreakOnlyTime.size()-1!=i) mPaint.setAlpha(255); else if (mAddSubFade && mFadingIn) {
+                        mPaint.setAlpha(mAlpha2);
+                        mPaintText.setAlpha(mAlpha2);
+                    };
                     mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
                     drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
                     mX2 += 132;
+
+                    //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
+                    if (mAddSubFade && !mFadingIn && (mBreakOnlyTime.size()-1==i)) {
+                        //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
+                        if (mAlpha2!=-1) {
+                            mPaint.setAlpha(mAlpha2);
+                            mPaintText.setAlpha(mAlpha2);
+                            drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
+                            mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
+                        }
+                    }
                 }
                 break;
             case 3:
@@ -323,8 +337,6 @@ public class DotDraws extends View {
                 }
                 break;
         }
-        //Used to prevent fading when canvas is drawn outside of add/sub methods.
-        mAddSubFade = false;
 
         if (mDrawBox) {
             //Setting to false so that the selection box is always removed after a deletion.

@@ -340,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: Fade in dots for add/sub pom.
     //Todo: Fade for count up/down mode.
-    //Todo: count up/down arrows affect dot fade (likely the conditions we set for the add/sub fade)
 
     //Todo: Database saves for count up mode.
     //Todo: Blank title at fresh app launch.
@@ -3467,6 +3466,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
         }
         prefEdit.apply();
+        //Sets fadeVar to 0 so our first dot doesn't fade.
+        drawDots(0);
     }
 
     public void drawDots(int fadeVar) {
