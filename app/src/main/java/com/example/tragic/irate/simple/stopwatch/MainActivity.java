@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: "Update" will crash if nothing is saved.
 
     //Todo: Issues with multiple timers at once.
-    //Todo:     (B) End of breaksOmly timer fades out breaks in Custom. (D) Pause/resume button in wrong mode for breaksOnly after switching tabs.
+    //Todo:
     //Todo: Database saves for count up mode.
     //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
     //Todo: Blank title at fresh app launch.
@@ -1684,6 +1684,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timePaused.setText(convertSeconds((setMillis + 999)/1000));
                     drawDots(1);
                 }
+                if (setMillis<500) timerDisabled = true;
             }
 
             @Override
@@ -1702,11 +1703,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     progressBar.setAnimation(endAnimation);
                     timeLeft.setAnimation(endAnimation);
                 }
-                //Disabling pause/resume clicks until animation finishes.
-                timerDisabled = true;
-                //Smooths out end fade.
-                fadeVar = 1;
-                mHandler.post(endFade);
+
+                if (mode==1) {
+                    //Smooths out end fade.
+                    fadeVar = 1;
+                    mHandler.post(endFade);
+                }
 
                 timeLeft.setText("0");
                 customProgressPause = maxProgress;
@@ -1714,7 +1716,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     //Re-enabling timer clicks.
                     timerDisabled = false;
                     //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
-                    removeSetOrBreak(true);
+                    numberOfSets--;
+                    setMillis = customSetTime.get((int) (customSetTime.size()-numberOfSets));
                     endAnimation.cancel();
                     dotDraws.setAlpha();
                     if (!breaksAreCountingUp) {
@@ -1759,6 +1762,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
                         drawDots(2);
                     }
+                    if (breakMillis<500) timerDisabled = true;
                 }
 
                 @Override
@@ -1779,8 +1783,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     if (numberOfBreaks >0) {
                         customProgressPause = maxProgress;
-                        //Disabling pause/resume clicks until animation finishes.
-                        timerDisabled = true;
                         //Smooths out end fade.
                         fadeVar = 2;
                         mHandler.post(endFade);
@@ -1788,7 +1790,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         mHandler.postDelayed(() -> {
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
-                            removeSetOrBreak(false);
+                            numberOfBreaks--;
+                            breakMillis = customBreakTime.get((int) (customBreakTime.size()-numberOfBreaks));
                             //Re-enabling timer clicks. Used regardless of numberOfBreaks.
                             timerDisabled = false;
 
@@ -1841,6 +1844,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         timePaused2.setText(convertSeconds((millisUntilFinished +999) / 1000));
                         drawDots(3);
                     }
+                    if (breakOnlyMillis<500) boTimerDisabled = true;
                 }
 
                 @Override
@@ -1858,18 +1862,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     if (numberOfBreaksOnly>0) {
                         breaksOnlyProgressPause = maxProgress;
-                        //Disabling pause/resume clicks until animation finishes.
-                        boTimerDisabled = true;
                         //Smooths out end fade.
-                        fadeVar = 3;
-                        mHandler.post(endFade);
+                        //Todo: fadeVar is issue. Likely because break count is lowered and our canvas draws the next one dark. We declare fadeVar here for use w/ endFade.
+                        if (mode==2){
+                            fadeVar = 3;
+                            mHandler.post(endFade);
+                        }
                         //Activates RESETTING_TIMER in pauseAndResume. Var gets set to 2 on next click in pauseAndResume, and then resets to 0.
                         movingBOCycle=1;
 
                         mHandler.postDelayed(() -> {
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
-                            removeSetOrBreak(false);
+                            numberOfBreaksOnly--;
+                            breakOnlyMillis = breaksOnlyTime.get((int) (breaksOnlyTime.size()-numberOfBreaksOnly));
                             boTimerDisabled = false;
                             //If numberOfBreaksOnly has been reduced to 0 in this runnable, do end cycle stuff. Since we are pausing between breaks in this mode anyway, we are doing less than the set/break combos.
                             if (numberOfBreaksOnly==0){
@@ -1892,7 +1898,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                     };
                     mHandler.post(ot);
-
                 }
             }.start();
         }
@@ -1950,10 +1955,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     customHalted = true;
                     //Disabling pause/resume clicks until animation finishes.
                     pomTimerDisabled = true;
-                    //Smooths out end fade.
-                    fadeVar = 4;
-                    mHandler.post(endFade);
-
+                    if (mode==3) {
+                        //Smooths out end fade.
+                        fadeVar = 4;
+                        mHandler.post(endFade);
+                    }
                     mHandler.postDelayed(() ->{
                         //Counter must increase here for conditional below to work.
                         pomDotCounter++;
@@ -2296,7 +2302,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
         }
         dotDraws.setAlpha();
-        drawDots(fadeVar);
+        drawDots(0);
     }
 
     //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
@@ -3304,7 +3310,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     }
 
-    //Todo: Possible onBreak issues when switching tabs (e.g. if custom on sets)
     public void nextCountUpRound() {
         //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
         timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
@@ -3633,17 +3638,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
-        //Disables pause/resume if <500 ms left.
         if (mode == 1) {
-            if ((setMillis <= 500 || breakMillis <= 500) && numberOfBreaks > 0)
-                timerDisabled = true;
             if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) {
                 next_round.setVisibility(View.VISIBLE);
                 fab.setVisibility(View.INVISIBLE);
             }
         }
         if (mode == 2) {
-            if (breakOnlyMillis <= 500 && numberOfBreaksOnly > 0) boTimerDisabled = true;
             if (breaksOnlyAreCountingUp) {
                 next_round.setVisibility(View.VISIBLE);
                 fab.setVisibility(View.INVISIBLE);
@@ -3746,7 +3747,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 next_round.setEnabled(true);
                             }
                         } else if (pausing == RESETTING_TIMER) {
-                            if (endAnimation != null) endAnimation.cancel();
+                            if (endAnimation2 != null) endAnimation2.cancel();
                             isOvertimeRunning = false;
                             mHandler.removeCallbacks(ot);
                             overSeconds = 0;
