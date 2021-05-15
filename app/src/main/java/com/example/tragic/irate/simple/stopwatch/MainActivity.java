@@ -338,16 +338,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Issues with multiple timers at once.
-    //Todo:
+    //Todo: Fade in dots for add/sub pom.
+    //Todo: Fade for count up/down mode.
+    //Todo: count up/down arrows affect dot fade (likely the conditions we set for the add/sub fade)
+
     //Todo: Database saves for count up mode.
-    //Todo: Stopwatch does not maintain reset (0) value when switching tabs.
     //Todo: Blank title at fresh app launch.
     //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
-    //Todo: Fade in dots for add/sub pom.
     //Todo: TDEE in sep popup w/ tabs.
     //Todo: Drag round move?
     //Todo: Variable set count-up timer, for use w/ TDEE.
@@ -1047,7 +1047,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss(); else {
                 switch (mode) {
                     case 1:
-                        editCyclesPopupWindow.setHeight(365); break;
+                        editCyclesPopupWindow.setHeight(405); break;
                     case 2:
                         editCyclesPopupWindow.setHeight(255); break;
                     case 3:
@@ -3617,8 +3617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 lapRecycler.setVisibility(View.VISIBLE);
                 cycle_reset.setText(R.string.clear_laps);
-                msTime.setAlpha(1);
-                msTimePaused.setAlpha(1);
+                if (!stopwatchHalted) msTime.setAlpha(1); else msTimePaused.setAlpha(1);
 
                 timeLeft4.setText(displayTime);
                 timePaused4.setText(displayTime);

@@ -57,7 +57,7 @@ public class DotDraws extends View {
     int mOldMode;
     boolean mGoingUpSets;
     boolean mGoingUpBreaks;
-    boolean mDotsAreDrawn;
+    boolean mAddSubFade;
     boolean mFadingIn;
 
     public interface sendPosition {
@@ -249,7 +249,7 @@ public class DotDraws extends View {
                         if (mFadeDone == 1) fadeDot();
                     } else if (mSetReduce + i < mSetTime.size()){
                         mPaint.setAlpha(100);
-                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn && mFadingIn) {
+                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mAddSubFade && mFadingIn) {
                         mPaint.setAlpha(mAlpha2);
                         mPaintText.setAlpha(mAlpha2);
                     }
@@ -258,7 +258,7 @@ public class DotDraws extends View {
                     mX += 132;
 
                     //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
-                    if (mDotsAreDrawn && !mFadingIn && (mSetTime.size()-1==i)) {
+                    if (mAddSubFade && !mFadingIn && (mSetTime.size()-1==i)) {
                         //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
                         if (mAlpha2!=-1) {
                             mPaint.setAlpha(mAlpha2);
@@ -276,7 +276,7 @@ public class DotDraws extends View {
                         if (mFadeDone == 2) fadeDot();
                     } else if (mBreakReduce + i <  mBreakTime.size()) {
                         mPaint.setAlpha(100);
-                    } else if (mBreakTime.size()-1!=i) mPaint.setAlpha(255); else if (mDotsAreDrawn && mFadingIn) {
+                    } else if (mBreakTime.size()-1!=i) mPaint.setAlpha(255); else if (mAddSubFade && mFadingIn) {
                         mPaint.setAlpha(mAlpha2);
                         mPaintText.setAlpha(mAlpha2);
                     }
@@ -285,7 +285,7 @@ public class DotDraws extends View {
                     mX2 += 132;
 
                     //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
-                    if (mDotsAreDrawn && !mFadingIn && (mBreakTime.size()-1==i)) {
+                    if (mAddSubFade && !mFadingIn && (mBreakTime.size()-1==i)) {
                         //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
                         if (mAlpha2!=-1) {
                             mPaint.setAlpha(mAlpha2);
@@ -323,6 +323,8 @@ public class DotDraws extends View {
                 }
                 break;
         }
+        //Used to prevent fading when canvas is drawn outside of add/sub methods.
+        mAddSubFade = false;
 
         if (mDrawBox) {
             //Setting to false so that the selection box is always removed after a deletion.
@@ -453,7 +455,7 @@ public class DotDraws extends View {
     public void fadeDotDraw(int alpha, boolean fadingIn) {
         mAlpha2 = alpha;
         mFadingIn = fadingIn;
-        mDotsAreDrawn = true;
+        mAddSubFade = true;
         invalidate();
     }
 
