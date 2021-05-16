@@ -337,7 +337,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Index crash issues w/ selectingRounds. Trash button is also b0rked if no rounds left.
     //Todo: Fade for count up/down mode.
 
     //Todo: Database saves for count up mode.
@@ -389,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     editCyclesPopupWindow.dismiss();
                     selectingRounds = false;
                 } else {
+                    selectingRounds = true;
                     if (!setsAreCountingUp || !breaksAreCountingUp) {
                         left_arrow.setVisibility(View.VISIBLE);
                         right_arrow.setVisibility(View.VISIBLE);
@@ -402,6 +402,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
             Log.i("testPos", "position is " + receivedPos);
+            Log.i("testPos", "selectingRounds is " + selectingRounds);
+//            Log.i("testPos", "list values are " + customSetTime);
         }
     }
 
