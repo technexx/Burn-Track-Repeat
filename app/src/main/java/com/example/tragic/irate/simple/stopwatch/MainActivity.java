@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Fade in dots for add/sub pom.
+    //Todo: Index crash issues w/ selectingRounds.
     //Todo: Fade for count up/down mode.
 
     //Todo: Database saves for count up mode.
@@ -1528,7 +1528,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     mHandler.postDelayed(this, 35);
                     dotDraws.fadeDotDraw(dotAlpha, false);
                 } else {
-                    dotDraws.fadeDotDraw(-1, false);
+                    if (mode==3){
+                        pomValuesTime.clear();
+
+                    } else dotDraws.fadeDotDraw(-1, false);
                     mHandler.removeCallbacks(this);
                 }
             }
@@ -1716,7 +1719,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     timerDisabled = false;
                     //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                     numberOfSets--;
-                    setMillis = customSetTime.get((int) (customSetTime.size()-numberOfSets));
+                    if (numberOfSets>0) setMillis = customSetTime.get((int) (customSetTime.size()-numberOfSets));
                     endAnimation.cancel();
                     dotDraws.setAlpha();
                     if (!breaksAreCountingUp) {
@@ -1790,7 +1793,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
                             numberOfBreaks--;
-                            breakMillis = customBreakTime.get((int) (customBreakTime.size()-numberOfBreaks));
+                            if (numberOfBreaks>0) breakMillis = customBreakTime.get((int) (customBreakTime.size()-numberOfBreaks));
                             //Re-enabling timer clicks. Used regardless of numberOfBreaks.
                             timerDisabled = false;
 
@@ -1874,7 +1877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
                             //Must execute here for conditional below to work.
                             numberOfBreaksOnly--;
-                            breakOnlyMillis = breaksOnlyTime.get((int) (breaksOnlyTime.size()-numberOfBreaksOnly));
+                            if (numberOfBreaksOnly>0) breakOnlyMillis = breaksOnlyTime.get((int) (breaksOnlyTime.size()-numberOfBreaksOnly));
                             boTimerDisabled = false;
                             //If numberOfBreaksOnly has been reduced to 0 in this runnable, do end cycle stuff. Since we are pausing between breaks in this mode anyway, we are doing less than the set/break combos.
                             if (numberOfBreaksOnly==0){
@@ -2001,13 +2004,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         customBreakTime.add(breakValue * 1000);
                         customBreakTimeUP.add((long) 0);
                         canSaveOrUpdate(true);
-                    } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                        emptyCycle = false;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                        //Return to save on resources. Also to avoid unnecessary fading in Pom mode.
+                        return;
+                    }
                     break;
                 case 2:
                     if (breaksOnlyTime.size() < 8) {
                         breaksOnlyTime.add(breaksOnlyValue * 1000);
                         breaksOnlyTimeUP.add((long) 0);
-                    } else Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                        emptyCycle = false;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     break;
                 case 3:
                     if (pomValuesTime.size()==0) {
@@ -2016,7 +2028,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         pomValuesTime.add(pomValue1);
                         pomValuesTime.add(pomValue3);
-                    } else Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
+                        emptyCycle = false;
+                        //Necessary for Pomodoro mode, since we disable it in subtraction for the sake of fading out the dot text.
+                        timerDisabled = false;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     break;
             }
             dotAlpha = 5;
@@ -2039,30 +2057,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                             customBreakTime.remove(customBreakTime.size() - 1);
                             customBreakTimeUP.remove(customBreakTimeUP.size() -1);
                             canSaveOrUpdate(true);
+                            if (customSetTime.size()==0) {
+                                timePaused.setTextSize(90f);
+                                timePaused.setText("?");
+                                emptyCycle = true;
+                                drawDots(0);
+                            }
                         } else {
-                            emptyCycle = true;
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                            return;
                         }
                         break;
                     case 2:
-                        if (breaksOnlyTime.size() > 0) {
+                        if (breaksOnlyTime.size()>0) {
                             breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
                             breaksOnlyTimeUP.remove(breaksOnlyTimeUP.size()-1);
                             canSaveOrUpdate(true);
-                            //Used w/ arrows to switch break places.
-//                            if (breaksOnlyTime.size() - 1 < receivedPos) receivedPos = breaksOnlyTime.size() - 1;
-//                            if (receivedPos >=0) dotDraws.selectRound(receivedPos);
+                            if (breaksOnlyTime.size()==0) {
+                                emptyCycle = true;
+                                timePaused.setTextSize(90f);
+                                timePaused2.setText("?");
+                                drawDots(0);
+                            }
                         } else {
-                            emptyCycle = true;
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+                            return;
                         }
                         break;
                     case 3:
-                        if (pomValuesTime.size()!=0) {
-                            pomValuesTime.clear();
-                        } else {
+                        //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateCycleUI().
+                        if (pomValuesTime.size()!=0) pomTimerDisabled = true; else {
                             emptyCycle = true;
+                            timePaused3.setTextSize(90f);
+                            timePaused3.setText("?");
                             Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+                            return;
                         }
                         break;
                 }
@@ -3630,14 +3659,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void pauseAndResumeTimer(int pausing) {
         //Dismisses our add/subtract round menu and arrows once timer has begun.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
-//        left_arrow.setVisibility(View.INVISIBLE);
-//        right_arrow.setVisibility(View.INVISIBLE);
-        //Controls the alpha/enabled status of reset and FAB buttons.
-        if (pausing==PAUSING_TIMER) resetAndFabToggle(true, false); else resetAndFabToggle(false, false);
         //Toasts empty cycle message and exits out of method.
         if (emptyCycle) {
             Toast.makeText(getApplicationContext(), "What are we timing?", Toast.LENGTH_SHORT).show();
             return; }
+        //Controls the alpha/enabled status of reset and FAB buttons.
+        if (pausing==PAUSING_TIMER) resetAndFabToggle(true, false); else resetAndFabToggle(false, false);
         if (mode == 1) {
             if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) {
                 next_round.setVisibility(View.VISIBLE);
@@ -3846,7 +3873,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void populateCycleUI() {
         switch (mode) {
             case 1:
-                //Todo: Conditional to set millis values unnecessary since we are replacing blank cycles w/ our default. We may want to change if they are replaced, in which case our DISABLED timer in pause/resume will also need to change, since it triggers @ <500ms.
                 if (customSetTime.size()>0) {
                     setMillis = customSetTime.get(0);
                     breakMillis = customBreakTime.get(0);
@@ -3855,12 +3881,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (customSetTime.size()>0) {
                         timePaused.setText(convertSeconds((setMillis+999)/1000));
                         timeLeft.setText(convertSeconds((setMillis+999)/1000));
-                        emptyCycle = false;
-                    } else {
-                        timePaused.setText("?");
-                        emptyCycle = true;
                     }
-
                     if (setMillis>=60000) {
                         timePaused.setTextSize(70f);
                         timeLeft.setTextSize(70f);
@@ -3887,17 +3908,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (breaksOnlyTime.size()>0) {
                         timePaused2.setText(convertSeconds((breakOnlyMillis+999)/1000));
                         timeLeft2.setText(convertSeconds((breakOnlyMillis+999)/1000));
-                        emptyCycle = false;
-                    } else {
-                        timePaused2.setText("?");
-                        emptyCycle = true;
                     }
                     if (breakOnlyMillis>=60000) {
                         timePaused2.setTextSize(70f);
                         timeLeft2.setTextSize(70f);
-                    } else {
-                        timePaused2.setTextSize(90f);
-                        timeLeft2.setTextSize(90f);
                     }
                 } else {
                     timeLeft2.setText("0");
@@ -3908,16 +3922,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 break;
             case 3:
                 //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
-                if (pomValuesTime.size()!=0) pomMillis1 = pomValuesTime.get(0)*1000*60;
-                pomMillis = pomMillis1;
-                if (pomValuesTime.size()==0) {
-                    pomTimerDisabled = true;
-                    timePaused3.setText("?");
-                } else {
-                    pomTimerDisabled = false;
+                if (pomValuesTime.size()>0) {
+                    pomMillis1 = pomValuesTime.get(0)*1000*60;
+                    pomMillis = pomMillis1;
                     timePaused3.setText(convertSeconds((pomMillis+999)/1000));
                 }
-                if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 break;
         }
         next_round.setVisibility(View.INVISIBLE);

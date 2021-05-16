@@ -380,6 +380,7 @@ public class DotDraws extends View {
                 mPaint.setColor(Color.GREEN);
                 //Must be called AFTER color is changed, otherwise alpha will reset to 255.
                 if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
+                if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
                 mCanvas.drawCircle(mX, 550, 60, mPaint);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
                 break;
@@ -387,6 +388,7 @@ public class DotDraws extends View {
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
                 mCanvas.drawCircle(mX2, 550, 45 , mPaint);
+                if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 mX+=250;
                 mX2=mX+125;
@@ -395,6 +397,7 @@ public class DotDraws extends View {
                 mPaint.setColor(Color.RED);
                 if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
                 mCanvas.drawRect(mX+90, 495, mX+200, 605, mPaint);
+                if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
                 if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
                 break;
         }
