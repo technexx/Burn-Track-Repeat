@@ -332,17 +332,17 @@
         android:textSize="16sp">
     </TextView>
 
-    <ImageButton
-        android:id="@+id/delete_set_break"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="6dp"
-        android:layout_marginBottom="6dp"
-        android:src="@drawable/delete_sb"
-        android:background="@color/black">
-    </ImageButton>
+<!--    <ImageButton-->
+<!--        android:id="@+id/delete_set_break"-->
+<!--        android:layout_width="48dp"-->
+<!--        android:layout_height="48dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        android:layout_marginStart="6dp"-->
+<!--        android:layout_marginBottom="6dp"-->
+<!--        android:src="@drawable/delete_sb"-->
+<!--        android:background="@color/black">-->
+<!--    </ImageButton>-->
 
     <ImageButton
         android:id="@+id/fab"

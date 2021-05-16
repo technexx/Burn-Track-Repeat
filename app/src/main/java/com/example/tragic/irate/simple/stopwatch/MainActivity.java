@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     EditText edit_header;
     Button confirm_header_save;
     Button cancel_header_save;
-    ImageButton delete_sb;
     TextView overtime;
     ImageButton upDown_arrow_one;
     ImageButton upDown_arrow_two;
@@ -338,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Test all db stuff.
     //Todo: "Update" will crash if nothing is saved.
 
-    //Todo: Index crash issues w/ selectingRounds.
+    //Todo: Index crash issues w/ selectingRounds. Trash button is also b0rked if no rounds left.
     //Todo: Fade for count up/down mode.
 
     //Todo: Database saves for count up mode.
@@ -393,26 +392,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (!setsAreCountingUp || !breaksAreCountingUp) {
                         left_arrow.setVisibility(View.VISIBLE);
                         right_arrow.setVisibility(View.VISIBLE);
-                        delete_sb.setVisibility(View.VISIBLE);
-                        circle_reset.setVisibility(View.INVISIBLE);
-                        selectingRounds = true;
-                        if (mode==1 && customSetTime.size()==0) {
-                            delete_sb.setAlpha(0.3f);
-                            delete_sb.setEnabled(false);
-                        } else {
-                            delete_sb.setAlpha(1.0f);
-                            delete_sb.setEnabled(true);
-                        }
                     }
                 }
                 //If not clicking on an existing round (i.e. a blank space in box), remove arrow visibility.
                 if (pos<0 || pos==100) {
                     left_arrow.setVisibility(View.INVISIBLE);
                     right_arrow.setVisibility(View.INVISIBLE);
-                    delete_sb.setVisibility(View.INVISIBLE);
                     circle_reset.setVisibility(View.VISIBLE);
                 }
             }
+            Log.i("testPos", "position is " + receivedPos);
         }
     }
 
@@ -763,7 +752,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         skip = findViewById(R.id.skip);
         left_arrow = findViewById(R.id.left_arrow);
         right_arrow = findViewById(R.id.right_arrow);
-        delete_sb = findViewById(R.id.delete_set_break);
         fab = findViewById(R.id.fab);
         circle_reset = findViewById(R.id.circle_reset);
         next_round = findViewById(R.id.next_round);
@@ -805,7 +793,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_edit_two.setVisibility(View.GONE);
         second_value_single_edit.setVisibility(View.GONE);
         third_value_single_edit.setVisibility(View.GONE);
-        delete_sb.setVisibility(View.INVISIBLE);
         progressBar2.setVisibility(View.GONE);
         progressBar3.setVisibility(View.GONE);
         stopWatchView.setVisibility(View.GONE);
@@ -1348,11 +1335,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             drawDots(0);
             dotDraws.selectRound(receivedPos);
             saveArrays();
-        });
-
-        delete_sb.setOnClickListener(v->{
-            deleteSelectedRound();
-            drawDots(0);
         });
 
         add_cycle.setOnClickListener(v-> {
@@ -3530,19 +3512,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             numberOfBreaks-=1;
             if (!setsAreCountingUp) dotDraws.setTime(customSetTime); else dotDraws.setTime(customSetTimeUP);
             if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
-            if (numberOfSets==0) {
-                delete_sb.setAlpha(0.3f);
-                delete_sb.setEnabled(false);
-            }
         } else if (mode==2){
             breaksOnlyTime.remove(receivedPos);
             breaksOnlyTimeUP.remove(receivedPos);
             numberOfBreaksOnly-=1;
             if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(breaksOnlyTimeUP);
-            if (numberOfBreaksOnly==0) {
-                delete_sb.setAlpha(0.3f);
-                delete_sb.setEnabled(false);
-            }
         }
         canSaveOrUpdate(true);
     }
@@ -3679,7 +3653,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         //disabledTimer booleans are to prevent ANY action being taken.
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
-            delete_sb.setVisibility(View.INVISIBLE);
             add_cycle.setEnabled(false);
             sub_cycle.setEnabled(false);
             removeViews();
