@@ -401,8 +401,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     circle_reset.setVisibility(View.VISIBLE);
                 }
             }
-            Log.i("testPos", "position is " + receivedPos);
-            Log.i("testPos", "selectingRounds is " + selectingRounds);
+//            Log.i("testPos", "position is " + receivedPos);
+//            Log.i("testPos", "selectingRounds is " + selectingRounds);
 //            Log.i("testPos", "list values are " + customSetTime);
         }
     }
