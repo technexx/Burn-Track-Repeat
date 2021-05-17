@@ -340,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Fade for count up/down mode.
 
     //Todo: Database saves for count up mode.
-    //Todo: Blank title at fresh app launch.
     //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
@@ -890,6 +889,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String[] convPom = retrievedPomArray.split(",");
         String[] convBO = retrievedBOArray.split(",");
 
+        //Sets our saved title.
+        if (!retrievedTitle.equals("")) cycle_header_text.setText(retrievedTitle); else cycle_header_text.setText(R.string.default_title);
+
         //Starting list for Sets+, counting down. Recalls previously entered rounds. If no rounds exist, populates using default.
         if (!retrievedSetArray.equals("")) {
             for (int i=0; i<convSets.length; i++) {
@@ -944,8 +946,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Start mode of reset and fab buttons.
         resetAndFabToggle(false, true);
 
-        //Sets our saved title.
-        cycle_header_text.setText(retrievedTitle);
         //Sets xml views.
         tabViews();
         //Populates UI elements at app start.
