@@ -339,6 +339,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: Fade for count up/down mode.
 
+    //Todo: editCyclePopup doesn't change size on tab switch.
+    //Todo: Fade is active on tab switch even if timer text is the same.
+    //Todo: Add count up for Pom?
     //Todo: Database saves for count up mode.
     //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
@@ -398,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     right_arrow.setVisibility(View.INVISIBLE);
                     circle_reset.setVisibility(View.VISIBLE);
                 }
-            }
+            } else if (mode==3) editCyclesPopupWindow.dismiss();
 //            Log.i("testPos", "position is " + receivedPos);
 //            Log.i("testPos", "selectingRounds is " + selectingRounds);
 //            Log.i("testPos", "list values are " + customSetTime);
@@ -2231,6 +2234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         new_lap.setVisibility(View.INVISIBLE);
         upDown_arrow_one.setVisibility(View.VISIBLE);
         upDown_arrow_two.setVisibility(View.VISIBLE);
+        if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -3609,9 +3613,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
                 cycle_reset.setText(R.string.clear_cycles);
-                s1.setTextSize(21f);
-                s2.setTextSize(21f);
-                s3.setTextSize(21f);
+                s1.setTextSize(20f);
+                s2.setTextSize(20f);
+                s3.setTextSize(20f);
                 break;
             case 4:
                 progressBar.setVisibility(View.INVISIBLE);

@@ -37,7 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_third_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
-        android:layout_marginStart="25dp"
+        android:layout_marginStart="4dp"
         android:layout_marginBottom="14dp"
         android:textSize="24sp"
         android:textColor="@color/white"/>
