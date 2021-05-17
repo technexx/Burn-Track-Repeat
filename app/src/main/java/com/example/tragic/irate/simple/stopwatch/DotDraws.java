@@ -245,7 +245,6 @@ public class DotDraws extends View {
                 encloseDots(mY-70, mY+200);
                 //Filled or stroked dots depending on count up/down.
                 setDotStyle(mGoingUpSets);
-                float tempX = 0;
                 //Using mSetTime array size for loop instead of int constructor value.
                 for (int i=0; i<mSetTime.size(); i++) {
                     mPaint.setColor(Color.GREEN);

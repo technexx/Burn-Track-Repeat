@@ -346,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
     //Todo: TDEE in sep popup w/ tabs.
-    //Todo: Drag round move?
     //Todo: Variable set count-up timer, for use w/ TDEE.
     //Todo: Variable set only mode? Again, for TDEE.
     //Todo: Option to skip EITHER set or break. Option to undo skip.
@@ -908,7 +907,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else setDefaultCustomCycle(true);
 
         //Retrieves the last entered Pom cycle, or default if none. Converts default millis to its first round.
-        if (!retrievedPomArray.equals("")) for (int i=0; i<8; i++) pomValuesTime.add(Long.parseLong(convPom[i])); else setDefaultPomCycle();
+        if (!retrievedPomArray.equals("")) {
+            for (int i=0; i<8; i++) pomValuesTime.add(Long.parseLong(convPom[i]));
+        } else setDefaultPomCycle();
         pomMillis = pomValuesTime.get(0) * 1000 * 60;
         pomMillis1 = pomMillis;
 
@@ -3075,6 +3076,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void setDefaultPomCycle() {
         pomValuesTime.clear();
+        pomValue1 = 25; pomValue2 = 5; pomValue3 = 15;
         for (int i=0; i<3; i++) {
             pomValuesTime.add(pomValue1);
             pomValuesTime.add(pomValue2);
