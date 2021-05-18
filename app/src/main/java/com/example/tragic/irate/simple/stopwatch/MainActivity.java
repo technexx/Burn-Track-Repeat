@@ -2242,7 +2242,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
                 if (halted) {
                     setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
-                    fadeInText(timePaused);
+//                    fadeInText(timePaused);
                     if (setMillis<100) timePaused.setText("0");
                 } else {
                     setNewText(lastTextView, timeLeft, (setMillis + 999)/1000);
@@ -2266,7 +2266,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 if (halted) {
                     setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
-                    fadeInText(timePaused2);
+//                    fadeInText(timePaused2);
                     if (breakOnlyMillis<100)  timePaused2.setText("0");
                 } else {
                     setNewText(lastTextView, timeLeft2, (breakOnlyMillis + 999)/1000);
@@ -2382,11 +2382,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         boolean fadeTime = false;
         //Converts and compares the previous timer's textView with the current one. If one is <60 seconds and the other is >=60 seconds, we change the text size to reflect the increased or decreased digits used.
         String oldText = (String) oldTextView.getText();
+        String newText = (String) currentTextView.getText();
+        if (!oldText.equals(newText)) fadeTime = true;
+
         if (!oldText.equals("") && !oldText.equals("?")) {
             oldText = oldText.replace(":", "");
             long oldTime = Long.parseLong(oldText);
             if (oldTime<60 && newTime>=60) {
-                fadeTime = true;
                 switch (mode) {
                     case 1:
                         changeTextSize(valueAnimatorDown, timeLeft, timePaused); break;
@@ -2398,7 +2400,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         changeTextSize(valueAnimatorDown, timeLeft4,  timePaused4); break;
                 }
             } else if (oldTime>=60 && newTime<60) {
-                fadeTime = true;
                 switch (mode) {
                     case 1:
                         changeTextSize(valueAnimatorUp, timeLeft, timePaused); break;
@@ -2423,6 +2424,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 4:
                     if (stopwatchHalted) fadeInText(timePaused4); else fadeInText(timeLeft4); break;
             }
+            Log.i("testFade", "true!");
+        } else {
+            switch (mode) {
+                case 1:
+                    if (customHalted) timePaused.setAlpha(1); break;
+                case 2:
+                    if (breaksOnlyHalted) timePaused2.setAlpha(1); break;
+                case 3:
+                    if (pomHalted) timePaused3.setAlpha(1); break;
+                case 4:
+                    if (stopwatchHalted) timePaused4.setAlpha(1); break;
+            }
+            Log.i("testFade", "false!");
         }
         currentTextView.setText(convertSeconds(newTime));
     }
