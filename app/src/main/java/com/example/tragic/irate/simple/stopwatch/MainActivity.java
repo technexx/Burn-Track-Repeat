@@ -829,7 +829,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler = new Handler();
 
         //Sets all timerText alphas 0, so that we can then set to 1 whichever one we want to use.
-        removeViews();
+        removeTimerViews();
         //Since we launch our app to Sets+ default, its paused timer should always default to visible. Same w/ mode being 1.
         timePaused.setAlpha(1);
         mode = 1;
@@ -1002,6 +1002,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
+                //Clears out any active editViews when switching to a new tab.
+                removeEditViews();
                 switch (tab.getPosition()) {
                     case 0:
                         if (customHalted) {
@@ -1505,7 +1507,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotAlpha+=25;
                     mHandler.postDelayed(this, 35);
                     dotDraws.fadeDotDraw(dotAlpha, true);
-                } else mHandler.removeCallbacks(this);
+                } else {
+                    add_cycle.setClickable(true);
+                    sub_cycle.setClickable(true);
+                    mHandler.removeCallbacks(this);
+                }
             }
         };
 
@@ -1526,6 +1532,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         drawDots(0);
                     }
                     mHandler.removeCallbacks(this);
+                    dotDraws.setFadePos(-1);
+                    add_cycle.setClickable(true);
+                    sub_cycle.setClickable(true);
                 }
             }
         };
@@ -2097,6 +2106,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             mHandler.post(fadeOutDot);
         }
         saveArrays();
+        add_cycle.setClickable(false);
+        sub_cycle.setClickable(false);
     }
 
     public void skipRound() {
@@ -2230,7 +2241,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     public void switchTimer(int mode, boolean halted) {
         //Sets views for respective tab each time one is switched.
-        removeViews(); tabViews();
+        removeTimerViews(); tabViews();
         //If a given timer is halted, sets the reset button to visible.
         if (halted) resetAndFabToggle(true, false);
         if ((mode==1 && !setBegun) || (mode==2 && !breakOnlyBegun) || (mode==3 && !pomBegun)) {
@@ -3559,7 +3570,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         canSaveOrUpdate(true);
     }
 
-    public void removeViews() {
+    public void removeTimerViews() {
         timeLeft.setAlpha(0);
         timeLeft2.setAlpha(0);
         timeLeft3.setAlpha(0);
@@ -3571,6 +3582,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         msTime.setAlpha(0);
         msTimePaused.setAlpha(0);
         overtime.setVisibility(View.INVISIBLE);
+    }
+
+    public void removeEditViews() {
+        if (mode==1 || mode==2) {
+            first_value_edit.setVisibility(View.GONE);
+            first_value_edit_two.setVisibility(View.GONE);
+            first_value_sep.setVisibility(View.GONE);
+            second_value_edit.setVisibility(View.GONE);
+            second_value_edit_two.setVisibility(View.GONE);
+            second_value_sep.setVisibility(View.GONE);
+        } else if (mode==3) {
+            first_value_single_edit.setVisibility(View.GONE);
+            second_value_single_edit.setVisibility(View.GONE);
+            third_value_single_edit.setVisibility(View.GONE);
+        }
     }
 
     public void tabViews(){
@@ -3693,7 +3719,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
             add_cycle.setEnabled(false);
             sub_cycle.setEnabled(false);
-            removeViews();
+            removeTimerViews();
             if (fadeInObj != null) fadeInObj.cancel();
             if (fadeOutObj != null) fadeOutObj.cancel();
             switch (mode) {
@@ -3947,7 +3973,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     public void resetTimer() {
-        removeViews();
+        removeTimerViews();
         switch (mode) {
             case 1:
                 progressBar.setProgress(10000);
@@ -4018,8 +4044,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 resetAndFabToggle(false, false);
                 break;
         }
-        add_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
-        sub_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
+//        add_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
+//        sub_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
