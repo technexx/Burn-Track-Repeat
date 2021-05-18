@@ -175,6 +175,10 @@ public class DotDraws extends View {
         mAlpha = 255; cycle = 0;
     }
 
+    public void setFadePos(int pos) {
+        fadePos = pos;
+    }
+
     public void selectCycle(int posX, int posY, int size) {
         int base = 0;
         switch (mMode) {
@@ -232,13 +236,18 @@ public class DotDraws extends View {
         }
     }
 
+    //Todo: Reset fadePos to -1 after an add/subtract from Main.
     @Override
     public void onDraw(Canvas canvas) {
         setupPaint();
         this.mCanvas = canvas;
 
+        Log.i("testFade", "fadePos is " + fadePos);
+
+//        if (currentPos>mSetTime.size()-1) fadePos = -1;
+
         //If fadePos returns 100 (no round selected), set it to most recently added round position.
-        if (fadePos==100) fadePos = mSetTime.size()-1;
+        if (fadePos==-1) fadePos = mSetTime.size()-1;
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
         switch (mMode) {
             case 1:
@@ -255,8 +264,6 @@ public class DotDraws extends View {
                         //If fading out (subtracting rounds), cycle the alpha value on the received position, and set it to 255 on the rest.
                     } else if (!mFadingIn && (fadePos!=100 || fadePos!=mSetTime.size()-1)) {
                         if (i!=fadePos) mPaint.setAlpha(255); else if (mAddSubFade) {
-                            mCanvas.drawCircle(mX+20, mY, 55, mPaint);
-                            drawText(mSetTime, mX+16, mY+2, i);
                             mPaint.setAlpha(mAlpha2);
                         }
                         //If fading in (adding rounds), cycle the alpha value on the newly added round/position, and set it to 255 on the rest.

@@ -339,8 +339,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: Fade for count up/down mode.
 
-    //Todo: editCyclePopup doesn't change size on tab switch.
-    //Todo: Fade is active on tab switch even if timer text is the same.
     //Todo: Add count up for Pom?
     //Todo: Database saves for count up mode.
     //Todo: Single editText for seconds instead of m:ss?
@@ -917,6 +915,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else setDefaultPomCycle();
         pomMillis = pomValuesTime.get(0) * 1000 * 60;
         pomMillis1 = pomMillis;
+        pomValue1 = pomValuesTime.get(0);
+        pomValue2 = pomValuesTime.get(1);
+        pomValue3 = pomValuesTime.get(2);
 
         //Sets number of rounds to size of round list.
         numberOfSets = customSetTime.size();
@@ -1123,7 +1124,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 1:
                         if (incrementValues) setValue+=1; else setValue -=1;
                         break;
-                    case 2:
+                    case 3:
                         if (incrementValues) pomValue1+=1; else pomValue1 -=1;
                         pomMillis1 = (pomValue1*1000) * 60;
                         break;
@@ -1518,8 +1519,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 } else {
                     if (mode==3){
                         pomValuesTime.clear();
-
-                    } else dotDraws.fadeDotDraw(-1, false);
+                    } else {
+                        deleteSelectedRound(false);
+                        selectingRounds = false;
+                        dotDraws.fadeDotDraw(-1, false);
+                        drawDots(0);
+                    }
                     mHandler.removeCallbacks(this);
                 }
             }
@@ -2031,10 +2036,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             mHandler.post(fadeInDot);
             //emptyCycle toggles to true if we switch tab into a timer w/ no rounds. This turns it false if we've added one.
             emptyCycle = false;
+            populateCycleUI();
         } else {
             //Using a specific position to delete round if one is selected, otherwise deleting the most recently added.
             if (selectingRounds) {
-                deleteSelectedRound();
+                deleteSelectedRound(true);
                 selectingRounds = false;
             } else {
                 switch (mode) {
@@ -2083,12 +2089,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         break;
                 }
+                populateCycleUI();
+
             }
             dotAlpha = 255;
             dotDraws.fadeDotDraw(255, false);
             mHandler.post(fadeOutDot);
         }
-        populateCycleUI();
         saveArrays();
     }
 
@@ -2298,6 +2305,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     startObjectAnimator();
                     setNewText(lastTextView, timeLeft3, (pomMillis + 999)/1000);
                 }
+                first_value_textView.setText(String.valueOf(pomValue1));
+                second_value_textView.setText(String.valueOf(pomValue2));
+                third_value_textView.setText(String.valueOf(pomValue3));
                 if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 if (modeThreeBetweenRounds) animateEnding(true);
                 break;
@@ -2424,7 +2434,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 4:
                     if (stopwatchHalted) fadeInText(timePaused4); else fadeInText(timeLeft4); break;
             }
-            Log.i("testFade", "true!");
         } else {
             switch (mode) {
                 case 1:
@@ -2436,7 +2445,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 4:
                     if (stopwatchHalted) timePaused4.setAlpha(1); break;
             }
-            Log.i("testFade", "false!");
         }
         currentTextView.setText(convertSeconds(newTime));
     }
@@ -3524,16 +3532,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
-    public void deleteSelectedRound() {
+    public void deleteSelectedRound(boolean instantDelete) {
         if (mode==1) {
-            customSetTime.remove(receivedPos);
-            customBreakTime.remove(receivedPos);
-            customSetTimeUP.remove(receivedPos);
-            customBreakTimeUP.remove(receivedPos);
-            numberOfSets-=1;
-            numberOfBreaks-=1;
-            if (!setsAreCountingUp) dotDraws.setTime(customSetTime); else dotDraws.setTime(customSetTimeUP);
-            if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
+            ArrayList<Long> tempSets = new ArrayList<>(customSetTime);
+            ArrayList<Long> tempSetsUp = new ArrayList<>(customSetTimeUP);
+            ArrayList<Long> tempBreaks = new ArrayList<>(customBreakTime);
+            ArrayList<Long> tempBreaksUp = new ArrayList<>(customBreakTimeUP);
+
+            if (!setsAreCountingUp) dotDraws.setTime(tempSets); else dotDraws.setTime(tempSetsUp);
+            if (!breaksAreCountingUp) dotDraws.breakTime(tempBreaks); else dotDraws.breakTime(tempBreaksUp);
+
+            if (instantDelete) {
+                customSetTime.remove(receivedPos);
+                customBreakTime.remove(receivedPos);
+                customSetTimeUP.remove(receivedPos);
+                customBreakTimeUP.remove(receivedPos);
+                numberOfSets-=1;
+                numberOfBreaks-=1;
+            }
         } else if (mode==2){
             breaksOnlyTime.remove(receivedPos);
             breaksOnlyTimeUP.remove(receivedPos);
