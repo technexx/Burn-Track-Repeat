@@ -2574,7 +2574,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     }
                     break;
                 case 3:
-                    if (viewRemoved == 3) {
+                    if (viewRemoved == 1) {
+                        if (first_value_single_edit.isShown()) {
+                            first_value_single_edit.setVisibility(View.GONE);
+                            first_value_textView.setVisibility(View.VISIBLE);
+                        }
+                    } else if (viewRemoved == 2) {
+                        if (second_value_single_edit.isShown()) {
+                            second_value_single_edit.setVisibility(View.GONE);
+                            second_value_textView.setVisibility(View.VISIBLE);
+                        }
+                    } else if (viewRemoved == 3) {
                         if (third_value_single_edit.isShown()) {
                             third_value_single_edit.setVisibility(View.GONE);
                             third_value_textView.setVisibility(View.VISIBLE);
