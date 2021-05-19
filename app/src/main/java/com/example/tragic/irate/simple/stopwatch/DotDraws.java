@@ -52,14 +52,13 @@ public class DotDraws extends View {
     int mListSize;
     int currentPos = -1;
     int previousPos = -1;
-    int fadePos;
     sendPosition mSendPosition;
     sendAlpha mSendAlpha;
     int mOldMode;
     boolean mGoingUpSets;
     boolean mGoingUpBreaks;
     boolean mAddSubFade;
-    boolean mFadingIn = true;
+    boolean mFadingIn;
 
     public interface sendPosition {
         void sendPos(int pos);
@@ -175,10 +174,6 @@ public class DotDraws extends View {
         mAlpha = 255; cycle = 0;
     }
 
-    public void setFadePos(int pos) {
-        fadePos = pos;
-    }
-
     public void selectCycle(int posX, int posY, int size) {
         int base = 0;
         switch (mMode) {
@@ -197,10 +192,8 @@ public class DotDraws extends View {
             else if (posX > base*5 && posX <= base*6 && mListSize >= 6) currentPos = 5;
             else if (posX > base*6 && posX <= base*7 && mListSize >= 7) currentPos = 6;
             else if (posX > base*7 && posX <= base*8 && mListSize >= 8) currentPos = 7;
-            //Used to reference the entire box.
+                //Used to reference the entire box.
             else currentPos = 100;
-            //Only setting a fadePos if we are clicking with the box.
-            fadePos = currentPos;
             //Only drawing new box if selected position (box) is different than current.
             if (previousPos != currentPos && currentPos!=100) mDrawBox = true; else mDrawBox = false;
             previousPos = -1;
@@ -242,45 +235,38 @@ public class DotDraws extends View {
         setupPaint();
         this.mCanvas = canvas;
 
-        Log.i("testFade", "fadePos is " + fadePos);
-
-        //If fadePos returns 100 (no round selected), set it to most recently added round position.
-        if (fadePos==100) {
-            fadePos = mSetTime.size()-1;
-        }
-
         mX = 58; mY = 490; mX2 = 58; mY2 = 620;
         switch (mMode) {
             case 1:
                 encloseDots(mY-70, mY+200);
                 //Filled or stroked dots depending on count up/down.
                 setDotStyle(mGoingUpSets);
+
                 //Using mSetTime array size for loop instead of int constructor value.
                 for (int i=0; i<mSetTime.size(); i++) {
                     mPaint.setColor(Color.GREEN);
                     if (mSetTime.size() - mSetReduce == i) {
                         if (mFadeDone == 1) fadeDot();
-                    } else if (mSetReduce + i < mSetTime.size()) {
+                    } else if (mSetReduce + i < mSetTime.size()){
                         mPaint.setAlpha(100);
-                        //Todo: "OR" conditional keeps this executing every time.
-                        //If fading out (subtracting rounds), cycle the alpha value on the received position, and set it to 255 on the rest.
-                    } else if (!mFadingIn && (fadePos != 100 || fadePos != (mSetTime.size() - 1))) {
-                        if (i != fadePos) mPaint.setAlpha(255);
-                        else if (mAddSubFade) {
+                    } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mAddSubFade && mFadingIn) {
+                        mPaint.setAlpha(mAlpha2);
+                        mPaintText.setAlpha(mAlpha2);
+                    }
+                    mCanvas.drawCircle(mX+20, mY, 55, mPaint);
+                    drawText(mSetTime, mX+16, mY+2, i);
+                    mX += 132;
+
+                    //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
+                    if (mAddSubFade && !mFadingIn && (mSetTime.size()-1==i)) {
+                        //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
+                        if (mAlpha2!=-1) {
                             mPaint.setAlpha(mAlpha2);
-                        }
-                        //If fading out WITHOUT a round selected, set the position to be faded out on the newly added round/position, and set it to 255 on the rest.
-                    } else {
-                        if (mSetTime.size() - 1 != i) mPaint.setAlpha(255);
-                        else if (mAddSubFade) {
-                            Log.i("testFade", "true!");
-                            mPaint.setAlpha(mAlpha2);
+                            mPaintText.setAlpha(mAlpha2);
+                            drawText(mSetTime, mX+16, mY+2, i);
+                            mCanvas.drawCircle(mX+20, mY, 55, mPaint);
                         }
                     }
-                    mCanvas.drawCircle(mX + 20, mY, 55, mPaint);
-                    drawText(mSetTime, mX + 16, mY + 2, i);
-
-                    mX += 132;
                 }
 
                 for (int i=0; i<mBreakTime.size(); i++) {

@@ -1012,6 +1012,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
 
+            //Todo: lastTextView is blank except when moving from mode 1-> mode 2. Is
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 //Clears out any active editViews when switching to a new tab.
@@ -1020,19 +1021,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 0:
                         if (customHalted) {
                             fadeOutText(timePaused);
-                            lastTextView = timePaused;
                         } else fadeOutText(timeLeft); lastTextView = timeLeft;
                         break;
                     case 1:
                         if (breaksOnlyHalted) {
                             fadeOutText(timePaused2);
-                            lastTextView = timePaused2;
                         } else fadeOutText(timeLeft2); lastTextView = timeLeft2;
                         break;
                     case 2:
                         if (pomHalted) {
                             fadeOutText(timePaused3);
-                            lastTextView = timePaused3;
                         } else fadeOutText(timeLeft3); lastTextView = timeLeft3;
                         break;
                     case 3:
@@ -1041,6 +1039,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         lapRecycler.setVisibility(View.GONE);
                         break;
                 }
+                Log.i("testFade", "paused1 value is " + timePaused.getText().toString());
+                Log.i("testFade", "last value for ONE is " + lastTextView.getText().toString());
                 left_arrow.setVisibility(View.INVISIBLE);
                 right_arrow.setVisibility(View.INVISIBLE);
             }
@@ -1544,19 +1544,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     mHandler.postDelayed(this, 35);
                     dotDraws.fadeDotDraw(dotAlpha, false);
                 } else {
-                    //This runnable is only active on Pom subtraction.
                     if (mode==3){
                         pomValuesTime.clear();
-                    } else {
-                        deleteSelectedRound(false);
-                        selectingRounds = false;
-                        dotDraws.fadeDotDraw(-1, false);
-                        drawDots(0);
-                    }
+
+                    } else dotDraws.fadeDotDraw(-1, false);
                     mHandler.removeCallbacks(this);
-                    dotDraws.setFadePos(-1);
-                    add_cycle.setClickable(true);
-                    sub_cycle.setClickable(true);
                 }
             }
         };
@@ -2067,11 +2059,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             mHandler.post(fadeInDot);
             //emptyCycle toggles to true if we switch tab into a timer w/ no rounds. This turns it false if we've added one.
             emptyCycle = false;
-            populateCycleUI();
         } else {
             //Using a specific position to delete round if one is selected, otherwise deleting the most recently added.
             if (selectingRounds) {
-                deleteSelectedRound(true);
+                deleteSelectedRound();
                 selectingRounds = false;
             } else {
                 switch (mode) {
@@ -2088,7 +2079,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 emptyCycle = true;
                                 drawDots(0);
                             }
-                            populateCycleUI();
                         } else {
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                             return;
@@ -2105,7 +2095,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 timePaused2.setText("?");
                                 drawDots(0);
                             }
-                            populateCycleUI();
                         } else {
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                             return;
@@ -2113,12 +2102,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                     case 3:
                         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateCycleUI().
-                        if (pomValuesTime.size()!=0) {
-                            pomTimerDisabled = true;
+                        if (pomValuesTime.size()!=0) pomTimerDisabled = true; else {
                             emptyCycle = true;
                             timePaused3.setTextSize(90f);
                             timePaused3.setText("?");
-                        } else {
                             Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
                             return;
                         }
@@ -2129,9 +2116,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.fadeDotDraw(255, false);
             mHandler.post(fadeOutDot);
         }
+        populateCycleUI();
         saveArrays();
-        add_cycle.setClickable(false);
-        sub_cycle.setClickable(false);
     }
 
     public void skipRound() {
@@ -2278,6 +2264,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_two.setVisibility(View.VISIBLE);
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
 
+        Log.i("testFade", "switching in value is " + lastTextView.getText().toString());
+        Log.i("testFade", "switching value 1 " + timePaused.getText().toString());
+        Log.i("testFade", "switching value 2 " + timePaused2.getText().toString());
+        Log.i("testFade", "switching value 3 " + timePaused3.getText().toString());
+
+
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2285,7 +2277,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (breakMillisUntilFinished==0) breakMillisUntilFinished = breakMillis;
                 if (halted) {
                     setNewText(lastTextView, timePaused, (setMillis + 999)/1000);
-//                    fadeInText(timePaused);
                     if (setMillis<100) timePaused.setText("0");
                 } else {
                     setNewText(lastTextView, timeLeft, (setMillis + 999)/1000);
@@ -2309,7 +2300,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 if (halted) {
                     setNewText(lastTextView, timePaused2, (breakOnlyMillis + 999)/1000);
-//                    fadeInText(timePaused2);
                     if (breakOnlyMillis<100)  timePaused2.setText("0");
                 } else {
                     setNewText(lastTextView, timeLeft2, (breakOnlyMillis + 999)/1000);
@@ -2326,8 +2316,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (modeTwoBetweenRounds) animateEnding(true);
                 break;
             case 3:
-//                ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//                plus_first_value.setLayoutParams(params);
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
                 upDown_arrow_one.setVisibility(View.INVISIBLE);
                 savedCycleAdapter.setView(3);
@@ -2368,6 +2356,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         dotDraws.setAlpha();
         drawDots(0);
+        lastTextView = timePaused;
     }
 
     //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
@@ -2426,16 +2415,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sizeAnimator.start();
     }
 
-    public void setNewText(TextView oldTextView, TextView currentTextView, long newTime) {
+    public void setNewText(TextView oldTextView, TextView newTextView, long newTime) {
         boolean fadeTime = false;
-        //Converts and compares the previous timer's textView with the current one. If one is <60 seconds and the other is >=60 seconds, we change the text size to reflect the increased or decreased digits used.
+        //Retrieves the text String from the previous and current timer's textView and converted it into a long.
         String oldText = (String) oldTextView.getText();
-        String newText = (String) currentTextView.getText();
-        if (!oldText.equals(newText)) fadeTime = true;
+        long oldTime = 0;
+        if  (!oldText.equals("") && !oldText.equals("?")) oldTime = Long.parseLong(oldText);
+        //Compares the previous timer's long value with the one we are switching to. If different, we fade in the new text.
+        if (oldTime!=newTime) fadeTime = true;
 
         if (!oldText.equals("") && !oldText.equals("?")) {
-            oldText = oldText.replace(":", "");
-            long oldTime = Long.parseLong(oldText);
+            //Converts the last and current timer's textViews into longs, then compares them. If one is <60 seconds and one is <60 seconds, we change the size of the current textView so it fills our progressBar circle better.
             if (oldTime<60 && newTime>=60) {
                 switch (mode) {
                     case 1:
@@ -2484,7 +2474,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     if (stopwatchHalted) timePaused4.setAlpha(1); break;
             }
         }
-        currentTextView.setText(convertSeconds(newTime));
+        newTextView.setText(convertSeconds(newTime));
     }
 
     public void fadeInText(TextView textView) {
@@ -3580,29 +3570,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
-    public void deleteSelectedRound(boolean instantDelete) {
+    public void deleteSelectedRound() {
         if (mode==1) {
-            ArrayList<Long> tempSets = new ArrayList<>(customSetTime);
-            ArrayList<Long> tempSetsUp = new ArrayList<>(customSetTimeUP);
-            ArrayList<Long> tempBreaks = new ArrayList<>(customBreakTime);
-            ArrayList<Long> tempBreaksUp = new ArrayList<>(customBreakTimeUP);
-
-            if (!setsAreCountingUp) dotDraws.setTime(tempSets); else dotDraws.setTime(tempSetsUp);
-            if (!breaksAreCountingUp) dotDraws.breakTime(tempBreaks); else dotDraws.breakTime(tempBreaksUp);
-
-            if (instantDelete) {
-                customSetTime.remove(receivedPos);
-                customBreakTime.remove(receivedPos);
-                customSetTimeUP.remove(receivedPos);
-                customBreakTimeUP.remove(receivedPos);
-                numberOfSets-=1;
-                numberOfBreaks-=1;
-            }
+            customSetTime.remove(receivedPos);
+            customBreakTime.remove(receivedPos);
+            customSetTimeUP.remove(receivedPos);
+            customBreakTimeUP.remove(receivedPos);
+            numberOfSets-=1;
+            numberOfBreaks-=1;
+            if (!setsAreCountingUp) dotDraws.setTime(customSetTime); else dotDraws.setTime(customSetTimeUP);
+            if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
+//            if (numberOfSets==0) {
+//                delete_sb.setAlpha(0.3f);
+//                delete_sb.setEnabled(false);
+//            }
         } else if (mode==2){
             breaksOnlyTime.remove(receivedPos);
             breaksOnlyTimeUP.remove(receivedPos);
             numberOfBreaksOnly-=1;
             if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(breaksOnlyTimeUP);
+//            if (numberOfBreaksOnly==0) {
+//                delete_sb.setAlpha(0.3f);
+//                delete_sb.setEnabled(false);
+//            }
         }
         canSaveOrUpdate(true);
     }
