@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextView overtime;
     ImageButton upDown_arrow_one;
     ImageButton upDown_arrow_two;
+    View top_anchor;
 
     ImageView sortCheckmark;
     Button skip;
@@ -747,6 +748,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sub_cycle_pom = editCyclesPopupView.findViewById(R.id.subtract_cycle_pom);
         upDown_arrow_one  = editCyclesPopupView.findViewById(R.id.s1_up);
         upDown_arrow_two  = editCyclesPopupView.findViewById(R.id.s2_up);
+        top_anchor = editCyclesPopupView.findViewById(R.id.top_anchor);
 
         reset = findViewById(R.id.reset);
         cycle_header_text = findViewById(R.id.cycle_header_text);
@@ -1363,6 +1365,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         sub_cycle.setOnClickListener(v-> {
             adjustCustom(false);
+
         });
 
         add_cycle_pom.setOnClickListener(v-> {
@@ -3643,6 +3646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     first_value_textView.setVisibility(View.VISIBLE);
                     plus_first_value.setVisibility(View.VISIBLE);
                     minus_first_value.setVisibility(View.VISIBLE);
+                    top_anchor.setVisibility(View.VISIBLE);
                     second_value_textView.setText(convertCustomTextView(breakValue));
                 } else if (mode==2) {
                     progressBar.setVisibility(View.INVISIBLE);
@@ -3652,6 +3656,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     plus_first_value.setVisibility(View.INVISIBLE);
                     minus_first_value.setVisibility(View.INVISIBLE);
                     s1.setVisibility(View.INVISIBLE);
+                    top_anchor.setVisibility(View.GONE);
                     second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                     if (isOvertimeRunning) overtime.setVisibility(View.VISIBLE); else overtime.setVisibility(View.INVISIBLE);
                 }
@@ -3697,6 +3702,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 sub_cycle.setVisibility(View.GONE);
                 add_cycle_pom.setVisibility(View.VISIBLE);
                 sub_cycle_pom.setVisibility(View.VISIBLE);
+                top_anchor.setVisibility(View.VISIBLE);
 
                 third_value_textView.setVisibility(View.VISIBLE);
                 first_value_textView.setText(String.valueOf(pomValue1));
