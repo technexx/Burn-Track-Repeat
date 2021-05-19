@@ -345,7 +345,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: Fade for count up/down mode.
 
-    //Todo: Add count up for Pom?
     //Todo: Database saves for count up mode.
     //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
@@ -1059,7 +1058,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 2:
                         editCyclesPopupWindow.setHeight(255); break;
                     case 3:
-                        editCyclesPopupWindow.setHeight(460); break;
+                        editCyclesPopupWindow.setHeight(380); break;
                 }
                 editCyclesPopupWindow.showAsDropDown((View) tabLayout);
             }

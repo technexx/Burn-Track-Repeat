@@ -47,7 +47,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_third_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginStart="4dp"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="8dp"
         android:textSize="24sp"
         android:textColor="@color/white"/>
 
@@ -369,8 +369,9 @@
     <Button
         android:text="Add"
         android:id="@+id/add_cycle_pom"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        app:layout_constraintStart_toEndOf="@id/minus_second_value"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="10dp"
@@ -386,8 +387,9 @@
     <Button
         android:text="Remove"
         android:id="@+id/subtract_cycle_pom"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        app:layout_constraintStart_toEndOf="@id/minus_second_value"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="70dp"
