@@ -1544,6 +1544,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     mHandler.postDelayed(this, 35);
                     dotDraws.fadeDotDraw(dotAlpha, false);
                 } else {
+                    //This runnable is only active on Pom subtraction.
                     if (mode==3){
                         pomValuesTime.clear();
                     } else {
@@ -2087,6 +2088,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 emptyCycle = true;
                                 drawDots(0);
                             }
+                            populateCycleUI();
                         } else {
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                             return;
@@ -2103,6 +2105,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                                 timePaused2.setText("?");
                                 drawDots(0);
                             }
+                            populateCycleUI();
                         } else {
                             Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
                             return;
@@ -2110,17 +2113,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                     case 3:
                         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateCycleUI().
-                        if (pomValuesTime.size()!=0) pomTimerDisabled = true; else {
+                        if (pomValuesTime.size()!=0) {
+                            pomTimerDisabled = true;
                             emptyCycle = true;
                             timePaused3.setTextSize(90f);
                             timePaused3.setText("?");
+                        } else {
                             Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
                             return;
                         }
                         break;
                 }
-                populateCycleUI();
-
             }
             dotAlpha = 255;
             dotDraws.fadeDotDraw(255, false);
@@ -4004,6 +4007,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     pomMillis1 = pomValuesTime.get(0)*1000*60;
                     pomMillis = pomMillis1;
                     timePaused3.setText(convertSeconds((pomMillis+999)/1000));
+                    pomTimerDisabled = false;
                 }
                 break;
         }
@@ -4085,8 +4089,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 resetAndFabToggle(false, false);
                 break;
         }
-//        add_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
-//        sub_cycle.setBackgroundColor(getResources().getColor(R.color.test_grey));
         add_cycle.setEnabled(true);
         sub_cycle.setEnabled(true);
         populateCycleUI();
