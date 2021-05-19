@@ -2269,7 +2269,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Log.i("testFade", "switching value 2 " + timePaused2.getText().toString());
         Log.i("testFade", "switching value 3 " + timePaused3.getText().toString());
 
-
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2293,6 +2292,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (customSetTime.size() >0) emptyCycle = false; else emptyCycle = true;
                 if (modeOneBetweenRounds) animateEnding(true);
                 if (endAnimation2!=null && !endAnimation2.hasEnded()) endAnimation2.cancel();
+
+                //Since our count up/down toggle switches from its boolean's previous state, we set it to its opposite here so that the tab switch calls the current count up/down state.
+                setsAreCountingUp = !setsAreCountingUp; breaksAreCountingUp = !breaksAreCountingUp;
+                countUpMode(true); countUpMode(false);
                 break;
             case 2:
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
@@ -2313,7 +2316,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 canSaveOrUpdate(canSaveOrUpdateBreaksOnly);
                 if (breaksOnlyTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 //Begins end cycle animation if cycle has ended on the mode being switched to. This animation does not trigger if we are in a different mode, because of the overlap that animates the current (non-ended) mode.
-                if (modeTwoBetweenRounds) animateEnding(true);
+                if (modeTwoBetweenRounds) animateEnding(false);
+
+                breaksOnlyAreCountingUp = !breaksOnlyAreCountingUp;
+                countUpMode(false);
                 break;
             case 3:
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
@@ -2420,7 +2426,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Retrieves the text String from the previous and current timer's textView and converted it into a long.
         String oldText = (String) oldTextView.getText();
         long oldTime = 0;
-        if  (!oldText.equals("") && !oldText.equals("?")) oldTime = Long.parseLong(oldText);
+        if  (!oldText.equals("") && !oldText.equals("?")) {
+            oldText = oldText.replace(":", "");
+            oldTime = Long.parseLong(oldText);
+        }
         //Compares the previous timer's long value with the one we are switching to. If different, we fade in the new text.
         if (oldTime!=newTime) fadeTime = true;
 
@@ -3526,7 +3535,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 breaksOnlyAreCountingUp = true;
                 upDown_arrow_one.setTag(COUNtING_UP);
                 upDown_arrow_one.setImageResource(R.drawable.arrow_up);
-                dotDraws.countingUpBreaks(true);
+                dotDraws.countingUpBreaksOnly(true);
                 dotDraws.breakOnlyTime(breaksOnlyTimeUP);
                 dotDraws.breaksOnlyDraw(breaksOnlyTimeUP.size(), numberOfBreaksOnly, 3);
                 timeLeft2.setText("0");
@@ -3536,7 +3545,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 breaksOnlyAreCountingUp = false;
                 upDown_arrow_one.setTag(COUNTING_DOWN);
                 upDown_arrow_one.setImageResource(R.drawable.arrow_down);
-                dotDraws.countingUpBreaks(false);
+                dotDraws.countingUpBreaksOnly(false);
                 dotDraws.breakOnlyTime(breaksOnlyTime);
                 dotDraws.breaksOnlyDraw(breaksOnlyTime.size(), numberOfBreaksOnly, 3);
                 timePaused2.setText(convertSeconds((breakOnlyMillis+999)/1000));

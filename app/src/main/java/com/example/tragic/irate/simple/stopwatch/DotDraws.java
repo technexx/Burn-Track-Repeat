@@ -57,6 +57,7 @@ public class DotDraws extends View {
     int mOldMode;
     boolean mGoingUpSets;
     boolean mGoingUpBreaks;
+    boolean mGoingUpBreaksOnly;
     boolean mAddSubFade;
     boolean mFadingIn;
 
@@ -115,6 +116,10 @@ public class DotDraws extends View {
     //Called from Main and determines whether we are counting up or down.
     public void countingUpBreaks(boolean goingUpBreaks) {
         mGoingUpBreaks = goingUpBreaks;
+    }
+
+    public void countingUpBreaksOnly(boolean goingupBreaksOnly) {
+        mGoingUpBreaksOnly = goingupBreaksOnly;
     }
 
     public void customDrawSet(long setCount, long setReduce, int fadeDone) {
@@ -299,7 +304,7 @@ public class DotDraws extends View {
             case 2:
                 mX2 = 15;
                 encloseDots(mY-30, mY+160);
-                if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
+                if (mGoingUpBreaksOnly) setDotStyle(true); else setDotStyle(false);
 
                 for (int i=0; i<mBreakOnlyCount; i++) {
                     mPaint.setColor(Color.RED);
