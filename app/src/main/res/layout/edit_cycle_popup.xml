@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/dark_grey">
+    android:background="@color/dark_grey"
+    android:id="@+id/edit_cycle_layout">
 
     <TextView
         android:id="@+id/s1"
@@ -47,9 +48,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/add_24"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/first_value_textView"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="100dp"
+        android:layout_marginEnd="18dp"
         android:layout_marginTop="6dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
@@ -60,9 +61,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/subtract_24"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/first_value_textView"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="235dp"
+        android:layout_marginStart="18dp"
         android:layout_marginTop="6dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
@@ -73,9 +74,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/add_24"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/second_value_textView"
         app:layout_constraintTop_toBottomOf="@id/plus_first_value"
-        android:layout_marginStart="100dp"
+        android:layout_marginEnd="18dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -86,9 +87,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/subtract_24"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/second_value_textView"
         app:layout_constraintTop_toBottomOf="@id/minus_first_value"
-        android:layout_marginStart="235dp"
+        android:layout_marginStart="18dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -99,9 +100,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/add_24"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/third_value_textView"
         app:layout_constraintTop_toBottomOf="@id/plus_second_value"
-        android:layout_marginStart="100dp"
+        android:layout_marginEnd="18dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -112,9 +113,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/subtract_24"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/third_value_textView"
         app:layout_constraintTop_toBottomOf="@id/minus_second_value"
-        android:layout_marginStart="235dp"
+        android:layout_marginStart="18dp"
         android:backgroundTint="@color/dark_grey"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded">
@@ -124,11 +125,10 @@
         android:id="@+id/first_value_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/plus_first_value"
-        app:layout_constraintEnd_toStartOf="@id/minus_first_value"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
-        android:layout_marginBottom="3dp"
         android:textSize="25sp">
     </TextView>
 
@@ -139,8 +139,7 @@
         app:layout_constraintStart_toEndOf="@id/plus_first_value"
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
-        android:layout_marginStart="11dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginStart="7.5dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -158,8 +157,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
-        android:layout_marginStart="173.5dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginStart="170dp"
         android:textSize="25sp">
     </TextView>
 
@@ -170,8 +168,7 @@
         app:layout_constraintEnd_toStartOf="@id/minus_second_value"
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
-        android:layout_marginEnd="17dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="14dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -189,7 +186,6 @@
         app:layout_constraintEnd_toStartOf="@id/minus_first_value"
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
-        android:layout_marginBottom="2dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -203,11 +199,11 @@
         android:id="@+id/second_value_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/plus_second_value"
-        app:layout_constraintEnd_toStartOf="@id/minus_second_value"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
-        app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
-        android:layout_marginBottom="3dp"
+        android:minWidth="28dp"
+        android:gravity="center_horizontal"
         android:textSize="25sp">
     </TextView>
 
@@ -218,8 +214,8 @@
         app:layout_constraintStart_toEndOf="@id/plus_second_value"
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
-        android:layout_marginStart="11dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginStart="7.5dp"
+        android:layout_marginTop="2dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
@@ -238,8 +234,8 @@
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:textSize="25sp"
-        android:layout_marginStart="173.5dp"
-        android:layout_marginBottom="3dp">
+        android:layout_marginTop="2dp"
+        android:layout_marginStart="170dp">
     </TextView>
 
     <EditText
@@ -249,8 +245,8 @@
         app:layout_constraintEnd_toStartOf="@id/minus_second_value"
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
-        android:layout_marginBottom="3dp"
-        android:layout_marginEnd="17dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginTop="2dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:inputType="number"
@@ -267,7 +263,7 @@
         app:layout_constraintEnd_toStartOf="@id/minus_second_value"
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
-        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
         android:textSize="25sp"
         android:textColor="@color/white"
         android:inputType="number"
@@ -280,8 +276,8 @@
         android:id="@+id/third_value_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/plus_third_value"
-        app:layout_constraintEnd_toStartOf="@id/minus_third_value"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_third_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:textSize="25sp">
@@ -354,6 +350,40 @@
         app:layout_constraintStart_toEndOf="@id/add_cycle"
         app:layout_constraintEnd_toEndOf="parent"
         android:textSize="15sp"
+        android:gravity="center"
+        android:backgroundTint="@color/dark_grey"
+        app:cornerRadius="50dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/black"
+        app:strokeWidth="1dp">
+    </Button>
+
+    <Button
+        android:text="Add"
+        android:id="@+id/add_cycle_pom"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:backgroundTint="@color/dark_grey"
+        app:cornerRadius="50dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/black"
+        app:strokeWidth="1dp">
+    </Button>
+
+    <Button
+        android:text="Remove"
+        android:id="@+id/subtract_cycle_pom"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="70dp"
+        android:textSize="14sp"
         android:gravity="center"
         android:backgroundTint="@color/dark_grey"
         app:cornerRadius="50dp"

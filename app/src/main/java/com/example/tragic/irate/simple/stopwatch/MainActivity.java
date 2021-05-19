@@ -11,12 +11,14 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -130,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ImageButton minus_third_value;
     Button add_cycle;
     Button sub_cycle;
+    Button add_cycle_pom;
+    Button sub_cycle_pom;
     ImageButton left_arrow;
     ImageButton right_arrow;
     EditText edit_header;
@@ -738,6 +743,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_single_edit = editCyclesPopupView.findViewById(R.id.third_value_single_edit);
         add_cycle = editCyclesPopupView.findViewById(R.id.add_cycle);
         sub_cycle = editCyclesPopupView.findViewById(R.id.subtract_cycle);
+        add_cycle_pom = editCyclesPopupView.findViewById(R.id.add_cycle_pom);
+        sub_cycle_pom = editCyclesPopupView.findViewById(R.id.subtract_cycle_pom);
         upDown_arrow_one  = editCyclesPopupView.findViewById(R.id.s1_up);
         upDown_arrow_two  = editCyclesPopupView.findViewById(R.id.s2_up);
 
@@ -801,6 +808,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         overtime.setVisibility(View.INVISIBLE);
         new_lap.setVisibility(View.INVISIBLE);
         next_round.setVisibility(View.INVISIBLE);
+        add_cycle_pom.setVisibility(View.GONE);
+        sub_cycle_pom.setVisibility(View.GONE);
 
         dotDraws.onPositionSelect(MainActivity.this);
         dotDraws.onAlphaSend(MainActivity.this);
@@ -954,6 +963,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabViews();
         //Populates UI elements at app start.
         populateCycleUI();
+
+
 
         //Used in all timers to smooth out end fade.
         endFade = new Runnable() {
@@ -1351,6 +1362,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
 
         sub_cycle.setOnClickListener(v-> {
+            adjustCustom(false);
+        });
+
+        add_cycle_pom.setOnClickListener(v-> {
+            adjustCustom(true);
+        });
+
+        sub_cycle_pom.setOnClickListener(v-> {
             adjustCustom(false);
         });
 
@@ -2253,6 +2272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_one.setVisibility(View.VISIBLE);
         upDown_arrow_two.setVisibility(View.VISIBLE);
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
+
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2301,6 +2321,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (modeTwoBetweenRounds) animateEnding(true);
                 break;
             case 3:
+//                ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//                plus_first_value.setLayoutParams(params);
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
                 upDown_arrow_one.setVisibility(View.INVISIBLE);
                 savedCycleAdapter.setView(3);
@@ -2480,7 +2502,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 switch (mode) {
                     case 1:
                         if (first_value_textView.isShown()) {
-                            first_value_textView.setVisibility(View.GONE);
+                            first_value_textView.setVisibility(View.INVISIBLE);
                             first_value_edit.setVisibility(View.VISIBLE);
                             first_value_edit_two.setVisibility(View.VISIBLE);
                             first_value_sep.setVisibility(View.VISIBLE);
@@ -2495,7 +2517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         break;
                     case 3:
                         if (first_value_textView.isShown()) {
-                            first_value_textView.setVisibility(View.GONE);
+                            first_value_textView.setVisibility(View.INVISIBLE);
                             first_value_single_edit.setVisibility(View.VISIBLE);
                         }
                         if (second_value_single_edit.isShown()) {
@@ -2532,7 +2554,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         }
                         if (second_value_textView.isShown()) {
                             second_value_single_edit.setVisibility(View.VISIBLE);
-                            second_value_textView.setVisibility(View.GONE);
+                            second_value_textView.setVisibility(View.INVISIBLE);
                         }
                         if (third_value_single_edit.isShown()){
                             third_value_single_edit.setVisibility(View.GONE);
@@ -2549,7 +2571,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     second_value_single_edit.setVisibility(View.GONE);
                     second_value_textView.setVisibility(View.VISIBLE);
                 }
-                third_value_textView.setVisibility(View.GONE);
+                third_value_textView.setVisibility(View.INVISIBLE);
                 third_value_single_edit.setVisibility(View.VISIBLE);
             }
 
@@ -3616,21 +3638,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 if (mode==1) {
                     progressBar.setVisibility(View.VISIBLE);
                     progressBar2.setVisibility(View.INVISIBLE);
-                    second_value_textView.setText(convertCustomTextView(breakValue));
+                    s1.setVisibility(View.VISIBLE);
+                    overtime.setVisibility(View.GONE);
                     first_value_textView.setVisibility(View.VISIBLE);
                     plus_first_value.setVisibility(View.VISIBLE);
                     minus_first_value.setVisibility(View.VISIBLE);
-                    s1.setVisibility(View.VISIBLE);
-                    overtime.setVisibility(View.GONE);
+                    second_value_textView.setText(convertCustomTextView(breakValue));
                 } else if (mode==2) {
                     progressBar.setVisibility(View.INVISIBLE);
                     progressBar2.setVisibility(View.VISIBLE);
-                    first_value_textView.setVisibility(View.GONE);
-                    plus_first_value.setVisibility(View.GONE);
-                    minus_first_value.setVisibility(View.GONE);
-                    s1.setVisibility(View.GONE);
-                    second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+                    first_value_textView.setVisibility(View.INVISIBLE);
                     second_value_textView.setVisibility(View.VISIBLE);
+                    plus_first_value.setVisibility(View.INVISIBLE);
+                    minus_first_value.setVisibility(View.INVISIBLE);
+                    s1.setVisibility(View.INVISIBLE);
+                    second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
                     if (isOvertimeRunning) overtime.setVisibility(View.VISIBLE); else overtime.setVisibility(View.INVISIBLE);
                 }
                 progressBar3.setVisibility(View.INVISIBLE);
@@ -3640,14 +3662,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s1.setText(R.string.set_time);
                 s2.setText(R.string.break_time);
                 cycle_reset.setText(R.string.clear_cycles);
-                s1.setTextSize(22f);
-                s2.setTextSize(22f);
-                s3.setVisibility(View.GONE);
+                s3.setVisibility(View.INVISIBLE);
                 third_value_textView.setVisibility(View.INVISIBLE);
                 third_value_single_edit.setVisibility(View.INVISIBLE);
                 plus_third_value.setVisibility(View.INVISIBLE);
                 minus_third_value.setVisibility(View.INVISIBLE);
                 cycle_header_text.setVisibility(View.VISIBLE);
+                add_cycle.setVisibility(View.VISIBLE);
+                sub_cycle.setVisibility(View.VISIBLE);
+                add_cycle_pom.setVisibility(View.GONE);
+                sub_cycle_pom.setVisibility(View.GONE);
                 break;
             case 3:
                 first_value_single_edit.setText(convertSeconds(pomValue1));
@@ -3669,6 +3693,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 minus_third_value.setVisibility(View.VISIBLE);
                 overtime.setVisibility(View.GONE);
                 cycle_header_text.setVisibility(View.VISIBLE);
+                add_cycle.setVisibility(View.GONE);
+                sub_cycle.setVisibility(View.GONE);
+                add_cycle_pom.setVisibility(View.VISIBLE);
+                sub_cycle_pom.setVisibility(View.VISIBLE);
 
                 third_value_textView.setVisibility(View.VISIBLE);
                 first_value_textView.setText(String.valueOf(pomValue1));
@@ -3679,9 +3707,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 s2.setText(R.string.small_break);
                 s3.setText(R.string.long_break);
                 cycle_reset.setText(R.string.clear_cycles);
-                s1.setTextSize(20f);
-                s2.setTextSize(20f);
-                s3.setTextSize(20f);
+//
                 break;
             case 4:
                 progressBar.setVisibility(View.INVISIBLE);
