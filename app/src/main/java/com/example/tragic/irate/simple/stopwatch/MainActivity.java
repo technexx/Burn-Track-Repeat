@@ -31,6 +31,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -695,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
         //Focus set to false so we can access rest of UI.
-        editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, false);
+        editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, true);
         editCyclesPopupWindow .setAnimationStyle(R.style.WindowAnimation);
 
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
