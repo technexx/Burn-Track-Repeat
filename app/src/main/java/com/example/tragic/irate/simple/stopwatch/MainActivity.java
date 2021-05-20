@@ -346,6 +346,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: Fade for count up/down mode.
 
+    //Todo: Lack of focus on editCyclePopup precludes selection of rounds, but otherwise we don't get the numberpad for editText.
+    //Todo: Retain count up/down mode for each tab on app launch.
     //Todo: Database saves for count up mode.
     //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
@@ -696,7 +698,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
         //Focus set to false so we can access rest of UI.
-        editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, true);
+        editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 415, false);
         editCyclesPopupWindow .setAnimationStyle(R.style.WindowAnimation);
 
         savedCycleRecycler = savedCyclePopupView.findViewById(R.id.cycle_list_recycler);
@@ -836,6 +838,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_reset.setText(R.string.clear_cycles);
         cycles_completed.setText(R.string.cycles_done);
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+        lastTextView = timePaused;
 
         mHandler = new Handler();
 
@@ -1022,17 +1025,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     case 0:
                         if (customHalted) {
                             fadeOutText(timePaused);
-                        } else fadeOutText(timeLeft); lastTextView = timeLeft;
+                        } else fadeOutText(timeLeft);
                         break;
                     case 1:
                         if (breaksOnlyHalted) {
                             fadeOutText(timePaused2);
-                        } else fadeOutText(timeLeft2); lastTextView = timeLeft2;
+                        } else fadeOutText(timeLeft2);
                         break;
                     case 2:
                         if (pomHalted) {
                             fadeOutText(timePaused3);
-                        } else fadeOutText(timeLeft3); lastTextView = timeLeft3;
+                        } else fadeOutText(timeLeft3);
                         break;
                     case 3:
                         if (stopwatchHalted) fadeOutText(timePaused4);
@@ -1678,6 +1681,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AtomicBoolean textSizeReduced = new AtomicBoolean(false);
         if (setMillis >= 59000) textSizeReduced.set(true);
 
+        //Todo: First instance of this fades on start timer click.
         setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
         timer = new CountDownTimer(setMillis, 50) {
             @Override
@@ -1687,9 +1691,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
                 if (fadeCustomTimer) {
-                    if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
-                    else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
-                    else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.12);
+                    if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.03);
+                    else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.06);
+                    else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.09);
                     else if (customAlpha>=1) fadeCustomTimer = false;
                 }
 
@@ -1765,9 +1769,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakMillis = millisUntilFinished;
 
                     if (fadeCustomTimer) {
-                        if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.04);
-                        else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.08);
-                        else timeLeft.setAlpha(customAlpha+=.12);
+                        if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.03);
+                        else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.06);
+                        else timeLeft.setAlpha(customAlpha+=.09);
                     }
                     if (customAlpha >=1) fadeCustomTimer = false;
 
@@ -1848,9 +1852,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     breakOnlyMillis = millisUntilFinished;
 
                     if (fadeCustomTimer) {
-                        if (customAlpha<0.25) timeLeft2.setAlpha(customAlpha+=0.04);
-                        else if (customAlpha<0.5) timeLeft2.setAlpha(customAlpha+=.08);
-                        else timeLeft2.setAlpha(customAlpha+=.12);
+                        if (customAlpha<0.25) timeLeft2.setAlpha(customAlpha+=0.03);
+                        else if (customAlpha<0.5) timeLeft2.setAlpha(customAlpha+=.06);
+                        else timeLeft2.setAlpha(customAlpha+=.09);
                     }
                     if (customAlpha >=1) fadeCustomTimer = false;
 
@@ -2265,11 +2269,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_two.setVisibility(View.VISIBLE);
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
 
-        Log.i("testFade", "switching in value is " + lastTextView.getText().toString());
-        Log.i("testFade", "switching value 1 " + timePaused.getText().toString());
-        Log.i("testFade", "switching value 2 " + timePaused2.getText().toString());
-        Log.i("testFade", "switching value 3 " + timePaused3.getText().toString());
-
         switch (mode) {
             case 1:
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
@@ -2297,6 +2296,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //Since our count up/down toggle switches from its boolean's previous state, we set it to its opposite here so that the tab switch calls the current count up/down state.
                 setsAreCountingUp = !setsAreCountingUp; breaksAreCountingUp = !breaksAreCountingUp;
                 countUpMode(true); countUpMode(false);
+                lastTextView = timePaused;
                 break;
             case 2:
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
@@ -2321,6 +2321,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
                 breaksOnlyAreCountingUp = !breaksOnlyAreCountingUp;
                 countUpMode(false);
+                lastTextView = timePaused2;
                 break;
             case 3:
                 upDown_arrow_two.setVisibility(View.INVISIBLE);
@@ -2341,8 +2342,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 first_value_textView.setText(String.valueOf(pomValue1));
                 second_value_textView.setText(String.valueOf(pomValue2));
                 third_value_textView.setText(String.valueOf(pomValue3));
+
                 if (pomValuesTime.size()>0) emptyCycle = false; else emptyCycle = true;
                 if (modeThreeBetweenRounds) animateEnding(true);
+                lastTextView = timePaused3;
                 break;
             case 4:
                 //Same animation instance can't be used simultaneously for both TextViews.
@@ -2363,7 +2366,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         dotDraws.setAlpha();
         drawDots(0);
-        lastTextView = timePaused;
     }
 
     //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
@@ -2431,8 +2433,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             oldText = oldText.replace(":", "");
             oldTime = Long.parseLong(oldText);
         }
-        //Compares the previous timer's long value with the one we are switching to. If different, we fade in the new text.
-        if (oldTime!=newTime) fadeTime = true;
 
         if (!oldText.equals("") && !oldText.equals("?")) {
             //Converts the last and current timer's textViews into longs, then compares them. If one is <60 seconds and one is <60 seconds, we change the size of the current textView so it fills our progressBar circle better.
@@ -2460,29 +2460,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 }
             }
         }
-        //If the timer is HALTED, use our Value Animator. If not, we have a separate method within the timer. This is necessary because our active timer textView is constantly updating, and thus overwrites any new alpha we are trying to set.
-        if (fadeTime) {
-            switch (mode) {
-                case 1:
-                    if (customHalted) fadeInText(timePaused); else fadeInText(timeLeft); break;
-                case 2:
-                    if (breaksOnlyHalted) fadeInText(timePaused2); else fadeInText(timeLeft2); break;
-                case 3:
-                    if (pomHalted) fadeInText(timePaused3); else fadeInText(timeLeft3); break;
-                case 4:
-                    if (stopwatchHalted) fadeInText(timePaused4); else fadeInText(timeLeft4); break;
-            }
-        } else {
-            switch (mode) {
-                case 1:
-                    if (customHalted) timePaused.setAlpha(1); break;
-                case 2:
-                    if (breaksOnlyHalted) timePaused2.setAlpha(1); break;
-                case 3:
-                    if (pomHalted) timePaused3.setAlpha(1); break;
-                case 4:
-                    if (stopwatchHalted) timePaused4.setAlpha(1); break;
-            }
+
+        switch (mode) {
+            case 1:
+                if (customHalted) fadeInText(timePaused); break;
+            case 2:
+                if (breaksOnlyHalted) fadeInText(timePaused2); break;
+            case 3:
+                if (pomHalted) fadeInText(timePaused3); break;
+            case 4:
+                if (stopwatchHalted) fadeInText(timePaused4); break;
         }
         newTextView.setText(convertSeconds(newTime));
     }
@@ -2490,14 +2477,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void fadeInText(TextView textView) {
         if (fadeInObj!=null) fadeInObj.cancel();
         fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
-        fadeInObj.setDuration(1000);
+        fadeInObj.setDuration(2000);
         fadeInObj.start();
     }
 
     public void fadeOutText(TextView textView) {
         if (fadeOutObj!=null) fadeOutObj.cancel();
         fadeOutObj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
-        fadeOutObj.setDuration(750);
+        fadeOutObj.setDuration(1000);
         fadeOutObj.start();
     }
 
@@ -3266,7 +3253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void setIncrements(MotionEvent event, Runnable runnable) {
         switch(event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
+                //Handler must not be instantiated before this, otherwise the rufnnable will execute it on every touch (i.e. even on "action_up" removal.
                 mHandler = new Handler();
                 mHandler.postDelayed(runnable,25);
                 mHandler.postDelayed(valueSpeed, 25);
@@ -3495,6 +3482,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     dotDraws.customDrawSet(customSetTimeUP.size(), numberOfSets, 1);
                     timeLeft.setText("0");
                     timePaused.setText("0");
+//                    setNewText(lastTextView, timePaused, 0);
                     prefEdit.putBoolean("setCountUpMode", true);
                 } else {
                     //Moving to COUNT DOWN mode.
@@ -3541,6 +3529,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 dotDraws.breaksOnlyDraw(breaksOnlyTimeUP.size(), numberOfBreaksOnly, 3);
                 timeLeft2.setText("0");
                 timePaused2.setText("0");
+//                setNewText(lastTextView, timePaused2, 0);
                 prefEdit.putBoolean("breakOnlyCountUpMode", true);
             } else {
                 breaksOnlyAreCountingUp = false;
