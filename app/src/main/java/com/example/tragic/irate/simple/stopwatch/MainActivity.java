@@ -346,8 +346,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Todo: Fade for count up/down mode.
 
+    //Todo: Begin w/ notepad style list of saved cycles and a FAB button. Use a single save button for each.
     //Todo: Lack of focus on editCyclePopup precludes selection of rounds, but otherwise we don't get the numberpad for editText.
-    //Todo: Retain count up/down mode for each tab on app launch.
     //Todo: Database saves for count up mode.
     //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
@@ -2477,14 +2477,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void fadeInText(TextView textView) {
         if (fadeInObj!=null) fadeInObj.cancel();
         fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
-        fadeInObj.setDuration(2000);
+        fadeInObj.setDuration(1600);
         fadeInObj.start();
     }
 
     public void fadeOutText(TextView textView) {
         if (fadeOutObj!=null) fadeOutObj.cancel();
         fadeOutObj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
-        fadeOutObj.setDuration(1000);
+        fadeOutObj.setDuration(800);
         fadeOutObj.start();
     }
 
@@ -2954,7 +2954,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                     String tempSets = "";
                     String tempBreaks = "";
                     if (recall) {
-                        cycles = cyclesList.get(customID);
+                        cycles = cyclesList.get(posHolder);
                         tempSets = cyclesList.get(0).getSets();
                         tempBreaks = cyclesList.get(0).getBreaks();
                     } else {
@@ -2980,7 +2980,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2:
                     String tempBreaksOnly = "";
                     if (recall) {
-                        cyclesBO = cyclesBOList.get(breaksOnlyID);
+                        cyclesBO = cyclesBOList.get(position);
                         tempBreaksOnly = cyclesBOList.get(0).getBreaksOnly();
                     } else {
                         queryCycles();
@@ -3001,7 +3001,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 3:
                     String tempPom = "";
                     if (recall) {
-                        pomCycles = pomCyclesList.get(pomID);
+                        pomCycles = pomCyclesList.get(position);
                         tempPom = pomCyclesList.get(0).getFullCycle();
                     } else {
                         queryCycles();
@@ -3040,6 +3040,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ArrayList<Long> tempBreaksOnly = new ArrayList<>();
 
         switch (mode) {
+            //Getting an instance of our current cycles' array list.
             case 1:
                 for (int i=0; i<customSetTime.size(); i++) {
                     tempSets.add(customSetTime.get(i) /1000);
@@ -3047,9 +3048,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 for (int i=0; i<customBreakTime.size(); i++){
                     tempBreaks.add(customBreakTime.get(i)/1000);
                 }
+                //Editing our displayed cycles' string array to sync with the retrieved format of our database's saved cycles.
                 convertedSetList = gson.toJson(tempSets);
                 convertedBreakList = gson.toJson(tempBreaks);
-
                 convertedSetList = convertedSetList.replace("\"", "");
                 convertedSetList = convertedSetList.replace("]", "");
                 convertedSetList = convertedSetList.replace("[", "");
@@ -3059,6 +3060,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 convertedBreakList = convertedBreakList.replace("[", "");
                 convertedBreakList = convertedBreakList.replace(",", " - ");
 
+                //If our displayed cycles and title match any database entry EXACTLY, we set duplicateCycle to true.
                 boolean endLoop = false;
                 if (cyclesList.size()>0) {
                     for (int i=0; i<cyclesList.size(); i++) {
