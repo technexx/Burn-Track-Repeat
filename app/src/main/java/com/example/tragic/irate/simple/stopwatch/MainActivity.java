@@ -342,21 +342,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
     //Todo: Test all db stuff.
-    //Todo: "Update" will crash if nothing is saved.
 
     //Todo: Fade for count up/down mode.
-
-    //Todo: Begin w/ notepad style list of saved cycles and a FAB button. Use a single save button for each.
+    //Todo: Have editing cycles occur on different (add popup, or another activity) page?
+    //Todo: Begin w/ notepad style list of saved cycles and a FAB button. Use a single save button for each. For now, just move recyclerView to main activity and launch "Main" as whichever cycle we're on, using a single Save button.
+    //Todo: Preset timer selections.
     //Todo: Lack of focus on editCyclePopup precludes selection of rounds, but otherwise we don't get the numberpad for editText.
     //Todo: Database saves for count up mode.
-    //Todo: Single editText for seconds instead of m:ss?
     //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
-    //Todo: If keeping short breaksOnly add/sub menu, disable Skip and Reset buttons while open.
     //Todo: No rounds added defaults to a default Cycle instead of staying blank.
     //Todo: TDEE in sep popup w/ tabs.
     //Todo: Variable set count-up timer, for use w/ TDEE.
     //Todo: Variable set only mode? Again, for TDEE.
-    //Todo: Option to skip EITHER set or break. Option to undo skip.
     //Todo: Reset vis/not vis depending on mode timer status.
     //Todo: Maybe: "cycle completed" as a db entry for each separate cycle.
 
@@ -2858,7 +2855,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         cycles.setSets(convertedSetList);
                         cycles.setBreaks(convertedBreakList);
                         cycles.setTimeAdded(System.currentTimeMillis());
-                        //Todo: Can simply disable cycle count for counting up.
                         cycles.setItemCount(customSetTime.size());
                         if (saveOrUpdate == SAVING_CYCLES){
                             cyclesDatabase.cyclesDao().insertCycle(cycles);
@@ -2948,21 +2944,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //When recall is TRUE, retrieves the last used ID instance, when recall is FALSE, Uses a positional input from our saved cycle list.
     public void selectRound(int position, boolean recall) {
         AsyncTask.execute(() -> {
-            int posHolder = position;
             switch (mode) {
                 case 1:
                     String tempSets = "";
                     String tempBreaks = "";
                     if (recall) {
-                        cycles = cyclesList.get(posHolder);
+                        cycles = cyclesList.get(position);
                         tempSets = cyclesList.get(0).getSets();
                         tempBreaks = cyclesList.get(0).getBreaks();
                     } else {
                         queryCycles();
-                        cycles = cyclesList.get(posHolder);
-                        tempSets = cyclesList.get(posHolder).getSets();
-                        tempBreaks = cyclesList.get(posHolder).getBreaks();
-                        customID = cyclesList.get(posHolder).getId();
+                        cycles = cyclesList.get(position);
+                        tempSets = cyclesList.get(position).getSets();
+                        tempBreaks = cyclesList.get(position).getBreaks();
+                        customID = cyclesList.get(position).getId();
                         prefEdit.putInt("customID", customID);
                     }
 
@@ -2984,9 +2979,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         tempBreaksOnly = cyclesBOList.get(0).getBreaksOnly();
                     } else {
                         queryCycles();
-                        cyclesBO = cyclesBOList.get(posHolder);
-                        tempBreaksOnly = cyclesBOList.get(posHolder).getBreaksOnly();
-                        breaksOnlyID = cyclesBOList.get(posHolder).getId();
+                        cyclesBO = cyclesBOList.get(position);
+                        tempBreaksOnly = cyclesBOList.get(position).getBreaksOnly();
+                        breaksOnlyID = cyclesBOList.get(position).getId();
                         prefEdit.putInt("breaksOnlyID", breaksOnlyID);
                     }
 
@@ -3005,9 +3000,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                         tempPom = pomCyclesList.get(0).getFullCycle();
                     } else {
                         queryCycles();
-                        pomCycles = pomCyclesList.get(posHolder);
-                        tempPom = pomCyclesList.get(posHolder).getFullCycle();
-                        pomID = pomCyclesList.get(posHolder).getId();
+                        pomCycles = pomCyclesList.get(position);
+                        tempPom = pomCyclesList.get(position).getFullCycle();
+                        pomID = pomCyclesList.get(position).getId();
                         prefEdit.putInt("pomID", pomID);
                     }
 
