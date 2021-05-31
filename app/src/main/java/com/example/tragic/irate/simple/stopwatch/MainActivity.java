@@ -80,12 +80,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View deleteCyclePopupView;
   View sortCyclePopupView;
   View savedCyclePopupView;
-  View cycleLabelView;
   View editCyclesPopupView;
 
   PopupWindow sortPopupWindow;
   PopupWindow savedCyclePopupWindow;
-  PopupWindow labelSavePopupWindow;
   PopupWindow deleteAllPopupWindow;
   PopupWindow editCyclesPopupWindow;
 
@@ -185,7 +183,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_UP = 2;
 
 
-  //Todo: Use infinite symbol in adapter list instead and keep timer values visible. Toggle will switch from infinite to whichever count down values we have.
+  //Todo: Revive db w/ new UI.
+  //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
 
   //Todo: Preset timer selections.
@@ -412,17 +411,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
-    cycleLabelView = inflater.inflate(R.layout.label_cycle_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
-    labelSavePopupWindow = new PopupWindow(cycleLabelView, 800, 400, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    labelSavePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
