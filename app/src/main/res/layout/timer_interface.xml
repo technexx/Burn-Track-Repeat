@@ -79,13 +79,13 @@
         app:strokeWidth="1dp">
     </Button>
 
-    <simple.stopwatch.DotDraws
+    <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout">
-    </simple.stopwatch.DotDraws>
+        app:layout_constraintTop_toTopOf="parent">
+    </com.example.tragic.irate.simple.stopwatch.DotDraws>
 
     <TextView
         android:id="@+id/timeLeft"
