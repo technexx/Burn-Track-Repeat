@@ -290,12 +290,19 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     mode = intent.getIntExtra("mode", 0);
     switch (mode) {
       case 1:
+        //Todo: We use(d) separate lists in this activity for up/down modes.
         customSetTime = intent.getIntegerArrayListExtra("setList");
         customBreakTime = intent.getIntegerArrayListExtra("breakList");
+        setsAreCountingUp = intent.getBooleanExtra("setsAreCountingUp", false);
+        breaksAreCountingUp = intent.getBooleanExtra("breaksAreCountingUp", false);
+        dotDraws.countingUpSets(setsAreCountingUp);
+        dotDraws.countingUpBreaks(breaksAreCountingUp);
         setMillis = customSetTime.get(0);
         break;
       case 2:
         breaksOnlyTime = intent.getIntegerArrayListExtra("breakOnlyList");
+        breaksOnlyAreCountingUp = intent.getBooleanExtra("breaksOnlyAreCountingUp", false);
+        dotDraws.countingUpBreaksOnly(breaksOnlyAreCountingUp);
         breakOnlyMillis = breaksOnlyTime.get(0);
         break;
       case 3:
@@ -346,7 +353,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         countUpMillisSets +=50;
         timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
         timePaused.setText(convertSeconds((countUpMillisSets) /1000));
-        customSetTimeUP.set((int) (customSetTimeUP.size()-numberOfSets), countUpMillisSets);
+        customSetTime.set((int) (customSetTime.size()-numberOfSets), countUpMillisSets);
         drawDots(1);
         mHandler.postDelayed(this, 50);
       }
@@ -358,7 +365,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         countUpMillisBreaks +=50;
         timeLeft.setText(convertSeconds((countUpMillisBreaks) /1000));
         timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
-        customBreakTimeUP.set((int) (customBreakTimeUP.size()-numberOfBreaks), countUpMillisBreaks);
+        customBreakTime.set((int) (customBreakTime.size()-numberOfBreaks), countUpMillisBreaks);
         drawDots(2);
         mHandler.postDelayed(this, 50);
       }
@@ -370,7 +377,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         countUpMillisBO +=50;
         timeLeft.setText(convertSeconds((countUpMillisBO) /1000));
         timePaused.setText(convertSeconds((countUpMillisBO) /1000));
-        breaksOnlyTimeUP.set((int) (breaksOnlyTimeUP.size()-numberOfBreaksOnly), countUpMillisBO);
+        breaksOnlyTime.set((int) (breaksOnlyTime.size()-numberOfBreaksOnly), countUpMillisBO);
         drawDots(3);
         mHandler.postDelayed(this, 50);
       }
@@ -1253,15 +1260,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void drawDots(int fadeVar) {
     switch (mode) {
       case 1:
-        if (!setsAreCountingUp) dotDraws.setTime(customSetTime);
-        else dotDraws.setTime(customSetTimeUP);
-        if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime);
-        else dotDraws.breakTime(customBreakTimeUP);
+        dotDraws.setTime(customSetTime);
+        dotDraws.breakTime(customBreakTime);
         dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
         dotDraws.customDrawBreak(startSets, numberOfBreaks);
         break;
       case 2:
-        if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(breaksOnlyTimeUP);
+        dotDraws.breakOnlyTime(breaksOnlyTime);
         dotDraws.breaksOnlyDraw(startBreaksOnly, numberOfBreaksOnly, fadeVar);
         break;
       case 3:
@@ -1603,8 +1608,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         onBreak = false;
         timePaused.setAlpha(1);
         //Sets all longs in list to "0" since we are restarting a Count Up cycle.
-        for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, 0);
-        for (int i=0; i<customBreakTimeUP.size(); i++) customBreakTimeUP.set(i, 0);
+//        for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, 0);
+//        for (int i=0; i<customBreakTimeUP.size(); i++) customBreakTimeUP.set(i, 0);
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;

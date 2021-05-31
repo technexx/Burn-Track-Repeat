@@ -799,12 +799,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       intent.putExtra("mode", mode);
       switch (mode) {
         case 1:
-          if (!setsAreCountingUp) intent.putIntegerArrayListExtra("setList", customSetTime); else intent.putIntegerArrayListExtra("setList", customSetTimeUP);
-          if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakList", customBreakTime);  else intent.putIntegerArrayListExtra("breakList", customBreakTimeUP);
+          if (!setsAreCountingUp) intent.putIntegerArrayListExtra("setList", customSetTime); else {
+            intent.putIntegerArrayListExtra("setList", customSetTimeUP);
+            intent.putExtra("setsAreCountingUp", true);
+          }
+          if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakList", customBreakTime); else {
+            intent.putIntegerArrayListExtra("breakList", customBreakTimeUP);
+            intent.putExtra("breaksAreCountingUp", true);
+          }
           if (customSetTime.size()==0) emptyCycle = true;
           break;
         case 2:
-          if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime); else intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTimeUP);
+          if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime); else {
+            intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTimeUP);
+            intent.putExtra("breaksOnlyAreCountingUp", true);
+          }
           if (breaksOnlyTime.size()==0) emptyCycle = true;
           break;
         case 3:
