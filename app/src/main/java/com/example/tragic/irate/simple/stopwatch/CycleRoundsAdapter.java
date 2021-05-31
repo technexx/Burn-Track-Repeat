@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -66,13 +65,24 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         modeOneRounds.round_sets.setBackgroundResource(0);
       } else {
         modeOneRounds.round_sets.setText("");
-        modeOneRounds.round_sets.setBackgroundResource(R.drawable.infinity_icon_small);
+        modeOneRounds.round_sets.setBackgroundResource(R.drawable.infinity_icon_green);
       }
-
-      modeOneRounds.round_breaks.setText(mBreaksList.get(position));
+      if (!mBreaksUp) {
+        modeOneRounds.round_breaks.setText(mBreaksList.get(position));
+        modeOneRounds.round_breaks.setBackgroundResource(0);
+      } else {
+        modeOneRounds.round_breaks.setText("");
+        modeOneRounds.round_breaks.setBackgroundResource(R.drawable.infinity_icon_red);
+      }
     } else if (holder instanceof ModeTwoRounds) {
       ModeTwoRounds modeTwoRounds = (ModeTwoRounds) holder;
-      modeTwoRounds.round_breaksOnly.setText(mBreaksOnlyList.get(position));
+      if (!mBreaksUp) {
+        modeTwoRounds.round_breaksOnly.setText(mBreaksOnlyList.get(position));
+        modeTwoRounds.round_breaksOnly.setBackgroundResource(0);
+      } else {
+        modeTwoRounds.round_breaksOnly.setText("");
+        modeTwoRounds.round_breaksOnly.setBackgroundResource(R.drawable.infinity_icon_red);
+      }
     }
   }
 

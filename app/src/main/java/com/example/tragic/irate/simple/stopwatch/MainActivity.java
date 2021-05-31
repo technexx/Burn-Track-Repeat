@@ -1371,7 +1371,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           upDown_arrow_one.setImageResource(R.drawable.arrow_up);;
           prefEdit.putBoolean("setCountUpMode", true);
           cycleRoundsAdapter.countingUpSets(true);
-//          toggleCountUpViews(true, true);
         } else {
           //Moving to COUNT DOWN mode.
           setsAreCountingUp = false;
@@ -1380,7 +1379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           upDown_arrow_one.setTag(1);
           prefEdit.putBoolean("setCountUpMode", false);
           cycleRoundsAdapter.countingUpSets(false);
-//          toggleCountUpViews(true, false);
         }
       } else {
         //Moving to COUNT UP mode.
@@ -1389,14 +1387,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           upDown_arrow_two.setTag(COUNTING_UP);
           upDown_arrow_two.setImageResource(R.drawable.arrow_up);
           prefEdit.putBoolean("breakCountUpMode", true);
-//          toggleCountUpViews(false, true);
+          cycleRoundsAdapter.countingUpBreaks(true);
         } else {
           //Moving to COUNT DOWN mode.
           breaksAreCountingUp = false;
           upDown_arrow_two.setTag(COUNTING_DOWN);
           upDown_arrow_two.setImageResource(R.drawable.arrow_down);
           prefEdit.putBoolean("breakCountUpMode", false);
-//          toggleCountUpViews(false, false);
+          cycleRoundsAdapter.countingUpBreaks(false);
         }
       }
     } else if (mode==2) {
@@ -1406,13 +1404,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_one.setTag(COUNTING_UP);
         upDown_arrow_one.setImageResource(R.drawable.arrow_up);
         prefEdit.putBoolean("breakOnlyCountUpMode", true);
-//        toggleCountUpViews(false, true);
+        cycleRoundsAdapter.countingUpBreaks(true);
       } else {
         breaksOnlyAreCountingUp = false;
         upDown_arrow_one.setTag(COUNTING_DOWN);
         upDown_arrow_one.setImageResource(R.drawable.arrow_down);
         prefEdit.putBoolean("breakOnlyCountUpMode", false);
-//        toggleCountUpViews(false, false);
+        cycleRoundsAdapter.countingUpBreaks(false);
       }
     }
     prefEdit.apply();
