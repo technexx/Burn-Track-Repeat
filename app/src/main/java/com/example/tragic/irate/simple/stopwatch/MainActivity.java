@@ -132,8 +132,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton upDown_arrow_one;
   ImageButton upDown_arrow_two;
   View top_anchor;
-  ImageView infinity_one;
-  ImageView infinity_two;
+//  ImageView infinity_one;
+//  ImageView infinity_two;
   boolean infinity_mode_one;
   boolean infinity_mode_two;
   Button start_timer;
@@ -184,8 +184,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
 
-  //Todo: Test all db stuff.
 
+  //Todo: Use infinite symbol in adapter list instead and keep timer values visible. Toggle will switch from infinite to whichever count down values we have.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
 
   //Todo: Preset timer selections.
@@ -453,8 +453,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     upDown_arrow_one = editCyclesPopupView.findViewById(R.id.s1_up);
     upDown_arrow_two = editCyclesPopupView.findViewById(R.id.s2_up);
     top_anchor = editCyclesPopupView.findViewById(R.id.top_anchor);
-    infinity_one = editCyclesPopupView.findViewById(R.id.infinity_one);
-    infinity_two = editCyclesPopupView.findViewById(R.id.infinity_two);
+//    infinity_one = editCyclesPopupView.findViewById(R.id.infinity_one);
+//    infinity_two = editCyclesPopupView.findViewById(R.id.infinity_two);
     start_timer = editCyclesPopupView.findViewById(R.id.start_timer);
 
     sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
@@ -462,8 +462,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
     sortCheckmark = sortCyclePopupView.findViewById(R.id.sortCheckmark);
-    infinity_one.setVisibility(View.INVISIBLE);
-    infinity_two.setVisibility(View.INVISIBLE);
+//    infinity_one.setVisibility(View.INVISIBLE);
+//    infinity_two.setVisibility(View.INVISIBLE);
 
     sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
 
@@ -509,7 +509,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
     breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
-    countUpMode(true); countUpMode(false);
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
     removeEditViews();
@@ -545,6 +544,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecycler.setLayoutManager(lm);
+
+    countUpMode(true); countUpMode(false);
 
     fab.setOnClickListener(v -> {
       editCyclesPopupWindow.showAsDropDown(tabLayout);
@@ -1239,40 +1240,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_sep.setVisibility(View.GONE);
     third_value_edit_two.setVisibility(View.GONE);
   }
-
-  @SuppressLint("ClickableViewAccessibility")
-  public void toggleCountUpViews(boolean onSets, boolean countingUp) {
-    removeEditViews();
-    if (countingUp) {
-      if (onSets) {
-        first_value_textView.setVisibility(View.INVISIBLE);
-        infinity_one.setVisibility(View.VISIBLE);
-        plus_first_value.setEnabled(false);
-        minus_first_value.setEnabled(false);
-        infinity_mode_one = true;
-      } else {
-        second_value_textView.setVisibility(View.INVISIBLE);
-        infinity_two.setVisibility(View.VISIBLE);
-        plus_second_value.setEnabled(false);
-        minus_second_value.setEnabled(false);
-        infinity_mode_two = true;
-      }
-    } else {
-      if (onSets) {
-        first_value_textView.setVisibility(View.VISIBLE);
-        infinity_one.setVisibility(View.INVISIBLE);
-        plus_first_value.setEnabled(true);
-        minus_first_value.setEnabled(true);
-        infinity_mode_one = false;
-      } else {
-        second_value_textView.setVisibility(View.VISIBLE);
-        infinity_two.setVisibility(View.INVISIBLE);
-        plus_second_value.setEnabled(true);
-        minus_second_value.setEnabled(true);
-        infinity_mode_two = false;
-      }
-    }
-  }
+//
+//  @SuppressLint("ClickableViewAccessibility")
+//  public void toggleCountUpViews(boolean onSets, boolean countingUp) {
+//    removeEditViews();
+//    if (countingUp) {
+//      if (onSets) {
+//        first_value_textView.setVisibility(View.INVISIBLE);
+//        infinity_one.setVisibility(View.VISIBLE);
+//        plus_first_value.setEnabled(false);
+//        minus_first_value.setEnabled(false);
+//        infinity_mode_one = true;
+//      } else {
+//        second_value_textView.setVisibility(View.INVISIBLE);
+//        infinity_two.setVisibility(View.VISIBLE);
+//        plus_second_value.setEnabled(false);
+//        minus_second_value.setEnabled(false);
+//        infinity_mode_two = true;
+//      }
+//    } else {
+//      if (onSets) {
+//        first_value_textView.setVisibility(View.VISIBLE);
+//        infinity_one.setVisibility(View.INVISIBLE);
+//        plus_first_value.setEnabled(true);
+//        minus_first_value.setEnabled(true);
+//        infinity_mode_one = false;
+//      } else {
+//        second_value_textView.setVisibility(View.VISIBLE);
+//        infinity_two.setVisibility(View.INVISIBLE);
+//        plus_second_value.setEnabled(true);
+//        minus_second_value.setEnabled(true);
+//        infinity_mode_two = false;
+//      }
+//    }
+//  }
 
   public void editCycleViews() {
     //Instance of layout objects we can set programatically based on which mode we're on.
@@ -1369,7 +1370,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           upDown_arrow_one.setTag(COUNTING_UP);
           upDown_arrow_one.setImageResource(R.drawable.arrow_up);;
           prefEdit.putBoolean("setCountUpMode", true);
-          toggleCountUpViews(true, true);
+          cycleRoundsAdapter.countingUpSets(true);
+//          toggleCountUpViews(true, true);
         } else {
           //Moving to COUNT DOWN mode.
           setsAreCountingUp = false;
@@ -1377,7 +1379,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           upDown_arrow_one.setImageResource(R.drawable.arrow_down);
           upDown_arrow_one.setTag(1);
           prefEdit.putBoolean("setCountUpMode", false);
-          toggleCountUpViews(true, false);
+          cycleRoundsAdapter.countingUpSets(false);
+//          toggleCountUpViews(true, false);
         }
       } else {
         //Moving to COUNT UP mode.
@@ -1386,14 +1389,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           upDown_arrow_two.setTag(COUNTING_UP);
           upDown_arrow_two.setImageResource(R.drawable.arrow_up);
           prefEdit.putBoolean("breakCountUpMode", true);
-          toggleCountUpViews(false, true);
+//          toggleCountUpViews(false, true);
         } else {
           //Moving to COUNT DOWN mode.
           breaksAreCountingUp = false;
           upDown_arrow_two.setTag(COUNTING_DOWN);
           upDown_arrow_two.setImageResource(R.drawable.arrow_down);
           prefEdit.putBoolean("breakCountUpMode", false);
-          toggleCountUpViews(false, false);
+//          toggleCountUpViews(false, false);
         }
       }
     } else if (mode==2) {
@@ -1403,16 +1406,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_one.setTag(COUNTING_UP);
         upDown_arrow_one.setImageResource(R.drawable.arrow_up);
         prefEdit.putBoolean("breakOnlyCountUpMode", true);
-        toggleCountUpViews(false, true);
+//        toggleCountUpViews(false, true);
       } else {
         breaksOnlyAreCountingUp = false;
         upDown_arrow_one.setTag(COUNTING_DOWN);
         upDown_arrow_one.setImageResource(R.drawable.arrow_down);
         prefEdit.putBoolean("breakOnlyCountUpMode", false);
-        toggleCountUpViews(false, false);
+//        toggleCountUpViews(false, false);
       }
     }
     prefEdit.apply();
+    cycleRoundsAdapter.notifyDataSetChanged();
   }
 
 //        cycle_header_text.setOnClickListener(v-> {

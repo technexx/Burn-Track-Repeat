@@ -4,12 +4,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -23,14 +22,23 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_TWO = 2;
   public static final int MODE_THREE = 3;
   int mMode;
+  public boolean mSetsUp;
+  public boolean mBreaksUp;
 
   public CycleRoundsAdapter(ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList) {
     this.mSetsList = setsList; this.mBreaksList = breaksList; this.mBreaksOnlyList = breaksOnlyList;
   }
 
-  //Todo: Remember to call this.
   public void setMode(int mode) {
     mMode = mode;
+  }
+
+  public void countingUpSets(boolean setsUp) {
+    mSetsUp = setsUp;
+  }
+
+  public void countingUpBreaks(boolean breaksUp) {
+    mBreaksUp = breaksUp;
   }
 
   @NonNull
@@ -53,7 +61,14 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     if (holder instanceof ModeOneRounds) {
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
-      modeOneRounds.round_sets.setText(mSetsList.get(position));
+      if (!mSetsUp) {
+        modeOneRounds.round_sets.setText(mSetsList.get(position));
+        modeOneRounds.round_sets.setBackgroundResource(0);
+      } else {
+        modeOneRounds.round_sets.setText("");
+        modeOneRounds.round_sets.setBackgroundResource(R.drawable.infinity_icon_small);
+      }
+
       modeOneRounds.round_breaks.setText(mBreaksList.get(position));
     } else if (holder instanceof ModeTwoRounds) {
       ModeTwoRounds modeTwoRounds = (ModeTwoRounds) holder;
