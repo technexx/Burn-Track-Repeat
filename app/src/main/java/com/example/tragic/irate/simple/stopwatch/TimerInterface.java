@@ -51,6 +51,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public Handler mHandler;
   TextView lastTextView;
 
+  String cycle_title;
   long setValue;
   long breakValue;
   long breaksOnlyValue;
@@ -288,6 +289,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Receives lists passed in from Main.
     Intent intent = getIntent();
     mode = intent.getIntExtra("mode", 0);
+    cycle_title = intent.getStringExtra("cycleTitle");
     switch (mode) {
       case 1:
         //Todo: We use(d) separate lists in this activity for up/down modes.

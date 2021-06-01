@@ -37,10 +37,15 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesBO;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener {
@@ -104,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int breaksOnlyID;
   int pomID;
 
+  EditText cycle_name_edit;
   TextView s1;
   TextView s2;
   TextView s3;
@@ -130,8 +136,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton upDown_arrow_one;
   ImageButton upDown_arrow_two;
   View top_anchor;
-//  ImageView infinity_one;
-//  ImageView infinity_two;
   boolean infinity_mode_one;
   boolean infinity_mode_two;
   Button start_timer;
@@ -146,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> convertedSetsList;
   ArrayList<String> convertedBreaksList;
   ArrayList<String> convertedBreaksOnlyList;
+  ArrayList<String> pomString;
 
   int setValue;
   int breakValue;
@@ -181,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean breaksOnlyAreCountingUp;
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
+  boolean newCycle;
 
 
   //Todo: Revive db w/ new UI.
@@ -390,7 +396,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     mainView = findViewById(R.id.main_layout);
-    AsyncTask.execute(() -> cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext()));
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
@@ -423,6 +428,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
     cl = findViewById(R.id.main_layout);
+    cycle_name_edit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
     s1 = editCyclesPopupView.findViewById(R.id.s1);
     s2 = editCyclesPopupView.findViewById(R.id.s2);
     s3 = editCyclesPopupView.findViewById(R.id.s3);
@@ -449,8 +455,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     upDown_arrow_one = editCyclesPopupView.findViewById(R.id.s1_up);
     upDown_arrow_two = editCyclesPopupView.findViewById(R.id.s2_up);
     top_anchor = editCyclesPopupView.findViewById(R.id.top_anchor);
-//    infinity_one = editCyclesPopupView.findViewById(R.id.infinity_one);
-//    infinity_two = editCyclesPopupView.findViewById(R.id.infinity_two);
     start_timer = editCyclesPopupView.findViewById(R.id.start_timer);
 
     sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
@@ -458,8 +462,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
     sortCheckmark = sortCyclePopupView.findViewById(R.id.sortCheckmark);
-//    infinity_one.setVisibility(View.INVISIBLE);
-//    infinity_two.setVisibility(View.INVISIBLE);
 
     sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
 
@@ -477,6 +479,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertedSetsList = new ArrayList<>();
     convertedBreaksList = new ArrayList<>();
     convertedBreaksOnlyList = new ArrayList<>();
+    pomString = new ArrayList<>();
 
     //Database entity lists.
     cyclesList = new ArrayList<>();
@@ -511,6 +514,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCycleViews();
     convertEditTime(true);
     setEditValues();
+
+    AsyncTask.execute(() -> {
+      //Loads database of saved cycles.
+      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+      //Instantiates cycleList object based on sort order. For app launch, this is defaulting to "1", or "most recent."
+      queryCycles();
+    });
+
 
     TextWatcher textWatcher = new TextWatcher() {
       @Override
@@ -592,7 +603,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    //Todo: Triggers textView show on infinity mode.
     //Dismisses editText views if we click within the unpopulated area of popUp.
     editCyclesPopupView.setOnClickListener(v-> {
       removeEditViews();
@@ -790,9 +800,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     start_timer.setOnClickListener(v-> {
+      //If cycle has zero rounds, set this to true which returns a Toast rather than switching activities.
       boolean emptyCycle = false;
+      //Name entered in the editText for the current cycle.
+      String cycle_name = cycle_name_edit.getText().toString();
       Intent intent = new Intent(MainActivity.this, TimerInterface.class);
       intent.putExtra("mode", mode);
+      intent.putExtra("cycleTitle", cycle_name);
+      //Gets current date for use in empty titles.
+      Calendar calendar = Calendar.getInstance();
+      SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+      String date = dateFormat.format(calendar.getTime());
       switch (mode) {
         case 1:
           if (!setsAreCountingUp) intent.putIntegerArrayListExtra("setList", customSetTime); else {
@@ -803,6 +821,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             intent.putIntegerArrayListExtra("breakList", customBreakTimeUP);
             intent.putExtra("breaksAreCountingUp", true);
           }
+          //If there is at least one round added, save it to the database.
           if (customSetTime.size()==0) emptyCycle = true;
           break;
         case 2:
@@ -818,6 +837,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
       if (!emptyCycle) startActivity(intent); else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+
     });
   }
 
@@ -1154,10 +1174,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             customSetTimeUP.add(0);
             customBreakTime.add(breakValue * 1000);
             customBreakTimeUP.add((0));
-
+            //String array that is used to convert to a single gSon String to store in database.
             convertedSetsList.add(convertSeconds(setValue));
             convertedBreaksList.add(convertSeconds(breakValue));
-            setEditValues();
           } else {
             Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
             //Return to save on resources. Also to avoid unnecessary fading in Pom mode.
@@ -1168,8 +1187,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (breaksOnlyTime.size() < 8) {
             breaksOnlyTime.add(breaksOnlyValue * 1000);
             breaksOnlyTimeUP.add((0));
+            //String array that is used to convert to a single gSon String to store in database.
             convertedBreaksOnlyList.add(convertSeconds(breaksOnlyValue));
-            setEditValues();
           } else {
             Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
             return;
@@ -1183,15 +1202,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             pomValuesTime.add(pomValue1);
             pomValuesTime.add(pomValue3);
-            setEditValues();
           } else {
             Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
             return;
           }
           break;
       }
-      //Resetting the "add/subtract fade" alpha to 5 to ensure we always fade in from black.
-//            dotDraws.fadeDotDraw(5, true);
+      setEditValues();
     } else {
       switch (mode) {
         case 1:
@@ -1422,6 +1439,127 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
   }
 
+  public void queryCycles() {
+    switch (mode) {
+      case 1:
+        switch (sortMode) {
+          case 1:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
+            sortCheckmark.setY(14);
+            break;
+          case 2:
+            cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent();
+            sortCheckmark.setY(110);
+            break;
+          case 3:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+            sortCheckmark.setY(206);
+            break;
+          case 4:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+            sortCheckmark.setY(302);
+            break;
+        }
+        break;
+      case 2:
+        switch (sortModeBO) {
+          case 1:
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
+            sortCheckmark.setY(14);
+            break;
+          case 2:
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCycleLeastRecentBO();
+            sortCheckmark.setY(110);
+            break;
+          case 3:
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO();
+            sortCheckmark.setY(206);
+            break;
+          case 4:
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO();
+            sortCheckmark.setY(302);
+        }
+        break;
+      case 3:
+        switch (sortModePom) {
+          case 1:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+            sortCheckmark.setY(14);
+            break;
+          case 2:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
+            sortCheckmark.setY(110);
+            break;
+        }
+        break;
+    }
+  }
+
+  private void saveCycles() {
+    //All run on separate thread to keep in sync.
+    AsyncTask.execute(()-> {
+      //Gets current date for use in empty titles.
+      Calendar calendar = Calendar.getInstance();
+      SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+      String date = dateFormat.format(calendar.getTime());
+
+      //Sets up Strings to save into database.
+      Gson gson = new Gson();
+      String setString;
+      String breakString;
+      String breakOnlyString;
+      String pomString;
+      String cycle_name = cycle_name_edit.getText().toString();
+
+      switch (mode) {
+        case 1:
+          //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
+          if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesList.get(cyclesList.size()-1);
+          //Converting our String array of rounds in a cycle to a single String so it can be stored in our database.
+          setString = gson.toJson(convertedSetsList);
+          breakString = gson.toJson(convertedBreaksList);
+          setString = setString.replace("\"", "");
+          setString = setString.replace("]", "");
+          setString =  setString.replace("[", "");
+          setString = setString.replace(",", " - ");
+          breakString = breakString.replace("\"", "");
+          breakString = breakString.replace("]", "");
+          breakString = breakString.replace("[", "");
+          breakString = breakString.replace(",", " - ");
+          cycles.setSets(setString);
+          cycles.setBreaks(breakString);
+          if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
+          cyclesDatabase.cyclesDao().insertCycle(cycles);
+          break;
+        case 2:
+          //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
+          if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesBOList.get(cyclesBOList.size()-1);
+          breakOnlyString = gson.toJson(convertedBreaksOnlyList);
+          breakOnlyString = breakOnlyString.replace("\"", "");
+          breakOnlyString = breakOnlyString.replace("]", "");
+          breakOnlyString = breakOnlyString.replace("[", "");
+          breakOnlyString = breakOnlyString.replace(",", " - ");
+          cyclesBO.setBreaksOnly(breakOnlyString);
+          if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
+          cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
+          break;
+        case 3:
+          //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
+          if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) pomCycles = pomCyclesList.get(pomCyclesList.size()-1);
+          pomString = gson.toJson(pomValuesTime);
+          pomString = pomString.replace("]", "");
+          pomString = pomString.replace("[", "");
+          pomString = pomString.replace(",", " -");
+          pomCycles.setFullCycle(pomString);
+          if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
+          cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
+          break;
+      }
+      //Todo: Save to db in same function.
+
+    });
+  }
+
 //        cycle_header_text.setOnClickListener(v-> {
 //            confirm_header_
 //            save.setText(R.string.update_cycles);
@@ -1492,61 +1630,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        }
 //    }
 
-//    public void queryCycles() {
-//        switch (mode) {
-//            case 1:
-//                switch (sortMode) {
-//                    case 1:
-//                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
-//                        sortCheckmark.setY(14);
-//                        break;
-//                    case 2:
-//                        cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent();
-//                        sortCheckmark.setY(110);
-//                        break;
-//                    case 3:
-//                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
-//                        sortCheckmark.setY(206);
-//                        break;
-//                    case 4:
-//                        cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
-//                        sortCheckmark.setY(302);
-//                        break;
-//                }
-//                break;
-//            case 2:
-//                switch (sortModeBO) {
-//                    case 1:
-//                        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
-//                        sortCheckmark.setY(14);
-//                        break;
-//                    case 2:
-//                        cyclesBOList = cyclesDatabase.cyclesDao().loadCycleLeastRecentBO();
-//                        sortCheckmark.setY(110);
-//                        break;
-//                    case 3:
-//                        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO();
-//                        sortCheckmark.setY(206);
-//                        break;
-//                    case 4:
-//                        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO();
-//                        sortCheckmark.setY(302);
-//                }
-//                break;
-//            case 3:
-//                switch (sortModePom) {
-//                    case 1:
-//                        pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-//                        sortCheckmark.setY(14);
-//                        break;
-//                    case 2:
-//                        pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
-//                        sortCheckmark.setY(110);
-//                        break;
-//                }
-//                break;
-//        }
-//    }
 //
 //    public void canSaveOrUpdate(boolean yesWeCan) {
 //        switch (mode) {
@@ -1695,8 +1778,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //
 //                    //If cycle is not duplicate OR size is 0 (nothing to duplicate), we proceed with insert/update.
 //                    if (!duplicateCycle || cyclesList.size()==0) {
-//                        cycles.setSets(convertedSetList);
-//                        cycles.setBreaks(convertedBreakList);
+//                        cycles.setSets(setString);
+//                        cycles.setBreaks(breakString);
 //                        cycles.setTimeAdded(System.currentTimeMillis());
 //                        cycles.setItemCount(customSetTime.size());
 //                        if (saveOrUpdate == SAVING_CYCLES){
@@ -1728,7 +1811,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                    breaksOnlyTitleArray.add(cycle_header_text.getText().toString());
 //
 //                    if (!duplicateCycle || cyclesBOList.size()==0) {
-//                        cyclesBO.setBreaksOnly(convertedBreakOnlyList);
+//                        cyclesBO.setBreaksOnly(breakOnlyString);
 //                        cyclesBO.setTimeAdded(System.currentTimeMillis());
 //                        cyclesBO.setItemCount(breaksOnlyTime.size());
 //                        if (saveOrUpdate == SAVING_CYCLES) {
@@ -1756,7 +1839,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                    pomCyclesTitleArray.add(cycle_header_text.getText().toString());
 //
 //                    if (!duplicateCycle && pomCyclesList.size()==0) {
-//                        pomCycles.setFullCycle(convertedPomList);
+//                        pomCycles.setFullCycle(pomString);
 //                        pomCycles.setTimeAdded(System.currentTimeMillis());
 //                        if (saveOrUpdate == SAVING_CYCLES) {
 //                            cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
@@ -1867,88 +1950,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        });
 //    }
 
-//    //All convertedLists are used in save/update method.
-//    private void retrieveAndCheckCycles() {
-//        queryCycles();
-//        Gson gson = new Gson();
-//        ArrayList<Long> tempSets = new ArrayList<>();
-//        ArrayList<Long> tempBreaks = new ArrayList<>();
-//        ArrayList<Long> tempBreaksOnly = new ArrayList<>();
-//
-//        switch (mode) {
-//            //Getting an instance of our current cycles' array list.
-//            case 1:
-//                for (int i=0; i<customSetTime.size(); i++) {
-//                    tempSets.add(customSetTime.get(i) /1000);
-//                }
-//                for (int i=0; i<customBreakTime.size(); i++){
-//                    tempBreaks.add(customBreakTime.get(i)/1000);
-//                }
-//                //Editing our displayed cycles' string array to sync with the retrieved format of our database's saved cycles.
-//                convertedSetList = gson.toJson(tempSets);
-//                convertedBreakList = gson.toJson(tempBreaks);
-//                convertedSetList = convertedSetList.replace("\"", "");
-//                convertedSetList = convertedSetList.replace("]", "");
-//                convertedSetList = convertedSetList.replace("[", "");
-//                convertedSetList = convertedSetList.replace(",", " - ");
-//                convertedBreakList = convertedBreakList.replace("\"", "");
-//                convertedBreakList = convertedBreakList.replace("]", "");
-//                convertedBreakList = convertedBreakList.replace("[", "");
-//                convertedBreakList = convertedBreakList.replace(",", " - ");
-//
-//                //If our displayed cycles and title match any database entry EXACTLY, we set duplicateCycle to true.
-//                boolean endLoop = false;
-//                if (cyclesList.size()>0) {
-//                    for (int i=0; i<cyclesList.size(); i++) {
-//                        if (!endLoop) {
-//                            if (cyclesList.get(i).getSets().equals(convertedSetList) && cyclesList.get(i).getBreaks().equals(convertedBreakList) && cyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString())) {
-//                                duplicateCycle = true; endLoop = true;
-//                            }
-//                        }
-//                        duplicateCycle = endLoop;
-//                    }
-//                }
-//                break;
-//            case 2:
-//                for (int i=0; i<breaksOnlyTime.size(); i++) {
-//                    tempBreaksOnly.add(breaksOnlyTime.get(i)/1000);
-//                }
-//                convertedBreakOnlyList = gson.toJson(tempBreaksOnly);
-//                convertedBreakOnlyList = convertedBreakOnlyList.replace("\"", "");
-//                convertedBreakOnlyList = convertedBreakOnlyList.replace("]", "");
-//                convertedBreakOnlyList = convertedBreakOnlyList.replace("[", "");
-//                convertedBreakOnlyList = convertedBreakOnlyList.replace(",", " - ");
-//
-//                if (cyclesBOList.size()>0) {
-//                    for (int i=0; i<cyclesBOList.size(); i++) {
-//                        if (cyclesBOList.get(i).getBreaksOnly().equals(convertedBreakOnlyList) && cyclesBOList.get(i).getTitle().equals(cycle_header_text.getText().toString()))
-//                            duplicateCycle = true;
-//                    }
-//                }
-//                break;
-//            case 3:
-//                convertedPomList = gson.toJson(pomValuesTime);
-//
-//                String[] pomSplit = convertedPomList.split(",", 0);
-//                convertedPomList = "";
-//                for (int i=0; i<pomSplit.length; i++) {
-//                    if (pomSplit[i].length()<2) pomSplit[i] = "0" + pomSplit[i];
-//                }
-//
-//                convertedPomList = Arrays.toString(pomSplit);
-//                convertedPomList = convertedPomList.replace("]", "");
-//                convertedPomList = convertedPomList.replace("[", "");
-//                convertedPomList = convertedPomList.replace(",", " -");
-//
-//                if (pomCyclesList.size()>0) {
-//                    for (int i=0; i<pomCyclesList.size(); i++) {
-//                        if (pomCyclesList.get(i).getFullCycle().equals(convertedPomList) && pomCyclesList.get(i).getTitle().equals(cycle_header_text.getText().toString()))
-//                            duplicateCycle = true;
-//                    }
-//                }
-//                break;
-//        }
-//    }
 //
 //    //Removes a set or break and calls function to update the millis value.
 //    public void removeSetOrBreak(boolean onSet) {
