@@ -53,9 +53,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mOnDeleteCycleListener = xOnDeleteCycleListener;
   }
 
-  public SavedCycleAdapter() {
-  }
-
   public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> pomList, ArrayList<String> title, ArrayList<String> breaksOnlyTitle, ArrayList<String> pomTitle) {
     this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mPomList = pomList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitle; this.mPomTitle = pomTitle;
   }
@@ -95,6 +92,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.fullView.setOnClickListener(v -> {
         mOnCycleClickListener.onCycleClick(position);
       });
+
+      //Todo: This callback should be used in recyclerView of Main (in supperActionBar).
 //      customHolder.customTrash.setOnClickListener(v-> {
 //        mOnDeleteCycleListener.onCycleDelete(position);
 //      });
@@ -107,9 +106,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       breaksOnlyHolder.fullView.setOnClickListener(v -> {
         mOnCycleClickListener.onCycleClick(position);
       });
-//      breaksOnlyHolder.breaksOnlyTrash.setOnClickListener(v-> {
-//        mOnDeleteCycleListener.onCycleDelete(position);
-//      });
 
     } else if (holder instanceof PomHolder) {
       PomHolder pomHolder = (PomHolder) holder;
@@ -132,10 +128,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       pomHolder.fullView.setOnClickListener(v-> {
         mOnCycleClickListener.onCycleClick(position);
       });
-
-//      pomHolder.pomTrash.setOnClickListener(v-> {
-//        mOnDeleteCycleListener.onCycleDelete(position);
-//      });
     }
   }
 
@@ -221,6 +213,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //Splitting into String[] entries.
       newSplit = listConv.split(" - ", 0);
 
+      //Todo: newSplit values should be WHOLE seconds when coming in to parse into Long, and converted via convertSeconds() below.
       for (int k=0; k<newSplit.length; k++) {
         //Creating new ArrayList of Long values.
         newLong.add(Long.parseLong(newSplit[k]));
@@ -243,6 +236,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
     long remainingSeconds;
+    totalSeconds = totalSeconds/1000;
 
     if (totalSeconds >=60) {
       minutes = totalSeconds/60;
