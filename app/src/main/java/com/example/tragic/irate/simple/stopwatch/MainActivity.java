@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int customID;
   int breaksOnlyID;
   int pomID;
+  int SAVING_CYCLE = 1;
+  int UPDATING_CYCLE = 2;
 
   EditText cycle_name_edit;
   TextView s1;
@@ -233,9 +235,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
+  //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
-
+    receivedPos = position;
   }
 
 //    @Override
@@ -852,7 +855,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Launches timer class.
         startActivity(intent);
         //Saves the current cycle into database.
-        saveCycles();
+        saveCycles(true);
         //
       } else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
     });
@@ -1512,7 +1515,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void saveCycles() {
+  private void saveCycles(boolean newCycle) {
     //All run on separate thread to keep in sync.
     AsyncTask.execute(()-> {
       //Gets current date for use in empty titles.
@@ -1527,11 +1530,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String breakOnlyString;
       String pomString;
       String cycle_name = cycle_name_edit.getText().toString();
+      int cycleID;
 
       switch (mode) {
         case 1:
+          //Gets the ID of the cycle instance we have clicked on from its position.
+          cycleID = cyclesList.get(receivedPos).getId();
           //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
-          if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesList.get(cyclesList.size()-1);
+          if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           //Converting our String array of rounds in a cycle to a single String so it can be stored in our database.
           setString = gson.toJson(convertedSetsList);
           breakString = gson.toJson(convertedBreaksList);
@@ -1550,11 +1556,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycles.setSets(setString);
           cycles.setBreaks(breakString);
           if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
-          cyclesDatabase.cyclesDao().insertCycle(cycles);
+          if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
           break;
         case 2:
+          //Gets the ID of the cycle instance we have clicked on from its position.
+          cycleID = cyclesBOList.get(receivedPos).getId();
           //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
-          if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesBOList.get(cyclesBOList.size()-1);
+          if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
           breakOnlyString = gson.toJson(convertedBreaksOnlyList);
           breakOnlyString = breakOnlyString.replace("\"", "");
           breakOnlyString = breakOnlyString.replace("]", "");
@@ -1563,11 +1571,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           concatBOString = breakOnlyString;
           cyclesBO.setBreaksOnly(breakOnlyString);
           if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
-          cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
+          if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
           break;
         case 3:
+          //Gets the ID of the cycle instance we have clicked on from its position.
+          cycleID = pomCyclesList.get(receivedPos).getId();
           //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
-          if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) pomCycles = pomCyclesList.get(pomCyclesList.size()-1);
+          if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
           pomString = gson.toJson(pomValuesTime);
           pomString = pomString.replace("]", "");
           pomString = pomString.replace("[", "");
@@ -1575,7 +1585,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           concatPomString = pomString;
           pomCycles.setFullCycle(pomString);
           if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
-          cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
+          if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
           break;
       }
     });
