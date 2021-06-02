@@ -238,6 +238,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onCycleClick(int position) {
     receivedPos = position;
+    //Todo: Launch Timer w/ cycle in this position. Move start_timer onClick stuff to function w/ array inputs.
+    Intent intent = new Intent(MainActivity.this, TimerInterface.class);
   }
 
 //    @Override
