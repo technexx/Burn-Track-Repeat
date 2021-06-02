@@ -156,10 +156,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> customTitleArray;
   ArrayList<String> breaksOnlyTitleArray;
   ArrayList<String> pomTitleArray;
-  String concatSetString;
-  String concatBreakString;
-  String concatBOString;
-  String concatPomString;
 
   int setValue;
   int breakValue;
@@ -1549,9 +1545,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           breakString = breakString.replace("]", "");
           breakString = breakString.replace("[", "");
           breakString = breakString.replace(",", " - ");
-          //Used in our savedCycleAdapter.
-          concatSetString = setString;
-          concatBreakString = breakString;
           //Adding and inserting into database.
           cycles.setSets(setString);
           cycles.setBreaks(breakString);
@@ -1568,8 +1561,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           breakOnlyString = breakOnlyString.replace("]", "");
           breakOnlyString = breakOnlyString.replace("[", "");
           breakOnlyString = breakOnlyString.replace(",", " - ");
-          concatBOString = breakOnlyString;
-          cyclesBO.setBreaksOnly(breakOnlyString);
           if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
           if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
           break;
@@ -1582,8 +1573,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomString = pomString.replace("]", "");
           pomString = pomString.replace("[", "");
           pomString = pomString.replace(",", " -");
-          concatPomString = pomString;
-          pomCycles.setFullCycle(pomString);
           if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
           if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
           break;
