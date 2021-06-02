@@ -150,7 +150,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> convertedSetsList;
   ArrayList<String> convertedBreaksList;
   ArrayList<String> convertedBreaksOnlyList;
-  ArrayList<String> pomString;
+  ArrayList<String> convertedPomList;
+  ArrayList<String> customTitleArray;
+  ArrayList<String> breaksOnlyTitleArray;
+  ArrayList<String> pomTitleArray;
+  String concatSetString;
+  String concatBreakString;
+  String concatBOString;
+  String concatPomString;
 
   int setValue;
   int breakValue;
@@ -190,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   //Todo: Revive db w/ new UI.
+  //Todo: Long click to highlight cycle in Main, which bring up a "select all" and "delete/trash" button in action bar.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
 
@@ -405,12 +413,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     fab = findViewById(R.id.fab);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
-//        LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-//        savedCycleAdapter = new SavedCycleAdapter();
-//        savedCycleRecycler.setAdapter(savedCycleAdapter);
-//        savedCycleRecycler.setLayoutManager(lm2);
-//        savedCycleAdapter.setItemClick(MainActivity.this);
-//        savedCycleAdapter.setDeleteCycle(MainActivity.this);
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
@@ -476,10 +478,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     customBreakTimeUP = new ArrayList<>();
     breaksOnlyTimeUP = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
+    customTitleArray = new ArrayList<>();
+    breaksOnlyTitleArray = new ArrayList<>();
+    pomTitleArray = new ArrayList<>();
     convertedSetsList = new ArrayList<>();
     convertedBreaksList = new ArrayList<>();
     convertedBreaksOnlyList = new ArrayList<>();
-    pomString = new ArrayList<>();
+    convertedPomList = new ArrayList<>();
 
     //Database entity lists.
     cyclesList = new ArrayList<>();
@@ -488,6 +493,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles = new Cycles();
     cyclesBO = new CyclesBO();
     pomCycles = new PomCycles();
+
+    LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
+    //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
+    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
+    savedCycleRecycler.setAdapter(savedCycleAdapter);
+    savedCycleRecycler.setLayoutManager(lm2);
+    savedCycleAdapter.setItemClick(MainActivity.this);
+    savedCycleAdapter.setDeleteCycle(MainActivity.this);
 
     mHandler = new Handler();
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
@@ -521,7 +534,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Instantiates cycleList object based on sort order. For app launch, this is defaulting to "1", or "most recent."
       queryCycles();
     });
-
 
     TextWatcher textWatcher = new TextWatcher() {
       @Override
@@ -836,8 +848,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (pomValuesTime.size()==0) emptyCycle = true;
           break;
       }
-      if (!emptyCycle) startActivity(intent); else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
-
+      if (!emptyCycle) {
+        //Launches timer class.
+        startActivity(intent);
+        //Saves the current cycle into database.
+        saveCycles();
+        //
+      } else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
     });
   }
 
@@ -1526,6 +1543,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           breakString = breakString.replace("]", "");
           breakString = breakString.replace("[", "");
           breakString = breakString.replace(",", " - ");
+          //Used in our savedCycleAdapter.
+          concatSetString = setString;
+          concatBreakString = breakString;
+          //Adding and inserting into database.
           cycles.setSets(setString);
           cycles.setBreaks(breakString);
           if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
@@ -1539,6 +1560,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           breakOnlyString = breakOnlyString.replace("]", "");
           breakOnlyString = breakOnlyString.replace("[", "");
           breakOnlyString = breakOnlyString.replace(",", " - ");
+          concatBOString = breakOnlyString;
           cyclesBO.setBreaksOnly(breakOnlyString);
           if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
           cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
@@ -1550,14 +1572,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomString = pomString.replace("]", "");
           pomString = pomString.replace("[", "");
           pomString = pomString.replace(",", " -");
+          concatPomString = pomString;
           pomCycles.setFullCycle(pomString);
           if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
           cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
           break;
       }
-      //Todo: Save to db in same function.
-
     });
+  }
+
+  //Todo: If fetching from cycleList and called at the same time as db is updated (which is the case), this needs to be on the same aSync thread as the save AND preceded by an updated query of the cycleList.
+  public void populateCycleList() {
+    switch (mode) {
+      case 1:
+        if (setsArray!=null) setsArray.clear();
+        if (breaksArray!=null) breaksArray.clear();
+        if (customTitleArray!=null) customTitleArray.clear();
+        for (int i=0; i<cyclesList.size(); i++) {
+          setsArray.add(cyclesList.get(i).getSets());
+          breaksArray.add(cyclesList.get(i).getBreaks());
+          customTitleArray.add(cyclesList.get(i).getTitle());
+        }
+        break;
+      case 2:
+        if (breaksOnlyArray!=null) breaksOnlyArray.clear();
+        if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
+        for (int i=0; i<cyclesBOList.size(); i++) {
+          breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+          breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
+        }
+        break;
+      case 3:
+        if (pomArray!=null) pomArray.clear();
+        for (int i=0; i<pomCyclesList.size(); i++) {
+          pomArray.add(pomCyclesList.get(0).getFullCycle());
+          pomTitleArray.add(pomCyclesList.get(0).getTitle());
+        }
+    }
+    savedCycleAdapter.notifyDataSetChanged();
   }
 
 //        cycle_header_text.setOnClickListener(v-> {
@@ -1587,48 +1639,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        update_cycles.setOnClickListener(v-> {
 //            confirmedSaveOrUpdate(UPDATING_CYCLES);
 //        });
-
-//    public void clearArrays(boolean populateList) {
-//        switch (mode) {
-//            case 1:
-//                if (setsArray!=null) setsArray.clear();
-//                if (breaksArray!=null) breaksArray.clear();
-//                if (customTitleArray!=null) customTitleArray.clear();
-//
-//                if (populateList) {
-//                    for (int i=0; i<cyclesList.size(); i++) {
-//                        setsArray.add(cyclesList.get(i).getSets());
-//                        breaksArray.add(cyclesList.get(i).getBreaks());
-//                        customTitleArray.add(cyclesList.get(i).getTitle());
-//                    }
-//                    if (setsArray.size()>0) runOnUiThread(() -> { savedCycleAdapter.notifyDataSetChanged();
-//                    });
-//                }
-//                break;
-//            case 2:
-//                if (breaksOnlyArray!=null) breaksOnlyArray.clear();
-//                if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
-//
-//                if (populateList) {
-//                    for (int i=0; i<cyclesBOList.size(); i++) {
-//                        breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-//                        breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
-//                    }
-//                    if (breaksOnlyArray.size()>0) runOnUiThread(() -> { savedCycleAdapter.notifyDataSetChanged();
-//                    });
-//                }
-//                break;
-//            case 3:
-//                if (pomArray!=null) pomArray.clear();
-//                if (populateList) {
-//                    for (int i=0; i<pomCyclesList.size(); i++) {
-//                        pomArray.add(pomCyclesList.get(0).getFullCycle());
-//                        pomCyclesTitleArray.add(pomCyclesList.get(0).getTitle());
-//                    }
-//                    if (pomArray.size()>0) runOnUiThread(()-> savedCycleAdapter.notifyDataSetChanged());
-//                }
-//        }
-//    }
 
 //
 //    public void canSaveOrUpdate(boolean yesWeCan) {
@@ -1746,124 +1756,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        }
 //    }
 
-//    //Actually saves or updates the cycle.
-//    public void confirmedSaveOrUpdate(int saveOrUpdate) {
-//        if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
-//            Toast.makeText(getApplicationContext(), "Nothing to save!", Toast.LENGTH_SHORT).show();;
-//            return;
-//        }
-//
-//        AsyncTask.execute(() -> {
-//            //Defaulting to unique cycle unless otherwise set by retrieveAndselectRounds();
-//            duplicateCycle = false;
-//            boolean changeCycle = false;
-//            Calendar calendar = Calendar.getInstance();
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-//
-//            //Executes gSon->Json conversion and compares new String to db lists, setting duplicateCycles to TRUE if an instance matches.
-//            retrieveAndCheckCycles();
-//
-//            switch (mode) {
-//                case 1:
-//                    //New instance of the Cycle entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
-//                    if (saveOrUpdate == SAVING_CYCLES) cycles = new Cycles(); else cycles = cyclesList.get(cyclesList.size()-1);
-//
-//                    if (!cycle_header_text.getText().toString().isEmpty()) {
-//                        cycles.setTitle(cycle_header_text.getText().toString());
-//                    } else {
-//                        String newDate = dateFormat.format(calendar.getTime());
-//                        cycles.setTitle(newDate);
-//                    }
-//                    customTitleArray.add(cycle_header_text.getText().toString());
-//
-//                    //If cycle is not duplicate OR size is 0 (nothing to duplicate), we proceed with insert/update.
-//                    if (!duplicateCycle || cyclesList.size()==0) {
-//                        cycles.setSets(setString);
-//                        cycles.setBreaks(breakString);
-//                        cycles.setTimeAdded(System.currentTimeMillis());
-//                        cycles.setItemCount(customSetTime.size());
-//                        if (saveOrUpdate == SAVING_CYCLES){
-//                            cyclesDatabase.cyclesDao().insertCycle(cycles);
-//                            //Re-instantiating cycleList with new row added.
-//                            queryCycles();
-//                            //Getting ID of latest row entry.
-//                            customID = cyclesList.get(0).getId();
-//                            //Saving ID to sharedPref.
-//                            prefEdit.putInt("customID", customID);
-//                        } else cyclesDatabase.cyclesDao().updateCycles(cycles);
-//                        runOnUiThread(() -> {
-//                            if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-//                            canSaveOrUpdate(false);
-//                        });
-//                        changeCycle = true;
-//                    }
-//                    break;
-//                case 2:
-//                    //New instance of the CycleBO entity that can be used for insertion. Otherwise, inheriting the instance from onCycleClick callback that uses a specific position to update.
-//                    if (saveOrUpdate == SAVING_CYCLES) cyclesBO = new CyclesBO(); else cyclesBO = cyclesBOList.get(cyclesBOList.size()-1);
-//
-//                    if (!cycle_header_text.getText().toString().isEmpty()) {
-//                        cyclesBO.setTitle(cycle_header_text.getText().toString());
-//                    } else {
-//                        String newDate = dateFormat.format(calendar.getTime());
-//                        cyclesBO.setTitle(newDate);
-//                    }
-//                    breaksOnlyTitleArray.add(cycle_header_text.getText().toString());
-//
-//                    if (!duplicateCycle || cyclesBOList.size()==0) {
-//                        cyclesBO.setBreaksOnly(breakOnlyString);
-//                        cyclesBO.setTimeAdded(System.currentTimeMillis());
-//                        cyclesBO.setItemCount(breaksOnlyTime.size());
-//                        if (saveOrUpdate == SAVING_CYCLES) {
-//                            cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO);
-//                            queryCycles();
-//                            breaksOnlyID = cyclesBOList.get(0).getId();
-//                            prefEdit.putInt("breaksOnlyID", breaksOnlyID);
-//                        } else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-//                        runOnUiThread(() -> {
-//                            if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-//                            canSaveOrUpdate(false);
-//                        });
-//                        changeCycle = true;
-//                    }
-//                    break;
-//                case 3:
-//                    if (saveOrUpdate == SAVING_CYCLES) pomCycles = new PomCycles(); else pomCycles = pomCyclesList.get(pomCyclesList.size()-1);
-//
-//                    if (!cycle_header_text.getText().toString().isEmpty()) {
-//                        pomCycles.setTitle(cycle_header_text.getText().toString());
-//                    } else {
-//                        String newDate = dateFormat.format(calendar.getTime());
-//                        pomCycles.setTitle(newDate);
-//                    }
-//                    pomCyclesTitleArray.add(cycle_header_text.getText().toString());
-//
-//                    if (!duplicateCycle && pomCyclesList.size()==0) {
-//                        pomCycles.setFullCycle(pomString);
-//                        pomCycles.setTimeAdded(System.currentTimeMillis());
-//                        if (saveOrUpdate == SAVING_CYCLES) {
-//                            cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
-//                            queryCycles();
-//                            pomID = pomCyclesList.get(0).getId();
-//                            prefEdit.putInt("pomID", pomID);
-//                        } else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-//                        runOnUiThread(() -> {
-//                            if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-//                            canSaveOrUpdate(false);
-//                        });
-//                        changeCycle = true;
-//                    }
-//            }
-//            prefEdit.apply();
-//            boolean finalChangeCycle = changeCycle;
-//            runOnUiThread(()-> {
-//                if (duplicateCycle) Toast.makeText(getApplicationContext(), "An identical cycle already exists!", Toast.LENGTH_SHORT).show();
-//                else if (saveOrUpdate == SAVING_CYCLES && finalChangeCycle) Toast.makeText(getApplicationContext(), "Cycle added", Toast.LENGTH_SHORT).show();
-//                else if (saveOrUpdate == UPDATING_CYCLES && finalChangeCycle) Toast.makeText(getApplicationContext(), "Cycle updated", Toast.LENGTH_SHORT).show();
-//                cycle_header_text.setText(cycle_header_text.getText().toString());
-//            });
-//        });
-//    }
 
 //    //Used to retrieve a single cycle within our database. Calls populateUICycle() which sets the Array values into our timer millis values.
 //    //When recall is TRUE, retrieves the last used ID instance, when recall is FALSE, Uses a positional input from our saved cycle list.

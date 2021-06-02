@@ -21,25 +21,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/delete_pom_cycle"
         android:layout_marginEnd="5dp"
         android:textStyle="bold"
         android:textSize="15sp"
         android:layout_marginTop="24dp">
     </TextView>
-
-    <ImageButton
-        android:id="@+id/delete_pom_cycle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/pom_view"
-        app:layout_constraintTop_toTopOf="@id/pom_view"
-        app:layout_constraintBottom_toBottomOf="@id/pom_view"
-        android:background="@color/Gray"
-        android:layout_marginBottom="4dp"
-        android:src="@drawable/delete_24">
-    </ImageButton>
 
     <View
         android:layout_width="match_parent"

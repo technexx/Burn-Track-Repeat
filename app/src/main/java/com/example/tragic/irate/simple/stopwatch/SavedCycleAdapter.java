@@ -56,8 +56,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public SavedCycleAdapter() {
   }
 
-  public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> title, ArrayList<String> breaksOnlyTitleArray, ArrayList<String> pomList, ArrayList<String> pomTitle) {
-    this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitleArray; this.mPomList = pomList; this.mPomTitle = pomTitle;
+  public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> pomList, ArrayList<String> title, ArrayList<String> breaksOnlyTitle, ArrayList<String> pomTitle) {
+    this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mPomList = pomList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitle; this.mPomTitle = pomTitle;
   }
 
   public void setBreaksOnly(boolean breaksOnly){
@@ -95,9 +95,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.fullView.setOnClickListener(v -> {
         mOnCycleClickListener.onCycleClick(position);
       });
-      customHolder.customTrash.setOnClickListener(v-> {
-        mOnDeleteCycleListener.onCycleDelete(position);
-      });
+//      customHolder.customTrash.setOnClickListener(v-> {
+//        mOnDeleteCycleListener.onCycleDelete(position);
+//      });
 
     } else if (holder instanceof BreaksOnlyHolder) {
       BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
@@ -107,9 +107,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       breaksOnlyHolder.fullView.setOnClickListener(v -> {
         mOnCycleClickListener.onCycleClick(position);
       });
-      breaksOnlyHolder.breaksOnlyTrash.setOnClickListener(v-> {
-        mOnDeleteCycleListener.onCycleDelete(position);
-      });
+//      breaksOnlyHolder.breaksOnlyTrash.setOnClickListener(v-> {
+//        mOnDeleteCycleListener.onCycleDelete(position);
+//      });
 
     } else if (holder instanceof PomHolder) {
       PomHolder pomHolder = (PomHolder) holder;
@@ -133,9 +133,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mOnCycleClickListener.onCycleClick(position);
       });
 
-      pomHolder.pomTrash.setOnClickListener(v-> {
-        mOnDeleteCycleListener.onCycleDelete(position);
-      });
+//      pomHolder.pomTrash.setOnClickListener(v-> {
+//        mOnDeleteCycleListener.onCycleDelete(position);
+//      });
     }
   }
 
@@ -169,7 +169,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView customName;
     public TextView customSet;
     public TextView customBreak;
-    public ImageButton customTrash;
     public View fullView;
 
     @SuppressLint("ResourceAsColor")
@@ -178,7 +177,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customName = itemView.findViewById(R.id.custom_name_header);
       customSet = itemView.findViewById(R.id.saved_custom_set_view);
       customBreak = itemView.findViewById(R.id.saved_custom_break_view);
-      customTrash = itemView.findViewById(R.id.delete_cycle);
       fullView = itemView;
     }
   }
@@ -186,14 +184,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public class BreaksOnlyHolder extends RecyclerView.ViewHolder {
     public TextView breaksOnlyName;
     public TextView breaksOnlyBreak;
-    public ImageButton breaksOnlyTrash;
     public View fullView;
 
     public BreaksOnlyHolder(@NonNull View itemView) {
       super(itemView);
       breaksOnlyName = itemView.findViewById(R.id.breaks_only_header);
       breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
-      breaksOnlyTrash = itemView.findViewById(R.id.delete_cycle_bo);
       fullView = itemView;
     }
   }
@@ -201,14 +197,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public class PomHolder extends RecyclerView.ViewHolder {
     public TextView pomName;
     public TextView pomView;
-    public ImageButton pomTrash;
     public View fullView;
 
     public PomHolder(@NonNull View itemView) {
       super(itemView);
       pomName = itemView.findViewById(R.id.pom_header);
       pomView = itemView.findViewById(R.id.pom_view);
-      pomTrash = itemView.findViewById(R.id.delete_pom_cycle);
       fullView = itemView;
     }
   }
