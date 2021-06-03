@@ -888,15 +888,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()-> {
       //Calling cycleList instance based on sort mode.
       queryCycles();
+      //For database entities for cases 1 and 2: If value equals "0", it is a COUNT UP instance, we simply set our intent boolean to true, since we don't need any saved values. If it is a COUNT DOWN instance, we split the concatenated String of values, and iterate them into a parsed list of Integers to be used in the timer. For case 3: Only a COUNT DOWN mode, so standard retrieval.
       switch (mode) {
         case 1:
-          //Since we are coming from our saved cycle adapter's callback, cycleList will always have at least one item.
           Cycles cycles = cyclesList.get(receivedPos);
-          String[] tempSets = cycles.getSets().split(" - ");
-          String[] tempBreaks = cycles.getBreaks().split(" - ");
-          for (int i=0; i<tempSets.length; i++) {
-
+          if (cycles.getSets().equals("0")) setsAreCountingUp = true; else {
+            setsAreCountingUp = false;
+            customSetTime.clear();
+            String[] tempSets = cycles.getSets().split(" - ");
+            for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
           }
+          if (cycles.getBreaks().equals("0")) breaksAreCountingUp = true; else {
+            breaksAreCountingUp = false;
+            customBreakTime.clear();
+            String[] tempBreaks = cycles.getBreaks().split(" - ");
+            for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
+          }
+          break;
+        case 2:
+          CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
+          if (cyclesBO.getBreaksOnly().equals("0")) breaksOnlyAreCountingUp = true; else {
+            breaksOnlyAreCountingUp = false;
+            breaksOnlyTime.clear();
+            String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
+            for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
+          }
+          break;
+        case 3:
+          PomCycles pomCycles = pomCyclesList.get(receivedPos);
+          pomValuesTime.clear();
+          String[] tempPom = pomCycles.getFullCycle().split(" - ");
+          for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
+          break;
       }
     });
   }
@@ -1579,19 +1602,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (cyclesList.size()>0) cycleID = cyclesList.get(receivedPos).getId();
           //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
           if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-          //Converting our String array of rounds in a cycle to a single String so it can be stored in our database.
-          //NEW format is: "X:XX - Y:YY" etc.
-          if (!setsAreCountingUp) setString = gson.toJson(customSetTime); else setString = gson.toJson(customBreakTimeUP);
-          if (!breaksAreCountingUp) breakString = gson.toJson(customBreakTime); else breakString = gson.toJson(customBreakTimeUP);
-
-          setString = setString.replace("\"", "");
-          setString = setString.replace("]", "");
-          setString =  setString.replace("[", "");
-          setString = setString.replace(",", " - ");
-          breakString = breakString.replace("\"", "");
-          breakString = breakString.replace("]", "");
-          breakString = breakString.replace("[", "");
-          breakString = breakString.replace(",", " - ");
+          //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Set single "0" for counting up.
+          if (!setsAreCountingUp) {
+            setString = gson.toJson(customSetTime);
+            setString = setString.replace("\"", "");
+            setString = setString.replace("]", "");
+            setString =  setString.replace("[", "");
+            setString = setString.replace(",", " - ");
+          } else setString = "0";
+          if (!breaksAreCountingUp) {
+            breakString = gson.toJson(customBreakTime);
+            breakString = breakString.replace("\"", "");
+            breakString = breakString.replace("]", "");
+            breakString = breakString.replace("[", "");
+            breakString = breakString.replace(",", " - ");
+          } else breakString = "0";
           //Adding and inserting into database.
           cycles.setSets(setString);
           cycles.setBreaks(breakString);
@@ -1605,11 +1630,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (cyclesBOList.size()>0) cycleID = cyclesBOList.get(receivedPos).getId();
           //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
           if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
-          if (!breaksOnlyAreCountingUp) breakOnlyString = gson.toJson(breaksOnlyTime); else breakOnlyString = gson.toJson(breaksOnlyTime);
-          breakOnlyString = breakOnlyString.replace("\"", "");
-          breakOnlyString = breakOnlyString.replace("]", "");
-          breakOnlyString = breakOnlyString.replace("[", "");
-          breakOnlyString = breakOnlyString.replace(",", " - ");
+          if (!breaksOnlyAreCountingUp) {
+            breakOnlyString = gson.toJson(breaksOnlyTime);
+            breakOnlyString = breakOnlyString.replace("\"", "");
+            breakOnlyString = breakOnlyString.replace("]", "");
+            breakOnlyString = breakOnlyString.replace("[", "");
+            breakOnlyString = breakOnlyString.replace(",", " - ");
+          } else breakOnlyString = "0";
           cyclesBO.setBreaksOnly(breakOnlyString);
           cyclesBO.setTimeAdded(System.currentTimeMillis());
           cyclesBO.setItemCount(breaksOnlyTime.size());
@@ -1624,7 +1651,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomString = gson.toJson(pomValuesTime);
           pomString = pomString.replace("]", "");
           pomString = pomString.replace("[", "");
-          pomString = pomString.replace(",", " -");
+          pomString = pomString.replace(",", " - ");
           pomCycles.setFullCycle(pomString);
           pomCycles.setTimeAdded(System.currentTimeMillis());
           if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
