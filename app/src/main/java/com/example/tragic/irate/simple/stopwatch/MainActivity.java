@@ -196,9 +196,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_UP = 2;
   boolean newCycle;
 
-
-  //Todo: Revive db w/ new UI.
-  //Todo: Long click to highlight cycle in Main, which bring up a "select all" and "delete/trash" button in action bar.
+  //Todo: Make sure queryCycles is called anytime we need an instance of cycleList (for proper sort mode).
+  //Todo: Long click to highlight cycle in Main, which bring up a "select all," "delete/trash", and "edit" buttons in action bar.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
 
@@ -230,6 +229,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: REMINDER, Try next app w/ Kotlin.
 
   @Override
+  public void onBackPressed() {
+    if (editCyclesPopupWindow.isShowing()) {
+      //Todo: Save or update cycle.
+    }
+  }
+
+  @Override
   public void onCycleDelete(int position) {
 
   }
@@ -240,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     receivedPos = position;
     //Todo: Launch Timer w/ cycle in this position. Move start_timer onClick stuff to function w/ array inputs.
     Intent intent = new Intent(MainActivity.this, TimerInterface.class);
+
   }
 
 //    @Override
@@ -475,6 +482,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setCustomView(R.layout.custom_bar);
 
+    //These Integer Lists hold our millis values for each round.
     customSetTime = new ArrayList<>();
     customBreakTime = new ArrayList<>();
     breaksOnlyTime = new ArrayList<>();
@@ -482,17 +490,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     customBreakTimeUP = new ArrayList<>();
     breaksOnlyTimeUP = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
-    customTitleArray = new ArrayList<>();
-    breaksOnlyTitleArray = new ArrayList<>();
-    pomTitleArray = new ArrayList<>();
+    //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes.
     convertedSetsList = new ArrayList<>();
     convertedBreaksList = new ArrayList<>();
     convertedBreaksOnlyList = new ArrayList<>();
     convertedPomList = new ArrayList<>();
+    //These String lists hold concatenated Strings of COMPLETE cycles (e.g. 2:00, 4:30, etc.), used for storing the cycles in our database.
     setsArray = new ArrayList<>();
     breaksArray = new ArrayList<>();
     breaksOnlyArray = new ArrayList<>();
     pomArray = new ArrayList<>();
+    //These String lists hold each cycle's title.
     customTitleArray = new ArrayList<>();
     breaksOnlyTitleArray = new ArrayList<>();
     pomTitleArray = new ArrayList<>();
@@ -831,49 +839,65 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     start_timer.setOnClickListener(v-> {
-      //If cycle has zero rounds, set this to true which returns a Toast rather than switching activities.
-      boolean emptyCycle = false;
-      //Name entered in the editText for the current cycle.
-      String cycle_name = cycle_name_edit.getText().toString();
-      Intent intent = new Intent(MainActivity.this, TimerInterface.class);
-      intent.putExtra("mode", mode);
-      intent.putExtra("cycleTitle", cycle_name);
-      //Gets current date for use in empty titles.
-      Calendar calendar = Calendar.getInstance();
-      SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-      String date = dateFormat.format(calendar.getTime());
+      newTimerCycle();
+    });
+  }
+
+  public void newTimerCycle() {
+    //If cycle has zero rounds, set this to true which returns a Toast rather than switching activities.
+    boolean emptyCycle = false;
+    //Name entered in the editText for the current cycle.
+    String cycle_name = cycle_name_edit.getText().toString();
+    Intent intent = new Intent(MainActivity.this, TimerInterface.class);
+    intent.putExtra("mode", mode);
+    intent.putExtra("cycleTitle", cycle_name);
+    switch (mode) {
+      case 1:
+        if (!setsAreCountingUp) intent.putIntegerArrayListExtra("setList", customSetTime); else {
+          intent.putIntegerArrayListExtra("setList", customSetTimeUP);
+          intent.putExtra("setsAreCountingUp", true);
+        }
+        if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakList", customBreakTime); else {
+          intent.putIntegerArrayListExtra("breakList", customBreakTimeUP);
+          intent.putExtra("breaksAreCountingUp", true);
+        }
+        //If there is at least one round added, save it to the database.
+        if (customSetTime.size()==0) emptyCycle = true;
+        break;
+      case 2:
+        if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime); else {
+          intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTimeUP);
+          intent.putExtra("breaksOnlyAreCountingUp", true);
+        }
+        if (breaksOnlyTime.size()==0) emptyCycle = true;
+        break;
+      case 3:
+        intent.putIntegerArrayListExtra("pomList", pomValuesTime);
+        if (pomValuesTime.size()==0) emptyCycle = true;
+        break;
+    }
+    if (!emptyCycle) {
+      //Launches timer class.
+      startActivity(intent);
+      //Saves the current cycle into database.
+      saveCycles(true);
+    } else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+  }
+
+  public void savedTimerCycle() {
+    AsyncTask.execute(()-> {
+      //Calling cycleList instance based on sort mode.
+      queryCycles();
       switch (mode) {
         case 1:
-          if (!setsAreCountingUp) intent.putIntegerArrayListExtra("setList", customSetTime); else {
-            intent.putIntegerArrayListExtra("setList", customSetTimeUP);
-            intent.putExtra("setsAreCountingUp", true);
+          //Since we are coming from our saved cycle adapter's callback, cycleList will always have at least one item.
+          Cycles cycles = cyclesList.get(receivedPos);
+          String[] tempSets = cycles.getSets().split(" - ");
+          String[] tempBreaks = cycles.getBreaks().split(" - ");
+          for (int i=0; i<tempSets.length; i++) {
+
           }
-          if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakList", customBreakTime); else {
-            intent.putIntegerArrayListExtra("breakList", customBreakTimeUP);
-            intent.putExtra("breaksAreCountingUp", true);
-          }
-          //If there is at least one round added, save it to the database.
-          if (customSetTime.size()==0) emptyCycle = true;
-          break;
-        case 2:
-          if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime); else {
-            intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTimeUP);
-            intent.putExtra("breaksOnlyAreCountingUp", true);
-          }
-          if (breaksOnlyTime.size()==0) emptyCycle = true;
-          break;
-        case 3:
-          intent.putIntegerArrayListExtra("pomList", pomValuesTime);
-          if (pomValuesTime.size()==0) emptyCycle = true;
-          break;
       }
-      if (!emptyCycle) {
-        //Launches timer class.
-        startActivity(intent);
-        //Saves the current cycle into database.
-        saveCycles(true);
-        //
-      } else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
     });
   }
 
@@ -1531,6 +1555,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //
   private void saveCycles(boolean newCycle) {
     //All run on separate thread to keep in sync.
     AsyncTask.execute(()-> {
@@ -1541,10 +1566,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Sets up Strings to save into database.
       Gson gson = new Gson();
-      String setString;
-      String breakString;
-      String breakOnlyString;
-      String pomString;
+      String setString = "";
+      String breakString  = "";
+      String breakOnlyString = "";
+      String pomString = "";
       String cycle_name = cycle_name_edit.getText().toString();
       int cycleID = 0;
 
@@ -1555,8 +1580,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
           if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           //Converting our String array of rounds in a cycle to a single String so it can be stored in our database.
-          setString = gson.toJson(customSetTime);
-          breakString = gson.toJson(customBreakTime);
+          //NEW format is: "X:XX - Y:YY" etc.
+          if (!setsAreCountingUp) setString = gson.toJson(customSetTime); else setString = gson.toJson(customBreakTimeUP);
+          if (!breaksAreCountingUp) breakString = gson.toJson(customBreakTime); else breakString = gson.toJson(customBreakTimeUP);
+
           setString = setString.replace("\"", "");
           setString = setString.replace("]", "");
           setString =  setString.replace("[", "");
@@ -1568,6 +1595,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Adding and inserting into database.
           cycles.setSets(setString);
           cycles.setBreaks(breakString);
+          cycles.setTimeAdded(System.currentTimeMillis());
+          cycles.setItemCount(customSetTime.size());
           if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
           if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
           break;
@@ -1576,11 +1605,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (cyclesBOList.size()>0) cycleID = cyclesBOList.get(receivedPos).getId();
           //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
           if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
-          breakOnlyString = gson.toJson(breaksOnlyTime);
+          if (!breaksOnlyAreCountingUp) breakOnlyString = gson.toJson(breaksOnlyTime); else breakOnlyString = gson.toJson(breaksOnlyTime);
           breakOnlyString = breakOnlyString.replace("\"", "");
           breakOnlyString = breakOnlyString.replace("]", "");
           breakOnlyString = breakOnlyString.replace("[", "");
           breakOnlyString = breakOnlyString.replace(",", " - ");
+          cyclesBO.setBreaksOnly(breakOnlyString);
+          cyclesBO.setTimeAdded(System.currentTimeMillis());
+          cyclesBO.setItemCount(breaksOnlyTime.size());
           if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
           if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
           break;
@@ -1593,6 +1625,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomString = pomString.replace("]", "");
           pomString = pomString.replace("[", "");
           pomString = pomString.replace(",", " -");
+          pomCycles.setFullCycle(pomString);
+          pomCycles.setTimeAdded(System.currentTimeMillis());
           if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
           if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
           break;
@@ -1604,7 +1638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Clears arrays, re-populates them with database values, and calls them via notifyDataSetChanged().
+  //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
   public void populateCycleList() {
     switch (mode) {
       case 1:

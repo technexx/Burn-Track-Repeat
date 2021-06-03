@@ -215,7 +215,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void onBackPressed() {
     Intent intent = new Intent(TimerInterface.this, MainActivity.class);
     startActivity(intent);
-    //Todo: Update cycle here.
   }
 
   @Override
