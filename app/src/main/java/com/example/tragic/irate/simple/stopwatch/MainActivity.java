@@ -240,9 +240,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onCycleClick(int position) {
     receivedPos = position;
-    //Todo: Launch Timer w/ cycle in this position. Move start_timer onClick stuff to function w/ array inputs.
-    launchSavedTimerCycle();
-    Intent intent = new Intent(MainActivity.this, TimerInterface.class);
+    launchTimerCycle(false);
 
   }
 
@@ -591,6 +589,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     countUpMode(true); countUpMode(false);
 
     fab.setOnClickListener(v -> {
+      //Clears timer arrays so they can be freshly populated.
+      clearTimerArrays();
+      //Brings up menu to add/subtract rounds to new cycle.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
     });
 
@@ -836,84 +837,85 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     start_timer.setOnClickListener(v-> {
-      launchNewTimerCycle();
+      launchTimerCycle(true);
     });
   }
 
-  public void launchNewTimerCycle() {
-    //If cycle has zero rounds, set this to true which returns a Toast rather than switching activities.
-    boolean emptyCycle = false;
-    //Name entered in the editText for the current cycle.
-    String cycle_name = cycle_name_edit.getText().toString();
-    Intent intent = new Intent(MainActivity.this, TimerInterface.class);
-    intent.putExtra("mode", mode);
-    intent.putExtra("cycleTitle", cycle_name);
-    //For modes 1/2: Lists are passed in no matter what, to simplify receiving nulls in Timer class. If COuNT UP mode is true, make that boolean true.
-    switch (mode) {
-      case 1:
-        intent.putIntegerArrayListExtra("setList", customSetTime);
-        if (setsAreCountingUp) intent.putExtra("setsAreCountingUp", true);
-        intent.putIntegerArrayListExtra("breakList", customBreakTime);
-        if (breaksAreCountingUp)intent.putExtra("breaksAreCountingUp", true);
-        //If there is at least one round added, launch our Timer class.
-        if (customSetTime.size()==0) emptyCycle = true;
-        break;
-      case 2:
-        intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
-        if (breaksAreCountingUp) intent.putExtra("breaksOnlyAreCountingUp", true);
-        if (breaksOnlyTime.size()==0) emptyCycle = true;
-        break;
-      case 3:
-        intent.putIntegerArrayListExtra("pomList", pomValuesTime);
-        if (pomValuesTime.size()==0) emptyCycle = true;
-        break;
-    }
-    if (!emptyCycle) {
-      //Launches timer class.
-      startActivity(intent);
-      //Saves the current cycle into database.
-      saveCycles(true);
-    } else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
-  }
-
-  public void launchSavedTimerCycle() {
+  //Todo: Remember, this is running on another thread.
+  public void launchTimerCycle(boolean newCycle) {
     AsyncTask.execute(()-> {
-      //Calling cycleList instance based on sort mode.
-      queryCycles();
-      //For database entities for cases 1 and 2: If value equals "0", it is a COUNT UP instance, we simply set our intent boolean to true, since we don't need any saved values. If it is a COUNT DOWN instance, we split the concatenated String of values, and iterate them into a parsed list of Integers to be used in the timer. For case 3: Only a COUNT DOWN mode, so standard retrieval.
+      clearTimerArrays();
+      Intent intent = new Intent(MainActivity.this, TimerInterface.class);
+      //If we are RETRIEVING a cycle from the database, do the stuff below. If we are creating a new round, the timer arrays have already been populated by adjustCustom() and all we do it set the title based on our editText value.
+      if (!newCycle) {
+        //Calling cycleList instance based on sort mode.
+        queryCycles();
+        //For database entities for cases 1 and 2: If value equals "0", it is a COUNT UP instance, we simply set our intent boolean to true, since we don't need any saved values. If it is a COUNT DOWN instance, we split the concatenated String of values, and iterate them into a parsed list of Integers to be used in the timer. For case 3: Only a COUNT DOWN mode, so standard retrieval.
+        switch (mode) {
+          case 1:
+            Cycles cycles = cyclesList.get(receivedPos);
+            if (cycles.getSets().equals("0")) setsAreCountingUp = true; else {
+              setsAreCountingUp = false;
+              String[] tempSets = cycles.getSets().split(" - ");
+              for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
+            }
+            if (cycles.getBreaks().equals("0")) breaksAreCountingUp = true; else {
+              breaksAreCountingUp = false;
+              String[] tempBreaks = cycles.getBreaks().split(" - ");
+              for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
+            }
+            intent.putExtra("cycleTitle", cycles.getTitle());
+            break;
+          case 2:
+            CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
+            if (cyclesBO.getBreaksOnly().equals("0")) breaksOnlyAreCountingUp = true; else {
+              breaksOnlyAreCountingUp = false;
+              String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
+              for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
+            }
+            intent.putExtra("cycleTitle", cyclesBO.getTitle());
+            break;
+          case 3:
+            PomCycles pomCycles = pomCyclesList.get(receivedPos);
+            pomValuesTime.clear();
+            String[] tempPom = pomCycles.getFullCycle().split(" - ");
+            for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
+            intent.putExtra("cycleTitle", pomCycles.getTitle());
+            break;
+        }
+      } else {
+        //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
+        if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
+          Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+          return;
+        }
+        intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
+      }
+      //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
       switch (mode) {
         case 1:
-          Cycles cycles = cyclesList.get(receivedPos);
-          if (cycles.getSets().equals("0")) setsAreCountingUp = true; else {
-            setsAreCountingUp = false;
-            customSetTime.clear();
-            String[] tempSets = cycles.getSets().split(" - ");
-            for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
-          }
-          if (cycles.getBreaks().equals("0")) breaksAreCountingUp = true; else {
-            breaksAreCountingUp = false;
-            customBreakTime.clear();
-            String[] tempBreaks = cycles.getBreaks().split(" - ");
-            for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
-          }
+          intent.putIntegerArrayListExtra("setList", customSetTime);
+          intent.putExtra("setsAreCountingUp", setsAreCountingUp);
+          intent.putIntegerArrayListExtra("breakList", customBreakTime);
+          intent.putExtra("breaksAreCountingUp", breaksAreCountingUp);
           break;
         case 2:
-          CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
-          if (cyclesBO.getBreaksOnly().equals("0")) breaksOnlyAreCountingUp = true; else {
-            breaksOnlyAreCountingUp = false;
-            breaksOnlyTime.clear();
-            String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
-            for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
-          }
+          intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
+          intent.putExtra("breaksOnlyAreCountingUp", breaksOnlyAreCountingUp);
           break;
         case 3:
-          PomCycles pomCycles = pomCyclesList.get(receivedPos);
-          pomValuesTime.clear();
-          String[] tempPom = pomCycles.getFullCycle().split(" - ");
-          for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
+          intent.putIntegerArrayListExtra("pomList", pomValuesTime);
           break;
       }
+      intent.putExtra("mode", mode);
     });
+  }
+
+  public void clearTimerArrays() {
+    customSetTime.clear();
+    customBreakTime.clear();
+    breaksOnlyTime.clear();
+    pomValuesTime.clear();
   }
 
   //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
