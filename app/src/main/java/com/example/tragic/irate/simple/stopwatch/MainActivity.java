@@ -137,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean infinity_mode_two;
   Button start_timer;
 
-  //These Integer Lists hold our whole second values for each round.
   ArrayList<Integer> customSetTime;
   ArrayList<Integer> customBreakTime;
   ArrayList<Integer> breaksOnlyTime;
@@ -145,16 +144,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<Integer> customSetTimeUP;
   ArrayList<Integer> customBreakTimeUP;
   ArrayList<Integer> breaksOnlyTimeUP;
-  //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes.
   ArrayList<String> convertedSetsList;
   ArrayList<String> convertedBreaksList;
   ArrayList<String> convertedBreaksOnlyList;
   ArrayList<String> convertedPomList;
-  //These String lists hold each cycle's title.
   ArrayList<String> customTitleArray;
   ArrayList<String> breaksOnlyTitleArray;
   ArrayList<String> pomTitleArray;
-  //These String lists hold concatenated Strings of COMPLETE cycles (e.g. 2:00, 4:30, etc.), used for storing the cycles in our database.
   ArrayList<String> setsArray;
   ArrayList<String> breaksArray;
   ArrayList<String> breaksOnlyArray;
@@ -245,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onCycleClick(int position) {
     receivedPos = position;
     //Todo: Launch Timer w/ cycle in this position. Move start_timer onClick stuff to function w/ array inputs.
+    launchSavedTimerCycle();
     Intent intent = new Intent(MainActivity.this, TimerInterface.class);
 
   }
@@ -839,11 +836,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     start_timer.setOnClickListener(v-> {
-      newTimerCycle();
+      launchNewTimerCycle();
     });
   }
 
-  public void newTimerCycle() {
+  public void launchNewTimerCycle() {
     //If cycle has zero rounds, set this to true which returns a Toast rather than switching activities.
     boolean emptyCycle = false;
     //Name entered in the editText for the current cycle.
@@ -851,24 +848,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Intent intent = new Intent(MainActivity.this, TimerInterface.class);
     intent.putExtra("mode", mode);
     intent.putExtra("cycleTitle", cycle_name);
+    //For modes 1/2: Lists are passed in no matter what, to simplify receiving nulls in Timer class. If COuNT UP mode is true, make that boolean true.
     switch (mode) {
       case 1:
-        if (!setsAreCountingUp) intent.putIntegerArrayListExtra("setList", customSetTime); else {
-          intent.putIntegerArrayListExtra("setList", customSetTimeUP);
-          intent.putExtra("setsAreCountingUp", true);
-        }
-        if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakList", customBreakTime); else {
-          intent.putIntegerArrayListExtra("breakList", customBreakTimeUP);
-          intent.putExtra("breaksAreCountingUp", true);
-        }
-        //If there is at least one round added, save it to the database.
+        intent.putIntegerArrayListExtra("setList", customSetTime);
+        if (setsAreCountingUp) intent.putExtra("setsAreCountingUp", true);
+        intent.putIntegerArrayListExtra("breakList", customBreakTime);
+        if (breaksAreCountingUp)intent.putExtra("breaksAreCountingUp", true);
+        //If there is at least one round added, launch our Timer class.
         if (customSetTime.size()==0) emptyCycle = true;
         break;
       case 2:
-        if (!breaksAreCountingUp) intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime); else {
-          intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTimeUP);
-          intent.putExtra("breaksOnlyAreCountingUp", true);
-        }
+        intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
+        if (breaksAreCountingUp) intent.putExtra("breaksOnlyAreCountingUp", true);
         if (breaksOnlyTime.size()==0) emptyCycle = true;
         break;
       case 3:
@@ -884,7 +876,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
   }
 
-  public void savedTimerCycle() {
+  public void launchSavedTimerCycle() {
     AsyncTask.execute(()-> {
       //Calling cycleList instance based on sort mode.
       queryCycles();

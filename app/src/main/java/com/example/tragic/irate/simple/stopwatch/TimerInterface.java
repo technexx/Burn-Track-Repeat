@@ -298,7 +298,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycle_title = intent.getStringExtra("cycleTitle");
     switch (mode) {
       case 1:
-        //Todo: We use(d) separate lists in this activity for up/down modes.
         customSetTime = intent.getIntegerArrayListExtra("setList");
         customBreakTime = intent.getIntegerArrayListExtra("breakList");
         setsAreCountingUp = intent.getBooleanExtra("setsAreCountingUp", false);
