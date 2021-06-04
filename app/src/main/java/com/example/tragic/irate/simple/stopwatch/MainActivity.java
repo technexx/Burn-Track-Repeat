@@ -845,10 +845,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void launchTimerCycle(boolean newCycle) {
     AsyncTask.execute(()-> {
-      clearTimerArrays();
       Intent intent = new Intent(MainActivity.this, TimerInterface.class);
       //If we are RETRIEVING a cycle from the database, do the stuff below. If we are creating a new round, the timer arrays have already been populated by adjustCustom() and all we do it set the title based on our editText value.
       if (!newCycle) {
+        //Clears old array values.
+        clearTimerArrays();
         //Calling cycleList instance based on sort mode.
         queryCycles();
         //For database entities for cases 1 and 2: If value equals "0", it is a COUNT UP instance, we simply set our intent boolean to true, since we don't need any saved values. If it is a COUNT DOWN instance, we split the concatenated String of values, and iterate them into a parsed list of Integers to be used in the timer. For case 3: Only a COUNT DOWN mode, so standard retrieval.
@@ -887,7 +888,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
         if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
-          Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+          runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
           return;
         }
         intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
