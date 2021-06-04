@@ -588,11 +588,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     countUpMode(true); countUpMode(false);
 
+    //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
       //Clears timer arrays so they can be freshly populated.
       clearTimerArrays();
       //Brings up menu to add/subtract rounds to new cycle.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
+    });
+
+    //Launched from editCyclePopUp and calls TimerInterface w/ new cycle info.
+    start_timer.setOnClickListener(v-> {
+      launchTimerCycle(true);
     });
 
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
@@ -833,15 +839,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     sub_cycle.setOnClickListener(v -> {
       adjustCustom(false);
-
     });
 
-    start_timer.setOnClickListener(v-> {
-      launchTimerCycle(true);
-    });
   }
 
-  //Todo: Remember, this is running on another thread.
   public void launchTimerCycle(boolean newCycle) {
     AsyncTask.execute(()-> {
       clearTimerArrays();
@@ -890,6 +891,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           return;
         }
         intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
+        //Since this is a new Cycle, we automatically save it to database.
+        saveCycles(true);
+        //Updates the adapter display of saved cycles.
+        runOnUiThread(() -> populateCycleList());
       }
       //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
       switch (mode) {
@@ -908,6 +913,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
       intent.putExtra("mode", mode);
+      //Starts Timer class.
+      startActivity(intent);
     });
   }
 
@@ -1574,89 +1581,82 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //
   private void saveCycles(boolean newCycle) {
-    //All run on separate thread to keep in sync.
-    AsyncTask.execute(()-> {
-      //Gets current date for use in empty titles.
-      Calendar calendar = Calendar.getInstance();
-      SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-      String date = dateFormat.format(calendar.getTime());
+    //Gets current date for use in empty titles.
+    Calendar calendar = Calendar.getInstance();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+    String date = dateFormat.format(calendar.getTime());
 
-      //Sets up Strings to save into database.
-      Gson gson = new Gson();
-      String setString = "";
-      String breakString  = "";
-      String breakOnlyString = "";
-      String pomString = "";
-      String cycle_name = cycle_name_edit.getText().toString();
-      int cycleID = 0;
+    //Sets up Strings to save into database.
+    Gson gson = new Gson();
+    String setString = "";
+    String breakString  = "";
+    String breakOnlyString = "";
+    String pomString = "";
+    String cycle_name = cycle_name_edit.getText().toString();
+    int cycleID = 0;
 
-      switch (mode) {
-        case 1:
-          //Gets the ID of the cycle instance we have clicked on from its position.
-          if (cyclesList.size()>0) cycleID = cyclesList.get(receivedPos).getId();
-          //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
-          if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-          //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Set single "0" for counting up.
-          if (!setsAreCountingUp) {
-            setString = gson.toJson(customSetTime);
-            setString = setString.replace("\"", "");
-            setString = setString.replace("]", "");
-            setString =  setString.replace("[", "");
-            setString = setString.replace(",", " - ");
-          } else setString = "0";
-          if (!breaksAreCountingUp) {
-            breakString = gson.toJson(customBreakTime);
-            breakString = breakString.replace("\"", "");
-            breakString = breakString.replace("]", "");
-            breakString = breakString.replace("[", "");
-            breakString = breakString.replace(",", " - ");
-          } else breakString = "0";
-          //Adding and inserting into database.
-          cycles.setSets(setString);
-          cycles.setBreaks(breakString);
-          cycles.setTimeAdded(System.currentTimeMillis());
-          cycles.setItemCount(customSetTime.size());
-          if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
-          if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
-          break;
-        case 2:
-          //Gets the ID of the cycle instance we have clicked on from its position.
-          if (cyclesBOList.size()>0) cycleID = cyclesBOList.get(receivedPos).getId();
-          //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
-          if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
-          if (!breaksOnlyAreCountingUp) {
-            breakOnlyString = gson.toJson(breaksOnlyTime);
-            breakOnlyString = breakOnlyString.replace("\"", "");
-            breakOnlyString = breakOnlyString.replace("]", "");
-            breakOnlyString = breakOnlyString.replace("[", "");
-            breakOnlyString = breakOnlyString.replace(",", " - ");
-          } else breakOnlyString = "0";
-          cyclesBO.setBreaksOnly(breakOnlyString);
-          cyclesBO.setTimeAdded(System.currentTimeMillis());
-          cyclesBO.setItemCount(breaksOnlyTime.size());
-          if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
-          if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-          break;
-        case 3:
-          //Gets the ID of the cycle instance we have clicked on from its position.
-          if (pomCyclesList.size()>0) cycleID = pomCyclesList.get(receivedPos).getId();
-          //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
-          if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
-          pomString = gson.toJson(pomValuesTime);
-          pomString = pomString.replace("]", "");
-          pomString = pomString.replace("[", "");
-          pomString = pomString.replace(",", " - ");
-          pomCycles.setFullCycle(pomString);
-          pomCycles.setTimeAdded(System.currentTimeMillis());
-          if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
-          if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-          break;
-      }
-      //Updates the adapter display of saved cycles in our Main activity.
-      runOnUiThread(() -> {
-        populateCycleList();
-      });
-    });
+    switch (mode) {
+      case 1:
+        //Gets the ID of the cycle instance we have clicked on from its position.
+        if (cyclesList.size()>0) cycleID = cyclesList.get(receivedPos).getId();
+        //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
+        if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+        //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Set single "0" for counting up.
+        if (!setsAreCountingUp) {
+          setString = gson.toJson(customSetTime);
+          setString = setString.replace("\"", "");
+          setString = setString.replace("]", "");
+          setString =  setString.replace("[", "");
+          setString = setString.replace(",", " - ");
+        } else setString = "0";
+        if (!breaksAreCountingUp) {
+          breakString = gson.toJson(customBreakTime);
+          breakString = breakString.replace("\"", "");
+          breakString = breakString.replace("]", "");
+          breakString = breakString.replace("[", "");
+          breakString = breakString.replace(",", " - ");
+        } else breakString = "0";
+        //Adding and inserting into database.
+        cycles.setSets(setString);
+        cycles.setBreaks(breakString);
+        cycles.setTimeAdded(System.currentTimeMillis());
+        cycles.setItemCount(customSetTime.size());
+        if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
+        if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
+        break;
+      case 2:
+        //Gets the ID of the cycle instance we have clicked on from its position.
+        if (cyclesBOList.size()>0) cycleID = cyclesBOList.get(receivedPos).getId();
+        //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
+        if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
+        if (!breaksOnlyAreCountingUp) {
+          breakOnlyString = gson.toJson(breaksOnlyTime);
+          breakOnlyString = breakOnlyString.replace("\"", "");
+          breakOnlyString = breakOnlyString.replace("]", "");
+          breakOnlyString = breakOnlyString.replace("[", "");
+          breakOnlyString = breakOnlyString.replace(",", " - ");
+        } else breakOnlyString = "0";
+        cyclesBO.setBreaksOnly(breakOnlyString);
+        cyclesBO.setTimeAdded(System.currentTimeMillis());
+        cyclesBO.setItemCount(breaksOnlyTime.size());
+        if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
+        if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+        break;
+      case 3:
+        //Gets the ID of the cycle instance we have clicked on from its position.
+        if (pomCyclesList.size()>0) cycleID = pomCyclesList.get(receivedPos).getId();
+        //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
+        if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+        pomString = gson.toJson(pomValuesTime);
+        pomString = pomString.replace("]", "");
+        pomString = pomString.replace("[", "");
+        pomString = pomString.replace(",", " - ");
+        pomCycles.setFullCycle(pomString);
+        pomCycles.setTimeAdded(System.currentTimeMillis());
+        if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
+        if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+        break;
+    }
   }
 
   //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
