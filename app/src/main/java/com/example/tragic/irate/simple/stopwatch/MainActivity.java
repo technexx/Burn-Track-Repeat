@@ -16,9 +16,11 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -42,10 +44,10 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener {
@@ -53,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
-  boolean defaultMenu = true;
   View mainView;
   TextView save_cycles;
   TextView update_cycles;
@@ -241,63 +242,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onCycleClick(int position) {
     receivedPos = position;
     launchTimerCycle(false);
-
   }
-
-//    @Override
-//    public void onCycleDelete(int position) {
-//        AsyncTask.execute(()->{
-//            //Initial query, applying to all retrievals.
-//            queryCycles();
-//            switch (mode) {
-//                case 1:
-//                    Cycles removedCycle = cyclesList.get(position);
-//                    cyclesDatabase.cyclesDao().deleteCycle(removedCycle);
-//                    //Second query, retrieving the new, post-modified entity.
-//                    queryCycles();
-//
-//                    runOnUiThread(() -> {
-//                        setsArray.clear();
-//                        breaksArray.clear();
-//                        for (int i=0; i<cyclesList.size(); i++) {
-//                            setsArray.add(cyclesList.get(i).getSets());
-//                            breaksArray.add(cyclesList.get(i).getBreaks());
-//                            customTitleArray.add(cyclesList.get(i).getTitle());
-//                        }
-//                        savedCycleAdapter.notifyDataSetChanged();
-//                    });
-//                    break;
-//                case 2:
-//                    CyclesBO removedBOCycle = cyclesBOList.get(position);
-//                    cyclesDatabase.cyclesDao().deleteBOCycle(removedBOCycle);
-//                    queryCycles();
-//
-//                    runOnUiThread(() -> {
-//                        breaksOnlyArray.clear();
-//                        for (int i=0; i<cyclesBOList.size(); i++) {
-//                            breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-//                            breaksOnlyTitleArray.add(cyclesList.get(i).getTitle());
-//                        }
-//                        savedCycleAdapter.notifyDataSetChanged();
-//                    });
-//                    break;
-//                case 3:
-//                    int deletedID = pomCyclesList.get(position).getId();
-//
-//                    PomCycles removedPom = pomCyclesList.get(position);
-//                    cyclesDatabase.cyclesDao().deletePomCycle(removedPom);
-//                    queryCycles();
-//
-//                    runOnUiThread(()-> {
-//                        pomArray.remove(position);
-//                        savedCycleAdapter.notifyDataSetChanged();
-//                    });
-//                    break;
-//            }
-//            saveArrays();
-//        });
-//        Toast.makeText(getApplicationContext(), "Cycle deleted!", Toast.LENGTH_SHORT).show();
-//    }
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
@@ -306,103 +251,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
-    if (defaultMenu) {
-      MenuInflater inflater = getMenuInflater();
-      inflater.inflate(R.menu.options_menu, menu);
-    }
-    return true;
-  }
-
-  @Override
-  public boolean onPrepareOptionsMenu(final Menu menu) {
-    menu.clear();
     MenuInflater inflater = getMenuInflater();
-    if (!defaultMenu) inflater.inflate(R.menu.revised_options_menu, menu);
-    else inflater.inflate(R.menu.options_menu, menu);
+    inflater.inflate(R.menu.main_options_menu, menu);
     return true;
   }
 
-  @Override
-  public boolean onMenuOpened(int featureId, Menu menu) {
-    return true;
-  }
-
-//    @SuppressLint("NonConstantResourceId")
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-////        if (savedCyclePopupWindow!=null &&savedCyclePopupWindow.isShowing()) return false;
-//        AtomicBoolean cyclesExist = new AtomicBoolean(false);
-//        switch (item.getItemId()) {
-//            case R.id.saved_cycle_list:
-//                AsyncTask.execute(() -> {
-//                    queryCycles();
-//                    clearArrays(false);
-//                    switch (mode) {
-//                        case 1:
-//                            savedCycleAdapter.setView(1);
-//                            if (cyclesList.size()>0) {
-//                                for (int i=0; i<cyclesList.size(); i++) {
-//                                    setsArray.add(cyclesList.get(i).getSets());
-//                                    breaksArray.add(cyclesList.get(i).getBreaks());
-//                                    customTitleArray.add(cyclesList.get(i).getTitle());
-//                                }
-//                                cyclesExist.set(true);
-//                            }
-//                            break;
-//                        case 2:
-//                            savedCycleAdapter.setView(2);
-//                            if (cyclesBOList.size()>0) {
-//                                for (int i=0; i<cyclesBOList.size(); i++) {
-//                                    breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
-//                                    breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-//                                }
-//                                cyclesExist.set(true);
-//                            }
-//                            break;
-//                        case 3:
-//                            savedCycleAdapter.setView(3);
-//                            if (pomCyclesList.size()>0) {
-//                                for (int i=0; i<pomCyclesList.size(); i++) {
-//                                    pomArray.add(pomCyclesList.get(i).getFullCycle());
-//                                    pomCyclesTitleArray.add(pomCyclesList.get(i).getTitle());
-//                                }
-//                                cyclesExist.set(true);
-//                            }
-//                            break;
-//                    }
-//
-//                    runOnUiThread(()-> {
-//                        if (cyclesExist.get()) {
-//                            save_cycles.setText(R.string.sort_cycles);
-//                            //Focusable must be false for save/sort switch function to work, otherwise window will steal focus from button.
-//                            savedCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 100);
-//                            savedCycleAdapter.notifyDataSetChanged();
-//                            switchMenu();
-//                        } else {
-//                            Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                });
-//                break;
-//
-//            case R.id.delete_all_cycles:
-//                AsyncTask.execute(() -> {
-//                    queryCycles();
-//                    if ((mode==1 && cyclesList.size()==0)|| (mode==2 && cyclesBOList.size()==0)){
-//                        runOnUiThread(()-> {
-//                            runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
-//                        });
-//                    } else {
-//                        runOnUiThread(()-> {
-//                            if (mode==1) delete_all_text.setText(R.string.delete_all_custom); else delete_all_text.setText(R.string.delete_all_BO);
-//                            deleteAllPopupWindow.showAtLocation(deleteCyclePopupView, Gravity.CENTER, 0, 0);
-//                        });
-//                        ;
-//                    }
-//                });
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        AtomicBoolean cyclesExist = new AtomicBoolean(false);
+        switch (item.getItemId()) {
+          //Todo: popUp confirm for this.
+            case R.id.delete_all_cycles:
+              AsyncTask.execute(() -> {
+                deleteCycle(true);
+              });
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
@@ -543,6 +409,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertEditTime(true);
     setEditValues();
 
+    //Todo: Pass in positional to use for cyclesList sort mode?
     mHandler.postDelayed((Runnable) () -> {
       AsyncTask.execute(() -> {
         //Loads database of saved cycles.
@@ -845,6 +712,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void launchTimerCycle(boolean newCycle) {
     AsyncTask.execute(()-> {
+      //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
+      int passedID = 0;
       Intent intent = new Intent(MainActivity.this, TimerInterface.class);
       //If we are RETRIEVING a cycle from the database, do the stuff below. If we are creating a new round, the timer arrays have already been populated by adjustCustom() and all we do it set the title based on our editText value.
       if (!newCycle) {
@@ -867,6 +736,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
             }
             intent.putExtra("cycleTitle", cycles.getTitle());
+            passedID = cyclesList.get(receivedPos).getId();
             break;
           case 2:
             CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
@@ -876,6 +746,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
             }
             intent.putExtra("cycleTitle", cyclesBO.getTitle());
+            passedID = cyclesBOList.get(receivedPos).getId();
             break;
           case 3:
             PomCycles pomCycles = pomCyclesList.get(receivedPos);
@@ -883,6 +754,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             String[] tempPom = pomCycles.getFullCycle().split(" - ");
             for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
             intent.putExtra("cycleTitle", pomCycles.getTitle());
+            passedID = pomCyclesList.get(receivedPos).getId();
             break;
         }
       } else {
@@ -913,7 +785,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           intent.putIntegerArrayListExtra("pomList", pomValuesTime);
           break;
       }
+      //Mode used for type of timer.
       intent.putExtra("mode", mode);
+      //Sends the current cycle's database position so we can delete it from the Timer class if desired.
+      intent.putExtra("passedID", passedID);
       //Starts Timer class.
       startActivity(intent);
     });
@@ -1330,7 +1205,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
     }
-    Log.i("testPop", "set list is " + convertedSetsList + " and break is " + convertedBreaksList);
     cycleRoundsAdapter.setMode(mode);
     cycleRoundsAdapter.notifyDataSetChanged();
   }
@@ -1347,40 +1221,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_sep.setVisibility(View.GONE);
     third_value_edit_two.setVisibility(View.GONE);
   }
-//
-//  @SuppressLint("ClickableViewAccessibility")
-//  public void toggleCountUpViews(boolean onSets, boolean countingUp) {
-//    removeEditViews();
-//    if (countingUp) {
-//      if (onSets) {
-//        first_value_textView.setVisibility(View.INVISIBLE);
-//        infinity_one.setVisibility(View.VISIBLE);
-//        plus_first_value.setEnabled(false);
-//        minus_first_value.setEnabled(false);
-//        infinity_mode_one = true;
-//      } else {
-//        second_value_textView.setVisibility(View.INVISIBLE);
-//        infinity_two.setVisibility(View.VISIBLE);
-//        plus_second_value.setEnabled(false);
-//        minus_second_value.setEnabled(false);
-//        infinity_mode_two = true;
-//      }
-//    } else {
-//      if (onSets) {
-//        first_value_textView.setVisibility(View.VISIBLE);
-//        infinity_one.setVisibility(View.INVISIBLE);
-//        plus_first_value.setEnabled(true);
-//        minus_first_value.setEnabled(true);
-//        infinity_mode_one = false;
-//      } else {
-//        second_value_textView.setVisibility(View.VISIBLE);
-//        infinity_two.setVisibility(View.INVISIBLE);
-//        plus_second_value.setEnabled(true);
-//        minus_second_value.setEnabled(true);
-//        infinity_mode_two = false;
-//      }
-//    }
-//  }
 
   public void editCycleViews() {
     //Instance of layout objects we can set programatically based on which mode we're on.
@@ -1659,15 +1499,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Will have deleteAll AND a selected positional type
   private void deleteCycle(boolean deleteAll) {
-    int cycleID = 0;
+    queryCycles();
+    int cycleID;
+    boolean emptyCycle = false;
     switch (mode) {
       case 1:
         if (!deleteAll) {
           cycleID = cyclesList.get(receivedPos).getId();
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deleteCycle(cycles);
-        } else cyclesDatabase.cyclesDao().deleteAll();
+        } else if (cyclesList.size()>0) cyclesDatabase.cyclesDao().deleteAllCycles(); else emptyCycle = true;
 
         break;
       case 2:
@@ -1675,15 +1518,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleID = cyclesBOList.get(receivedPos).getId();
           cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
           cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO);
-        } else cyclesDatabase.cyclesDao().deleteAllBO();
+        } else if (cyclesBOList.size()>0) cyclesDatabase.cyclesDao().deleteAllBOCycles(); else emptyCycle = true;
         break;
       case 3:
         if (!deleteAll) {
           cycleID = pomCyclesList.get(receivedPos).getId();
           pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
-        } else cyclesDatabase.cyclesDao().deleteAllPomCycles();
+        } else if (pomCyclesList.size()>0) cyclesDatabase.cyclesDao().deleteAllPomCycles(); else emptyCycle = true;
         break;
+    }
+    if (emptyCycle){
+      runOnUiThread(() -> {
+        Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show();
+      });
     }
   }
 
@@ -1942,7 +1790,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                resetTimer();
 //                savedCyclePopupWindow.dismiss();
 //                invalidateOptionsMenu();
-//                defaultMenu = true;
 //            });
 //            prefEdit.apply();
 //        });
@@ -1971,7 +1818,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //
 //    public void switchMenu() {
 //        Runnable r = () -> {
-//            defaultMenu = false;
 //            invalidateOptionsMenu();
 //        };
 //        mHandler.postDelayed(r, 50);

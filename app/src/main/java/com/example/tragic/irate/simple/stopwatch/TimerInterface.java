@@ -2,12 +2,20 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -15,15 +23,21 @@ import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.TypedArrayUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
+import com.example.tragic.irate.simple.stopwatch.Database.CyclesBO;
+import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
+import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.DecimalFormat;
@@ -32,7 +46,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TimerInterface extends AppCompatActivity implements DotDraws.sendAlpha{
+public class TimerInterface extends AppCompatActivity implements DotDraws.sendAlpha {
 
   ProgressBar progressBar;;
   ImageView stopWatchView;
@@ -211,10 +225,41 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   boolean modeThreeBetweenRounds;
   ImageButton exit_timer;
 
+  ConstraintLayout timerInterface;
+  View deleteCyclePopupView;
+  PopupWindow deleteCyclePopupWindow;
+  Button confirm_delete;
+  Button cancel_delete;
+
+  CyclesDatabase cyclesDatabase;
+  Cycles cycles;
+  CyclesBO cyclesBO;
+  PomCycles pomCycles;
+  int passedID;
+
   @Override
   public void onBackPressed() {
     Intent intent = new Intent(TimerInterface.this, MainActivity.class);
     startActivity(intent);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(final Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.timer_options_menu, menu);
+    return true;
+  }
+
+  @SuppressLint("NonConstantResourceId")
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      //Launches popup to confirm/cancel cycle deletion.
+      case R.id.delete_single_cycle:
+        deleteCyclePopupWindow.showAsDropDown(timerInterface, 0, 0, Gravity.CENTER);
+        break;
+    }
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
@@ -226,6 +271,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     super.onCreate(savedInstanceState);
     setContentView(R.layout.timer_interface);
 
+    //Object to access our layout.
+    timerInterface = new ConstraintLayout(this);
     mHandler = new Handler();
 
     valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
@@ -289,6 +336,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
     lastTextView = timePaused;
 
+    //Todo: Use same window for all deletes, including in Main. Just change textView and "confirm" button ties.
+    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
+    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
+    TextView delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
+    confirm_delete = deleteCyclePopupView.findViewById(R.id.confirm_yes);
+    cancel_delete = deleteCyclePopupView.findViewById(R.id.confirm_no);
+
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
@@ -296,6 +351,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     Intent intent = getIntent();
     mode = intent.getIntExtra("mode", 0);
     cycle_title = intent.getStringExtra("cycleTitle");
+    //Used to delete cycle.
+    passedID = intent.getIntExtra("passedID", 0);
+
     switch (mode) {
       case 1:
         customSetTime = intent.getIntegerArrayListExtra("setList");
@@ -318,6 +376,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         pomValue3 = intent.getIntExtra("pomValue3", 0);
         break;
     }
+
+    AsyncTask.execute(() -> {
+      //Loads database of saved cycles. Used for deleting cycles.
+      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+     });
     dotDraws.setMode(mode);
     dotDraws.onAlphaSend(TimerInterface.this);
 
@@ -531,6 +594,21 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     exit_timer.setOnClickListener(v-> {
       Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
       startActivity(exitIntent);
+    });
+
+    confirm_delete.setOnClickListener(v-> {
+      //Delete the current cycle and kicks us back to Main.
+      AsyncTask.execute(()->{
+        deleteCycle();
+        runOnUiThread(() -> {
+          //Todo: Intent w/ notifyDataSetChanged().
+        });
+      });
+    });
+
+    cancel_delete.setOnClickListener(v-> {
+      //Removes our delete confirm popUp if we cancel.
+      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
   }
 
@@ -1532,8 +1610,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-
-
   public void populateCycleUI() {
     switch (mode) {
       case 1:
@@ -1663,5 +1739,22 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
     }
     populateCycleUI();
+  }
+
+  public void deleteCycle() {
+    switch (mode) {
+      case 1:
+        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
+        cyclesDatabase.cyclesDao().deleteCycle(cycles);
+        break;
+      case 2:
+        cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(passedID).get(0);
+        cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO);
+        break;
+      case 3:
+        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
+        cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
+        break;
+    }
   }
 }

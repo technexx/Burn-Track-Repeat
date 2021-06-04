@@ -94,10 +94,10 @@ public interface CyclesDao {
     void deletePomCycle(PomCycles pomCycles);
 
     @Query("DELETE from Cycles")
-    void deleteAll();
+    void deleteAllCycles();
 
     @Query("DELETE from CyclesBO")
-    void deleteAllBO();
+    void deleteAllBOCycles();
 
     @Query("DELETE from PomCycles")
     void deleteAllPomCycles();
