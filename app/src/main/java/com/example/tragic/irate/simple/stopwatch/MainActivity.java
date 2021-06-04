@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onBackPressed() {
     if (editCyclesPopupWindow.isShowing()) {
-      //Todo: Save or update cycle.
+      //Todo: Save or update cycle. We can determine this by whether we come to this popup via FAB or from actionBar edit (to be added)
     }
   }
 
@@ -1580,7 +1580,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //
   private void saveCycles(boolean newCycle) {
     //Gets current date for use in empty titles.
     Calendar calendar = Calendar.getInstance();
@@ -1656,6 +1655,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomCycles.setTimeAdded(System.currentTimeMillis());
         if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
         if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+        break;
+    }
+  }
+
+  private void deleteCycle(boolean deleteAll) {
+    int cycleID = 0;
+    switch (mode) {
+      case 1:
+        if (!deleteAll) {
+          cycleID = cyclesList.get(receivedPos).getId();
+          cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+          cyclesDatabase.cyclesDao().deleteCycle(cycles);
+        } else cyclesDatabase.cyclesDao().deleteAll();
+
+        break;
+      case 2:
+        if (!deleteAll) {
+          cycleID = cyclesBOList.get(receivedPos).getId();
+          cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
+          cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO);
+        } else cyclesDatabase.cyclesDao().deleteAllBO();
+        break;
+      case 3:
+        if (!deleteAll) {
+          cycleID = pomCyclesList.get(receivedPos).getId();
+          pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+          cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
+        } else cyclesDatabase.cyclesDao().deleteAllPomCycles();
         break;
     }
   }
