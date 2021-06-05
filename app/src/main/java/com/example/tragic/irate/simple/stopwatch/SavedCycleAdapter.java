@@ -3,6 +3,8 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -38,6 +40,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public static final int BREAKS_ONLY = 1;
   public static final int POMODORO = 2;
   int mChosenView;
+  boolean mHighlightedCycle;
+  boolean mToggleColor;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -45,6 +49,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public interface onDeleteCycleListener {
     void onCycleDelete (int position);
+  }
+
+  public interface onHighlightListener {
+    void onCycleHighlight ();
   }
 
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -92,16 +100,28 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
-      customHolder.fullView.setOnTouchListener((v, event) -> {
-        switch (event.getAction()) {
-          case MotionEvent.ACTION_DOWN:
-            Toast.makeText(mContext, "BOO!", Toast.LENGTH_SHORT).show();
+      //Todo: New onClick method if in highlight mode (to select multiple cycles) Add button(s) in supportActionBar for deletions. Callback selected positions->get IDs therefrom in Main.
+      customHolder.fullView.setOnClickListener(v -> {
+        //If not in highlight mode, launch our timer activity from cycle clicked on.
+        if (!mHighlightedCycle) {
+          mOnCycleClickListener.onCycleClick(position);
+          //If in highlight mode, clicking on any given cycle highlights it.
+        } else {
+          if ((customHolder.fullView.getBackground()!=null)) {
+            ColorDrawable colorDrawable = (ColorDrawable) customHolder.fullView.getBackground();
+            int color = colorDrawable.getColor();
+            if (color==Color.BLACK) customHolder.fullView.setBackgroundColor(Color.GRAY);
+            else customHolder.fullView.setBackgroundColor(Color.BLACK);
+          }
         }
-        return true;
       });
 
-      customHolder.fullView.setOnClickListener(v -> {
-        mOnCycleClickListener.onCycleClick(position);
+      //Highlight cycle on long click and make visible action bar buttons. Sets mHighlightedCycle to true so no cycles can be launched in timer.
+      customHolder.fullView.setOnLongClickListener(v-> {
+        customHolder.fullView.setBackgroundColor(Color.GRAY);
+        mHighlightedCycle = true;
+        Toast.makeText(mContext, "BOO!", Toast.LENGTH_SHORT).show();
+        return true;
       });
 
     } else if (holder instanceof BreaksOnlyHolder) {
