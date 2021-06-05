@@ -56,14 +56,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
   View mainView;
-  TextView save_cycles;
-  TextView update_cycles;
 
   DotDraws dotDraws;
   ImageButton fab;
-  EditText edit_header;
-  Button confirm_header_save;
-  Button cancel_header_save;
 
   ImageView sortCheckmark;
 
@@ -82,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View sortCyclePopupView;
   View savedCyclePopupView;
   View editCyclesPopupView;
+  boolean currentCycleEmpty;
 
   PopupWindow sortPopupWindow;
   PopupWindow savedCyclePopupWindow;
@@ -104,8 +100,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int customID;
   int breaksOnlyID;
   int pomID;
-  int SAVING_CYCLE = 1;
-  int UPDATING_CYCLE = 2;
 
   EditText cycle_name_edit;
   TextView s1;
@@ -191,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean breaksOnlyAreCountingUp;
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
-  boolean newCycle;
 
   //Todo: Make sure queryCycles is called anytime we need an instance of cycleList (for proper sort mode).
   //Todo: Long click to highlight cycle in Main, which bring up a "select all," "delete/trash", and "edit" buttons in action bar.
@@ -237,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
+  //Todo: Highliight w/ long click here?
   //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
@@ -259,10 +253,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        AtomicBoolean cyclesExist = new AtomicBoolean(false);
         switch (item.getItemId()) {
             case R.id.delete_all_cycles:
-              deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
+              AsyncTask.execute(()-> {
+                //Get instance of cycles/cyclesBO/pomCycles.
+                queryCycles();
+                //if instance is empty, pop a Toast and return. Otherwise, show popUp window to confirm cycle deletion.
+                if (currentCycleEmpty) {
+                  runOnUiThread(() -> Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show());
+                } else deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
+              });
               break;
         }
         return super.onOptionsItemSelected(item);
@@ -396,7 +396,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
     breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
 
-    //Todo: Might put adapter stuff inside here under runOnUI.
     mHandler.postDelayed(() -> {
       AsyncTask.execute(() -> {
         //Loads database of saved cycles.
@@ -712,7 +711,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       adjustCustom(false);
     });
 
-    //Todo: notifyDataSet, threading, and calling new db entries as Arrays.
     delete_all_confirm.setOnClickListener(v-> {
       //Removes confirmation window.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
@@ -1323,6 +1321,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             sortCheckmark.setY(302);
             break;
         }
+        if (cyclesList.size()==0) currentCycleEmpty = true; else currentCycleEmpty = false;
         break;
       case 2:
         switch (sortModeBO) {
@@ -1342,6 +1341,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO();
             sortCheckmark.setY(302);
         }
+        if (cyclesBOList.size()==0) currentCycleEmpty = true; else currentCycleEmpty = false;
         break;
       case 3:
         switch (sortModePom) {
@@ -1354,6 +1354,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             sortCheckmark.setY(110);
             break;
         }
+        if (pomCyclesList.size()==0) currentCycleEmpty = true; else currentCycleEmpty = false;
         break;
     }
   }

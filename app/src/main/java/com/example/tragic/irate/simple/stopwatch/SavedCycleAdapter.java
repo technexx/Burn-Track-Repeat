@@ -213,7 +213,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //Splitting into String[] entries.
       newSplit = listConv.split(" - ", 0);
 
-      //Todo: newSplit values should be WHOLE seconds when coming in to parse into Long, and converted via convertSeconds() below.
       for (int k=0; k<newSplit.length; k++) {
         //Creating new ArrayList of Long values.
         newLong.add(Long.parseLong(newSplit[k]));

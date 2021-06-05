@@ -336,7 +336,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
     lastTextView = timePaused;
 
-    //Todo: Use same window for all deletes, including in Main. Just change textView and "confirm" button ties.
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
