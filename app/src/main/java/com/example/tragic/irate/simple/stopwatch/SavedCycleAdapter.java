@@ -9,10 +9,12 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,6 +83,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else return null;
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     if (holder instanceof CustomHolder) {
@@ -89,14 +92,17 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
+      customHolder.fullView.setOnTouchListener((v, event) -> {
+        switch (event.getAction()) {
+          case MotionEvent.ACTION_DOWN:
+            Toast.makeText(mContext, "BOO!", Toast.LENGTH_SHORT).show();
+        }
+        return true;
+      });
+
       customHolder.fullView.setOnClickListener(v -> {
         mOnCycleClickListener.onCycleClick(position);
       });
-
-      //Todo: This callback should be used in recyclerView of Main (in supperActionBar).
-//      customHolder.customTrash.setOnClickListener(v-> {
-//        mOnDeleteCycleListener.onCycleDelete(position);
-//      });
 
     } else if (holder instanceof BreaksOnlyHolder) {
       BreaksOnlyHolder breaksOnlyHolder = (BreaksOnlyHolder) holder;
@@ -115,6 +121,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
       Spannable pomSpan = new SpannableString(tempPom);
 
+      //Sets green/red alternating colors using text char indices.
       int moving = 0;
       for (int i=0; i<8; i++) {
         if (pomSpan.length()>=moving+2){

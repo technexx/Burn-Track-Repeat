@@ -403,8 +403,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Instantiates cycleList object based on sort order. For app launch, this is defaulting to "1", or "most recent."
         queryCycles();
         runOnUiThread(()-> {
-          //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
-          populateCycleList();
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
           savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
@@ -414,6 +412,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.setDeleteCycle(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
+          //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
+          populateCycleList();
           //Calling this by default, so any launch of Main will update our cycle list.
           savedCycleAdapter.notifyDataSetChanged();
         });
