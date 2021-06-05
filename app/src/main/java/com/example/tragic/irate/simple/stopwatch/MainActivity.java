@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   PopupWindow sortPopupWindow;
   PopupWindow savedCyclePopupWindow;
-  PopupWindow deleteAllPopupWindow;
+  PopupWindow deleteCyclePopupWindow;
   PopupWindow editCyclesPopupWindow;
 
   TextView sortRecent;
@@ -261,11 +261,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         AtomicBoolean cyclesExist = new AtomicBoolean(false);
         switch (item.getItemId()) {
-          //Todo: popUp confirm for this.
             case R.id.delete_all_cycles:
-              AsyncTask.execute(() -> {
-                deleteCycle(true);
-              });
+              deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
+              break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -293,15 +291,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
-    deleteAllPopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
+    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
+
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    deleteAllPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
-    cl = findViewById(R.id.main_layout);
+    cl = new ConstraintLayout(this);
     cycle_name_edit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
     s1 = editCyclesPopupView.findViewById(R.id.s1);
     s2 = editCyclesPopupView.findViewById(R.id.s2);
@@ -337,7 +336,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
     sortCheckmark = sortCyclePopupView.findViewById(R.id.sortCheckmark);
 
-    sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
+    delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
+    delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
+    delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_text);
 
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -374,19 +375,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cyclesBO = new CyclesBO();
     pomCycles = new PomCycles();
 
-    LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-    //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
-    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
-    savedCycleRecycler.setAdapter(savedCycleAdapter);
-    savedCycleRecycler.setLayoutManager(lm2);
-    savedCycleAdapter.setItemClick(MainActivity.this);
-    savedCycleAdapter.setDeleteCycle(MainActivity.this);
-    savedCycleAdapter.setView(mode);
-
     mHandler = new Handler();
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
+    mode = sharedPreferences.getInt("mode", 1);
     setValue = sharedPreferences.getInt("setValue", 30);
     breakValue = sharedPreferences.getInt("breakValue", 30);
     breaksOnlyValue = sharedPreferences.getInt("breakOnlyValue", 30);
@@ -403,26 +396,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
     breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
 
-    //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-    removeEditViews();
-    editCycleViews();
-    convertEditTime(true);
-    setEditValues();
-
-    //Todo: Pass in positional to use for cyclesList sort mode?
-    mHandler.postDelayed((Runnable) () -> {
+    //Todo: Might put adapter stuff inside here under runOnUI.
+    mHandler.postDelayed(() -> {
       AsyncTask.execute(() -> {
         //Loads database of saved cycles.
         cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
         //Instantiates cycleList object based on sort order. For app launch, this is defaulting to "1", or "most recent."
         queryCycles();
-        //Populates our cycle arrays from the database, so our list of cycles shows up.
         runOnUiThread(()-> {
+          //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
           populateCycleList();
+          //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
+          LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
+          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
+          savedCycleRecycler.setAdapter(savedCycleAdapter);
+          savedCycleRecycler.setLayoutManager(lm2);
+          savedCycleAdapter.setItemClick(MainActivity.this);
+          savedCycleAdapter.setDeleteCycle(MainActivity.this);
+          //Setting mode from savedPref so we are on whichever one was previously used.
+          savedCycleAdapter.setView(mode);
+          //Calling this by default, so any launch of Main will update our cycle list.
+          savedCycleAdapter.notifyDataSetChanged();
         });
       });
     },50);
 
+    //Adapter and Recycler for round views within our editCycles popUp.
+    LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
+    RecyclerView roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
+    cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList);
+    roundRecycler.setAdapter(cycleRoundsAdapter);
+    roundRecycler.setLayoutManager(lm);
+
+    //Sets all editTexts to GONE, and then populates them + textViews based on mode.
+    removeEditViews();
+    editCycleViews();
+    convertEditTime(true);
+    setEditValues();
 
     TextWatcher textWatcher = new TextWatcher() {
       @Override
@@ -446,12 +456,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     second_value_edit_two.addTextChangedListener(textWatcher);
     third_value_edit.addTextChangedListener(textWatcher);
     third_value_edit_two.addTextChangedListener(textWatcher);
-
-    LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
-    RecyclerView roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
-    cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList);
-    roundRecycler.setAdapter(cycleRoundsAdapter);
-    roundRecycler.setLayoutManager(lm);
 
     countUpMode(true); countUpMode(false);
 
@@ -708,89 +712,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       adjustCustom(false);
     });
 
-  }
-
-  public void launchTimerCycle(boolean newCycle) {
-    AsyncTask.execute(()-> {
-      //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
-      int passedID = 0;
-      Intent intent = new Intent(MainActivity.this, TimerInterface.class);
-      //If we are RETRIEVING a cycle from the database, do the stuff below. If we are creating a new round, the timer arrays have already been populated by adjustCustom() and all we do it set the title based on our editText value.
-      if (!newCycle) {
-        //Clears old array values.
-        clearTimerArrays();
-        //Calling cycleList instance based on sort mode.
+    //Todo: notifyDataSet, threading, and calling new db entries as Arrays.
+    delete_all_confirm.setOnClickListener(v-> {
+      //Removes confirmation window.
+      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
+      AsyncTask.execute(() -> {
+        //Deletes all cycles.
+        deleteCycle(true);
+        //Mew instance (which will be empty) of whichever Cycles entity we're on.
         queryCycles();
-        //For database entities for cases 1 and 2: If value equals "0", it is a COUNT UP instance, we simply set our intent boolean to true, since we don't need any saved values. If it is a COUNT DOWN instance, we split the concatenated String of values, and iterate them into a parsed list of Integers to be used in the timer. For case 3: Only a COUNT DOWN mode, so standard retrieval.
-        switch (mode) {
-          case 1:
-            Cycles cycles = cyclesList.get(receivedPos);
-            if (cycles.getSets().equals("0")) setsAreCountingUp = true; else {
-              setsAreCountingUp = false;
-              String[] tempSets = cycles.getSets().split(" - ");
-              for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
-            }
-            if (cycles.getBreaks().equals("0")) breaksAreCountingUp = true; else {
-              breaksAreCountingUp = false;
-              String[] tempBreaks = cycles.getBreaks().split(" - ");
-              for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
-            }
-            intent.putExtra("cycleTitle", cycles.getTitle());
-            passedID = cyclesList.get(receivedPos).getId();
-            break;
-          case 2:
-            CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
-            if (cyclesBO.getBreaksOnly().equals("0")) breaksOnlyAreCountingUp = true; else {
-              breaksOnlyAreCountingUp = false;
-              String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
-              for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
-            }
-            intent.putExtra("cycleTitle", cyclesBO.getTitle());
-            passedID = cyclesBOList.get(receivedPos).getId();
-            break;
-          case 3:
-            PomCycles pomCycles = pomCyclesList.get(receivedPos);
-            pomValuesTime.clear();
-            String[] tempPom = pomCycles.getFullCycle().split(" - ");
-            for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
-            intent.putExtra("cycleTitle", pomCycles.getTitle());
-            passedID = pomCyclesList.get(receivedPos).getId();
-            break;
-        }
-      } else {
-        //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
-        if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
-          runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
-          return;
-        }
-        intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
-        //Since this is a new Cycle, we automatically save it to database.
-        saveCycles(true);
-        //Updates the adapter display of saved cycles.
-        runOnUiThread(() -> populateCycleList());
-      }
-      //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
-      switch (mode) {
-        case 1:
-          intent.putIntegerArrayListExtra("setList", customSetTime);
-          intent.putExtra("setsAreCountingUp", setsAreCountingUp);
-          intent.putIntegerArrayListExtra("breakList", customBreakTime);
-          intent.putExtra("breaksAreCountingUp", breaksAreCountingUp);
-          break;
-        case 2:
-          intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
-          intent.putExtra("breaksOnlyAreCountingUp", breaksOnlyAreCountingUp);
-          break;
-        case 3:
-          intent.putIntegerArrayListExtra("pomList", pomValuesTime);
-          break;
-      }
-      //Mode used for type of timer.
-      intent.putExtra("mode", mode);
-      //Sends the current cycle's database position so we can delete it from the Timer class if desired.
-      intent.putExtra("passedID", passedID);
-      //Starts Timer class.
-      startActivity(intent);
+        //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
+        populateCycleList();
+      });
+    });
+
+    delete_all_cancel.setOnClickListener(v-> {
+      //Removes confirmation window.
+      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
   }
 
@@ -1418,6 +1356,91 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
     }
+  }
+
+
+  public void launchTimerCycle(boolean newCycle) {
+    AsyncTask.execute(()-> {
+      //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
+      int passedID = 0;
+      Intent intent = new Intent(MainActivity.this, TimerInterface.class);
+      //If we are RETRIEVING a cycle from the database, do the stuff below. If we are creating a new round, the timer arrays have already been populated by adjustCustom() and all we do it set the title based on our editText value.
+      if (!newCycle) {
+        //Clears old array values.
+        clearTimerArrays();
+        //Calling cycleList instance based on sort mode.
+        queryCycles();
+        //For database entities for cases 1 and 2: If value equals "0", it is a COUNT UP instance, we simply set our intent boolean to true, since we don't need any saved values. If it is a COUNT DOWN instance, we split the concatenated String of values, and iterate them into a parsed list of Integers to be used in the timer. For case 3: Only a COUNT DOWN mode, so standard retrieval.
+        switch (mode) {
+          case 1:
+            Cycles cycles = cyclesList.get(receivedPos);
+            if (cycles.getSets().equals("0")) setsAreCountingUp = true; else {
+              setsAreCountingUp = false;
+              String[] tempSets = cycles.getSets().split(" - ");
+              for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
+            }
+            if (cycles.getBreaks().equals("0")) breaksAreCountingUp = true; else {
+              breaksAreCountingUp = false;
+              String[] tempBreaks = cycles.getBreaks().split(" - ");
+              for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
+            }
+            intent.putExtra("cycleTitle", cycles.getTitle());
+            passedID = cyclesList.get(receivedPos).getId();
+            break;
+          case 2:
+            CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
+            if (cyclesBO.getBreaksOnly().equals("0")) breaksOnlyAreCountingUp = true; else {
+              breaksOnlyAreCountingUp = false;
+              String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
+              for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
+            }
+            intent.putExtra("cycleTitle", cyclesBO.getTitle());
+            passedID = cyclesBOList.get(receivedPos).getId();
+            break;
+          case 3:
+            PomCycles pomCycles = pomCyclesList.get(receivedPos);
+            pomValuesTime.clear();
+            String[] tempPom = pomCycles.getFullCycle().split(" - ");
+            for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
+            intent.putExtra("cycleTitle", pomCycles.getTitle());
+            passedID = pomCyclesList.get(receivedPos).getId();
+            break;
+        }
+      } else {
+        //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
+        if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
+          runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
+          return;
+        }
+        intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
+        //Since this is a new Cycle, we automatically save it to database.
+        saveCycles(true);
+        //Updates the adapter display of saved cycles.
+        runOnUiThread(() -> populateCycleList());
+      }
+      //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
+      switch (mode) {
+        case 1:
+          intent.putIntegerArrayListExtra("setList", customSetTime);
+          intent.putExtra("setsAreCountingUp", setsAreCountingUp);
+          intent.putIntegerArrayListExtra("breakList", customBreakTime);
+          intent.putExtra("breaksAreCountingUp", breaksAreCountingUp);
+          break;
+        case 2:
+          intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
+          intent.putExtra("breaksOnlyAreCountingUp", breaksOnlyAreCountingUp);
+          break;
+        case 3:
+          intent.putIntegerArrayListExtra("pomList", pomValuesTime);
+          break;
+      }
+      //Mode used for type of timer.
+      intent.putExtra("mode", mode);
+      //Sends the current cycle's database position so we can delete it from the Timer class if desired.
+      intent.putExtra("passedID", passedID);
+      //Starts Timer class.
+      startActivity(intent);
+    });
   }
 
   private void saveCycles(boolean newCycle) {

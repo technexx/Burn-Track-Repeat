@@ -340,6 +340,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
+    deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    //Todo: Set textView.
     TextView delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
     confirm_delete = deleteCyclePopupView.findViewById(R.id.confirm_yes);
     cancel_delete = deleteCyclePopupView.findViewById(R.id.confirm_no);
@@ -601,7 +603,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       AsyncTask.execute(()->{
         deleteCycle();
         runOnUiThread(() -> {
-          //Todo: Intent w/ notifyDataSetChanged().
+          Intent deleteIntent = new Intent(TimerInterface.this, MainActivity.class);
+          startActivity(deleteIntent);
         });
       });
     });
