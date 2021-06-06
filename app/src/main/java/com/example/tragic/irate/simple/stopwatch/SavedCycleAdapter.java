@@ -114,23 +114,28 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
           ArrayList<String> tempList = new ArrayList<>(mPositionList);
 
-          //Using tempList for loop and (contains) conditional to keep stable index values as we add/remove from mPositionList.
+          //Iterate through every cycle in list.
           for (int i=0; i<mSetsList.size(); i++) {
+            //Using tempList for stable loop since mPositionList changes.
             for (int j=0; j<tempList.size(); j++) {
+              //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
               if (String.valueOf(position).contains(tempList.get(j))) {
                 customHolder.fullView.setBackgroundColor(Color.BLACK);
                 //Adds the position at its identical index for easy removal access
                 mPositionList.remove(String.valueOf(position));
+                //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
                 changed = true;
               }
             }
           }
+          //If we have not toggle our highlight off above, toggle it on below.
           if (!changed) {
             if (!mPositionList.contains(String.valueOf(position))) {
               mPositionList.add(String.valueOf(position));
               customHolder.fullView.setBackgroundColor(Color.GRAY);
             }
           }
+          Log.i("testSize", "mPosition list is " + mPositionList);
           //Callback to send position list (Using Strings to make removing values easier) back to Main.
           mOnHighlightListener.onCycleHighlight(mPositionList);
         }
