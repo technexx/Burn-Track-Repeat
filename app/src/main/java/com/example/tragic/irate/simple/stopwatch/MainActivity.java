@@ -50,7 +50,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onHighlightListener {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -230,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
-  //Todo: Highliight w/ long click here?
   //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
@@ -238,9 +237,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     launchTimerCycle(false);
   }
 
+  //Receives highlighted positions from our adapter.
   @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    return false;
+  public void onCycleHighlight(List<String> listOfPositions) {
+//    Log.i("testpos", "positions are " + listOfPositions);
   }
 
   @Override
@@ -410,6 +410,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleRecycler.setLayoutManager(lm2);
           savedCycleAdapter.setItemClick(MainActivity.this);
           savedCycleAdapter.setDeleteCycle(MainActivity.this);
+          savedCycleAdapter.setHighlight(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
           //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().

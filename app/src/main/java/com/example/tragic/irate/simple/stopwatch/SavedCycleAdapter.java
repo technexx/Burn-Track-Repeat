@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
   Context mContext;
@@ -36,12 +38,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mBreaksOnly;
   onCycleClickListener mOnCycleClickListener;
   onDeleteCycleListener mOnDeleteCycleListener;
+  onHighlightListener mOnHighlightListener;
   public static final int SETS_AND_BREAKS = 0;
   public static final int BREAKS_ONLY = 1;
   public static final int POMODORO = 2;
   int mChosenView;
-  boolean mHighlightedCycle;
-  boolean mToggleColor;
+  boolean mHighlightMode;
+  List<String> mPositionList;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -52,7 +55,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public interface onHighlightListener {
-    void onCycleHighlight ();
+    void onCycleHighlight (List<String> listOfPositions);
   }
 
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -63,12 +66,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mOnDeleteCycleListener = xOnDeleteCycleListener;
   }
 
-  public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> pomList, ArrayList<String> title, ArrayList<String> breaksOnlyTitle, ArrayList<String> pomTitle) {
-    this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mPomList = pomList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitle; this.mPomTitle = pomTitle;
+  public void setHighlight(onHighlightListener xOnHighlightListener) {
+    this.mOnHighlightListener = xOnHighlightListener;
   }
 
-  public void setBreaksOnly(boolean breaksOnly){
-    mBreaksOnly = breaksOnly;
+  public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> pomList, ArrayList<String> title, ArrayList<String> breaksOnlyTitle, ArrayList<String> pomTitle) {
+    this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mPomList = pomList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitle; this.mPomTitle = pomTitle;
+    //Must be instantiated here so it does not loop and reset in onBindView.
+    mPositionList = new ArrayList<>();
   }
 
   public void setView(int chosenView) {
@@ -91,36 +96,55 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else return null;
   }
 
+  //Todo: Remember, this entire method executes as many times as there are position returns, but to ensure we don't run out of bounds we need to limit the mPositionList comparison to its size.
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+    //Used to store highlighted positions that we callback to Main to delete.
     if (holder instanceof CustomHolder) {
       CustomHolder customHolder = (CustomHolder) holder;
       customHolder.customName.setText(mTitle.get(position));
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
-      //Todo: New onClick method if in highlight mode (to select multiple cycles) Add button(s) in supportActionBar for deletions. Callback selected positions->get IDs therefrom in Main.
       customHolder.fullView.setOnClickListener(v -> {
-        //If not in highlight mode, launch our timer activity from cycle clicked on.
-        if (!mHighlightedCycle) {
-          mOnCycleClickListener.onCycleClick(position);
-          //If in highlight mode, clicking on any given cycle highlights it.
-        } else {
-          if ((customHolder.fullView.getBackground()!=null)) {
-            ColorDrawable colorDrawable = (ColorDrawable) customHolder.fullView.getBackground();
-            int color = colorDrawable.getColor();
-            if (color==Color.BLACK) customHolder.fullView.setBackgroundColor(Color.GRAY);
-            else customHolder.fullView.setBackgroundColor(Color.BLACK);
+        boolean changed = false;
+        //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
+        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
+          ArrayList<String> tempList = new ArrayList<>(mPositionList);
+
+          //Using tempList for loop and (contains) conditional to keep stable index values as we add/remove from mPositionList.
+          for (int i=0; i<mSetsList.size(); i++) {
+            for (int j=0; j<tempList.size(); j++) {
+              if (String.valueOf(position).contains(tempList.get(j))) {
+                customHolder.fullView.setBackgroundColor(Color.BLACK);
+                //Adds the position at its identical index for easy removal access
+                mPositionList.remove(String.valueOf(position));
+                changed = true;
+              }
+            }
           }
+          if (!changed) {
+            if (!mPositionList.contains(String.valueOf(position))) {
+              mPositionList.add(String.valueOf(position));
+              customHolder.fullView.setBackgroundColor(Color.GRAY);
+            }
+          }
+          //Callback to send position list (Using Strings to make removing values easier) back to Main.
+          mOnHighlightListener.onCycleHighlight(mPositionList);
         }
       });
 
-      //Highlight cycle on long click and make visible action bar buttons. Sets mHighlightedCycle to true so no cycles can be launched in timer.
+      //Todo: Add button(s) in supportActionBar for deletions - should be a "Back" arrow to cancel highlights and set mHighlightMode to FALSE again.
+      // Callback selected positions->get IDs therefrom in Main.
+      //Highlight cycle on long click and make visible action bar buttons. Sets mHighlightMode to true so no cycles can be launched in timer.
       customHolder.fullView.setOnLongClickListener(v-> {
-        customHolder.fullView.setBackgroundColor(Color.GRAY);
-        mHighlightedCycle = true;
-        Toast.makeText(mContext, "BOO!", Toast.LENGTH_SHORT).show();
+        if (!mHighlightMode) {
+          mPositionList.add(String.valueOf(position));
+          customHolder.fullView.setBackgroundColor(Color.GRAY);
+          mHighlightMode = true;
+        }
         return true;
       });
 
