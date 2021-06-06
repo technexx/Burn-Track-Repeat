@@ -96,7 +96,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else return null;
   }
 
-  //Todo: Remember, this entire method executes as many times as there are position returns, but to ensure we don't run out of bounds we need to limit the mPositionList comparison to its size.
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -121,21 +120,18 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
               //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
               if (String.valueOf(position).contains(tempList.get(j))) {
                 customHolder.fullView.setBackgroundColor(Color.BLACK);
-                //Adds the position at its identical index for easy removal access
                 mPositionList.remove(String.valueOf(position));
                 //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
                 changed = true;
               }
             }
           }
-          //If we have not toggle our highlight off above, toggle it on below.
+          //If we have not toggled our highlight off above, toggle it on below.
           if (!changed) {
-            if (!mPositionList.contains(String.valueOf(position))) {
-              mPositionList.add(String.valueOf(position));
-              customHolder.fullView.setBackgroundColor(Color.GRAY);
-            }
+            //Adds the position at its identical index for easy removal access.
+            mPositionList.add(String.valueOf(position));
+            customHolder.fullView.setBackgroundColor(Color.GRAY);
           }
-          Log.i("testSize", "mPosition list is " + mPositionList);
           //Callback to send position list (Using Strings to make removing values easier) back to Main.
           mOnHighlightListener.onCycleHighlight(mPositionList);
         }
