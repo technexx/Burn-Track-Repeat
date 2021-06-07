@@ -43,6 +43,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public static final int BREAKS_ONLY = 1;
   public static final int POMODORO = 2;
   int mChosenView;
+  boolean mCancelHighlight;
   boolean mHighlightMode;
   List<String> mPositionList;
 
@@ -55,7 +56,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public interface onHighlightListener {
-    void onCycleHighlight (List<String> listOfPositions);
+    void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
   }
 
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -74,10 +75,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mPomList = pomList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitle; this.mPomTitle = pomTitle;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
+    //Resets our cancel so bindView does not continuously call black backgrounds.
+    mCancelHighlight = false;
   }
 
   public void setView(int chosenView) {
     this.mChosenView = chosenView;
+  }
+
+  public void cancelHighlight() {
+    mCancelHighlight = true;
   }
 
   @NonNull
@@ -107,6 +114,17 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
+      if (mCancelHighlight) {
+        //Clears highlight list.
+        mPositionList.clear();
+        //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
+        mHighlightMode = false;
+        //Sets all of our backgrounds to black (unhighlighted).
+        for (int i=0; i<mSetsList.size(); i++) {
+          customHolder.fullView.setBackgroundColor(Color.BLACK);
+        }
+      }
+
       customHolder.fullView.setOnClickListener(v -> {
         boolean changed = false;
         //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
@@ -133,7 +151,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             customHolder.fullView.setBackgroundColor(Color.GRAY);
           }
           //Callback to send position list (Using Strings to make removing values easier) back to Main.
-          mOnHighlightListener.onCycleHighlight(mPositionList);
+          mOnHighlightListener.onCycleHighlight(mPositionList, false);
         }
       });
 
@@ -145,6 +163,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           mPositionList.add(String.valueOf(position));
           customHolder.fullView.setBackgroundColor(Color.GRAY);
           mHighlightMode = true;
+          //Calls back for initial highlighted position, Also to set actionBar views for highlight mode.
+          mOnHighlightListener.onCycleHighlight(mPositionList, true);
         }
         return true;
       });

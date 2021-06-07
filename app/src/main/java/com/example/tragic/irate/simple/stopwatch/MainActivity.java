@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -57,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SharedPreferences.Editor prefEdit;
   View mainView;
 
-  DotDraws dotDraws;
   ImageButton fab;
 
   ImageView sortCheckmark;
@@ -91,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView delete_all_text;
   Button delete_all_confirm;
   Button delete_all_cancel;
+  TextView appHeader;
+  ImageButton trashCan;
+  ImageButton cancelHighlight;
 
   int mode = 1;
   int sortMode = 1;
@@ -227,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onCycleDelete(int position) {
-
   }
 
   //Gets the position clicked on from our saved cycle adapter.
@@ -239,8 +241,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Receives highlighted positions from our adapter.
   @Override
-  public void onCycleHighlight(List<String> listOfPositions) {
-//    Log.i("testpos", "positions are " + listOfPositions);
+  public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
+    if (addButtons) {
+      trashCan.setVisibility(View.VISIBLE);
+      cancelHighlight.setVisibility(View.VISIBLE);
+      appHeader.setVisibility(View.INVISIBLE);
+    }
   }
 
   @Override
@@ -259,9 +265,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 //Get instance of cycles/cyclesBO/pomCycles.
                 queryCycles();
                 //if instance is empty, pop a Toast and return. Otherwise, show popUp window to confirm cycle deletion.
-                if (currentCycleEmpty) {
-                  runOnUiThread(() -> Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show());
-                } else deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
+                runOnUiThread(()-> {
+                  if (currentCycleEmpty) {
+                    Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
+                  } else deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
+                });
               });
               break;
         }
@@ -343,6 +351,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setCustomView(R.layout.custom_bar);
+    appHeader = findViewById(R.id.app_header);
+    trashCan = findViewById(R.id.save_cycles);
+    cancelHighlight = findViewById(R.id.cancel_highlight);
+    trashCan.setVisibility(View.INVISIBLE);
+    cancelHighlight.setVisibility(View.INVISIBLE);
 
     //These Integer Lists hold our millis values for each round.
     customSetTime = new ArrayList<>();
@@ -458,6 +471,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_edit_two.addTextChangedListener(textWatcher);
 
     countUpMode(true); countUpMode(false);
+
+    cancelHighlight.setOnClickListener(v-> {
+      cancelHighlight.setVisibility(View.INVISIBLE);
+      trashCan.setVisibility(View.INVISIBLE);
+      appHeader.setVisibility(View.VISIBLE);
+      savedCycleAdapter.cancelHighlight();
+      savedCycleAdapter.notifyDataSetChanged();
+    });
 
     //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
