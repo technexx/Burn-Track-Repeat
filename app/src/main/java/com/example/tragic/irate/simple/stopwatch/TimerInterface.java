@@ -236,6 +236,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   CyclesBO cyclesBO;
   PomCycles pomCycles;
   int passedID;
+  MainActivity mainActivity;
 
   @Override
   public void onBackPressed() {
@@ -270,6 +271,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.timer_interface);
+    mainActivity = new MainActivity();
 
     //Object to access our layout.
     timerInterface = new ConstraintLayout(this);
@@ -406,7 +408,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     progressBar.setProgress(maxProgress);
 
     //Populates UI elements at app start.
-    populateCycleUI();
+    populateTimerUI();
 
     //Used in all timers to smooth out end fade.
     endFade = new Runnable() {
@@ -600,6 +602,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     confirm_delete.setOnClickListener(v-> {
       //Delete the current cycle and kicks us back to Main.
       AsyncTask.execute(()->{
+        mainActivity.queryCycles();
         deleteCycle();
         runOnUiThread(() -> {
           Intent deleteIntent = new Intent(TimerInterface.this, MainActivity.class);
@@ -907,7 +910,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (numberOfBreaksOnly>0) {
             breaksOnlyProgressPause = maxProgress;
             //Smooths out end fade.
-            //Todo: fadeVar is issue. Likely because break count is lowered and our canvas draws the next one dark. We declare fadeVar here for use w/ endFade.
             if (mode==2){
               fadeVar = 3;
               mHandler.post(endFade);
@@ -1612,7 +1614,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-  public void populateCycleUI() {
+  public void populateTimerUI() {
     switch (mode) {
       case 1:
         if (customSetTime.size()>0) {
@@ -1740,7 +1742,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         lapAdapter.notifyDataSetChanged();
         break;
     }
-    populateCycleUI();
+    populateTimerUI();
   }
 
   public void deleteCycle() {

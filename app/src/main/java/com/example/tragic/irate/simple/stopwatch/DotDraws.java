@@ -126,7 +126,6 @@ public class DotDraws extends View {
   public void customDrawSet(int setCount, int setReduce, int fadeDone) {
     this.mSetCount = setCount; this.mSetReduce = setReduce; this.mFadeDone = fadeDone;
     invalidate();
-    Log.i("testDots", "true!");
   }
 
   public void customDrawBreak(int breakCount, int breakReduce) {
