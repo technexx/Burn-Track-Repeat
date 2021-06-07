@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int customID;
   int breaksOnlyID;
   int pomID;
+  List<String> receivedHighlightPositions;
 
   EditText cycle_name_edit;
   TextView s1;
@@ -243,6 +244,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
     if (addButtons) {
+      receivedHighlightPositions = listOfPositions;
       trashCan.setVisibility(View.VISIBLE);
       cancelHighlight.setVisibility(View.VISIBLE);
       appHeader.setVisibility(View.INVISIBLE);
@@ -379,6 +381,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     customTitleArray = new ArrayList<>();
     breaksOnlyTitleArray = new ArrayList<>();
     pomTitleArray = new ArrayList<>();
+    //If highlighting cycles for deletion, contains all POSITIONS (not IDs) of cycles highlighted.
+    receivedHighlightPositions = new ArrayList<>();
 
     //Database entity lists.
     cyclesList = new ArrayList<>();
@@ -472,27 +476,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     countUpMode(true); countUpMode(false);
 
-    cancelHighlight.setOnClickListener(v-> {
-      cancelHighlight.setVisibility(View.INVISIBLE);
-      trashCan.setVisibility(View.INVISIBLE);
-      appHeader.setVisibility(View.VISIBLE);
-      savedCycleAdapter.cancelHighlight();
-      savedCycleAdapter.notifyDataSetChanged();
-    });
-
-    //Brings up editCycle popUp to create new Cycle.
-    fab.setOnClickListener(v -> {
-      //Clears timer arrays so they can be freshly populated.
-      clearTimerArrays();
-      //Brings up menu to add/subtract rounds to new cycle.
-      editCyclesPopupWindow.showAsDropDown(tabLayout);
-    });
-
-    //Launched from editCyclePopUp and calls TimerInterface w/ new cycle info.
-    start_timer.setOnClickListener(v-> {
-      launchTimerCycle(true);
-    });
-
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
@@ -538,10 +521,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
+
+    //Brings up editCycle popUp to create new Cycle.
+    fab.setOnClickListener(v -> {
+      //Clears timer arrays so they can be freshly populated.
+      clearTimerArrays();
+      //Brings up menu to add/subtract rounds to new cycle.
+      editCyclesPopupWindow.showAsDropDown(tabLayout);
+    });
+
+    ////--ActionBar Item onClicks START--////
+    trashCan.setOnClickListener(v-> {
+      List<Integer> convList = new ArrayList<>();
+      for (int i=0; i<receivedHighlightPositions.size(); i++) convList.add(Integer.valueOf(receivedHighlightPositions.get(i)));
+
+
+    });
+
+    //Turns off our cycle highlight mode from adapter.
+    cancelHighlight.setOnClickListener(v-> {
+      cancelHighlight.setVisibility(View.INVISIBLE);
+      trashCan.setVisibility(View.INVISIBLE);
+      appHeader.setVisibility(View.VISIBLE);
+      savedCycleAdapter.cancelHighlight();
+      savedCycleAdapter.notifyDataSetChanged();
+    });
+    ////--ActionBar Item onClicks END--////
+
+    ////--EditCycles Menu Item onClicks START--////
     //Dismisses editText views if we click within the unpopulated area of popUp.
     editCyclesPopupView.setOnClickListener(v-> {
       removeEditViews();
       editCycleViews();
+    });
+
+    //Launched from editCyclePopUp and calls TimerInterface w/ new cycle info.
+    start_timer.setOnClickListener(v-> {
+      launchTimerCycle(true);
     });
 
     upDown_arrow_one.setImageResource(R.drawable.arrow_down);
@@ -732,6 +748,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sub_cycle.setOnClickListener(v -> {
       adjustCustom(false);
     });
+    ////--EditCycles Menu Item OnClicks END--////
+
 
     delete_all_confirm.setOnClickListener(v-> {
       //Removes confirmation window.
