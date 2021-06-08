@@ -43,7 +43,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public static final int BREAKS_ONLY = 1;
   public static final int POMODORO = 2;
   int mChosenView;
-  boolean mCancelHighlight;
+  boolean mHighlightDeleted;
   boolean mHighlightMode;
   List<String> mPositionList;
 
@@ -76,15 +76,18 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
-    mCancelHighlight = false;
+    mHighlightDeleted = false;
   }
 
   public void setView(int chosenView) {
     this.mChosenView = chosenView;
   }
 
-  public void cancelHighlight() {
-    mCancelHighlight = true;
+  public void removeHighlight(boolean cancelMode) {
+    //If boolean is false, highlight has simply been deleted and we clear the highlight list while turning all backgrounds black/
+    mHighlightDeleted = true;
+    //If boolean is true, we have canceled the highlight process entirely, which does the above but also removes the Trash/Back buttons (done in Main) and sets the next row click to launch a timer instead of highlight (done here).
+    if (cancelMode) mHighlightMode = false;
   }
 
   @NonNull
@@ -114,7 +117,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
-      if (mCancelHighlight) {
+      if (mHighlightDeleted) {
         //Clears highlight list.
         mPositionList.clear();
         //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.

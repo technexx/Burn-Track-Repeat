@@ -190,8 +190,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
 
-  //Todo: Make sure queryCycles is called anytime we need an instance of cycleList (for proper sort mode).
-  //Todo: Long click to highlight cycle in Main, which bring up a "select all," "delete/trash", and "edit" buttons in action bar.
+  //Todo; Send default dated title to Timer when launching new cycle.
+  //Todo: "Count Up" bubbles use "Count Down" time.
+  //Todo: Make "next round" button visible if starting in "count up" mode.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
 
@@ -531,26 +532,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.showAsDropDown(tabLayout);
     });
 
-    //Todo: We need to update receivedHighlightPositions to reflect db entries after first deletion.
+    //Todo: Remaining highlight fixes.
     ////--ActionBar Item onClicks START--////
     trashCan.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
+        ArrayList<String> tempPos = new ArrayList<>(receivedHighlightPositions);
         queryCycles();
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
           receivedPos = Integer.parseInt(receivedHighlightPositions.get(i));
-          switch (mode) {
-            case 1:
-              deleteCycle(false);
-//              cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cyclesList.get(receivedPos).getId()).get(0);
-//              cyclesDatabase.cyclesDao().deleteCycle(cycles);
-              break;
-          }
+          deleteCycle(false);
+          tempPos.remove(String.valueOf(receivedPos));
         }
         //Calls new database entries and updates our adapter's recyclerView.
         runOnUiThread(() -> {
           queryCycles();
           populateCycleList();
+          savedCycleAdapter.removeHighlight(false);
           savedCycleAdapter.notifyDataSetChanged();
+          receivedHighlightPositions = tempPos;
         });
       });
     });
@@ -560,7 +559,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.setVisibility(View.INVISIBLE);
       trashCan.setVisibility(View.INVISIBLE);
       appHeader.setVisibility(View.VISIBLE);
-      savedCycleAdapter.cancelHighlight();
+      savedCycleAdapter.removeHighlight(true);
       savedCycleAdapter.notifyDataSetChanged();
     });
     ////--ActionBar Item onClicks END--////
