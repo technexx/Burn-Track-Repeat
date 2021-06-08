@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -66,16 +67,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   TextView lastTextView;
 
   String cycle_title;
-  long setValue;
-  long breakValue;
-  long breaksOnlyValue;
   long pomValue1;
   long pomValue2;
   long pomValue3;
-  long editSetSeconds;
-  long editSetMinutes;
-  long editBreakMinutes;
-  long editBreakSeconds;
   int overSeconds;
   TextView overtime;
 
@@ -90,8 +84,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   int RESUMING_TIMER = 2;
   int RESETTING_TIMER = 3;
   int RESTARTING_TIMER = 4;
-  int SAVING_CYCLES = 1;
-  int UPDATING_CYCLES = 2;
   int movingBOCycle;
 
   long setMillis;
@@ -106,12 +98,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   long breakMillisUntilFinished;
   long breakOnlyMillisUntilFinished;
   long pomMillisUntilFinished;
-  boolean incrementValues;
-  int incrementTimer = 10;
-  Runnable changeFirstValue;
-  Runnable changeSecondValue;
-  Runnable changeThirdValue;
-  Runnable valueSpeed;
   Runnable endFade;
   Runnable ot;
 
@@ -155,7 +141,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   boolean modeTwoTimerEnded;
   boolean modeThreeTimerEnded;
   boolean onBreak;
-  boolean emptyCycle;
   boolean timerDisabled;
   boolean boTimerDisabled;
   boolean pomTimerDisabled;
@@ -187,9 +172,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> customBreakTime;
   ArrayList<Integer> breaksOnlyTime;
   ArrayList<Integer> pomValuesTime;
-  ArrayList<Integer> customSetTimeUP;
-  ArrayList<Integer> customBreakTimeUP;
-  ArrayList<Integer> breaksOnlyTimeUP;
+  ArrayList<Integer> zeroArray;
 
   boolean activePomCycle;
   boolean setBegun;
@@ -208,8 +191,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   int countUpMillisSets;
   int countUpMillisBreaks;
   int countUpMillisBO;
-  int COUNTING_DOWN = 1;
-  int COUNTING_UP = 2;
   public Runnable secondsUpSetRunnable;
   public Runnable secondsUpBreakRunnable;
   public Runnable secondsUpBORunnable;
@@ -285,12 +266,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     customSetTime = new ArrayList<>();
     customBreakTime = new ArrayList<>();
     breaksOnlyTime = new ArrayList<>();
-    customSetTimeUP = new ArrayList<>();
-    customBreakTimeUP = new ArrayList<>();
-    breaksOnlyTimeUP = new ArrayList<>();
     currentLapList = new ArrayList<>();
     savedLapList = new ArrayList<>();
 
+    zeroArray = new ArrayList<>();
     setsArray = new ArrayList<>();
     breaksArray = new ArrayList<>();
     breaksOnlyArray = new ArrayList<>();
@@ -366,12 +345,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         dotDraws.countingUpSets(setsAreCountingUp);
         dotDraws.countingUpBreaks(breaksAreCountingUp);
         setMillis = customSetTime.get(0);
+        //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
+        for (int i=0; i<customSetTime.size(); i++) zeroArray.add(0);
         break;
       case 2:
         breaksOnlyTime = intent.getIntegerArrayListExtra("breakOnlyList");
         breaksOnlyAreCountingUp = intent.getBooleanExtra("breaksOnlyAreCountingUp", false);
         dotDraws.countingUpBreaksOnly(breaksOnlyAreCountingUp);
         breakOnlyMillis = breaksOnlyTime.get(0);
+        //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
+        for (int i=0; i<breaksOnlyTime.size(); i++) zeroArray.add(0);
         break;
       case 3:
         pomValue1 = intent.getIntExtra("pomValue1", 0);
@@ -1347,16 +1330,17 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     dotDraws.setAlpha();
   }
 
+  //Todo: Set Count Up mode dot values here.
   public void drawDots(int fadeVar) {
     switch (mode) {
       case 1:
-        dotDraws.setTime(customSetTime);
-        dotDraws.breakTime(customBreakTime);
+        if (!setsAreCountingUp) dotDraws.setTime(customSetTime); else dotDraws.setTime(zeroArray);
+        if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(zeroArray);
         dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
         dotDraws.customDrawBreak(startSets, numberOfBreaks);
         break;
       case 2:
-        dotDraws.breakOnlyTime(breaksOnlyTime);
+        if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); dotDraws.breakOnlyTime(zeroArray);
         dotDraws.breaksOnlyDraw(startBreaksOnly, numberOfBreaksOnly, fadeVar);
         break;
       case 3:
@@ -1711,7 +1695,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         breakOnlyBegun = false;
         breaksOnlyHalted = true;
         mHandler.removeCallbacks(secondsUpBORunnable);
-        for (int i=0; i<breaksOnlyTimeUP.size(); i++) breaksOnlyTimeUP.set(i, 0);
         break;
       case 3:
         pomDotCounter = 1;

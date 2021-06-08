@@ -190,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
 
-  //Todo: "Count Up" bubbles use "Count Down" time.
   //Todo: Make "next round" button visible if starting in "count up" mode.
   //Todo: Implement cycle highlights in modes 2 and 3. Careful nothing overlaps (i.e. cancel highlight mode when switching tabs).
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
