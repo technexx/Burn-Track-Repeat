@@ -379,6 +379,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         pomValue3 = intent.getIntExtra("pomValue3", 0);
         break;
     }
+    cycle_header_text.setText(intent.getStringExtra("cyclesTitle"));
 
     AsyncTask.execute(() -> {
       //Loads database of saved cycles. Used for deleting cycles.

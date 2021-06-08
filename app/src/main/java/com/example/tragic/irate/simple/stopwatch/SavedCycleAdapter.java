@@ -158,8 +158,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
       });
 
-      //Todo: Add button(s) in supportActionBar for deletions - should be a "Back" arrow to cancel highlights and set mHighlightMode to FALSE again.
-      // Callback selected positions->get IDs therefrom in Main.
       //Highlight cycle on long click and make visible action bar buttons. Sets mHighlightMode to true so no cycles can be launched in timer.
       customHolder.fullView.setOnLongClickListener(v-> {
         if (!mHighlightMode) {

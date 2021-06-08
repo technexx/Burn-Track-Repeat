@@ -190,9 +190,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
 
-  //Todo; Send default dated title to Timer when launching new cycle.
   //Todo: "Count Up" bubbles use "Count Down" time.
   //Todo: Make "next round" button visible if starting in "count up" mode.
+  //Todo: Implement cycle highlights in modes 2 and 3. Careful nothing overlaps (i.e. cancel highlight mode when switching tabs).
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
 
@@ -547,9 +547,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(() -> {
           queryCycles();
           populateCycleList();
-          savedCycleAdapter.removeHighlight(false);
           savedCycleAdapter.notifyDataSetChanged();
           receivedHighlightPositions = tempPos;
+          //If there are no cycles left, cancel highlight mode. If there are any left, simply remove all highlights.
+          if (receivedHighlightPositions.size()>0) savedCycleAdapter.removeHighlight(false); else {
+            cancelHighlight.setVisibility(View.INVISIBLE);
+            trashCan.setVisibility(View.INVISIBLE);
+            appHeader.setVisibility(View.VISIBLE);
+            savedCycleAdapter.removeHighlight(true);
+          }
         });
       });
     });
@@ -1420,6 +1426,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   public void launchTimerCycle(boolean newCycle) {
+    //Gets current date for use in empty titles.
+    Calendar calendar = Calendar.getInstance();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+    String date = dateFormat.format(calendar.getTime());
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
     int passedID = 0;
     Intent intent = new Intent(MainActivity.this, TimerInterface.class);
@@ -1471,7 +1481,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
         return;
       }
-      intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
+      //Todo: saveCycles defaults to date/time for empty title, but nothing gets set here.
+      if (cycle_name_edit.getText().toString().isEmpty()) intent.putExtra("cyclesTitle", date);
+      else intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
       //Updates the adapter display of saved cycles.
