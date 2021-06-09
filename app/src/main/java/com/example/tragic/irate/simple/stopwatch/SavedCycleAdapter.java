@@ -37,7 +37,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mPomTitle;
   boolean mBreaksOnly;
   onCycleClickListener mOnCycleClickListener;
-  onDeleteCycleListener mOnDeleteCycleListener;
   onHighlightListener mOnHighlightListener;
   public static final int SETS_AND_BREAKS = 0;
   public static final int BREAKS_ONLY = 1;
@@ -51,20 +50,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     void onCycleClick (int position);
   }
 
-  public interface onDeleteCycleListener {
-    void onCycleDelete (int position);
-  }
-
   public interface onHighlightListener {
     void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
   }
 
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
     this.mOnCycleClickListener = xOnCycleClickListener;
-  }
-
-  public void setDeleteCycle(onDeleteCycleListener xOnDeleteCycleListener) {
-    this.mOnDeleteCycleListener = xOnDeleteCycleListener;
   }
 
   public void setHighlight(onHighlightListener xOnHighlightListener) {

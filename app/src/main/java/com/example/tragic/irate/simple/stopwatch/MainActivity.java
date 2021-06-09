@@ -51,7 +51,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onDeleteCycleListener, SavedCycleAdapter.onHighlightListener {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -230,10 +230,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  @Override
-  public void onCycleDelete(int position) {
-  }
-
   //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
@@ -246,9 +242,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Receives highlighted positions from our adapter.
   @Override
   public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
+    //Receives list of cycle positions highlighted.
+    receivedHighlightPositions = listOfPositions;
+    //Sets "highlight mode" actionBar buttons to Visible if entering mode.
     if (addButtons) {
-      //Todo: Not ideal to have this called every time we click on a cycle.
-      receivedHighlightPositions = listOfPositions;
       edit_highlighted_cycle.setVisibility(View.VISIBLE);
       delete_highlighted_cycle.setVisibility(View.VISIBLE);
       cancelHighlight.setVisibility(View.VISIBLE);
@@ -431,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleRecycler.setAdapter(savedCycleAdapter);
           savedCycleRecycler.setLayoutManager(lm2);
           savedCycleAdapter.setItemClick(MainActivity.this);
-          savedCycleAdapter.setDeleteCycle(MainActivity.this);
           savedCycleAdapter.setHighlight(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
@@ -534,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.showAsDropDown(tabLayout);
     });
 
-    //Todo: Cancel highlight mode here.
+    //Todo: Cancel highlight mode here and get title as well.
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
       editCyclesPopupWindow.showAsDropDown(tabLayout);
@@ -557,10 +553,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
             break;
         }
-        //Updating adapter views.
         runOnUiThread(()-> {
+          //Setting editText title.
+          cycle_name_edit.setText(cycleTitle);
+          //Updating adapter views.
           cycleRoundsAdapter.setMode(mode);
           cycleRoundsAdapter.notifyDataSetChanged();
+          //Removing highlights.
+          savedCycleAdapter.removeHighlight(true);
         });
       });
     });
