@@ -279,6 +279,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       for (int k=0; k<newSplit.length; k++) {
         //Creating new ArrayList of Long values.
+        //Todo: If for some reason we receive a blank String here, we will crash w/ null exception.
         newLong.add(Long.parseLong(newSplit[k]));
         //Converting each Long value into a String we can display.
         newString.add(convertSeconds(newLong.get(k)));

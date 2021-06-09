@@ -189,9 +189,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean breaksOnlyAreCountingUp;
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
+  boolean onNewCycle;
 
+  //Todo: In cycleRounds recycler, preface <60 seconds w/ 0:XX.
   //Todo: Show visual reference to round time even if in "count up?"
-  //Todo: Highlight mode EDIT, which can also toggle "count up/down."
   //Todo: Implement cycle highlights in modes 2 and 3. Careful nothing overlaps (i.e. cancel highlight mode when switching tabs).
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
@@ -226,8 +227,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onBackPressed() {
     if (editCyclesPopupWindow.isShowing()) {
-      //Todo: Save or update cycle. We can determine this by whether we come to this popup via FAB or from actionBar edit (to be added)
+      //If non-database cycle (i.e. FAB launched) is present, save it as a new entry. If a database-saved cycle (i.e. highlight launched) is present, update it in the database.
+      //Todo: notify needs Array lists populated for update, roundAdapter needs its data cleared for next FAB to show as empty, and we need a conditional for blank rounds (probably better to put this in the save() method than launch().
+      //Todo: Should we sub or have another method of populateArray that doesn't query db? Just for adapter views.
+      AsyncTask.execute(()->{
+        if (onNewCycle) saveCycles(true); else saveCycles(false);
+        runOnUiThread(()-> {
+          savedCycleAdapter.notifyDataSetChanged();
+          editCyclesPopupWindow.dismiss();
+          clearTimerArrays();
+        });
+      });
     }
+    queryCycles();
+    Log.i("testSize", "size is " + cyclesList.size());
   }
 
   //Gets the position clicked on from our saved cycle adapter.
@@ -306,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, false);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -528,18 +541,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearTimerArrays();
       //Brings up menu to add/subtract rounds to new cycle.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
+      //Boolean set to true indicates a new, non-database-saved cycle is populating our editCyclesPopup. This is primarily used for onBackPressed, to determine whether to save it as a new entry, or update its current position in the database.
+      onNewCycle = true;
     });
 
-    //Todo: Cancel highlight mode here and get title as well.
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       AsyncTask.execute(()-> {
         queryCycles();
-        //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected).
-        int editPos = Integer.parseInt(receivedHighlightPositions.get(0));
+        //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
+        receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
         //Uses this single position to retrieve cycle and populate timer arrays.
-        retrieveCycle(editPos);
+        retrieveCycle();
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
         switch (mode) {
           case 1:
@@ -561,6 +575,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.notifyDataSetChanged();
           //Removing highlights.
           savedCycleAdapter.removeHighlight(true);
+          //Boolean set to false indicates that a current database-saved cycle is populating our editCyclesPopup.
+          onNewCycle = false;
         });
       });
     });
@@ -827,11 +843,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  //Clears both timer millis arrays and their converted String arrays.
   public void clearTimerArrays() {
     customSetTime.clear();
     customBreakTime.clear();
     breaksOnlyTime.clear();
     pomValuesTime.clear();
+    convertedSetsList.clear();
+    convertedBreaksList.clear();
+    convertedBreaksOnlyList.clear();
+    convertedPomList.clear();
   }
 
   //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
@@ -1398,6 +1419,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
   }
 
+  public String friendlyString(String altString) {
+    altString = altString.replace("\"", "");
+    altString = altString.replace("]", "");
+    altString = altString.replace("[", "");
+    altString = altString.replace(",", " - ");
+    return altString;
+  }
+
   public void queryCycles() {
     switch (mode) {
       case 1:
@@ -1490,14 +1519,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Gets instance of our database entity class based on which mode we're in. Converts its String into Integers and populates our timer arrays with them.
-  public void retrieveCycle(int position) {
+  public void retrieveCycle() {
     //Calling cycleList instance based on sort mode.
     queryCycles();
     //Clears old array values.
     clearTimerArrays();
     switch (mode) {
       case 1:
-        Cycles cycles = cyclesList.get(position);
+        Cycles cycles = cyclesList.get(receivedPos);
         String[] tempSets = cycles.getSets().split(" - ");
         for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
 
@@ -1507,14 +1536,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleTitle = cycles.getTitle();
         break;
       case 2:
-        CyclesBO cyclesBO = cyclesBOList.get(position);
+        CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
         String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
         for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
         retrievedID = cyclesBOList.get(0).getId();
         cycleTitle = cyclesBO.getTitle();
         break;
       case 3:
-        PomCycles pomCycles = pomCyclesList.get(position);
+        PomCycles pomCycles = pomCyclesList.get(receivedPos);
         pomValuesTime.clear();
         String[] tempPom = pomCycles.getFullCycle().split(" - ");
         for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
@@ -1546,7 +1575,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Updates the adapter display of saved cycles, since we are adding to it.
       runOnUiThread(() -> populateCycleList());
       //If selecting an existing cycle, call its info and set timer value arrays.
-    } else retrieveCycle(receivedPos);
+    } else retrieveCycle();
 
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
     switch (mode) {
@@ -1587,24 +1616,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String cycle_name = cycle_name_edit.getText().toString();
     int cycleID = 0;
 
-    //Todo: Saving "0" for count up mode b0rks retrieval. Should save "count down" values but not use them in Timer mode if "count up"
     switch (mode) {
       case 1:
-        //Gets the ID of the cycle instance we have clicked on from its position.
-        if (cyclesList.size()>0) cycleID = cyclesList.get(receivedPos).getId();
         //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
-        if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+        if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) {
+          cycleID = cyclesList.get(receivedPos).getId();
+          cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+        }
         //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
         setString = gson.toJson(customSetTime);
-        setString = setString.replace("\"", "");
-        setString = setString.replace("]", "");
-        setString =  setString.replace("[", "");
-        setString = setString.replace(",", " - ");
+        setString = friendlyString(setString);
         breakString = gson.toJson(customBreakTime);
-        breakString = breakString.replace("\"", "");
-        breakString = breakString.replace("]", "");
-        breakString = breakString.replace("[", "");
-        breakString = breakString.replace(",", " - ");
+        breakString = friendlyString(breakString);
         //Adding and inserting into database.
         cycles.setSets(setString);
         cycles.setBreaks(breakString);
@@ -1614,15 +1637,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
         break;
       case 2:
-        //Gets the ID of the cycle instance we have clicked on from its position.
-        if (cyclesBOList.size()>0) cycleID = cyclesBOList.get(receivedPos).getId();
         //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
-        if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
+        if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) {
+          cycleID = cyclesBOList.get(receivedPos).getId();
+          cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
+        }
         breakOnlyString = gson.toJson(breaksOnlyTime);
-        breakOnlyString = breakOnlyString.replace("\"", "");
-        breakOnlyString = breakOnlyString.replace("]", "");
-        breakOnlyString = breakOnlyString.replace("[", "");
-        breakOnlyString = breakOnlyString.replace(",", " - ");
+        breakOnlyString = friendlyString(breakOnlyString);
+
         cyclesBO.setBreaksOnly(breakOnlyString);
         cyclesBO.setTimeAdded(System.currentTimeMillis());
         cyclesBO.setItemCount(breaksOnlyTime.size());
@@ -1630,14 +1652,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
         break;
       case 3:
-        //Gets the ID of the cycle instance we have clicked on from its position.
-        if (pomCyclesList.size()>0) cycleID = pomCyclesList.get(receivedPos).getId();
         //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
-        if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+        if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
+          cycleID = pomCyclesList.get(receivedPos).getId();
+          pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+        }
         pomString = gson.toJson(pomValuesTime);
-        pomString = pomString.replace("]", "");
-        pomString = pomString.replace("[", "");
-        pomString = pomString.replace(",", " - ");
+        pomString = friendlyString(pomString);
         pomCycles.setFullCycle(pomString);
         pomCycles.setTimeAdded(System.currentTimeMillis());
         if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
