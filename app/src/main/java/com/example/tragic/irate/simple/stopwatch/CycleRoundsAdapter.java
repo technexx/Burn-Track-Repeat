@@ -17,6 +17,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   ArrayList<String> mSetsList;
   ArrayList<String> mBreaksList;
   ArrayList<String> mBreaksOnlyList;
+  ArrayList<String> mPomList;
   public static final int MODE_ONE = 1;
   public static final int MODE_TWO = 2;
   public static final int MODE_THREE = 3;
@@ -24,8 +25,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public boolean mSetsUp;
   public boolean mBreaksUp;
 
-  public CycleRoundsAdapter(ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList) {
-    this.mSetsList = setsList; this.mBreaksList = breaksList; this.mBreaksOnlyList = breaksOnlyList;
+  public CycleRoundsAdapter(ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> pomList) {
+    this.mSetsList = setsList; this.mBreaksList = breaksList; this.mBreaksOnlyList = breaksOnlyList; mPomList = pomList;
   }
 
   public void setMode(int mode) {
@@ -83,6 +84,9 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         modeTwoRounds.round_breaksOnly.setText("");
         modeTwoRounds.round_breaksOnly.setBackgroundResource(R.drawable.infinity_icon_red);
       }
+    } else if (holder instanceof ModeThreeRounds) {
+      ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
+      modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
     }
   }
 
@@ -93,7 +97,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return mSetsList.size();
       case 2:
         return mBreaksOnlyList.size();
-      case 3: return 1;
+      case 3: return mPomList.size();
       default: return 0;
     }
   }

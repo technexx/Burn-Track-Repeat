@@ -101,9 +101,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortModeBO = 1;
   int sortModePom = 1;
   int receivedPos;
-  int customID;
-  int breaksOnlyID;
-  int pomID;
+  int retrievedID;
+  String cycleTitle;
   List<String> receivedHighlightPositions;
 
   EditText cycle_name_edit;
@@ -415,9 +414,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
-    customID = sharedPreferences.getInt("customID", 0);
-    breaksOnlyID = sharedPreferences.getInt("breaksOnlyID", 0);
-    pomID = sharedPreferences.getInt("pomID", 0);
 
     setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
     breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
@@ -450,7 +446,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Adapter and Recycler for round views within our editCycles popUp.
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
     RecyclerView roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
-    cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList);
+    cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList, convertedPomList);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecycler.setLayoutManager(lm);
 
@@ -538,20 +534,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.showAsDropDown(tabLayout);
     });
 
+    //Todo: Cancel highlight mode here.
     ////--ActionBar Item onClicks START--////
-    //Todo: Populate recyclerView w/ values found in this database's position AND the integer arrays we pass into Timer.
     edit_highlighted_cycle.setOnClickListener(v-> {
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       AsyncTask.execute(()-> {
         queryCycles();
         //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected).
         int editPos = Integer.parseInt(receivedHighlightPositions.get(0));
+        //Uses this single position to retrieve cycle and populate timer arrays.
+        retrieveCycle(editPos);
+        //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
         switch (mode) {
           case 1:
-            Cycles cycles = cyclesList.get(editPos);
-            String[] tempSets = cycles.getSets().split(" - ");
-            for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
+            for (int i=0; i<customSetTime.size(); i++) convertedSetsList.add(convertSeconds(customSetTime.get(i)/1000));
+            for (int i=0; i<customBreakTime.size(); i++) convertedBreaksList.add(convertSeconds(customBreakTime.get(i)/1000));
+            break;
+          case 2:
+            for (int i=0; i<breaksOnlyTime.size(); i++) convertedBreaksOnlyList.add(convertSeconds(breaksOnlyTime.get(i)/1000));
+            break;
+          case 3:
+            for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
+            break;
         }
+        //Updating adapter views.
+        runOnUiThread(()-> {
+          cycleRoundsAdapter.setMode(mode);
+          cycleRoundsAdapter.notifyDataSetChanged();
+        });
       });
     });
 
@@ -1148,90 +1158,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void adjustCustom(boolean adding) {
-    if (adding) {
-      switch (mode) {
-        case 1:
-          if (customSetTime.size() < 8) {
-            customSetTime.add(setValue * 1000);
-            customSetTimeUP.add(0);
-            customBreakTime.add(breakValue * 1000);
-            customBreakTimeUP.add((0));
-            //String array that is used to convert to a single gSon String to store in database.
-            convertedSetsList.add(convertSeconds(setValue));
-            convertedBreaksList.add(convertSeconds(breakValue));
-          } else {
-            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-            //Return to save on resources. Also to avoid unnecessary fading in Pom mode.
-            return;
-          }
-          break;
-        case 2:
-          if (breaksOnlyTime.size() < 8) {
-            breaksOnlyTime.add(breaksOnlyValue * 1000);
-            breaksOnlyTimeUP.add((0));
-            //String array that is used to convert to a single gSon String to store in database.
-            convertedBreaksOnlyList.add(convertSeconds(breaksOnlyValue));
-          } else {
-            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
-        case 3:
-          if (pomValuesTime.size() == 0) {
-            for (int i = 0; i < 3; i++) {
-              pomValuesTime.add(pomValue1);
-              pomValuesTime.add(pomValue2);
-            }
-            pomValuesTime.add(pomValue1);
-            pomValuesTime.add(pomValue3);
-          } else {
-            Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
-      }
-      setEditValues();
-    } else {
-      switch (mode) {
-        case 1:
-          if (customSetTime.size() > 0) {
-            customSetTime.remove(customSetTime.size() - 1);
-            customSetTimeUP.remove(customSetTimeUP.size() - 1);
-            customBreakTime.remove(customBreakTime.size() - 1);
-            customBreakTimeUP.remove(customBreakTimeUP.size() - 1);
-
-            convertedSetsList.remove(convertedSetsList.size()-1);
-            convertedBreaksList.remove(convertedBreaksList.size()-1);
-          } else {
-            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
-        case 2:
-          if (breaksOnlyTime.size() > 0) {
-            breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
-            breaksOnlyTimeUP.remove(breaksOnlyTimeUP.size() - 1);
-
-            convertedBreaksOnlyList.remove(convertedBreaksOnlyList.size()-1);
-          } else {
-            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
-        case 3:
-          //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
-          if (pomValuesTime.size() != 0) pomValuesTime.clear(); else {
-            Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
-      }
-    }
-    cycleRoundsAdapter.setMode(mode);
-    cycleRoundsAdapter.notifyDataSetChanged();
-  }
-
   public void removeEditViews() {
     first_value_edit.setVisibility(View.GONE);
     first_value_sep.setVisibility(View.GONE);
@@ -1387,6 +1313,91 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
   }
 
+  public void adjustCustom(boolean adding) {
+    if (adding) {
+      switch (mode) {
+        case 1:
+          if (customSetTime.size() < 8) {
+            customSetTime.add(setValue * 1000);
+            customSetTimeUP.add(0);
+            customBreakTime.add(breakValue * 1000);
+            customBreakTimeUP.add((0));
+            //String array that is used to convert to a single gSon String to store in database.
+            convertedSetsList.add(convertSeconds(setValue));
+            convertedBreaksList.add(convertSeconds(breakValue));
+          } else {
+            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+            //Return to save on resources. Also to avoid unnecessary fading in Pom mode.
+            return;
+          }
+          break;
+        case 2:
+          if (breaksOnlyTime.size() < 8) {
+            breaksOnlyTime.add(breaksOnlyValue * 1000);
+            breaksOnlyTimeUP.add((0));
+            //String array that is used to convert to a single gSon String to store in database.
+            convertedBreaksOnlyList.add(convertSeconds(breaksOnlyValue));
+          } else {
+            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
+            return;
+          }
+          break;
+        case 3:
+          if (pomValuesTime.size() == 0) {
+            for (int i = 0; i < 3; i++) {
+              pomValuesTime.add(pomValue1 * 1000);
+              pomValuesTime.add(pomValue2 * 1000);
+            }
+            pomValuesTime.add(pomValue1* 1000);
+            pomValuesTime.add(pomValue3 * 1000);
+            for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)));
+          } else {
+            Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
+            return;
+          }
+          break;
+      }
+      setEditValues();
+    } else {
+      switch (mode) {
+        case 1:
+          if (customSetTime.size() > 0) {
+            customSetTime.remove(customSetTime.size() - 1);
+            customSetTimeUP.remove(customSetTimeUP.size() - 1);
+            customBreakTime.remove(customBreakTime.size() - 1);
+            customBreakTimeUP.remove(customBreakTimeUP.size() - 1);
+
+            convertedSetsList.remove(convertedSetsList.size()-1);
+            convertedBreaksList.remove(convertedBreaksList.size()-1);
+          } else {
+            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+            return;
+          }
+          break;
+        case 2:
+          if (breaksOnlyTime.size() > 0) {
+            breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
+            breaksOnlyTimeUP.remove(breaksOnlyTimeUP.size() - 1);
+
+            convertedBreaksOnlyList.remove(convertedBreaksOnlyList.size()-1);
+          } else {
+            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
+            return;
+          }
+          break;
+        case 3:
+          //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
+          if (pomValuesTime.size() != 0) pomValuesTime.clear(); else {
+            Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+            return;
+          }
+          break;
+      }
+    }
+    cycleRoundsAdapter.setMode(mode);
+    cycleRoundsAdapter.notifyDataSetChanged();
+  }
+
   public void queryCycles() {
     switch (mode) {
       case 1:
@@ -1446,50 +1457,78 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void retrieveCycle () {
+  //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
+  //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
+  public void populateCycleList() {
+    switch (mode) {
+      case 1:
+        setsArray.clear();
+        breaksArray.clear();
+        customTitleArray.clear();
+        for (int i=0; i<cyclesList.size(); i++) {
+          setsArray.add(cyclesList.get(i).getSets());
+          breaksArray.add(cyclesList.get(i).getBreaks());
+          customTitleArray.add(cyclesList.get(i).getTitle());
+        }
+        break;
+      case 2:
+        breaksOnlyArray.clear();
+        if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
+        for (int i=0; i<cyclesBOList.size(); i++) {
+          breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+          breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
+        }
+        break;
+      case 3:
+        pomArray.clear();
+        for (int i=0; i<pomCyclesList.size(); i++) {
+          pomArray.add(pomCyclesList.get(0).getFullCycle());
+          pomTitleArray.add(pomCyclesList.get(0).getTitle());
+        }
+    }
+    savedCycleAdapter.notifyDataSetChanged();
+  }
+
+  //Gets instance of our database entity class based on which mode we're in. Converts its String into Integers and populates our timer arrays with them.
+  public void retrieveCycle(int position) {
+    //Calling cycleList instance based on sort mode.
     queryCycles();
+    //Clears old array values.
+    clearTimerArrays();
+    switch (mode) {
+      case 1:
+        Cycles cycles = cyclesList.get(position);
+        String[] tempSets = cycles.getSets().split(" - ");
+        for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
+
+        String[] tempBreaks = cycles.getBreaks().split(" - ");
+        for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
+        retrievedID = cyclesList.get(0).getId();
+        cycleTitle = cycles.getTitle();
+        break;
+      case 2:
+        CyclesBO cyclesBO = cyclesBOList.get(position);
+        String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
+        for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
+        retrievedID = cyclesBOList.get(0).getId();
+        cycleTitle = cyclesBO.getTitle();
+        break;
+      case 3:
+        PomCycles pomCycles = pomCyclesList.get(position);
+        pomValuesTime.clear();
+        String[] tempPom = pomCycles.getFullCycle().split(" - ");
+        for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
+        retrievedID = pomCyclesList.get(0).getId();
+        cycleTitle = pomCycles.getTitle();
+        break;
+    }
   }
 
   public void launchTimerCycle(boolean newCycle) {
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
-    int passedID = 0;
     Intent intent = new Intent(MainActivity.this, TimerInterface.class);
-    //If we are RETRIEVING a cycle from the database, do the stuff below. If we are creating a new round, the timer arrays have already been populated by adjustCustom() and all we do it set the title based on our editText value.
-    if (!newCycle) {
-      //Clears old array values.
-      clearTimerArrays();
-      //Calling cycleList instance based on sort mode.
-      queryCycles();
-      //For database entities for cases 1 and 2: If value equals "0", it is a COUNT UP instance, we simply set our intent boolean to true, since we don't need any saved values. If it is a COUNT DOWN instance, we split the concatenated String of values, and iterate them into a parsed list of Integers to be used in the timer. For case 3: Only a COUNT DOWN mode, so standard retrieval.
-      switch (mode) {
-        case 1:
-          Cycles cycles = cyclesList.get(receivedPos);
-          String[] tempSets = cycles.getSets().split(" - ");
-          for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
-
-          String[] tempBreaks = cycles.getBreaks().split(" - ");
-          for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
-          intent.putExtra("cycleTitle", cycles.getTitle());
-          passedID = cyclesList.get(receivedPos).getId();
-          break;
-        case 2:
-          CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
-          String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
-          for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
-          intent.putExtra("cycleTitle", cyclesBO.getTitle());
-          passedID = cyclesBOList.get(receivedPos).getId();
-          break;
-        case 3:
-          PomCycles pomCycles = pomCyclesList.get(receivedPos);
-          pomValuesTime.clear();
-          String[] tempPom = pomCycles.getFullCycle().split(" - ");
-          for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
-          intent.putExtra("cycleTitle", pomCycles.getTitle());
-          passedID = pomCyclesList.get(receivedPos).getId();
-          break;
-      }
-      Log.i("testval", "received sets are " + cyclesList.get(receivedPos).getSets());
-    } else {
+    // If we are launching a new cycle, set a conditional for an empty title, a conditional for an empty list, and run the saveCycles() method to automatically save it in our database. For both new and old cycles, send all necessary intents to our Timer class.
+    if (newCycle) {
       //Gets current date for use as title in new cycles where title is left empty.
       Calendar calendar = Calendar.getInstance();
       SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
@@ -1504,9 +1543,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
-      //Updates the adapter display of saved cycles.
+      //Updates the adapter display of saved cycles, since we are adding to it.
       runOnUiThread(() -> populateCycleList());
-    }
+      //If selecting an existing cycle, call its info and set timer value arrays.
+    } else retrieveCycle(receivedPos);
+
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
     switch (mode) {
       case 1:
@@ -1526,7 +1567,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Mode used for type of timer.
     intent.putExtra("mode", mode);
     //Sends the current cycle's database position so we can delete it from the Timer class if desired.
-    intent.putExtra("passedID", passedID);
+    intent.putExtra("passedID", retrievedID);
     //Starts Timer class.
     startActivity(intent);
   }
@@ -1636,38 +1677,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show();
       });
     }
-  }
-
-  //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
-  //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
-  public void populateCycleList() {
-    switch (mode) {
-      case 1:
-        setsArray.clear();
-        breaksArray.clear();
-        customTitleArray.clear();
-        for (int i=0; i<cyclesList.size(); i++) {
-          setsArray.add(cyclesList.get(i).getSets());
-          breaksArray.add(cyclesList.get(i).getBreaks());
-          customTitleArray.add(cyclesList.get(i).getTitle());
-        }
-        break;
-      case 2:
-        breaksOnlyArray.clear();
-        if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
-        for (int i=0; i<cyclesBOList.size(); i++) {
-          breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-          breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
-        }
-        break;
-      case 3:
-        pomArray.clear();
-        for (int i=0; i<pomCyclesList.size(); i++) {
-          pomArray.add(pomCyclesList.get(0).getFullCycle());
-          pomTitleArray.add(pomCyclesList.get(0).getTitle());
-        }
-    }
-    savedCycleAdapter.notifyDataSetChanged();
   }
 
 //        cycle_header_text.setOnClickListener(v-> {
