@@ -305,7 +305,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     lapRecycler.setVisibility(View.GONE);
     overtime.setVisibility(View.INVISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
-    next_round.setVisibility(View.INVISIBLE);
 
     timeLeft.setTextSize(90f);
     timePaused.setTextSize(90f);
@@ -1402,17 +1401,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
 
   public void pauseAndResumeTimer(int pausing) {
-    //Controls the alpha/enabled status of reset and FAB buttons.
-    if (mode == 1) {
-      if ((!onBreak && setsAreCountingUp) || (onBreak && breaksAreCountingUp)) {
-        next_round.setVisibility(View.VISIBLE);
-      }
-    }
-    if (mode == 2) {
-      if (breaksOnlyAreCountingUp) {
-        next_round.setVisibility(View.VISIBLE);
-      }
-    }
     //disabledTimer booleans are to prevent ANY action being taken.
     if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
       if (fadeInObj != null) fadeInObj.cancel();
@@ -1659,7 +1647,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
         break;
     }
-    next_round.setVisibility(View.INVISIBLE);
     dotDraws.setAlpha();
     drawDots(0);
   }

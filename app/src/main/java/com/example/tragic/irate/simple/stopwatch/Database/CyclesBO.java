@@ -24,10 +24,6 @@ public class CyclesBO {
         this.title = title;
     }
 
-    public CyclesBO(String breaksOnly) {
-        this.breaksOnly = breaksOnly;
-    }
-
     public int getId() {
         return id;
     }

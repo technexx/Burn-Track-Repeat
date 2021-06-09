@@ -25,7 +25,7 @@
     <string name="clear_laps">Clear Laps</string>
     <string name="laps_completed">Laps Completed: %1$s</string>
 
-    <string name="save_cycles">Save</string>
+    <string name="delete_highlighted_cycles">Save</string>
     <string name="update_cycles">Update</string>
     <string name="sort_cycles">Sort</string>
     <string name="saved_cycle_list">Saved Cycles</string>

@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Button delete_all_confirm;
   Button delete_all_cancel;
   TextView appHeader;
-  ImageButton trashCan;
+  ImageButton edit_highlighted_cycle;
+  ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
 
   int mode = 1;
@@ -190,7 +191,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
 
-  //Todo: Make "next round" button visible if starting in "count up" mode.
+  //Todo: Show visual reference to round time even if in "count up?"
+  //Todo: Highlight mode EDIT, which can also toggle "count up/down."
   //Todo: Implement cycle highlights in modes 2 and 3. Careful nothing overlaps (i.e. cancel highlight mode when switching tabs).
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
@@ -246,10 +248,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
     if (addButtons) {
+      //Todo: Not ideal to have this called every time we click on a cycle.
       receivedHighlightPositions = listOfPositions;
-      trashCan.setVisibility(View.VISIBLE);
+      edit_highlighted_cycle.setVisibility(View.VISIBLE);
+      delete_highlighted_cycle.setVisibility(View.VISIBLE);
       cancelHighlight.setVisibility(View.VISIBLE);
       appHeader.setVisibility(View.INVISIBLE);
+      edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
     }
   }
 
@@ -356,9 +361,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setCustomView(R.layout.custom_bar);
     appHeader = findViewById(R.id.app_header);
-    trashCan = findViewById(R.id.save_cycles);
+    edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
+    delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
-    trashCan.setVisibility(View.INVISIBLE);
+    edit_highlighted_cycle.setVisibility(View.INVISIBLE);
+    delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
 
     //These Integer Lists hold our millis values for each round.
@@ -531,9 +538,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.showAsDropDown(tabLayout);
     });
 
-    //Todo: Remaining highlight fixes.
     ////--ActionBar Item onClicks START--////
-    trashCan.setOnClickListener(v-> {
+    //Todo: Populate recyclerView w/ values found in this database's position AND the integer arrays we pass into Timer.
+    edit_highlighted_cycle.setOnClickListener(v-> {
+      editCyclesPopupWindow.showAsDropDown(tabLayout);
+      AsyncTask.execute(()-> {
+        queryCycles();
+        //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected).
+        int editPos = Integer.parseInt(receivedHighlightPositions.get(0));
+        switch (mode) {
+          case 1:
+            Cycles cycles = cyclesList.get(editPos);
+            String[] tempSets = cycles.getSets().split(" - ");
+            for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
+        }
+      });
+    });
+
+    delete_highlighted_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
         ArrayList<String> tempPos = new ArrayList<>(receivedHighlightPositions);
         queryCycles();
@@ -551,7 +573,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //If there are no cycles left, cancel highlight mode. If there are any left, simply remove all highlights.
           if (receivedHighlightPositions.size()>0) savedCycleAdapter.removeHighlight(false); else {
             cancelHighlight.setVisibility(View.INVISIBLE);
-            trashCan.setVisibility(View.INVISIBLE);
+            edit_highlighted_cycle.setVisibility(View.INVISIBLE);
+            delete_highlighted_cycle.setVisibility(View.INVISIBLE);
             appHeader.setVisibility(View.VISIBLE);
             savedCycleAdapter.removeHighlight(true);
           }
@@ -562,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Turns off our cycle highlight mode from adapter.
     cancelHighlight.setOnClickListener(v-> {
       cancelHighlight.setVisibility(View.INVISIBLE);
-      trashCan.setVisibility(View.INVISIBLE);
+      delete_highlighted_cycle.setVisibility(View.INVISIBLE);
       appHeader.setVisibility(View.VISIBLE);
       savedCycleAdapter.removeHighlight(true);
       savedCycleAdapter.notifyDataSetChanged();
@@ -1423,12 +1446,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void retrieveCycle () {
+    queryCycles();
+  }
 
   public void launchTimerCycle(boolean newCycle) {
-    //Gets current date for use in empty titles.
-    Calendar calendar = Calendar.getInstance();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-    String date = dateFormat.format(calendar.getTime());
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
     int passedID = 0;
     Intent intent = new Intent(MainActivity.this, TimerInterface.class);
@@ -1442,26 +1464,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       switch (mode) {
         case 1:
           Cycles cycles = cyclesList.get(receivedPos);
-          if (cycles.getSets().equals("0")) setsAreCountingUp = true; else {
-            setsAreCountingUp = false;
-            String[] tempSets = cycles.getSets().split(" - ");
-            for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
-          }
-          if (cycles.getBreaks().equals("0")) breaksAreCountingUp = true; else {
-            breaksAreCountingUp = false;
-            String[] tempBreaks = cycles.getBreaks().split(" - ");
-            for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
-          }
+          String[] tempSets = cycles.getSets().split(" - ");
+          for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
+
+          String[] tempBreaks = cycles.getBreaks().split(" - ");
+          for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
           intent.putExtra("cycleTitle", cycles.getTitle());
           passedID = cyclesList.get(receivedPos).getId();
           break;
         case 2:
           CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
-          if (cyclesBO.getBreaksOnly().equals("0")) breaksOnlyAreCountingUp = true; else {
-            breaksOnlyAreCountingUp = false;
-            String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
-            for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
-          }
+          String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
+          for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
           intent.putExtra("cycleTitle", cyclesBO.getTitle());
           passedID = cyclesBOList.get(receivedPos).getId();
           break;
@@ -1474,13 +1488,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           passedID = pomCyclesList.get(receivedPos).getId();
           break;
       }
+      Log.i("testval", "received sets are " + cyclesList.get(receivedPos).getSets());
     } else {
+      //Gets current date for use as title in new cycles where title is left empty.
+      Calendar calendar = Calendar.getInstance();
+      SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+      String date = dateFormat.format(calendar.getTime());
+
       //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
       if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
         return;
       }
-      //Todo: saveCycles defaults to date/time for empty title, but nothing gets set here.
       if (cycle_name_edit.getText().toString().isEmpty()) intent.putExtra("cyclesTitle", date);
       else intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
       //Since this is a new Cycle, we automatically save it to database.
@@ -1527,27 +1546,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String cycle_name = cycle_name_edit.getText().toString();
     int cycleID = 0;
 
+    //Todo: Saving "0" for count up mode b0rks retrieval. Should save "count down" values but not use them in Timer mode if "count up"
     switch (mode) {
       case 1:
         //Gets the ID of the cycle instance we have clicked on from its position.
         if (cyclesList.size()>0) cycleID = cyclesList.get(receivedPos).getId();
         //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
         if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-        //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Set single "0" for counting up.
-        if (!setsAreCountingUp) {
-          setString = gson.toJson(customSetTime);
-          setString = setString.replace("\"", "");
-          setString = setString.replace("]", "");
-          setString =  setString.replace("[", "");
-          setString = setString.replace(",", " - ");
-        } else setString = "0";
-        if (!breaksAreCountingUp) {
-          breakString = gson.toJson(customBreakTime);
-          breakString = breakString.replace("\"", "");
-          breakString = breakString.replace("]", "");
-          breakString = breakString.replace("[", "");
-          breakString = breakString.replace(",", " - ");
-        } else breakString = "0";
+        //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
+        setString = gson.toJson(customSetTime);
+        setString = setString.replace("\"", "");
+        setString = setString.replace("]", "");
+        setString =  setString.replace("[", "");
+        setString = setString.replace(",", " - ");
+        breakString = gson.toJson(customBreakTime);
+        breakString = breakString.replace("\"", "");
+        breakString = breakString.replace("]", "");
+        breakString = breakString.replace("[", "");
+        breakString = breakString.replace(",", " - ");
         //Adding and inserting into database.
         cycles.setSets(setString);
         cycles.setBreaks(breakString);
@@ -1561,13 +1577,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (cyclesBOList.size()>0) cycleID = cyclesBOList.get(receivedPos).getId();
         //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
         if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
-        if (!breaksOnlyAreCountingUp) {
-          breakOnlyString = gson.toJson(breaksOnlyTime);
-          breakOnlyString = breakOnlyString.replace("\"", "");
-          breakOnlyString = breakOnlyString.replace("]", "");
-          breakOnlyString = breakOnlyString.replace("[", "");
-          breakOnlyString = breakOnlyString.replace(",", " - ");
-        } else breakOnlyString = "0";
+        breakOnlyString = gson.toJson(breaksOnlyTime);
+        breakOnlyString = breakOnlyString.replace("\"", "");
+        breakOnlyString = breakOnlyString.replace("]", "");
+        breakOnlyString = breakOnlyString.replace("[", "");
+        breakOnlyString = breakOnlyString.replace(",", " - ");
         cyclesBO.setBreaksOnly(breakOnlyString);
         cyclesBO.setTimeAdded(System.currentTimeMillis());
         cyclesBO.setItemCount(breaksOnlyTime.size());

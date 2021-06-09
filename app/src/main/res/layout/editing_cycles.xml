@@ -383,19 +383,18 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/round_list_recycler"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_cycle"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/add_cycle">
     </androidx.recyclerview.widget.RecyclerView>
 
     <Button
         android:text="Start"
         android:id="@+id/start_timer"
         android:layout_width="wrap_content"
-        android:layout_height="70dp"
+        android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="4dp"
@@ -408,28 +407,5 @@
         app:strokeColor="@color/black"
         app:strokeWidth="1dp">
     </Button>
-
-<!--    <ImageView-->
-<!--        android:id="@+id/infinity_one"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/plus_first_value"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/minus_first_value"-->
-<!--        app:layout_constraintTop_toTopOf="@id/plus_first_value"-->
-<!--        app:layout_constraintBottom_toBottomOf="@id/plus_first_value"-->
-<!--        android:src="@drawable/infinity_icon">-->
-<!--    </ImageView>-->
-
-<!--    <ImageView-->
-<!--        android:id="@+id/infinity_two"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/plus_second_value"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/minus_second_value"-->
-<!--        app:layout_constraintTop_toTopOf="@id/plus_second_value"-->
-<!--        app:layout_constraintBottom_toBottomOf="@id/plus_second_value"-->
-<!--        android:layout_marginTop="2dp"-->
-<!--        android:src="@drawable/infinity_icon">-->
-<!--    </ImageView>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -29,17 +29,26 @@
     </TextView>
 
     <ImageButton
-        android:id="@+id/save_cycles"
+        android:id="@+id/edit_highlighted_cycle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/delete_highlighted_cycles"
+        android:layout_marginEnd="14dp"
+        android:backgroundTint="@color/black"
+        android:src="@drawable/edit_icon_2">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/delete_highlighted_cycles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
-        android:gravity="center"
-        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:backgroundTint="@color/black"
-        android:src="@drawable/delete_24">
+        android:src="@drawable/trash_can_3">
     </ImageButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

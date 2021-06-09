@@ -17,10 +17,6 @@ public class Cycles {
     public Cycles() {
     }
 
-    public Cycles(String sets, String breaks) {
-        this.sets = sets; this.breaks = breaks;
-    }
-
     public String getTitle() {
         return title;
     }
