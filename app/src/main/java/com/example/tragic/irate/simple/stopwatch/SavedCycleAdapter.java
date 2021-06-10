@@ -166,8 +166,55 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       breaksOnlyHolder.breaksOnlyName.setText(mBreaksOnlyTitle.get(position));
       breaksOnlyHolder.breaksOnlyBreak.setText(convertTime(mBreaksOnlyList).get(position));
 
+      if (mHighlightDeleted) {
+        //Clears highlight list.
+        mPositionList.clear();
+        //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
+        mHighlightMode = false;
+        //Sets all of our backgrounds to black (unhighlighted).
+        for (int i=0; i<mBreaksOnlyList.size(); i++) {
+          breaksOnlyHolder.fullView.setBackgroundColor(Color.BLACK);
+        }
+      }
+
       breaksOnlyHolder.fullView.setOnClickListener(v -> {
-        mOnCycleClickListener.onCycleClick(position);
+        boolean changed = false;
+        if (mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
+          ArrayList<String> tempList = new ArrayList<>(mPositionList);
+
+          //Iterate through every cycle in list.
+          for (int i=0; i<mBreaksOnlyList.size(); i++) {
+            //Using tempList for stable loop since mPositionList changes.
+            for (int j=0; j<tempList.size(); j++) {
+              //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
+              if (String.valueOf(position).contains(tempList.get(j))) {
+                breaksOnlyHolder.fullView.setBackgroundColor(Color.BLACK);
+                mPositionList.remove(String.valueOf(position));
+                //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
+                changed = true;
+              }
+            }
+          }
+          //If we have not toggled our highlight off above, toggle it on below.
+          if (!changed) {
+            //Adds the position at its identical index for easy removal access.
+            mPositionList.add(String.valueOf(position));
+            breaksOnlyHolder.fullView.setBackgroundColor(Color.GRAY);
+          }
+          //Callback to send position list (Using Strings to make removing values easier) back to Main.
+          mOnHighlightListener.onCycleHighlight(mPositionList, false);
+        }
+      });
+
+      breaksOnlyHolder.fullView.setOnLongClickListener(v-> {
+        if (!mHighlightMode) {
+          mPositionList.add(String.valueOf(position));
+          breaksOnlyHolder.fullView.setBackgroundColor(Color.GRAY);
+          mHighlightMode = true;
+          //Calls back for initial highlighted position, Also to set actionBar views for highlight mode.
+          mOnHighlightListener.onCycleHighlight(mPositionList, true);
+        }
+        return true;
       });
 
     } else if (holder instanceof PomHolder) {
@@ -189,8 +236,55 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
       pomHolder.pomView.setText(pomSpan);
 
+      if (mHighlightDeleted) {
+        //Clears highlight list.
+        mPositionList.clear();
+        //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
+        mHighlightMode = false;
+        //Sets all of our backgrounds to black (unhighlighted).
+        for (int i=0; i<mSetsList.size(); i++) {
+          pomHolder.fullView.setBackgroundColor(Color.BLACK);
+        }
+      }
+
       pomHolder.fullView.setOnClickListener(v-> {
-        mOnCycleClickListener.onCycleClick(position);
+        boolean changed = false;
+        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
+          ArrayList<String> tempList = new ArrayList<>(mPositionList);
+
+          //Iterate through every cycle in list.
+          for (int i=0; i<mPomList.size(); i++) {
+            //Using tempList for stable loop since mPositionList changes.
+            for (int j=0; j<tempList.size(); j++) {
+              //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
+              if (String.valueOf(position).contains(tempList.get(j))) {
+                pomHolder.fullView.setBackgroundColor(Color.BLACK);
+                mPositionList.remove(String.valueOf(position));
+                //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
+                changed = true;
+              }
+            }
+          }
+          //If we have not toggled our highlight off above, toggle it on below.
+          if (!changed) {
+            //Adds the position at its identical index for easy removal access.
+            mPositionList.add(String.valueOf(position));
+            pomHolder.fullView.setBackgroundColor(Color.GRAY);
+          }
+          //Callback to send position list (Using Strings to make removing values easier) back to Main.
+          mOnHighlightListener.onCycleHighlight(mPositionList, false);
+        }
+      });
+
+      pomHolder.fullView.setOnLongClickListener(v-> {
+        if (!mHighlightMode) {
+          mPositionList.add(String.valueOf(position));
+          pomHolder.fullView.setBackgroundColor(Color.GRAY);
+          mHighlightMode = true;
+          //Calls back for initial highlighted position, Also to set actionBar views for highlight mode.
+          mOnHighlightListener.onCycleHighlight(mPositionList, true);
+        }
+        return true;
       });
     }
   }

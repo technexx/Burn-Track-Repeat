@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_ONE = 1;
   public static final int MODE_TWO = 2;
   public static final int MODE_THREE = 3;
-  int mMode;
+  int mMode = 1;
   public boolean mSetsUp;
   public boolean mBreaksUp;
 
@@ -88,6 +89,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
     }
+//    Log.i("testSize", "size is " + mBreaksOnlyList.size());
   }
 
   @Override
@@ -97,8 +99,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return mSetsList.size();
       case 2:
         return mBreaksOnlyList.size();
-      case 3: return mPomList.size();
-      default: return 0;
+      case 3:
+        return mPomList.size();
+      default:
+        return 0;
     }
   }
 

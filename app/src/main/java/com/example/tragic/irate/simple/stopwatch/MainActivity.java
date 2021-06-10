@@ -494,15 +494,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (tab.getPosition()) {
           case 0:
             mode = 1;
+            //Sets the recyclerView classes for each mode on both adapters.
             savedCycleAdapter.setView(1);
+            cycleRoundsAdapter.setMode(1);
             break;
           case 1:
             mode = 2;
             savedCycleAdapter.setView(2);
+            cycleRoundsAdapter.setMode(2);
             break;
           case 2:
             mode = 3;
             savedCycleAdapter.setView(3);
+            cycleRoundsAdapter.setMode(3);
             break;
           case 3:
             mode = 4;
@@ -515,7 +519,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onTabUnselected(TabLayout.Tab tab) {
+        //Dismisses editCycle popupp when switching tabs.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
+        //Repopulates savedCycle recyclerView when switching tabs.
+        savedCycleAdapter.notifyDataSetChanged();
         switch (tab.getPosition()) {
           case 0:
             break;
@@ -570,7 +577,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Setting editText title.
           cycle_name_edit.setText(cycleTitle);
           //Updating adapter views.
-          cycleRoundsAdapter.setMode(mode);
           cycleRoundsAdapter.notifyDataSetChanged();
           //Removing highlights.
           savedCycleAdapter.removeHighlight(true);
@@ -1367,7 +1373,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             pomValuesTime.add(pomValue1* 1000);
             pomValuesTime.add(pomValue3 * 1000);
-            for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)));
+            for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
           } else {
             Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
             return;
@@ -1401,14 +1407,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 3:
           //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
-          if (pomValuesTime.size() != 0) pomValuesTime.clear(); else {
+          if (pomValuesTime.size() != 0) {
+            pomValuesTime.clear();
+            convertedPomList.clear();
+          } else {
             Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
             return;
           }
           break;
       }
     }
-    cycleRoundsAdapter.setMode(mode);
     cycleRoundsAdapter.notifyDataSetChanged();
   }
 
