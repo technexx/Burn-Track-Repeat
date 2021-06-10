@@ -188,7 +188,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_UP = 2;
   boolean onNewCycle;
 
-  //Todo: Bring breaksOnly and pom mode up to speed.
   //Todo: Show visual reference to round time even if in "count up?"
   //Todo: Implement cycle highlights in modes 2 and 3. Careful nothing overlaps (i.e. cancel highlight mode when switching tabs).
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
@@ -902,9 +901,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editBreakSeconds < 5 && editBreakMinutes == 0) editBreakSeconds = 0;
 
       //Sets value of editBreakMinutes to either breakValue, or breakOnlyValue, depending on which mode we're on.
-      if (mode == 1) breakValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
-      else if (mode == 2) breaksOnlyValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
-      second_value_textView.setText(convertCustomTextView(breakValue));
+      if (mode == 1) {
+        breakValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
+        second_value_textView.setText(convertCustomTextView(breakValue));
+      }
+      else if (mode == 2) {
+        breaksOnlyValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
+        second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+      }
 
       toastBounds(5, 300, setValue);
       toastBounds(5, 300, breakValue);
