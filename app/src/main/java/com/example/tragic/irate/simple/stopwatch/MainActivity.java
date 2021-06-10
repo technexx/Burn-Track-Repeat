@@ -226,8 +226,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onBackPressed() {
     if (editCyclesPopupWindow.isShowing()) {
       //If non-database cycle (i.e. FAB launched) is present, save it as a new entry. If a database-saved cycle (i.e. highlight launched) is present, update it in the database. queryCycles() has already been called from the edit_highlighted_text button.
-      //Todo: This all works, except that an updated cycle gets moved to the top position in adapter.
-      //Todo: we need a conditional for blank rounds (probably better to put this in the save() method than launch().
       AsyncTask.execute(()->{
         if (onNewCycle) saveCycles(true); else {
           saveCycles(false);
@@ -1622,13 +1620,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setString = friendlyString(setString);
         breakString = gson.toJson(customBreakTime);
         breakString = friendlyString(breakString);
-        //Adding and inserting into database.
-        cycles.setSets(setString);
-        cycles.setBreaks(breakString);
-        cycles.setTimeAdded(System.currentTimeMillis());
-        cycles.setItemCount(customSetTime.size());
-        if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
-        if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
+        //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
+        if (!setString.equals("")) {
+          //Adding and inserting into database.
+          cycles.setSets(setString);
+          cycles.setBreaks(breakString);
+          //Only setting timeAdded for NEW cycle. We want our (sort by date) to use the initial time/date.
+          if (newCycle) cycles.setTimeAdded(System.currentTimeMillis());
+          cycles.setItemCount(customSetTime.size());
+          if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
+          if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
+        }
         break;
       case 2:
         //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
@@ -1639,11 +1641,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakOnlyString = gson.toJson(breaksOnlyTime);
         breakOnlyString = friendlyString(breakOnlyString);
 
-        cyclesBO.setBreaksOnly(breakOnlyString);
-        cyclesBO.setTimeAdded(System.currentTimeMillis());
-        cyclesBO.setItemCount(breaksOnlyTime.size());
-        if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
-        if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+        if (!breakOnlyString.equals("")) {
+          cyclesBO.setBreaksOnly(breakOnlyString);
+          if (newCycle) cyclesBO.setTimeAdded(System.currentTimeMillis());
+          cyclesBO.setItemCount(breaksOnlyTime.size());
+          if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
+          if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+        }
         break;
       case 3:
         //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
@@ -1653,10 +1657,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         pomString = gson.toJson(pomValuesTime);
         pomString = friendlyString(pomString);
-        pomCycles.setFullCycle(pomString);
-        pomCycles.setTimeAdded(System.currentTimeMillis());
-        if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
-        if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+
+        if (!pomString.equals("")) {
+          pomCycles.setFullCycle(pomString);
+          if (newCycle) pomCycles.setTimeAdded(System.currentTimeMillis());
+          if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
+          if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+        }
         break;
     }
   }
