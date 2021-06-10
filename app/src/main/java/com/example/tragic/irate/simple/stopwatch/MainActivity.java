@@ -140,9 +140,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<Integer> customBreakTime;
   ArrayList<Integer> breaksOnlyTime;
   ArrayList<Integer> pomValuesTime;
-  ArrayList<Integer> customSetTimeUP;
-  ArrayList<Integer> customBreakTimeUP;
-  ArrayList<Integer> breaksOnlyTimeUP;
   ArrayList<String> convertedSetsList;
   ArrayList<String> convertedBreaksList;
   ArrayList<String> convertedBreaksOnlyList;
@@ -196,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Implement cycle highlights in modes 2 and 3. Careful nothing overlaps (i.e. cancel highlight mode when switching tabs).
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
+  //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
 
   //Todo: Preset timer selections.
   //Todo: Database saves for count up mode.
@@ -227,12 +225,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onBackPressed() {
     if (editCyclesPopupWindow.isShowing()) {
-      //If non-database cycle (i.e. FAB launched) is present, save it as a new entry. If a database-saved cycle (i.e. highlight launched) is present, update it in the database.
-      //Todo: notify needs Array lists populated for update, roundAdapter needs its data cleared for next FAB to show as empty, and we need a conditional for blank rounds (probably better to put this in the save() method than launch().
-      //Todo: Should we sub or have another method of populateArray that doesn't query db? Just for adapter views.
+      //If non-database cycle (i.e. FAB launched) is present, save it as a new entry. If a database-saved cycle (i.e. highlight launched) is present, update it in the database. queryCycles() has already been called from the edit_highlighted_text button.
+      //Todo: This all works, except that an updated cycle gets moved to the top position in adapter.
+      //Todo: we need a conditional for blank rounds (probably better to put this in the save() method than launch().
       AsyncTask.execute(()->{
-        if (onNewCycle) saveCycles(true); else saveCycles(false);
+        if (onNewCycle) saveCycles(true); else {
+          saveCycles(false);
+        }
+        //Calling queryCycles() to fetch the latest post-save list our cycles.
+        queryCycles();
+        //Populates the savedCycleAdapter's array lists., formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
         runOnUiThread(()-> {
+          populateCycleList();
           savedCycleAdapter.notifyDataSetChanged();
           editCyclesPopupWindow.dismiss();
           clearTimerArrays();
@@ -240,7 +244,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     }
     queryCycles();
-    Log.i("testSize", "size is " + cyclesList.size());
   }
 
   //Gets the position clicked on from our saved cycle adapter.
@@ -381,9 +384,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     customSetTime = new ArrayList<>();
     customBreakTime = new ArrayList<>();
     breaksOnlyTime = new ArrayList<>();
-    customSetTimeUP = new ArrayList<>();
-    customBreakTimeUP = new ArrayList<>();
-    breaksOnlyTimeUP = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
     //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes.
     convertedSetsList = new ArrayList<>();
@@ -1340,9 +1340,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           if (customSetTime.size() < 8) {
             customSetTime.add(setValue * 1000);
-            customSetTimeUP.add(0);
             customBreakTime.add(breakValue * 1000);
-            customBreakTimeUP.add((0));
             //String array that is used to convert to a single gSon String to store in database.
             convertedSetsList.add(convertSeconds(setValue));
             convertedBreaksList.add(convertSeconds(breakValue));
@@ -1355,7 +1353,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 2:
           if (breaksOnlyTime.size() < 8) {
             breaksOnlyTime.add(breaksOnlyValue * 1000);
-            breaksOnlyTimeUP.add((0));
             //String array that is used to convert to a single gSon String to store in database.
             convertedBreaksOnlyList.add(convertSeconds(breaksOnlyValue));
           } else {
@@ -1384,9 +1381,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           if (customSetTime.size() > 0) {
             customSetTime.remove(customSetTime.size() - 1);
-            customSetTimeUP.remove(customSetTimeUP.size() - 1);
             customBreakTime.remove(customBreakTime.size() - 1);
-            customBreakTimeUP.remove(customBreakTimeUP.size() - 1);
 
             convertedSetsList.remove(convertedSetsList.size()-1);
             convertedBreaksList.remove(convertedBreaksList.size()-1);
@@ -1398,7 +1393,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 2:
           if (breaksOnlyTime.size() > 0) {
             breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
-            breaksOnlyTimeUP.remove(breaksOnlyTimeUP.size() - 1);
 
             convertedBreaksOnlyList.remove(convertedBreaksOnlyList.size()-1);
           } else {
