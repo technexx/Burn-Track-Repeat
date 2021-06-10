@@ -62,14 +62,14 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (holder instanceof ModeOneRounds) {
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
       if (!mSetsUp) {
-        modeOneRounds.round_sets.setText(mSetsList.get(position));
+        modeOneRounds.round_sets.setText(appendSeconds(mSetsList.get(position)));
         modeOneRounds.round_sets.setBackgroundResource(0);
       } else {
         modeOneRounds.round_sets.setText("");
         modeOneRounds.round_sets.setBackgroundResource(R.drawable.infinity_icon_green);
       }
       if (!mBreaksUp) {
-        modeOneRounds.round_breaks.setText(mBreaksList.get(position));
+        modeOneRounds.round_breaks.setText(appendSeconds(mBreaksList.get(position)));
         modeOneRounds.round_breaks.setBackgroundResource(0);
       } else {
         modeOneRounds.round_breaks.setText("");
@@ -78,7 +78,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else if (holder instanceof ModeTwoRounds) {
       ModeTwoRounds modeTwoRounds = (ModeTwoRounds) holder;
       if (!mBreaksUp) {
-        modeTwoRounds.round_breaksOnly.setText(mBreaksOnlyList.get(position));
+        modeTwoRounds.round_breaksOnly.setText(appendSeconds(mBreaksOnlyList.get(position)));
         modeTwoRounds.round_breaksOnly.setBackgroundResource(0);
       } else {
         modeTwoRounds.round_breaksOnly.setText("");
@@ -139,5 +139,11 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       super(itemView);
       round_pomodoro = itemView.findViewById(R.id.round_pomodoro);
     }
+  }
+
+  public String appendSeconds(String seconds) {
+    if (seconds.length()==1) seconds = "0:0" + seconds;
+    else if (seconds.length()==2) seconds = "0:" + seconds;
+    return seconds;
   }
 }
