@@ -132,8 +132,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton upDown_arrow_one;
   ImageButton upDown_arrow_two;
   View top_anchor;
-  boolean infinity_mode_one;
-  boolean infinity_mode_two;
   Button start_timer;
 
   ArrayList<Integer> customSetTime;
@@ -196,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
 
   //Todo: Preset timer selections.
-  //Todo: Database saves for count up mode.
   //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
   //Todo: No rounds added defaults to a default Cycle instead of staying blank.
   //Todo: TDEE in sep popup w/ tabs.
@@ -1220,27 +1217,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         minus_second_value.setVisibility(View.VISIBLE);
         upDown_arrow_one.setVisibility(View.VISIBLE);
         upDown_arrow_two.setVisibility(View.VISIBLE);
-        if (!infinity_mode_two) {
-          second_value_textView.setVisibility(View.VISIBLE);
-          s2.setText(R.string.break_time);
-        }
+        second_value_textView.setVisibility(View.VISIBLE);
+        s2.setText(R.string.break_time);
         if (mode==1) {
-          if (!infinity_mode_one) {
-            first_value_textView.setVisibility(View.VISIBLE);
-            first_value_textView.setText(convertCustomTextView(setValue));
-          }
           s1.setVisibility(View.VISIBLE);
           s1.setText(R.string.set_time);
           plus_first_value.setVisibility(View.VISIBLE);
           minus_first_value.setVisibility(View.VISIBLE);
           s1.setText(R.string.set_time);
-          if (!infinity_mode_two) second_value_textView.setText(convertCustomTextView(breakValue));
         } else {
           s1.setVisibility(View.INVISIBLE);
           first_value_textView.setVisibility(View.INVISIBLE);
           plus_first_value.setVisibility(View.INVISIBLE);
           minus_first_value.setVisibility(View.INVISIBLE);
+          upDown_arrow_two.setVisibility(View.GONE);
           second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
+
         }
         addParams.topToBottom = R.id.s2;
         addParams.topMargin = 60;
@@ -1713,317 +1705,4 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     }
   }
-
-//        cycle_header_text.setOnClickListener(v-> {
-//            confirm_header_
-//            save.setText(R.string.update_cycles);
-//            labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, -200);
-//
-//            String titleText = cycle_header_text.getText().toString();
-//            edit_header.setText(titleText);
-//            edit_header.setSelection(titleText.length());
-//
-//            cancel_header_save.setOnClickListener(v2-> {
-//                if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-//            });
-//
-//            confirm_header_save.setOnClickListener(v2 -> {
-//                String newTitle = edit_header.getText().toString();
-//                if (!titleText.equals(newTitle)) canSaveOrUpdate(true);
-//                cycle_header_text.setText(newTitle);
-//            });
-//        });
-
-//        save_cycles.setOnClickListener(v->{
-//            saveAndUpdateCycles();
-//        });
-//
-//        update_cycles.setOnClickListener(v-> {
-//            confirmedSaveOrUpdate(UPDATING_CYCLES);
-//        });
-
-//
-//    public void canSaveOrUpdate(boolean yesWeCan) {
-//        switch (mode) {
-//            case 1:
-//                canSaveOrUpdateCustom = yesWeCan; break;
-//            case 2:
-//                canSaveOrUpdateBreaksOnly = yesWeCan; break;
-//            case 3:
-//                canSaveOrUpdatePom = yesWeCan; break;
-//        }
-//
-//        if ( (mode==1 && canSaveOrUpdateCustom) || (mode==2 && canSaveOrUpdateBreaksOnly) || (mode==3 && canSaveOrUpdatePom)) {
-//            save_cycles.setTextColor(getResources().getColor(R.color.white));
-//            update_cycles.setTextColor(getResources().getColor(R.color.white));
-//            save_cycles.setEnabled(true);
-//            update_cycles.setEnabled(true);
-//        } else {
-//            save_cycles.setTextColor(getResources().getColor(R.color.test_grey));
-//            update_cycles.setTextColor(getResources().getColor(R.color.test_grey));
-//            save_cycles.setEnabled(false);
-//            update_cycles.setEnabled(false);
-//        }
-//    }
-//
-//    //Launches either Sort option, or popUp window w/ option to save.
-//    public void saveAndUpdateCycles() {
-//        if (savedCyclePopupWindow!=null && savedCyclePopupWindow.isShowing()){
-//            sortPopupWindow.showAtLocation(mainView, Gravity.TOP, 325, 10);
-//
-//            sortRecent.setOnClickListener(v1 -> {
-//                AsyncTask.execute(() -> {
-//                    switch (mode) {
-//                        case 1:
-//                            sortMode = 1; break;
-//                        case 2:
-//                            sortModeBO = 1; break;
-//                        case 3:
-//                            sortModePom = 1; break;
-//                    }
-//                    queryCycles();
-//                    runOnUiThread(()-> {
-//                        sortCheckmark.setY(14);
-//                        clearArrays(true);
-//                    });
-//                });
-//            });
-//
-//            sortNotRecent.setOnClickListener(v2 ->{
-//                AsyncTask.execute(() -> {
-//                    switch (mode) {
-//                        case 1:
-//                            sortMode = 1; break;
-//                        case 2:
-//                            sortModeBO = 1; break;
-//                        case 3:
-//                            sortModePom = 1; break;
-//                    }
-//                    queryCycles();
-//                    runOnUiThread(()-> {
-//                        sortCheckmark.setY(110);
-//                        clearArrays(true);
-//                    });
-//                });
-//            });
-//
-//            sortHigh.setOnClickListener(v3 -> {
-//                AsyncTask.execute(() -> {
-//                    switch (mode) {
-//                        case 1:
-//                            sortMode = 1; break;
-//                        case 2:
-//                            sortModeBO = 1; break;
-//                    }
-//                    queryCycles();
-//                    runOnUiThread(()-> {
-//                        sortCheckmark.setY(206);
-//                        clearArrays(true);
-//                    });
-//                });
-//            });
-//
-//            sortLow.setOnClickListener(v4 -> {
-//                AsyncTask.execute(() -> {
-//                    switch (mode) {
-//                        case 1:
-//                            sortMode = 1; break;
-//                        case 2:
-//                            sortModeBO = 1; break;
-//                    }
-//                    queryCycles();
-//                    runOnUiThread(()-> {
-//                        sortCheckmark.setY(302);
-//                        clearArrays(true);
-//                    });
-//                });
-//            });
-//            sortCheckmark.setY(0);
-//            prefEdit.putInt("sortMode", sortMode);
-//            prefEdit.putInt("sortModeBO", sortModeBO);
-//            prefEdit.putInt("sortModePom", sortModePom);
-//            prefEdit.apply();
-//        } else {
-//            labelSavePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
-//            edit_header.setText("");
-//
-//            cancel_header_save.setOnClickListener(v2-> {
-//                if (labelSavePopupWindow!=null) labelSavePopupWindow.dismiss();
-//            });
-//
-//            confirm_header_save.setOnClickListener(v2-> {
-//                confirm_header_save.setText(R.string.save_cycles);
-//                confirmedSaveOrUpdate(SAVING_CYCLES);
-//            });
-//        }
-//    }
-
-
-//    //Used to retrieve a single cycle within our database. Calls populateUICycle() which sets the Array values into our timer millis values.
-//    //When recall is TRUE, retrieves the last used ID instance, when recall is FALSE, Uses a positional input from our saved cycle list.
-//    public void selectRound(int position, boolean recall) {
-//        AsyncTask.execute(() -> {
-//            switch (mode) {
-//                case 1:
-//                    String tempSets = "";
-//                    String tempBreaks = "";
-//                    if (recall) {
-//                        cycles = cyclesList.get(position);
-//                        tempSets = cyclesList.get(0).getSets();
-//                        tempBreaks = cyclesList.get(0).getBreaks();
-//                    } else {
-//                        queryCycles();
-//                        cycles = cyclesList.get(position);
-//                        tempSets = cyclesList.get(position).getSets();
-//                        tempBreaks = cyclesList.get(position).getBreaks();
-//                        customID = cyclesList.get(position).getId();
-//                        prefEdit.putInt("customID", customID);
-//                    }
-//
-//                    String[] setSplit = tempSets.split(" - ", 0);
-//                    String[] breakSplit = tempBreaks.split(" - ", 0);
-//                    customSetTime.clear();
-//                    customBreakTime.clear();
-//
-//                    for (int i=0; i<setSplit.length; i++) {
-//                        customSetTime.add(Long.parseLong(setSplit[i])*1000);
-//                        customBreakTime.add(Long.parseLong(breakSplit[i])*1000);
-//                    }
-//                    runOnUiThread(() -> cycle_header_text.setText(cycles.getTitle()));
-//                    break;
-//                case 2:
-//                    String tempBreaksOnly = "";
-//                    if (recall) {
-//                        cyclesBO = cyclesBOList.get(position);
-//                        tempBreaksOnly = cyclesBOList.get(0).getBreaksOnly();
-//                    } else {
-//                        queryCycles();
-//                        cyclesBO = cyclesBOList.get(position);
-//                        tempBreaksOnly = cyclesBOList.get(position).getBreaksOnly();
-//                        breaksOnlyID = cyclesBOList.get(position).getId();
-//                        prefEdit.putInt("breaksOnlyID", breaksOnlyID);
-//                    }
-//
-//                    String[] breaksOnlySplit = tempBreaksOnly.split(" - ", 0);
-//                    breaksOnlyTime.clear();
-//
-//                    for (int i=0; i<breaksOnlySplit.length; i++) {
-//                        breaksOnlyTime.add(Long.parseLong(breaksOnlySplit[i])*1000);
-//                    }
-//                    runOnUiThread(() -> cycle_header_text.setText(cyclesBO.getTitle()));
-//                    break;
-//                case 3:
-//                    String tempPom = "";
-//                    if (recall) {
-//                        pomCycles = pomCyclesList.get(position);
-//                        tempPom = pomCyclesList.get(0).getFullCycle();
-//                    } else {
-//                        queryCycles();
-//                        pomCycles = pomCyclesList.get(position);
-//                        tempPom = pomCyclesList.get(position).getFullCycle();
-//                        pomID = pomCyclesList.get(position).getId();
-//                        prefEdit.putInt("pomID", pomID);
-//                    }
-//
-//                    String[] pomSplit = tempPom.split("-", 0);
-//                    pomValuesTime.clear();
-//
-//                    for (int i=0; i<pomSplit.length; i++) pomValuesTime.add(Long.parseLong(pomSplit[i]));
-//                    runOnUiThread(() -> cycle_header_text.setText(pomCycles.getTitle()));
-//                    break;
-//            }
-//
-//            runOnUiThread(() -> {
-//                saveArrays();
-//                resetTimer();
-//                savedCyclePopupWindow.dismiss();
-//                invalidateOptionsMenu();
-//            });
-//            prefEdit.apply();
-//        });
-//    }
-
-//
-//    //Removes a set or break and calls function to update the millis value.
-//    public void removeSetOrBreak(boolean onSet) {
-//        switch (mode) {
-//            case 1:
-//                if (onSet) {
-//                    setMillis = newMillis(true);
-//                    numberOfSets--;
-//                } else {
-//                    breakMillis = newMillis(false);
-//                    numberOfBreaks--;
-//                }
-//                break;
-//            case 2:
-//                breakOnlyMillis = newMillis(false);
-//                numberOfBreaksOnly--;
-//                break;
-//        }
-//        drawDots(0);
-//    }
-//
-//    public void switchMenu() {
-//        Runnable r = () -> {
-//            invalidateOptionsMenu();
-//        };
-//        mHandler.postDelayed(r, 50);
-//    }
-
-
-//    public void saveArrays() {
-//        Gson gson = new Gson();
-//        String savedSetArrays = "";
-//        String savedBreakArrays = "";
-//        String savedBOArrays = "";
-//        String savedPomArrays = "";
-//        String savedTitle = "";
-//        if (!edit_header.getText().toString().equals("")) savedTitle = edit_header.getText().toString(); else savedTitle = getString(R.string.default_title);
-//        if (customSetTime.size()>0){
-//            savedSetArrays = gson.toJson(customSetTime);
-//            savedBreakArrays = gson.toJson(customBreakTime);
-//        }
-//        if (breaksOnlyTime.size()>0) savedBOArrays = gson.toJson(breaksOnlyTime);
-//        savedPomArrays = gson.toJson((pomValuesTime));
-//
-//        prefEdit.putString("setArrays", savedSetArrays);
-//        prefEdit.putString("breakArrays", savedBreakArrays);
-//        prefEdit.putString("savedBOArrays", savedBOArrays);
-//        prefEdit.putString("savedPomArrays", savedPomArrays);
-//        prefEdit.putString("savedTitle", savedTitle);
-//        prefEdit.apply();
-//    }
-//
-
-//    //receivedPos is taken from dotDraws using the sendPos callback, called from onTouchEvent when it uses setCycle. It returns 0-7 based on which round has been selected.
-//    public void deleteSelectedRound() {
-//        if (mode==1) {
-//            customSetTime.remove(receivedPos);
-//            customBreakTime.remove(receivedPos);
-//            customSetTimeUP.remove(receivedPos);
-//            customBreakTimeUP.remove(receivedPos);
-//            numberOfSets-=1;
-//            numberOfBreaks-=1;
-//            if (!setsAreCountingUp) dotDraws.setTime(customSetTime); else dotDraws.setTime(customSetTimeUP);
-//            if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(customBreakTimeUP);
-////            if (numberOfSets==0) {
-////                delete_sb.setAlpha(0.3f);
-////                delete_sb.setEnabled(false);
-////            }
-//        } else if (mode==2){
-//            breaksOnlyTime.remove(receivedPos);
-//            breaksOnlyTimeUP.remove(receivedPos);
-//            numberOfBreaksOnly-=1;
-//            if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(breaksOnlyTimeUP);
-////            if (numberOfBreaksOnly==0) {
-////                delete_sb.setAlpha(0.3f);
-////                delete_sb.setEnabled(false);
-////            }
-//        }
-//        canSaveOrUpdate(true);
-//    }
-
-
-
 }
