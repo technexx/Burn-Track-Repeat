@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -61,35 +62,22 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     if (holder instanceof ModeOneRounds) {
+      //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
-      if (!mSetsUp) {
-        modeOneRounds.round_sets.setText(appendSeconds(mSetsList.get(position)));
-        modeOneRounds.round_sets.setBackgroundResource(0);
-      } else {
-        modeOneRounds.round_sets.setText("");
-        modeOneRounds.round_sets.setBackgroundResource(R.drawable.infinity_icon_green);
-      }
-      if (!mBreaksUp) {
-        modeOneRounds.round_breaks.setText(appendSeconds(mBreaksList.get(position)));
-        modeOneRounds.round_breaks.setBackgroundResource(0);
-      } else {
-        modeOneRounds.round_breaks.setText("");
-        modeOneRounds.round_breaks.setBackgroundResource(R.drawable.infinity_icon_red);
-      }
+      //Sets our round textViews.
+      modeOneRounds.round_sets.setText(appendSeconds(mSetsList.get(position)));
+      modeOneRounds.round_breaks.setText(appendSeconds(mBreaksList.get(position)));
+      //If infinity mode is toggled, shows the symbol next to rounds. Removes symbol if not.
+      if (!mSetsUp) modeOneRounds.infinity_green.setVisibility(View.INVISIBLE); else modeOneRounds.infinity_green.setVisibility(View.VISIBLE);
+      if (!mBreaksUp) modeOneRounds.infinity_red.setVisibility(View.INVISIBLE); else modeOneRounds.infinity_red.setVisibility(View.VISIBLE);
     } else if (holder instanceof ModeTwoRounds) {
       ModeTwoRounds modeTwoRounds = (ModeTwoRounds) holder;
-      if (!mBreaksUp) {
-        modeTwoRounds.round_breaksOnly.setText(appendSeconds(mBreaksOnlyList.get(position)));
-        modeTwoRounds.round_breaksOnly.setBackgroundResource(0);
-      } else {
-        modeTwoRounds.round_breaksOnly.setText("");
-        modeTwoRounds.round_breaksOnly.setBackgroundResource(R.drawable.infinity_icon_red);
-      }
+      modeTwoRounds.round_breaksOnly.setText(appendSeconds(mBreaksOnlyList.get(position)));
+      if (!mBreaksUp) modeTwoRounds.infinity_red.setVisibility(View.INVISIBLE); else modeTwoRounds.infinity_red.setVisibility(View.VISIBLE);
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
     }
-//    Log.i("testSize", "size is " + mBreaksOnlyList.size());
   }
 
   @Override
@@ -119,20 +107,28 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public class ModeOneRounds extends RecyclerView.ViewHolder {
     public TextView round_sets;
     public TextView round_breaks;
+    public ImageView infinity_green;
+    public ImageView infinity_red;
 
     public ModeOneRounds(@NonNull View itemView) {
       super(itemView);
       round_sets = itemView.findViewById(R.id.round_sets);
       round_breaks = itemView.findViewById(R.id.round_breaks);
+      infinity_green = itemView.findViewById(R.id.infinity_green);
+      infinity_red = itemView.findViewById(R.id.infinity_red);
     }
   }
 
   public class ModeTwoRounds extends RecyclerView.ViewHolder {
     public TextView round_breaksOnly;
+    public ImageView infinity_green;
+    public ImageView infinity_red;
 
     public ModeTwoRounds(@NonNull View itemView) {
       super(itemView);
       round_breaksOnly = itemView.findViewById(R.id.round_breaksOnly);
+      infinity_green = itemView.findViewById(R.id.infinity_green);
+      infinity_red = itemView.findViewById(R.id.infinity_red);
     }
   }
 

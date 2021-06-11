@@ -186,10 +186,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_UP = 2;
   boolean onNewCycle;
 
-  //Todo: Show visual reference to round time even if in "count up?"
-  //Todo: Implement cycle highlights in modes 2 and 3. Careful nothing overlaps (i.e. cancel highlight mode when switching tabs).
+  //Todo: Show visual reference to round time even if in "count up" - in both recyclerViews.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
-  //Todo: Two digits in MM of add/sub slightly overlap ":" due to larger textViews.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
 

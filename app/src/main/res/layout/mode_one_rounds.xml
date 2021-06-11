@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@id/center_anchor_one"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="24dp"
         android:textColor="@color/green"
         android:textSize="22sp">
     </TextView>
@@ -30,9 +30,31 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/center_anchor_one"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="24dp"
         android:textColor="@color/red"
         android:textSize="22sp">
     </TextView>
+
+    <ImageView
+        android:id="@+id/infinity_green"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/round_sets"
+        app:layout_constraintTop_toTopOf="@id/round_sets"
+        app:layout_constraintBottom_toBottomOf="@id/round_sets"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/infinity_icon_green">
+    </ImageView>
+
+    <ImageView
+        android:id="@+id/infinity_red"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/round_breaks"
+        app:layout_constraintTop_toTopOf="@id/round_breaks"
+        app:layout_constraintBottom_toBottomOf="@id/round_breaks"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/infinity_icon_red">
+    </ImageView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
