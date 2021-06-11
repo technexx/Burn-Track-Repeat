@@ -373,7 +373,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       for (int k=0; k<newSplit.length; k++) {
         //Creating new ArrayList of Long values.
-        //Todo: If for some reason we receive a blank String here, we will crash w/ null exception.
         newLong.add(Long.parseLong(newSplit[k]));
         //Converting each Long value into a String we can display.
         newString.add(convertSeconds(newLong.get(k)));
@@ -400,7 +399,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       minutes = totalSeconds/60;
       remainingSeconds = totalSeconds % 60;
       return (minutes + ":" + df.format(remainingSeconds));
-    } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
-    else return "05";
+    } else if (totalSeconds >=10) return "0:" + totalSeconds;
+    else return "0:0" + totalSeconds;
   }
 }

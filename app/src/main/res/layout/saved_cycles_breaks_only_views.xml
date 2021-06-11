@@ -27,18 +27,6 @@
         android:layout_marginTop="24dp">
     </TextView>
 
-    <ImageButton
-        android:id="@+id/delete_cycle_bo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/saved_breaks_only_view"
-        app:layout_constraintBottom_toBottomOf="@id/saved_breaks_only_view"
-        android:background="@color/Gray"
-        android:layout_marginBottom="4dp"
-        android:src="@drawable/trash_can">
-    </ImageButton>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"

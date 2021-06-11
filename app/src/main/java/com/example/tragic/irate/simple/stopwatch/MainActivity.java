@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton upDown_arrow_one;
   ImageButton upDown_arrow_two;
   View top_anchor;
-  Button start_timer;
+  ImageButton start_timer;
 
   ArrayList<Integer> customSetTime;
   ArrayList<Integer> customBreakTime;

@@ -16,7 +16,7 @@
         android:layout_marginTop="12dp"
         android:textColorHint="@color/circular_progress_default_subtitle"
         android:textColor="@color/white"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:gravity="center_horizontal"
         android:hint="@string/cycle_name"
         android:background="@null"
@@ -43,7 +43,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="2dp"
         android:layout_marginBottom="6dp"
-        android:textSize="28sp"
+        android:textSize="25sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -55,7 +55,7 @@
         app:layout_constraintBottom_toBottomOf="@id/minus_second_value"
         android:layout_marginStart="2dp"
         android:layout_marginBottom="6dp"
-        android:textSize="28sp"
+        android:textSize="25sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -67,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginStart="2dp"
         android:layout_marginBottom="6dp"
-        android:textSize="28sp"
+        android:textSize="25sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -78,7 +78,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginEnd="124dp"
-        android:textSize="30sp">
+        android:textSize="27sp">
     </TextView>
     <TextView
         android:id="@+id/second_value_textView"
@@ -89,7 +89,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:layout_marginEnd="124dp"
         android:gravity="center_horizontal"
-        android:textSize="30sp">
+        android:textSize="27sp">
     </TextView>
 
     <TextView
@@ -101,7 +101,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginEnd="124dp"
         android:gravity="center_horizontal"
-        android:textSize="30sp">
+        android:textSize="27sp">
     </TextView>
 
     <ImageButton
@@ -112,7 +112,7 @@
         app:layout_constraintEnd_toStartOf="@id/first_value_textView"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginEnd="14dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
     </ImageButton>
@@ -125,7 +125,7 @@
         app:layout_constraintStart_toEndOf="@id/first_value_textView"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginStart="14dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
     </ImageButton>
@@ -190,7 +190,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="5dp"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:gravity="center_horizontal"
@@ -208,7 +208,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="188dp"
-        android:textSize="30sp">
+        android:textSize="27sp">
     </TextView>
 
     <EditText
@@ -219,7 +219,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginEnd="10dp"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:gravity="center_horizontal"
@@ -237,7 +237,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:inputType="number"
@@ -254,7 +254,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:layout_marginTop="2dp"
         android:layout_marginStart="188dp">
     </TextView>
@@ -268,7 +268,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="2dp"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:textColor="@color/white"
         android:inputType="number"
         android:maxLength="2"
@@ -285,7 +285,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:inputType="number"
@@ -302,7 +302,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_third_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:layout_marginTop="2dp"
         android:layout_marginStart="188dp">
     </TextView>
@@ -316,7 +316,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="2dp"
-        android:textSize="30sp"
+        android:textSize="27sp"
         android:textColor="@color/white"
         android:inputType="number"
         android:maxLength="2"
@@ -384,31 +384,34 @@
         app:strokeWidth="1dp">
     </Button>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/round_list_recycler"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_cycle">
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/recyclerview_border">
 
-    <Button
-        android:text="Start"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/round_list_recycler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="4dp">
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageButton
         android:id="@+id/start_timer"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="4dp"
-        android:textSize="24sp"
-        android:gravity="center"
-        android:backgroundTint="@color/dark_grey"
-        app:cornerRadius="50dp"
-        app:rippleColor="#33AAAAAA"
-        app:strokeColor="@color/black"
-        app:strokeWidth="1dp">
-    </Button>
+        android:background="@drawable/start_cycle">
+    </ImageButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
