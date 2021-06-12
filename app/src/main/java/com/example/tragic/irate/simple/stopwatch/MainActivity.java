@@ -51,7 +51,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityMode {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -263,6 +263,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Can simply set received boolean to our activity's.
+  //1/2 sets false/true. 3/4 breaks false/true. 5/6 breaksOnly false/true
+  @Override
+  public void onInfinity(int infinity) {
+    switch (infinity) {
+      case 1: setsAreCountingUp = false; break;
+      case 2: setsAreCountingUp = true; break;
+      case 3: breaksAreCountingUp = false; break;
+      case 4: breaksAreCountingUp = true; break;
+      case 5: breaksOnlyAreCountingUp = false; break;
+      case 6: breaksOnlyAreCountingUp = true; break;
+    }
+  }
+
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
     MenuInflater inflater = getMenuInflater();
@@ -433,8 +447,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
           savedCycleRecycler.setAdapter(savedCycleAdapter);
           savedCycleRecycler.setLayoutManager(lm2);
+          //Instantiating callbacks from adapter.
           savedCycleAdapter.setItemClick(MainActivity.this);
           savedCycleAdapter.setHighlight(MainActivity.this);
+          savedCycleAdapter.setInfinityMode(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
           //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().

@@ -68,12 +68,12 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       modeOneRounds.round_sets.setText(appendSeconds(mSetsList.get(position)));
       modeOneRounds.round_breaks.setText(appendSeconds(mBreaksList.get(position)));
       //If infinity mode is toggled, shows the symbol next to rounds. Removes symbol if not.
-      if (!mSetsUp) modeOneRounds.infinity_green.setVisibility(View.INVISIBLE); else modeOneRounds.infinity_green.setVisibility(View.VISIBLE);
-      if (!mBreaksUp) modeOneRounds.infinity_red.setVisibility(View.INVISIBLE); else modeOneRounds.infinity_red.setVisibility(View.VISIBLE);
+      if (!mSetsUp) modeOneRounds.infinity_green_rounds.setVisibility(View.INVISIBLE); else modeOneRounds.infinity_green_rounds.setVisibility(View.VISIBLE);
+      if (!mBreaksUp) modeOneRounds.infinity_red_rounds.setVisibility(View.INVISIBLE); else modeOneRounds.infinity_red_rounds.setVisibility(View.VISIBLE);
     } else if (holder instanceof ModeTwoRounds) {
       ModeTwoRounds modeTwoRounds = (ModeTwoRounds) holder;
       modeTwoRounds.round_breaksOnly.setText(appendSeconds(mBreaksOnlyList.get(position)));
-      if (!mBreaksUp) modeTwoRounds.infinity_red.setVisibility(View.INVISIBLE); else modeTwoRounds.infinity_red.setVisibility(View.VISIBLE);
+      if (!mBreaksUp) modeTwoRounds.infinity_red_rounds.setVisibility(View.INVISIBLE); else modeTwoRounds.infinity_red_rounds.setVisibility(View.VISIBLE);
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
@@ -107,28 +107,28 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public class ModeOneRounds extends RecyclerView.ViewHolder {
     public TextView round_sets;
     public TextView round_breaks;
-    public ImageView infinity_green;
-    public ImageView infinity_red;
+    public ImageView infinity_green_rounds;
+    public ImageView infinity_red_rounds;
 
     public ModeOneRounds(@NonNull View itemView) {
       super(itemView);
       round_sets = itemView.findViewById(R.id.round_sets);
       round_breaks = itemView.findViewById(R.id.round_breaks);
-      infinity_green = itemView.findViewById(R.id.infinity_green);
-      infinity_red = itemView.findViewById(R.id.infinity_red);
+      infinity_green_rounds = itemView.findViewById(R.id.infinity_green_rounds);
+      infinity_red_rounds = itemView.findViewById(R.id.infinity_red_rounds);
     }
   }
 
   public class ModeTwoRounds extends RecyclerView.ViewHolder {
     public TextView round_breaksOnly;
-    public ImageView infinity_green;
-    public ImageView infinity_red;
+    public ImageView infinity_green_rounds;
+    public ImageView infinity_red_rounds;
 
     public ModeTwoRounds(@NonNull View itemView) {
       super(itemView);
       round_breaksOnly = itemView.findViewById(R.id.round_breaksOnly);
-      infinity_green = itemView.findViewById(R.id.infinity_green);
-      infinity_red = itemView.findViewById(R.id.infinity_red);
+      infinity_green_rounds = itemView.findViewById(R.id.infinity_green_rounds);
+      infinity_red_rounds = itemView.findViewById(R.id.infinity_red_rounds);
     }
   }
 

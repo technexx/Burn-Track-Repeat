@@ -2,22 +2,17 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,9 +30,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mBreaksOnlyTitle;
   ArrayList<String> mPomList;
   ArrayList<String> mPomTitle;
-  boolean mBreaksOnly;
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
+  onInfinityMode mOnInfinityMode;
   public static final int SETS_AND_BREAKS = 0;
   public static final int BREAKS_ONLY = 1;
   public static final int POMODORO = 2;
@@ -45,6 +40,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mHighlightDeleted;
   boolean mHighlightMode;
   List<String> mPositionList;
+  List<Boolean> mInfinityArrayOne = new ArrayList<>();
+  List<Boolean> mInfinityArrayTwo = new ArrayList<>();
+  List<Boolean> mInfinityArrayThree = new ArrayList<>();
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -52,6 +50,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public interface onHighlightListener {
     void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
+  }
+
+  //Using (int) so we can do one callback for both sets and breaks on/off.
+  public interface onInfinityMode {
+    void onInfinity(int infinity);
   }
 
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -62,6 +65,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mOnHighlightListener = xOnHighlightListener;
   }
 
+  public void setInfinityMode(onInfinityMode xOnInfinityMode) {
+    this.mOnInfinityMode = xOnInfinityMode;
+  }
+
+  //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
   public SavedCycleAdapter (Context context, ArrayList<String> setsList, ArrayList<String> breaksList, ArrayList<String> breaksOnlyList, ArrayList<String> pomList, ArrayList<String> title, ArrayList<String> breaksOnlyTitle, ArrayList<String> pomTitle) {
     this.mContext = context; mSetsList = setsList; mBreaksList = breaksList; mBreaksOnlyList = breaksOnlyList; this.mPomList = pomList; this.mTitle = title; this.mBreaksOnlyTitle = breaksOnlyTitle; this.mPomTitle = pomTitle;
     //Must be instantiated here so it does not loop and reset in onBindView.
@@ -86,13 +94,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     Context context = parent.getContext();
     if (viewType == SETS_AND_BREAKS) {
-      View view = LayoutInflater.from(context).inflate(R.layout.saved_cycles_views, parent, false);
+      View view = LayoutInflater.from(context).inflate(R.layout.mode_one_cycles, parent, false);
       return new CustomHolder(view);
     } else if (viewType == BREAKS_ONLY){
-      View view = LayoutInflater.from(context).inflate(R.layout.saved_cycles_breaks_only_views, parent, false);
+      View view = LayoutInflater.from(context).inflate(R.layout.mode_two_cycles, parent, false);
       return new BreaksOnlyHolder(view);
     } else if (viewType == POMODORO) {
-      View view = LayoutInflater.from(context).inflate(R.layout.saved_pom_views, parent, false);
+      View view = LayoutInflater.from(context).inflate(R.layout.mode_three_cycles, parent, false);
       return new PomHolder(view);
     } else return null;
   }
@@ -100,13 +108,42 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
     //Used to store highlighted positions that we callback to Main to delete.
     if (holder instanceof CustomHolder) {
       CustomHolder customHolder = (CustomHolder) holder;
       customHolder.customName.setText(mTitle.get(position));
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
+
+      for (int i=0; i<)
+      if (mInfinityArrayOne.get(position)) mOnInfinityMode.onInfinity(2); else mOnInfinityMode.onInfinity(1);
+      if (mInfinityArrayTwo.get(position)) mOnInfinityMode.onInfinity(4); else mOnInfinityMode.onInfinity(3);
+
+      //Todo: Restrict fullView to majority block outside infinity signs.
+      //Todo: Save infinity mode on/off.
+      customHolder.infinity_green_cycles.setOnClickListener(v-> {
+        if (customHolder.infinity_green_cycles.getAlpha()==1.0f) {
+          customHolder.infinity_green_cycles.setAlpha(0.35f);
+          mOnInfinityMode.onInfinity(1);
+          mInfinityArrayOne.add(position, false);
+        } else {
+          customHolder.infinity_green_cycles.setAlpha(1.0f);
+          mOnInfinityMode.onInfinity(2);
+          mInfinityArrayOne.add(position, true);
+        }
+      });
+
+      customHolder.infinity_red_cycles.setOnClickListener(v-> {
+        if (customHolder.infinity_red_cycles.getAlpha()==1.0f) {
+          customHolder.infinity_red_cycles.setAlpha(0.35f);
+          mOnInfinityMode.onInfinity(3);
+          mInfinityArrayTwo.add(position, false);
+        } else {
+          customHolder.infinity_red_cycles.setAlpha(1.0f);
+          mOnInfinityMode.onInfinity(4);
+          mInfinityArrayTwo.add(position, true);
+        }
+      });
 
       if (mHighlightDeleted) {
         //Clears highlight list.
@@ -320,6 +357,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView customSet;
     public TextView customBreak;
     public View fullView;
+    public ImageView infinity_green_cycles;
+    public ImageView infinity_red_cycles;
 
     @SuppressLint("ResourceAsColor")
     public CustomHolder(@NonNull View itemView) {
@@ -328,6 +367,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customSet = itemView.findViewById(R.id.saved_custom_set_view);
       customBreak = itemView.findViewById(R.id.saved_custom_break_view);
       fullView = itemView;
+      infinity_green_cycles = itemView.findViewById(R.id.infinity_green_cycles);
+      infinity_red_cycles = itemView.findViewById(R.id.infinity_red_cycles);
     }
   }
 
@@ -335,12 +376,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView breaksOnlyName;
     public TextView breaksOnlyBreak;
     public View fullView;
+    public ImageView infinity_red_cycles;
 
     public BreaksOnlyHolder(@NonNull View itemView) {
       super(itemView);
       breaksOnlyName = itemView.findViewById(R.id.breaks_only_header);
       breaksOnlyBreak = itemView.findViewById(R.id.saved_breaks_only_view);
       fullView = itemView;
+      infinity_red_cycles = itemView.findViewById(R.id.infinity_red_cycles);
     }
   }
 
@@ -380,7 +423,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       finalSplit = String.valueOf(newString);
       finalSplit = finalSplit.replace("[", "");
       finalSplit = finalSplit.replace("]", "");
-      finalSplit = finalSplit.replace(",", " " + mContext.getString( R.string.bullet));
+      finalSplit = finalSplit.replace(",", " " + mContext.getString(R.string.bullet));
       finalList.add(finalSplit);
 
       newLong = new ArrayList<>();

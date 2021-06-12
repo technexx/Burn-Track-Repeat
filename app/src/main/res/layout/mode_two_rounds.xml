@@ -16,4 +16,15 @@
         android:textSize="22sp">
     </TextView>
 
+    <ImageView
+        android:id="@+id/infinity_red_rounds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/round_breaksOnly"
+        app:layout_constraintTop_toTopOf="@id/round_breaksOnly"
+        app:layout_constraintBottom_toBottomOf="@id/round_breaksOnly"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/infinity_icon_red">
+    </ImageView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
