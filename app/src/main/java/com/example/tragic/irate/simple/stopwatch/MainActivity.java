@@ -45,13 +45,14 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityMode {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityModeListener, SavedCycleAdapter.onInfinityToggleListener {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -185,8 +186,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COUNTING_DOWN = 1;
   int COUNTING_UP = 2;
   boolean onNewCycle;
+  public ArrayList<Integer> infinityArrayOne;
+  public ArrayList<Integer> infinityArrayTwo;
+  public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Show visual reference to round time even if in "count up" - in both recyclerViews.
+  //Todo: Pass title into timer.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
@@ -222,9 +226,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (editCyclesPopupWindow.isShowing()) {
       //If non-database cycle (i.e. FAB launched) is present, save it as a new entry. If a database-saved cycle (i.e. highlight launched) is present, update it in the database. queryCycles() has already been called from the edit_highlighted_text button.
       AsyncTask.execute(()->{
-        if (onNewCycle) saveCycles(true); else {
-          saveCycles(false);
-        }
+        if (onNewCycle) saveCycles(true); else saveCycles(false);
         //Calling queryCycles() to fetch the latest post-save list our cycles.
         queryCycles();
         //Populates the savedCycleAdapter's array lists., formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
@@ -236,7 +238,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
       });
     }
-    queryCycles();
   }
 
   //Gets the position clicked on from our saved cycle adapter.
@@ -263,18 +264,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Can simply set received boolean to our activity's.
-  //1/2 sets false/true. 3/4 breaks false/true. 5/6 breaksOnly false/true
+  //1/2 sets false/true. 3/4 breaks false/true. 5/6 breaksOnly false/true. Since each value affects a different variable, we can receive multiple callbacks (and we do) for multiple toggles.
   @Override
-  public void onInfinity(int infinity) {
+  public void onInfinityMode(int infinity) {
+
     switch (infinity) {
       case 1: setsAreCountingUp = false; break;
       case 2: setsAreCountingUp = true; break;
+
       case 3: breaksAreCountingUp = false; break;
       case 4: breaksAreCountingUp = true; break;
+
       case 5: breaksOnlyAreCountingUp = false; break;
       case 6: breaksOnlyAreCountingUp = true; break;
     }
+    //Todo: Bad method here. We need to extract, AS or BEFORE we launch Timer, the corresponding position and toggle value. Right now, we receive this callback as many times as there are list positions, and the boolean gets set to the last one received.
+    Log.i("testList", "boolean values are " + setsAreCountingUp + " " + breaksAreCountingUp);
+
+  }
+
+  @Override
+  public void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks) {
+    infinityArrayOne = toggleSets; infinityArrayTwo = toggleBreaks;
+
   }
 
   @Override
@@ -408,6 +420,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomTitleArray = new ArrayList<>();
     //If highlighting cycles for deletion, contains all POSITIONS (not IDs) of cycles highlighted.
     receivedHighlightPositions = new ArrayList<>();
+    infinityArrayOne = new ArrayList<>();
+    infinityArrayTwo = new ArrayList<>();
 
     //Database entity lists.
     cyclesList = new ArrayList<>();
@@ -432,8 +446,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
-    setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
-    breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
+//    setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
+//    breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
+
 
     mHandler.postDelayed(() -> {
       AsyncTask.execute(() -> {
@@ -441,6 +456,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
         //Instantiates cycleList object based on sort order. For app launch, this is defaulting to "1", or "most recent."
         queryCycles();
+        //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
+        populateCycleList();
         runOnUiThread(()-> {
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -451,11 +468,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.setItemClick(MainActivity.this);
           savedCycleAdapter.setHighlight(MainActivity.this);
           savedCycleAdapter.setInfinityMode(MainActivity.this);
+          savedCycleAdapter.setInfinityToggle(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
-          //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
-          populateCycleList();
-          //Calling this by default, so any launch of Main will update our cycle list.
+
+          //FOR REFERENCE: Main (intent-> Timer) ---> Timer (intent->Main) && (callback to adapter for saved toggles).
+          //Receives infinity arrays from Timer class, which are the same ones we passed into Timer when launching it from Main. This is done to prevent them being lost when our activity is recreated.
+          Intent intent = getIntent();
+          if (intent!=null) {
+            infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
+            if (infinityArrayOne == null) infinityArrayOne = new ArrayList<>();
+            infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
+            if (infinityArrayTwo == null) infinityArrayTwo = new ArrayList<>();
+          }
+          if (infinityArrayOne.isEmpty()) {
+            for (int i=0; i<setsArray.size(); i++) {
+              infinityArrayOne.add(0);
+              infinityArrayTwo.add(0);
+            }
+          }
+          //Sends infinity arrays to our saved cycle adapter.
+          savedCycleAdapter.receiveInfinityMode(infinityArrayOne, infinityArrayTwo);
+
+          //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
           savedCycleAdapter.notifyDataSetChanged();
         });
       });
@@ -849,6 +884,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryCycles();
         //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
         populateCycleList();
+        savedCycleAdapter.notifyDataSetChanged();
       });
     });
 
@@ -1526,7 +1562,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomTitleArray.add(pomCyclesList.get(0).getTitle());
         }
     }
-    savedCycleAdapter.notifyDataSetChanged();
   }
 
   //Gets instance of our database entity class based on which mode we're in. Converts its String into Integers and populates our timer arrays with them.
@@ -1608,6 +1643,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     intent.putExtra("mode", mode);
     //Sends the current cycle's database position so we can delete it from the Timer class if desired.
     intent.putExtra("passedID", retrievedID);
+    //Sends infinity toggle arrays to Timer, so they can be sent back to Main when we come back. This is necessary because we are not using Shared Preferences, and our Main activity is set to recreate itself when exiting from Timer.
+    intent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+    intent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
     //Starts Timer class.
     startActivity(intent);
   }

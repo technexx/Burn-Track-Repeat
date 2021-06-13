@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -17,8 +18,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -32,7 +36,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mPomTitle;
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
-  onInfinityMode mOnInfinityMode;
+  onInfinityModeListener monInfinityModeListener;
+  onInfinityToggleListener mOnInfinityToggleListener;
   public static final int SETS_AND_BREAKS = 0;
   public static final int BREAKS_ONLY = 1;
   public static final int POMODORO = 2;
@@ -40,9 +45,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mHighlightDeleted;
   boolean mHighlightMode;
   List<String> mPositionList;
-  List<Boolean> mInfinityArrayOne = new ArrayList<>();
-  List<Boolean> mInfinityArrayTwo = new ArrayList<>();
-  List<Boolean> mInfinityArrayThree = new ArrayList<>();
+  //Needed for sets and breaks.
+  ArrayList<Integer> mInfinityArrayOne = new ArrayList<>();
+  ArrayList<Integer> mInfinityArrayTwo = new ArrayList<>();
+  //Needed for breaksOnly.
+  ArrayList<Integer> mInfinityArrayThree = new ArrayList<>();
+  ArrayList<Integer> mInfinityOneTemp = new ArrayList<>();
+  ArrayList<Integer> mInfinityTwoTemp = new ArrayList<>();
+  ArrayList<Integer> mInfinityThreeTemp = new ArrayList<>();
+
+  Gson gson;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -53,8 +65,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   //Using (int) so we can do one callback for both sets and breaks on/off.
-  public interface onInfinityMode {
-    void onInfinity(int infinity);
+  public interface onInfinityModeListener {
+    void onInfinityMode(int infinity);
+  }
+
+  public interface onInfinityToggleListener {
+    void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks);
   }
 
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -65,8 +81,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mOnHighlightListener = xOnHighlightListener;
   }
 
-  public void setInfinityMode(onInfinityMode xOnInfinityMode) {
-    this.mOnInfinityMode = xOnInfinityMode;
+  public void setInfinityMode(onInfinityModeListener xonInfinityModeListener) {
+    this.monInfinityModeListener = xonInfinityModeListener;
+  }
+
+  public void setInfinityToggle(onInfinityToggleListener xOnInfinityToggleListener) {
+    this.mOnInfinityToggleListener = xOnInfinityToggleListener;
+  }
+
+  public SavedCycleAdapter() {
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
@@ -87,6 +110,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mHighlightDeleted = true;
     //If boolean is true, we have canceled the highlight process entirely, which does the above but also removes the Trash/Back buttons (done in Main) and sets the next row click to launch a timer instead of highlight (done here).
     if (cancelMode) mHighlightMode = false;
+  }
+
+  public void receiveInfinityMode(ArrayList<Integer> infinityListOne, ArrayList<Integer> infinityListTwo) {
+    mInfinityOneTemp = infinityListOne; mInfinityTwoTemp = infinityListTwo;
   }
 
   @NonNull
@@ -115,34 +142,53 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
-      for (int i=0; i<)
-      if (mInfinityArrayOne.get(position)) mOnInfinityMode.onInfinity(2); else mOnInfinityMode.onInfinity(1);
-      if (mInfinityArrayTwo.get(position)) mOnInfinityMode.onInfinity(4); else mOnInfinityMode.onInfinity(3);
+      mInfinityArrayOne = mInfinityOneTemp;
+      mInfinityArrayTwo = mInfinityTwoTemp;
+
+      //Using 0/1 for false/true on each array. Using 1-6 for false/true toggles on callbacks to Main.
+      if (mInfinityArrayOne.get(position)==0) {
+        //Todo: These send back too often. We just need the mode for CURRENT
+        monInfinityModeListener.onInfinityMode(1);
+        customHolder.infinity_green_cycles.setAlpha(0.35f);
+      } else {
+        monInfinityModeListener.onInfinityMode(2);
+        customHolder.infinity_green_cycles.setAlpha(1.0f);
+      }
+
+      if (mInfinityArrayTwo.get(position)==0) {
+        monInfinityModeListener.onInfinityMode(3);
+        customHolder.infinity_red_cycles.setAlpha(0.35f);
+      } else {
+        monInfinityModeListener.onInfinityMode(4);
+        customHolder.infinity_red_cycles.setAlpha(1.0f);
+      }
+      mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo);
 
       //Todo: Restrict fullView to majority block outside infinity signs.
-      //Todo: Save infinity mode on/off.
-      customHolder.infinity_green_cycles.setOnClickListener(v-> {
-        if (customHolder.infinity_green_cycles.getAlpha()==1.0f) {
+      customHolder.infinity_green_cycles.setOnClickListener(v -> {
+        if (customHolder.infinity_green_cycles.getAlpha() == 1.0f) {
           customHolder.infinity_green_cycles.setAlpha(0.35f);
-          mOnInfinityMode.onInfinity(1);
-          mInfinityArrayOne.add(position, false);
+          monInfinityModeListener.onInfinityMode(1);
+          mInfinityArrayOne.set(position, 0);
         } else {
           customHolder.infinity_green_cycles.setAlpha(1.0f);
-          mOnInfinityMode.onInfinity(2);
-          mInfinityArrayOne.add(position, true);
+          monInfinityModeListener.onInfinityMode(2);
+          mInfinityArrayOne.set(position, 1);
         }
+        mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo);
       });
 
-      customHolder.infinity_red_cycles.setOnClickListener(v-> {
-        if (customHolder.infinity_red_cycles.getAlpha()==1.0f) {
+      customHolder.infinity_red_cycles.setOnClickListener(v -> {
+        if (customHolder.infinity_red_cycles.getAlpha() == 1.0f) {
           customHolder.infinity_red_cycles.setAlpha(0.35f);
-          mOnInfinityMode.onInfinity(3);
-          mInfinityArrayTwo.add(position, false);
+          monInfinityModeListener.onInfinityMode(3);
+          mInfinityArrayTwo.set(position, 0);
         } else {
           customHolder.infinity_red_cycles.setAlpha(1.0f);
-          mOnInfinityMode.onInfinity(4);
-          mInfinityArrayTwo.add(position, true);
+          monInfinityModeListener.onInfinityMode(4);
+          mInfinityArrayTwo.set(position, 1);
         }
+        mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo);
       });
 
       if (mHighlightDeleted) {
@@ -151,7 +197,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
         mHighlightMode = false;
         //Sets all of our backgrounds to black (unhighlighted).
-        for (int i=0; i<mSetsList.size(); i++) {
+        for (int i = 0; i < mSetsList.size(); i++) {
           customHolder.fullView.setBackgroundColor(Color.BLACK);
         }
       }
@@ -159,13 +205,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.fullView.setOnClickListener(v -> {
         boolean changed = false;
         //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
-        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
+        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position);
+        else {
           ArrayList<String> tempList = new ArrayList<>(mPositionList);
 
           //Iterate through every cycle in list.
-          for (int i=0; i<mSetsList.size(); i++) {
+          for (int i = 0; i < mSetsList.size(); i++) {
             //Using tempList for stable loop since mPositionList changes.
-            for (int j=0; j<tempList.size(); j++) {
+            for (int j = 0; j < tempList.size(); j++) {
               //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
               if (String.valueOf(position).contains(tempList.get(j))) {
                 customHolder.fullView.setBackgroundColor(Color.BLACK);
@@ -187,7 +234,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       });
 
       //Highlight cycle on long click and make visible action bar buttons. Sets mHighlightMode to true so no cycles can be launched in timer.
-      customHolder.fullView.setOnLongClickListener(v-> {
+      customHolder.fullView.setOnLongClickListener(v -> {
         if (!mHighlightMode) {
           mPositionList.add(String.valueOf(position));
           customHolder.fullView.setBackgroundColor(Color.GRAY);

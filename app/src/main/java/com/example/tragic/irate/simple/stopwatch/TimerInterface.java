@@ -179,7 +179,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   boolean breakBegun;
   boolean breakOnlyBegun;
   boolean pomBegun;
-  boolean selectingRounds;
   boolean isOvertimeRunning;
 
   SharedPreferences sharedPreferences;
@@ -194,12 +193,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public Runnable secondsUpSetRunnable;
   public Runnable secondsUpBreakRunnable;
   public Runnable secondsUpBORunnable;
-  public Runnable fadeInDot;
-  public Runnable fadeOutDot;
   boolean setsAreCountingUp;
   boolean breaksAreCountingUp;
   boolean breaksOnlyAreCountingUp;
-  int dotAlpha;
 
   boolean modeOneBetweenRounds;
   boolean modeTwoBetweenRounds;
@@ -218,10 +214,17 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   PomCycles pomCycles;
   int passedID;
   MainActivity mainActivity;
+  SavedCycleAdapter savedCycleAdapter;
+  ArrayList<Integer> infinityArrayOne;
+  ArrayList<Integer> infinityArrayTwo;
+  ArrayList<Integer> infinityArrayThree;
 
+  //Todo: Highlight saves work, but onBackPressed defaults to infinite mode OFF unless we click-enable.
   @Override
   public void onBackPressed() {
     Intent intent = new Intent(TimerInterface.this, MainActivity.class);
+    intent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+    intent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
     startActivity(intent);
   }
 
@@ -275,6 +278,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     breaksOnlyArray = new ArrayList<>();
     pomArray = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
+    infinityArrayOne = new ArrayList<>();
+    infinityArrayTwo  = new ArrayList<>();
+    infinityArrayThree = new ArrayList<>();
 
     reset = findViewById(R.id.reset);
     cycle_header_text = findViewById(R.id.cycle_header_text);
@@ -316,6 +322,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
     lastTextView = timePaused;
 
+    savedCycleAdapter = new SavedCycleAdapter();
+
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -334,6 +342,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycle_title = intent.getStringExtra("cycleTitle");
     //Used to delete cycle.
     passedID = intent.getIntExtra("passedID", 0);
+    infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
+    infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
 
     switch (mode) {
       case 1:
@@ -688,7 +698,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     AtomicBoolean textSizeReduced = new AtomicBoolean(false);
     if (setMillis >= 59000) textSizeReduced.set(true);
 
-    //Todo: First instance of this fades on start timer click.
     setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
     timer = new CountDownTimer(setMillis, 50) {
       @Override
@@ -1329,7 +1338,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     dotDraws.setAlpha();
   }
 
-  //Todo: Set Count Up mode dot values here.
   public void drawDots(int fadeVar) {
     switch (mode) {
       case 1:
