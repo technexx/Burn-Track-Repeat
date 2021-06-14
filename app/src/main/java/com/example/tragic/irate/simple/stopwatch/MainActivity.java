@@ -264,14 +264,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Received from SavedCycleAdapter via a single adapter position onClick. Sets our count up/down mode to correspond to whether infinity is on/off. This callback executes WITH onCycleClick, which launches our timer.
   @Override
   public void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks, int position) {
     infinityArrayOne = toggleSets; infinityArrayTwo = toggleBreaks;
-    if (infinityArrayOne.get(position)==0) setsAreCountingUp = false;
-    else setsAreCountingUp = true;
-    if (infinityArrayTwo.get(position)==0) breaksAreCountingUp = false;
-    else breaksAreCountingUp = true;
-    Log.i("testList", "receivedPos is " + position);
+    if (infinityArrayOne.get(position)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
+    if (infinityArrayTwo.get(position)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
   }
 
   @Override

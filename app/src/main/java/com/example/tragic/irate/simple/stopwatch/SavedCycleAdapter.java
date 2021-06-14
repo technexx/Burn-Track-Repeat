@@ -36,7 +36,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mPomTitle;
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
-  onInfinityModeListener monInfinityModeListener;
   onInfinityToggleListener mOnInfinityToggleListener;
   public static final int SETS_AND_BREAKS = 0;
   public static final int BREAKS_ONLY = 1;
@@ -50,11 +49,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<Integer> mInfinityArrayTwo = new ArrayList<>();
   //Needed for breaksOnly.
   ArrayList<Integer> mInfinityArrayThree = new ArrayList<>();
-  ArrayList<Integer> mInfinityOneTemp = new ArrayList<>();
-  ArrayList<Integer> mInfinityTwoTemp = new ArrayList<>();
-  ArrayList<Integer> mInfinityThreeTemp = new ArrayList<>();
-
-  Gson gson;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -62,11 +56,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public interface onHighlightListener {
     void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
-  }
-
-  //Using (int) so we can do one callback for both sets and breaks on/off.
-  public interface onInfinityModeListener {
-    void onInfinityMode(int infinity);
   }
 
   public interface onInfinityToggleListener {
@@ -79,10 +68,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public void setHighlight(onHighlightListener xOnHighlightListener) {
     this.mOnHighlightListener = xOnHighlightListener;
-  }
-
-  public void setInfinityMode(onInfinityModeListener xonInfinityModeListener) {
-    this.monInfinityModeListener = xonInfinityModeListener;
   }
 
   public void setInfinityToggle(onInfinityToggleListener xOnInfinityToggleListener) {
@@ -113,7 +98,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public void receiveInfinityMode(ArrayList<Integer> infinityListOne, ArrayList<Integer> infinityListTwo) {
-    mInfinityOneTemp = infinityListOne; mInfinityTwoTemp = infinityListTwo;
+    mInfinityArrayOne = infinityListOne; mInfinityArrayTwo = infinityListTwo;
   }
 
   @NonNull
@@ -142,16 +127,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
-      mInfinityArrayOne = mInfinityOneTemp;
-      mInfinityArrayTwo = mInfinityTwoTemp;
-      mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo, position);
-      //Using 0/1 for false/true on each array. Using 1-6 for false/true toggles on callbacks to Main.
+      //Arrays One/Two correspond to the entire list of saved Sets/Breaks, and have a 0 or 1 value to mark our infinity mode as on/off. Since this is in our bindViewHolder, it will execute for every adapter position we have.
       if (mInfinityArrayOne.get(position)==0)
         customHolder.infinity_green_cycles.setAlpha(0.35f); else customHolder.infinity_green_cycles.setAlpha(1.0f);
       if (mInfinityArrayTwo.get(position)==0)
         customHolder.infinity_red_cycles.setAlpha(0.35f); else customHolder.infinity_red_cycles.setAlpha(1.0f);
 
       //Todo: Restrict fullView to majority block outside infinity signs.
+      //Toggles infinity mode on/off, sets (replaces) the corresponding position clicked on to that state, and calls back both arrays, along with the position, to our Main activity.
       customHolder.infinity_green_cycles.setOnClickListener(v -> {
         if (customHolder.infinity_green_cycles.getAlpha() == 1.0f) {
           customHolder.infinity_green_cycles.setAlpha(0.35f);
@@ -160,8 +143,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           customHolder.infinity_green_cycles.setAlpha(1.0f);
           mInfinityArrayOne.set(position, 1);
         }
-
-//        mOnCycleClickListener.onCycleClick(position);
         mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo, position);
       });
 
