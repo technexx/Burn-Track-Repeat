@@ -52,7 +52,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityModeListener, SavedCycleAdapter.onInfinityToggleListener {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityToggleListener {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -264,29 +264,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //1/2 sets false/true. 3/4 breaks false/true. 5/6 breaksOnly false/true. Since each value affects a different variable, we can receive multiple callbacks (and we do) for multiple toggles.
   @Override
-  public void onInfinityMode(int infinity) {
-
-    switch (infinity) {
-      case 1: setsAreCountingUp = false; break;
-      case 2: setsAreCountingUp = true; break;
-
-      case 3: breaksAreCountingUp = false; break;
-      case 4: breaksAreCountingUp = true; break;
-
-      case 5: breaksOnlyAreCountingUp = false; break;
-      case 6: breaksOnlyAreCountingUp = true; break;
-    }
-    //Todo: Bad method here. We need to extract, AS or BEFORE we launch Timer, the corresponding position and toggle value. Right now, we receive this callback as many times as there are list positions, and the boolean gets set to the last one received.
-    Log.i("testList", "boolean values are " + setsAreCountingUp + " " + breaksAreCountingUp);
-
-  }
-
-  @Override
-  public void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks) {
+  public void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks, int position) {
     infinityArrayOne = toggleSets; infinityArrayTwo = toggleBreaks;
-
+    if (infinityArrayOne.get(position)==0) setsAreCountingUp = false;
+    else setsAreCountingUp = true;
+    if (infinityArrayTwo.get(position)==0) breaksAreCountingUp = false;
+    else breaksAreCountingUp = true;
+    Log.i("testList", "receivedPos is " + position);
   }
 
   @Override
@@ -467,7 +452,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Instantiating callbacks from adapter.
           savedCycleAdapter.setItemClick(MainActivity.this);
           savedCycleAdapter.setHighlight(MainActivity.this);
-          savedCycleAdapter.setInfinityMode(MainActivity.this);
           savedCycleAdapter.setInfinityToggle(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
@@ -487,6 +471,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               infinityArrayTwo.add(0);
             }
           }
+
+          if (infinityArrayOne.get(receivedPos)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
+          if (infinityArrayTwo.get(receivedPos)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
           //Sends infinity arrays to our saved cycle adapter.
           savedCycleAdapter.receiveInfinityMode(infinityArrayOne, infinityArrayTwo);
 

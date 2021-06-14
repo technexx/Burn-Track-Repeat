@@ -70,7 +70,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public interface onInfinityToggleListener {
-    void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks);
+    void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks, int position);
   }
 
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -144,51 +144,36 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       mInfinityArrayOne = mInfinityOneTemp;
       mInfinityArrayTwo = mInfinityTwoTemp;
-
+      mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo, position);
       //Using 0/1 for false/true on each array. Using 1-6 for false/true toggles on callbacks to Main.
-      if (mInfinityArrayOne.get(position)==0) {
-        //Todo: These send back too often. We just need the mode for CURRENT
-        monInfinityModeListener.onInfinityMode(1);
-        customHolder.infinity_green_cycles.setAlpha(0.35f);
-      } else {
-        monInfinityModeListener.onInfinityMode(2);
-        customHolder.infinity_green_cycles.setAlpha(1.0f);
-      }
-
-      if (mInfinityArrayTwo.get(position)==0) {
-        monInfinityModeListener.onInfinityMode(3);
-        customHolder.infinity_red_cycles.setAlpha(0.35f);
-      } else {
-        monInfinityModeListener.onInfinityMode(4);
-        customHolder.infinity_red_cycles.setAlpha(1.0f);
-      }
-      mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo);
+      if (mInfinityArrayOne.get(position)==0)
+        customHolder.infinity_green_cycles.setAlpha(0.35f); else customHolder.infinity_green_cycles.setAlpha(1.0f);
+      if (mInfinityArrayTwo.get(position)==0)
+        customHolder.infinity_red_cycles.setAlpha(0.35f); else customHolder.infinity_red_cycles.setAlpha(1.0f);
 
       //Todo: Restrict fullView to majority block outside infinity signs.
       customHolder.infinity_green_cycles.setOnClickListener(v -> {
         if (customHolder.infinity_green_cycles.getAlpha() == 1.0f) {
           customHolder.infinity_green_cycles.setAlpha(0.35f);
-          monInfinityModeListener.onInfinityMode(1);
           mInfinityArrayOne.set(position, 0);
         } else {
           customHolder.infinity_green_cycles.setAlpha(1.0f);
-          monInfinityModeListener.onInfinityMode(2);
           mInfinityArrayOne.set(position, 1);
         }
-        mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo);
+
+//        mOnCycleClickListener.onCycleClick(position);
+        mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo, position);
       });
 
       customHolder.infinity_red_cycles.setOnClickListener(v -> {
         if (customHolder.infinity_red_cycles.getAlpha() == 1.0f) {
           customHolder.infinity_red_cycles.setAlpha(0.35f);
-          monInfinityModeListener.onInfinityMode(3);
           mInfinityArrayTwo.set(position, 0);
         } else {
           customHolder.infinity_red_cycles.setAlpha(1.0f);
-          monInfinityModeListener.onInfinityMode(4);
           mInfinityArrayTwo.set(position, 1);
         }
-        mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo);
+        mOnInfinityToggleListener.onInfinityToggle(mInfinityArrayOne, mInfinityArrayTwo, position);
       });
 
       if (mHighlightDeleted) {
