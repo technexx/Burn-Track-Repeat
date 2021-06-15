@@ -52,7 +52,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityToggleListener {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityToggleListener, SavedCycleAdapter.onInfinityToggleListenerTwo {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
+  //Todo: Infinity retention not working.
   //Todo: Pass title into timer.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
@@ -270,6 +271,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityArrayOne = toggleSets; infinityArrayTwo = toggleBreaks;
     if (infinityArrayOne.get(position)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
     if (infinityArrayTwo.get(position)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
+  }
+
+  @Override
+  public void onInfinityToggleTwo(ArrayList<Integer> toggleBreaksOnly, int position) {
+    infinityArrayThree = toggleBreaksOnly;
+    if (infinityArrayThree.get(position)==0) breaksOnlyAreCountingUp = false; else breaksOnlyAreCountingUp = true;
   }
 
   @Override
@@ -405,6 +412,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     receivedHighlightPositions = new ArrayList<>();
     infinityArrayOne = new ArrayList<>();
     infinityArrayTwo = new ArrayList<>();
+    infinityArrayThree = new ArrayList<>();
 
     //Database entity lists.
     cyclesList = new ArrayList<>();
@@ -429,16 +437,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
-//    setsAreCountingUp = !sharedPreferences.getBoolean("setCountUpMode", false);
-//    breaksAreCountingUp = !sharedPreferences.getBoolean("breakCountUpMode", false);
-
-
     mHandler.postDelayed(() -> {
       AsyncTask.execute(() -> {
         //Loads database of saved cycles.
         cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-        //Instantiates cycleList object based on sort order. For app launch, this is defaulting to "1", or "most recent."
-        queryCycles();
+        //Loading ALL cycle saves and arrays on initial app launch. After this, we will only query the mode we're on.
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
+        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
+        pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+        for (int i=0; i<cyclesList.size(); i++) {
+          setsArray.add(cyclesList.get(i).getSets());
+          breaksArray.add(cyclesList.get(i).getBreaks());
+          customTitleArray.add(cyclesList.get(i).getTitle());
+        }
+        for (int i=0; i<cyclesBOList.size(); i++) {
+          breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
+          breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
+        }
+
         //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
         populateCycleList();
         runOnUiThread(()-> {
@@ -451,13 +467,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.setItemClick(MainActivity.this);
           savedCycleAdapter.setHighlight(MainActivity.this);
           savedCycleAdapter.setInfinityToggle(MainActivity.this);
+          savedCycleAdapter.setInfinityToggleTwo(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
 
           //FOR REFERENCE: Main (intent-> Timer) ---> Timer (intent->Main) && (callback to adapter for saved toggles).
           //Receives infinity arrays from Timer class, which are the same ones we passed into Timer when launching it from Main. This is done to prevent them being lost when our activity is recreated.
           Intent intent = getIntent();
-          if (intent!=null) {
+          if (intent!= null) {
             infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
             if (infinityArrayOne == null) infinityArrayOne = new ArrayList<>();
             infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
@@ -469,11 +486,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               infinityArrayTwo.add(0);
             }
           }
-
-          if (infinityArrayOne.get(receivedPos)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
-          if (infinityArrayTwo.get(receivedPos)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
           //Sends infinity arrays to our saved cycle adapter.
           savedCycleAdapter.receiveInfinityMode(infinityArrayOne, infinityArrayTwo);
+
+          if (intent!=null) {
+            infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
+            if (infinityArrayThree == null) infinityArrayThree = new ArrayList<>();
+          }
+          if (infinityArrayThree.isEmpty()) {
+            for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
+          }
+          //Sends infinity arrays to our saved cycle adapter.
+          savedCycleAdapter.receiveInfinityModeTwo(infinityArrayThree);
 
           //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
           savedCycleAdapter.notifyDataSetChanged();
@@ -521,6 +545,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
+        populateCycleList();
         switch (tab.getPosition()) {
           case 0:
             mode = 1;
@@ -545,6 +570,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.
         removeEditViews();
         editCycleViews();
+        savedCycleAdapter.notifyDataSetChanged();
       }
 
       @Override
@@ -553,6 +579,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Repopulates savedCycle recyclerView when switching tabs.
         savedCycleAdapter.notifyDataSetChanged();
+        //Turning highlight mode off since we are moving to a new tab.
+        savedCycleAdapter.removeHighlight(true);
         switch (tab.getPosition()) {
           case 0:
             break;
@@ -1518,6 +1546,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Needs to be populated for everything at app start (or tab switch?) to prevent nulls on infinity onClicks (since no infinity imageView positions will exist to set onClick on w/ a 0 array.
   //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
   //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
   public void populateCycleList() {
@@ -1611,26 +1640,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
     switch (mode) {
       case 1:
+        //receivedPos is received from onCycleClick callback, which in turn executes launchCycles(). Before this callback, receivedPos is always 0.
+        if (infinityArrayOne.get(receivedPos)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
+        if (infinityArrayTwo.get(receivedPos)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
+
         intent.putIntegerArrayListExtra("setList", customSetTime);
         intent.putExtra("setsAreCountingUp", setsAreCountingUp);
         intent.putIntegerArrayListExtra("breakList", customBreakTime);
         intent.putExtra("breaksAreCountingUp", breaksAreCountingUp);
+        //Sends infinity toggle arrays to Timer, so they can be sent back to Main when we come back. This is necessary because we are not using Shared Preferences, and our Main activity is set to recreate itself when exiting from Timer.
+        intent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+        intent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
         break;
       case 2:
+        if (infinityArrayThree.get(receivedPos)==0) breaksOnlyAreCountingUp = false; else breaksOnlyAreCountingUp = true;
         intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
         intent.putExtra("breaksOnlyAreCountingUp", breaksOnlyAreCountingUp);
+        intent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
         break;
       case 3:
         intent.putIntegerArrayListExtra("pomList", pomValuesTime);
         break;
     }
+
     //Mode used for type of timer.
     intent.putExtra("mode", mode);
     //Sends the current cycle's database position so we can delete it from the Timer class if desired.
     intent.putExtra("passedID", retrievedID);
-    //Sends infinity toggle arrays to Timer, so they can be sent back to Main when we come back. This is necessary because we are not using Shared Preferences, and our Main activity is set to recreate itself when exiting from Timer.
-    intent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-    intent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
     //Starts Timer class.
     startActivity(intent);
   }

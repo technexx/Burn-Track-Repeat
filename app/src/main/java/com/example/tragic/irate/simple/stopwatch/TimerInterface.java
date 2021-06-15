@@ -219,13 +219,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> infinityArrayTwo;
   ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Highlight saves work, but onBackPressed defaults to infinite mode OFF unless we click-enable.
   @Override
   public void onBackPressed() {
-    Intent intent = new Intent(TimerInterface.this, MainActivity.class);
-    intent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-    intent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-    startActivity(intent);
+    Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
+    if (mode==1) {
+      exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+      exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
+    } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+    Log.i("testlist", "infinity lists are " + infinityArrayOne + " and " + infinityArrayTwo + " and " + infinityArrayThree);
+
+    startActivity(exitIntent);
   }
 
   @Override
@@ -344,6 +347,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     passedID = intent.getIntExtra("passedID", 0);
     infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
     infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
+    infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
 
     switch (mode) {
       case 1:
@@ -384,9 +388,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     numberOfSets = customSetTime.size();
     numberOfBreaks = customBreakTime.size();
     numberOfBreaksOnly = breaksOnlyTime.size();
-
-    //Sets initial millis values to first round value.
-    setMillis = customSetTime.get(0);
 
     //Animation that plays when round completes. Creating one for initial use.
     animateEnding(false);
@@ -589,6 +590,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     exit_timer.setOnClickListener(v-> {
       Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
+      if (mode==1) {
+        exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+        exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
+      } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
       startActivity(exitIntent);
     });
 
@@ -598,8 +603,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         mainActivity.queryCycles();
         deleteCycle();
         runOnUiThread(() -> {
-          Intent deleteIntent = new Intent(TimerInterface.this, MainActivity.class);
-          startActivity(deleteIntent);
+          Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
+          if (mode==1) {
+            exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+            exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
+          } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+          startActivity(exitIntent);
         });
       });
     });
@@ -676,7 +685,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         if (!pomBegun) {
           //Ensures any features meant for running timer cannot be executed here.
           pomHalted = false;
-//                    pomMillis = 5000;
           dotDraws.setAlpha();
           objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) pomProgressPause, 0);
           objectAnimator.setInterpolator(new LinearInterpolator());
@@ -1347,7 +1355,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         dotDraws.customDrawBreak(startSets, numberOfBreaks);
         break;
       case 2:
-        if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); dotDraws.breakOnlyTime(zeroArray);
+        if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(zeroArray);
         dotDraws.breaksOnlyDraw(startBreaksOnly, numberOfBreaksOnly, fadeVar);
         break;
       case 3:

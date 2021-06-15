@@ -37,6 +37,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
   onInfinityToggleListener mOnInfinityToggleListener;
+  onInfinityToggleListenerTwo mOnInfinityToggleListenerTwo;
   public static final int SETS_AND_BREAKS = 0;
   public static final int BREAKS_ONLY = 1;
   public static final int POMODORO = 2;
@@ -62,6 +63,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks, int position);
   }
 
+  public interface onInfinityToggleListenerTwo {
+    void onInfinityToggleTwo(ArrayList<Integer> toggleBreaksOnly, int position);
+  }
+
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
     this.mOnCycleClickListener = xOnCycleClickListener;
   }
@@ -72,6 +77,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public void setInfinityToggle(onInfinityToggleListener xOnInfinityToggleListener) {
     this.mOnInfinityToggleListener = xOnInfinityToggleListener;
+  }
+
+  public void setInfinityToggleTwo(onInfinityToggleListenerTwo xOnInfinityToggleListenerTwo) {
+    this.mOnInfinityToggleListenerTwo = xOnInfinityToggleListenerTwo;
   }
 
   public SavedCycleAdapter() {
@@ -91,7 +100,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public void removeHighlight(boolean cancelMode) {
-    //If boolean is false, highlight has simply been deleted and we clear the highlight list while turning all backgrounds black/
+    //If boolean is false, highlight has simply been deleted and we clear the highlight list while turning all backgrounds black.
     mHighlightDeleted = true;
     //If boolean is true, we have canceled the highlight process entirely, which does the above but also removes the Trash/Back buttons (done in Main) and sets the next row click to launch a timer instead of highlight (done here).
     if (cancelMode) mHighlightMode = false;
@@ -99,6 +108,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public void receiveInfinityMode(ArrayList<Integer> infinityListOne, ArrayList<Integer> infinityListTwo) {
     mInfinityArrayOne = infinityListOne; mInfinityArrayTwo = infinityListTwo;
+  }
+
+  public void receiveInfinityModeTwo(ArrayList<Integer> infinityListThree) {
+    mInfinityArrayThree = infinityListThree;
   }
 
   @NonNull
@@ -174,7 +187,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position);
         else {
           ArrayList<String> tempList = new ArrayList<>(mPositionList);
-
           //Iterate through every cycle in list.
           for (int i = 0; i < mSetsList.size(); i++) {
             //Using tempList for stable loop since mPositionList changes.
@@ -216,6 +228,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       breaksOnlyHolder.breaksOnlyName.setText(mBreaksOnlyTitle.get(position));
       breaksOnlyHolder.breaksOnlyBreak.setText(convertTime(mBreaksOnlyList).get(position));
 
+      if (mInfinityArrayThree.size()>0) if (mInfinityArrayThree.get(position)==0)
+        breaksOnlyHolder.infinity_red_cycles.setAlpha(0.35f); else breaksOnlyHolder.infinity_red_cycles.setAlpha(1.0f);
+
+      breaksOnlyHolder.infinity_red_cycles.setOnClickListener(v-> {
+        if (breaksOnlyHolder.infinity_red_cycles.getAlpha() == 1.0f) {
+          breaksOnlyHolder.infinity_red_cycles.setAlpha(0.35f);
+          mInfinityArrayThree.set(position, 0);
+        } else {
+          breaksOnlyHolder.infinity_red_cycles.setAlpha(1.0f);
+          mInfinityArrayThree.set(position, 1);
+        }
+        mOnInfinityToggleListenerTwo.onInfinityToggleTwo(mInfinityArrayThree, position);
+      });
+
       if (mHighlightDeleted) {
         //Clears highlight list.
         mPositionList.clear();
@@ -229,7 +255,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       breaksOnlyHolder.fullView.setOnClickListener(v -> {
         boolean changed = false;
-        if (mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
+        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
           ArrayList<String> tempList = new ArrayList<>(mPositionList);
 
           //Iterate through every cycle in list.

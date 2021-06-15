@@ -119,8 +119,8 @@ public class DotDraws extends View {
     mGoingUpBreaks = goingUpBreaks;
   }
 
-  public void countingUpBreaksOnly(boolean goingupBreaksOnly) {
-    mGoingUpBreaksOnly = goingupBreaksOnly;
+  public void countingUpBreaksOnly(boolean goingUpBreaksOnly) {
+    mGoingUpBreaksOnly = goingUpBreaksOnly;
   }
 
   public void customDrawSet(int setCount, int setReduce, int fadeDone) {
@@ -172,6 +172,7 @@ public class DotDraws extends View {
     for (int i=0; i<breakOnlyTime.size(); i++) {
       mBreakOnlyTime.add(convertSeconds(breakOnlyTime.get(i)/1000));
     }
+
   }
 
   public void setAlpha() {
@@ -242,6 +243,7 @@ public class DotDraws extends View {
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
     switch (mMode) {
       case 1:
+
         encloseDots(mY-10, mY+260);
         //Filled or stroked dots depending on count up/down.
         setDotStyle(mGoingUpSets);
