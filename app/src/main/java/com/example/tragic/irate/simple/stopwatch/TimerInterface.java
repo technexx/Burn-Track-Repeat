@@ -340,13 +340,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     //Receives lists passed in from Main.
     Intent intent = getIntent();
-    mode = intent.getIntExtra("mode", 0);
-    cycle_title = intent.getStringExtra("cycleTitle");
-    //Used to delete cycle.
-    passedID = intent.getIntExtra("passedID", 0);
-    infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
-    infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
-    infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
+    if (intent!=null) {
+      mode = intent.getIntExtra("mode", 0);
+      cycle_title = intent.getStringExtra("cycleTitle");
+      //Used to delete cycle.
+      passedID = intent.getIntExtra("passedID", 0);
+      infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
+      infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
+      infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
+    }
 
     switch (mode) {
       case 1:
@@ -374,7 +376,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         pomValue3 = intent.getIntExtra("pomValue3", 0);
         break;
     }
-    cycle_header_text.setText(intent.getStringExtra("cyclesTitle"));
+    cycle_header_text.setText(cycle_title);
 
     AsyncTask.execute(() -> {
       //Loads database of saved cycles. Used for deleting cycles.

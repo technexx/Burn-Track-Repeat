@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String cycleTitle;
   List<String> receivedHighlightPositions;
 
+  String cycle_name;
   EditText cycle_name_edit;
   TextView s1;
   TextView s2;
@@ -191,13 +192,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Retain mode tab when moving back from Timer.
-  //Todo: First tab switch does not change adapter views.
-  //Todo: Pass title into timer.
   //Todo: Add viewPager to tablayout?
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
+  //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
   //Todo: Preset timer selections.
   //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
@@ -1636,8 +1635,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
         return;
       }
-      if (cycle_name_edit.getText().toString().isEmpty()) intent.putExtra("cyclesTitle", date);
-      else intent.putExtra("cyclesTitle", cycle_name_edit.getText().toString());
+      //If cycle editText is empty, use the set its String to the current date/time by default. Otherwise, use what is there.
+      if (cycle_name_edit.getText().toString().isEmpty()) cycle_name = date;
+      else cycle_name = cycle_name_edit.getText().toString();
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
       //Updates the adapter display of saved cycles, since we are adding to it.
@@ -1670,7 +1670,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         intent.putIntegerArrayListExtra("pomList", pomValuesTime);
         break;
     }
-
+    //Sends the title.
+    intent.putExtra("cycleTitle", cycleTitle);
     //Mode used for type of timer.
     intent.putExtra("mode", mode);
     //Sends the current cycle's database position so we can delete it from the Timer class if desired.
@@ -1691,7 +1692,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String breakString  = "";
     String breakOnlyString = "";
     String pomString = "";
-    String cycle_name = cycle_name_edit.getText().toString();
+    cycle_name = cycle_name_edit.getText().toString();
     int cycleID = 0;
 
     switch (mode) {
