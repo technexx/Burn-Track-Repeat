@@ -192,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
+  //Todo: Empty title -> Timer on cycle addition.
+  //Todo: Crash issues w/ adding cycles on first and/or empty db + textViews on editCycles.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
@@ -901,9 +903,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         deleteCycle(true);
         //Mew instance (which will be empty) of whichever Cycles entity we're on.
         queryCycles();
-        //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-        populateCycleList();
-        savedCycleAdapter.notifyDataSetChanged();
+        runOnUiThread(()->{
+          //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
+          populateCycleList();
+          savedCycleAdapter.notifyDataSetChanged();
+        });
       });
     });
 
@@ -1636,8 +1640,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return;
       }
       //If cycle editText is empty, use the set its String to the current date/time by default. Otherwise, use what is there.
-      if (cycle_name_edit.getText().toString().isEmpty()) cycle_name = date;
-      else cycle_name = cycle_name_edit.getText().toString();
+      if (cycle_name_edit.getText().toString().isEmpty()) cycleTitle = date;
+      else cycleTitle = cycle_name_edit.getText().toString();
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
       //Updates the adapter display of saved cycles, since we are adding to it.
