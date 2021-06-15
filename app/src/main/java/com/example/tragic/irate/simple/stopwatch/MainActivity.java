@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -190,8 +191,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Infinity retention not working.
+  //Todo: Retain mode tab when moving back from Timer.
+  //Todo: First tab switch does not change adapter views.
   //Todo: Pass title into timer.
+  //Todo: Add viewPager to tablayout?
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
@@ -426,7 +429,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
-    mode = sharedPreferences.getInt("mode", 1);
     setValue = sharedPreferences.getInt("setValue", 30);
     breakValue = sharedPreferences.getInt("breakValue", 30);
     breaksOnlyValue = sharedPreferences.getInt("breakOnlyValue", 30);
@@ -479,6 +481,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (infinityArrayOne == null) infinityArrayOne = new ArrayList<>();
             infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
             if (infinityArrayTwo == null) infinityArrayTwo = new ArrayList<>();
+            infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
+            if (infinityArrayThree == null) infinityArrayThree = new ArrayList<>();
           }
           if (infinityArrayOne.isEmpty()) {
             for (int i=0; i<setsArray.size(); i++) {
@@ -486,24 +490,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               infinityArrayTwo.add(0);
             }
           }
-          //Sends infinity arrays to our saved cycle adapter.
-          savedCycleAdapter.receiveInfinityMode(infinityArrayOne, infinityArrayTwo);
-
-          if (intent!=null) {
-            infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
-            if (infinityArrayThree == null) infinityArrayThree = new ArrayList<>();
-          }
           if (infinityArrayThree.isEmpty()) {
             for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
           }
           //Sends infinity arrays to our saved cycle adapter.
+          savedCycleAdapter.receiveInfinityMode(infinityArrayOne, infinityArrayTwo);
+          //Sends infinity arrays to our saved cycle adapter.
           savedCycleAdapter.receiveInfinityModeTwo(infinityArrayThree);
-
           //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
           savedCycleAdapter.notifyDataSetChanged();
         });
       });
     },50);
+
+    //Receives mode from Timer activity and sets the previously used Tab when we are coming back to Main. Default is 1 since modes are 1++, and getTab is mode -1 because we use 0++ indices for each tab.
+    Intent intent = getIntent();
+    if (intent!= null) {
+      mode = intent.getIntExtra("mode", 1);
+      TabLayout.Tab tab = tabLayout.getTabAt(mode - 1);
+      if (tab != null){
+        tab.select();
+      }
+    }
 
     //Adapter and Recycler for round views within our editCycles popUp.
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
@@ -542,7 +550,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     countUpMode(true); countUpMode(false);
 
-    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
+      tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
         populateCycleList();

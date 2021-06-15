@@ -226,8 +226,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
       exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
     } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
-    Log.i("testlist", "infinity lists are " + infinityArrayOne + " and " + infinityArrayTwo + " and " + infinityArrayThree);
-
+    exitIntent.putExtra("mode", mode);
     startActivity(exitIntent);
   }
 
@@ -594,6 +593,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
         exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
       } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+      exitIntent.putExtra("mode", mode);
       startActivity(exitIntent);
     });
 
@@ -608,6 +608,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
             exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
           } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+          exitIntent.putExtra("mode", mode);
           startActivity(exitIntent);
         });
       });
