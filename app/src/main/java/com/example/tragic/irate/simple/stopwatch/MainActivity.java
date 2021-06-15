@@ -1595,17 +1595,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Cycles cycles = cyclesList.get(receivedPos);
         String[] tempSets = cycles.getSets().split(" - ");
         for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
-
         String[] tempBreaks = cycles.getBreaks().split(" - ");
         for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
-        retrievedID = cyclesList.get(0).getId();
+        retrievedID = cyclesList.get(receivedPos).getId();
         cycleTitle = cycles.getTitle();
         break;
       case 2:
         CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
         String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
         for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
-        retrievedID = cyclesBOList.get(0).getId();
+        retrievedID = cyclesBOList.get(receivedPos).getId();
         cycleTitle = cyclesBO.getTitle();
         break;
       case 3:
@@ -1613,10 +1612,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         String[] tempPom = pomCycles.getFullCycle().split(" - ");
         for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
-        retrievedID = pomCyclesList.get(0).getId();
+        retrievedID = pomCyclesList.get(receivedPos).getId();
         cycleTitle = pomCycles.getTitle();
         break;
     }
+    Log.i("testPos", "position is is " + receivedPos);
+    Log.i("testPos", "id is " + retrievedID);
   }
 
   public void launchTimerCycle(boolean newCycle) {

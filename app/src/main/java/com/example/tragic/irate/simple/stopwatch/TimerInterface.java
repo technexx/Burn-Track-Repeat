@@ -213,7 +213,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   CyclesBO cyclesBO;
   PomCycles pomCycles;
   int passedID;
-  MainActivity mainActivity;
   SavedCycleAdapter savedCycleAdapter;
   ArrayList<Integer> infinityArrayOne;
   ArrayList<Integer> infinityArrayTwo;
@@ -243,7 +242,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     switch (item.getItemId()) {
       //Launches popup to confirm/cancel cycle deletion.
       case R.id.delete_single_cycle:
-        deleteCyclePopupWindow.showAsDropDown(timerInterface, 0, 0, Gravity.CENTER);
+        deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -150);
         break;
     }
     return super.onOptionsItemSelected(item);
@@ -257,7 +256,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.timer_interface);
-    mainActivity = new MainActivity();
 
     //Object to access our layout.
     timerInterface = new ConstraintLayout(this);
@@ -332,6 +330,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     //Todo: Set textView.
     TextView delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
+    delete_text.setText(R.string.confirm_single_delete);
     confirm_delete = deleteCyclePopupView.findViewById(R.id.confirm_yes);
     cancel_delete = deleteCyclePopupView.findViewById(R.id.confirm_no);
 
@@ -599,10 +598,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       startActivity(exitIntent);
     });
 
+    //Todo: This is deleting 0 position.
     confirm_delete.setOnClickListener(v-> {
       //Delete the current cycle and kicks us back to Main.
       AsyncTask.execute(()->{
-        mainActivity.queryCycles();
         deleteCycle();
         runOnUiThread(() -> {
           Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
@@ -1735,6 +1734,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     populateTimerUI();
   }
 
+  //Using the row ID passed in from Main, deletes the currently displayed cycle.
   public void deleteCycle() {
     switch (mode) {
       case 1:

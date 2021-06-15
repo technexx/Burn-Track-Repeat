@@ -146,7 +146,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (mInfinityArrayTwo.get(position)==0)
         customHolder.infinity_red_cycles.setAlpha(0.35f); else customHolder.infinity_red_cycles.setAlpha(1.0f);
 
-      //Todo: Restrict fullView to majority block outside infinity signs.
       //Toggles infinity mode on/off, sets (replaces) the corresponding position clicked on to that state, and calls back both arrays, along with the position, to our Main activity.
       customHolder.infinity_green_cycles.setOnClickListener(v -> {
         if (customHolder.infinity_green_cycles.getAlpha() == 1.0f) {
