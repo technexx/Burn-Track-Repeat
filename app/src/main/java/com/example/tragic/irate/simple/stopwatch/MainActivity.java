@@ -192,8 +192,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Empty title -> Timer on cycle addition.
-  //Todo: Crash issues w/ adding cycles on first and/or empty db + textViews on editCycles.
   //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
@@ -1652,9 +1650,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
     switch (mode) {
       case 1:
+        //Todo: 0/0 index exception here on first cycle addition, though cycle is added. Fix for for Mode 2, too.
         //receivedPos is received from onCycleClick callback, which in turn executes launchCycles(). Before this callback, receivedPos is always 0.
-        if (infinityArrayOne.get(receivedPos)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
-        if (infinityArrayTwo.get(receivedPos)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
+        if (infinityArrayOne.size()>0) if (infinityArrayOne.get(receivedPos)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
+        if (infinityArrayTwo.size()>0) if (infinityArrayTwo.get(receivedPos)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
 
         intent.putIntegerArrayListExtra("setList", customSetTime);
         intent.putExtra("setsAreCountingUp", setsAreCountingUp);
@@ -1665,7 +1664,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         intent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
         break;
       case 2:
-        if (infinityArrayThree.get(receivedPos)==0) breaksOnlyAreCountingUp = false; else breaksOnlyAreCountingUp = true;
+        if (infinityArrayThree.size()>0) if (infinityArrayThree.get(receivedPos)==0) breaksOnlyAreCountingUp = false; else breaksOnlyAreCountingUp = true;
         intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
         intent.putExtra("breaksOnlyAreCountingUp", breaksOnlyAreCountingUp);
         intent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
