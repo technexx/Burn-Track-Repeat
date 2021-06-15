@@ -10,6 +10,7 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -45,11 +46,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mHighlightDeleted;
   boolean mHighlightMode;
   List<String> mPositionList;
-  //Needed for sets and breaks.
   ArrayList<Integer> mInfinityArrayOne = new ArrayList<>();
   ArrayList<Integer> mInfinityArrayTwo = new ArrayList<>();
-  //Needed for breaksOnly.
   ArrayList<Integer> mInfinityArrayThree = new ArrayList<>();
+  float mPosX;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -181,11 +181,22 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
       }
 
+      //Grabs our X-axis value so we can limit the area that onClick triggers.
+      //Return values: TRUE consumes (ends) event, so onClick does not trigger. FALSE allows further methods (e.g. onClick) to continue.
+      customHolder.fullView.setOnTouchListener((v, event) -> {
+        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+          mPosX = event.getX();
+        }
+        return false;
+      });
+
       customHolder.fullView.setOnClickListener(v -> {
         boolean changed = false;
         //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
-        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position);
-        else {
+        if (!mHighlightMode) {
+          //Excludes the X-axis where we keep our infinity symbols from launching timer cycle.
+          if (mPosX<900) mOnCycleClickListener.onCycleClick(position);
+        } else {
           ArrayList<String> tempList = new ArrayList<>(mPositionList);
           //Iterate through every cycle in list.
           for (int i = 0; i < mSetsList.size(); i++) {
@@ -253,11 +264,19 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
       }
 
+      breaksOnlyHolder.fullView.setOnTouchListener((v, event) -> {
+        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+          mPosX = event.getX();
+        }
+        return false;
+      });
+
       breaksOnlyHolder.fullView.setOnClickListener(v -> {
         boolean changed = false;
-        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
+        if (!mHighlightMode) {
+          if (mPosX<900) mOnCycleClickListener.onCycleClick(position);
+        } else {
           ArrayList<String> tempList = new ArrayList<>(mPositionList);
-
           //Iterate through every cycle in list.
           for (int i=0; i<mBreaksOnlyList.size(); i++) {
             //Using tempList for stable loop since mPositionList changes.
