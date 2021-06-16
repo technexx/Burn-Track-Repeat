@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int incrementTimer = 10;
   boolean minReached;
   boolean maxReached;
+  float editPosX;
 
   Handler mHandler;
   Runnable valueSpeed;
@@ -197,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: First click on editCycle textView reveals editText, but no cursor till next click.
   //Todo: Remove/Grey "Next Round" button on count-down rounds.
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
@@ -727,16 +727,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       countUpMode(false);
     });
 
-    first_value_textView.setOnClickListener(v -> {
-      editAndTextSwitch(true, 1);
+    //Grabs the x-axis value of textView, and uses that determine whether we replace it with the minutes or seconds editText.
+    first_value_textView.setOnTouchListener((v, event) -> {
+      if (event.getAction()==MotionEvent.ACTION_DOWN) {
+        editPosX = event.getX();
+        editAndTextSwitch(true, 1);
+      }
+      return true;
     });
 
-    second_value_textView.setOnClickListener(v -> {
-      editAndTextSwitch(true, 2);
+    second_value_textView.setOnTouchListener((v, event) -> {
+      if (event.getAction()==MotionEvent.ACTION_DOWN) {
+        editPosX = event.getX();
+        editAndTextSwitch(true, 2);
+      }
+      return true;
     });
 
-    third_value_textView.setOnClickListener(v -> {
-      editAndTextSwitch(true, 3);
+    third_value_textView.setOnTouchListener((v, event) -> {
+      if (event.getAction()==MotionEvent.ACTION_DOWN) {
+        editPosX = event.getX();
+        editAndTextSwitch(true, 3);
+      }
+      return true;
     });
 
     changeFirstValue = new Runnable() {
@@ -1119,6 +1132,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             third_value_textView.setVisibility(View.VISIBLE);
           }
         }
+        //Used to request focus, and then show the soft keyboard. Using x-axis values to determine whether we focus on minutes or seconds.
+        if (editPosX<=75) {
+          first_value_edit.requestFocus();
+          inputMethodManager.showSoftInput(first_value_edit, 0);
+        } else {
+          first_value_edit_two.requestFocus();
+          inputMethodManager.showSoftInput(first_value_edit_two, 0);
+        }
       } else if (viewRemoved == 2) {
         second_value_textView.setVisibility(View.INVISIBLE);
         second_value_edit.setVisibility(View.VISIBLE);
@@ -1138,6 +1159,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             third_value_textView.setVisibility(View.VISIBLE);
           }
         }
+        if (editPosX<=75) {
+          second_value_edit.requestFocus();
+          inputMethodManager.showSoftInput(second_value_edit, 0);
+        } else {
+          second_value_edit_two.requestFocus();
+          inputMethodManager.showSoftInput(second_value_edit_two, 0);
+        }
       } else if (viewRemoved == 3) {
         if (first_value_edit.isShown()) {
           first_value_edit.setVisibility(View.GONE);
@@ -1155,6 +1183,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_edit.setVisibility(View.VISIBLE);
         third_value_edit_two.setVisibility(View.VISIBLE);
         third_value_sep.setVisibility(View.VISIBLE);
+      }
+      if (editPosX<=75) {
+        third_value_edit.requestFocus();
+        inputMethodManager.showSoftInput(third_value_edit, 0);
+      } else {
+        third_value_edit_two.requestFocus();
+        inputMethodManager.showSoftInput(third_value_edit_two, 0);
       }
     } else {
       //If moving from editText -> textView.
@@ -1634,8 +1669,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleTitle = pomCycles.getTitle();
         break;
     }
-    Log.i("testPos", "position is is " + receivedPos);
-    Log.i("testPos", "id is " + retrievedID);
   }
 
   public void launchTimerCycle(boolean newCycle) {
