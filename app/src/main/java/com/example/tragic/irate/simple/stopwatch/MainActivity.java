@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable changeSecondValue;
   Runnable changeThirdValue;
   boolean editListener;
+  InputMethodManager inputMethodManager;
 
   boolean setsAreCountingUp;
   boolean breaksAreCountingUp;
@@ -432,6 +433,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomCycles = new PomCycles();
 
     mHandler = new Handler();
+    inputMethodManager =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
@@ -618,8 +620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public boolean onTouch(View v, MotionEvent event) {
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
           //Hides soft keyboard by using a token of the current editCycleView.
-          InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-          imm.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+          inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
         }
         return false;
       }
@@ -1505,6 +1506,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     cycleRoundsAdapter.notifyDataSetChanged();
+    //Hides soft keyboard by using a token of the current editCycleView.
+    inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
   }
 
   public String friendlyString(String altString) {
