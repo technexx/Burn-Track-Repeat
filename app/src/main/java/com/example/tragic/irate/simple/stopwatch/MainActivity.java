@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Remove/Grey "Next Round" button on count-down rounds.
+  //Todo: Replace skip round w/ next round? Too much redundancy.
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
@@ -227,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
   //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
-  //Todo: REMEMBER, any reference to our GLOBAL instance of a cycles position will retain that position unless changed.
   //Todo: REMINDER, Try next app w/ Kotlin.
 
   @Override

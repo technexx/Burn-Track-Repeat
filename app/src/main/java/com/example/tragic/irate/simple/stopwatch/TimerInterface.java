@@ -328,7 +328,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    //Todo: Set textView.
     TextView delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
     delete_text.setText(R.string.confirm_single_delete);
     confirm_delete = deleteCyclePopupView.findViewById(R.id.confirm_yes);
@@ -349,6 +348,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
     }
 
+    //Todo: In CUSTOM mode only (since BO are a single type of round), disable/enable next_round button as needed.
     switch (mode) {
       case 1:
         customSetTime = intent.getIntegerArrayListExtra("setList");
@@ -360,6 +360,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         setMillis = customSetTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
         for (int i=0; i<customSetTime.size(); i++) zeroArray.add(0);
+        if (!setsAreCountingUp) toggleNextRoundButton(false);
         break;
       case 2:
         breaksOnlyTime = intent.getIntegerArrayListExtra("breakOnlyList");
@@ -368,6 +369,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         breakOnlyMillis = breaksOnlyTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
         for (int i=0; i<breaksOnlyTime.size(); i++) zeroArray.add(0);
+        if (!breaksOnlyAreCountingUp) toggleNextRoundButton(false);
         break;
       case 3:
         pomValue1 = intent.getIntExtra("pomValue1", 0);
@@ -504,6 +506,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     });
 
+    next_round.setOnClickListener(v-> {
+      if (next_round.getAlpha()==1.0f) {
+        nextCountUpRound();
+        next_round.setAlpha(0.3f);
+        next_round.setEnabled(false);
+      }
+    });
+
     new_lap.setOnClickListener(v -> {
       double newSeconds = msReset/60;
       double newMinutes = newSeconds/60;
@@ -545,14 +555,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         msReset = 0;
         msConvert2 = 0;
-      }
-    });
-
-    next_round.setOnClickListener(v-> {
-      if (next_round.getAlpha()==1.0f) {
-        nextCountUpRound();
-        next_round.setAlpha(0.3f);
-        next_round.setEnabled(false);
       }
     });
 
@@ -771,11 +773,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (!breaksAreCountingUp) {
             startObjectAnimator();
             startBreakTimer();
+            toggleNextRoundButton(false);
           } else {
             progressBar.setProgress(10000);
             mHandler.post(secondsUpBreakRunnable);
-            next_round.setAlpha(1.0f);
-            next_round.setEnabled(true);
+            toggleNextRoundButton(true);
           }
         },750);
       }
@@ -848,11 +850,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 if (!setsAreCountingUp) {
                   startObjectAnimator();
                   startSetTimer();
+                  toggleNextRoundButton(false);
                 } else {
                   progressBar.setProgress(10000);
                   mHandler.post(secondsUpSetRunnable);
-                  next_round.setAlpha(1.0f);
-                  next_round.setEnabled(true);
+                  toggleNextRoundButton(true);
                 }
                 endAnimation.cancel();
               } else {
@@ -1262,7 +1264,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-
+  //Ends the current round if counting up, and moves onto the next one.
   public void nextCountUpRound() {
     //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
     timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
@@ -1285,7 +1287,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           } else {
             mHandler.post(secondsUpBreakRunnable);
             next_round.setAlpha(1.0f);
-            next_round.setEnabled(true);
+            toggleNextRoundButton(true);
           }
         }, 1000);
         fadeVar = 1;
@@ -1307,8 +1309,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               startSetTimer();
             } else {
               mHandler.post(secondsUpSetRunnable);
-              next_round.setAlpha(1.0f);
-              next_round.setEnabled(true);
+              toggleNextRoundButton(true);
             }
             endAnimation.cancel();
           } else {
@@ -1332,8 +1333,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           countUpMillisBO = 0;
           progressBar.setProgress(10000);
           mHandler.post(secondsUpBORunnable);
-          next_round.setAlpha(1.0f);
-          next_round.setEnabled(true);
+          toggleNextRoundButton(true);
           endAnimation.cancel();
         } else {
           modeTwoTimerEnded = true;
@@ -1345,6 +1345,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
     mHandler.post(endFade);
     dotDraws.setAlpha();
+  }
+
+  public void toggleNextRoundButton(boolean enabled) {
+    if (enabled) {
+      next_round.setAlpha(1.0f);
+      next_round.setEnabled(true);
+    } else {
+      next_round.setAlpha(0.3f);
+      next_round.setEnabled(false);
+    }
   }
 
   public void drawDots(int fadeVar) {
@@ -1416,7 +1426,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-
   public void pauseAndResumeTimer(int pausing) {
     //disabledTimer booleans are to prevent ANY action being taken.
     if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
@@ -1466,16 +1475,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               } else {
                 if (!onBreak) {
                   mHandler.post(secondsUpSetRunnable);
-                  next_round.setAlpha(1.0f);
-                  next_round.setEnabled(true);
+                  toggleNextRoundButton(true);
                 } else {
                   if (!breaksAreCountingUp) {
                     startObjectAnimator();
                     startBreakTimer();
                   } else {
                     mHandler.post(secondsUpBreakRunnable);
-                    next_round.setAlpha(1.0f);
-                    next_round.setEnabled(true);
+                    toggleNextRoundButton(true);
                   }
                 }
               }
@@ -1503,8 +1510,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 startBreakTimer();
               } else {
                 mHandler.post(secondsUpBORunnable);
-                next_round.setAlpha(1.0f);
-                next_round.setEnabled(true);
+                toggleNextRoundButton(true);
               }
             } else if (pausing == RESETTING_TIMER) {
               if (endAnimation != null) endAnimation.cancel();
