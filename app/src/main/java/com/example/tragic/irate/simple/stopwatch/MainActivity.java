@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -27,6 +29,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   List<String> receivedHighlightPositions;
 
   String cycle_name;
+  TextView cycle_name_text;
   EditText cycle_name_edit;
   TextView s1;
   TextView s2;
@@ -192,7 +196,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Soft kb still pushes up tabLayout since it's not part of the popUp.
+  //Todo: First click on editCycle textView reveals editText, but no cursor till next click.
+  //Todo: Set value textView on editCycle disappearing w/ some Break textView clicks.
+  //Todo: Remove/Grey "Next Round" button on count-down rounds.
+  //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
@@ -332,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, false);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -340,6 +347,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
     cl = new ConstraintLayout(this);
+    cycle_name_text = editCyclesPopupView.findViewById(R.id.cycle_name_text);
     cycle_name_edit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
     s1 = editCyclesPopupView.findViewById(R.id.s1);
     s2 = editCyclesPopupView.findViewById(R.id.s2);
@@ -548,7 +556,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     countUpMode(true); countUpMode(false);
 
-      tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
+    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
         populateCycleList();
@@ -604,6 +612,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
+    //Sets a listener on our editCycles popup.
+    editCyclesPopupView.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+          //Hides soft keyboard by using a token of the current editCycleView.
+          InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+        }
+        return false;
+      }
+    });
 
     //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
@@ -1082,9 +1102,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else return 0;
   }
 
+  //Todo:
   //Function for switching between textView and editText in add/sub menu.
   public void editAndTextSwitch(boolean removeTextView, int viewRemoved) {
     convertEditTime(false);
+    cycle_name_edit.clearFocus();
     //If moving from textView -> editText.
     if (removeTextView) {
       if (viewRemoved == 1) {
@@ -1147,12 +1169,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_edit_two.setVisibility(View.VISIBLE);
         third_value_sep.setVisibility(View.VISIBLE);
       }
-
     } else {
       //If moving from editText -> textView.
       switch (mode) {
-        case 1:
-        case 2:
+        case 1: case 2:
           if (viewRemoved == 1) {
             //If first is shown, second and separator are also shown.
             if (first_value_edit.isShown()) {
