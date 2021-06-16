@@ -198,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayThree;
 
   //Todo: First click on editCycle textView reveals editText, but no cursor till next click.
-  //Todo: Set value textView on editCycle disappearing w/ some Break textView clicks.
   //Todo: Remove/Grey "Next Round" button on count-down rounds.
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
@@ -529,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setLayoutManager(lm);
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-    removeEditViews();
+    removeEditViews(false);
     editCycleViews();
     convertEditTime(true);
     setEditValues();
@@ -584,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         }
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-        removeEditViews();
+        removeEditViews(false);
         editCycleViews();
         savedCycleAdapter.notifyDataSetChanged();
       }
@@ -611,18 +610,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onTabReselected(TabLayout.Tab tab) {
-      }
-    });
-
-    //Sets a listener on our editCycles popup.
-    editCyclesPopupView.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction()==MotionEvent.ACTION_DOWN) {
-          //Hides soft keyboard by using a token of the current editCycleView.
-          inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-        }
-        return false;
       }
     });
 
@@ -709,10 +696,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ////--ActionBar Item onClicks END--////
 
     ////--EditCycles Menu Item onClicks START--////
-    //Dismisses editText views if we click within the unpopulated area of popUp.
-    editCyclesPopupView.setOnClickListener(v-> {
-      removeEditViews();
-      editCycleViews();
+    //Sets a listener on our editCycles popup.
+    editCyclesPopupView.setOnTouchListener((v, event) -> {
+      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
+      removeEditViews(true);
+      if (event.getAction()==MotionEvent.ACTION_DOWN) {
+        //Hides soft keyboard by using a token of the current editCycleView.
+        inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+      }
+      return false;
     });
 
     //Launched from editCyclePopUp and calls TimerInterface w/ new cycle info.
@@ -1103,20 +1095,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else return 0;
   }
 
-  //Todo:
   //Function for switching between textView and editText in add/sub menu.
   public void editAndTextSwitch(boolean removeTextView, int viewRemoved) {
     convertEditTime(false);
-    cycle_name_edit.clearFocus();
     //If moving from textView -> editText.
     if (removeTextView) {
       if (viewRemoved == 1) {
-        if (first_value_textView.isShown()) {
-          first_value_textView.setVisibility(View.INVISIBLE);
-          first_value_edit.setVisibility(View.VISIBLE);
-          first_value_edit_two.setVisibility(View.VISIBLE);
-          first_value_sep.setVisibility(View.VISIBLE);
-        }
+        first_value_textView.setVisibility(View.INVISIBLE);
+        first_value_edit.setVisibility(View.VISIBLE);
+        first_value_edit_two.setVisibility(View.VISIBLE);
+        first_value_sep.setVisibility(View.VISIBLE);
         if (second_value_edit.isShown() || second_value_edit_two.isShown()) {
           second_value_textView.setVisibility(View.VISIBLE);
           second_value_edit.setVisibility(View.GONE);
@@ -1132,12 +1120,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
       } else if (viewRemoved == 2) {
-        if (second_value_textView.isShown()) {
-          second_value_textView.setVisibility(View.INVISIBLE);
-          second_value_edit.setVisibility(View.VISIBLE);
-          second_value_edit_two.setVisibility(View.VISIBLE);
-          second_value_sep.setVisibility(View.VISIBLE);
-        }
+        second_value_textView.setVisibility(View.INVISIBLE);
+        second_value_edit.setVisibility(View.VISIBLE);
+        second_value_edit_two.setVisibility(View.VISIBLE);
+        second_value_sep.setVisibility(View.VISIBLE);
         if (first_value_edit.isShown() || first_value_edit_two.isShown()) {
           first_value_textView.setVisibility(View.VISIBLE);
           first_value_edit.setVisibility(View.GONE);
@@ -1277,7 +1263,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void removeEditViews() {
+  //Sets all of our editTexts to Invisible.
+  public void removeEditViews(boolean reinstateText) {
     first_value_edit.setVisibility(View.GONE);
     first_value_sep.setVisibility(View.GONE);
     first_value_edit.setVisibility(View.GONE);
@@ -1288,10 +1275,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_edit.setVisibility(View.GONE);
     third_value_sep.setVisibility(View.GONE);
     third_value_edit_two.setVisibility(View.GONE);
+
+    //Replaces editTexts w/ textViews if desired.
+    if (reinstateText) {
+      if (mode==1 || mode==3) first_value_textView.setVisibility(View.VISIBLE);
+      if (mode==3) third_value_textView.setVisibility(View.VISIBLE);
+      second_value_textView.setVisibility(View.VISIBLE);
+    }
   }
 
   public void editCycleViews() {
-    //Instance of layout objects we can set programatically based on which mode we're on.
+    //Instance of layout objects we can set programmatically based on which mode we're on.
     ConstraintLayout.LayoutParams s2ParamsAdd = (ConstraintLayout.LayoutParams) plus_second_value.getLayoutParams();
     ConstraintLayout.LayoutParams s2ParamsSub = (ConstraintLayout.LayoutParams) minus_second_value.getLayoutParams();
     ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) add_cycle.getLayoutParams();
@@ -1324,7 +1318,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           minus_first_value.setVisibility(View.INVISIBLE);
           upDown_arrow_two.setVisibility(View.GONE);
           second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-
         }
         addParams.topToBottom = R.id.s2;
         addParams.topMargin = 60;

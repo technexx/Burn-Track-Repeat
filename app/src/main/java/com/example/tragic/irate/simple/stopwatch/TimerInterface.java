@@ -598,7 +598,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       startActivity(exitIntent);
     });
 
-    //Todo: This is deleting 0 position.
     confirm_delete.setOnClickListener(v-> {
       //Delete the current cycle and kicks us back to Main.
       AsyncTask.execute(()->{
