@@ -373,7 +373,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         setMillis = customSetTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
         for (int i=0; i<customSetTime.size(); i++) zeroArray.add(0);
-//        if (!setsAreCountingUp) toggleNextRoundButton(false);
         break;
       case 2:
         breaksOnlyTime = intent.getIntegerArrayListExtra("breakOnlyList");
@@ -382,7 +381,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         breakOnlyMillis = breaksOnlyTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
         for (int i=0; i<breaksOnlyTime.size(); i++) zeroArray.add(0);
-//        if (!breaksOnlyAreCountingUp) toggleNextRoundButton(false);
         break;
       case 3:
         pomValue1 = intent.getIntExtra("pomValue1", 0);
@@ -707,7 +705,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void startSetTimer() {
     AtomicBoolean textSizeReduced = new AtomicBoolean(false);
     if (setMillis >= 59000) textSizeReduced.set(true);
-    setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
     //Unchanging start point of setMillis used to count total set time over multiple rounds.
     permMillis = setMillis;
 
@@ -725,21 +722,21 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           else if (customAlpha>=1) fadeCustomTimer = false;
         }
 
-        if (mode==1) {
-          if (textSizeReduced.get()) if (setMillis<59000) {
-            changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-            textSizeReduced.set(false);
-          }
-          //Displays Long->String conversion of time left every tick.
-          timeLeft.setText(convertSeconds((setMillis + 999)/1000));
-          timePaused.setText(convertSeconds((setMillis + 999)/1000));
-          //Sets value to difference between starting millis and current millis (e.g. 45000 left from 50000 start is 5000/5 sec elapsed).
-          setMillisHolder =  (permMillis - (setMillis));
-          //Temporary value for current round, using totalSetMillis which is our permanent value.
-          long tempMillis = totalSetMillis + setMillisHolder;
-          total_set_time.setText(convertSeconds(tempMillis/1000));
-          drawDots(1);
+        //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
+        if (textSizeReduced.get()) if (setMillis<59000) {
+          changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+          textSizeReduced.set(false);
         }
+
+        //Displays Long->String conversion of time left every tick.
+        timeLeft.setText(convertSeconds((setMillis + 999)/1000));
+        timePaused.setText(convertSeconds((setMillis + 999)/1000));
+        //Sets value to difference between starting millis and current millis (e.g. 45000 left from 50000 start is 5000/5 sec elapsed).
+        setMillisHolder =  (permMillis - (setMillis));
+        //Temporary value for current round, using totalSetMillis which is our permanent value.
+        long tempMillis = totalSetMillis + setMillisHolder;
+        total_set_time.setText(convertSeconds(tempMillis/1000));
+        drawDots(1);
         if (setMillis<500) timerDisabled = true;
       }
 
@@ -772,11 +769,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (!breaksAreCountingUp) {
             startObjectAnimator();
             startBreakTimer();
-//            toggleNextRoundButton(false);
           } else {
             progressBar.setProgress(10000);
             mHandler.post(secondsUpBreakRunnable);
-            toggleNextRoundButton(true);
           }
         },750);
       }
@@ -801,16 +796,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           }
           if (customAlpha >=1) fadeCustomTimer = false;
 
-          //Prevents overlap once timer has begin, since conditional only needs to be true to start the series of ticks.
-          if (mode==1) {
-            if (textSizeReduced.get()) if (breakMillis<59000) {
-              changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-              textSizeReduced.set(false);
-            }
-            timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
-            timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
-            drawDots(2);
+          if (textSizeReduced.get()) if (breakMillis<59000) {
+            changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+            textSizeReduced.set(false);
           }
+
+          timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
+          timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
+          drawDots(2);
           if (breakMillis<500) timerDisabled = true;
         }
 
@@ -846,11 +839,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 if (!setsAreCountingUp) {
                   startObjectAnimator();
                   startSetTimer();
-//                  toggleNextRoundButton(false);
                 } else {
                   progressBar.setProgress(10000);
                   mHandler.post(secondsUpSetRunnable);
-                  toggleNextRoundButton(true);
                 }
                 endAnimation.cancel();
               } else {
@@ -881,11 +872,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           }
           if (customAlpha >=1) fadeCustomTimer = false;
 
-          if (mode==2) {
-            if (textSizeReduced.get()) if (breakOnlyMillis<59000) {
-              changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-              textSizeReduced.set(false);
-            }
+          if (textSizeReduced.get()) if (breakOnlyMillis<59000) {
+            changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+            textSizeReduced.set(false);
+
             timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
             timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
             drawDots(3);
@@ -944,6 +934,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void startPomTimer() {
+    AtomicBoolean textSizeReduced = new AtomicBoolean(false);
+    if (pomMillis >= 59000) textSizeReduced.set(true);
+
     timer3 = new CountDownTimer(pomMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
@@ -1021,7 +1014,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   private void animateEnding(boolean setAnimation) {
     endAnimation = new AlphaAnimation(1.0f, 0.0f);
     endAnimation.setDuration(300);
-    endAnimation.setStartOffset(0);
+    endAnimation.setStartOffset(20);
     endAnimation.setRepeatMode(Animation.REVERSE);
     endAnimation.setRepeatCount(Animation.INFINITE);
 
@@ -1043,69 +1036,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     sizeAnimator.start();
   }
 
-  public void setNewText(TextView oldTextView, TextView newTextView, long newTime) {
-    boolean fadeTime = false;
-    //Retrieves the text String from the previous and current timer's textView and converted it into a long.
-    String oldText = (String) oldTextView.getText();
-    long oldTime = 0;
-    if  (!oldText.equals("") && !oldText.equals("?")) {
-      oldText = oldText.replace(":", "");
-      oldTime = Long.parseLong(oldText);
-    }
-    if (!oldText.equals("") && !oldText.equals("?")) {
-      //Converts the last and current timer's textViews into longs, then compares them. If one is <60 seconds and one is <60 seconds, we change the size of the current textView so it fills our progressBar circle better.
-      if (oldTime<60 && newTime>=60) {
-        switch (mode) {
-          case 1:
-            changeTextSize(valueAnimatorDown, timeLeft, timePaused); break;
-          case 2:
-            changeTextSize(valueAnimatorDown, timeLeft, timePaused); break;
-          case 3:
-            changeTextSize(valueAnimatorDown, timeLeft, timePaused); break;
-          case 4:
-            changeTextSize(valueAnimatorDown, timeLeft4,  timePaused4); break;
-        }
-      } else if (oldTime>=60 && newTime<60) {
-        switch (mode) {
-          case 1:
-            changeTextSize(valueAnimatorUp, timeLeft, timePaused); break;
-          case 2:
-            changeTextSize(valueAnimatorUp, timeLeft, timePaused); break;
-          case 3:
-            changeTextSize(valueAnimatorUp, timeLeft, timePaused); break;
-          case 4:
-            changeTextSize(valueAnimatorUp, timeLeft4,  timePaused4); break;
-        }
-      }
-    }
-
-    switch (mode) {
-      case 1:
-        if (customHalted) fadeInText(timePaused); break;
-      case 2:
-        if (breaksOnlyHalted) fadeInText(timePaused); break;
-      case 3:
-        if (pomHalted) fadeInText(timePaused); break;
-      case 4:
-        if (stopwatchHalted) fadeInText(timePaused4); break;
-    }
-    newTextView.setText(convertSeconds(newTime));
-  }
-
-  public void fadeInText(TextView textView) {
-    if (fadeInObj!=null) fadeInObj.cancel();
-    fadeInObj = ObjectAnimator.ofFloat(textView, "alpha", 0.0f, 1.0f);
-    fadeInObj.setDuration(1600);
-    fadeInObj.start();
-  }
-
-  public void fadeOutText(TextView textView) {
-    if (fadeOutObj!=null) fadeOutObj.cancel();
-    fadeOutObj = ObjectAnimator.ofFloat(textView, "alpha", 1.0f, 0.0f);
-    fadeOutObj.setDuration(800);
-    fadeOutObj.start();
-  }
-
   //Sets millis values based on which round we are on (list size minus number of non-completed rounds).
   //REMEMBER, this is not a void method and we need to do something with its return. If we do not, whatever method we are currently in will RETURN itself.
   public long newMillis(boolean onSets) {
@@ -1121,7 +1051,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-  //Todo: Remove timer textView fades - unnecessary now that we're separating modes.
+  //Todo: Remove timer textView fades for ONFINISH only. We still want them for textSize changes.
+  //Todo: pomMillis1/2/3 need populating.
   //Todo: Update totalMillis values during timer itself. This will save code and also be better practice if app crashes/is force-closed. SharedPref since we will likely use this in an overall db scheme?
   //Ends the current round and moves onto the next one.
   public void nextRound() {
@@ -1161,7 +1092,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           } else {
             mHandler.post(secondsUpBreakRunnable);
             next_round.setAlpha(1.0f);
-            toggleNextRoundButton(true);
           }
         }, 1000);
       } else {
@@ -1192,7 +1122,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               startSetTimer();
             } else {
               mHandler.post(secondsUpSetRunnable);
-              toggleNextRoundButton(true);
             }
             endAnimation.cancel();
           } else {
@@ -1215,7 +1144,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           countUpMillisBO = 0;
           progressBar.setProgress(10000);
           mHandler.post(secondsUpBORunnable);
-          toggleNextRoundButton(true);
           endAnimation.cancel();
         } else {
           modeTwoTimerEnded = true;
@@ -1227,16 +1155,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
     mHandler.post(endFade);
     dotDraws.setAlpha();
-  }
-
-  public void toggleNextRoundButton(boolean enabled) {
-    if (enabled) {
-      next_round.setAlpha(1.0f);
-      next_round.setEnabled(true);
-    } else {
-      next_round.setAlpha(0.3f);
-      next_round.setEnabled(false);
-    }
   }
 
   public void drawDots(int fadeVar) {
@@ -1343,7 +1261,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             } else if (pausing == RESUMING_TIMER) {
               reset.setVisibility(View.INVISIBLE);
               customHalted = false;
-              timeLeft.setAlpha(1);
+              timePaused.setAlpha(0);
               if (!setsAreCountingUp) {
                 //If on Sets Mode and sets are counting down, do the following.
                 if (!onBreak) {
@@ -1357,14 +1275,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               } else {
                 if (!onBreak) {
                   mHandler.post(secondsUpSetRunnable);
-                  toggleNextRoundButton(true);
                 } else {
                   if (!breaksAreCountingUp) {
                     startObjectAnimator();
                     startBreakTimer();
                   } else {
                     mHandler.post(secondsUpBreakRunnable);
-                    toggleNextRoundButton(true);
                   }
                 }
               }
@@ -1392,7 +1308,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 startBreakTimer();
               } else {
                 mHandler.post(secondsUpBORunnable);
-                toggleNextRoundButton(true);
               }
             } else if (pausing == RESETTING_TIMER) {
               if (endAnimation != null) endAnimation.cancel();
