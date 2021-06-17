@@ -206,9 +206,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   boolean breaksAreCountingUp;
   boolean breaksOnlyAreCountingUp;
 
-  boolean modeOneBetweenRounds;
-  boolean modeTwoBetweenRounds;
-  boolean modeThreeBetweenRounds;
   ImageButton exit_timer;
 
   ConstraintLayout timerInterface;
@@ -365,7 +362,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
     }
 
-    //Todo: In CUSTOM mode only (since BO are a single type of round), disable/enable next_round button as needed.
     switch (mode) {
       case 1:
         customSetTime = intent.getIntegerArrayListExtra("setList");
@@ -377,7 +373,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         setMillis = customSetTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
         for (int i=0; i<customSetTime.size(); i++) zeroArray.add(0);
-        if (!setsAreCountingUp) toggleNextRoundButton(false);
+//        if (!setsAreCountingUp) toggleNextRoundButton(false);
         break;
       case 2:
         breaksOnlyTime = intent.getIntegerArrayListExtra("breakOnlyList");
@@ -386,7 +382,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         breakOnlyMillis = breaksOnlyTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
         for (int i=0; i<breaksOnlyTime.size(); i++) zeroArray.add(0);
-        if (!breaksOnlyAreCountingUp) toggleNextRoundButton(false);
+//        if (!breaksOnlyAreCountingUp) toggleNextRoundButton(false);
         break;
       case 3:
         pomValue1 = intent.getIntExtra("pomValue1", 0);
@@ -524,11 +520,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
 
     next_round.setOnClickListener(v-> {
-      if (next_round.getAlpha()==1.0f) {
-        nextCountUpRound();
-        next_round.setAlpha(0.3f);
-        next_round.setEnabled(false);
-      }
+      nextRound();
+//      if (next_round.getAlpha()==1.0f) {
+//        nextRound();
+//        next_round.setAlpha(0.3f);
+//        next_round.setEnabled(false);
+//      }
     });
 
     new_lap.setOnClickListener(v -> {
@@ -679,8 +676,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             if (objectAnimator!=null) objectAnimator.resume();
           }
         }
-        //If true, triggers an animation on tab switch. Used since we disable any mode's animations if not tabbed in (to prevent overlap).
-        modeOneBetweenRounds = false;
         break;
       case 2:
         if (!breakOnlyBegun) {
@@ -699,7 +694,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           breakOnlyMillis = breakOnlyMillisUntilFinished;
           if (objectAnimator!=null) objectAnimator.resume();
         }
-        modeTwoBetweenRounds = false;
         break;
       case 3:
         if (!pomBegun) {
@@ -717,7 +711,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           pomMillis = pomMillisUntilFinished;
           if (objectAnimator!=null) objectAnimator.resume();
         }
-        modeThreeBetweenRounds = false;
         break;
     }
   }
@@ -763,8 +756,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       @Override
       public void onFinish() {
-        //Open to animations during tab switches until next Object Animator begins.
-        modeOneBetweenRounds = true;
         //Used for pause/resume and fading text in (i.e. timeLeft or timePaused). We set it here so that when we switch tabs, the correct textView is shown.
         customHalted = true;
         //Used in startObjectAnimator, and dictates if we are on a set or break.
@@ -799,7 +790,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (!breaksAreCountingUp) {
             startObjectAnimator();
             startBreakTimer();
-            toggleNextRoundButton(false);
+//            toggleNextRoundButton(false);
           } else {
             progressBar.setProgress(10000);
             mHandler.post(secondsUpBreakRunnable);
@@ -843,7 +834,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         @Override
         public void onFinish() {
-          modeOneBetweenRounds = true;
           //Used for pause/resume and fading text in (i.e. timeLeft or timePaused). We set it here so that when we switch tabs, the correct textView is shown.
           customHalted = true;
           //Used in startObjectAnimator, and dictates if we are on a set or break.
@@ -876,7 +866,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 if (!setsAreCountingUp) {
                   startObjectAnimator();
                   startSetTimer();
-                  toggleNextRoundButton(false);
+//                  toggleNextRoundButton(false);
                 } else {
                   progressBar.setProgress(10000);
                   mHandler.post(secondsUpSetRunnable);
@@ -925,7 +915,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         @Override
         public void onFinish() {
-          modeTwoBetweenRounds = true;
           //Ensures any features meant for a running timer cannot be executed here.
           breaksOnlyHalted = true;
           breakOnlyBegun = false;
@@ -1001,7 +990,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       @Override
       public void onFinish() {
-        modeThreeBetweenRounds = true;
         //Ensures any features meant for a running timer cannot be executed here.
         pomHalted = true;
         pomBegun = false;
@@ -1056,135 +1044,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     }.start();
   }
-
-  public void skipRound() {
-    if (customSetTime.size()>0) {
-      int oldCycle = 0;
-      int oldCycle2 = 0;
-      int oldCycle3 = 0;
-      switch (mode) {
-        case 1:
-          //Setting timer to Paused mode.
-          customHalted = true;
-          if (timer != null) timer.cancel();
-          if (objectAnimator != null) objectAnimator.cancel();
-
-          //If not on last round, reset progress bar.
-          if (numberOfSets >0 && numberOfBreaks >0) {
-            setBegun = false;
-            customProgressPause = maxProgress;
-            timePaused.setAlpha(1);
-            timeLeft.setAlpha(0);
-            progressBar.setProgress(10000);
-          }
-          //If not on last round (i.e. set OR break has >=2 rounds left), remove set and/or break.
-          if (numberOfSets >0 && numberOfSets == numberOfBreaks) numberOfSets--;
-          if (numberOfBreaks >0 && numberOfBreaks != numberOfSets) {
-            numberOfBreaks--;
-            onBreak = false;
-            oldCycle = customCyclesDone;
-          }
-          //If, AFTER removing the last round, we still have a set/break combo remaining, we set a new textView w/ new millis value.
-          if (numberOfSets >0) {
-            if (!setsAreCountingUp) setNewText(timePaused, timePaused, (newMillis(true)+999)/1000);
-            else {
-              setNewText(timePaused, timePaused, 0);
-              setNewText(timeLeft, timeLeft, 0);
-            }
-          }
-
-          //If we have reduced the last round's break count (above) to 0, we have skipped the last round in this cycle. Setting our end animation, and the timer text to "0". Essentially duplicating a naturally ended cycle.
-          if (numberOfBreaks == 0) {
-            timePaused.setAlpha(0);
-            timeLeft.setAlpha(1);
-            if (oldCycle == customCyclesDone) {
-              customCyclesDone++;
-              cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-            }
-            if (!modeOneTimerEnded) animateEnding(true);
-            progressBar.setProgress(0);
-            timeLeft.setText("0");
-            timePaused.setText("0");
-            modeOneTimerEnded = true;
-          }
-          if (setsAreCountingUp) {
-            mHandler.removeCallbacks(secondsUpSetRunnable);
-            countUpMillisSets = 0;
-          }
-          if (breaksOnlyAreCountingUp) {
-            mHandler.removeCallbacks(secondsUpBreakRunnable);
-            countUpMillisBreaks = 0;
-          }
-          break;
-        case 2:
-          breaksOnlyHalted = true;
-          if (timer2 != null) timer2.cancel();
-          if (objectAnimator != null) objectAnimator.cancel();
-
-          if (numberOfBreaksOnly >0) {
-            numberOfBreaksOnly--;
-            oldCycle2 = breaksOnlyCyclesDone;
-            breakOnlyBegun = false;
-          }
-          if (numberOfBreaksOnly >0) {
-            if (!breaksOnlyAreCountingUp) setNewText(timePaused, timePaused, (newMillis(false) +999) / 1000);
-            else {
-              setNewText(timeLeft, timeLeft, 0);
-              setNewText(timePaused, timePaused, 0);
-            }
-          }
-
-          if (numberOfBreaksOnly==0) {
-            timePaused.setAlpha(0);
-            timeLeft.setAlpha(1);
-            if (oldCycle2 == breaksOnlyCyclesDone) {
-              breaksOnlyCyclesDone++;
-              cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
-            }
-            if (!modeTwoTimerEnded) animateEnding(true);
-            progressBar.setProgress(0);
-            timeLeft.setText("0");
-            timePaused.setText("0");
-            modeTwoTimerEnded = true;
-          }
-          if (breaksOnlyAreCountingUp) {
-            mHandler.removeCallbacks(secondsUpBORunnable);
-            countUpMillisBO = 0;
-          }
-          break;
-        case 3:
-          pomHalted = true;
-          if (timer3!=null) timer3.cancel();
-
-          if (objectAnimator!=null) objectAnimator.cancel();
-
-          if (pomDotCounter<9) {
-            pomDotCounter++;
-            oldCycle3 = pomCyclesDone;
-            pomBegun = false;
-          }
-          if (pomDotCounter<9) setNewText(timePaused, timePaused,(newMillis(false) +999) / 1000);
-
-          if (pomDotCounter==9) {
-            timePaused.setAlpha(0);
-            timeLeft.setAlpha(1);
-            if (oldCycle3 == pomCyclesDone) {
-              pomCyclesDone++;
-              cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
-            }
-            if (!modeThreeTimerEnded) animateEnding(true);
-            progressBar.setProgress(0);
-            timeLeft.setText("0");
-            timePaused.setText("0");
-            modeThreeTimerEnded = true;
-          }
-          break;
-      }
-    }
-    dotDraws.setAlpha();
-    drawDots(0);
-  }
-
 
   //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
   private void animateEnding(boolean setAnimation) {
@@ -1290,19 +1149,36 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-  //Todo: Combine this and skipRound to move forward from either count up or count down.
+  //Todo: Fix end animation.
+  //Todo: Update totalMillis values during timer itself. This will save code and also be better practice if app crashes/is force-closed. SharedPref since we will likely use this in an overall db scheme?
   //Ends the current round if counting up, and moves onto the next one.
-  public void nextCountUpRound() {
+  public void nextRound() {
     //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
-    timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
-    timePaused.setText(convertSeconds((countUpMillisSets) /1000));
     animateEnding(true);
     if (mode==1) {
       if (!onBreak) {
-        mHandler.removeCallbacks(secondsUpSetRunnable);
-        //For pause/resume and tab switches.
-        customHalted = false;
+        //onFinish tasks for counting up sets.
+        if (!setsAreCountingUp) {
+          setBegun = false;
+          //Cancelling timer and animator.
+          if (timer != null) timer.cancel();
+          if (objectAnimator != null) objectAnimator.cancel();
+          //Resetting progressBar values.
+          customProgressPause = maxProgress;
+          progressBar.setProgress(10000);
+          //onFinish for counting down sets.
+        } else {
+          timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
+          timePaused.setText(convertSeconds((countUpMillisSets) /1000));
+          mHandler.removeCallbacks(secondsUpSetRunnable);
+          //For pause/resume and tab switches.
+          customHalted = false;
+        }
+
+        //Ensuring fadeVar is set correctly.
+        fadeVar = 1;
         mHandler.postDelayed(() -> {
+          //Iterating down on set numbers.
           removeSetOrBreak(true);
           endAnimation.cancel();
           onBreak = true;
@@ -1317,18 +1193,27 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             toggleNextRoundButton(true);
           }
         }, 1000);
-        fadeVar = 1;
       } else {
-        if (numberOfBreaks==1) {
+        if (!breaksAreCountingUp) {
+          breakBegun = false;
+          //Cancelling timer and animator.
+          if (timer != null) timer.cancel();
+          if (objectAnimator != null) objectAnimator.cancel();
+          //Resetting progressBar values.
+          customProgressPause = maxProgress;
+          progressBar.setProgress(10000);
+        } else {
           timeLeft.setText(convertSeconds((countUpMillisBreaks) /1000));
           timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
+          mHandler.removeCallbacks(secondsUpBreakRunnable);
+          //For pause/resume and tab switches.
+          customHalted = false;
         }
-        mHandler.removeCallbacks(secondsUpBreakRunnable);
-        //For pause/resume and tab switches.
-        customHalted = false;
+        fadeVar = 2;
         mHandler.postDelayed(() -> {
           removeSetOrBreak(false);
           onBreak = false;
+
           if (numberOfBreaks>0) {
             countUpMillisBreaks = 0;
             if (!setsAreCountingUp) {
@@ -1345,7 +1230,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
           }
         }, 1000);
-        fadeVar = 2;
       }
     } else if (mode==2) {
       if (numberOfBreaksOnly==1) {

@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
   //Todo: Preset timer selections.
-  //Todo: Save completed cycles in sharedPref? If so, remember in nextCountUpRound() as well.
+  //Todo: Save completed cycles in sharedPref? If so, remember in nextRound() as well.
   //Todo: No rounds added defaults to a default Cycle instead of staying blank.
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Variable set count-up timer, for use w/ TDEE.
