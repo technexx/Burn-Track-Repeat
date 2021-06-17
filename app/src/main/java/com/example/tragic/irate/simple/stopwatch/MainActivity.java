@@ -200,9 +200,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Replace skip round w/ next round? Too much redundancy.
   //Todo: Letter -> Number soft kb is a bit choppy.
+  //Todo: Cull all unnecessary timer textView fades, now that we're separating timers.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
+
 
   //Todo: Preset timer selections.
   //Todo: Save completed cycles in sharedPref? If so, remember in nextRound() as well.

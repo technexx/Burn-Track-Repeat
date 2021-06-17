@@ -505,10 +505,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 //      }
 //    });
 
-//    skip.setOnClickListener(v -> {
-//      skipRound();
-//    });
-
     reset.setOnClickListener(v-> {
       if (mode!=3) resetTimer(); else {
         if (reset.getText().equals(getString(R.string.reset))) reset.setText(R.string.confirm_cycle_reset);
@@ -521,11 +517,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     next_round.setOnClickListener(v-> {
       nextRound();
-//      if (next_round.getAlpha()==1.0f) {
-//        nextRound();
-//        next_round.setAlpha(0.3f);
-//        next_round.setEnabled(false);
-//      }
     });
 
     new_lap.setOnClickListener(v -> {
@@ -553,9 +544,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             savedMinutes +=1;
           }
           savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
-        } else {
-          savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
-        }
+        } else savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
 
         newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
 
@@ -763,17 +752,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
         setBegun = false;
         //Creates a new alpha animation, and sets this timer's progress bar/text on it.
-        if (mode==1) {
-          animateEnding(false);
-          progressBar.setAnimation(endAnimation);
-          timeLeft.setAnimation(endAnimation);
-        }
-
-        if (mode==1) {
-          //Smooths out end fade.
-          fadeVar = 1;
-          mHandler.post(endFade);
-        }
+        animateEnding(true);
+        //Smooths out end fade.
+        fadeVar = 1;
+        mHandler.post(endFade);
 
         timeLeft.setText("0");
         customProgressPause = maxProgress;
@@ -842,11 +824,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           breakBegun = false;
           timeLeft.setText("0");
 
-          if (mode==1) {
-            animateEnding(false);
-            progressBar.setAnimation(endAnimation);
-            timeLeft.setAnimation(endAnimation);
-          }
+          //Sets end animation.
+          animateEnding(true);
+
           if (numberOfBreaks >0) {
             customProgressPause = maxProgress;
             //Smooths out end fade.
@@ -919,12 +899,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           breaksOnlyHalted = true;
           breakOnlyBegun = false;
           timeLeft.setText("0");
+          animateEnding(true);
 
-          if (mode==2) {
-            animateEnding(false);
-            progressBar.setAnimation(endAnimation);
-            timeLeft.setAnimation(endAnimation);
-          }
           if (numberOfBreaksOnly>0) {
             breaksOnlyProgressPause = maxProgress;
             //Smooths out end fade.
@@ -1007,12 +983,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             pomMillis = pomMillis3;
             break;
         }
+        animateEnding(true);
 
-        if (mode==3) {
-          animateEnding(false);
-          progressBar.setAnimation(endAnimation);
-          timeLeft.setAnimation(endAnimation);
-        }
         if (pomDotCounter<9) {
           //Ensures any features meant for a running timer cannot be executed here.
           customHalted = true;
@@ -1049,15 +1021,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   private void animateEnding(boolean setAnimation) {
     endAnimation = new AlphaAnimation(1.0f, 0.0f);
     endAnimation.setDuration(300);
-    endAnimation.setStartOffset(20);
+    endAnimation.setStartOffset(0);
     endAnimation.setRepeatMode(Animation.REVERSE);
     endAnimation.setRepeatCount(Animation.INFINITE);
 
     if (setAnimation) {
-      progressBar.setAnimation(endAnimation);
-      timeLeft.setAnimation(endAnimation);
+      progressBar.startAnimation(endAnimation);
+      timeLeft.startAnimation(endAnimation);
+      timePaused.startAnimation(endAnimation);
     }
-
   }
 
   public void changeTextSize(ValueAnimator va, TextView textView, TextView textViewPaused) {
@@ -1149,11 +1121,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-  //Todo: Fix end animation.
+  //Todo: Remove timer textView fades - unnecessary now that we're separating modes.
   //Todo: Update totalMillis values during timer itself. This will save code and also be better practice if app crashes/is force-closed. SharedPref since we will likely use this in an overall db scheme?
-  //Ends the current round if counting up, and moves onto the next one.
+  //Ends the current round and moves onto the next one.
   public void nextRound() {
-    //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
     animateEnding(true);
     if (mode==1) {
       if (!onBreak) {
@@ -1171,7 +1142,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
           timePaused.setText(convertSeconds((countUpMillisSets) /1000));
           mHandler.removeCallbacks(secondsUpSetRunnable);
-          //For pause/resume and tab switches.
+          //For pause/resume.
           customHalted = false;
         }
 
