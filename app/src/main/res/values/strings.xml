@@ -39,4 +39,7 @@
 
     <string name="max_value_reached">Maximum value reached!</string>
     <string name="min_value_reached">Minimum value reached!</string>
+
+    <string name="total_sets">Total Set Time:</string>
+    <string name="total_breaks">Total Break Time:</string>
 </resources>

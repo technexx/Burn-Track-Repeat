@@ -15,9 +15,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="2dp"
         android:textColor="@color/teal_200"
-        android:textSize="24sp">
+        android:textSize="25sp">
     </TextView>
 
     <TextView
@@ -27,45 +27,89 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="48dp"
         android:textColor="@color/white"
+        android:textSize="22sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/total_set_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/cycles_completed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/total_break_header"
+        android:layout_marginTop="20dp"
         android:textSize="18sp">
     </TextView>
 
-    <Button
-        android:id="@+id/skip"
-        android:textColor="@color/white"
+    <TextView
+        android:id="@+id/total_break_header"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/cycle_reset"
-        android:layout_marginTop="115dp"
-        android:textSize="15sp"
-        android:gravity="center_vertical"
-        android:backgroundTint="@color/black"
-        app:cornerRadius="50dp"
-        app:rippleColor="#33AAAAAA"
-        app:strokeColor="@color/dark_grey"
-        app:strokeWidth="1dp">
-    </Button>
-
-    <Button
-        android:id="@+id/cycle_reset"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/cycles_completed"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/skip"
-        android:layout_marginTop="115dp"
-        android:textSize="15sp"
-        android:gravity="center_vertical"
-        android:backgroundTint="@color/black"
-        app:cornerRadius="50dp"
-        app:rippleColor="#33AAAAAA"
-        app:strokeColor="@color/dark_grey"
-        app:strokeWidth="1dp">
-    </Button>
+        app:layout_constraintStart_toEndOf="@id/total_set_header"
+        android:layout_marginTop="20dp"
+        android:textSize="18sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/total_set_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/total_set_header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/total_break_header"
+        android:layout_marginTop="2dp"
+        android:textSize="18sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/total_break_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/total_break_header"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/total_set_header"
+        android:layout_marginTop="2dp"
+        android:textSize="18sp">
+    </TextView>
+
+<!--    <Button-->
+<!--        android:id="@+id/skip"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="40dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/cycle_reset"-->
+<!--        android:layout_marginTop="115dp"-->
+<!--        android:textSize="15sp"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:backgroundTint="@color/black"-->
+<!--        app:cornerRadius="50dp"-->
+<!--        app:rippleColor="#33AAAAAA"-->
+<!--        app:strokeColor="@color/dark_grey"-->
+<!--        app:strokeWidth="1dp">-->
+<!--    </Button>-->
+
+<!--    <Button-->
+<!--        android:id="@+id/cycle_reset"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="40dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        android:layout_marginTop="115dp"-->
+<!--        android:textSize="15sp"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:backgroundTint="@color/black"-->
+<!--        app:cornerRadius="50dp"-->
+<!--        app:rippleColor="#33AAAAAA"-->
+<!--        app:strokeColor="@color/dark_grey"-->
+<!--        app:strokeWidth="1dp">-->
+<!--    </Button>-->
 
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"

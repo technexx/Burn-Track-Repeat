@@ -211,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Variable set count-up timer, for use w/ TDEE.
   //Todo: Variable set only mode? Again, for TDEE.
   //Todo: Reset vis/not vis depending on mode timer status.
-  //Todo: Maybe: "cycle completed" as a db entry for each separate cycle.
 
   //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
   //Todo: Add taskbar notification for timers.

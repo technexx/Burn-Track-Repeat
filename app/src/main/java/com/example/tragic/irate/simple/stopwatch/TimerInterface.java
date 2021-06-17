@@ -79,6 +79,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ImageButton new_lap;
   ImageButton next_round;
   Button skip;
+  TextView total_set_header;
+  TextView total_break_header;
+  TextView total_set_time;
+  TextView total_break_time;
 
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
@@ -89,6 +93,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   long setMillis;
   long breakMillis;
   long breakOnlyMillis;
+  long totalSetMillis;
+  long totalBreakMillis;
+  long setMillisHolder;
+  long breakMillisHolder;
+  long permMillis;
   int maxProgress = 10000;
   int customProgressPause = 10000;
   int breaksOnlyProgressPause = 10000;
@@ -286,10 +295,18 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycle_header_text = findViewById(R.id.cycle_header_text);
 
     cycles_completed = findViewById(R.id.cycles_completed);
-    cycle_reset = findViewById(R.id.cycle_reset);
-    skip = findViewById(R.id.skip);
+//    cycle_reset = findViewById(R.id.cycle_reset);
+//    skip = findViewById(R.id.skip);
     next_round = findViewById(R.id.next_round);
     new_lap = findViewById(R.id.new_lap);
+    total_set_header = findViewById(R.id.total_set_header);
+    total_break_header = findViewById(R.id.total_break_header);
+    total_set_time = findViewById(R.id.total_set_time);
+    total_break_time = findViewById(R.id.total_break_time);
+    total_set_header.setText(R.string.total_sets);
+    total_break_header.setText(R.string.total_breaks);
+    total_set_time.setText("0");
+    total_break_time.setText("0");
 
     progressBar = findViewById(R.id.progressBar);
     stopWatchView = findViewById(R.id.stopWatchView);
@@ -316,8 +333,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     timePaused.setTextSize(90f);
     timeLeft4.setTextSize(90f);
     timePaused4.setTextSize(90f);
-    skip.setText(R.string.skip_round);
-    cycle_reset.setText(R.string.clear_cycles);
+//    skip.setText(R.string.skip_round);
+//    cycle_reset.setText(R.string.clear_cycles);
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
     lastTextView = timePaused;
@@ -452,49 +469,49 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     };
 
-    cycle_reset.setOnClickListener(v -> {
-      boolean clearIt = false;
-      if (cycle_reset.getText().equals(getString(R.string.clear_cycles))) {
-        switch (mode) {
-          case 1:
-            if (customCyclesDone>0) clearIt = true;
-            break;
-          case 2:
-            if (breaksOnlyCyclesDone>0) clearIt = true;
-            break;
-          case 3:
-            if (pomCyclesDone>0) clearIt = true;
-            break;
-        }
-        if (clearIt) cycle_reset.setText(R.string.confirm_cycle_reset);
-      } else if (cycle_reset.getText().equals(getString(R.string.confirm_cycle_reset))) {
-        switch (mode) {
-          case 1:
-            customCyclesDone = 0;
-            break;
-          case 2:
-            breaksOnlyCyclesDone = 0;
-            break;
-          case 3:
-            pomCyclesDone = 0;
-            break;
-        }
-        cycle_reset.setText(R.string.clear_cycles);
-        cycles_completed.setText(getString(R.string.cycles_done, "0"));
-      } else if (cycle_reset.getText().equals(getString(R.string.clear_laps)) && lapsNumber>0) {
-        resetEntries = newEntries;
-        currentLapList.clear();
-        savedLapList.clear();
-        lapAdapter.notifyDataSetChanged();
-        lapsNumber = 0;
-        msReset = 0;
-        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
-      }
-    });
+//    cycle_reset.setOnClickListener(v -> {
+//      boolean clearIt = false;
+//      if (cycle_reset.getText().equals(getString(R.string.clear_cycles))) {
+//        switch (mode) {
+//          case 1:
+//            if (customCyclesDone>0) clearIt = true;
+//            break;
+//          case 2:
+//            if (breaksOnlyCyclesDone>0) clearIt = true;
+//            break;
+//          case 3:
+//            if (pomCyclesDone>0) clearIt = true;
+//            break;
+//        }
+//        if (clearIt) cycle_reset.setText(R.string.confirm_cycle_reset);
+//      } else if (cycle_reset.getText().equals(getString(R.string.confirm_cycle_reset))) {
+//        switch (mode) {
+//          case 1:
+//            customCyclesDone = 0;
+//            break;
+//          case 2:
+//            breaksOnlyCyclesDone = 0;
+//            break;
+//          case 3:
+//            pomCyclesDone = 0;
+//            break;
+//        }
+//        cycle_reset.setText(R.string.clear_cycles);
+//        cycles_completed.setText(getString(R.string.cycles_done, "0"));
+//      } else if (cycle_reset.getText().equals(getString(R.string.clear_laps)) && lapsNumber>0) {
+//        resetEntries = newEntries;
+//        currentLapList.clear();
+//        savedLapList.clear();
+//        lapAdapter.notifyDataSetChanged();
+//        lapsNumber = 0;
+//        msReset = 0;
+//        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
+//      }
+//    });
 
-    skip.setOnClickListener(v -> {
-      skipRound();
-    });
+//    skip.setOnClickListener(v -> {
+//      skipRound();
+//    });
 
     reset.setOnClickListener(v-> {
       if (mode!=3) resetTimer(); else {
@@ -708,8 +725,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void startSetTimer() {
     AtomicBoolean textSizeReduced = new AtomicBoolean(false);
     if (setMillis >= 59000) textSizeReduced.set(true);
-
     setNewText(timeLeft, timeLeft,(setMillis + 999)/1000);
+    //Unchanging start point of setMillis used to count total set time over multiple rounds.
+    permMillis = setMillis;
+
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
@@ -732,6 +751,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           //Displays Long->String conversion of time left every tick.
           timeLeft.setText(convertSeconds((setMillis + 999)/1000));
           timePaused.setText(convertSeconds((setMillis + 999)/1000));
+          //Sets value to difference between starting millis and current millis (e.g. 45000 left from 50000 start is 5000/5 sec elapsed).
+          setMillisHolder =  (permMillis - (setMillis));
+          //Temporary value for current round, using totalSetMillis which is our permanent value.
+          long tempMillis = totalSetMillis + setMillisHolder;
+          total_set_time.setText(convertSeconds(tempMillis/1000));
           drawDots(1);
         }
         if (setMillis<500) timerDisabled = true;
@@ -762,6 +786,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         timeLeft.setText("0");
         customProgressPause = maxProgress;
+        totalSetMillis = totalSetMillis + setMillisHolder;
+        total_set_time.setText(convertSeconds(totalSetMillis/1000));
         mHandler.postDelayed(() -> {
           //Re-enabling timer clicks.
           timerDisabled = false;
@@ -1264,6 +1290,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
+  //Todo: Combine this and skipRound to move forward from either count up or count down.
   //Ends the current round if counting up, and moves onto the next one.
   public void nextCountUpRound() {
     //Setting text here because ending a runnable manipulating them seems to cause threading issues when we want to call an animator on them immediately after.
