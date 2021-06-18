@@ -198,7 +198,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Save totalMillis whenever we stop/end timer.
+  //Todo: Save totalMillis whenever we stop/end timer. onBack/onExit to db?
+  //Todo: infinity mode dots should iterate up w/ seconds.
   //Todo: resetCycle button resets both total times and cycles?
   //Todo: pomMillis1/2/3 need populating.
   //Todo: Bigger reset button or wider click area.
