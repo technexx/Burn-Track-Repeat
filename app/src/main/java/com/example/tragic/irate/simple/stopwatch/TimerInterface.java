@@ -753,11 +753,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Smooths out end fade.
         fadeVar = 1;
         mHandler.post(endFade);
-
         timeLeft.setText("0");
         customProgressPause = maxProgress;
+
+        //Adds current round elapsed millis to saved total.
         totalSetMillis = totalSetMillis + setMillisHolder;
-        total_set_time.setText(convertSeconds(totalSetMillis/1000));
+        //Since our millis values never reach 0 (they tend to stop at a point where subtracting 50, our countDown iteration, would make them negative), we add 100 on their display to ensure their converted int is always the correct whole number.
+        total_set_time.setText(convertSeconds((totalSetMillis+100)/1000));
+        Log.i("testmillis", "total finished is " + totalSetMillis);
+
         mHandler.postDelayed(() -> {
           //Re-enabling timer clicks.
           timerDisabled = false;
@@ -1051,9 +1055,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-  //Todo: Remove timer textView fades for ONFINISH only. We still want them for textSize changes.
-  //Todo: pomMillis1/2/3 need populating.
-  //Todo: Update totalMillis values during timer itself. This will save code and also be better practice if app crashes/is force-closed. SharedPref since we will likely use this in an overall db scheme?
   //Ends the current round and moves onto the next one.
   public void nextRound() {
     animateEnding(true);

@@ -198,7 +198,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Replace skip round w/ next round? Too much redundancy.
+  //Todo: Save totalMillis whenever we stop/end timer.
+  //Todo: resetCycle button resets both total times and cycles?
+  //Todo: pomMillis1/2/3 need populating.
+  //Todo: Bigger reset button or wider click area.
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: Cull all unnecessary timer textView fades, now that we're separating timers.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
