@@ -44,6 +44,7 @@ import com.google.android.material.button.MaterialButton;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -216,10 +217,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   Button cancel_delete;
 
   CyclesDatabase cyclesDatabase;
+  List<Cycles> cyclesList;
+  List<CyclesBO> cyclesBOList;
+  List<PomCycles> pomCyclesList;
   Cycles cycles;
   CyclesBO cyclesBO;
   PomCycles pomCycles;
   int passedID;
+  boolean isNewCycle;
   SavedCycleAdapter savedCycleAdapter;
   ArrayList<Integer> infinityArrayOne;
   ArrayList<Integer> infinityArrayTwo;
@@ -227,6 +232,28 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   @Override
   public void onBackPressed() {
+    //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
+    AsyncTask.execute(()-> {
+      switch (mode) {
+        case 1:
+         cycles.setTotalSetTime((int) tempSetMillis/1000);
+         cycles.setTotalBreakTime((int) tempBreakMillis/1000);
+         cycles.setCyclesCompleted(customCyclesDone);
+        cyclesDatabase.cyclesDao().updateCycles(cycles);
+       break;
+        case 2:
+          cyclesBO.setTotalBOTime((int) tempBreakMillis/1000);
+          cyclesBO.setCyclesCompleted(breaksOnlyCyclesDone);
+          cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+          break;
+        case 3:
+          pomCycles.setCyclesCompleted(pomCyclesDone);
+          cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+          break;
+      }
+    });
+
+    //Since we re-create our Main activity and do not used saved preferences for these arrays, we re-send the values back to thr activity so they have them.
     Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
     if (mode==1) {
       exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
@@ -354,6 +381,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Receives lists passed in from Main.
     Intent intent = getIntent();
     if (intent!=null) {
+      isNewCycle = intent.getBooleanExtra("isNewCycle", false);
       mode = intent.getIntExtra("mode", 0);
       cycle_title = intent.getStringExtra("cycleTitle");
       //Used to delete cycle.
@@ -391,11 +419,54 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
     cycle_header_text.setText(cycle_title);
 
+    //Todo: Retrieve total set/break values and set them to TOTAL vars, which temp will add to and then save as.
+    //Loads database of saved cycles. Since we are on a specific cycle, we can access it via its unique ID here.
     AsyncTask.execute(() -> {
-      //Loads database of saved cycles. Used for deleting cycles.
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-     });
+      //If not a new cycle, retrieve cycle based on its ID and get its total times + cycles completed.
+      if (!isNewCycle) {
+        switch (mode) {
+          case 1:
+            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
+            totalSetMillis = cycles.getTotalSetTime();
+            totalBreakMillis = cycles.getTotalBreakTime();
+            customCyclesDone = cycles.getCyclesCompleted();
+            break;
+          case 2:
+            cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(passedID).get(0);
+            totalBreakMillis = cyclesBO.getTotalBOTime();
+            breaksOnlyCyclesDone = cyclesBO.getCyclesCompleted();
+            break;
+          case 3:
+            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
+            break;
+        }
+      } else {
+        //If a new cycle, retrieve the most recently added db entry (the one we just created in Main), pull its ID, and assign an instance of the db entity class to it so we can save total set/break time and total cycles to it when we exit.
+        int id = 0;
+        switch (mode) {
+          case 1:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
+            id = cyclesList.get(0).getId();
+            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(id).get(0);
+            break;
+          case 2:
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
+            id = cyclesBOList.get(0).getId();
+            cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(id).get(0);
+            break;
+          case 3:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+            id = pomCyclesList.get(0).getId();
+            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(id).get(0);
+            break;
+        }
+
+      }
+    });
+    //Draws dot display depending on which more we're on.
     dotDraws.setMode(mode);
+    //Implements callback for end-of-round alpha fade on dots.
     dotDraws.onAlphaSend(TimerInterface.this);
 
     //Sets number of rounds to size of round list.
@@ -1557,19 +1628,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     populateTimerUI();
   }
 
-  //Using the row ID passed in from Main, deletes the currently displayed cycle.
+  //Deletes the currently displayed cycle.
   public void deleteCycle() {
     switch (mode) {
       case 1:
-        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
         cyclesDatabase.cyclesDao().deleteCycle(cycles);
         break;
       case 2:
-        cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(passedID).get(0);
         cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO);
         break;
       case 3:
-        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
         break;
     }

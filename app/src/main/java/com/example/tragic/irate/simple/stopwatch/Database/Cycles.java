@@ -13,6 +13,9 @@ public class Cycles {
     public String breaks;
     public long timeAdded;
     public int itemCount;
+    public int cyclesCompleted;
+    public int totalSetTime;
+    public int totalBreakTime;
 
     public Cycles() {
     }
@@ -63,5 +66,29 @@ public class Cycles {
 
     public void setItemCount(int itemCount) {
         this.itemCount = itemCount;
+    }
+
+    public int getCyclesCompleted() {
+        return cyclesCompleted;
+    }
+
+    public void setCyclesCompleted(int cyclesCompleted) {
+        this.cyclesCompleted = cyclesCompleted;
+    }
+
+    public int getTotalSetTime() {
+        return totalSetTime;
+    }
+
+    public void setTotalSetTime(int totalSetTime) {
+        this.totalSetTime = totalSetTime;
+    }
+
+    public int getTotalBreakTime() {
+        return totalBreakTime;
+    }
+
+    public void setTotalBreakTime(int totalBreakTime) {
+        this.totalBreakTime = totalBreakTime;
     }
 }

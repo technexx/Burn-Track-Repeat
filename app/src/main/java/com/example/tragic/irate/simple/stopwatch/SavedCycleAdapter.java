@@ -140,6 +140,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       customHolder.customSet.setText(convertTime(mSetsList).get(position));
       customHolder.customBreak.setText(convertTime(mBreaksList).get(position));
 
+      //If creating a new cycle, this ensures the most recently added set/break will have a corresponding infinity entry so we do not try to fetch from an index in that list that does not exist (i.e., the newly added set/break will have a "0", or "off", entry created for it in the infinity list).
+      if (mInfinityArrayOne.size()<mSetsList.size()) mInfinityArrayOne.add(0);
+      if (mInfinityArrayTwo.size()<mSetsList.size()) mInfinityArrayTwo.add(0);
+
       //Arrays One/Two correspond to the entire list of saved Sets/Breaks, and have a 0 or 1 value to mark our infinity mode as on/off. Since this is in our bindViewHolder, it will execute for every adapter position we have.
       if (mInfinityArrayOne.get(position)==0)
         customHolder.infinity_green_cycles.setAlpha(0.35f); else customHolder.infinity_green_cycles.setAlpha(1.0f);
@@ -148,6 +152,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       //Toggles infinity mode on/off, sets (replaces) the corresponding position clicked on to that state, and calls back both arrays, along with the position, to our Main activity.
       customHolder.infinity_green_cycles.setOnClickListener(v -> {
+
         if (customHolder.infinity_green_cycles.getAlpha() == 1.0f) {
           customHolder.infinity_green_cycles.setAlpha(0.35f);
           mInfinityArrayOne.set(position, 0);

@@ -12,6 +12,8 @@ public class CyclesBO {
     public String breaksOnly;
     public long timeAdded;
     public int itemCount;
+    public int totalBOTime;
+    public int cyclesCompleted;
 
     public CyclesBO() {
     }
@@ -54,5 +56,21 @@ public class CyclesBO {
 
     public void setItemCount(int itemCount) {
         this.itemCount = itemCount;
+    }
+
+    public int getTotalBOTime() {
+        return totalBOTime;
+    }
+
+    public void setTotalBOTime(int totalBOTime) {
+        this.totalBOTime = totalBOTime;
+    }
+
+    public int getCyclesCompleted() {
+        return cyclesCompleted;
+    }
+
+    public void setCyclesCompleted(int cyclesCompleted) {
+        this.cyclesCompleted = cyclesCompleted;
     }
 }
