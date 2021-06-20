@@ -725,6 +725,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           objectAnimator.start();
           breakOnlyBegun = true;
           modeTwoTimerEnded = false;
+          //Unchanging start point of breakOnlyMillis used to count total set time over multiple rounds.
+          permBreakMillis = breakOnlyMillis;
         } else {
           breakOnlyMillis = breakOnlyMillisUntilFinished;
           if (objectAnimator!=null) objectAnimator.resume();
@@ -775,7 +777,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Displays Long->String conversion of time left every tick.
         timeLeft.setText(convertSeconds((setMillis + 999)/1000));
         timePaused.setText(convertSeconds((setMillis + 999)/1000));
-        drawDots(1);
         if (setMillis<500) timerDisabled = true;
 
         //Sets value to difference between starting millis and current millis (e.g. 45000 left from 50000 start is 5000/5 sec elapsed).
@@ -783,6 +784,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Temporary value for current round, using totalSetMillis which is our permanent value.
         tempSetMillis = totalSetMillis + setMillisHolder;
         total_set_time.setText(convertSeconds(tempSetMillis/1000));
+        drawDots(1);
       }
 
       @Override
@@ -878,6 +880,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             fadeVar = 2;
             mHandler.post(endFade);
 
+            //Adds current round elapsed millis to saved total.
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
             total_break_time.setText(convertSeconds((totalBreakMillis+100)/1000));
 
@@ -930,12 +933,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (textSizeReduced.get()) if (breakOnlyMillis<59000) {
             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
             textSizeReduced.set(false);
-
-            timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
-            timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
-            drawDots(3);
           }
+          timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
+          timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
+          drawDots(3);
           if (breakOnlyMillis<500) boTimerDisabled = true;
+
+          //Using breakOnlyMillis (unique), but mode 1's break holder since we run these modes separately.
+          breakMillisHolder = permBreakMillis - breakOnlyMillis;
+          tempBreakMillis = breakOnlyMillis + breakMillisHolder;
+          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
         }
 
         @Override
@@ -955,6 +962,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             }
             //Activates RESETTING_TIMER in pauseAndResume. Var gets set to 2 on next click in pauseAndResume, and then resets to 0.
             movingBOCycle=1;
+
+            totalBreakMillis = totalBreakMillis + breakMillisHolder;
+            total_break_time.setText(convertSeconds((totalBreakMillis+100)/1000));
 
             mHandler.postDelayed(() -> {
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
