@@ -514,46 +514,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     };
 
-//    cycle_reset.setOnClickListener(v -> {
-//      boolean clearIt = false;
-//      if (cycle_reset.getText().equals(getString(R.string.clear_cycles))) {
-//        switch (mode) {
-//          case 1:
-//            if (customCyclesDone>0) clearIt = true;
-//            break;
-//          case 2:
-//            if (breaksOnlyCyclesDone>0) clearIt = true;
-//            break;
-//          case 3:
-//            if (pomCyclesDone>0) clearIt = true;
-//            break;
-//        }
-//        if (clearIt) cycle_reset.setText(R.string.confirm_cycle_reset);
-//      } else if (cycle_reset.getText().equals(getString(R.string.confirm_cycle_reset))) {
-//        switch (mode) {
-//          case 1:
-//            customCyclesDone = 0;
-//            break;
-//          case 2:
-//            breaksOnlyCyclesDone = 0;
-//            break;
-//          case 3:
-//            pomCyclesDone = 0;
-//            break;
-//        }
-//        cycle_reset.setText(R.string.clear_cycles);
-//        cycles_completed.setText(getString(R.string.cycles_done, "0"));
-//      } else if (cycle_reset.getText().equals(getString(R.string.clear_laps)) && lapsNumber>0) {
-//        resetEntries = newEntries;
-//        currentLapList.clear();
-//        savedLapList.clear();
-//        lapAdapter.notifyDataSetChanged();
-//        lapsNumber = 0;
-//        msReset = 0;
-//        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
-//      }
-//    });
-
     reset.setOnClickListener(v-> {
       if (mode!=3) resetTimer(); else {
         if (reset.getText().equals(getString(R.string.reset))) reset.setText(R.string.confirm_cycle_reset);
@@ -805,8 +765,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         //Adds current round elapsed millis to saved total.
         totalSetMillis = totalSetMillis + setMillisHolder;
-        //Since our millis values never reach 0 (they tend to stop at a point where subtracting 50, our countDown iteration, would make them negative), we add 100 on their display to ensure their converted int is always the correct whole number.
-        total_set_time.setText(convertSeconds((totalSetMillis+100)/1000));
+        //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
+        tempSetMillis = (totalSetMillis+100) / 1000;
+        total_set_time.setText(convertSeconds((tempSetMillis)));
 
         mHandler.postDelayed(() -> {
           //Re-enabling timer clicks.
@@ -882,7 +843,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
             //Adds current round elapsed millis to saved total.
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
-            total_break_time.setText(convertSeconds((totalBreakMillis+100)/1000));
+            //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
+            tempBreakMillis = (totalBreakMillis+100) / 1000;
+            total_break_time.setText(convertSeconds((tempBreakMillis+100)/1000));
 
             mHandler.postDelayed(() -> {
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
@@ -964,6 +927,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             movingBOCycle=1;
 
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
+            tempBreakMillis = (totalBreakMillis+100) / 1000;
             total_break_time.setText(convertSeconds((totalBreakMillis+100)/1000));
 
             mHandler.postDelayed(() -> {
