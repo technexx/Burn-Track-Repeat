@@ -100,6 +100,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   long breakMillisHolder;
   long tempSetMillis;
   long tempBreakMillis;
+  long permSetMillis;
+  long permBreakMillis;
   int maxProgress = 10000;
   int customProgressPause = 10000;
   int breaksOnlyProgressPause = 10000;
@@ -232,35 +234,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   @Override
   public void onBackPressed() {
-    //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
-    AsyncTask.execute(()-> {
-      switch (mode) {
-        case 1:
-         cycles.setTotalSetTime((int) tempSetMillis/1000);
-         cycles.setTotalBreakTime((int) tempBreakMillis/1000);
-         cycles.setCyclesCompleted(customCyclesDone);
-        cyclesDatabase.cyclesDao().updateCycles(cycles);
-       break;
-        case 2:
-          cyclesBO.setTotalBOTime((int) tempBreakMillis/1000);
-          cyclesBO.setCyclesCompleted(breaksOnlyCyclesDone);
-          cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-          break;
-        case 3:
-          pomCycles.setCyclesCompleted(pomCyclesDone);
-          cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-          break;
-      }
-    });
-
-    //Since we re-create our Main activity and do not used saved preferences for these arrays, we re-send the values back to thr activity so they have them.
-    Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
-    if (mode==1) {
-      exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-      exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-    } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
-    exitIntent.putExtra("mode", mode);
-    startActivity(exitIntent);
+    exitTimer();
   }
 
   @Override
@@ -669,13 +643,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
 
     exit_timer.setOnClickListener(v-> {
-      Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
-      if (mode==1) {
-        exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-        exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-      } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
-      exitIntent.putExtra("mode", mode);
-      startActivity(exitIntent);
+      exitTimer();
     });
 
     confirm_delete.setOnClickListener(v-> {
@@ -700,7 +668,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
   }
 
-
   public void startObjectAnimator() {
     //Always set to false before new round begins, so fade smooth resets. May cause super rare overlap in fade out dot alphas, but this can be solved by just using separate ascent variables.
     switch (mode) {
@@ -719,6 +686,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             objectAnimator.start();
             setBegun = true;
             modeOneTimerEnded = false;
+//            permSetMillis = setMillis;
           } else {
             setMillis = setMillisUntilFinished;
             if (objectAnimator!=null) objectAnimator.resume();
@@ -735,6 +703,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             objectAnimator.setDuration(breakMillis);
             objectAnimator.start();
             breakBegun = true;
+//            permBreakMillis = breakMillis;
           } else {
             breakMillis = breakMillisUntilFinished;
             if (objectAnimator!=null) objectAnimator.resume();
@@ -1628,6 +1597,39 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     populateTimerUI();
   }
 
+  //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
+  public void exitTimer() {
+    //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
+    AsyncTask.execute(()-> {
+      switch (mode) {
+        case 1:
+          cycles.setTotalSetTime((int) tempSetMillis/1000);
+          cycles.setTotalBreakTime((int) tempBreakMillis/1000);
+          cycles.setCyclesCompleted(customCyclesDone);
+          cyclesDatabase.cyclesDao().updateCycles(cycles);
+          break;
+        case 2:
+          cyclesBO.setTotalBOTime((int) tempBreakMillis/1000);
+          cyclesBO.setCyclesCompleted(breaksOnlyCyclesDone);
+          cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+          break;
+        case 3:
+          pomCycles.setCyclesCompleted(pomCyclesDone);
+          cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+          break;
+      }
+    });
+
+    //Since we re-create our Main activity and do not used saved preferences for these arrays, we re-send the values back to thr activity so they have them.
+    Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
+    if (mode==1) {
+      exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+      exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
+    } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+    exitIntent.putExtra("mode", mode);
+    startActivity(exitIntent);
+  }
+
   //Deletes the currently displayed cycle.
   public void deleteCycle() {
     switch (mode) {
@@ -1642,4 +1644,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
     }
   }
+
+
 }
