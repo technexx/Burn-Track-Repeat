@@ -199,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayThree;
 
   //Todo: Disable nextRound button for brief periods before/after click.
+  //Todo: Crash if "next round" on last round.
   //Todo: Total rounds as well?
   //Todo: Save totalMillis whenever we stop/end timer. onBack/onExit to db?
   //Todo: Cycles completed for Pom.

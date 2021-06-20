@@ -232,6 +232,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> infinityArrayTwo;
   ArrayList<Integer> infinityArrayThree;
 
+  Runnable toggleNextRoundRunnable;
+  boolean toggleIsActive;
+
   @Override
   public void onBackPressed() {
     exitTimer();
@@ -393,7 +396,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
     cycle_header_text.setText(cycle_title);
 
-    //Todo: Retrieve total set/break values and set them to TOTAL vars, which temp will add to and then save as.
+    toggleNextRoundRunnable = () -> {
+      if (toggleIsActive) {
+        toggleIsActive = false;
+        next_round.setEnabled(true);
+      }
+    };
+
     //Loads database of saved cycles. Since we are on a specific cycle, we can access it via its unique ID here.
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -525,8 +534,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     });
 
+    //Disables button for 1 second after push. Re-enables it through runnable after that.
     next_round.setOnClickListener(v-> {
       nextRound();
+      if (!toggleIsActive) {
+        next_round.setEnabled(false);
+        toggleIsActive = true;
+        mHandler.postDelayed(toggleNextRoundRunnable, 1000);
+      }
     });
 
     new_lap.setOnClickListener(v -> {
@@ -1625,6 +1640,4 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
     }
   }
-
-
 }

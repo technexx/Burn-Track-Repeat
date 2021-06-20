@@ -90,41 +90,6 @@
         android:src="@drawable/reset_24">
     </ImageButton>
 
-<!--    <Button-->
-<!--        android:id="@+id/skip"-->
-<!--        android:textColor="@color/white"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="40dp"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/cycle_reset"-->
-<!--        android:layout_marginTop="115dp"-->
-<!--        android:textSize="15sp"-->
-<!--        android:gravity="center_vertical"-->
-<!--        android:backgroundTint="@color/black"-->
-<!--        app:cornerRadius="50dp"-->
-<!--        app:rippleColor="#33AAAAAA"-->
-<!--        app:strokeColor="@color/dark_grey"-->
-<!--        app:strokeWidth="1dp">-->
-<!--    </Button>-->
-
-<!--    <Button-->
-<!--        android:id="@+id/cycle_reset"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="40dp"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        android:layout_marginTop="115dp"-->
-<!--        android:textSize="15sp"-->
-<!--        android:gravity="center_vertical"-->
-<!--        android:backgroundTint="@color/black"-->
-<!--        app:cornerRadius="50dp"-->
-<!--        app:rippleColor="#33AAAAAA"-->
-<!--        app:strokeColor="@color/dark_grey"-->
-<!--        app:strokeWidth="1dp">-->
-<!--    </Button>-->
-
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="wrap_content"

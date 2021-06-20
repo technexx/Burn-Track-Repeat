@@ -10,7 +10,8 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-public interface CyclesDao {
+public interface
+CyclesDao {
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
