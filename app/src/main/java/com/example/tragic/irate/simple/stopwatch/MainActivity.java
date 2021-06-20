@@ -198,8 +198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Infinity mode total time going too high.
-  //Todo: Total times a bit out of sync.
+  //Todo: Disable nextRound button for brief periods before/after click.
   //Todo: Total rounds as well?
   //Todo: Save totalMillis whenever we stop/end timer. onBack/onExit to db?
   //Todo: Cycles completed for Pom.

@@ -496,6 +496,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
         customBreakTime.set((int) (customBreakTime.size()-numberOfBreaks), countUpMillisBreaks);
         drawDots(2);
+        //Temporary value for current round, using totalBreakMillis which is our permanent value.
         tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
         total_break_time.setText(convertSeconds(tempBreakMillis/1000));
         mHandler.postDelayed(this, 50);
@@ -767,7 +768,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         totalSetMillis = totalSetMillis + setMillisHolder;
         //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
         tempSetMillis = (totalSetMillis+100) / 1000;
-        total_set_time.setText(convertSeconds((tempSetMillis)));
+        total_set_time.setText(convertSeconds(tempSetMillis));
 
         mHandler.postDelayed(() -> {
           //Re-enabling timer clicks.
@@ -845,7 +846,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
             //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
             tempBreakMillis = (totalBreakMillis+100) / 1000;
-            total_break_time.setText(convertSeconds((tempBreakMillis+100)/1000));
+            total_break_time.setText(convertSeconds(tempBreakMillis+100));
 
             mHandler.postDelayed(() -> {
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
@@ -928,7 +929,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
             tempBreakMillis = (totalBreakMillis+100) / 1000;
-            total_break_time.setText(convertSeconds((totalBreakMillis+100)/1000));
+            total_break_time.setText(convertSeconds(totalBreakMillis));
 
             mHandler.postDelayed(() -> {
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
@@ -1104,9 +1105,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
         //Ensuring fadeVar is set correctly.
         fadeVar = 1;
-        //Adds current round elapsed millis to saved total.
-        totalSetMillis = totalSetMillis + tempSetMillis;
-        total_set_time.setText(convertSeconds((totalSetMillis+100)/1000));
+        //Sets our total millis to the temp value iterated up in our runnable.
+        totalSetMillis = tempSetMillis;
+        //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
+        tempSetMillis = (totalSetMillis+100) / 1000;
+        total_set_time.setText(convertSeconds(tempSetMillis));
 
         mHandler.postDelayed(() -> {
           //Iterating down on set numbers.
@@ -1140,9 +1143,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           customHalted = false;
         }
         fadeVar = 2;
-        //Adds current round elapsed millis to saved total.
-        totalBreakMillis = totalBreakMillis + tempBreakMillis;
-        total_break_time.setText(convertSeconds((totalBreakMillis+100)/1000));
+        //Sets our total millis to the temp value iterated up in our runnable.
+        totalBreakMillis = tempBreakMillis;
+        //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
+        tempBreakMillis = (totalBreakMillis+100) / 1000;
+        total_break_time.setText(convertSeconds(tempBreakMillis));
 
         mHandler.postDelayed(() -> {
           removeSetOrBreak(false);
@@ -1185,6 +1190,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
       }, 1000);
       fadeVar = 3;
+      //We use all the same vars as in mode 1, since we do not need a unique millis value to count down from because we are in infinity mode.
+      totalBreakMillis = tempBreakMillis;
+      tempBreakMillis = (totalBreakMillis+100) / 1000;
+      total_break_time.setText(convertSeconds(tempBreakMillis));
     }
     mHandler.post(endFade);
     dotDraws.setAlpha();
