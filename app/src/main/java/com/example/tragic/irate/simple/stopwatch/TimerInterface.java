@@ -686,7 +686,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             objectAnimator.start();
             setBegun = true;
             modeOneTimerEnded = false;
-//            permSetMillis = setMillis;
+            //Unchanging start point of setMillis used to count total set time over multiple rounds.
+            permSetMillis = setMillis;
           } else {
             setMillis = setMillisUntilFinished;
             if (objectAnimator!=null) objectAnimator.resume();
@@ -703,7 +704,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             objectAnimator.setDuration(breakMillis);
             objectAnimator.start();
             breakBegun = true;
-//            permBreakMillis = breakMillis;
+            //Unchanging start point of breakMillis used to count total set time over multiple rounds.
+            permBreakMillis = breakMillis;
           } else {
             breakMillis = breakMillisUntilFinished;
             if (objectAnimator!=null) objectAnimator.resume();
@@ -751,8 +753,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void startSetTimer() {
     AtomicBoolean textSizeReduced = new AtomicBoolean(false);
     if (setMillis >= 59000) textSizeReduced.set(true);
-    //Unchanging start point of setMillis used to count total set time over multiple rounds.
-    long permMillis = setMillis;
 
     timer = new CountDownTimer(setMillis, 50) {
       @Override
@@ -779,7 +779,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         if (setMillis<500) timerDisabled = true;
 
         //Sets value to difference between starting millis and current millis (e.g. 45000 left from 50000 start is 5000/5 sec elapsed).
-        setMillisHolder = permMillis - setMillis;
+        setMillisHolder = permSetMillis - setMillis;
         //Temporary value for current round, using totalSetMillis which is our permanent value.
         tempSetMillis = totalSetMillis + setMillisHolder;
         total_set_time.setText(convertSeconds(tempSetMillis/1000));
@@ -830,8 +830,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     if (mode==1) {
       AtomicBoolean textSizeReduced = new AtomicBoolean(false);
       if (breakMillis >= 59000) textSizeReduced.set(true);
-      //Unchanging start point of setMillis used to count total set time over multiple rounds.
-      long permMillis = breakMillis;
 
       timer = new CountDownTimer(breakMillis, 50) {
         @Override
@@ -856,7 +854,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           drawDots(2);
           if (breakMillis<500) timerDisabled = true;
 
-          breakMillisHolder = permMillis - breakMillis;
+          breakMillisHolder = permBreakMillis - breakMillis;
           tempBreakMillis = totalBreakMillis + breakMillisHolder;
           total_break_time.setText(convertSeconds(tempBreakMillis/1000));
         }

@@ -198,8 +198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: Total time resets on pause/resume
-  //Infinity mode total time going too high.
+  //Todo: Infinity mode total time going too high.
   //Todo: Total times a bit out of sync.
   //Todo: Total rounds as well?
   //Todo: Save totalMillis whenever we stop/end timer. onBack/onExit to db?
