@@ -233,7 +233,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> infinityArrayThree;
 
   Runnable toggleNextRoundRunnable;
-  boolean toggleIsActive;
+  boolean nextRoundToggleIsActive;
 
   @Override
   public void onBackPressed() {
@@ -397,8 +397,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycle_header_text.setText(cycle_title);
 
     toggleNextRoundRunnable = () -> {
-      if (toggleIsActive) {
-        toggleIsActive = false;
+      if (nextRoundToggleIsActive) {
+        nextRoundToggleIsActive = false;
         next_round.setEnabled(true);
       }
     };
@@ -537,53 +537,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Disables button for 1 second after push. Re-enables it through runnable after that.
     next_round.setOnClickListener(v-> {
       nextRound();
-      if (!toggleIsActive) {
+      if (!nextRoundToggleIsActive) {
         next_round.setEnabled(false);
-        toggleIsActive = true;
+        nextRoundToggleIsActive = true;
         mHandler.postDelayed(toggleNextRoundRunnable, 1000);
       }
     });
 
     new_lap.setOnClickListener(v -> {
-      double newSeconds = msReset/60;
-      double newMinutes = newSeconds/60;
-
-      double savedMinutes = 0;
-      double savedSeconds = 0;
-      double savedMs = 0;
-
-      String[] holder = null;
-      if (!stopwatchHalted) {
-        if (savedLapList.size()>0) {
-          holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
-          savedMinutes = newMinutes + Integer.parseInt(holder[0]);
-          savedSeconds = newSeconds + Integer.parseInt(holder[1]);
-          savedMs = newMsConvert + Integer.parseInt(holder[2]);
-
-          if (savedMs>99) {
-            savedMs = savedMs-100;
-            savedSeconds +=1;
-          }
-          if (savedSeconds>99){
-            savedSeconds = savedSeconds-100;
-            savedMinutes +=1;
-          }
-          savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
-        } else savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
-
-        newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
-
-        currentLapList.add(newEntries);
-        savedLapList.add(savedEntries);
-        lapLayout.scrollToPosition(savedLapList.size()-1);
-        lapAdapter.notifyDataSetChanged();
-
-        lapsNumber++;
-        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
-
-        msReset = 0;
-        msConvert2 = 0;
-      }
+      newLap();
     });
 
     pauseResumeButton.setOnClickListener(v-> {
@@ -962,7 +924,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               }
             },750);
           };
-          if (mode==2) overtime.setVisibility(View.VISIBLE);
+
+          overtime.setVisibility(View.VISIBLE);
           isOvertimeRunning = true;
           ot = new Runnable() {
             @Override
@@ -1100,6 +1063,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void nextRound() {
     animateEnding(true);
     if (mode==1) {
+      //Since breaks will always be the last round in modes 1 and 2, return without executing anything if there are none left.
+      if (numberOfBreaks==0) return;
       if (!onBreak) {
         //onFinish tasks for counting up sets.
         if (!setsAreCountingUp) {
@@ -1133,12 +1098,25 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           onBreak = true;
           mHandler.removeCallbacks(secondsUpSetRunnable);
           countUpMillisSets = 0;
-          if (!breaksAreCountingUp) {
-            startObjectAnimator();
-            startBreakTimer();
+
+          //If timer is paused and we skip to the next round, begin that round paused. We do this by simply setting the timer textViews to the next type of round (i.e. breaks), and resetting the progressBar.
+          if (customHalted) {
+            progressBar.setProgress(10000);
+            timePaused.setAlpha(1.0f);
+            if (!breaksAreCountingUp) {
+              timeLeft.setText(convertSeconds((breakMillis)/1000));
+              timePaused.setText(convertSeconds((breakMillis/1000)));
+            } else {
+              timeLeft.setText(convertSeconds((0)));
+              timePaused.setText(convertSeconds((0)));
+            }
           } else {
-            mHandler.post(secondsUpBreakRunnable);
-            next_round.setAlpha(1.0f);
+            if (!breaksAreCountingUp) {
+              startObjectAnimator();
+              startBreakTimer();
+            } else {
+              mHandler.post(secondsUpBreakRunnable);
+            }
           }
         }, 1000);
       } else {
@@ -1163,20 +1141,34 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
         tempBreakMillis = (totalBreakMillis+100) / 1000;
         total_break_time.setText(convertSeconds(tempBreakMillis));
+        removeSetOrBreak(false);
 
         mHandler.postDelayed(() -> {
-          removeSetOrBreak(false);
+          endAnimation.cancel();
           onBreak = false;
 
           if (numberOfBreaks>0) {
             countUpMillisBreaks = 0;
-            if (!setsAreCountingUp) {
-              startObjectAnimator();
-              startSetTimer();
+
+            //If timer is paused and we skip to the next round, begin that round paused. We do this by simply setting the timer textViews to the next type of round (i.e. sets), and resetting the progressBar.
+            if (customHalted) {
+              progressBar.setProgress(10000);
+              timePaused.setAlpha(1.0f);
+              if (!setsAreCountingUp) {
+                timeLeft.setText(convertSeconds((setMillis)/1000));
+                timePaused.setText(convertSeconds((setMillis/1000)));
+              } else {
+                timeLeft.setText(convertSeconds((0)));
+                timePaused.setText(convertSeconds((0)));
+              }
             } else {
-              mHandler.post(secondsUpSetRunnable);
+              if (!setsAreCountingUp) {
+                startObjectAnimator();
+                startSetTimer();
+              } else {
+                mHandler.post(secondsUpSetRunnable);
+              }
             }
-            endAnimation.cancel();
           } else {
             modeOneTimerEnded = true;
             customCyclesDone++;
@@ -1185,12 +1177,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }, 1000);
       }
     } else if (mode==2) {
+      //Since breaks will always be the last round in modes 1 and 2, return without executing anything if there are none left.
+      if (numberOfBreaksOnly==0) return;
+
       if (numberOfBreaksOnly==1) {
         timeLeft.setText(convertSeconds((countUpMillisBO) /1000));
         timePaused.setText(convertSeconds((countUpMillisBO) /1000));
       }
       mHandler.removeCallbacks(secondsUpBORunnable);
       breaksOnlyHalted = false;
+
       mHandler.postDelayed(() -> {
         removeSetOrBreak(false);
         if (numberOfBreaksOnly>0) {
@@ -1283,6 +1279,48 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
+  public void newLap() {
+    double newSeconds = msReset/60;
+    double newMinutes = newSeconds/60;
+
+    double savedMinutes = 0;
+    double savedSeconds = 0;
+    double savedMs = 0;
+
+    String[] holder = null;
+    if (!stopwatchHalted) {
+      if (savedLapList.size()>0) {
+        holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
+        savedMinutes = newMinutes + Integer.parseInt(holder[0]);
+        savedSeconds = newSeconds + Integer.parseInt(holder[1]);
+        savedMs = newMsConvert + Integer.parseInt(holder[2]);
+
+        if (savedMs>99) {
+          savedMs = savedMs-100;
+          savedSeconds +=1;
+        }
+        if (savedSeconds>99){
+          savedSeconds = savedSeconds-100;
+          savedMinutes +=1;
+        }
+        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
+      } else savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+
+      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
+
+      currentLapList.add(newEntries);
+      savedLapList.add(savedEntries);
+      lapLayout.scrollToPosition(savedLapList.size()-1);
+      lapAdapter.notifyDataSetChanged();
+
+      lapsNumber++;
+      cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
+
+      msReset = 0;
+      msConvert2 = 0;
+    }
+  }
+
   public void pauseAndResumeTimer(int pausing) {
     //disabledTimer booleans are to prevent ANY action being taken.
     if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
@@ -1342,7 +1380,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 }
               }
             }
-          } else resetTimer();
+          } else {
+            //If cycle has run its course, reset the cycle and re-enable the next_round button.
+            resetTimer();
+          }
           break;
         case 2:
           if (!modeTwoTimerEnded) {
@@ -1383,7 +1424,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               timePaused.setAlpha(0f);
               timeLeft.setAlpha(1.0f);
             }
-          } else resetTimer();
+          } else {
+            resetTimer();
+          }
           break;
         case 3:
           if (reset.getText().equals(getString(R.string.confirm_cycle_reset))) reset.setText(R.string.reset);
