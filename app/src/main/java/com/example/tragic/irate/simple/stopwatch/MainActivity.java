@@ -199,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayThree;
 
   //Todo: Total times + round skip for Pom as well.
-  //Todo: Total rounds as well?
   //Todo: Issue w/ breaks fading prematurely when clicking next_round. Likely fadeVar issue.
   //Todo: Save totalMillis whenever we stop/end timer. onBack/onExit to db?
   //Todo: Cycles completed for Pom.

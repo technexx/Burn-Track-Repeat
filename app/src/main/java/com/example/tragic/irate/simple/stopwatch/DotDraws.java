@@ -250,17 +250,6 @@ public class DotDraws extends View {
           mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
           drawText(mSetTime, mX+16, mY+62, i);
           mX += 132;
-
-          //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
-          if (mAddSubFade && !mFadingIn && (mSetTime.size()-1==i)) {
-            //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
-            if (mAlpha2!=-1) {
-              mPaint.setAlpha(mAlpha2);
-              mPaintText.setAlpha(mAlpha2);
-              drawText(mSetTime, mX+16, mY+62, i);
-              mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
-            }
-          }
         }
 
         for (int i=0; i<mBreakTime.size(); i++) {
@@ -277,17 +266,6 @@ public class DotDraws extends View {
           mCanvas.drawCircle(mX2+20, mY2+60, 55, mPaint);
           drawText(mBreakTime, mX2+16, mY2+62, i);
           mX2 += 132;
-
-          //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
-          if (mAddSubFade && !mFadingIn && (mBreakTime.size()-1==i)) {
-            //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
-            if (mAlpha2!=-1) {
-              mPaint.setAlpha(mAlpha2);
-              mPaintText.setAlpha(mAlpha2);
-              drawText(mBreakTime, mX2+16, mY2+62, i);
-              mCanvas.drawCircle(mX2+20, mY2+60, 55, mPaint);
-            }
-          }
         }
         break;
       case 2:
@@ -308,17 +286,6 @@ public class DotDraws extends View {
           mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
           drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
           mX2 += 132;
-
-          //Animation to remove a dot, cycling alpha values by using a post-delayed runnable from Main.
-          if (mAddSubFade && !mFadingIn && (mBreakOnlyTime.size()-1==i)) {
-            //At end of fade, passing in a -1 alpha value which we use to avoid drawing the dot (as it has been removed).
-            if (mAlpha2!=-1) {
-              mPaint.setAlpha(mAlpha2);
-              mPaintText.setAlpha(mAlpha2);
-              drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
-              mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
-            }
-          }
         }
         break;
       case 3:

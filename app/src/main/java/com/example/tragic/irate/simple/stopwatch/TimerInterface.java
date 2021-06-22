@@ -189,7 +189,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> customBreakTime;
   ArrayList<Integer> breaksOnlyTime;
   ArrayList<Integer> pomValuesTime;
-  ArrayList<Integer> zeroArray;
+  ArrayList<Integer> zeroArraySets;
+  ArrayList<Integer> zeroArrayBreaks;
 
   boolean activePomCycle;
   boolean setBegun;
@@ -289,7 +290,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     currentLapList = new ArrayList<>();
     savedLapList = new ArrayList<>();
 
-    zeroArray = new ArrayList<>();
+    zeroArraySets = new ArrayList<>();
+    zeroArrayBreaks = new ArrayList<>();
     setsArray = new ArrayList<>();
     breaksArray = new ArrayList<>();
     breaksOnlyArray = new ArrayList<>();
@@ -367,24 +369,30 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       isNewCycle = intent.getBooleanExtra("isNewCycle", false);
       mode = intent.getIntExtra("mode", 0);
       cycle_title = intent.getStringExtra("cycleTitle");
-      //Used to delete cycle.
+      //The primary key ID of our current cycle row.
       passedID = intent.getIntExtra("passedID", 0);
+      //Infinity toggle lists passed in from Main, for the purpose of passing back since they are not saved.
       infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
       infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
       infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
     }
 
+    //Retrieves our list of Timer values for each round in the cycle.
     switch (mode) {
       case 1:
         customSetTime = intent.getIntegerArrayListExtra("setList");
         customBreakTime = intent.getIntegerArrayListExtra("breakList");
         setsAreCountingUp = intent.getBooleanExtra("setsAreCountingUp", false);
         breaksAreCountingUp = intent.getBooleanExtra("breaksAreCountingUp", false);
+        //Setting count up or count down modes.
         dotDraws.countingUpSets(setsAreCountingUp);
         dotDraws.countingUpBreaks(breaksAreCountingUp);
+        //Since we begin on Sets, we are getting the millis value of our first round.
         setMillis = customSetTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
-        for (int i = 0; i < customSetTime.size(); i++) zeroArray.add(0);
+        for (int i = 0; i < customSetTime.size(); i++) {
+          zeroArraySets.add(0); zeroArrayBreaks.add(0);
+        }
         break;
       case 2:
         breaksOnlyTime = intent.getIntegerArrayListExtra("breakOnlyList");
@@ -392,7 +400,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         dotDraws.countingUpBreaksOnly(breaksOnlyAreCountingUp);
         breaksOnlyMillis = breaksOnlyTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
-        for (int i = 0; i < breaksOnlyTime.size(); i++) zeroArray.add(0);
+        for (int i = 0; i < breaksOnlyTime.size(); i++) zeroArrayBreaks.add(0);
         break;
       case 3:
         pomValue1 = intent.getIntExtra("pomValue1", 0);
@@ -495,9 +503,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         countUpMillisSets += 50;
+        //Sets the current index of our initial "zero array" to the millis value being counted up.
+        zeroArraySets.set((zeroArraySets.size() - numberOfSets), countUpMillisSets);
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         timePaused.setText(convertSeconds((countUpMillisSets) / 1000));
-        customSetTime.set((int) (customSetTime.size() - numberOfSets), countUpMillisSets);
         drawDots(1);
         //Temporary value for current round, using totalSetMillis which is our permanent value.
         tempSetMillis = totalSetMillis + countUpMillisSets;
@@ -510,9 +519,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         countUpMillisBreaks += 50;
+        zeroArrayBreaks.set((zeroArrayBreaks.size() - numberOfBreaks), countUpMillisBreaks);
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
         timePaused.setText(convertSeconds((countUpMillisBreaks) / 1000));
-        customBreakTime.set((int) (customBreakTime.size() - numberOfBreaks), countUpMillisBreaks);
         drawDots(2);
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
         tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
@@ -525,9 +534,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         countUpMillisBO += 50;
+        zeroArrayBreaks.set((zeroArrayBreaks.size() - numberOfBreaks), countUpMillisBreaks);
         timeLeft.setText(convertSeconds((countUpMillisBO) / 1000));
         timePaused.setText(convertSeconds((countUpMillisBO) / 1000));
-        breaksOnlyTime.set((int) (breaksOnlyTime.size() - numberOfBreaksOnly), countUpMillisBO);
         drawDots(3);
         mHandler.postDelayed(this, 50);
       }
@@ -1240,15 +1249,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     switch (mode) {
       case 1:
         if (!setsAreCountingUp) dotDraws.setTime(customSetTime);
-        else dotDraws.setTime(zeroArray);
+        else dotDraws.setTime(zeroArraySets);
         if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime);
-        else dotDraws.breakTime(zeroArray);
+        else dotDraws.breakTime(zeroArrayBreaks);
         dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
         dotDraws.customDrawBreak(startSets, numberOfBreaks);
         break;
       case 2:
         if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime);
-        else dotDraws.breakOnlyTime(zeroArray);
+        else dotDraws.breakOnlyTime(zeroArrayBreaks);
         dotDraws.breaksOnlyDraw(startBreaksOnly, numberOfBreaksOnly, fadeVar);
         break;
       case 3:
