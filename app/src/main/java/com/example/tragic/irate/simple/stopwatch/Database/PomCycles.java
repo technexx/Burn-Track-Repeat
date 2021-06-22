@@ -11,6 +11,7 @@ public class PomCycles {
     public String title;
     public String fullCycle;
     public long timeAdded;
+    public long timeAccessed;
     public int cyclesCompleted;
 
     public PomCycles() {
@@ -46,6 +47,14 @@ public class PomCycles {
 
     public void setTimeAdded(long timeAdded) {
         this.timeAdded = timeAdded;
+    }
+
+    public long getTimeAccessed() {
+        return timeAccessed;
+    }
+
+    public void setTimeAccessed(long timeAccessed) {
+        this.timeAccessed = timeAccessed;
     }
 
     public int getCyclesCompleted() {

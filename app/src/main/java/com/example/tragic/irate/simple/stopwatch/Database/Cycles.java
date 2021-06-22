@@ -12,10 +12,12 @@ public class Cycles {
     public String sets;
     public String breaks;
     public long timeAdded;
+    public long timeAccessed;
     public int itemCount;
     public int cyclesCompleted;
     public int totalSetTime;
     public int totalBreakTime;
+
 
     public Cycles() {
     }
@@ -58,6 +60,14 @@ public class Cycles {
 
     public void setTimeAdded(long timeAdded) {
         this.timeAdded = timeAdded;
+    }
+
+    public long getTimeAccessed() {
+        return timeAccessed;
+    }
+
+    public void setTimeAccessed(long timeAccessed) {
+        this.timeAccessed = timeAccessed;
     }
 
     public int getItemCount() {

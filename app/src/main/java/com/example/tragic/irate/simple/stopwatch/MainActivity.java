@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton edit_highlighted_cycle;
   ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
+  TextView sort_textView;
 
   int mode = 1;
   int sortMode = 1;
@@ -199,36 +200,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayThree;
 
   //Todo: Total times + round skip for Pom as well.
-  //Todo: Issue w/ breaks fading prematurely when clicking next_round. Likely fadeVar issue.
-  //Todo: Save totalMillis whenever we stop/end timer. onBack/onExit to db?
   //Todo: Cycles completed for Pom.
+  //Todo: Hide total time option?
   //Todo: Sort mode/onOptionsSelected.
   //Todo: Sort by Title (alphabetical) option.
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
-  //Todo: infinity mode dots should iterate up w/ seconds.
-  //Todo: resetCycle button resets both total times and cycles?
   //Todo: pomMillis1/2/3 need populating.
   //Todo: Bigger reset button or wider click area.
   //Todo: Letter -> Number soft kb is a bit choppy.
-  //Todo: Cull all unnecessary timer textView fades, now that we're separating timers.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
-
   //Todo: Preset timer selections.
-  //Todo: Save completed cycles in sharedPref? If so, remember in nextRound() as well.
   //Todo: No rounds added defaults to a default Cycle instead of staying blank.
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Variable set count-up timer, for use w/ TDEE.
   //Todo: Variable set only mode? Again, for TDEE.
-  //Todo: Reset vis/not vis depending on mode timer status.
 
   //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
   //Todo: Add taskbar notification for timers.
   //Todo: Add color scheme options.
-  //Todo: Test all Pom cycles.
   //Todo: All DB calls in aSync.
   //Todo: Rename app, of course.
   //Todo: Add onOptionsSelected dots for About, etc.
@@ -236,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
   //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
   //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
+  //Todo: Test everything 10x.
 
   //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
   //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
@@ -413,6 +407,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
     delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_text);
 
+    //Custom Action Bar.
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setCustomView(R.layout.custom_bar);
@@ -420,6 +415,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
+    sort_textView = findViewById(R.id.sort_textView);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -636,16 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.notifyDataSetChanged();
         //Turning highlight mode off since we are moving to a new tab.
         savedCycleAdapter.removeHighlight(true);
-        switch (tab.getPosition()) {
-          case 0:
-            break;
-          case 1:
-            break;
-          case 2:
-            break;
-          case 3:
-            break;
-        }
       }
 
       @Override
@@ -661,6 +647,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       //Boolean set to true indicates a new, non-database-saved cycle is populating our editCyclesPopup. This is primarily used for onBackPressed, to determine whether to save it as a new entry, or update its current position in the database.
       onNewCycle = true;
+    });
+
+    sort_textView.setOnClickListener(v-> {
+
     });
 
     ////--ActionBar Item onClicks START--////
@@ -1808,11 +1798,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Adding and inserting into database.
           cycles.setSets(setString);
           cycles.setBreaks(breakString);
-          //Only setting timeAdded for NEW cycle. We want our (sort by date) to use the initial time/date.
+          //Setting most recent time accessed for sort mode.
+          cycles.setTimeAccessed(System.currentTimeMillis());
           cycles.setItemCount(customSetTime.size());
           if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
           //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
           if (newCycle) {
+            //Only setting timeAdded for NEW cycle. We want our (sort by date) to use the initial time/date.
             cycles.setTimeAdded(System.currentTimeMillis());
             cycles.setTotalSetTime(0);
             cycles.setTotalBreakTime(0);
@@ -1833,6 +1825,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (!breakOnlyString.equals("")) {
           cyclesBO.setBreaksOnly(breakOnlyString);
+          cyclesBO.setTimeAccessed(System.currentTimeMillis());;
           cyclesBO.setItemCount(breaksOnlyTime.size());
           if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
           if (newCycle) {
@@ -1855,6 +1848,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (!pomString.equals("")) {
           pomCycles.setFullCycle(pomString);
+          pomCycles.setTimeAccessed(System.currentTimeMillis());;
           if (newCycle) pomCycles.setTimeAdded(System.currentTimeMillis());
           if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
           if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);

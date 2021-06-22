@@ -51,4 +51,15 @@
         android:src="@drawable/trash_can_3">
     </ImageButton>
 
+    <TextView
+        android:id="@+id/sort_textView"
+        android:text="Sort"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="12dp">
+    </TextView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
