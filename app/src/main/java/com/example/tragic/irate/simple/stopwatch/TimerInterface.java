@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.TypedArrayUtils;
@@ -50,7 +51,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TimerInterface extends AppCompatActivity implements DotDraws.sendAlpha {
 
-  ProgressBar progressBar;;
+  ProgressBar progressBar;
+  ;
   ImageView stopWatchView;
   TextView timeLeft;
   TextView timePaused;
@@ -79,7 +81,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   Button cycle_reset;
   ImageButton new_lap;
   ImageButton next_round;
-  Button skip;
+  ImageButton reset_total_times;
   TextView total_set_header;
   TextView total_break_header;
   TextView total_set_time;
@@ -89,11 +91,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   int RESUMING_TIMER = 2;
   int RESETTING_TIMER = 3;
   int RESTARTING_TIMER = 4;
+  int DELETING_CYCLE = 1;
+  int DELETING_TIMES = 2;
   int movingBOCycle;
 
   long setMillis;
   long breakMillis;
-  long breakOnlyMillis;
+  long breaksOnlyMillis;
   long totalSetMillis;
   long totalBreakMillis;
   long setMillisHolder;
@@ -109,7 +113,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   long pomMillis;
   long setMillisUntilFinished;
   long breakMillisUntilFinished;
-  long breakOnlyMillisUntilFinished;
+  long breaksOnlyMillisUntilFinished;
   long pomMillisUntilFinished;
   Runnable endFade;
   Runnable ot;
@@ -117,7 +121,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   long pomMillis1;
   long pomMillis2;
   long pomMillis3;
-  int pomDotCounter=1;
+  int pomDotCounter = 1;
 
   double ms;
   double msConvert;
@@ -172,7 +176,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   LinearLayoutManager lapLayout;
 
   DotDraws dotDraws;
-  int mode=1;
+  int mode = 1;
   ValueAnimator sizeAnimator;
   ValueAnimator valueAnimatorDown;
   ValueAnimator valueAnimatorUp;
@@ -217,6 +221,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   PopupWindow deleteCyclePopupWindow;
   Button confirm_delete;
   Button cancel_delete;
+  TextView delete_text;
 
   CyclesDatabase cyclesDatabase;
   List<Cycles> cyclesList;
@@ -253,7 +258,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     switch (item.getItemId()) {
       //Launches popup to confirm/cancel cycle deletion.
       case R.id.delete_single_cycle:
-        deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -150);
+        delete_text.setText(R.string.confirm_single_delete);
+        deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
         break;
     }
     return super.onOptionsItemSelected(item);
@@ -290,7 +296,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     pomArray = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
     infinityArrayOne = new ArrayList<>();
-    infinityArrayTwo  = new ArrayList<>();
+    infinityArrayTwo = new ArrayList<>();
     infinityArrayThree = new ArrayList<>();
 
     reset = findViewById(R.id.reset);
@@ -313,7 +319,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     progressBar = findViewById(R.id.progressBar);
     stopWatchView = findViewById(R.id.stopWatchView);
     timeLeft = findViewById(R.id.timeLeft);
-    timeLeft4 =findViewById(R.id.timeLeft4);
+    timeLeft4 = findViewById(R.id.timeLeft4);
     timePaused = findViewById(R.id.timePaused);
     timePaused4 = findViewById(R.id.timePaused4);
     msTime = findViewById(R.id.msTime);
@@ -325,6 +331,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
     pauseResumeButton.setRippleColor(null);
     exit_timer = findViewById(R.id.exit_timer);
+    reset_total_times = findViewById(R.id.reset_total_times);
 
     stopWatchView.setVisibility(View.GONE);
     lapRecycler.setVisibility(View.GONE);
@@ -347,8 +354,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    TextView delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
-    delete_text.setText(R.string.confirm_single_delete);
+    delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
     confirm_delete = deleteCyclePopupView.findViewById(R.id.confirm_yes);
     cancel_delete = deleteCyclePopupView.findViewById(R.id.confirm_no);
 
@@ -357,7 +363,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     //Receives lists passed in from Main.
     Intent intent = getIntent();
-    if (intent!=null) {
+    if (intent != null) {
       isNewCycle = intent.getBooleanExtra("isNewCycle", false);
       mode = intent.getIntExtra("mode", 0);
       cycle_title = intent.getStringExtra("cycleTitle");
@@ -378,15 +384,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         dotDraws.countingUpBreaks(breaksAreCountingUp);
         setMillis = customSetTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
-        for (int i=0; i<customSetTime.size(); i++) zeroArray.add(0);
+        for (int i = 0; i < customSetTime.size(); i++) zeroArray.add(0);
         break;
       case 2:
         breaksOnlyTime = intent.getIntegerArrayListExtra("breakOnlyList");
         breaksOnlyAreCountingUp = intent.getBooleanExtra("breaksOnlyAreCountingUp", false);
         dotDraws.countingUpBreaksOnly(breaksOnlyAreCountingUp);
-        breakOnlyMillis = breaksOnlyTime.get(0);
+        breaksOnlyMillis = breaksOnlyTime.get(0);
         //Populates an array of zeros for use in "count up" mode. Will always sync in size w/ its counterpart.
-        for (int i=0; i<breaksOnlyTime.size(); i++) zeroArray.add(0);
+        for (int i = 0; i < breaksOnlyTime.size(); i++) zeroArray.add(0);
         break;
       case 3:
         pomValue1 = intent.getIntExtra("pomValue1", 0);
@@ -411,14 +417,17 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         switch (mode) {
           case 1:
             cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
-            totalSetMillis = cycles.getTotalSetTime();
-            totalBreakMillis = cycles.getTotalBreakTime();
+            totalSetMillis = cycles.getTotalSetTime() * 1000;
+            totalBreakMillis = cycles.getTotalBreakTime() * 1000;
             customCyclesDone = cycles.getCyclesCompleted();
+            total_set_time.setText(convertSeconds(totalSetMillis / 1000));
+            total_break_time.setText(convertSeconds(totalBreakMillis / 1000));
             break;
           case 2:
             cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(passedID).get(0);
-            totalBreakMillis = cyclesBO.getTotalBOTime();
+            totalBreakMillis = cyclesBO.getTotalBOTime() * 1000;
             breaksOnlyCyclesDone = cyclesBO.getCyclesCompleted();
+            total_break_time.setText(convertSeconds(totalBreakMillis / 1000));
             break;
           case 3:
             pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
@@ -444,7 +453,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(id).get(0);
             break;
         }
-
       }
     });
     //Draws dot display depending on which more we're on.
@@ -461,7 +469,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     animateEnding(false);
 
     //Recycler view for our stopwatch laps.
-    lapLayout= new LinearLayoutManager(getApplicationContext());
+    lapLayout = new LinearLayoutManager(getApplicationContext());
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
     lapRecycler.setAdapter(lapAdapter);
     lapRecycler.setLayoutManager(lapLayout);
@@ -477,7 +485,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         drawDots(fadeVar);
-        if (receivedAlpha<=100) mHandler.removeCallbacks(this); else mHandler.postDelayed(this, 50);
+        if (receivedAlpha <= 100) mHandler.removeCallbacks(this);
+        else mHandler.postDelayed(this, 50);
       }
     };
 
@@ -485,14 +494,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     secondsUpSetRunnable = new Runnable() {
       @Override
       public void run() {
-        countUpMillisSets +=50;
-        timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
-        timePaused.setText(convertSeconds((countUpMillisSets) /1000));
-        customSetTime.set((int) (customSetTime.size()-numberOfSets), countUpMillisSets);
+        countUpMillisSets += 50;
+        timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
+        timePaused.setText(convertSeconds((countUpMillisSets) / 1000));
+        customSetTime.set((int) (customSetTime.size() - numberOfSets), countUpMillisSets);
         drawDots(1);
         //Temporary value for current round, using totalSetMillis which is our permanent value.
         tempSetMillis = totalSetMillis + countUpMillisSets;
-        total_set_time.setText(convertSeconds(tempSetMillis/1000));
+        total_set_time.setText(convertSeconds(tempSetMillis / 1000));
         mHandler.postDelayed(this, 50);
       }
     };
@@ -500,14 +509,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     secondsUpBreakRunnable = new Runnable() {
       @Override
       public void run() {
-        countUpMillisBreaks +=50;
-        timeLeft.setText(convertSeconds((countUpMillisBreaks) /1000));
-        timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
-        customBreakTime.set((int) (customBreakTime.size()-numberOfBreaks), countUpMillisBreaks);
+        countUpMillisBreaks += 50;
+        timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
+        timePaused.setText(convertSeconds((countUpMillisBreaks) / 1000));
+        customBreakTime.set((int) (customBreakTime.size() - numberOfBreaks), countUpMillisBreaks);
         drawDots(2);
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
         tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
-        total_break_time.setText(convertSeconds(tempBreakMillis/1000));
+        total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
         mHandler.postDelayed(this, 50);
       }
     };
@@ -515,18 +524,20 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     secondsUpBORunnable = new Runnable() {
       @Override
       public void run() {
-        countUpMillisBO +=50;
-        timeLeft.setText(convertSeconds((countUpMillisBO) /1000));
-        timePaused.setText(convertSeconds((countUpMillisBO) /1000));
-        breaksOnlyTime.set((int) (breaksOnlyTime.size()-numberOfBreaksOnly), countUpMillisBO);
+        countUpMillisBO += 50;
+        timeLeft.setText(convertSeconds((countUpMillisBO) / 1000));
+        timePaused.setText(convertSeconds((countUpMillisBO) / 1000));
+        breaksOnlyTime.set((int) (breaksOnlyTime.size() - numberOfBreaksOnly), countUpMillisBO);
         drawDots(3);
         mHandler.postDelayed(this, 50);
       }
     };
 
-    reset.setOnClickListener(v-> {
-      if (mode!=3) resetTimer(); else {
-        if (reset.getText().equals(getString(R.string.reset))) reset.setText(R.string.confirm_cycle_reset);
+    reset.setOnClickListener(v -> {
+      if (mode != 3) resetTimer();
+      else {
+        if (reset.getText().equals(getString(R.string.reset)))
+          reset.setText(R.string.confirm_cycle_reset);
         else {
           reset.setText(R.string.reset);
           resetTimer();
@@ -535,7 +546,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
 
     //Disables button for 1 second after push. Re-enables it through runnable after that.
-    next_round.setOnClickListener(v-> {
+    next_round.setOnClickListener(v -> {
       nextRound();
       if (!nextRoundToggleIsActive) {
         next_round.setEnabled(false);
@@ -548,20 +559,23 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       newLap();
     });
 
-    pauseResumeButton.setOnClickListener(v-> {
+    pauseResumeButton.setOnClickListener(v -> {
       switch (mode) {
         case 1:
-          if (!customHalted) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+          if (!customHalted) pauseAndResumeTimer(PAUSING_TIMER);
+          else pauseAndResumeTimer(RESUMING_TIMER);
           break;
         case 2:
           //If counting up, use the same pause/resume feature as other modes. If not, iterate through the four pause cycles.
-          if (!breaksOnlyHalted) pauseAndResumeTimer(PAUSING_TIMER); else if (!breaksOnlyAreCountingUp) {
+          if (!breaksOnlyHalted) pauseAndResumeTimer(PAUSING_TIMER);
+          else if (!breaksOnlyAreCountingUp) {
             switch (movingBOCycle) {
               case 0:
                 pauseAndResumeTimer(RESUMING_TIMER);
                 break;
               case 1:
-                pauseAndResumeTimer(RESETTING_TIMER); movingBOCycle++;
+                pauseAndResumeTimer(RESETTING_TIMER);
+                movingBOCycle++;
                 break;
               case 2:
                 pauseAndResumeTimer(RESTARTING_TIMER);
@@ -575,38 +589,37 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           else pauseAndResumeTimer(RESUMING_TIMER);
           break;
         case 4:
-          if (stopwatchHalted) pauseAndResumeTimer(RESUMING_TIMER); else pauseAndResumeTimer(PAUSING_TIMER);
+          if (stopwatchHalted) pauseAndResumeTimer(RESUMING_TIMER);
+          else pauseAndResumeTimer(PAUSING_TIMER);
           break;
       }
     });
 
-    exit_timer.setOnClickListener(v-> {
+    exit_timer.setOnClickListener(v -> {
       exitTimer();
     });
 
-    confirm_delete.setOnClickListener(v-> {
-      //Delete the current cycle and kicks us back to Main.
-      AsyncTask.execute(()->{
-        deleteCycle();
-        runOnUiThread(() -> {
-          Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
-          if (mode==1) {
-            exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-            exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-          } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
-          exitIntent.putExtra("mode", mode);
-          startActivity(exitIntent);
-        });
+    confirm_delete.setOnClickListener(v -> {
+      //If popUp text contains universal delete_total_times String, execute that part of the function. Otherwise, we're deleting the current cycle.
+      AsyncTask.execute(() -> {
+        if (delete_text.getText().equals(getString(R.string.delete_total_times))) deleteCycle(DELETING_TIMES);
+        else deleteCycle(DELETING_CYCLE);
       });
     });
 
-    cancel_delete.setOnClickListener(v-> {
+    cancel_delete.setOnClickListener(v -> {
       //Removes our delete confirm popUp if we cancel.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
+    });
+
+    reset_total_times.setOnClickListener(v -> {
+      deleteTotalTimes();
     });
   }
 
   public void startObjectAnimator() {
+    //Ensures each new dot fade begins @ full alpha.
+    dotDraws.setAlpha();
     //Always set to false before new round begins, so fade smooth resets. May cause super rare overlap in fade out dot alphas, but this can be solved by just using separate ascent variables.
     switch (mode) {
       case 1:
@@ -614,10 +627,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (!setBegun) {
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             customHalted = false;
-            //Ensures each new dot fade begins @ full alpha.
-            dotDraws.setAlpha();
             //Returns and sets our setMillis value to the first position in our Array.
-            if (numberOfSets>0) setMillis = newMillis(true);
+            if (numberOfSets > 0) setMillis = newMillis(true);
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
             objectAnimator.setDuration(setMillis);
@@ -628,15 +639,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             permSetMillis = setMillis;
           } else {
             setMillis = setMillisUntilFinished;
-            if (objectAnimator!=null) objectAnimator.resume();
+            if (objectAnimator != null) objectAnimator.resume();
           }
         } else {
           if (!breakBegun) {
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             customHalted = false;
-            dotDraws.setAlpha();
             //Returns and sets our breakMillis value to the first position in our Array.
-            if (numberOfBreaks>0) breakMillis = newMillis(false);
+            if (numberOfBreaks > 0) breakMillis = newMillis(false);
             objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
             objectAnimator.setInterpolator(new LinearInterpolator());
             objectAnimator.setDuration(breakMillis);
@@ -646,7 +656,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             permBreakMillis = breakMillis;
           } else {
             breakMillis = breakMillisUntilFinished;
-            if (objectAnimator!=null) objectAnimator.resume();
+            if (objectAnimator != null) objectAnimator.resume();
           }
         }
         break;
@@ -654,20 +664,19 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         if (!breakOnlyBegun) {
           //Ensures any features meant for running timer cannot be executed here.
           breaksOnlyHalted = false;
-          dotDraws.setAlpha();
-          //Returns and sets our breakOnlyMillis value to the first position in our Array.
-          if (breaksOnlyTime.size()>0) breakOnlyMillis = newMillis(true);
+          //Returns and sets our breaksOnlyMillis value to the first position in our Array.
+          if (breaksOnlyTime.size() > 0) breaksOnlyMillis = newMillis(true);
           objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) breaksOnlyProgressPause, 0);
           objectAnimator.setInterpolator(new LinearInterpolator());
-          objectAnimator.setDuration(breakOnlyMillis);
+          objectAnimator.setDuration(breaksOnlyMillis);
           objectAnimator.start();
           breakOnlyBegun = true;
           modeTwoTimerEnded = false;
-          //Unchanging start point of breakOnlyMillis used to count total set time over multiple rounds.
-          permBreakMillis = breakOnlyMillis;
+          //Unchanging start point of breaksOnlyMillis used to count total set time over multiple rounds.
+          permBreakMillis = breaksOnlyMillis;
         } else {
-          breakOnlyMillis = breakOnlyMillisUntilFinished;
-          if (objectAnimator!=null) objectAnimator.resume();
+          breaksOnlyMillis = breaksOnlyMillisUntilFinished;
+          if (objectAnimator != null) objectAnimator.resume();
         }
         break;
       case 3:
@@ -684,7 +693,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           modeThreeTimerEnded = false;
         } else {
           pomMillis = pomMillisUntilFinished;
-          if (objectAnimator!=null) objectAnimator.resume();
+          if (objectAnimator != null) objectAnimator.resume();
         }
         break;
     }
@@ -702,26 +711,26 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
         if (fadeCustomTimer) {
-          if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.03);
-          else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.06);
-          else if (customAlpha<1) timeLeft.setAlpha(customAlpha+=.09);
-          else if (customAlpha>=1) fadeCustomTimer = false;
+          if (customAlpha < 0.25) timeLeft.setAlpha(customAlpha += 0.03);
+          else if (customAlpha < 0.5) timeLeft.setAlpha(customAlpha += .06);
+          else if (customAlpha < 1) timeLeft.setAlpha(customAlpha += .09);
+          else if (customAlpha >= 1) fadeCustomTimer = false;
         }
         //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
-        if (textSizeReduced.get()) if (setMillis<59000) {
+        if (textSizeReduced.get()) if (setMillis < 59000) {
           changeTextSize(valueAnimatorUp, timeLeft, timePaused);
           textSizeReduced.set(false);
         }
         //Displays Long->String conversion of time left every tick.
-        timeLeft.setText(convertSeconds((setMillis + 999)/1000));
-        timePaused.setText(convertSeconds((setMillis + 999)/1000));
-        if (setMillis<500) timerDisabled = true;
+        timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
+        timePaused.setText(convertSeconds((setMillis + 999) / 1000));
+        if (setMillis < 500) timerDisabled = true;
 
         //Sets value to difference between starting millis and current millis (e.g. 45000 left from 50000 start is 5000/5 sec elapsed).
         setMillisHolder = permSetMillis - setMillis;
         //Temporary value for current round, using totalSetMillis which is our permanent value.
         tempSetMillis = totalSetMillis + setMillisHolder;
-        total_set_time.setText(convertSeconds(tempSetMillis/1000));
+        total_set_time.setText(convertSeconds(tempSetMillis / 1000));
         drawDots(1);
       }
 
@@ -744,7 +753,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Adds current round elapsed millis to saved total.
         totalSetMillis = totalSetMillis + setMillisHolder;
         //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
-        tempSetMillis = (totalSetMillis+100) / 1000;
+        tempSetMillis = (totalSetMillis + 100) / 1000;
         total_set_time.setText(convertSeconds(tempSetMillis));
 
         mHandler.postDelayed(() -> {
@@ -752,7 +761,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           timerDisabled = false;
           //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
           numberOfSets--;
-          if (numberOfSets>0) setMillis = customSetTime.get((int) (customSetTime.size()-numberOfSets));
+          if (numberOfSets > 0)
+            setMillis = customSetTime.get((int) (customSetTime.size() - numberOfSets));
           endAnimation.cancel();
           dotDraws.setAlpha();
           if (!breaksAreCountingUp) {
@@ -762,13 +772,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             progressBar.setProgress(10000);
             mHandler.post(secondsUpBreakRunnable);
           }
-        },750);
+        }, 750);
       }
     }.start();
   }
 
   public void startBreakTimer() {
-    if (mode==1) {
+    if (mode == 1) {
       AtomicBoolean textSizeReduced = new AtomicBoolean(false);
       if (breakMillis >= 59000) textSizeReduced.set(true);
 
@@ -779,25 +789,25 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           breakMillis = millisUntilFinished;
 
           if (fadeCustomTimer) {
-            if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.03);
-            else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.06);
-            else timeLeft.setAlpha(customAlpha+=.09);
+            if (customAlpha < 0.25) timeLeft.setAlpha(customAlpha += 0.03);
+            else if (customAlpha < 0.5) timeLeft.setAlpha(customAlpha += .06);
+            else timeLeft.setAlpha(customAlpha += .09);
           }
-          if (customAlpha >=1) fadeCustomTimer = false;
+          if (customAlpha >= 1) fadeCustomTimer = false;
 
-          if (textSizeReduced.get()) if (breakMillis<59000) {
+          if (textSizeReduced.get()) if (breakMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
             textSizeReduced.set(false);
           }
 
-          timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
-          timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
+          timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
+          timePaused.setText(convertSeconds((millisUntilFinished + 999) / 1000));
           drawDots(2);
-          if (breakMillis<500) timerDisabled = true;
+          if (breakMillis < 500) timerDisabled = true;
 
           breakMillisHolder = permBreakMillis - breakMillis;
           tempBreakMillis = totalBreakMillis + breakMillisHolder;
-          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
+          total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
         }
 
         @Override
@@ -813,7 +823,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           //Sets end animation.
           animateEnding(true);
 
-          if (numberOfBreaks >0) {
+          if (numberOfBreaks > 0) {
             customProgressPause = maxProgress;
             //Smooths out end fade.
             fadeVar = 2;
@@ -822,19 +832,20 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             //Adds current round elapsed millis to saved total.
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
             //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
-            tempBreakMillis = (totalBreakMillis+100) / 1000;
-            total_break_time.setText(convertSeconds(tempBreakMillis+100));
+            tempBreakMillis = (totalBreakMillis + 100) / 1000;
+            total_break_time.setText(convertSeconds(tempBreakMillis + 100));
 
             mHandler.postDelayed(() -> {
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
               //Must execute here for conditional below to work.
               numberOfBreaks--;
-              if (numberOfBreaks>0) breakMillis = customBreakTime.get((int) (customBreakTime.size()-numberOfBreaks));
+              if (numberOfBreaks > 0)
+                breakMillis = customBreakTime.get((int) (customBreakTime.size() - numberOfBreaks));
               //Re-enabling timer clicks. Used regardless of numberOfBreaks.
               timerDisabled = false;
 
               //If numberOfBreaks has not been reduced to 0 within this runnable, begin our next set. Otherwise, do end cycle stuff.
-              if (numberOfBreaks!=0) {
+              if (numberOfBreaks != 0) {
                 if (!setsAreCountingUp) {
                   startObjectAnimator();
                   startSetTimer();
@@ -850,40 +861,40 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 drawDots(0);
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
               }
-            },750);
+            }, 750);
           }
         }
       }.start();
-    } else if (mode==2) {
+    } else if (mode == 2) {
       AtomicBoolean textSizeReduced = new AtomicBoolean(false);
-      if (breakOnlyMillis >= 59000) textSizeReduced.set(true);
+      if (breaksOnlyMillis >= 59000) textSizeReduced.set(true);
 
-      timer2 = new CountDownTimer(breakOnlyMillis, 50) {
+      timer2 = new CountDownTimer(breaksOnlyMillis, 50) {
         @Override
         public void onTick(long millisUntilFinished) {
           breaksOnlyProgressPause = (int) objectAnimator.getAnimatedValue();
-          breakOnlyMillis = millisUntilFinished;
+          breaksOnlyMillis = millisUntilFinished;
 
           if (fadeCustomTimer) {
-            if (customAlpha<0.25) timeLeft.setAlpha(customAlpha+=0.03);
-            else if (customAlpha<0.5) timeLeft.setAlpha(customAlpha+=.06);
-            else timeLeft.setAlpha(customAlpha+=.09);
+            if (customAlpha < 0.25) timeLeft.setAlpha(customAlpha += 0.03);
+            else if (customAlpha < 0.5) timeLeft.setAlpha(customAlpha += .06);
+            else timeLeft.setAlpha(customAlpha += .09);
           }
-          if (customAlpha >=1) fadeCustomTimer = false;
+          if (customAlpha >= 1) fadeCustomTimer = false;
 
-          if (textSizeReduced.get()) if (breakOnlyMillis<59000) {
+          if (textSizeReduced.get()) if (breaksOnlyMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
             textSizeReduced.set(false);
           }
-          timeLeft.setText(convertSeconds((millisUntilFinished +999) / 1000));
-          timePaused.setText(convertSeconds((millisUntilFinished +999) / 1000));
+          timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
+          timePaused.setText(convertSeconds((millisUntilFinished + 999) / 1000));
           drawDots(3);
-          if (breakOnlyMillis<500) boTimerDisabled = true;
+          if (breaksOnlyMillis < 500) boTimerDisabled = true;
 
-          //Using breakOnlyMillis (unique), but mode 1's break holder since we run these modes separately.
-          breakMillisHolder = permBreakMillis - breakOnlyMillis;
-          tempBreakMillis = breakOnlyMillis + breakMillisHolder;
-          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
+          //Using breaksOnlyMillis (unique), but mode 1's break holder since we run these modes separately.
+          breakMillisHolder = permBreakMillis - breaksOnlyMillis;
+          tempBreakMillis = breaksOnlyMillis + breakMillisHolder;
+          total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
         }
 
         @Override
@@ -894,43 +905,45 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           timeLeft.setText("0");
           animateEnding(true);
 
-          if (numberOfBreaksOnly>0) {
+          if (numberOfBreaksOnly > 0) {
             breaksOnlyProgressPause = maxProgress;
             //Smooths out end fade.
-            if (mode==2){
+            if (mode == 2) {
               fadeVar = 3;
               mHandler.post(endFade);
             }
             //Activates RESETTING_TIMER in pauseAndResume. Var gets set to 2 on next click in pauseAndResume, and then resets to 0.
-            movingBOCycle=1;
+            movingBOCycle = 1;
 
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
-            tempBreakMillis = (totalBreakMillis+100) / 1000;
+            tempBreakMillis = (totalBreakMillis + 100) / 1000;
             total_break_time.setText(convertSeconds(totalBreakMillis));
 
             mHandler.postDelayed(() -> {
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
               //Must execute here for conditional below to work.
               numberOfBreaksOnly--;
-              if (numberOfBreaksOnly>0) breakOnlyMillis = breaksOnlyTime.get((int) (breaksOnlyTime.size()-numberOfBreaksOnly));
+              if (numberOfBreaksOnly > 0)
+                breaksOnlyMillis = breaksOnlyTime.get((int) (breaksOnlyTime.size() - numberOfBreaksOnly));
               boTimerDisabled = false;
               //If numberOfBreaksOnly has been reduced to 0 in this runnable, do end cycle stuff. Since we are pausing between breaks in this mode anyway, we are doing less than the set/break combos.
-              if (numberOfBreaksOnly==0){
+              if (numberOfBreaksOnly == 0) {
                 //Used to call resetTimer() in pause/resume method. Separate than our disable method.
                 modeTwoTimerEnded = true;
                 breaksOnlyCyclesDone++;
                 cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(breaksOnlyCyclesDone)));
                 drawDots(0);
               }
-            },750);
-          };
+            }, 750);
+          }
+          ;
 
           overtime.setVisibility(View.VISIBLE);
           isOvertimeRunning = true;
           ot = new Runnable() {
             @Override
             public void run() {
-              overSeconds +=1;
+              overSeconds += 1;
               overtime.setText(getString(R.string.overtime, String.valueOf(overSeconds)));
               mHandler.postDelayed(this, 1000);
             }
@@ -952,15 +965,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         pomMillis = millisUntilFinished;
 
         if (fadeCustomTimer) {
-          if (pomAlpha<0.25) timeLeft.setAlpha(pomAlpha+=0.04);
-          else if (pomAlpha<0.5) timeLeft.setAlpha(pomAlpha+=.08);
-          else if (pomAlpha<1) timeLeft.setAlpha(pomAlpha+=.12);
-          else if (pomAlpha>=1) fadeCustomTimer = false;
+          if (pomAlpha < 0.25) timeLeft.setAlpha(pomAlpha += 0.04);
+          else if (pomAlpha < 0.5) timeLeft.setAlpha(pomAlpha += .08);
+          else if (pomAlpha < 1) timeLeft.setAlpha(pomAlpha += .12);
+          else if (pomAlpha >= 1) fadeCustomTimer = false;
         }
-        if (pomAlpha >=1) fadeCustomTimer = false;
+        if (pomAlpha >= 1) fadeCustomTimer = false;
 
-        if (mode==3) {
-          timeLeft.setText(convertSeconds((pomMillis+999)/1000));
+        if (mode == 3) {
+          timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
           drawDots(4);
         }
       }
@@ -974,10 +987,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         pomProgressPause = maxProgress;
 
         switch (pomDotCounter) {
-          case 1: case 3: case 5: case 7:
+          case 1:
+          case 3:
+          case 5:
+          case 7:
             pomMillis = pomMillis1;
             break;
-          case 2: case 4: case 6:
+          case 2:
+          case 4:
+          case 6:
             pomMillis = pomMillis2;
             break;
           case 8:
@@ -986,29 +1004,29 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
         animateEnding(true);
 
-        if (pomDotCounter<9) {
+        if (pomDotCounter < 9) {
           //Ensures any features meant for a running timer cannot be executed here.
           customHalted = true;
           //Disabling pause/resume clicks until animation finishes.
           pomTimerDisabled = true;
-          if (mode==3) {
+          if (mode == 3) {
             //Smooths out end fade.
             fadeVar = 4;
             mHandler.post(endFade);
           }
-          mHandler.postDelayed(() ->{
+          mHandler.postDelayed(() -> {
             //Counter must increase here for conditional below to work.
             pomDotCounter++;
             //Re-enabling timer clicks. Used regardless of number of rounds left.
             pomTimerDisabled = false;
 
-            if (pomDotCounter!=9) {
+            if (pomDotCounter != 9) {
               startObjectAnimator();
               startPomTimer();
               endAnimation.cancel();
             } else {
               modeThreeTimerEnded = true;
-              pomCyclesDone +=1;
+              pomCyclesDone += 1;
               drawDots(0);
               cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
             }
@@ -1049,23 +1067,27 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public long newMillis(boolean onSets) {
     switch (mode) {
       case 1:
-        if (onSets) return customSetTime.get((int) (customSetTime.size()-numberOfSets));
-        else return customBreakTime.get((int) (customBreakTime.size()-numberOfBreaks));
+        if (onSets) return customSetTime.get((int) (customSetTime.size() - numberOfSets));
+        else return customBreakTime.get((int) (customBreakTime.size() - numberOfBreaks));
       case 2:
-        return breaksOnlyTime.get((int) (breaksOnlyTime.size()-numberOfBreaksOnly));
+        return breaksOnlyTime.get((int) (breaksOnlyTime.size() - numberOfBreaksOnly));
       case 3:
-        return pomValuesTime.get(pomDotCounter-1) * 1000 * 60;
-      default: return 0;
+        return pomValuesTime.get(pomDotCounter - 1) * 1000 * 60;
+      default:
+        return 0;
     }
   }
 
+  //Todo: Try throwing in a dotDraws method to halt the canvas fade instead.
   //Ends the current round and moves onto the next one.
   public void nextRound() {
     animateEnding(true);
-    if (mode==1) {
+    if (mode == 1) {
       //Since breaks will always be the last round in modes 1 and 2, return without executing anything if there are none left.
-      if (numberOfBreaks==0) return;
+      if (numberOfBreaks == 0) return;
       if (!onBreak) {
+        fadeVar = 1;
+        mHandler.post(endFade);
         //onFinish tasks for counting up sets.
         if (!setsAreCountingUp) {
           setBegun = false;
@@ -1077,18 +1099,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           progressBar.setProgress(10000);
           //onFinish for counting down sets.
         } else {
-          timeLeft.setText(convertSeconds((countUpMillisSets) /1000));
-          timePaused.setText(convertSeconds((countUpMillisSets) /1000));
+          timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
+          timePaused.setText(convertSeconds((countUpMillisSets) / 1000));
           mHandler.removeCallbacks(secondsUpSetRunnable);
           //For pause/resume.
           customHalted = false;
         }
-        //Ensuring fadeVar is set correctly.
-        fadeVar = 1;
         //Sets our total millis to the temp value iterated up in our runnable.
         totalSetMillis = tempSetMillis;
         //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
-        tempSetMillis = (totalSetMillis+100) / 1000;
+        tempSetMillis = (totalSetMillis + 100) / 1000;
         total_set_time.setText(convertSeconds(tempSetMillis));
 
         mHandler.postDelayed(() -> {
@@ -1104,11 +1124,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             progressBar.setProgress(10000);
             timePaused.setAlpha(1.0f);
             if (!breaksAreCountingUp) {
-              timeLeft.setText(convertSeconds((breakMillis)/1000));
-              timePaused.setText(convertSeconds((breakMillis/1000)));
+              timeLeft.setText(convertSeconds((breakMillis) / 1000));
+              timePaused.setText(convertSeconds((breakMillis / 1000)));
             } else {
-              timeLeft.setText(convertSeconds((0)));
-              timePaused.setText(convertSeconds((0)));
+              timeLeft.setText("0");
+              timePaused.setText("0");
             }
           } else {
             if (!breaksAreCountingUp) {
@@ -1118,9 +1138,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               mHandler.post(secondsUpBreakRunnable);
             }
           }
+          fadeVar = 2;
         }, 1000);
       } else {
+        fadeVar = 2;
         if (!breaksAreCountingUp) {
+          mHandler.post(endFade);
           breakBegun = false;
           //Cancelling timer and animator.
           if (timer != null) timer.cancel();
@@ -1129,37 +1152,36 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           customProgressPause = maxProgress;
           progressBar.setProgress(10000);
         } else {
-          timeLeft.setText(convertSeconds((countUpMillisBreaks) /1000));
-          timePaused.setText(convertSeconds((countUpMillisBreaks) /1000));
+          timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
+          timePaused.setText(convertSeconds((countUpMillisBreaks) / 1000));
           mHandler.removeCallbacks(secondsUpBreakRunnable);
           //For pause/resume and tab switches.
           customHalted = false;
         }
-        fadeVar = 2;
         //Sets our total millis to the temp value iterated up in our runnable.
         totalBreakMillis = tempBreakMillis;
         //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
-        tempBreakMillis = (totalBreakMillis+100) / 1000;
+        tempBreakMillis = (totalBreakMillis + 100) / 1000;
         total_break_time.setText(convertSeconds(tempBreakMillis));
         removeSetOrBreak(false);
 
         mHandler.postDelayed(() -> {
-          endAnimation.cancel();
           onBreak = false;
 
-          if (numberOfBreaks>0) {
+          if (numberOfBreaks > 0) {
             countUpMillisBreaks = 0;
+            endAnimation.cancel();
 
             //If timer is paused and we skip to the next round, begin that round paused. We do this by simply setting the timer textViews to the next type of round (i.e. sets), and resetting the progressBar.
             if (customHalted) {
               progressBar.setProgress(10000);
               timePaused.setAlpha(1.0f);
               if (!setsAreCountingUp) {
-                timeLeft.setText(convertSeconds((setMillis)/1000));
-                timePaused.setText(convertSeconds((setMillis/1000)));
+                timeLeft.setText(convertSeconds((setMillis) / 1000));
+                timePaused.setText(convertSeconds((setMillis / 1000)));
               } else {
-                timeLeft.setText(convertSeconds((0)));
-                timePaused.setText(convertSeconds((0)));
+                timeLeft.setText("0");
+                timePaused.setText("0");
               }
             } else {
               if (!setsAreCountingUp) {
@@ -1174,26 +1196,33 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             customCyclesDone++;
             cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
           }
+          fadeVar = 1;
         }, 1000);
       }
-    } else if (mode==2) {
+    } else if (mode == 2) {
       //Since breaks will always be the last round in modes 1 and 2, return without executing anything if there are none left.
-      if (numberOfBreaksOnly==0) return;
+      if (numberOfBreaksOnly == 0) return;
 
-      if (numberOfBreaksOnly==1) {
-        timeLeft.setText(convertSeconds((countUpMillisBO) /1000));
-        timePaused.setText(convertSeconds((countUpMillisBO) /1000));
-      }
       mHandler.removeCallbacks(secondsUpBORunnable);
-      breaksOnlyHalted = false;
+//      breaksOnlyHalted = false;
+      removeSetOrBreak(false);
 
       mHandler.postDelayed(() -> {
-        removeSetOrBreak(false);
-        if (numberOfBreaksOnly>0) {
-          countUpMillisBO = 0;
-          progressBar.setProgress(10000);
-          mHandler.post(secondsUpBORunnable);
+        //We always want the next round in breaksOnly to start paused, so we do not execute any timers or animators here.
+        if (numberOfBreaksOnly > 0) {
           endAnimation.cancel();
+          countUpMillisBO = 0;
+          if (breaksOnlyHalted) {
+            progressBar.setProgress(10000);
+            timePaused.setAlpha(1.0f);
+            if (!breaksOnlyAreCountingUp) {
+              timeLeft.setText(convertSeconds((breaksOnlyMillis) / 1000));
+              timePaused.setText(convertSeconds((breaksOnlyMillis / 1000)));
+            } else {
+              timeLeft.setText("0");
+              timePaused.setText("0");
+            }
+          }
         } else {
           modeTwoTimerEnded = true;
           breaksOnlyCyclesDone++;
@@ -1203,23 +1232,24 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       fadeVar = 3;
       //We use all the same vars as in mode 1, since we do not need a unique millis value to count down from because we are in infinity mode.
       totalBreakMillis = tempBreakMillis;
-      tempBreakMillis = (totalBreakMillis+100) / 1000;
+      tempBreakMillis = (totalBreakMillis + 100) / 1000;
       total_break_time.setText(convertSeconds(tempBreakMillis));
     }
-    mHandler.post(endFade);
-    dotDraws.setAlpha();
   }
 
   public void drawDots(int fadeVar) {
     switch (mode) {
       case 1:
-        if (!setsAreCountingUp) dotDraws.setTime(customSetTime); else dotDraws.setTime(zeroArray);
-        if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime); else dotDraws.breakTime(zeroArray);
+        if (!setsAreCountingUp) dotDraws.setTime(customSetTime);
+        else dotDraws.setTime(zeroArray);
+        if (!breaksAreCountingUp) dotDraws.breakTime(customBreakTime);
+        else dotDraws.breakTime(zeroArray);
         dotDraws.customDrawSet(startSets, numberOfSets, fadeVar);
         dotDraws.customDrawBreak(startSets, numberOfBreaks);
         break;
       case 2:
-        if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime); else dotDraws.breakOnlyTime(zeroArray);
+        if (!breaksOnlyAreCountingUp) dotDraws.breakOnlyTime(breaksOnlyTime);
+        else dotDraws.breakOnlyTime(zeroArray);
         dotDraws.breaksOnlyDraw(startBreaksOnly, numberOfBreaksOnly, fadeVar);
         break;
       case 3:
@@ -1240,7 +1270,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
         break;
       case 2:
-        breakOnlyMillis = newMillis(false);
+        breaksOnlyMillis = newMillis(false);
         numberOfBreaksOnly--;
         break;
     }
@@ -1268,10 +1298,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     long roundedSeconds;
     DecimalFormat df = new DecimalFormat("0");
     DecimalFormat df2 = new DecimalFormat("00");
-    if (seconds>=60) {
-      minutes = seconds/60;
+    if (seconds >= 60) {
+      minutes = seconds / 60;
       roundedSeconds = seconds % 60;
-      if (minutes>=10 && timeLeft4.getTextSize() != 70f) timeLeft4.setTextSize(70f);
+      if (minutes >= 10 && timeLeft4.getTextSize() != 70f) timeLeft4.setTextSize(70f);
       return (df.format(minutes) + ":" + df2.format(roundedSeconds));
     } else {
       if (timeLeft4.getTextSize() != 90f) timeLeft4.setTextSize(90f);
@@ -1280,8 +1310,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void newLap() {
-    double newSeconds = msReset/60;
-    double newMinutes = newSeconds/60;
+    double newSeconds = msReset / 60;
+    double newMinutes = newSeconds / 60;
 
     double savedMinutes = 0;
     double savedSeconds = 0;
@@ -1289,28 +1319,29 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     String[] holder = null;
     if (!stopwatchHalted) {
-      if (savedLapList.size()>0) {
-        holder = (savedLapList.get(savedLapList.size()-1).split(":", 3));
+      if (savedLapList.size() > 0) {
+        holder = (savedLapList.get(savedLapList.size() - 1).split(":", 3));
         savedMinutes = newMinutes + Integer.parseInt(holder[0]);
         savedSeconds = newSeconds + Integer.parseInt(holder[1]);
         savedMs = newMsConvert + Integer.parseInt(holder[2]);
 
-        if (savedMs>99) {
-          savedMs = savedMs-100;
-          savedSeconds +=1;
+        if (savedMs > 99) {
+          savedMs = savedMs - 100;
+          savedSeconds += 1;
         }
-        if (savedSeconds>99){
-          savedSeconds = savedSeconds-100;
-          savedMinutes +=1;
+        if (savedSeconds > 99) {
+          savedSeconds = savedSeconds - 100;
+          savedMinutes += 1;
         }
         savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
-      } else savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+      } else
+        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
 
       newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
 
       currentLapList.add(newEntries);
       savedLapList.add(savedEntries);
-      lapLayout.scrollToPosition(savedLapList.size()-1);
+      lapLayout.scrollToPosition(savedLapList.size() - 1);
       lapAdapter.notifyDataSetChanged();
 
       lapsNumber++;
@@ -1323,7 +1354,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   public void pauseAndResumeTimer(int pausing) {
     //disabledTimer booleans are to prevent ANY action being taken.
-    if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode==4) {
+    if ((!timerDisabled && mode == 1) || (!boTimerDisabled && mode == 2) || (!pomTimerDisabled && mode == 3) || mode == 4) {
       if (fadeInObj != null) fadeInObj.cancel();
       if (fadeOutObj != null) fadeOutObj.cancel();
       switch (mode) {
@@ -1393,8 +1424,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               if (timer2 != null) timer2.cancel();
               if (objectAnimator != null) objectAnimator.pause();
               if (!breaksOnlyAreCountingUp) {
-                breakOnlyMillisUntilFinished = breakOnlyMillis;
-                timePaused.setText(convertSeconds((breakOnlyMillis + 999) / 1000));
+                breaksOnlyMillisUntilFinished = breaksOnlyMillis;
+                timePaused.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
               } else mHandler.removeCallbacks(secondsUpBORunnable);
               reset.setVisibility(View.VISIBLE);
             } else if (pausing == RESUMING_TIMER) {
@@ -1415,8 +1446,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               overtime.setVisibility(View.INVISIBLE);
               progressBar.setProgress(10000);
               timePaused.setAlpha(1.0f);
-              timeLeft.setText(convertSeconds((breakOnlyMillis + 999) / 1000));
-              timePaused.setText(convertSeconds((breakOnlyMillis + 999) / 1000));
+              timeLeft.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
+              timePaused.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
             } else if (pausing == RESTARTING_TIMER) {
               startObjectAnimator();
               startBreakTimer();
@@ -1429,7 +1460,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           }
           break;
         case 3:
-          if (reset.getText().equals(getString(R.string.confirm_cycle_reset))) reset.setText(R.string.reset);
+          if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
+            reset.setText(R.string.reset);
           if (!modeThreeTimerEnded) {
             if (pausing == PAUSING_TIMER) {
               timePaused.setAlpha(1);
@@ -1510,16 +1542,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void populateTimerUI() {
     switch (mode) {
       case 1:
-        if (customSetTime.size()>0) {
+        if (customSetTime.size() > 0) {
           setMillis = customSetTime.get(0);
           breakMillis = customBreakTime.get(0);
         }
         if (!setsAreCountingUp) {
-          if (customSetTime.size()>0) {
-            timePaused.setText(convertSeconds((setMillis+999)/1000));
-            timeLeft.setText(convertSeconds((setMillis+999)/1000));
+          if (customSetTime.size() > 0) {
+            timePaused.setText(convertSeconds((setMillis + 999) / 1000));
+            timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
           }
-          if (setMillis>=60000) {
+          if (setMillis >= 60000) {
             timePaused.setTextSize(70f);
             timeLeft.setTextSize(70f);
           } else {
@@ -1540,13 +1572,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         startBreaksOnly = breaksOnlyTime.size();
         break;
       case 2:
-        if (breaksOnlyTime.size()>0) breakOnlyMillis = breaksOnlyTime.get(0);
+        if (breaksOnlyTime.size() > 0) breaksOnlyMillis = breaksOnlyTime.get(0);
         if (!breaksOnlyAreCountingUp) {
-          if (breaksOnlyTime.size()>0) {
-            timePaused.setText(convertSeconds((breakOnlyMillis+999)/1000));
-            timeLeft.setText(convertSeconds((breakOnlyMillis+999)/1000));
+          if (breaksOnlyTime.size() > 0) {
+            timePaused.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
+            timeLeft.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
           }
-          if (breakOnlyMillis>=60000) {
+          if (breaksOnlyMillis >= 60000) {
             timePaused.setTextSize(70f);
             timeLeft.setTextSize(70f);
           }
@@ -1559,10 +1591,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
       case 3:
         //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
-        if (pomValuesTime.size()>0) {
-          pomMillis1 = pomValuesTime.get(0)*1000*60;
+        if (pomValuesTime.size() > 0) {
+          pomMillis1 = pomValuesTime.get(0) * 1000 * 60;
           pomMillis = pomMillis1;
-          timePaused.setText(convertSeconds((pomMillis+999)/1000));
+          timePaused.setText(convertSeconds((pomMillis + 999) / 1000));
           pomTimerDisabled = false;
         }
         break;
@@ -1628,8 +1660,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         timeLeft4.setText("0");
         msTime.setText("00");
         cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
-        if (currentLapList.size()>0) currentLapList.clear();
-        if (savedLapList.size()>0) savedLapList.clear();
+        if (currentLapList.size() > 0) currentLapList.clear();
+        if (savedLapList.size() > 0) savedLapList.clear();
         lapAdapter.notifyDataSetChanged();
         break;
     }
@@ -1639,16 +1671,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
-    AsyncTask.execute(()-> {
+    AsyncTask.execute(() -> {
       switch (mode) {
         case 1:
-          cycles.setTotalSetTime((int) tempSetMillis/1000);
-          cycles.setTotalBreakTime((int) tempBreakMillis/1000);
+          cycles.setTotalSetTime((int) tempSetMillis / 1000);
+          cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
           cycles.setCyclesCompleted(customCyclesDone);
           cyclesDatabase.cyclesDao().updateCycles(cycles);
           break;
         case 2:
-          cyclesBO.setTotalBOTime((int) tempBreakMillis/1000);
+          cyclesBO.setTotalBOTime((int) tempBreakMillis / 1000);
           cyclesBO.setCyclesCompleted(breaksOnlyCyclesDone);
           cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
           break;
@@ -1661,26 +1693,58 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     //Since we re-create our Main activity and do not used saved preferences for these arrays, we re-send the values back to thr activity so they have them.
     Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
-    if (mode==1) {
+    if (mode == 1) {
       exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
       exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-    } else if (mode==2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+    } else if (mode == 2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
     exitIntent.putExtra("mode", mode);
     startActivity(exitIntent);
   }
 
-  //Deletes the currently displayed cycle.
-  public void deleteCycle() {
-    switch (mode) {
-      case 1:
-        cyclesDatabase.cyclesDao().deleteCycle(cycles);
-        break;
-      case 2:
-        cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO);
-        break;
-      case 3:
-        cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
-        break;
+  public void deleteTotalTimes() {
+    delete_text.setText(R.string.delete_total_times);
+    deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
+
+  }
+
+  public void deleteCycle(int typeOfDeletion) {
+    //Deletes the currently displayed cycle.
+    if (typeOfDeletion == DELETING_CYCLE) {
+      switch (mode) {
+        case 1:
+          cyclesDatabase.cyclesDao().deleteCycle(cycles); break;
+        case 2:
+          cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO); break;
+        case 3:
+          cyclesDatabase.cyclesDao().deletePomCycle(pomCycles); break;
+      }
+      //Kicks us back to Main, since our current cycle has been deleted.
+      runOnUiThread(() -> {
+        Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
+        if (mode == 1) {
+          exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
+          exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
+        } else if (mode == 2)
+          exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+        exitIntent.putExtra("mode", mode);
+        startActivity(exitIntent);
+      });
+      //Deletes total set/break/pom times and cycles completed.
+    } else if (typeOfDeletion == DELETING_TIMES) {
+      switch (mode) {
+        case 1:
+          cyclesDatabase.cyclesDao().deleteTotalTimesCycle(); break;
+        case 2:
+          cyclesDatabase.cyclesDao().deleteTotalTimesCycleBO(); break;
+        case 3:
+          cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
+      }
+      runOnUiThread(() -> {
+        deleteCyclePopupWindow.dismiss();
+        total_set_time.setText("0");
+        total_break_time.setText("0");
+        cycles_completed.setText("0");
+      });
     }
   }
 }

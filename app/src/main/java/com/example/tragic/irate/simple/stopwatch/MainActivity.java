@@ -198,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: next_round needs to be implemented in mode 2. Should resemble "paused" transition in mode 1.
-  //Todo: Total break time is inaccurate @ end of cycle.
+  //Todo: reset + confirm for total times.
+  //Todo: reset + confirm for cycles completed (separate?).
   //Todo: Total times + round skip for Pom as well.
   //Todo: Total rounds as well?
   //Todo: Issue w/ breaks fading prematurely when clicking next_round. Likely fadeVar issue.

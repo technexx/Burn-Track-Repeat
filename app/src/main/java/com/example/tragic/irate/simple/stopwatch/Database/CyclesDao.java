@@ -76,6 +76,15 @@ CyclesDao {
     @Query("UPDATE cyclesbo set title=:newTitle WHERE id=:listID")
     void updateBOTitle(String newTitle, int listID);
 
+    @Query("DELETE from CYCLES where totalSetTime AND totalBreakTime AND cyclesCompleted")
+    void deleteTotalTimesCycle();
+
+    @Query("DELETE from CYCLESBO WHERE totalBOTime AND cyclesCompleted")
+    void deleteTotalTimesCycleBO();
+
+    @Query("DELETE from POMCYCLES WHERE cyclesCompleted")
+    void deleteTotalTimesPom();
+
     @Update
     void updateCycles(Cycles cycles);
 

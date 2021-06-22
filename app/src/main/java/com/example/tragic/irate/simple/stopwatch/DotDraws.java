@@ -18,8 +18,6 @@ import java.util.logging.Handler;
 public class DotDraws extends View {
   Canvas mCanvas;
   Paint mPaint;
-  Paint mPaint2;
-  Paint mPaint3;
   Paint mPaintBox;
   Paint mPaintText;
   float mX;
@@ -89,16 +87,6 @@ public class DotDraws extends View {
     mPaint.setAntiAlias(true);
     mPaint.setStyle(Paint.Style.FILL);
     mPaint.setStrokeWidth(4);
-
-    mPaint2 = new Paint();
-    mPaint2.setAntiAlias(true);
-    mPaint2.setStyle(Paint.Style.FILL);
-    mPaint2.setStrokeWidth(4);
-
-    mPaint3 = new Paint();
-    mPaint3.setAntiAlias(true);
-    mPaint3.setStyle(Paint.Style.FILL);
-    mPaint3.setStrokeWidth(4);
 
     mPaintText = new Paint();
     mPaintText.setAntiAlias(true);
