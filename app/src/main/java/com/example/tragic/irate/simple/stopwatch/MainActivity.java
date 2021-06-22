@@ -198,8 +198,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: reset + confirm for total times.
-  //Todo: reset + confirm for cycles completed (separate?).
   //Todo: Total times + round skip for Pom as well.
   //Todo: Total rounds as well?
   //Todo: Issue w/ breaks fading prematurely when clicking next_round. Likely fadeVar issue.

@@ -1078,7 +1078,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-  //Todo: Try throwing in a dotDraws method to halt the canvas fade instead.
   //Ends the current round and moves onto the next one.
   public void nextRound() {
     animateEnding(true);
@@ -1163,7 +1162,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
         tempBreakMillis = (totalBreakMillis + 100) / 1000;
         total_break_time.setText(convertSeconds(tempBreakMillis));
-        removeSetOrBreak(false);
 
         mHandler.postDelayed(() -> {
           onBreak = false;
@@ -1171,6 +1169,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (numberOfBreaks > 0) {
             countUpMillisBreaks = 0;
             endAnimation.cancel();
+            removeSetOrBreak(false);
 
             //If timer is paused and we skip to the next round, begin that round paused. We do this by simply setting the timer textViews to the next type of round (i.e. sets), and resetting the progressBar.
             if (customHalted) {
