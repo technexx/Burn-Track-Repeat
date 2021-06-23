@@ -30,11 +30,14 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
+  View tabView;
   View mainView;
 
   ImageButton fab;
@@ -100,7 +104,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton edit_highlighted_cycle;
   ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
-  TextView sort_textView;
+  TextView sort_text;
+  Spinner sort_spinner;
 
   int mode = 1;
   int sortMode = 1;
@@ -284,21 +289,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityArrayOne = toggleSets; infinityArrayTwo = toggleBreaks;
     if (infinityArrayOne.get(position)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
     if (infinityArrayTwo.get(position)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
-
-//    String tempSets = String.valueOf(toggleSets);
-//    String tempBreaks = String.valueOf(toggleBreaks);
-//
-//    tempSets = tempSets.replace("[", "");
-//    tempSets = tempSets.replace("]", "");
-//    tempSets = tempSets.replace(" ", "");
-//
-//    tempBreaks = tempBreaks.replace("[", "");
-//    tempBreaks = tempBreaks.replace("]", "");
-//    tempBreaks = tempBreaks.replace(" ", "");
-//
-//    prefEdit.putString("infinityOne", tempSets);
-//    prefEdit.putString("infinityTwo", tempBreaks);
-//    prefEdit.apply();
   }
 
   @Override
@@ -340,6 +330,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     mainView = findViewById(R.id.main_layout);
+    tabView = findViewById(R.id.tabLayout);
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
@@ -415,7 +406,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
-    sort_textView = findViewById(R.id.sort_textView);
+    sort_text = findViewById(R.id.sort_text);
+    sort_spinner = findViewById(R.id.sort_spinner);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -492,7 +484,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           infinityArrayOne = new ArrayList<>();
           infinityArrayTwo = new ArrayList<>();
 
-          //Todo: onBack/onExit contain one less infinity round than set/break Array, crashing w/ index exception.
           //FOR REFERENCE: Main (intent-> Timer) ---> Timer (intent->Main) && (callback to adapter for saved toggles).
           //Receives infinity arrays from Timer class, which are the same ones we passed into Timer when launching it from Main. This is done to prevent them being lost when our activity is recreated.
           Intent intent = getIntent();
@@ -515,13 +506,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (infinityArrayThree.isEmpty()) {
             for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
           }
-
-//          String infinityOne = sharedPreferences.getString("infinityOne", "");
-//          String infinityTwo = sharedPreferences.getString("infinityTwo", "");
-//          String[] setHolder = infinityOne.split(",", 0);
-//          String[] breakHolder = infinityTwo.split(",", 0);
-//          for (int i=0; i<setHolder.length; i++) infinityArrayOne.add(i);
-//          for (int i=0; i<breakHolder.length; i++) infinityArrayTwo.add(i);
 
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -563,6 +547,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecycler.setLayoutManager(lm);
 
+//    //Setting listener - current context depends on onItemSelected interface.
+//    sort_spinner.setOnItemSelectedListener(this);
+//    //ArrayList of our sort options.
+//    List<String> sortArray = new ArrayList<>();
+////    sortArray.add("Sort");
+//    sortArray.add("Accessed " + getString(R.string.string_up_arrow));
+//    sortArray.add("Accessed " + getString(R.string.string_down_arrow));
+//    sortArray.add("Added " + getString(R.string.string_up_arrow));
+//    sortArray.add("Added " + getString(R.string.string_down_arrow));
+//    if (mode==1 || mode ==2) {
+//      sortArray.add("Rounds " + getString(R.string.string_up_arrow));
+//      sortArray.add("Rounds " + getString(R.string.string_down_arrow));
+//    }
+//    //Adapter for our spinner, using our arrayList and a custom layout.
+//    ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(this, R.layout.sort_spinner, sortArray);
+//    //Style of dropdown list - using default. Replaces xml layout values.
+////    sortAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+//    sort_spinner.setAdapter(sortAdapter);
+//    sortAdapter.notifyDataSetChanged();
+
+    //Instantiates count up/count down methods.
+    countUpMode(true); countUpMode(false);
+
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
     removeEditViews(false);
     editCycleViews();
@@ -590,8 +597,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     second_value_edit_two.addTextChangedListener(textWatcher);
     third_value_edit.addTextChangedListener(textWatcher);
     third_value_edit_two.addTextChangedListener(textWatcher);
-
-    countUpMode(true); countUpMode(false);
 
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
@@ -649,9 +654,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       onNewCycle = true;
     });
 
-    sort_textView.setOnClickListener(v-> {
-
+    //Showing sort popup window.
+    sort_text.setOnClickListener(v-> {
+      sortPopupWindow.showAtLocation(mainView, Gravity.END, 0, -650);
     });
+
+    sortRecent.setOnClickListener(v-> {
+      queryCycles();
+    });
+
+    //Uses single view for all sort buttons. Queries the appropriate cycle sort via the DAO and sets checkmark.
+    View.OnClickListener sortListener = view -> {
+      AsyncTask.execute(()-> {
+        runOnUiThread(()-> {
+          //Casting View used by listener to textView, which we then check against its String value.
+          TextView textButton = (TextView) view;
+          if (textButton.getText().toString().equals("Most Recent")) {
+            sortCheckmark.setY(14); sortMode = 1;
+          }
+          if (textButton.getText().toString().equals("Least Recent")) {
+            sortCheckmark.setY(110); sortMode = 2;
+          }
+          if (textButton.getText().toString().equals("Highest Count")) {
+            sortCheckmark.setY(206); sortMode = 3;
+          }
+          if (textButton.getText().toString().equals("Lowest Count")) {
+            sortCheckmark.setY(302); sortMode = 4;
+          }
+        });
+        //Executing this last, as it uses the sortMode set above.
+        queryCycles();
+      });
+
+    };
+    sortRecent.setOnClickListener(sortListener);
+    sortNotRecent.setOnClickListener(sortListener);
+    sortHigh.setOnClickListener(sortListener);
+    sortLow.setOnClickListener(sortListener);
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
@@ -1577,60 +1616,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void queryCycles() {
-    switch (mode) {
+    switch (sortMode) {
       case 1:
-        switch (sortMode) {
+        switch (mode) {
           case 1:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
-            sortCheckmark.setY(14);
-            break;
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
           case 2:
-            cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent();
-            sortCheckmark.setY(110);
-            break;
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO(); break;
           case 3:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
-            sortCheckmark.setY(206);
-            break;
-          case 4:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
-            sortCheckmark.setY(302);
-            break;
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
         }
-        if (cyclesList.size()==0) currentCycleEmpty = true; else currentCycleEmpty = false;
         break;
       case 2:
-        switch (sortModeBO) {
+        switch (mode) {
           case 1:
-            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
-            sortCheckmark.setY(14);
-            break;
+            cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
           case 2:
-            cyclesBOList = cyclesDatabase.cyclesDao().loadCycleLeastRecentBO();
-            sortCheckmark.setY(110);
-            break;
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCycleLeastRecentBO(); break;
           case 3:
-            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO();
-            sortCheckmark.setY(206);
-            break;
-          case 4:
-            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO();
-            sortCheckmark.setY(302);
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
         }
-        if (cyclesBOList.size()==0) currentCycleEmpty = true; else currentCycleEmpty = false;
         break;
       case 3:
-        switch (sortModePom) {
+        switch (mode) {
           case 1:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-            sortCheckmark.setY(14);
-            break;
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
           case 2:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
-            sortCheckmark.setY(110);
-            break;
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO(); break;
         }
-        if (pomCyclesList.size()==0) currentCycleEmpty = true; else currentCycleEmpty = false;
+        break;
+      case 4:
+        switch (mode) {
+          case 1:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+          case 2:
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO(); break;
+        }
         break;
     }
   }

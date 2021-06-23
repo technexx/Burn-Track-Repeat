@@ -43,4 +43,6 @@
 
     <string name="total_sets">Total Set Time:</string>
     <string name="total_breaks">Total Break Time:</string>
+    <string name="string_up_arrow">"\u25B2"</string>
+    <string name="string_down_arrow">"\u25BC"</string>
 </resources>
