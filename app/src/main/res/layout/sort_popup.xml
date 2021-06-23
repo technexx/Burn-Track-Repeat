@@ -7,14 +7,26 @@
     android:id="@+id/sort_layout">
 
     <TextView
-        android:text="Most Recent"
-        android:id="@+id/sort_most_recent"
+        android:text="Last Accessed"
+        android:id="@+id/sort_last_accessed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Most Recent"
+        android:id="@+id/sort_most_recent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_last_accessed"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp"
         android:textSize="16sp">
     </TextView>
 
@@ -51,18 +63,6 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
-        android:textSize="16sp">
-    </TextView>
-
-    <TextView
-        android:text="Last Accessed"
-        android:id="@+id/last_accessed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_number_low"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
         android:textSize="16sp">
     </TextView>
 

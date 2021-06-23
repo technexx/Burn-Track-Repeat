@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow deleteCyclePopupWindow;
   PopupWindow editCyclesPopupWindow;
 
+  TextView sortAccessed;
   TextView sortRecent;
   TextView sortNotRecent;
   TextView sortHigh;
@@ -224,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Variable set count-up timer, for use w/ TDEE.
   //Todo: Variable set only mode? Again, for TDEE.
 
+  //Todo: Make sure sort checkmark positions work on different size screens.
   //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
   //Todo: Add taskbar notification for timers.
   //Todo: Add color scheme options.
@@ -388,6 +390,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     top_anchor = editCyclesPopupView.findViewById(R.id.top_anchor);
     start_timer = editCyclesPopupView.findViewById(R.id.start_timer);
 
+    sortAccessed = sortCyclePopupView.findViewById(R.id.sort_last_accessed);
     sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
     sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
@@ -659,7 +662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       queryCycles();
     });
 
-    //Todo: Add Accessed up/down sorts to this and queryCycles().
+    //Todo: Retain sort when moving from Main -> Timer.
     //Uses single view for all sort buttons. Queries the appropriate cycle sort via the DAO and sets checkmark.
     View.OnClickListener sortListener = view -> {
       AsyncTask.execute(()-> {
@@ -667,17 +670,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> {
           //Casting View used by listener to textView, which we then check against its String value.
           TextView textButton = (TextView) view;
-          if (textButton.getText().toString().equals("Most Recent")) {
+          if (textButton.getText().toString().equals("Last Accessed")) {
             sortCheckmark.setY(14); sortMode = 1;
           }
-          if (textButton.getText().toString().equals("Least Recent")) {
+          if (textButton.getText().toString().equals("Most Recent")) {
             sortCheckmark.setY(110); sortMode = 2;
           }
-          if (textButton.getText().toString().equals("Highest Count")) {
+          if (textButton.getText().toString().equals("Least Recent")) {
             sortCheckmark.setY(206); sortMode = 3;
           }
-          if (textButton.getText().toString().equals("Lowest Count")) {
+          if (textButton.getText().toString().equals("Highest Count")) {
             sortCheckmark.setY(302); sortMode = 4;
+          }
+          if (textButton.getText().toString().equals("Lowest Count")) {
+            sortCheckmark.setY(398); sortMode = 5;
           }
         });
         //Slight delay to ensure sortMode sets correctly. Without it, queryCycles() will fetch the old cycles list.
@@ -692,6 +698,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         },10);
       });
     };
+    sortAccessed.setOnClickListener(sortListener);
     sortRecent.setOnClickListener(sortListener);
     sortNotRecent.setOnClickListener(sortListener);
     sortHigh.setOnClickListener(sortListener);
@@ -1625,6 +1632,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         switch (mode) {
           case 1:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesLastAccessed(); break;
+          case 2:
+            cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesBOLastAccessed(); break;
+          case 3:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomLastAccessed(); break;
+        }
+        break;
+      case 2:
+        switch (mode) {
+          case 1:
             cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
           case 2:
             cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO(); break;
@@ -1632,7 +1649,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
         }
         break;
-      case 2:
+      case 3:
         switch (mode) {
           case 1:
             cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
@@ -1642,7 +1659,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
         }
         break;
-      case 3:
+      case 4:
         switch (mode) {
           case 1:
             cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
@@ -1650,7 +1667,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO(); break;
         }
         break;
-      case 4:
+      case 5:
         switch (mode) {
           case 1:
             cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
@@ -1748,8 +1765,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       saveCycles(true);
       //Updates the adapter display of saved cycles, since we are adding to it.
       runOnUiThread(() -> populateCycleList());
-      //If selecting an existing cycle, call its info and set timer value arrays.
-    } else retrieveCycle();
+      //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
+    } else {
+      retrieveCycle();
+      saveCycles(false);
+    }
 
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
     switch (mode) {
@@ -1790,6 +1810,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     startActivity(intent);
   }
 
+  //Todo: This was not being called in launchTimer() and thus not updating time accessed. Should be working now.+
   private void saveCycles(boolean newCycle) {
     //sets boolean used in launchCycles.
     isNewCycle = newCycle;
@@ -1814,6 +1835,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleID = cyclesList.get(receivedPos).getId();
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
         }
+        ///*----All of this occurs whether we are saving a new cycle, or launching a cycle currently in the database.----*///
         //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
         setString = gson.toJson(customSetTime);
         setString = friendlyString(setString);
