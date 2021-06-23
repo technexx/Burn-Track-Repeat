@@ -468,15 +468,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
         cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
         pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-        for (int i=0; i<cyclesList.size(); i++) {
-          setsArray.add(cyclesList.get(i).getSets());
-          breaksArray.add(cyclesList.get(i).getBreaks());
-          customTitleArray.add(cyclesList.get(i).getTitle());
-        }
-        for (int i=0; i<cyclesBOList.size(); i++) {
-          breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-          breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
-        }
 
         //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
         populateCycleList();
@@ -663,9 +654,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       queryCycles();
     });
 
+    //Todo: Add Accessed up/down sorts to this and queryCycles().
     //Uses single view for all sort buttons. Queries the appropriate cycle sort via the DAO and sets checkmark.
     View.OnClickListener sortListener = view -> {
       AsyncTask.execute(()-> {
+        //Must run this first to get sort mode.
         runOnUiThread(()-> {
           //Casting View used by listener to textView, which we then check against its String value.
           TextView textButton = (TextView) view;
@@ -682,8 +675,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             sortCheckmark.setY(302); sortMode = 4;
           }
         });
-        //Executing this last, as it uses the sortMode set above.
-        queryCycles();
+        //Slight delay to ensure sortMode sets correctly. Without it, queryCycles() will fetch the old cycles list.
+        mHandler.postDelayed(()-> {
+          queryCycles();
+          runOnUiThread(()-> {
+            //Populates adapter arrays.
+            populateCycleList();
+            //Refreshes adapter.
+            savedCycleAdapter.notifyDataSetChanged();
+          });
+        },10);
       });
 
     };
