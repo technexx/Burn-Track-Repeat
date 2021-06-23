@@ -3,7 +3,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/Gray">
+    android:background="@color/Gray"
+    android:id="@+id/sort_layout">
 
     <TextView
         android:text="Most Recent"
@@ -50,6 +51,18 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Last Accessed"
+        android:id="@+id/last_accessed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_number_low"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp"
         android:textSize="16sp">
     </TextView>
 

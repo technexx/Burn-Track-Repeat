@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
-    sortPopupWindow = new PopupWindow(sortCyclePopupView, 400, 375, true);
+    sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -460,6 +460,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
+    //Receives mode from Timer activity and sets the previously used Tab when we are coming back to Main. Default is 1 since modes are 1++, and getTab is mode -1 because we use 0++ indices for each tab.
+    Intent intent = getIntent();
+    if (intent!= null) {
+      mode = intent.getIntExtra("mode", 1);
+      TabLayout.Tab tab = tabLayout.getTabAt(mode - 1);
+      if (tab != null){
+        tab.select();
+      }
+    }
+
     mHandler.postDelayed(() -> {
       AsyncTask.execute(() -> {
         //Loads database of saved cycles.
@@ -477,7 +487,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           //FOR REFERENCE: Main (intent-> Timer) ---> Timer (intent->Main) && (callback to adapter for saved toggles).
           //Receives infinity arrays from Timer class, which are the same ones we passed into Timer when launching it from Main. This is done to prevent them being lost when our activity is recreated.
-          Intent intent = getIntent();
           if (intent!= null) {
             infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
             if (infinityArrayOne == null) infinityArrayOne = new ArrayList<>();
@@ -520,16 +529,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
       });
     },50);
-
-    //Receives mode from Timer activity and sets the previously used Tab when we are coming back to Main. Default is 1 since modes are 1++, and getTab is mode -1 because we use 0++ indices for each tab.
-    Intent intent = getIntent();
-    if (intent!= null) {
-      mode = intent.getIntExtra("mode", 1);
-      TabLayout.Tab tab = tabLayout.getTabAt(mode - 1);
-      if (tab != null){
-        tab.select();
-      }
-    }
 
     //Adapter and Recycler for round views within our editCycles popUp.
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
@@ -599,16 +598,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Sets the recyclerView classes for each mode on both adapters.
             savedCycleAdapter.setView(1);
             cycleRoundsAdapter.setMode(1);
+            sortHigh.setVisibility(View.VISIBLE);
+            sortLow.setVisibility(View.VISIBLE);
             break;
           case 1:
             mode = 2;
             savedCycleAdapter.setView(2);
             cycleRoundsAdapter.setMode(2);
+            sortHigh.setVisibility(View.VISIBLE);
+            sortLow.setVisibility(View.VISIBLE);
             break;
           case 2:
             mode = 3;
             savedCycleAdapter.setView(3);
             cycleRoundsAdapter.setMode(3);
+            sortHigh.setVisibility(View.GONE);
+            sortLow.setVisibility(View.GONE);
             break;
           case 3:
             mode = 4;
@@ -622,7 +627,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onTabUnselected(TabLayout.Tab tab) {
-        //Dismisses editCycle popupp when switching tabs.
+        //Dismisses editCycle popup when switching tabs.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Repopulates savedCycle recyclerView when switching tabs.
         savedCycleAdapter.notifyDataSetChanged();
@@ -686,7 +691,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           });
         },10);
       });
-
     };
     sortRecent.setOnClickListener(sortListener);
     sortNotRecent.setOnClickListener(sortListener);

@@ -61,6 +61,15 @@ CyclesDao {
     @Query("SELECT * from POMCYCLES ORDER by timeAdded ASC")
     List<PomCycles> loadPomCyclesLeastRecent();
 
+    @Query("SELECT * from CYCLES ORDER by timeAccessed DESC")
+    List<Cycles> loadCyclesLastAccessed();
+
+    @Query("SELECT * from CYCLESBO ORDER by timeAccessed DESC")
+    List<CyclesBO> loadCyclesBOLastAccessed();
+
+    @Query("SELECT * from PomCycles ORDER by timeAccessed DESC")
+    List<PomCycles> loadPomLastAccessed();
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCycle(Cycles cycles);
 
