@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String cycleTitle;
   List<String> receivedHighlightPositions;
 
-  String cycle_name;
+  String cycle_name = "";
   TextView cycle_name_text;
   EditText cycle_name_edit;
   TextView s1;
@@ -204,7 +204,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayOne;
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
+  TextWatcher titleTextWatcher;
+  boolean titleChanged;
 
+  //Getting dates replacing titles when editing - likely retrieving incorrect/blank positions and subbing date.
+  //Todo: Reset editPopUp ui after onBackPressed/onExit
   //todo: After highlight mode, wrong position sometimes retained on click - INCLUDING Fab button right after highlight is finished.
   //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
@@ -247,18 +251,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (editCyclesPopupWindow.isShowing()) {
       //If non-database cycle (i.e. FAB launched) is present, save it as a new entry. If a database-saved cycle (i.e. highlight launched) is present, update it in the database. queryCycles() has already been called from the edit_highlighted_text button.
       AsyncTask.execute(()->{
-        if (onNewCycle) saveCycles(true); else saveCycles(false);
+//        if (onNewCycle) saveCycles(true); else saveCycles(false);
         //Calling queryCycles() to fetch the latest post-save list our cycles.
-        queryCycles();
+//        queryCycles();
         //Populates the savedCycleAdapter's array lists., formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
         runOnUiThread(()-> {
-          populateCycleList();
-          savedCycleAdapter.notifyDataSetChanged();
+//          populateCycleList();
+//          savedCycleAdapter.notifyDataSetChanged();
           editCyclesPopupWindow.dismiss();
-          clearTimerArrays();
+//          clearTimerArrays();
         });
       });
     }
+    //Resets titleChanged boolean.
+    titleChanged = false;
   }
 
   //Gets the position clicked on from our saved cycle adapter.
@@ -268,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       receivedPos = position;
       launchTimerCycle(false);
       Log.i("testPos", "onClick position is " + position);
+      Log.i("testPos", "onClick title is " + cyclesList.get(receivedPos).getTitle());
     });
   }
 
@@ -552,14 +559,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertEditTime(true);
     setEditValues();
 
-    TextWatcher textWatcher = new TextWatcher() {
+    //Listens to cycle title for changes.
+    titleTextWatcher = new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
       }
       @Override
       public void onTextChanged(CharSequence s, int start, int before, int count) {
+      }
+      @Override
+      public void afterTextChanged(Editable s) {
+        titleChanged = true;
+      }
+    };
 
+    //Listens to all editTexts for changes.
+    TextWatcher textWatcher = new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
       }
       @Override
       public void afterTextChanged(Editable s) {
@@ -573,6 +593,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     second_value_edit_two.addTextChangedListener(textWatcher);
     third_value_edit.addTextChangedListener(textWatcher);
     third_value_edit_two.addTextChangedListener(textWatcher);
+    cycle_name_edit.addTextChangedListener(titleTextWatcher);
 
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
@@ -629,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
       //Clears timer arrays so they can be freshly populated.
-      clearTimerArrays();
+//      clearTimerArrays();
       //Brings up menu to add/subtract rounds to new cycle.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       //Boolean set to true indicates a new, non-database-saved cycle is populating our editCyclesPopup. This is primarily used for onBackPressed, to determine whether to save it as a new entry, or update its current position in the database.
@@ -705,6 +726,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Todo: Likely culprit of incorrect position retrieval.
         receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
         Log.i("testPos", "LONG CLICK position is " + receivedPos);
+        Log.i("testPos", "LONG CLICK title is " + cyclesList.get(receivedPos).getTitle());
 
         //Uses this single position to retrieve cycle and populate timer arrays.
         retrieveCycle();
@@ -1820,6 +1842,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       retrieveCycle();
       saveCycles(false);
+      Log.i("testTitle", "title is " + cycleTitle);
     }
 
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
@@ -1875,9 +1898,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String breakString  = "";
     String breakOnlyString = "";
     String pomString = "";
-    cycle_name = cycle_name_edit.getText().toString();
+    //Todo: This is overwriting retrieveCycle()'s setting of cycleTitle. We DO want that if it's edited, but not if nothing has been set on the editText, otherwise we blank and overwrite w/ a default date.
+    if (titleChanged) cycleTitle = cycle_name_edit.getText().toString();
     int cycleID = 0;
-
     switch (mode) {
       case 1:
         //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
@@ -1899,7 +1922,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Setting most recent time accessed for sort mode.
           cycles.setTimeAccessed(System.currentTimeMillis());
           cycles.setItemCount(customSetTime.size());
-          if (!cycle_name.isEmpty()) cycles.setTitle(cycle_name); else cycles.setTitle(date);
+          //Todo: This is retrieving an empty. editText and textView switch?
+          if (!cycleTitle.isEmpty()) cycles.setTitle(cycleTitle); else cycles.setTitle(date);
           //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
           if (newCycle) {
             //Only setting timeAdded for NEW cycle. We want our (sort by date) to use the initial time/date.
@@ -1925,7 +1949,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesBO.setBreaksOnly(breakOnlyString);
           cyclesBO.setTimeAccessed(System.currentTimeMillis());;
           cyclesBO.setItemCount(breaksOnlyTime.size());
-          if (!cycle_name.isEmpty()) cyclesBO.setTitle(cycle_name); else cyclesBO.setTitle(date);
+          if (!cycleTitle.isEmpty()) cyclesBO.setTitle(cycleTitle); else cyclesBO.setTitle(date);
           if (newCycle) {
             cyclesBO.setTimeAdded(System.currentTimeMillis());
             cyclesBO.setTotalBOTime(0);
@@ -1948,7 +1972,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomCycles.setFullCycle(pomString);
           pomCycles.setTimeAccessed(System.currentTimeMillis());;
           if (newCycle) pomCycles.setTimeAdded(System.currentTimeMillis());
-          if (!cycle_name.isEmpty()) pomCycles.setTitle(cycle_name); else pomCycles.setTitle(date);
+          if (!cycleTitle.isEmpty()) pomCycles.setTitle(cycleTitle); else pomCycles.setTitle(date);
           if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         }
         break;
