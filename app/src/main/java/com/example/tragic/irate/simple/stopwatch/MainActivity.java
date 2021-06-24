@@ -205,8 +205,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //Todo: textView of cycle instead of editText when edit first executed.
-  //Todo: Add long click to highlight all text when editing title.
   //todo: After highlight mode, wrong position sometimes retained on click - INCLUDING Fab button right after highlight is finished.
   //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
@@ -269,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()-> {
       receivedPos = position;
       launchTimerCycle(false);
+      Log.i("testPos", "onClick position is " + position);
     });
   }
 
@@ -703,7 +702,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         queryCycles();
         //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
+        //Todo: Likely culprit of incorrect position retrieval.
         receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
+        Log.i("testPos", "LONG CLICK position is " + receivedPos);
+
         //Uses this single position to retrieve cycle and populate timer arrays.
         retrieveCycle();
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
@@ -798,10 +800,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return false;
     });
 
-    //Launched from editCyclePopUp and calls TimerInterface w/ new cycle info.
+    //Launched from editCyclePopUp and calls TimerInterface. Boolean is set to FALSE by default (launching an existing cycle, used primarily in editing), and set to TRUE from the Fab button.
     start_timer.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
-        launchTimerCycle(true);
+        launchTimerCycle(onNewCycle);
       });
     });
 
