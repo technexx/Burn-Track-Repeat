@@ -31,6 +31,12 @@ CyclesDao {
     @Query("SELECT * from PomCycles")
     List<PomCycles> loadAllPomCycles();
 
+    @Query("SELECT * from Cycles ORDER by title DESC")
+    List<Cycles> loadCyclesAlphaEnd();
+
+    @Query("SELECT * from Cycles ORDER by title ASC")
+    List<Cycles> loadCyclesAlphaStart();
+
     @Query("SELECT * from CYCLES ORDER by timeAdded DESC")
     List<Cycles> loadCyclesMostRecent();
 
@@ -43,6 +49,12 @@ CyclesDao {
     @Query("SELECT * from CYCLES ORDER by itemCount ASC")
     List<Cycles> loadCyclesLeastItems();
 
+    @Query("SELECT * from CyclesBO ORDER by title DESC")
+    List<CyclesBO> loadCyclesBOAlphaEnd();
+
+    @Query("SELECT * from CyclesBO ORDER by title ASC")
+    List<CyclesBO> loadCyclesBOAlphaStart();
+
     @Query("SELECT * from CYCLESBO ORDER by timeAdded DESC")
     List<CyclesBO> loadCyclesMostRecentBO();
 
@@ -54,6 +66,13 @@ CyclesDao {
 
     @Query("SELECT * from CYCLESBO ORDER by itemCount ASC")
     List<CyclesBO> loadCyclesLeastItemsBO();
+
+    @Query("SELECT * from PomCycles ORDER by title DESC")
+    List<PomCycles> loadPomAlphaEnd();
+
+    @Query("SELECT * from PomCycles ORDER by title ASC")
+    List<PomCycles> loadPomAlphaStart();
+
 
     @Query("SELECT * from POMCYCLES ORDER by timeAdded DESC")
     List<PomCycles> loadPomCyclesMostRecent();
