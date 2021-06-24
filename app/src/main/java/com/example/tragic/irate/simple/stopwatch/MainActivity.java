@@ -205,9 +205,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayTwo;
   public ArrayList<Integer> infinityArrayThree;
 
-  //todo: After highlight mode, wrong position sometiems retained on click.
-  //Todo: Scroll issue w/ cycles adapter.
+  //Todo: textView of cycle instead of editText when edit first executed.
   //Todo: Add long click to highlight all text when editing title.
+  //todo: After highlight mode, wrong position sometimes retained on click - INCLUDING Fab button right after highlight is finished.
   //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
   //Todo: Hide total time option?
@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
   //Todo: Preset timer selections.
   //Todo: No rounds added defaults to a default Cycle instead of staying blank.
   //Todo: TDEE in sep popup w/ tabs.
@@ -417,6 +418,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
+    cycle_name_text.setVisibility(View.INVISIBLE);
 
     //These Integer Lists hold our millis values for each round.
     customSetTime = new ArrayList<>();
@@ -482,15 +484,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(() -> {
         //Loads database of saved cycles.
         cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+        //Calls instance of Cycle entity list based on sort mode.
         queryCycles();
-//        //Loading ALL cycle saves and arrays on initial app launch. After this, we will only query the mode we're on.
-//        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
-//        cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO();
-//        pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-
         //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
         populateCycleList();
-
         runOnUiThread(()-> {
           infinityArrayOne = new ArrayList<>();
           infinityArrayTwo = new ArrayList<>();
@@ -546,26 +543,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList, convertedPomList);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecycler.setLayoutManager(lm);
-
-//    //Setting listener - current context depends on onItemSelected interface.
-//    sort_spinner.setOnItemSelectedListener(this);
-//    //ArrayList of our sort options.
-//    List<String> sortArray = new ArrayList<>();
-////    sortArray.add("Sort");
-//    sortArray.add("Accessed " + getString(R.string.string_up_arrow));
-//    sortArray.add("Accessed " + getString(R.string.string_down_arrow));
-//    sortArray.add("Added " + getString(R.string.string_up_arrow));
-//    sortArray.add("Added " + getString(R.string.string_down_arrow));
-//    if (mode==1 || mode ==2) {
-//      sortArray.add("Rounds " + getString(R.string.string_up_arrow));
-//      sortArray.add("Rounds " + getString(R.string.string_down_arrow));
-//    }
-//    //Adapter for our spinner, using our arrayList and a custom layout.
-//    ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(this, R.layout.sort_spinner, sortArray);
-//    //Style of dropdown list - using default. Replaces xml layout values.
-////    sortAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-//    sort_spinner.setAdapter(sortAdapter);
-//    sortAdapter.notifyDataSetChanged();
 
     //Instantiates count up/count down methods.
     countUpMode(true); countUpMode(false);
@@ -743,6 +720,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         }
         runOnUiThread(()-> {
+          cycle_name_text.setVisibility(View.VISIBLE);
+          cycle_name_edit.setVisibility(View.INVISIBLE);
+          cycle_name_text.setText(cycleTitle);
           //Setting editText title.
           cycle_name_edit.setText(cycleTitle);
           //Updating adapter views.
@@ -753,6 +733,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           onNewCycle = false;
         });
       });
+    });
+
+    //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
+    cycle_name_text.setOnClickListener(v-> {
+      cycle_name_text.setVisibility(View.INVISIBLE);
+      cycle_name_edit.setVisibility(View.VISIBLE);
+      cycle_name_edit.requestFocus();
+      inputMethodManager.showSoftInput(cycle_name_edit, 0);
+    });
+
+    //Selects all text when long clicking in editText.
+    cycle_name_edit.setOnLongClickListener(v-> {
+      cycle_name_edit.selectAll();
+      return true;
     });
 
     delete_highlighted_cycle.setOnClickListener(v-> {
