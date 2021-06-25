@@ -244,6 +244,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   @Override
   public void onBackPressed() {
     exitTimer();
+//    moveTaskToBack(true);
   }
 
   @Override

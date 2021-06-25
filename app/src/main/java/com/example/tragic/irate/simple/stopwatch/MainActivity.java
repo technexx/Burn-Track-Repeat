@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -206,10 +207,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public ArrayList<Integer> infinityArrayThree;
   TextWatcher titleTextWatcher;
   boolean titleChanged;
+  boolean editingCycle;
 
-  //Getting dates replacing titles when editing - likely retrieving incorrect/blank positions and subbing date.
-  //Todo: Reset editPopUp ui after onBackPressed/onExit
-  //todo: After highlight mode, wrong position sometimes retained on click - INCLUDING Fab button right after highlight is finished.
+  //Todo: Getting dates replacing titles when editing - likely retrieving incorrect/blank positions and subbing date.
+    //todo: After highlight mode, wrong position sometimes retained on click - INCLUDING Fab button right after highlight is finished.
   //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
   //Todo: Hide total time option?
@@ -248,23 +249,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
-    if (editCyclesPopupWindow.isShowing()) {
-      //If non-database cycle (i.e. FAB launched) is present, save it as a new entry. If a database-saved cycle (i.e. highlight launched) is present, update it in the database. queryCycles() has already been called from the edit_highlighted_text button.
-      AsyncTask.execute(()->{
-//        if (onNewCycle) saveCycles(true); else saveCycles(false);
-        //Calling queryCycles() to fetch the latest post-save list our cycles.
-//        queryCycles();
-        //Populates the savedCycleAdapter's array lists., formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
-        runOnUiThread(()-> {
-//          populateCycleList();
-//          savedCycleAdapter.notifyDataSetChanged();
-          editCyclesPopupWindow.dismiss();
-//          clearTimerArrays();
-        });
-      });
-    }
-    //Resets titleChanged boolean.
-    titleChanged = false;
+    //Minimizes activity.
+    moveTaskToBack(true);
   }
 
   //Gets the position clicked on from our saved cycle adapter.
@@ -361,6 +347,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
+    //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
+    editCyclesPopupWindow.setOnDismissListener(() -> {
+      //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
+      titleChanged = false;
+      //If a cycle has been selected via highlight to edit, we automatically update its contents. If not, we do nothing.
+      if (editingCycle) {
+        AsyncTask.execute(()->{
+          saveCycles(false);
+          //Calling queryCycles() to fetch the latest post-save list our cycles.
+          queryCycles();
+          //Populates the savedCycleAdapter's array lists, formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
+          runOnUiThread(()-> {
+            //Populates savedCycleAdapter's array lists from new database entry and updates adapter view.
+            populateCycleList();
+            savedCycleAdapter.notifyDataSetChanged();
+            //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
+            clearTimerArrays();
+            editingCycle = false;
+          });   });
+
+   }
+    });
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -420,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
     sort_text = findViewById(R.id.sort_text);
-    sort_spinner = findViewById(R.id.sort_spinner);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -755,6 +762,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeHighlight(true);
           //Boolean set to false indicates that a current database-saved cycle is populating our editCyclesPopup.
           onNewCycle = false;
+          editingCycle = true;
         });
       });
     });
