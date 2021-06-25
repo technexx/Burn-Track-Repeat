@@ -209,8 +209,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean titleChanged;
   boolean editingCycle;
 
-  //Todo: Getting dates replacing titles when editing - likely retrieving incorrect/blank positions and subbing date.
-    //todo: After highlight mode, wrong position sometimes retained on click - INCLUDING Fab button right after highlight is finished.
+  AlphaAnimation fadeIn;
+  AlphaAnimation fadeOut;
+
+  //Todo: Fade transition for highlight mode.
   //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
   //Todo: Hide total time option?
@@ -271,11 +273,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     receivedHighlightPositions = listOfPositions;
     //Sets "highlight mode" actionBar buttons to Visible if entering mode.
     if (addButtons) {
-      edit_highlighted_cycle.setVisibility(View.VISIBLE);
-      delete_highlighted_cycle.setVisibility(View.VISIBLE);
-      cancelHighlight.setVisibility(View.VISIBLE);
-      appHeader.setVisibility(View.INVISIBLE);
-      edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
+        edit_highlighted_cycle.startAnimation(fadeIn);
+        delete_highlighted_cycle.startAnimation(fadeIn);
+        cancelHighlight.startAnimation(fadeIn);
+
+        appHeader.startAnimation(fadeOut);
+        sort_text.startAnimation(fadeOut);
+
+        edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
     }
   }
 
@@ -479,9 +484,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomValue3 = sharedPreferences.getInt("pomValue3", 900);
     sortMode = sharedPreferences.getInt("sortMode", 1);
 
+    fadeIn = new AlphaAnimation(0.0f, 1.0f);
+    fadeOut = new AlphaAnimation(1.0f, 0.0f);
+    fadeIn.setDuration(750);
+    fadeOut.setDuration(750);
+    fadeIn.setFillAfter(true);
+    fadeOut.setFillAfter(true);
+
     //Retrieves checkmark position for sort popup.
     setSortCheckmark();
-//    sortHigh.setText(getString(R.string.sort_recent) + get);
 
     //Receives mode from Timer activity and sets the previously used Tab when we are coming back to Main. Default is 1 since modes are 1++, and getTab is mode -1 because we use 0++ indices for each tab.
     Intent intent = getIntent();
@@ -730,10 +741,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         queryCycles();
         //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
-        //Todo: Likely culprit of incorrect position retrieval.
         receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
-        Log.i("testPos", "LONG CLICK position is " + receivedPos);
-        Log.i("testPos", "LONG CLICK title is " + cyclesList.get(receivedPos).getTitle());
 
         //Uses this single position to retrieve cycle and populate timer arrays.
         retrieveCycle();
@@ -810,11 +818,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Turns off our cycle highlight mode from adapter.
     cancelHighlight.setOnClickListener(v-> {
-      cancelHighlight.setVisibility(View.INVISIBLE);
-      delete_highlighted_cycle.setVisibility(View.INVISIBLE);
-      appHeader.setVisibility(View.VISIBLE);
-      savedCycleAdapter.removeHighlight(true);
-      savedCycleAdapter.notifyDataSetChanged();
+        edit_highlighted_cycle.startAnimation(fadeOut);
+        cancelHighlight.startAnimation(fadeOut);
+        delete_highlighted_cycle.startAnimation(fadeOut);
+
+        appHeader.startAnimation(fadeIn);
+        sort_text.startAnimation(fadeIn);
+
+        savedCycleAdapter.removeHighlight(true);
+        savedCycleAdapter.notifyDataSetChanged();
     });
     ////--ActionBar Item onClicks END--////
 
