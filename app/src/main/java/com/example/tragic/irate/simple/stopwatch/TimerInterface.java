@@ -404,11 +404,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         for (int i = 0; i < breaksOnlyTime.size(); i++) zeroArrayBreaks.add(0);
         break;
       case 3:
+        //Todo: Need pomValues time here (customSetTime equiv.)
         pomValue1 = intent.getIntExtra("pomValue1", 0);
         pomValue2 = intent.getIntExtra("pomValue2", 0);
         pomValue3 = intent.getIntExtra("pomValue3", 0);
+        pomValuesTime = intent.getIntegerArrayListExtra("pomList");
         break;
     }
+
     cycle_header_text.setText(cycle_title);
 
     toggleNextRoundRunnable = () -> {
@@ -1601,7 +1604,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 3:
         //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
         if (pomValuesTime.size() > 0) {
-          pomMillis1 = pomValuesTime.get(0) * 1000 * 60;
+          Log.i("testList", "pom millis is " + pomValuesTime);
+          pomMillis1 = pomValuesTime.get(0);
           pomMillis = pomMillis1;
           timePaused.setText(convertSeconds((pomMillis + 999) / 1000));
           pomTimerDisabled = false;

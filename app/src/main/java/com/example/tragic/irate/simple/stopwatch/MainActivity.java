@@ -215,8 +215,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
 
-  //Todo: Switching to BO tab doesn't refresh/show adapter list.
-  //Todo Infinity mode in BO has index crash.
+  //Pom cycle displays and index issues.
   //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
   //Todo: Hide total time option?
@@ -226,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Bigger reset button or wider click area.
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
+    // Todo: Still have issues w/ adapter refreshing while switching modes.
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
@@ -489,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
 
-      fadeIn = new AlphaAnimation(0.0f, 1.0f);
+    fadeIn = new AlphaAnimation(0.0f, 1.0f);
     fadeOut = new AlphaAnimation(1.0f, 0.0f);
     fadeIn.setDuration(750);
     fadeOut.setDuration(750);
@@ -618,45 +618,46 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_edit_two.addTextChangedListener(textWatcher);
     cycle_name_edit.addTextChangedListener(titleTextWatcher);
 
-    //Todo: Also need separate sort modes.
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
           AsyncTask.execute(()-> {
               queryCycles();
+              runOnUiThread(()-> {
+                  switch (tab.getPosition()) {
+                      case 0:
+                          mode = 1;
+                          //Sets the recyclerView classes for each mode on both adapters.
+                          savedCycleAdapter.setView(1);
+                          cycleRoundsAdapter.setMode(1);
+                          sortHigh.setVisibility(View.VISIBLE);
+                          sortLow.setVisibility(View.VISIBLE);
+                          break;
+                      case 1:
+                          mode = 2;
+                          savedCycleAdapter.setView(2);
+                          cycleRoundsAdapter.setMode(2);
+                          sortHigh.setVisibility(View.VISIBLE);
+                          sortLow.setVisibility(View.VISIBLE);
+                          break;
+                      case 2:
+                          mode = 3;
+                          savedCycleAdapter.setView(3);
+                          cycleRoundsAdapter.setMode(3);
+                          sortHigh.setVisibility(View.GONE);
+                          sortLow.setVisibility(View.GONE);
+                          break;
+                      case 3:
+                          mode = 4;
+                          break;
+                  }
+                  //Sets all editTexts to GONE, and then populates them + textViews based on mode.
+                  removeEditViews(false);
+                  editCycleViews();
+                  populateCycleList();
+                  savedCycleAdapter.notifyDataSetChanged();
+              });
           });
-        switch (tab.getPosition()) {
-          case 0:
-            mode = 1;
-            //Sets the recyclerView classes for each mode on both adapters.
-            savedCycleAdapter.setView(1);
-            cycleRoundsAdapter.setMode(1);
-            sortHigh.setVisibility(View.VISIBLE);
-            sortLow.setVisibility(View.VISIBLE);
-            break;
-          case 1:
-            mode = 2;
-            savedCycleAdapter.setView(2);
-            cycleRoundsAdapter.setMode(2);
-            sortHigh.setVisibility(View.VISIBLE);
-            sortLow.setVisibility(View.VISIBLE);
-            break;
-          case 2:
-            mode = 3;
-            savedCycleAdapter.setView(3);
-            cycleRoundsAdapter.setMode(3);
-            sortHigh.setVisibility(View.GONE);
-            sortLow.setVisibility(View.GONE);
-            break;
-          case 3:
-            mode = 4;
-            break;
-        }
-        //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-        removeEditViews(false);
-        editCycleViews();
-        populateCycleList();
-        savedCycleAdapter.notifyDataSetChanged();
       }
 
       @Override
@@ -725,15 +726,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           prefEdit.putInt("sortModeBO", sortModeBO);
           prefEdit.putInt("sortModePom", sortModePom);
           prefEdit.apply();
-
-          //Todo: Test logs for alpha sort.
-          List<String> blah = new ArrayList<>();
-          for (int i=0; i<cyclesList.size(); i++) {
-            blah.add(cyclesList.get(i).getTitle());
-          }
-          Log.i("testSort", "values are " + blah);
-
-
         },10);
       });
     };
@@ -1837,7 +1829,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       retrieveCycle();
       saveCycles(false);
-      Log.i("testTitle", "title is " + cycleTitle);
     }
 
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
@@ -1893,7 +1884,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String breakString  = "";
     String breakOnlyString = "";
     String pomString = "";
-    //Todo: This is overwriting retrieveCycle()'s setting of cycleTitle. We DO want that if it's edited, but not if nothing has been set on the editText, otherwise we blank and overwrite w/ a default date.
     if (titleChanged) cycleTitle = cycle_name_edit.getText().toString();
     int cycleID = 0;
     switch (mode) {
@@ -1917,7 +1907,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Setting most recent time accessed for sort mode.
           cycles.setTimeAccessed(System.currentTimeMillis());
           cycles.setItemCount(customSetTime.size());
-          //Todo: This is retrieving an empty. editText and textView switch?
           if (!cycleTitle.isEmpty()) cycles.setTitle(cycleTitle); else cycles.setTitle(date);
           //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
           if (newCycle) {
@@ -1962,6 +1951,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         pomString = gson.toJson(pomValuesTime);
         pomString = friendlyString(pomString);
+        String[] temp = pomString.split(" - ", 0);
+        ArrayList<Long> tempLong = new ArrayList<>();
+        ArrayList<String> tempStringArray = new ArrayList<>();
+        for (int i=0; i<temp.length; i++) {
+            tempStringArray.add(convertSeconds(i));
+        }
+        pomString = Arrays.toString(new ArrayList[]{tempStringArray});
+
 
         if (!pomString.equals("")) {
           pomCycles.setFullCycle(pomString);
