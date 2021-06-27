@@ -320,13 +320,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       PomHolder pomHolder = (PomHolder) holder;
       pomHolder.pomName.setText(mPomTitle.get(position));
 
-      String tempPom = mPomList.get(position);
+      String tempPom = (convertTime(mPomList).get(position));
       tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
       Spannable pomSpan = new SpannableString(tempPom);
 
       //Sets green/red alternating colors using text char indices.
       int moving = 0;
       for (int i=0; i<8; i++) {
+
         if (pomSpan.length()>=moving+2){
           if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);

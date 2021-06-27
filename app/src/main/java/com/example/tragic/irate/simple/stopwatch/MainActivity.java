@@ -1951,14 +1951,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         pomString = gson.toJson(pomValuesTime);
         pomString = friendlyString(pomString);
-        String[] temp = pomString.split(" - ", 0);
-        ArrayList<Long> tempLong = new ArrayList<>();
-        ArrayList<String> tempStringArray = new ArrayList<>();
-        for (int i=0; i<temp.length; i++) {
-            tempStringArray.add(convertSeconds(i));
-        }
-        pomString = Arrays.toString(new ArrayList[]{tempStringArray});
-
 
         if (!pomString.equals("")) {
           pomCycles.setFullCycle(pomString);
