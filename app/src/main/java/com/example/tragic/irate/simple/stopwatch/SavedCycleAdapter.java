@@ -39,9 +39,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   onHighlightListener mOnHighlightListener;
   onInfinityToggleListener mOnInfinityToggleListener;
   onInfinityToggleListenerTwo mOnInfinityToggleListenerTwo;
-  public static final int SETS_AND_BREAKS = 0;
-  public static final int BREAKS_ONLY = 1;
-  public static final int POMODORO = 2;
+  public static final int SETS_AND_BREAKS = 1;
+  public static final int BREAKS_ONLY = 2;
+  public static final int POMODORO = 3;
   int mChosenView;
   boolean mHighlightDeleted;
   boolean mHighlightMode;
@@ -50,6 +50,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<Integer> mInfinityArrayTwo = new ArrayList<>();
   ArrayList<Integer> mInfinityArrayThree = new ArrayList<>();
   float mPosX;
+  ArrayList<Integer> mSizeToggle = new ArrayList<>();
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -93,6 +94,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
     mHighlightDeleted = false;
+    //Populates a toggle list for Pom's spannable colors so we can simply replace them at will w/ out resetting the list. This should only be called in our initial adapter instantiation.
+    if (mSizeToggle.size()==0) for (int i=0; i<8; i++) mSizeToggle.add(0);
   }
 
   public void setView(int chosenView) {
@@ -326,13 +329,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       //Sets green/red alternating colors using text char indices.
       int moving = 0;
+      int rangeStart = 0;
+      int rangeEnd = 4;
       for (int i=0; i<8; i++) {
-
-        if (pomSpan.length()>=moving+2){
-          if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-          else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving, moving+2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-          moving+=5;
-        }
+        if (mSizeToggle.get(i)==1) rangeEnd = 5;
+        if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        if (mSizeToggle.get(i)==1) moving+=8; else moving+=7;
       }
       pomHolder.pomView.setText(pomSpan);
 
@@ -464,6 +467,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public ArrayList<String> convertTime(ArrayList<String> time) {
+    Log.i("testPop", "view is " + mChosenView);
+
     ArrayList<Long> newLong = new ArrayList<>();
     ArrayList<String> newString = new ArrayList<>();
     String listConv = "";
@@ -482,7 +487,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         newLong.add(Long.parseLong(newSplit[k]));
         //Converting each Long value into a String we can display.
         newString.add(convertSeconds(newLong.get(k)));
+        //If in Pom mode, set "0" for a time entry that is <10 minutes/4 length (e.g. X:XX), and "1" for >=10 minutes/5 length (e.g. XX:XX). This is so we can properly alternate green/red coloring in onBindView's Spannable.
+        if (mChosenView==POMODORO) if ((newString.get(k)).length()==4) mSizeToggle.set(k, 0); else mSizeToggle.set(k, 1);
       }
+      Log.i("testPop", "array is " + mSizeToggle);
       finalSplit = String.valueOf(newString);
       finalSplit = finalSplit.replace("[", "");
       finalSplit = finalSplit.replace("]", "");
