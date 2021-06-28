@@ -187,7 +187,6 @@ public class DotDraws extends View {
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
     switch (mMode) {
       case 1:
-
         encloseDots(mY-10, mY+260);
         //Filled or stroked dots depending on count up/down.
         setDotStyle(mGoingUpSets);
@@ -207,7 +206,6 @@ public class DotDraws extends View {
           drawText(mSetTime, mX+16, mY+62, i);
           mX += 132;
         }
-
         for (int i=0; i<mBreakTime.size(); i++) {
           mPaint.setColor(Color.RED);
           if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
@@ -239,7 +237,7 @@ public class DotDraws extends View {
         }
         break;
       case 3:
-        mX = 92; mX2=mX+125;
+        mX = 82; mX2=mX+125;
         encloseDots(mY-30, mY+160);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
@@ -249,6 +247,7 @@ public class DotDraws extends View {
         break;
     }
 
+    //Blanks out canvas for Stopwatch.
     if (mMode==4) mCanvas.drawColor(Color.BLACK);
   }
 
@@ -259,22 +258,22 @@ public class DotDraws extends View {
         //Must be called AFTER color is changed, otherwise alpha will reset to 255.
         if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        mCanvas.drawCircle(mX, 550, 60, mPaint);
+        mCanvas.drawCircle(mX, 575, 62, mPaint);
         if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
+        mX+=260;
         break;
       case 1: case 3: case 5:
         mPaint.setColor(Color.RED);
         if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
-        mCanvas.drawCircle(mX2, 550, 45 , mPaint);
+        mCanvas.drawCircle(mX2, 575, 50 , mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
-        mX+=250;
-        mX2=mX+125;
+        mX2=mX+130;
         break;
       case 7:
         mPaint.setColor(Color.RED);
         if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
-        mCanvas.drawRect(mX+90, 495, mX+200, 605, mPaint);
+        mCanvas.drawRect(mX-170, 520, mX-60, 630, mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
         break;
@@ -317,15 +316,16 @@ public class DotDraws extends View {
     } else if (mMode==3) {
       switch (i) {
         case 0: case 2: case 4: case 6:
-          mPaintText.setTextSize(70f);
-          mCanvas.drawText(list.get(i), x-40, y+87, mPaintText);
+          mPaintText.setTextSize(50f);
+          mCanvas.drawText(list.get(i), x-63, y+87, mPaintText);
           break;
         case 1: case 3: case 5:
           mPaintText.setTextSize(45f);
-          mCanvas.drawText(list.get(i), x-12, y+75, mPaintText);
+          mCanvas.drawText(list.get(i), x-42, y+82, mPaintText);
           break;
         case 7:
-          mCanvas.drawText(list.get(i), x-23, y+87, mPaintText);
+          mPaintText.setTextSize(45f);
+          mCanvas.drawText(list.get(i), x-42, y+87, mPaintText);
           break;
       }
     }
