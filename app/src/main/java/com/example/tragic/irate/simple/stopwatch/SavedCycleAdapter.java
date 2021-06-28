@@ -320,8 +320,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       });
 
     } else if (holder instanceof PomHolder) {
+      //Todo: Entries are fine. Display OR constructor values are issue.
       PomHolder pomHolder = (PomHolder) holder;
       pomHolder.pomName.setText(mPomTitle.get(position));
+      Log.i("testList", "list is " + mPomList);
 
       String tempPom = (convertTime(mPomList).get(position));
       tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
@@ -467,8 +469,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public ArrayList<String> convertTime(ArrayList<String> time) {
-    Log.i("testPop", "view is " + mChosenView);
-
     ArrayList<Long> newLong = new ArrayList<>();
     ArrayList<String> newString = new ArrayList<>();
     String listConv = "";
@@ -490,7 +490,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         //If in Pom mode, set "0" for a time entry that is <10 minutes/4 length (e.g. X:XX), and "1" for >=10 minutes/5 length (e.g. XX:XX). This is so we can properly alternate green/red coloring in onBindView's Spannable.
         if (mChosenView==POMODORO) if ((newString.get(k)).length()==4) mSizeToggle.set(k, 0); else mSizeToggle.set(k, 1);
       }
-      Log.i("testPop", "array is " + mSizeToggle);
       finalSplit = String.valueOf(newString);
       finalSplit = finalSplit.replace("[", "");
       finalSplit = finalSplit.replace("]", "");

@@ -1604,7 +1604,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 3:
         //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
         if (pomValuesTime.size() > 0) {
-          Log.i("testList", "pom millis is " + pomValuesTime);
           pomMillis1 = pomValuesTime.get(0);
           pomMillis = pomMillis1;
           timePaused.setText(convertSeconds((pomMillis + 999) / 1000));

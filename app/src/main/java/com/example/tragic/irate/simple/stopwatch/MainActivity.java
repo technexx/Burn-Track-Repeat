@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
 
-  //Pom cycle displays and index issues.
+  //Todo: Pom index issues.
   //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
   //Todo: Hide total time option?
@@ -1763,8 +1763,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 3:
         pomArray.clear();
         for (int i=0; i<pomCyclesList.size(); i++) {
-          pomArray.add(pomCyclesList.get(0).getFullCycle());
-          pomTitleArray.add(pomCyclesList.get(0).getTitle());
+          pomArray.add(pomCyclesList.get(i).getFullCycle());
+          pomTitleArray.add(pomCyclesList.get(i).getTitle());
         }
     }
   }
