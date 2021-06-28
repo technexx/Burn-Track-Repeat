@@ -215,14 +215,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
 
-  //Todo: Pom index issues.
-  //Todo: Total times + round skip for Pom as well.
+  //Todo: Total times + round skip for Pom as well. Remove "set time" from BO mode.
   //Todo: Cycles completed for Pom.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: pomMillis1/2/3 need populating.
-  //Todo: Bigger reset button or wider click area.
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
     // Todo: Still have issues w/ adapter refreshing while switching modes.
@@ -621,41 +619,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
+          //Running on another thread because we're fetching DB values and we want to keep the UI in sync.
           AsyncTask.execute(()-> {
+              switch (tab.getPosition()) {
+                  case 0:
+                      mode = 1;
+                      //Sets the recyclerView classes for each mode adapters.
+                      savedCycleAdapter.setView(1);
+                      cycleRoundsAdapter.setMode(1);
+//
+                      break;
+                  case 1:
+                      mode = 2;
+                      savedCycleAdapter.setView(2);
+                      cycleRoundsAdapter.setMode(2);
+                      break;
+                  case 2:
+                      mode = 3;
+                      savedCycleAdapter.setView(3);
+                      cycleRoundsAdapter.setMode(3);
+                      break;
+                  case 3:
+                      mode = 4;
+                      break;
+              }
               queryCycles();
+              //UI views change, so running on main thread.
               runOnUiThread(()-> {
-                  switch (tab.getPosition()) {
-                      case 0:
-                          mode = 1;
-                          //Sets the recyclerView classes for each mode on both adapters.
-                          savedCycleAdapter.setView(1);
-                          cycleRoundsAdapter.setMode(1);
-                          sortHigh.setVisibility(View.VISIBLE);
-                          sortLow.setVisibility(View.VISIBLE);
-                          break;
-                      case 1:
-                          mode = 2;
-                          savedCycleAdapter.setView(2);
-                          cycleRoundsAdapter.setMode(2);
-                          sortHigh.setVisibility(View.VISIBLE);
-                          sortLow.setVisibility(View.VISIBLE);
-                          break;
-                      case 2:
-                          mode = 3;
-                          savedCycleAdapter.setView(3);
-                          cycleRoundsAdapter.setMode(3);
-                          sortHigh.setVisibility(View.GONE);
-                          sortLow.setVisibility(View.GONE);
-                          break;
-                      case 3:
-                          mode = 4;
-                          break;
-                  }
                   //Sets all editTexts to GONE, and then populates them + textViews based on mode.
                   removeEditViews(false);
                   editCycleViews();
                   populateCycleList();
                   savedCycleAdapter.notifyDataSetChanged();
+                  if (mode==1||mode==2) {
+                      sortHigh.setVisibility(View.VISIBLE);
+                      sortLow.setVisibility(View.VISIBLE);
+                  } else {
+                      sortHigh.setVisibility(View.GONE);
+                      sortLow.setVisibility(View.GONE);
+                  }
               });
           });
       }
