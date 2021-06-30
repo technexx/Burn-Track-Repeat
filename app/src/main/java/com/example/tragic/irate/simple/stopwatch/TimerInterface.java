@@ -819,6 +819,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           drawDots(2);
           if (breakMillis < 500) timerDisabled = true;
 
+          //For "Total Break" times.
           breakMillisHolder = permBreakMillis - breakMillis;
           tempBreakMillis = totalBreakMillis + breakMillisHolder;
           total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
@@ -905,9 +906,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           drawDots(3);
           if (breaksOnlyMillis < 500) boTimerDisabled = true;
 
-          //Using breaksOnlyMillis (unique), but mode 1's break holder since we run these modes separately.
           breakMillisHolder = permBreakMillis - breaksOnlyMillis;
-          tempBreakMillis = breaksOnlyMillis + breakMillisHolder;
+          tempBreakMillis = totalBreakMillis + breakMillisHolder;
           total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
         }
 
@@ -1710,7 +1710,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void deleteTotalTimes() {
     delete_text.setText(R.string.delete_total_times);
     deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
-
   }
 
   public void deleteCycle(int typeOfDeletion) {
@@ -1745,8 +1744,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         case 3:
           cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
       }
+      //Todo: Just need to round millis values so full seconds stay in sync.
       runOnUiThread(() -> {
         deleteCyclePopupWindow.dismiss();
+        totalSetMillis = 0;
+        tempSetMillis = 0;
+        totalBreakMillis = 0;
+        tempBreakMillis = 0;
+        permSetMillis = ((setMillis+100) / 1000) * 1000;
+        if (mode==1) permBreakMillis = ((breakMillis+100) / 1000) * 1000; else permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;;
         total_set_time.setText("0");
         total_break_time.setText("0");
         cycles_completed.setText("0");

@@ -215,7 +215,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
 
-  //Todo: Total times + round skip for Pom as well. Remove "set time" from BO mode.
+  //Todo: Fix "total time" reset for active roumd, or grey out button.
+  //Todo: Total times + round skip for Pom as well.
   //Todo: Cycles completed for Pom.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
