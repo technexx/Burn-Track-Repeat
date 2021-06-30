@@ -220,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
-  //Todo: pomMillis1/2/3 need populating.
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
     // Todo: Still have issues w/ adapter refreshing while switching modes.
@@ -537,9 +536,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               infinityArrayTwo.add(0);
             }
           }
-          if (infinityArrayThree.isEmpty()) {
-            for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
-          }
+          if (infinityArrayThree.isEmpty()) for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
 
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
