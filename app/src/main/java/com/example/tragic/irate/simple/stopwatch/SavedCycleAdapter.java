@@ -323,7 +323,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //Todo: Entries are fine. Display OR constructor values are issue.
       PomHolder pomHolder = (PomHolder) holder;
       pomHolder.pomName.setText(mPomTitle.get(position));
-      Log.i("testList", "list is " + mPomList);
 
       String tempPom = (convertTime(mPomList).get(position));
       tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));

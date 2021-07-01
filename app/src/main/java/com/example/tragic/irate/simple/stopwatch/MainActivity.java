@@ -217,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Text in dots do not align for super low values in Pom. Not an immediate issue because of minimums, but should check all text and sizes for all modes.
   //Todo: Cycles completed for Pom + total work time.
+    //Todo: work/break time depending on round for Pom.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?

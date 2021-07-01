@@ -70,9 +70,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   TextView lastTextView;
 
   String cycle_title;
-  long pomValue1;
-  long pomValue2;
-  long pomValue3;
   int overSeconds;
   TextView overtime;
 
@@ -96,31 +93,34 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   int movingBOCycle;
 
   long setMillis;
+  long totalSetMillis;
+  long tempSetMillis;
+  long setMillisHolder;
+  long permSetMillis;
+
   long breakMillis;
   long breaksOnlyMillis;
-  long totalSetMillis;
   long totalBreakMillis;
-  long setMillisHolder;
   long breakMillisHolder;
-  long tempSetMillis;
   long tempBreakMillis;
-  long permSetMillis;
   long permBreakMillis;
+
+  long pomMillis;
+  long totalPomMillis;
+  long tempPomMillis;
+  long pomMillisHolder;
+  long permPomMillis;
+
   int maxProgress = 10000;
   int customProgressPause = 10000;
   int breaksOnlyProgressPause = 10000;
   int pomProgressPause = 10000;
-  long pomMillis;
   long setMillisUntilFinished;
   long breakMillisUntilFinished;
   long breaksOnlyMillisUntilFinished;
   long pomMillisUntilFinished;
   Runnable endFade;
   Runnable ot;
-
-  long pomMillis1;
-  long pomMillis2;
-  long pomMillis3;
   int pomDotCounter = 1;
 
   double ms;
@@ -409,17 +409,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
       case 3:
         pomValuesTime = intent.getIntegerArrayListExtra("pomList");
-        total_set_time.setVisibility(View.GONE);
-        total_set_header.setVisibility(View.GONE);
-        resetParam.rightMargin = 60;
+        //Replaces "total set time" w/ "work time".
+        total_set_header.setText(R.string.total_work);
         break;
     }
-    //Testing pom round iterations.
-    Log.i("testpop", "set, break and pom are " + customSetTime + " " + breaksOnlyTime + " " + pomValuesTime);
-    for (int i=1; i<9; i++) {
-      pomValuesTime.set(i-1, 2000*i);
-    }
-    Log.i("testpop", "REVISED pom is " + pomValuesTime);
+//    //Testing pom round iterations.
+//    Log.i("testpop", "set, break and pom are " + customSetTime + " " + breaksOnlyTime + " " + pomValuesTime);
+//    for (int i=1; i<9; i++) {
+//      pomValuesTime.set(i-1, 2000*i);
+//    }
+//    Log.i("testpop", "REVISED pom is " + pomValuesTime);
 
     toggleNextRoundRunnable = () -> {
       if (nextRoundToggleIsActive) {
@@ -711,6 +710,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           pomBegun = true;
           activePomCycle = true;
           modeThreeTimerEnded = false;
+          //Unchanging start point of pomMillis used to count total set time over multiple rounds.
+          permPomMillis = pomMillis;
         } else {
           pomMillis = pomMillisUntilFinished;
           if (objectAnimator != null) objectAnimator.resume();
@@ -989,11 +990,17 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           else if (pomAlpha >= 1) fadeCustomTimer = false;
         }
         if (pomAlpha >= 1) fadeCustomTimer = false;
+        timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
+        if (pomMillis<500) pomTimerDisabled = true;
 
-        if (mode == 3) {
-          timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-          drawDots(4);
-        }
+        pomMillisHolder = permPomMillis - pomMillis;
+        tempPomMillis = totalPomMillis + pomMillisHolder;
+        //Using "total_set_time" textView w/ renamed String.
+        total_set_time.setText(convertSeconds(tempPomMillis / 1000));
+        Log.i("testpom", "total IN TIMER is " + totalPomMillis);
+        Log.i("testpom", "temp IN TIMER is " + tempPomMillis);
+
+        drawDots(4);
       }
 
       @Override
@@ -1003,7 +1010,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         pomBegun = false;
         timeLeft.setText("0");
         pomProgressPause = maxProgress;
-
         animateEnding(true);
 
         if (pomDotCounter < 9) {
@@ -1011,11 +1017,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           customHalted = true;
           //Disabling pause/resume clicks until animation finishes.
           pomTimerDisabled = true;
-          if (mode == 3) {
-            //Smooths out end fade.
-            fadeVar = 4;
-            mHandler.post(endFade);
-          }
+          //Smooths out end fade.
+          fadeVar = 4;
+          mHandler.post(endFade);
+
+          totalPomMillis = totalPomMillis + pomMillisHolder;
+          tempPomMillis = (totalPomMillis + 100) / 1000;
+          total_set_time.setText(convertSeconds(tempPomMillis));
+
           mHandler.postDelayed(() -> {
             //Counter must increase here for conditional below to work.
             pomDotCounter++;
@@ -1590,8 +1599,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 3:
         //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
         if (pomValuesTime.size() > 0) {
-          pomMillis1 = pomValuesTime.get(0);
-          pomMillis = pomMillis1;
+          pomMillis = pomValuesTime.get(0);
           timePaused.setText(convertSeconds((pomMillis + 999) / 1000));
           pomTimerDisabled = false;
         }
@@ -1679,20 +1687,22 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Sets our total millis to the temp value iterated up in our runnable.
         totalBreakMillis = tempBreakMillis;
         //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
-        tempBreakMillis = (totalBreakMillis + 100) / 1000;
-        total_break_time.setText(convertSeconds(tempBreakMillis));
+        tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
+        total_break_time.setText(convertSeconds(tempBreakMillis/1000));
         //Sets our totalMillis to the new, revised and rounded tempMillis so when it's used again, it syncs up.
         totalBreakMillis = tempBreakMillis;
         break;
       case 2:
         totalBreakMillis = tempBreakMillis;
-        tempBreakMillis = (totalBreakMillis + 100) / 1000;
-        total_break_time.setText(convertSeconds(tempBreakMillis));
+        tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
+        total_break_time.setText(convertSeconds(tempBreakMillis/1000));
         totalBreakMillis = tempBreakMillis;
         break;
       case 3:
-        //Todo: For Pom.
-
+        totalPomMillis = tempPomMillis;
+        tempPomMillis = ((totalPomMillis + 100) / 1000) * 1000;
+        total_set_time.setText(convertSeconds(tempPomMillis/1000));
+        totalPomMillis = tempPomMillis;
         break;
     }
   }
