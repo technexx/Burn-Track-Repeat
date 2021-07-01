@@ -775,8 +775,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           timerDisabled = false;
           //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
           numberOfSets--;
-          if (numberOfSets > 0)
-            setMillis = customSetTime.get((int) (customSetTime.size() - numberOfSets));
+          if (numberOfSets > 0) setMillis = customSetTime.get((int) (customSetTime.size() - numberOfSets));
           endAnimation.cancel();
           dotDraws.setAlpha();
           if (!breaksAreCountingUp) {
@@ -1077,7 +1076,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   //Ends the current round and moves onto the next one.
   public void nextRound() {
+    //Animates timer and progressBar.
     animateEnding(true);
+    //Stores cumulative time valuation.
+    saveTotalTimes();
     switch (mode) {
       case 1:
         //Since breaks will always be the last round in modes 1 and 2, return without executing anything if there are none left.
@@ -1102,13 +1104,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             //For pause/resume.
             customHalted = false;
           }
-          //Sets our total millis to the temp value iterated up in our runnable.
-          totalSetMillis = tempSetMillis;
-          //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
-          tempSetMillis = (totalSetMillis + 100) / 1000;
-          total_set_time.setText(convertSeconds(tempSetMillis));
-
-          //Todo: Conditionals on some of these for infinity mode.
           mHandler.postDelayed(() -> {
             //Iterating down on set numbers.
             setMillis = newMillis(true);
@@ -1157,12 +1152,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             //For pause/resume and tab switches.
             customHalted = false;
           }
-          //Sets our total millis to the temp value iterated up in our runnable.
-          totalBreakMillis = tempBreakMillis;
-          //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
-          tempBreakMillis = (totalBreakMillis + 100) / 1000;
-          total_break_time.setText(convertSeconds(tempBreakMillis));
-
           mHandler.postDelayed(() -> {
             onBreak = false;
 
@@ -1232,10 +1221,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           }
         }, 1000);
         fadeVar = 3;
-        //We use all the same vars as in mode 1, since we do not need a unique millis value to count down from because we are in infinity mode.
-        totalBreakMillis = tempBreakMillis;
-        tempBreakMillis = (totalBreakMillis + 100) / 1000;
-        total_break_time.setText(convertSeconds(tempBreakMillis));
         break;
       case 3:
         fadeVar = 4;
@@ -1615,6 +1600,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     if (timer != null) timer.cancel();
     if (objectAnimator != null) objectAnimator.cancel();
     endAnimation.cancel();
+    //Stores cumulative time valuation.
+    saveTotalTimes();
     switch (mode) {
       case 1:
         customProgressPause = maxProgress;
@@ -1624,9 +1611,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         customHalted = true;
         onBreak = false;
         timePaused.setAlpha(1);
-        //Sets all longs in list to "0" since we are restarting a Count Up cycle.
-//        for (int i=0; i<customSetTimeUP.size(); i++) customSetTimeUP.set(i, 0);
-//        for (int i=0; i<customBreakTimeUP.size(); i++) customBreakTimeUP.set(i, 0);
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;
@@ -1672,6 +1656,38 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
     }
     populateTimerUI();
+  }
+
+  public void saveTotalTimes() {
+    switch (mode) {
+      case 1:
+        //Sets our total millis to the temp value iterated up in our runnable.
+        totalSetMillis = tempSetMillis;
+        //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
+        tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
+        total_set_time.setText(convertSeconds(tempSetMillis/1000));
+        //Sets our totalMillis to the new, revised and rounded tempMillis so when it's used again, it syncs up.
+        totalSetMillis = tempSetMillis;
+
+        //Sets our total millis to the temp value iterated up in our runnable.
+        totalBreakMillis = tempBreakMillis;
+        //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
+        tempBreakMillis = (totalBreakMillis + 100) / 1000;
+        total_break_time.setText(convertSeconds(tempBreakMillis));
+        //Sets our totalMillis to the new, revised and rounded tempMillis so when it's used again, it syncs up.
+        totalBreakMillis = tempBreakMillis;
+        break;
+      case 2:
+        totalBreakMillis = tempBreakMillis;
+        tempBreakMillis = (totalBreakMillis + 100) / 1000;
+        total_break_time.setText(convertSeconds(tempBreakMillis));
+        totalBreakMillis = tempBreakMillis;
+        break;
+      case 3:
+        //Todo: For Pom.
+
+        break;
+    }
   }
 
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
@@ -1744,18 +1760,27 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         case 3:
           cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
       }
-      //Todo: Just need to round millis values so full seconds stay in sync.
       runOnUiThread(() -> {
         deleteCyclePopupWindow.dismiss();
         totalSetMillis = 0;
         tempSetMillis = 0;
         totalBreakMillis = 0;
         tempBreakMillis = 0;
-        permSetMillis = ((setMillis+100) / 1000) * 1000;
-        if (mode==1) permBreakMillis = ((breakMillis+100) / 1000) * 1000; else permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;;
+
+        if (mode==1) {
+          permSetMillis = ((setMillis+100) / 1000) * 1000;
+          permBreakMillis = ((breakMillis+100) / 1000) * 1000;
+          customCyclesDone = 0;
+        } else if (mode==2) {
+          permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;
+          breaksOnlyCyclesDone = 0;
+        } else if (mode==3) {
+          pomCyclesDone = 0;
+        }
+
         total_set_time.setText("0");
         total_break_time.setText("0");
-        cycles_completed.setText("0");
+        cycles_completed.setText(getString(R.string.cycles_done, "0"));
       });
     }
   }
