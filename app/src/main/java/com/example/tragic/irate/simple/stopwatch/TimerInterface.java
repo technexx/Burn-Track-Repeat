@@ -414,6 +414,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         resetParam.rightMargin = 60;
         break;
     }
+    //Testing pom round iterations.
+    Log.i("testpop", "set, break and pom are " + customSetTime + " " + breaksOnlyTime + " " + pomValuesTime);
+    for (int i=1; i<9; i++) {
+      pomValuesTime.set(i-1, 2000*i);
+    }
+    Log.i("testpop", "REVISED pom is " + pomValuesTime);
 
     toggleNextRoundRunnable = () -> {
       if (nextRoundToggleIsActive) {
@@ -1016,10 +1022,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             //Re-enabling timer clicks. Used regardless of number of rounds left.
             pomTimerDisabled = false;
 
-            if (pomDotCounter != 9) {
+            if (pomDotCounter < 9) {
+              pomMillis = pomValuesTime.get(pomDotCounter-1);
+              endAnimation.cancel();
               startObjectAnimator();
               startPomTimer();
-              endAnimation.cancel();
             } else {
               modeThreeTimerEnded = true;
               pomCyclesDone += 1;
