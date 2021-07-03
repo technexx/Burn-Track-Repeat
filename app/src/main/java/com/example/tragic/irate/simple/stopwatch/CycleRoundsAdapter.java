@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
+      //Sets work texts to green and break to red.
+      if (position%2==0) modeThreeRounds.round_pomodoro.setTextColor(Color.GREEN); else modeThreeRounds.round_pomodoro.setTextColor(Color.RED);
     }
   }
 
