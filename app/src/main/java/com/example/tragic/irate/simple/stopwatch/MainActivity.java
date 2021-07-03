@@ -215,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
 
-  //Todo: Set/Break total times for modes 1 & 2 need fixing on their reset.
   //Todo: nextRound in Pom mode needs fixing.
   //Todo: Alternating colors for pom rounds in saved cycle adapter.
   //Todo: Text in dots do not align for super low values in Pom. Not an immediate issue because of minimums, but should check all text and sizes for all modes.
