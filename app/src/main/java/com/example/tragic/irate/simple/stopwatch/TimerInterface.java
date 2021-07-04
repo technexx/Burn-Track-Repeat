@@ -646,7 +646,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     confirm_delete.setOnClickListener(v -> {
       //If popUp text contains delete_total_times or delete_total_laps String, execute that part of the function. Otherwise, we're deleting the current cycle.
       AsyncTask.execute(() -> {
-        if (delete_text.getText().equals(getString(R.string.delete_total_times)) || delete_text.getText().equals(getString(R.string.delete_total_laps))) deleteCycle(DELETING_TIMES);
+        if (delete_text.getText().equals(getString(R.string.delete_total_times))) deleteCycle(DELETING_TIMES);
         else deleteCycle(DELETING_CYCLE);
       });
     });
@@ -1551,6 +1551,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         case 4:
           if (fadeInObj != null) fadeInObj.cancel();
           if (pausing == RESUMING_TIMER) {
+            reset.setVisibility(View.INVISIBLE);
             timeLeft.setAlpha(1);
             timePaused.setAlpha(0);
             msTime.setAlpha(1);
@@ -1561,6 +1562,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             //Main runnable for Stopwatch.
             mHandler.post(stopWatchRunnable);
           } else if (pausing == PAUSING_TIMER) {
+            reset.setVisibility(View.VISIBLE);
             timeLeft.setAlpha(0);
             timePaused.setAlpha(1);
             msTime.setAlpha(0);
@@ -1642,18 +1644,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         total_break_time.setVisibility(View.INVISIBLE);
         lapRecycler.setVisibility(View.VISIBLE);
         next_round.setVisibility(View.INVISIBLE);
+        reset_total_times.setVisibility(View.GONE);
         new_lap.setVisibility(View.VISIBLE);
         timePaused.setText("0");
         timeLeft.setText("0");
-        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
+        cycles_completed.setText(getString(R.string.laps_completed, "0"));
         //Modifies top layout.
         ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
-        ConstraintLayout.LayoutParams resetTotalParams = (ConstraintLayout.LayoutParams) reset_total_times.getLayoutParams();
+        ConstraintLayout.LayoutParams lapRecyclerParams = (ConstraintLayout.LayoutParams) lapRecycler.getLayoutParams();
         completedLapsParam.topMargin = 0;
-        resetTotalParams.topToBottom = R.id.cycles_completed;
-        resetTotalParams.bottomToTop = R.id.lap_recycler;
-        resetTotalParams.topMargin = 0;
-        resetTotalParams.bottomMargin = 0;
+        lapRecyclerParams.topMargin = 60;
     }
     dotDraws.setAlpha();
     drawDots(0);
@@ -1716,6 +1716,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         msTimePaused.setText("00");
         if (currentLapList.size() > 0) currentLapList.clear();
         if (savedLapList.size() > 0) savedLapList.clear();
+        lapsNumber = 0;
+        cycles_completed.setText(getString(R.string.laps_completed, "0"));
         lapAdapter.notifyDataSetChanged();
         break;
     }
@@ -1825,30 +1827,24 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       runOnUiThread(() -> {
         deleteCyclePopupWindow.dismiss();
         //Resets all total times to 0.
-        if (mode!=4) {
-          totalSetMillis = 0;
-          tempSetMillis = 0;
-          totalBreakMillis = 0;
-          tempBreakMillis = 0;
+        totalSetMillis = 0;
+        tempSetMillis = 0;
+        totalBreakMillis = 0;
+        tempBreakMillis = 0;
 
-          if (mode==1) {
-            permSetMillis = ((setMillis+100) / 1000) * 1000;
-            permBreakMillis = ((breakMillis+100) / 1000) * 1000;
-            customCyclesDone = 0;
-          } else if (mode==2) {
-            permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;
-            breaksOnlyCyclesDone = 0;
-          } else if (mode==3) {
-            pomCyclesDone = 0;
-          }
-          total_set_time.setText("0");
-          total_break_time.setText("0");
-          cycles_completed.setText(getString(R.string.cycles_done, "0"));
-        } else {
-          //Resets laps to 0 if in Stopwatch mode.
-          lapsNumber = 0;
-          cycles_completed.setText(getString(R.string.laps_completed, "0"));
+        if (mode==1) {
+          permSetMillis = ((setMillis+100) / 1000) * 1000;
+          permBreakMillis = ((breakMillis+100) / 1000) * 1000;
+          customCyclesDone = 0;
+        } else if (mode==2) {
+          permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;
+          breaksOnlyCyclesDone = 0;
+        } else if (mode==3) {
+          pomCyclesDone = 0;
         }
+        total_set_time.setText("0");
+        total_break_time.setText("0");
+        cycles_completed.setText(getString(R.string.cycles_done, "0"));
       });
     }
   }
