@@ -549,6 +549,38 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     };
 
+    stopWatchRunnable = new Runnable() {
+      @Override
+      public void run() {
+        DecimalFormat df2 = new DecimalFormat("00");
+        //ms can never be more than 60/sec due to refresh rate.
+        ms += 1;
+        msReset += 1;
+        msConvert += 1;
+        msConvert2 += 1;
+        msDisplay += 1;
+        if (msConvert > 59) msConvert = 0;
+        if (msConvert2 > 59) msConvert2 = 0;
+        if (msDisplay > 59) msDisplay = 0;
+
+        seconds = ms / 60;
+        minutes = seconds / 60;
+
+        newMs = df2.format((msConvert2 / 60) * 100);
+        savedMs = df2.format((msConvert / 60) * 100);
+        newMsConvert = Integer.parseInt(newMs);
+        savedMsConvert = Integer.parseInt(savedMs);
+
+        //Conversion to long solves +30 ms delay for display.
+        displayMs = df2.format((msDisplay / 60) * 100);
+        displayTime = convertStopwatch((long) seconds);
+
+        timeLeft4.setText(displayTime);
+        msTime.setText(displayMs);
+        mHandler.postDelayed(this, 10);
+      }
+    };
+
     reset.setOnClickListener(v -> {
       if (mode != 3) resetTimer();
       else {
@@ -1519,47 +1551,17 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           } else resetTimer();
           break;
         case 4:
-          DecimalFormat df2 = new DecimalFormat("00");
           if (fadeInObj != null) fadeInObj.cancel();
           if (pausing == RESUMING_TIMER) {
             timeLeft4.setAlpha(1);
             timePaused4.setAlpha(0);
             msTime.setAlpha(1);
             msTimePaused.setAlpha(0);
-            stopWatchRunnable = new Runnable() {
-              @Override
-              public void run() {
-                //ms can never be more than 60/sec due to refresh rate.
-                ms += 1;
-                msReset += 1;
-                msConvert += 1;
-                msConvert2 += 1;
-                msDisplay += 1;
-                if (msConvert > 59) msConvert = 0;
-                if (msConvert2 > 59) msConvert2 = 0;
-                if (msDisplay > 59) msDisplay = 0;
-
-                seconds = ms / 60;
-                minutes = seconds / 60;
-
-                newMs = df2.format((msConvert2 / 60) * 100);
-                savedMs = df2.format((msConvert / 60) * 100);
-                newMsConvert = Integer.parseInt(newMs);
-                savedMsConvert = Integer.parseInt(savedMs);
-
-                //Conversion to long solves +30 ms delay for display.
-                displayMs = df2.format((msDisplay / 60) * 100);
-                displayTime = convertStopwatch((long) seconds);
-
-                timeLeft4.setText(displayTime);
-                msTime.setText(displayMs);
-                mHandler.postDelayed(this, 10);
-              }
-            };
-            mHandler.post(stopWatchRunnable);
             stopwatchHalted = false;
             new_lap.setAlpha(1.0f);
             new_lap.setEnabled(true);
+            //Main runnable for Stopwatch.
+            mHandler.post(stopWatchRunnable);
           } else if (pausing == PAUSING_TIMER) {
             timeLeft4.setAlpha(0);
             timePaused4.setAlpha(1);

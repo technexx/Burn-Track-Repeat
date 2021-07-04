@@ -278,7 +278,6 @@ public class DotDraws extends View {
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
         break;
     }
-
   }
 
   private void drawText(ArrayList<String> list, float x, float y, int i) {
@@ -286,6 +285,7 @@ public class DotDraws extends View {
 
     if (mMode == 1 || mMode == 2) {
       if (list.size() >0) {
+        //If 2 or less chars in time string, fonts are as follows.
         if (list.get(i).length() <= 2) {
           if (list.get(i).length() == 1) {
             //Adds "0" to any single digit.
@@ -293,40 +293,63 @@ public class DotDraws extends View {
             temp = "0" + temp;
             list.set(i, temp);
           }
-
           mPaintText.setTypeface(Typeface.DEFAULT);
-          if (mMode==1) {
-            mPaintText.setTextSize(70f);
-            mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
-          } else if (mMode==2){
-            mPaintText.setTextSize(90f);
-            mCanvas.drawText(list.get(i), x-52, y+28, mPaintText);
+          switch (mMode) {
+            case 1:
+              mPaintText.setTextSize(70f);
+              mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
+              break;
+            case 2:
+              mPaintText.setTextSize(90f);
+              mCanvas.drawText(list.get(i), x-52, y+28, mPaintText);
+              break;
+            case 3:
+              switch (i) {
+                case 0: case 2: case 4: case 6:
+                  mPaintText.setTextSize(50f);
+                  mCanvas.drawText(list.get(i), x-63, y+87, mPaintText);
+                  break;
+                case 1: case 3: case 5:
+                  mPaintText.setTextSize(45f);
+                  mCanvas.drawText(list.get(i), x-42, y+82, mPaintText);
+                  break;
+                case 7:
+                  mPaintText.setTextSize(45f);
+                  mCanvas.drawText(list.get(i), x-42, y+87, mPaintText);
+                  break;
+              }
+              break;
           }
         } else {
+          //If 3 or more chars in time string, fonts are as follows.
           mPaintText.setTypeface(narrow);
-          if (mMode==1) {
-            mPaintText.setTextSize(58f);
-            mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
-          } else if (mMode==2) {
-            mPaintText.setTextSize(65f);
-            mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
+          switch (mMode) {
+            case 1:
+              mPaintText.setTextSize(58f);
+              mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
+              break;
+            case 2:
+              mPaintText.setTextSize(65f);
+              mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
+              break;
+            case 3:
+              //Todo: Reduce font size for more characters.
+              switch (i) {
+                case 0: case 2: case 4: case 6:
+                  mPaintText.setTextSize(50f);
+                  mCanvas.drawText(list.get(i), x-63, y+87, mPaintText);
+                  break;
+                case 1: case 3: case 5:
+                  mPaintText.setTextSize(45f);
+                  mCanvas.drawText(list.get(i), x-42, y+82, mPaintText);
+                  break;
+                case 7:
+                  mPaintText.setTextSize(45f);
+                  mCanvas.drawText(list.get(i), x-42, y+87, mPaintText);
+                  break;
+              }
           }
         }
-      }
-    } else if (mMode==3) {
-      switch (i) {
-        case 0: case 2: case 4: case 6:
-          mPaintText.setTextSize(50f);
-          mCanvas.drawText(list.get(i), x-63, y+87, mPaintText);
-          break;
-        case 1: case 3: case 5:
-          mPaintText.setTextSize(45f);
-          mCanvas.drawText(list.get(i), x-42, y+82, mPaintText);
-          break;
-        case 7:
-          mPaintText.setTextSize(45f);
-          mCanvas.drawText(list.get(i), x-42, y+87, mPaintText);
-          break;
       }
     }
   }

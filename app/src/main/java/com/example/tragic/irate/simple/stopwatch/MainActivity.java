@@ -215,14 +215,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
 
-  //Todo: Text in dots do not align for super low values in Pom. Not an immediate issue because of minimums, but should check all text and sizes for all modes.
-  //Todo: work/break time depending on round for Pom.
+  //Todo: Alter and changed pom text size for more chars (template ready).
+  //Todo: Get Stopwatch up and proper again. Rather than shifting a bunch of Timer stuff to Main, let's just create a simple options splash screen (e.g. shape, color, analog vs. digital, etc.), and then start the Stopwatch in Timer class. OR, just have tabbing to Stopwatch launch Timer class. OR, have Stopwatch as an option somewhere else, without its own tab.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
-    // Todo: Still have issues w/ adapter refreshing while switching modes.
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 

@@ -45,5 +45,17 @@
         app:elevation="8dp">
     </ImageButton>
 
+    <ImageButton
+        android:id="@+id/stopwatch_button"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="3dp"
+        android:src="@drawable/stopwatch_icon"
+        app:elevation="8dp">
+    </ImageButton>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
