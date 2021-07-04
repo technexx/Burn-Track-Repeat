@@ -121,28 +121,6 @@
     </TextView>
 
     <TextView
-        android:id="@+id/timeLeft4"
-        android:textColor="@color/white"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/progressBar"
-        app:layout_constraintBottom_toBottomOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="@id/progressBar"
-        app:layout_constraintEnd_toEndOf="@id/progressBar">
-    </TextView>
-
-    <TextView
-        android:id="@+id/timePaused4"
-        android:textColor="@color/white"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/progressBar"
-        app:layout_constraintBottom_toBottomOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="@id/progressBar"
-        app:layout_constraintEnd_toEndOf="@id/progressBar">
-    </TextView>
-
-    <TextView
         android:id="@+id/overtime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

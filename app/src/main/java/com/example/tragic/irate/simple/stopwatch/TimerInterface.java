@@ -56,8 +56,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ImageView stopWatchView;
   TextView timeLeft;
   TextView timePaused;
-  TextView timeLeft4;
-  TextView timePaused4;
   TextView msTime;
   TextView msTimePaused;
   CountDownTimer timer;
@@ -316,9 +314,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     progressBar = findViewById(R.id.progressBar);
     stopWatchView = findViewById(R.id.stopWatchView);
     timeLeft = findViewById(R.id.timeLeft);
-    timeLeft4 = findViewById(R.id.timeLeft4);
     timePaused = findViewById(R.id.timePaused);
-    timePaused4 = findViewById(R.id.timePaused4);
     msTime = findViewById(R.id.msTime);
     msTimePaused = findViewById(R.id.msTimePaused);
     dotDraws = findViewById(R.id.dotdraws);
@@ -337,8 +333,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     timeLeft.setTextSize(90f);
     timePaused.setTextSize(90f);
-    timeLeft4.setTextSize(90f);
-    timePaused4.setTextSize(90f);
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
     lastTextView = timePaused;
@@ -406,6 +400,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Replaces "total set time" w/ "work time".
         total_set_header.setText(R.string.total_work);
         break;
+      case 4:
+        lapRecycler.setVisibility(View.VISIBLE);
+        next_round.setVisibility(View.INVISIBLE);
+        new_lap.setVisibility(View.VISIBLE);
+        timePaused.setText("0");
+        timeLeft.setText("0");
+        //Todo: Draw boxy canvas thing around recyclerView. Thinking tapered black->grey solid block.
     }
 
 //    if (mode==3) {
@@ -575,7 +576,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         displayMs = df2.format((msDisplay / 60) * 100);
         displayTime = convertStopwatch((long) seconds);
 
-        timeLeft4.setText(displayTime);
+        timeLeft.setText(displayTime);
         msTime.setText(displayMs);
         mHandler.postDelayed(this, 10);
       }
@@ -1369,10 +1370,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     if (seconds >= 60) {
       minutes = seconds / 60;
       roundedSeconds = seconds % 60;
-      if (minutes >= 10 && timeLeft4.getTextSize() != 70f) timeLeft4.setTextSize(70f);
+      if (minutes >= 10 && timeLeft.getTextSize() != 70f) timeLeft.setTextSize(70f);
       return (df.format(minutes) + ":" + df2.format(roundedSeconds));
     } else {
-      if (timeLeft4.getTextSize() != 90f) timeLeft4.setTextSize(90f);
+      if (timeLeft.getTextSize() != 90f) timeLeft.setTextSize(90f);
       return df.format(seconds);
     }
   }
@@ -1417,6 +1418,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       msReset = 0;
       msConvert2 = 0;
+      Log.i("testStop", "current list is " + currentLapList);
+      Log.i("testStop", "saved list is " + savedLapList);
     }
   }
 
@@ -1553,8 +1556,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         case 4:
           if (fadeInObj != null) fadeInObj.cancel();
           if (pausing == RESUMING_TIMER) {
-            timeLeft4.setAlpha(1);
-            timePaused4.setAlpha(0);
+            timeLeft.setAlpha(1);
+            timePaused.setAlpha(0);
             msTime.setAlpha(1);
             msTimePaused.setAlpha(0);
             stopwatchHalted = false;
@@ -1563,11 +1566,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             //Main runnable for Stopwatch.
             mHandler.post(stopWatchRunnable);
           } else if (pausing == PAUSING_TIMER) {
-            timeLeft4.setAlpha(0);
-            timePaused4.setAlpha(1);
+            timeLeft.setAlpha(0);
+            timePaused.setAlpha(1);
             msTime.setAlpha(0);
             msTimePaused.setAlpha(1);
-            timePaused4.setText(timeLeft4.getText());
+            timePaused.setText(timeLeft.getText());
             msTimePaused.setText(msTime.getText());
             mHandler.removeCallbacksAndMessages(null);
             stopwatchHalted = true;
@@ -1690,9 +1693,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         seconds = 0;
         minutes = 0;
         lapsNumber = 0;
-        timeLeft4.setAlpha(1);
+        timeLeft.setAlpha(1);
         msTime.setAlpha(1);
-        timeLeft4.setText("0");
         msTime.setText("00");
         cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
         if (currentLapList.size() > 0) currentLapList.clear();

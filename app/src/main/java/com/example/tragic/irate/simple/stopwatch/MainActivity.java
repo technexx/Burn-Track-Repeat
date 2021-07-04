@@ -57,6 +57,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View mainView;
 
   ImageButton fab;
+  ImageButton stopwatch;
   ImageView sortCheckmark;
 
   CyclesDatabase cyclesDatabase;
@@ -214,40 +216,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
+  Intent intent;
 
-  //Todo: Alter and changed pom text size for more chars (template ready).
-  //Todo: Get Stopwatch up and proper again. Rather than shifting a bunch of Timer stuff to Main, let's just create a simple options splash screen (e.g. shape, color, analog vs. digital, etc.), and then start the Stopwatch in Timer class. OR, just have tabbing to Stopwatch launch Timer class. OR, have Stopwatch as an option somewhere else, without its own tab.
-  //Todo: Hide total time option?
-  //Todo: Should initial date/subsequence sort be updated by recent access time?
-  //Todo: Save total sets/breaks and completed by day option?
-  //Todo: Letter -> Number soft kb is a bit choppy.
-  //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
-  //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
-  //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
+    //Todo: Alter and changed pom text size for more chars (template ready).
+    //Todo: Get round "fade out" alpha to match completed round alpha.
+    //Todo: Hide total time option?
+    //Todo: Should initial date/subsequence sort be updated by recent access time?
+    //Todo: Save total sets/breaks and completed by day option?
+    //Todo: "BLIP" in textView when starting timer likely due to the timeLEFT not being same value as timerPaused.
+    //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
+    //Todo: Letter -> Number soft kb is a bit choppy.
+    //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
+    //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
+    //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
-  //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
-  //Todo: Preset timer selections.
-  //Todo: No rounds added defaults to a default Cycle instead of staying blank.
-  //Todo: TDEE in sep popup w/ tabs.
-  //Todo: Variable set count-up timer, for use w/ TDEE.
-  //Todo: Variable set only mode? Again, for TDEE.
+    //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
+    //Todo: Preset timer selections.
+    //Todo: No rounds added defaults to a default Cycle instead of staying blank.
+    //Todo: TDEE in sep popup w/ tabs.
+    //Todo: Variable set count-up timer, for use w/ TDEE.
+    //Todo: Variable set only mode? Again, for TDEE.
 
-  //Todo: Make sure sort checkmark positions work on different size screens.
-  //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
-  //Todo: Add taskbar notification for timers.
-  //Todo: Add color scheme options.
-  //Todo: All DB calls in aSync.
-  //Todo: Rename app, of course.
-  //Todo: Add onOptionsSelected dots for About, etc.
-  //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
-  //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
-  //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
-  //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
-  //Todo: Test everything 10x.
+    //Todo: Make sure sort checkmark positions work on different size screens.
+    //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
+    //Todo: Add taskbar notification for timers.
+    //Todo: Add color scheme options.
+    //Todo: All DB calls in aSync.
+    //Todo: Rename app, of course.
+    //Todo: Add onOptionsSelected dots for About, etc.
+    //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
+    //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
+    //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
+    //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
+    //Todo: Test everything 10x.
 
-  //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
-  //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
-  //Todo: REMINDER, Try next app w/ Kotlin.
+    //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
+    //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
+    //Todo: REMINDER, Try next app w/ Kotlin.
 
   @Override
   public void onBackPressed() {
@@ -338,6 +343,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
     fab = findViewById(R.id.fab);
+    stopwatch = findViewById(R.id.stopwatch_button);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -496,7 +502,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setSortCheckmark();
 
     //Receives mode from Timer activity and sets the previously used Tab when we are coming back to Main. Default is 1 since modes are 1++, and getTab is mode -1 because we use 0++ indices for each tab.
-    Intent intent = getIntent();
+    intent = getIntent();
     if (intent!= null) {
       mode = intent.getIntExtra("mode", 1);
       TabLayout.Tab tab = tabLayout.getTabAt(mode - 1);
@@ -681,6 +687,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       onNewCycle = true;
     });
 
+    stopwatch.setOnClickListener(v-> {
+        intent = new Intent(MainActivity.this, TimerInterface.class);
+        intent.putExtra("mode", 4);
+        startActivity(intent);
+    });
+
     //Showing sort popup window.
     sort_text.setOnClickListener(v-> {
       sortPopupWindow.showAtLocation(mainView, Gravity.END, 0, -650);
@@ -742,7 +754,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryCycles();
         //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
         receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
-
         //Uses this single position to retrieve cycle and populate timer arrays.
         retrieveCycle();
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
