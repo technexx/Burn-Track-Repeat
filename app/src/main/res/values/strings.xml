@@ -22,6 +22,7 @@
     <string name="delete_all_custom">Are you sure? This will delete all listed cycles.</string>
     <string name="delete_all_BO">Are you sure? This will delete all listed cycles.</string>
     <string name="delete_total_times">Delete time and cycle totals?</string>
+    <string name="delete_total_laps">Reset lap count?</string>
 
     <string name="lap">New Lap</string>
     <string name="clear_laps">Clear Laps</string>

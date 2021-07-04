@@ -218,41 +218,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-    //Todo: Alter and changed pom text size for more chars (template ready).
-    //Todo: Get round "fade out" alpha to match completed round alpha.
-    //Todo: Hide total time option?
-    //Todo: Should initial date/subsequence sort be updated by recent access time?
-    //Todo: Save total sets/breaks and completed by day option?
-    //Todo: "BLIP" in textView when starting timer likely due to the timeLEFT not being same value as timerPaused.
-    //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
-    //Todo: Letter -> Number soft kb is a bit choppy.
-    //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
-    //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
-    //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
+  //Todo: Add "laps completed" views (should already be there) for stopwatch.
+  //Todo: Alter and changed pom text size for more chars (template ready).
+  //Todo: Get round "fade out" alpha to match completed round alpha.
+  //Todo: Hide total time option?
+  //Todo: Should initial date/subsequence sort be updated by recent access time?
+  //Todo: Save total sets/breaks and completed by day option?
+  //Todo: "BLIP" in textView when starting timer likely due to the timeLEFT not being same value as timerPaused.
+  //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
+  //Todo: Letter -> Number soft kb is a bit choppy.
+  //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
+  //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
+  //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
-    //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
-    //Todo: Preset timer selections.
-    //Todo: No rounds added defaults to a default Cycle instead of staying blank.
-    //Todo: TDEE in sep popup w/ tabs.
-    //Todo: Variable set count-up timer, for use w/ TDEE.
-    //Todo: Variable set only mode? Again, for TDEE.
+  //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
+  //Todo: Preset timer selections.
+  //Todo: No rounds added defaults to a default Cycle instead of staying blank.
+  //Todo: TDEE in sep popup w/ tabs.
+  //Todo: Variable set count-up timer, for use w/ TDEE.
+  //Todo: Variable set only mode? Again, for TDEE.
+  //Todo: Make sure sort checkmark positions work on different size screens.
+  //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
+  //Todo: Add taskbar notification for timers.
+  //Todo: Add color scheme options.
+  //Todo: All DB calls in aSync.
+  //Todo: Rename app, of course.
+  //Todo: Add onOptionsSelected dots for About, etc.
+  //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
+  //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
+  //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
+  //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
+  //Todo: Test everything 10x.
 
-    //Todo: Make sure sort checkmark positions work on different size screens.
-    //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
-    //Todo: Add taskbar notification for timers.
-    //Todo: Add color scheme options.
-    //Todo: All DB calls in aSync.
-    //Todo: Rename app, of course.
-    //Todo: Add onOptionsSelected dots for About, etc.
-    //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
-    //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
-    //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
-    //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
-    //Todo: Test everything 10x.
-
-    //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
-    //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
-    //Todo: REMINDER, Try next app w/ Kotlin.
+   //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
+   //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
+   //Todo: REMINDER, Try next app w/ Kotlin.
 
   @Override
   public void onBackPressed() {
@@ -340,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
     tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-    tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
+//    tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
@@ -640,9 +640,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       mode = 3;
                       savedCycleAdapter.setView(3);
                       cycleRoundsAdapter.setMode(3);
-                      break;
-                  case 3:
-                      mode = 4;
                       break;
               }
               queryCycles();

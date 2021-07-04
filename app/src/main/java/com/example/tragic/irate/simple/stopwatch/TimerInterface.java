@@ -400,13 +400,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Replaces "total set time" w/ "work time".
         total_set_header.setText(R.string.total_work);
         break;
-      case 4:
-        lapRecycler.setVisibility(View.VISIBLE);
-        next_round.setVisibility(View.INVISIBLE);
-        new_lap.setVisibility(View.VISIBLE);
-        timePaused.setText("0");
-        timeLeft.setText("0");
-        //Todo: Draw boxy canvas thing around recyclerView. Thinking tapered black->grey solid block.
     }
 
 //    if (mode==3) {
@@ -645,7 +638,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
 
     exit_timer.setOnClickListener(v -> {
-      exitTimer();
+      AsyncTask.execute(()->{
+        exitTimer();
+      });
     });
 
     confirm_delete.setOnClickListener(v -> {
@@ -1639,6 +1634,27 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           pomTimerDisabled = false;
         }
         break;
+      case 4:
+        //Todo: Have "reset" simply reset timer, and keep loopy icon to reset total laps.
+        //Todo: Draw boxy canvas thing around recyclerView. Thinking tapered black->grey solid block.
+        total_set_header.setVisibility(View.INVISIBLE);
+        total_set_time.setVisibility(View.INVISIBLE);
+        total_break_header.setVisibility(View.INVISIBLE);
+        total_break_time.setVisibility(View.INVISIBLE);
+        lapRecycler.setVisibility(View.VISIBLE);
+        next_round.setVisibility(View.INVISIBLE);
+        new_lap.setVisibility(View.VISIBLE);
+        timePaused.setText("0");
+        timeLeft.setText("0");
+        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
+        //Modifies top layout.
+        ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
+        ConstraintLayout.LayoutParams resetTotalParams = (ConstraintLayout.LayoutParams) reset_total_times.getLayoutParams();
+        completedLapsParam.topMargin = 0;
+        resetTotalParams.topToBottom = R.id.cycles_completed;
+        resetTotalParams.bottomToTop = R.id.lap_recycler;
+        resetTotalParams.topMargin = 0;
+        resetTotalParams.bottomMargin = 0;
     }
     dotDraws.setAlpha();
     drawDots(0);
@@ -1692,11 +1708,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         msReset = 0;
         seconds = 0;
         minutes = 0;
-        lapsNumber = 0;
         timeLeft.setAlpha(1);
-        msTime.setAlpha(1);
+        timeLeft.setText("0");
+        timePaused.setText("0");
+        msTime.setAlpha(0);
+        msTimePaused.setAlpha(1);
         msTime.setText("00");
-        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(0)));
+        msTimePaused.setText("00");
         if (currentLapList.size() > 0) currentLapList.clear();
         if (savedLapList.size() > 0) savedLapList.clear();
         lapAdapter.notifyDataSetChanged();
@@ -1737,27 +1755,25 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
-    AsyncTask.execute(() -> {
-      switch (mode) {
-        case 1:
-          cycles.setTotalSetTime((int) tempSetMillis / 1000);
-          cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
-          cycles.setCyclesCompleted(customCyclesDone);
-          cyclesDatabase.cyclesDao().updateCycles(cycles);
-          break;
-        case 2:
-          cyclesBO.setTotalBOTime((int) tempBreakMillis / 1000);
-          cyclesBO.setCyclesCompleted(breaksOnlyCyclesDone);
-          cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-          break;
-        case 3:
-          pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
-          pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
-          pomCycles.setCyclesCompleted(pomCyclesDone);
-          cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-          break;
-      }
-    });
+    switch (mode) {
+      case 1:
+        cycles.setTotalSetTime((int) tempSetMillis / 1000);
+        cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
+        cycles.setCyclesCompleted(customCyclesDone);
+        cyclesDatabase.cyclesDao().updateCycles(cycles);
+        break;
+      case 2:
+        cyclesBO.setTotalBOTime((int) tempBreakMillis / 1000);
+        cyclesBO.setCyclesCompleted(breaksOnlyCyclesDone);
+        cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
+        break;
+      case 3:
+        pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
+        pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
+        pomCycles.setCyclesCompleted(pomCyclesDone);
+        cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+        break;
+    }
 
     //Since we re-create our Main activity and do not used saved preferences for these arrays, we re-send the values back to thr activity so they have them.
     Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
@@ -1770,7 +1786,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void deleteTotalTimes() {
-    delete_text.setText(R.string.delete_total_times);
+    if (mode!=4) delete_text.setText(R.string.delete_total_times); else delete_text.setText(R.string.delete_total_laps);
     deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
   }
 
@@ -1806,28 +1822,31 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         case 3:
           cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
       }
-      runOnUiThread(() -> {
-        deleteCyclePopupWindow.dismiss();
-        totalSetMillis = 0;
-        tempSetMillis = 0;
-        totalBreakMillis = 0;
-        tempBreakMillis = 0;
 
-        if (mode==1) {
-          permSetMillis = ((setMillis+100) / 1000) * 1000;
-          permBreakMillis = ((breakMillis+100) / 1000) * 1000;
-          customCyclesDone = 0;
-        } else if (mode==2) {
-          permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;
-          breaksOnlyCyclesDone = 0;
-        } else if (mode==3) {
-          pomCyclesDone = 0;
-        }
+      if (mode!=4) {
+        runOnUiThread(() -> {
+          deleteCyclePopupWindow.dismiss();
+          totalSetMillis = 0;
+          tempSetMillis = 0;
+          totalBreakMillis = 0;
+          tempBreakMillis = 0;
 
-        total_set_time.setText("0");
-        total_break_time.setText("0");
-        cycles_completed.setText(getString(R.string.cycles_done, "0"));
-      });
+          if (mode==1) {
+            permSetMillis = ((setMillis+100) / 1000) * 1000;
+            permBreakMillis = ((breakMillis+100) / 1000) * 1000;
+            customCyclesDone = 0;
+          } else if (mode==2) {
+            permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;
+            breaksOnlyCyclesDone = 0;
+          } else if (mode==3) {
+            pomCyclesDone = 0;
+          }
+
+          total_set_time.setText("0");
+          total_break_time.setText("0");
+          cycles_completed.setText(getString(R.string.cycles_done, "0"));
+        });
+      } else cycles_completed.setText(getString(R.string.laps_completed, "0"));
     }
   }
 }

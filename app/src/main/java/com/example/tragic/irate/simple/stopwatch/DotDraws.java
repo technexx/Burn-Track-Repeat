@@ -248,7 +248,7 @@ public class DotDraws extends View {
     }
 
     //Blanks out canvas for Stopwatch.
-    if (mMode==4) mCanvas.drawColor(Color.BLACK);
+//    if (mMode==4) mCanvas.drawColor(Color.BLACK);
   }
 
   public void pomFill(int i, boolean fade, int alpha) {
