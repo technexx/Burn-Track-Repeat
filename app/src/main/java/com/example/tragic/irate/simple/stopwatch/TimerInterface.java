@@ -644,9 +644,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
 
     confirm_delete.setOnClickListener(v -> {
-      //If popUp text contains universal delete_total_times String, execute that part of the function. Otherwise, we're deleting the current cycle.
+      //If popUp text contains delete_total_times or delete_total_laps String, execute that part of the function. Otherwise, we're deleting the current cycle.
       AsyncTask.execute(() -> {
-        if (delete_text.getText().equals(getString(R.string.delete_total_times))) deleteCycle(DELETING_TIMES);
+        if (delete_text.getText().equals(getString(R.string.delete_total_times)) || delete_text.getText().equals(getString(R.string.delete_total_laps))) deleteCycle(DELETING_TIMES);
         else deleteCycle(DELETING_CYCLE);
       });
     });
@@ -1635,7 +1635,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
         break;
       case 4:
-        //Todo: Have "reset" simply reset timer, and keep loopy icon to reset total laps.
         //Todo: Draw boxy canvas thing around recyclerView. Thinking tapered black->grey solid block.
         total_set_header.setVisibility(View.INVISIBLE);
         total_set_time.setVisibility(View.INVISIBLE);
@@ -1823,9 +1822,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
       }
 
-      if (mode!=4) {
-        runOnUiThread(() -> {
-          deleteCyclePopupWindow.dismiss();
+      runOnUiThread(() -> {
+        deleteCyclePopupWindow.dismiss();
+        //Resets all total times to 0.
+        if (mode!=4) {
           totalSetMillis = 0;
           tempSetMillis = 0;
           totalBreakMillis = 0;
@@ -1841,12 +1841,15 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           } else if (mode==3) {
             pomCyclesDone = 0;
           }
-
           total_set_time.setText("0");
           total_break_time.setText("0");
           cycles_completed.setText(getString(R.string.cycles_done, "0"));
-        });
-      } else cycles_completed.setText(getString(R.string.laps_completed, "0"));
+        } else {
+          //Resets laps to 0 if in Stopwatch mode.
+          lapsNumber = 0;
+          cycles_completed.setText(getString(R.string.laps_completed, "0"));
+        }
+      });
     }
   }
 }
