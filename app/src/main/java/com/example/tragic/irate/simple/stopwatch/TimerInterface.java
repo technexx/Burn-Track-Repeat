@@ -401,15 +401,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         total_set_header.setText(R.string.total_work);
         break;
     }
-
-//    if (mode==3) {
-//      //Testing pom round iterations.
-//      Log.i("testpop", "pom is " + pomValuesTime);
-//      for (int i=1; i<9; i++) {
-//        pomValuesTime.set(i-1, 4000*i);
-//      }
-//      Log.i("testpop", "REVISED pom is " + pomValuesTime);
-//    }
+    //Testing pom round iterations.
+    if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 70000);
 
     toggleNextRoundRunnable = () -> {
       if (nextRoundToggleIsActive) {

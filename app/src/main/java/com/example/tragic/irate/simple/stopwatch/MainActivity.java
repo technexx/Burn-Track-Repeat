@@ -218,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Add "laps completed" views (should already be there) for stopwatch.
   //Todo: Alter and changed pom text size for more chars (template ready).
   //Todo: Get round "fade out" alpha to match completed round alpha.
   //Todo: Hide total time option?
