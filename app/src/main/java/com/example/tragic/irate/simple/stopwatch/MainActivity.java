@@ -218,7 +218,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Text size change for infinity mode.
+  //Todo: Text size change mid-timer for infinity mode.
+    //Todo: Alpha animation for text between rounds?
   //Todo: Progressbar needs to reset on pom next round.
   //Todo: Get round "fade out" alpha to match completed round alpha.
   //Todo: Hide total time option?
@@ -489,7 +490,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
-
 
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
     fadeOut = new AlphaAnimation(1.0f, 0.0f);

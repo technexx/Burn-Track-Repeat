@@ -172,6 +172,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ValueAnimator sizeAnimator;
   ValueAnimator valueAnimatorDown;
   ValueAnimator valueAnimatorUp;
+  AlphaAnimation fadeIn;
+  AlphaAnimation fadeOut;
   boolean textSizeReduced;
 
   ArrayList<String> setsArray;
@@ -342,6 +344,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
     confirm_delete = deleteCyclePopupView.findViewById(R.id.confirm_yes);
     cancel_delete = deleteCyclePopupView.findViewById(R.id.confirm_no);
+
+    fadeIn = new AlphaAnimation(0.0f, 1.0f);
+    fadeOut = new AlphaAnimation(1.0f, 0.0f);
+    fadeIn.setDuration(1000);
+    fadeOut.setDuration(1000);
+    fadeIn.setFillAfter(true);
+    fadeOut.setFillAfter(true);
 
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
@@ -799,8 +808,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
         tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
         total_set_time.setText(convertSeconds(tempSetMillis/1000));
+        //Fade out effect at end of round, fading in after runnable posts on delay.
+        timeLeft.startAnimation(fadeOut);
 
         mHandler.postDelayed(() -> {
+          timeLeft.startAnimation(fadeIn);
           //Re-enabling timer clicks.
           timerDisabled = false;
           //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
@@ -880,8 +892,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
             tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
             total_break_time.setText(convertSeconds(tempBreakMillis/1000));
+            //Fade out effect at end of round, fading in after runnable posts on delay.
+            timeLeft.startAnimation(fadeOut);
 
             mHandler.postDelayed(() -> {
+              timeLeft.startAnimation(fadeIn);
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
               //Must execute here for conditional below to work.
               numberOfBreaks--;
@@ -962,8 +977,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             totalBreakMillis = totalBreakMillis + breakMillisHolder;
             tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
             total_break_time.setText(convertSeconds(totalBreakMillis/1000));
+            //Fade out effect at end of round, fading in after runnable posts on delay.
+            timeLeft.startAnimation(fadeOut);
 
             mHandler.postDelayed(() -> {
+              timeLeft.startAnimation(fadeIn);
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
               //Must execute here for conditional below to work.
               numberOfBreaksOnly--;
@@ -1067,8 +1085,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               total_break_time.setText(convertSeconds(tempBreakMillis/1000));
               break;
           }
+          //Fade out effect at end of round, fading in after runnable posts on delay.
+          timeLeft.startAnimation(fadeOut);
 
           mHandler.postDelayed(() -> {
+            timeLeft.startAnimation(fadeIn);
             //Counter must increase here for conditional below to work.
             pomDotCounter++;
             pomMillis = newMillis(false);
