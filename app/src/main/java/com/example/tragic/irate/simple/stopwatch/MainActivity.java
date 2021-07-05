@@ -218,7 +218,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Alter and changed pom text size for more chars (template ready).
+  //Todo: Text size change for infinity mode.
+  //Todo: Progressbar needs to reset on pom next round.
   //Todo: Get round "fade out" alpha to match completed round alpha.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?

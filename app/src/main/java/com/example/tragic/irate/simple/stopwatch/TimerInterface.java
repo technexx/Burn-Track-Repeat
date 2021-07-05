@@ -172,6 +172,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ValueAnimator sizeAnimator;
   ValueAnimator valueAnimatorDown;
   ValueAnimator valueAnimatorUp;
+  boolean textSizeReduced;
 
   ArrayList<String> setsArray;
   ArrayList<String> breaksArray;
@@ -298,8 +299,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     cycle_header_text = findViewById(R.id.cycle_header_text);
 
     cycles_completed = findViewById(R.id.cycles_completed);
-//    cycle_reset = findViewById(R.id.cycle_reset);
-//    skip = findViewById(R.id.skip);
     next_round = findViewById(R.id.next_round);
     new_lap = findViewById(R.id.new_lap);
     total_set_header = findViewById(R.id.total_set_header);
@@ -331,14 +330,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     overtime.setVisibility(View.INVISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
 
-    timeLeft.setTextSize(90f);
-    timePaused.setTextSize(90f);
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
     lastTextView = timePaused;
 
     savedCycleAdapter = new SavedCycleAdapter();
-
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -401,7 +397,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         total_set_header.setText(R.string.total_work);
         break;
     }
-    //Testing pom round iterations.
+
+    /////---------Testing pom round iterations---------------/////////
     if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 70000);
 
     toggleNextRoundRunnable = () -> {
@@ -746,6 +743,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void startSetTimer() {
+    //If timer begins at more than 60 seconds, set our reduced text sized boolean to true.
     AtomicBoolean textSizeReduced = new AtomicBoolean(false);
     if (setMillis >= 59000) textSizeReduced.set(true);
 
@@ -824,8 +822,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   public void startBreakTimer() {
     if (mode == 1) {
-      AtomicBoolean textSizeReduced = new AtomicBoolean(false);
-      if (breakMillis >= 59000) textSizeReduced.set(true);
+      setTextSize(breakMillis);
 
       timer = new CountDownTimer(breakMillis, 50) {
         @Override
@@ -840,9 +837,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           }
           if (customAlpha >= 1) fadeCustomTimer = false;
 
-          if (textSizeReduced.get()) if (breakMillis < 59000) {
+          if (textSizeReduced) if (breakMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-            textSizeReduced.set(false);
+            textSizeReduced = false;
           }
 
           timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
@@ -915,8 +912,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
       }.start();
     } else if (mode == 2) {
-      AtomicBoolean textSizeReduced = new AtomicBoolean(false);
-      if (breaksOnlyMillis >= 59000) textSizeReduced.set(true);
+      setTextSize(breaksOnlyMillis);
 
       timer = new CountDownTimer(breaksOnlyMillis, 50) {
         @Override
@@ -931,9 +927,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           }
           if (customAlpha >= 1) fadeCustomTimer = false;
 
-          if (textSizeReduced.get()) if (breaksOnlyMillis < 59000) {
+          if (textSizeReduced) if (breaksOnlyMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-            textSizeReduced.set(false);
+            textSizeReduced = false;
           }
           timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
           timePaused.setText(convertSeconds((millisUntilFinished + 999) / 1000));
@@ -1001,8 +997,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void startPomTimer() {
-    AtomicBoolean textSizeReduced = new AtomicBoolean(false);
-    if (pomMillis >= 59000) textSizeReduced.set(true);
+    setTextSize(pomMillis);
 
     timer = new CountDownTimer(pomMillis, 50) {
       @Override
@@ -1016,8 +1011,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           else if (pomAlpha < 1) timeLeft.setAlpha(pomAlpha += .12);
           else if (pomAlpha >= 1) fadeCustomTimer = false;
         }
-        if (pomAlpha >= 1) fadeCustomTimer = false;
+
+        if (textSizeReduced) if (pomMillis < 59000) {
+          changeTextSize(valueAnimatorUp, timeLeft, timePaused);
+          textSizeReduced = false;
+        }
+
         timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
+        timePaused.setText(convertSeconds((pomMillis + 999) / 1000));
         if (pomMillis<500) pomTimerDisabled = true;
 
         //Switches total time count depending on which round we're on.
@@ -1114,6 +1115,18 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
     sizeAnimator.setRepeatCount(0);
     sizeAnimator.start();
+  }
+
+  //Sets text size at round start. textSizeReduced is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
+  public void setTextSize(long millis) {
+    if (millis>=59000) {
+      timePaused.setTextSize(70f);
+      timeLeft.setTextSize(70f);
+      textSizeReduced = true;
+    } else {
+      timePaused.setTextSize(90f);
+      timeLeft.setTextSize(90f);
+    }
   }
 
   //Sets millis values based on which round we are on (list size minus number of non-completed rounds).
@@ -1583,13 +1596,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             timePaused.setText(convertSeconds((setMillis + 999) / 1000));
             timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
           }
-          if (setMillis >= 60000) {
-            timePaused.setTextSize(70f);
-            timeLeft.setTextSize(70f);
-          } else {
-            timePaused.setTextSize(90f);
-            timeLeft.setTextSize(90f);
-          }
         } else {
           timeLeft.setText("0");
           timePaused.setText("0");
@@ -1601,6 +1607,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         numberOfBreaks = customBreakTime.size();
         //Used to ensure our list size for breaksOnly is correctly passed in to drawDots on app launch.
         startBreaksOnly = breaksOnlyTime.size();
+        //Sets initial text size.
+        setTextSize(setMillis);
         break;
       case 2:
         if (breaksOnlyTime.size() > 0) breaksOnlyMillis = breaksOnlyTime.get(0);
@@ -1609,16 +1617,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             timePaused.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
             timeLeft.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
           }
-          if (breaksOnlyMillis >= 60000) {
-            timePaused.setTextSize(70f);
-            timeLeft.setTextSize(70f);
-          }
         } else {
           timeLeft.setText("0");
           timePaused.setText("0");
         }
         startBreaksOnly = breaksOnlyTime.size();
         numberOfBreaksOnly = breaksOnlyTime.size();
+        //Sets initial text size.
+        setTextSize(breaksOnlyMillis);
         break;
       case 3:
         //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
@@ -1627,10 +1633,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           timePaused.setText(convertSeconds((pomMillis + 999) / 1000));
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
           pomTimerDisabled = false;
+          //Sets initial text size.
+          setTextSize(pomMillis);
         }
         break;
       case 4:
-        //Todo: Draw boxy canvas thing around recyclerView. Thinking tapered black->grey solid block.
         total_set_header.setVisibility(View.INVISIBLE);
         total_set_time.setVisibility(View.INVISIBLE);
         total_break_header.setVisibility(View.INVISIBLE);

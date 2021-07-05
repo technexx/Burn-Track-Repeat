@@ -340,7 +340,7 @@ public class DotDraws extends View {
                 break;
               case 7:
                 mPaintText.setTextSize(65f);
-                mCanvas.drawText(list.get(i), x-36, y+87, mPaintText);
+                mCanvas.drawText(list.get(i), x-37, y+87, mPaintText);
                 break;
             }
         }
