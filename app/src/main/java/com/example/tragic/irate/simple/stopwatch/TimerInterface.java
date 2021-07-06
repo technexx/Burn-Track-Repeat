@@ -505,7 +505,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Animates text size change when timer gets to 60 seconds.
         animateTextSize(countUpMillisSets);
         countUpMillisSets += 50;
-        //Sets the current index of our initial "zero array" to the millis value being counted up.
+        //Sets the current index of our initial "zero array" to the millis value being counted up. When counting down, this is a static value. Here, it will change each tick. In either case, drawDots() uses this to populate the dot text.
         zeroArraySets.set((zeroArraySets.size() - numberOfSets), countUpMillisSets);
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         timePaused.setText(convertSeconds((countUpMillisSets) / 1000));
@@ -1601,6 +1601,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
           }
         } else {
+          //Sets all zero arrays back to 0.
+          for (int i=0; i<zeroArraySets.size(); i++) {
+            zeroArraySets.set(i, 0); zeroArrayBreaks.set(i, 0);
+          }
           timeLeft.setText("0");
           timePaused.setText("0");
         }
@@ -1622,6 +1626,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             timeLeft.setText(convertSeconds((breaksOnlyMillis + 999) / 1000));
           }
         } else {
+          for (int i=0; i<zeroArrayBreaks.size(); i++) zeroArrayBreaks.set(i, 0);
           timeLeft.setText("0");
           timePaused.setText("0");
         }
@@ -1664,6 +1669,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void resetTimer() {
+    reset.setVisibility(View.INVISIBLE);
     progressBar.setProgress(10000);
     timePaused.setAlpha(1);
     if (timer != null) timer.cancel();
