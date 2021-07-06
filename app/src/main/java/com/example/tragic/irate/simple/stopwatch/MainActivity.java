@@ -219,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Intent intent;
 
   //Todo: Text size change mid-timer for infinity mode.
-    //Todo: Alpha animation for text between rounds?
   //Todo: Progressbar needs to reset on pom next round.
   //Todo: Get round "fade out" alpha to match completed round alpha.
   //Todo: Hide total time option?

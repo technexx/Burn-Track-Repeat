@@ -158,9 +158,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   boolean pomHalted = true;
   boolean stopwatchHalted = true;
 
-  boolean fadeCustomTimer;
-  float customAlpha;
-  float pomAlpha;
   ObjectAnimator fadeInObj;
   ObjectAnimator fadeOutObj;
   RecyclerView lapRecycler;
@@ -174,7 +171,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ValueAnimator valueAnimatorUp;
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
-  boolean textSizeReduced;
+  boolean textSizeIncreased;
+  //Always true initially, since infinity mode starts at 0.
+  boolean textSizeReduced = true;
 
   ArrayList<String> setsArray;
   ArrayList<String> breaksArray;
@@ -502,6 +501,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     secondsUpSetRunnable = new Runnable() {
       @Override
       public void run() {
+        //Animates text size change when timer gets to 60 seconds.
+        animateTextSize(countUpMillisSets);
         countUpMillisSets += 50;
         //Sets the current index of our initial "zero array" to the millis value being counted up.
         zeroArraySets.set((zeroArraySets.size() - numberOfSets), countUpMillisSets);
@@ -518,6 +519,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     secondsUpBreakRunnable = new Runnable() {
       @Override
       public void run() {
+        animateTextSize(countUpMillisBreaks);
         countUpMillisBreaks += 50;
         zeroArrayBreaks.set((zeroArrayBreaks.size() - numberOfBreaks), countUpMillisBreaks);
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
@@ -533,6 +535,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     secondsUpBORunnable = new Runnable() {
       @Override
       public void run() {
+        animateTextSize(countUpMillisBO);
         countUpMillisBO += 50;
         zeroArrayBreaks.set((zeroArrayBreaks.size() - numberOfBreaks), countUpMillisBreaks);
         timeLeft.setText(convertSeconds((countUpMillisBO) / 1000));
@@ -752,9 +755,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void startSetTimer() {
-    //If timer begins at more than 60 seconds, set our reduced text sized boolean to true.
-    AtomicBoolean textSizeReduced = new AtomicBoolean(false);
-    if (setMillis >= 59000) textSizeReduced.set(true);
+    setTextSize(setMillis);
 
     timer = new CountDownTimer(setMillis, 50) {
       @Override
@@ -762,17 +763,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         customProgressPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
 
-        //Used to fade in textView from active timers. Since setting a new textView (as we do every tick) resets the alpha value, we need to continue to adjust the alpha each tick.
-        if (fadeCustomTimer) {
-          if (customAlpha < 0.25) timeLeft.setAlpha(customAlpha += 0.03);
-          else if (customAlpha < 0.5) timeLeft.setAlpha(customAlpha += .06);
-          else if (customAlpha < 1) timeLeft.setAlpha(customAlpha += .09);
-          else if (customAlpha >= 1) fadeCustomTimer = false;
-        }
         //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
-        if (textSizeReduced.get()) if (setMillis < 59000) {
+        if (textSizeIncreased) if (setMillis < 59000) {
           changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-          textSizeReduced.set(false);
+          textSizeIncreased = false;
         }
         //Displays Long->String conversion of time left every tick.
         timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
@@ -842,16 +836,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           customProgressPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
 
-          if (fadeCustomTimer) {
-            if (customAlpha < 0.25) timeLeft.setAlpha(customAlpha += 0.03);
-            else if (customAlpha < 0.5) timeLeft.setAlpha(customAlpha += .06);
-            else timeLeft.setAlpha(customAlpha += .09);
-          }
-          if (customAlpha >= 1) fadeCustomTimer = false;
-
-          if (textSizeReduced) if (breakMillis < 59000) {
+          if (textSizeIncreased) if (breakMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-            textSizeReduced = false;
+            textSizeIncreased = false;
           }
 
           timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
@@ -863,9 +850,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           breakMillisHolder = permBreakMillis - breakMillis;
           tempBreakMillis = totalBreakMillis + breakMillisHolder;
           total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
-          Log.i("testvalue", "tempSetMillis in BREAK is " + tempSetMillis);
-          Log.i("testvalue", "totalSetMillis in BREAK is " + totalSetMillis);
-
         }
 
         @Override
@@ -935,16 +919,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           breaksOnlyProgressPause = (int) objectAnimator.getAnimatedValue();
           breaksOnlyMillis = millisUntilFinished;
 
-          if (fadeCustomTimer) {
-            if (customAlpha < 0.25) timeLeft.setAlpha(customAlpha += 0.03);
-            else if (customAlpha < 0.5) timeLeft.setAlpha(customAlpha += .06);
-            else timeLeft.setAlpha(customAlpha += .09);
-          }
-          if (customAlpha >= 1) fadeCustomTimer = false;
-
-          if (textSizeReduced) if (breaksOnlyMillis < 59000) {
+          if (textSizeIncreased) if (breaksOnlyMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-            textSizeReduced = false;
+            textSizeIncreased = false;
           }
           timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
           timePaused.setText(convertSeconds((millisUntilFinished + 999) / 1000));
@@ -1023,16 +1000,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         pomProgressPause = (int) objectAnimator.getAnimatedValue();
         pomMillis = millisUntilFinished;
 
-        if (fadeCustomTimer) {
-          if (pomAlpha < 0.25) timeLeft.setAlpha(pomAlpha += 0.04);
-          else if (pomAlpha < 0.5) timeLeft.setAlpha(pomAlpha += .08);
-          else if (pomAlpha < 1) timeLeft.setAlpha(pomAlpha += .12);
-          else if (pomAlpha >= 1) fadeCustomTimer = false;
-        }
-
-        if (textSizeReduced) if (pomMillis < 59000) {
+        if (textSizeIncreased) if (pomMillis < 59000) {
           changeTextSize(valueAnimatorUp, timeLeft, timePaused);
-          textSizeReduced = false;
+          textSizeIncreased = false;
         }
 
         timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
@@ -1138,15 +1108,25 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     sizeAnimator.start();
   }
 
-  //Sets text size at round start. textSizeReduced is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
+  //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
   public void setTextSize(long millis) {
     if (millis>=59000) {
       timePaused.setTextSize(70f);
       timeLeft.setTextSize(70f);
-      textSizeReduced = true;
+      textSizeIncreased = true;
     } else {
       timePaused.setTextSize(90f);
       timeLeft.setTextSize(90f);
+    }
+  }
+
+  //Used in count up mode to animate text size changes in our runnables.
+  public void animateTextSize(long millis) {
+    if (textSizeReduced) {
+      if (millis >=60000) {
+        changeTextSize(valueAnimatorDown, timeLeft, timePaused);
+        textSizeReduced = false;
+      }
     }
   }
 
@@ -1440,8 +1420,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       msReset = 0;
       msConvert2 = 0;
-      Log.i("testStop", "current list is " + currentLapList);
-      Log.i("testStop", "saved list is " + savedLapList);
     }
   }
 
