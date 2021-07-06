@@ -218,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
+  //Todo: Edittext -> Textview caps time, but going back to editText shows out of bounds values (e.g. 06:88).
+  //Todo: timePaused in stopwatch is tiny text. Cycle adapter not populating coming back from stopwatch.
   //Todo: Timer text in infinity too small.
   //Todo: Issue w/ launching new cycle, coming back, reopening edit cycles. Array doesn't show even tho populated, and we get an index crash w/ mInfinityArray.get(position) - currently line 249.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
@@ -676,7 +678,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Change size of textViews in Mode 3. Here (only when opening).
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
-        setEditCycleTextSize();
       //Clears timer arrays so they can be freshly populated.
 //      clearTimerArrays();
       //Brings up menu to add/subtract rounds to new cycle.
@@ -1707,20 +1708,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     altString = altString.replace("[", "");
     altString = altString.replace(",", " - ");
     return altString;
-  }
-
-  public void setEditCycleTextSize() {
-//      ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
-//      switch (mode) {
-//          case 1:
-//              editCyclesPopupWindow.setHeight(1300);
-//              break;
-//          case 2:
-//              editCyclesPopupWindow.setHeight(1000);
-//              break;
-//          case 3:
-//              editCyclesPopupWindow.setHeight(1430);
-//      }
   }
 
   public void queryCycles() {
