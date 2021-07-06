@@ -218,9 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Check fading vars for count up mode.
-  //Todo: Get round "fade out" alpha to match completed round alpha.
-  //Todo: Change/animate dot textSize in infinity modes.
+  //Todo: Reset in infinity mode needs to reset dot times. Only does so after reset AND timer click at moment.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?

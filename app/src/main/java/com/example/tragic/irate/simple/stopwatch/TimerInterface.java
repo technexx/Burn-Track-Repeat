@@ -1184,6 +1184,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             customHalted = false;
           }
           mHandler.postDelayed(() -> {
+            //Changing fadeVar to one used by BREAKS as soon as new set round is started after runnable delay. This is to keep fading in sync.
+            fadeVar = 2;
             //Iterating down on set numbers.
             setMillis = newMillis(true);
             numberOfSets--;
@@ -1211,7 +1213,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 mHandler.post(secondsUpBreakRunnable);
               }
             }
-            fadeVar = 2;
           }, 1000);
         } else {
           fadeVar = 2;
@@ -1232,6 +1233,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             customHalted = false;
           }
           mHandler.postDelayed(() -> {
+            //Changing fadeVar to one used by BREAKS as soon as new set round is started after runnable delay. This is to keep fading in sync.
+            fadeVar = 1;
+            //Since we are switching back to sets, onBreak is now false.
             onBreak = false;
 
             if (numberOfBreaks > 0) {
@@ -1264,7 +1268,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               customCyclesDone++;
               cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
             }
-            fadeVar = 1;
           }, 1000);
         }
         break;

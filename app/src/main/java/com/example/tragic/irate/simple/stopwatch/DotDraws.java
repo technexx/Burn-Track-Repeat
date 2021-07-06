@@ -356,20 +356,6 @@ public class DotDraws extends View {
     if (mFadeUp) mAlpha +=15;
   }
 
-//  public void fadeDot() {
-//    if (mAlpha >255) mAlpha = 255;
-//    mPaint.setAlpha(mAlpha);
-//    cycle++;
-//    if (cycle <11) {
-//      mAlpha -=15;
-//    } else {
-//      mAlpha +=15;
-//      if (cycle >20) cycle = 0;
-//    }
-//    mSendAlpha.sendAlphaValue(mAlpha);
-//    Log.i("testFade", "value in dotDraws " + mAlpha);
-//  }
-
   public String convertSeconds(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
