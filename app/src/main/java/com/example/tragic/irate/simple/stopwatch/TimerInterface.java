@@ -407,7 +407,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
 
     /////---------Testing pom round iterations---------------/////////
-    if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 70000);
+//    if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 70000);
 
     toggleNextRoundRunnable = () -> {
       if (nextRoundToggleIsActive) {
@@ -1169,7 +1169,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             if (objectAnimator != null) objectAnimator.cancel();
             //Resetting progressBar values.
             customProgressPause = maxProgress;
-            progressBar.setProgress(10000);
+//            progressBar.setProgress(10000);
             //onFinish for counting down sets.
           } else {
             timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
@@ -1219,7 +1219,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             if (objectAnimator != null) objectAnimator.cancel();
             //Resetting progressBar values.
             customProgressPause = maxProgress;
-            progressBar.setProgress(10000);
           } else {
             timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
             timePaused.setText(convertSeconds((countUpMillisBreaks) / 1000));
@@ -1303,22 +1302,20 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         mHandler.post(endFade);
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
-        //Ensures objectAnimator sets millis value to NEW round value.
+        pomProgressPause = maxProgress;
+//        //Ensures objectAnimator sets millis value to NEW round value.
         pomBegun = false;
 
         mHandler.postDelayed(() -> {
           pomDotCounter++;
           pomMillis = newMillis(false);
           endAnimation.cancel();
-          customProgressPause = maxProgress;
-          progressBar.setProgress(10000);
           pomTimerDisabled = false;
 
           if (pomHalted) {
             timeLeft.setText(convertSeconds((pomMillis) / 1000));
             timePaused.setText(convertSeconds((pomMillis / 1000)));
           } else {
-            //millis is CORRECT before this changes it to 0.
             startObjectAnimator();
             startPomTimer();
           }
