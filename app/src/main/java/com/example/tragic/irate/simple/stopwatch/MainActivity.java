@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: progressBar not resetting from count down - > count up modes.
+  //Todo: Issue w/ launching new cycle, coming back, reopening edit cycles. Array doesn't show even tho populated, and we get an index crash w/ mInfinityArray.get(position) - currently line 249.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
