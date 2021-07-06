@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
+  //Todo: Timer text in infinity too small.
   //Todo: Issue w/ launching new cycle, coming back, reopening edit cycles. Array doesn't show even tho populated, and we get an index crash w/ mInfinityArray.get(position) - currently line 249.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
   //Todo: Hide total time option?
@@ -362,21 +363,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       titleChanged = false;
       //If a cycle has been selected via highlight to edit, we automatically update its contents. If not, we do nothing.
       if (editingCycle) {
-        AsyncTask.execute(()->{
-          saveCycles(false);
-          //Calling queryCycles() to fetch the latest post-save list our cycles.
-          queryCycles();
-          //Populates the savedCycleAdapter's array lists, formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
-          runOnUiThread(()-> {
-            //Populates savedCycleAdapter's array lists from new database entry and updates adapter view.
-            populateCycleList();
-            savedCycleAdapter.notifyDataSetChanged();
-            //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
-            clearTimerArrays();
-            editingCycle = false;
-          });   });
-
-   }
+          AsyncTask.execute(() -> {
+              saveCycles(false);
+              //Calling queryCycles() to fetch the latest post-save list our cycles.
+              queryCycles();
+              //Populates the savedCycleAdapter's array lists, formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
+              runOnUiThread(() -> {
+                  //Populates savedCycleAdapter's array lists from new database entry and updates adapter view.
+                  populateCycleList();
+                  savedCycleAdapter.notifyDataSetChanged();
+                  //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
+                  clearTimerArrays();
+                  editingCycle = false;
+              });
+          });
+      }
     });
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -628,7 +629,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       //Sets the recyclerView classes for each mode adapters.
                       savedCycleAdapter.setView(1);
                       cycleRoundsAdapter.setMode(1);
-//
                       break;
                   case 1:
                       mode = 2;
@@ -673,8 +673,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    //Brings up editCycle popUp to create new Cycle.
+      //Todo: Change size of textViews in Mode 3. Here (only when opening).
+      //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+        setEditCycleTextSize();
       //Clears timer arrays so they can be freshly populated.
 //      clearTimerArrays();
       //Brings up menu to add/subtract rounds to new cycle.
@@ -1516,9 +1518,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
         }
         addParams.topToBottom = R.id.s2;
-        addParams.topMargin = 60;
+        addParams.topMargin = 30;
         subParams.topToBottom = R.id.s2;
-        subParams.topMargin = 60;
+        subParams.topMargin = 30;
         break;
       case 3:
         s1.setVisibility(View.VISIBLE);
@@ -1540,9 +1542,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_textView.setText(convertCustomTextView(pomValue2));
         third_value_textView.setText(convertCustomTextView(pomValue3));
         addParams.topToBottom = R.id.s3;
-        addParams.topMargin = 60;
+        addParams.topMargin = 30;
         subParams.topToBottom = R.id.s3;
-        subParams.topMargin = 60;
+        subParams.topMargin = 30;
         break;
     }
     if (mode==2) {
@@ -1552,12 +1554,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       s2ParamsAdd.topToBottom = R.id.plus_first_value;
       s2ParamsSub.topToBottom = R.id.plus_first_value;
     }
-    add_cycle.requestLayout();
-    sub_cycle.requestLayout();
-    plus_first_value.requestLayout();
-    minus_first_value.requestLayout();
-    plus_second_value.requestLayout();
-    minus_second_value.requestLayout();
+//    add_cycle.requestLayout();
+//    sub_cycle.requestLayout();
+//    plus_first_value.requestLayout();
+//    minus_first_value.requestLayout();
+//    plus_second_value.requestLayout();
+//    minus_second_value.requestLayout();
   }
 
   public void countUpMode(boolean onSet) {
@@ -1705,6 +1707,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     altString = altString.replace("[", "");
     altString = altString.replace(",", " - ");
     return altString;
+  }
+
+  public void setEditCycleTextSize() {
+//      ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
+//      switch (mode) {
+//          case 1:
+//              editCyclesPopupWindow.setHeight(1300);
+//              break;
+//          case 2:
+//              editCyclesPopupWindow.setHeight(1000);
+//              break;
+//          case 3:
+//              editCyclesPopupWindow.setHeight(1430);
+//      }
   }
 
   public void queryCycles() {

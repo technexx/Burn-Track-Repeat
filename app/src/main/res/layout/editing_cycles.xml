@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:textColor="@color/white"
         android:textSize="22sp">
     </TextView>
@@ -26,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:textColorHint="@color/circular_progress_default_subtitle"
         android:textColor="@color/white"
         android:textSize="22sp"
@@ -54,8 +54,8 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="2dp"
-        android:layout_marginBottom="6dp"
-        android:textSize="25sp"
+        android:layout_marginBottom="2dp"
+        android:textSize="23sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -66,8 +66,8 @@
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/minus_second_value"
         android:layout_marginStart="2dp"
-        android:layout_marginBottom="6dp"
-        android:textSize="25sp"
+        android:layout_marginBottom="2dp"
+        android:textSize="23sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -78,8 +78,8 @@
         app:layout_constraintTop_toTopOf="@id/plus_third_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginStart="2dp"
-        android:layout_marginBottom="6dp"
-        android:textSize="25sp"
+        android:layout_marginBottom="2dp"
+        android:textSize="23sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -90,7 +90,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginEnd="124dp"
-        android:textSize="27sp">
+        android:textSize="23sp">
     </TextView>
     <TextView
         android:id="@+id/second_value_textView"
@@ -101,7 +101,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:layout_marginEnd="124dp"
         android:gravity="center_horizontal"
-        android:textSize="27sp">
+        android:textSize="23sp">
     </TextView>
 
     <TextView
@@ -113,7 +113,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginEnd="124dp"
         android:gravity="center_horizontal"
-        android:textSize="27sp">
+        android:textSize="23sp">
     </TextView>
 
     <ImageButton
@@ -124,7 +124,7 @@
         app:layout_constraintEnd_toStartOf="@id/first_value_textView"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginEnd="14dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="2dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
     </ImageButton>
@@ -137,7 +137,7 @@
         app:layout_constraintStart_toEndOf="@id/first_value_textView"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginStart="14dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="2dp"
         android:backgroundTint="@color/dark_grey"
         android:background="@drawable/rounded">
     </ImageButton>
@@ -202,7 +202,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="5dp"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:gravity="center_horizontal"
@@ -220,7 +220,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginStart="188dp"
-        android:textSize="27sp">
+        android:textSize="23sp">
     </TextView>
 
     <EditText
@@ -231,7 +231,7 @@
         app:layout_constraintTop_toTopOf="@id/plus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_first_value"
         android:layout_marginEnd="10dp"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:gravity="center_horizontal"
@@ -249,7 +249,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:inputType="number"
@@ -266,7 +266,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:layout_marginTop="2dp"
         android:layout_marginStart="188dp">
     </TextView>
@@ -280,7 +280,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_second_value"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="2dp"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:textColor="@color/white"
         android:inputType="number"
         android:maxLength="2"
@@ -297,7 +297,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:inputType="number"
@@ -314,7 +314,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/plus_third_value"
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:layout_marginTop="2dp"
         android:layout_marginStart="188dp">
     </TextView>
@@ -328,7 +328,7 @@
         app:layout_constraintBottom_toBottomOf="@id/plus_third_value"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="2dp"
-        android:textSize="27sp"
+        android:textSize="23sp"
         android:textColor="@color/white"
         android:inputType="number"
         android:maxLength="2"
@@ -343,7 +343,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginEnd="8dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="6dp"
         android:src="@drawable/arrow_up"
         android:background="@drawable/rectangle_shape_2">
     </ImageButton>
@@ -355,7 +355,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginEnd="8dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="60dp"
         android:src="@drawable/arrow_up"
         android:background="@drawable/rectangle_shape_2">
     </ImageButton>
@@ -399,7 +399,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/round_list_recycler"
         android:layout_width="235dp"
-        android:layout_height="250dp"
+        android:layout_height="240dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_cycle"
@@ -408,8 +408,7 @@
         android:layout_marginTop="5dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:paddingTop="2dp">
     </androidx.recyclerview.widget.RecyclerView>
 
     <ImageButton
