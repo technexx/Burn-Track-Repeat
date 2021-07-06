@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Reset in infinity mode needs to reset dot times. Only does so after reset AND timer click at moment.
+  //Todo: progressBar not resetting from count down - > count up modes.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?

@@ -1184,6 +1184,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             customHalted = false;
           }
           mHandler.postDelayed(() -> {
+            progressBar.setProgress(10000);
             //Changing fadeVar to one used by BREAKS as soon as new set round is started after runnable delay. This is to keep fading in sync.
             fadeVar = 2;
             //Iterating down on set numbers.
@@ -1196,7 +1197,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
             //If timer is paused and we skip to the next round, begin that round paused. We do this by simply setting the timer textViews to the next type of round (i.e. breaks), and resetting the progressBar.
             if (customHalted) {
-              progressBar.setProgress(10000);
               timePaused.setAlpha(1.0f);
               if (!breaksAreCountingUp) {
                 timeLeft.setText(convertSeconds((breakMillis) / 1000));
@@ -1233,6 +1233,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             customHalted = false;
           }
           mHandler.postDelayed(() -> {
+            progressBar.setProgress(10000);
             //Changing fadeVar to one used by BREAKS as soon as new set round is started after runnable delay. This is to keep fading in sync.
             fadeVar = 1;
             //Since we are switching back to sets, onBreak is now false.
@@ -1246,7 +1247,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
               //If timer is paused and we skip to the next round, begin that round paused. We do this by simply setting the timer textViews to the next type of round (i.e. sets), and resetting the progressBar.
               if (customHalted) {
-                progressBar.setProgress(10000);
                 timePaused.setAlpha(1.0f);
                 if (!setsAreCountingUp) {
                   timeLeft.setText(convertSeconds((setMillis) / 1000));
@@ -1283,12 +1283,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         boTimerDisabled = false;
 
         mHandler.postDelayed(() -> {
+          progressBar.setProgress(10000);
           //We always want the next round in breaksOnly to start paused, so we do not execute any timers or animators here.
           if (numberOfBreaksOnly > 0) {
             endAnimation.cancel();
             countUpMillisBO = 0;
             if (breaksOnlyHalted) {
-              progressBar.setProgress(10000);
               timePaused.setAlpha(1.0f);
               if (!breaksOnlyAreCountingUp) {
                 timeLeft.setText(convertSeconds((breaksOnlyMillis) / 1000));
@@ -1306,6 +1306,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }, 1000);
         break;
       case 3:
+        progressBar.setProgress(10000);
         fadeVar = 4;
         mHandler.post(endFade);
         if (timer != null) timer.cancel();
