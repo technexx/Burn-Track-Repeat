@@ -487,13 +487,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Populates UI elements at app start.
     populateTimerUI();
 
-    //Used in all timers to smooth out end fade.
+    //Used in all timers to smooth out end fade. Keeping received
     endFade = new Runnable() {
       @Override
       public void run() {
         drawDots(fadeVar);
-        if (receivedAlpha <= 100) mHandler.removeCallbacks(this);
-        else mHandler.postDelayed(this, 50);
+        if (receivedAlpha <= 90) {
+          mHandler.removeCallbacks(this);
+        } else mHandler.postDelayed(this, 50);
       }
     };
 
@@ -806,6 +807,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         timeLeft.startAnimation(fadeOut);
 
         mHandler.postDelayed(() -> {
+          //Changing fadeVar to one used by BREAKS as soon as new set round is started after runnable delay. This is to keep fading in sync.
+          fadeVar = 2;
           timeLeft.startAnimation(fadeIn);
           //Re-enabling timer clicks.
           timerDisabled = false;
@@ -880,6 +883,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             timeLeft.startAnimation(fadeOut);
 
             mHandler.postDelayed(() -> {
+              //Changing fadeVar to one used by SETS as soon as new set round is started after runnable delay. This is to keep fading in sync.
+              fadeVar = 1;
               timeLeft.startAnimation(fadeIn);
               //Removing the last used set at end of post-delayed runnable to allow time for its dot to fade out via endFade runnable above.
               //Must execute here for conditional below to work.

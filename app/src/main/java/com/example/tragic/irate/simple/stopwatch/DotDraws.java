@@ -42,8 +42,6 @@ public class DotDraws extends View {
   ArrayList<String> mBreakOnlyTime;
   ArrayList<String> mPomTime;
 
-  int savedCustomAlpha;
-  int savedCustomCycle;
   sendPosition mSendPosition;
   sendAlpha mSendAlpha;
   int mOldMode;
@@ -51,7 +49,7 @@ public class DotDraws extends View {
   boolean mGoingUpBreaks;
   boolean mGoingUpBreaksOnly;
   boolean mAddSubFade;
-  boolean mFadingIn;
+  boolean mFadeUp;
 
   public interface sendPosition {
     void sendPos(int pos);
@@ -198,10 +196,7 @@ public class DotDraws extends View {
             if (mFadeDone == 1) fadeDot();
           } else if (mSetReduce + i < mSetTime.size()){
             mPaint.setAlpha(100);
-          } else if (mSetTime.size()-1!=i) mPaint.setAlpha(255); else if (mAddSubFade && mFadingIn) {
-            mPaint.setAlpha(mAlpha2);
-            mPaintText.setAlpha(mAlpha2);
-          }
+          } else mPaint.setAlpha(255);
           mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
           drawText(mSetTime, mX+16, mY+62, i);
           mX += 132;
@@ -349,19 +344,31 @@ public class DotDraws extends View {
   }
 
   public void fadeDot() {
-    if (mAlpha >255) mAlpha = 255;
     mPaint.setAlpha(mAlpha);
-    cycle++;
-    if (cycle <10) {
-      mAlpha -=25;
-    } else {
-      mAlpha +=25;
-      if (cycle >19) cycle = 0;
-    }
-    savedCustomAlpha = mAlpha;
-    savedCustomCycle = cycle;
     mSendAlpha.sendAlphaValue(mAlpha);
+    if (mAlpha >=255) {
+      mAlpha = 255;
+      mFadeUp = false;
+    }
+    if (mAlpha>90 && !mFadeUp) mAlpha -=15; else {
+      mFadeUp = true;
+    }
+    if (mFadeUp) mAlpha +=15;
   }
+
+//  public void fadeDot() {
+//    if (mAlpha >255) mAlpha = 255;
+//    mPaint.setAlpha(mAlpha);
+//    cycle++;
+//    if (cycle <11) {
+//      mAlpha -=15;
+//    } else {
+//      mAlpha +=15;
+//      if (cycle >20) cycle = 0;
+//    }
+//    mSendAlpha.sendAlphaValue(mAlpha);
+//    Log.i("testFade", "value in dotDraws " + mAlpha);
+//  }
 
   public String convertSeconds(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");

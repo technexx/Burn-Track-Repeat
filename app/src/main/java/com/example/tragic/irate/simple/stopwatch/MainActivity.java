@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
+  //Todo: Check fading vars for count up mode.
   //Todo: Get round "fade out" alpha to match completed round alpha.
   //Todo: Change/animate dot textSize in infinity modes.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
@@ -231,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: Test dot text w/ different char numbers, tho there will be min values (e.g. in Pom) that will make some adjustment unnecessary.
   //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
   //Todo: Preset timer selections.
   //Todo: No rounds added defaults to a default Cycle instead of staying blank.
