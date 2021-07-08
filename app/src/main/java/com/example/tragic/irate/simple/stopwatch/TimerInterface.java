@@ -235,6 +235,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   Runnable toggleNextRoundRunnable;
   boolean nextRoundToggleIsActive;
+  boolean resetMenu;
 
   @Override
   public void onBackPressed() {
@@ -243,10 +244,20 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
   }
 
+  //Todo: Put in onPrepareOptions.
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
     MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.timer_options_menu, menu);
+    MenuItem counterItem = menu.findItem(R.id.hide_counter);
+
+    if (reset_total_times.getVisibility()==View.VISIBLE) {
+      hideCounter(true);
+      counterItem.setTitle("Show Counter");
+    } else {
+      hideCounter(false);
+      counterItem.setTitle("Hide Counter");
+    }
     return true;
   }
 
@@ -258,6 +269,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case R.id.delete_single_cycle:
         delete_text.setText(R.string.confirm_single_delete);
         deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
+        break;
+      case R.id.hide_counter:
+        resetMenu = true;
+        invalidateOptionsMenu();
         break;
     }
     return super.onOptionsItemSelected(item);
@@ -1136,6 +1151,22 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         changeTextSize(valueAnimatorDown, timeLeft, timePaused);
         textSizeReduced = false;
       }
+    }
+  }
+
+  public void hideCounter(boolean hiding) {
+    if (hiding) {
+      total_set_header.setVisibility(View.GONE);
+      total_set_time.setVisibility(View.GONE);
+      total_break_header.setVisibility(View.GONE);
+      total_break_time.setVisibility(View.GONE);
+      reset_total_times.setVisibility(View.GONE);
+    } else {
+      total_set_header.setVisibility(View.VISIBLE);
+      total_set_time.setVisibility(View.VISIBLE);
+      total_break_header.setVisibility(View.VISIBLE);
+      total_break_time.setVisibility(View.VISIBLE);
+      reset_total_times.setVisibility(View.VISIBLE);
     }
   }
 

@@ -4,4 +4,7 @@
     <item android:id="@+id/delete_single_cycle"
         android:title="Delete Cycle">
     </item>
+    <item android:id="@+id/hide_counter"
+        android:title="Hide Counter">
+    </item>
 </menu>
