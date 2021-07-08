@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Hide total time option?
+  //Todo: Setting infinity mode when creating cycle doesn't work (goes to count down regardless).
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: "BLIP" in textView when starting timer likely due to the timeLEFT not being same value as timerPaused.
@@ -1537,7 +1537,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           s1.setText(R.string.set_time);
           first_value_textView.setText(convertCustomTextView(setValue));
           second_value_textView.setText(convertCustomTextView(breakValue));
-          Log.i("testVal", "set val is " + setValue);
         } else {
           //Visibilities exclusive to mode 2.
           s1.setVisibility(View.INVISIBLE);
@@ -1555,7 +1554,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         subParams.topMargin = 30;
         break;
       case 3:
-        //Visibilites and values exclusive to mode 3.
+        //Visibilities and values exclusive to mode 3.
         s1.setVisibility(View.VISIBLE);
         s3.setVisibility(View.VISIBLE);
         first_value_textView.setVisibility(View.VISIBLE);
