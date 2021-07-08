@@ -219,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Pom edit mode needs work. Also w/ editCycle display.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
@@ -547,7 +546,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           if (infinityArrayThree.isEmpty()) for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
 
-          //Todo: Adapter lists are empty when coming back from Stopwatch, but not other modes. Comes from populateCycle().
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
           savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
@@ -1516,6 +1514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertEditTime(true);
     switch (mode) {
       case 1: case 2:
+        //All shared visibilities between modes 1 and 2.
         s2.setVisibility(View.VISIBLE);
         s3.setVisibility(View.GONE);
         third_value_textView.setVisibility(View.INVISIBLE);
@@ -1526,27 +1525,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         upDown_arrow_one.setVisibility(View.VISIBLE);
         upDown_arrow_two.setVisibility(View.VISIBLE);
         second_value_textView.setVisibility(View.VISIBLE);
+        //Shared String between modes 1 and 2.
         s2.setText(R.string.break_time);
         if (mode==1) {
+          //Visibilities exclusive to mode 1.
           s1.setVisibility(View.VISIBLE);
-          s1.setText(R.string.set_time);
+          first_value_textView.setVisibility(View.VISIBLE);
           plus_first_value.setVisibility(View.VISIBLE);
           minus_first_value.setVisibility(View.VISIBLE);
+          //Strings and values exclusive to mode 1.
           s1.setText(R.string.set_time);
+          first_value_textView.setText(convertCustomTextView(setValue));
+          second_value_textView.setText(convertCustomTextView(breakValue));
+          Log.i("testVal", "set val is " + setValue);
         } else {
+          //Visibilities exclusive to mode 2.
           s1.setVisibility(View.INVISIBLE);
           first_value_textView.setVisibility(View.INVISIBLE);
           plus_first_value.setVisibility(View.INVISIBLE);
           minus_first_value.setVisibility(View.INVISIBLE);
           upDown_arrow_two.setVisibility(View.GONE);
+          //Value exclusive to mode 2.
           second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
         }
+        //If in mode 1 or 2, constraining our add/remove buttons to the "s2" line of objects.
         addParams.topToBottom = R.id.s2;
         addParams.topMargin = 30;
         subParams.topToBottom = R.id.s2;
         subParams.topMargin = 30;
         break;
       case 3:
+        //Visibilites and values exclusive to mode 3.
         s1.setVisibility(View.VISIBLE);
         s3.setVisibility(View.VISIBLE);
         first_value_textView.setVisibility(View.VISIBLE);
@@ -1565,12 +1574,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         first_value_textView.setText(convertCustomTextView(pomValue1));
         second_value_textView.setText(convertCustomTextView(pomValue2));
         third_value_textView.setText(convertCustomTextView(pomValue3));
+        //If in mode 3, constraining our add/remove buttons to the "s3" line of objects.
         addParams.topToBottom = R.id.s3;
         addParams.topMargin = 30;
         subParams.topToBottom = R.id.s3;
         subParams.topMargin = 30;
         break;
     }
+    //If in mode 2, constraining views for a more compact interface.
     if (mode==2) {
       s2ParamsAdd.topToBottom = R.id.top_anchor;
       s2ParamsSub.topToBottom = R.id.top_anchor;
@@ -1578,12 +1589,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       s2ParamsAdd.topToBottom = R.id.plus_first_value;
       s2ParamsSub.topToBottom = R.id.plus_first_value;
     }
-//    add_cycle.requestLayout();
-//    sub_cycle.requestLayout();
-//    plus_first_value.requestLayout();
-//    minus_first_value.requestLayout();
-//    plus_second_value.requestLayout();
-//    minus_second_value.requestLayout();
   }
 
   public void countUpMode(boolean onSet) {
