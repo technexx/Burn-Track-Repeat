@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Spinner sort_spinner;
 
   int mode = 1;
+  int savedMode;
   int sortMode = 1;
   int sortModeBO = 1;
   int sortModePom = 1;
@@ -218,8 +219,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Edittext -> Textview caps time, but going back to editText shows out of bounds values (e.g. 06:88).
-  //Todo: timePaused in stopwatch is tiny text. Cycle adapter not populating coming back from stopwatch.
+  //Todo: Cycle adapter not populating coming back from stopwatch.
   //Todo: Timer text in infinity too small.
   //Todo: Issue w/ launching new cycle, coming back, reopening edit cycles. Array doesn't show even tho populated, and we get an index crash w/ mInfinityArray.get(position) - currently line 249.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
@@ -506,13 +506,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Receives mode from Timer activity and sets the previously used Tab when we are coming back to Main. Default is 1 since modes are 1++, and getTab is mode -1 because we use 0++ indices for each tab.
     intent = getIntent();
     if (intent!= null) {
+      //Last mode selected.
       mode = intent.getIntExtra("mode", 1);
+      //If stopwatch is launched, mode is 4. Since we only update our respective adapter lists in modes 1 - 3, we reset the mode to the last one used so that the proper lists can be updated.
+      savedMode = intent.getIntExtra("savedMode", 0);
+      if (mode==4) mode = savedMode;
       TabLayout.Tab tab = tabLayout.getTabAt(mode - 1);
       if (tab != null){
         tab.select();
       }
     }
 
+    //Todo: Diff. solution other than post-delay. May also be responsible for some of the lag.
     mHandler.postDelayed(() -> {
       AsyncTask.execute(() -> {
         //Loads database of saved cycles.
@@ -545,6 +550,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           if (infinityArrayThree.isEmpty()) for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
 
+          //Todo: Adapter lists are empty when coming back from Stopwatch, but not other modes. Comes from populateCycle().
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
           savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
@@ -675,7 +681,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-      //Todo: Change size of textViews in Mode 3. Here (only when opening).
+    //Caps and sets editText values when clicking outside (exiting) the editText box.
+    editCyclesPopupView.setOnClickListener(v-> {
+      convertEditTime(true);
+    });
+
+  //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
+    cycle_name_edit.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+          convertEditTime(true);
+        }
+        return false;
+      }
+    });
+
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
       //Clears timer arrays so they can be freshly populated.
@@ -687,9 +708,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopwatch.setOnClickListener(v-> {
-        intent = new Intent(MainActivity.this, TimerInterface.class);
-        intent.putExtra("mode", 4);
-        startActivity(intent);
+      intent = new Intent(MainActivity.this, TimerInterface.class);
+      //Retaining whichever cycle mode we're on when launching the stopwatch. This is necessary for the correct adapter refresh when coming back to Main.
+      intent.putExtra("savedMode", mode);
+      intent.putExtra("mode", 4);
+      startActivity(intent);
     });
 
     //Showing sort popup window.
@@ -1201,15 +1224,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Sets min/max bounds on timer values. MUST be separate from setEditValues() so it can be called w/ in our +/- increment runnable and not b0rk the values.
   public void setTimerValueBounds() {
     switch (mode) {
-      case 1: case 2:
+      case 1:
         toastBounds(5, 300, setValue);
         toastBounds(5, 300, breakValue);
-        toastBounds(5, 300, breaksOnlyValue);
         if (setValue < 5) setValue = 5;
         if (breakValue < 5) breakValue = 5;
-        if (breaksOnlyValue < 5) breaksOnlyValue = 5;
         if (setValue > 300) setValue = 300;
         if (breakValue > 300) breakValue = 300;
+      case 2:
+        toastBounds(5, 300, breaksOnlyValue);
+        if (breaksOnlyValue < 5) breaksOnlyValue = 5;
         if (breaksOnlyValue > 300) breaksOnlyValue = 300;
         break;
       case 3:
@@ -1227,7 +1251,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Converts and sets our minute and second edit values from raw time values.
-  public void convertEditTime(boolean setTextViews) {
+  public void convertEditTime(boolean setEditViews) {
     //Used to turn off editText listener's execution of setEditValues(), which overrides setValue and breakValue when trying to change them via +/- runnables, which call this function.
     editListener = false;
     if (mode==1 || mode==2) {
@@ -1240,7 +1264,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         editBreakSeconds = breaksOnlyValue % 60;
         editBreakMinutes = breaksOnlyValue / 60;
       }
-      if (setTextViews) {
+      if (setEditViews) {
         first_value_edit.setText(String.valueOf(editSetMinutes));
         first_value_edit_two.setText(elongateEditSeconds(editSetSeconds));
         second_value_edit.setText(String.valueOf(editBreakMinutes));
@@ -1254,7 +1278,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editPomMinutesTwo = pomValue2 / 60;
       editPomSecondsThree = pomValue3 % 60;
       editPomMinutesThree = pomValue3 / 60;
-      if (setTextViews) {
+      if (setEditViews) {
         first_value_edit.setText(String.valueOf(editPomMinutesOne));
         second_value_edit.setText(String.valueOf(editPomMinutesTwo));
         third_value_edit.setText(String.valueOf(editPomMinutesThree));

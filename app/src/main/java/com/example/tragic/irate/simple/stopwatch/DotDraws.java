@@ -44,7 +44,6 @@ public class DotDraws extends View {
 
   sendPosition mSendPosition;
   sendAlpha mSendAlpha;
-  int mOldMode;
   boolean mGoingUpSets;
   boolean mGoingUpBreaks;
   boolean mGoingUpBreaksOnly;
@@ -90,9 +89,7 @@ public class DotDraws extends View {
   }
 
   public void setMode(int mode) {
-    mOldMode = mMode;
     mMode = mode;
-    if (mMode==4) invalidate();
   }
 
   //Called from Main and determines whether we are counting up or down.

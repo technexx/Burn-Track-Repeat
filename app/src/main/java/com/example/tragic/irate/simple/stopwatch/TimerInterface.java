@@ -166,6 +166,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   DotDraws dotDraws;
   int mode = 1;
+  int savedMode;
   ValueAnimator sizeAnimator;
   ValueAnimator valueAnimatorDown;
   ValueAnimator valueAnimatorUp;
@@ -237,8 +238,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   @Override
   public void onBackPressed() {
-    exitTimer();
-//    moveTaskToBack(true);
+    AsyncTask.execute(()-> {
+      exitTimer();
+    });
   }
 
   @Override
@@ -359,6 +361,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     if (intent != null) {
       isNewCycle = intent.getBooleanExtra("isNewCycle", false);
       mode = intent.getIntExtra("mode", 0);
+      //Used as a reference to the mode we launched Stopwatch from, if we did.
+      savedMode = intent.getIntExtra("savedMode", 0);
       cycle_title = intent.getStringExtra("cycleTitle");
       //The primary key ID of our current cycle row.
       passedID = intent.getIntExtra("passedID", 0);
@@ -1584,6 +1588,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             stopwatchHalted = true;
             new_lap.setAlpha(0.3f);
             new_lap.setEnabled(false);
+            break;
           }
       }
     }
@@ -1664,6 +1669,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         ConstraintLayout.LayoutParams lapRecyclerParams = (ConstraintLayout.LayoutParams) lapRecycler.getLayoutParams();
         completedLapsParam.topMargin = 0;
         lapRecyclerParams.topMargin = 60;
+        //Stopwatch always starts at 0.
+        setTextSize(0);
     }
     dotDraws.setAlpha();
     drawDots(0);
