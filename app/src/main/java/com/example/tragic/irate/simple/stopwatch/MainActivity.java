@@ -219,9 +219,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeOut;
   Intent intent;
 
-  //Todo: Cycle adapter not populating coming back from stopwatch.
-  //Todo: Timer text in infinity too small.
-  //Todo: Issue w/ launching new cycle, coming back, reopening edit cycles. Array doesn't show even tho populated, and we get an index crash w/ mInfinityArray.get(position) - currently line 249.
   //Todo: Pom edit mode needs work. Also w/ editCycle display.
   //Todo: Hide total time option?
   //Todo: Should initial date/subsequence sort be updated by recent access time?
@@ -580,6 +577,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList, convertedPomList);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecycler.setLayoutManager(lm);
+    //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
+    cycleRoundsAdapter.setMode(mode);
 
     //Instantiates count up/count down methods.
     countUpMode(true); countUpMode(false);
@@ -1645,6 +1644,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void adjustCustom(boolean adding) {
     if (adding) {
+      //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
+      setEditValues();
       switch (mode) {
         case 1:
           if (customSetTime.size() < 8) {
@@ -1684,7 +1685,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           break;
       }
-      setEditValues();
     } else {
       switch (mode) {
         case 1:
@@ -1721,6 +1721,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
     }
+    //Updates our recyclerView list via adapter after each addition/subtraction of round.
     cycleRoundsAdapter.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
