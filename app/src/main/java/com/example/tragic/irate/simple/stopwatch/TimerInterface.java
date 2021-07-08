@@ -244,19 +244,22 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
   }
 
-  //Todo: Put in onPrepareOptions.
+  //Todo: Put in onPrepareOptions. Also shift layout constraints.
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
     MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.timer_options_menu, menu);
-    MenuItem counterItem = menu.findItem(R.id.hide_counter);
 
-    if (reset_total_times.getVisibility()==View.VISIBLE) {
-      hideCounter(true);
-      counterItem.setTitle("Show Counter");
-    } else {
-      hideCounter(false);
-      counterItem.setTitle("Hide Counter");
+    //Boolean set to true on first menu click so this doesm't execute on activity's initial instantiation Toggles menu text and visibility of total time counters.
+    if (resetMenu) {
+      MenuItem counterItem = menu.findItem(R.id.hide_counter);
+      if (reset_total_times.getVisibility()==View.VISIBLE) {
+        hideCounter(true);
+        counterItem.setTitle("Show Counter");
+      } else {
+        hideCounter(false);
+        counterItem.setTitle("Hide Counter");
+      }
     }
     return true;
   }
@@ -270,6 +273,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         delete_text.setText(R.string.confirm_single_delete);
         deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
         break;
+        //Refreshes onCreateOptionsMenu.
       case R.id.hide_counter:
         resetMenu = true;
         invalidateOptionsMenu();
