@@ -155,6 +155,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View top_anchor;
   ImageButton start_timer;
 
+  ArrayList<Integer> workoutTime;
+  ArrayList<String> convertedWorkoutTime;
+  ArrayList<String> workoutTitle;
+  ArrayList<String> workoutConcatArray;
+  ArrayList<Integer> typeOfRound;
+  int SETS_DOWN = 1;
+  int BREAKS_DOWN = 2;
+  int SETS_UP = 3;
+  int BREAKS_UP = 4;
+  boolean setsUp;
+  boolean breaksUp;
+
   ArrayList<Integer> customSetTime;
   ArrayList<Integer> customBreakTime;
   ArrayList<Integer> breaksOnlyTime;
@@ -218,6 +230,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
   Intent intent;
+
+  //Todo: Combining modes 1 and 2 still seems like best option. Simpler UI as well. Think we should be able to mix/match sets and breaks. Use numbered rows for dotDraws? More versatile, good for super sets, etc. Can also add "tandem" button to sync up sets/breaks automatically. We'd also be able to remove the infinity toggle.
+      //Todo: Either one single list (append w/ marker?), or keep current lists and draw from each in a certain order. Latter seems easier if we have correct formula. We can just create a second list w/ markers, like 0/1/2/3 for set/break/setUp/breakUp in the correct order.
 
   //Todo: Setting infinity mode when creating cycle doesn't work (goes to count down regardless).
   //Todo: Should initial date/subsequence sort be updated by recent access time?
@@ -339,7 +354,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
     tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-//    tabLayout.addTab(tabLayout.newTab().setText("Stopwatch"));
 
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
@@ -441,17 +455,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cancelHighlight.setVisibility(View.INVISIBLE);
     cycle_name_text.setVisibility(View.INVISIBLE);
 
+    workoutTime = new ArrayList<>();
+    convertedWorkoutTime = new ArrayList<>();
+    workoutTitle = new ArrayList<>();
+    workoutConcatArray = new ArrayList<>();
+    typeOfRound = new ArrayList<>();
+
     //These Integer Lists hold our millis values for each round.
     customSetTime = new ArrayList<>();
     customBreakTime = new ArrayList<>();
     breaksOnlyTime = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
-    //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes.
+    //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes in recyclerView via adapter.
     convertedSetsList = new ArrayList<>();
     convertedBreaksList = new ArrayList<>();
     convertedBreaksOnlyList = new ArrayList<>();
     convertedPomList = new ArrayList<>();
-    //These String lists hold concatenated Strings of COMPLETE cycles (e.g. 2:00, 4:30, etc.), used for storing the cycles in our database.
+    //These String lists hold concatenated Strings of COMPLETE cycles (e.g. [2:00, 4:30., 3:15] etc.), used for storing the cycles in our database.
     setsArray = new ArrayList<>();
     breaksArray = new ArrayList<>();
     breaksOnlyArray = new ArrayList<>();
@@ -572,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Adapter and Recycler for round views within our editCycles popUp.
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
     RecyclerView roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
-    cycleRoundsAdapter = new CycleRoundsAdapter(convertedSetsList, convertedBreaksList, convertedBreaksOnlyList, convertedPomList);
+    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), convertedWorkoutTime, typeOfRound, convertedPomList);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecycler.setLayoutManager(lm);
     //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
@@ -1072,12 +1092,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
 
+    //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
     add_cycle.setOnClickListener(v -> {
-      adjustCustom(true);
+      if (!setsUp) adjustCustom(true, 1); else adjustCustom(true, 2);
     });
 
     sub_cycle.setOnClickListener(v -> {
-      adjustCustom(false);
+      if (breaksUp) adjustCustom(false, 3); else adjustCustom(false, 4);
     });
     ////--EditCycles Menu Item OnClicks END--////
 
@@ -1591,54 +1612,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void countUpMode(boolean onSet) {
-    if (mode==1) {
-      if (onSet) {
-        //Moving to COUNT UP mode.
-        if (!setsAreCountingUp) {
-          setsAreCountingUp = true;
-          upDown_arrow_one.setTag(COUNTING_UP);
-          upDown_arrow_one.setImageResource(R.drawable.arrow_up);;
-          prefEdit.putBoolean("setCountUpMode", true);
-          cycleRoundsAdapter.countingUpSets(true);
-        } else {
-          //Moving to COUNT DOWN mode.
-          setsAreCountingUp = false;
-          upDown_arrow_one.setTag(COUNTING_DOWN);
-          upDown_arrow_one.setImageResource(R.drawable.arrow_down);
-          upDown_arrow_one.setTag(1);
-          prefEdit.putBoolean("setCountUpMode", false);
-          cycleRoundsAdapter.countingUpSets(false);
-        }
-      } else {
-        //Moving to COUNT UP mode.
-        if (!breaksAreCountingUp) {
-          breaksAreCountingUp = true;
-          upDown_arrow_two.setTag(COUNTING_UP);
-          upDown_arrow_two.setImageResource(R.drawable.arrow_up);
-          prefEdit.putBoolean("breakCountUpMode", true);
-          cycleRoundsAdapter.countingUpBreaks(true);
-        } else {
-          //Moving to COUNT DOWN mode.
-          breaksAreCountingUp = false;
-          upDown_arrow_two.setTag(COUNTING_DOWN);
-          upDown_arrow_two.setImageResource(R.drawable.arrow_down);
-          prefEdit.putBoolean("breakCountUpMode", false);
-          cycleRoundsAdapter.countingUpBreaks(false);
-        }
-      }
-    } else if (mode==2) {
+    if (onSet) {
       //Moving to COUNT UP mode.
-      if (!breaksOnlyAreCountingUp) {
-        breaksOnlyAreCountingUp = true;
+      if (!setsAreCountingUp) {
+        setsUp = true;
         upDown_arrow_one.setTag(COUNTING_UP);
-        upDown_arrow_one.setImageResource(R.drawable.arrow_up);
-        prefEdit.putBoolean("breakOnlyCountUpMode", true);
-        cycleRoundsAdapter.countingUpBreaks(true);
+        upDown_arrow_one.setImageResource(R.drawable.arrow_up);;
       } else {
-        breaksOnlyAreCountingUp = false;
+        //Moving to COUNT DOWN mode.
+        setsUp = false;
         upDown_arrow_one.setTag(COUNTING_DOWN);
         upDown_arrow_one.setImageResource(R.drawable.arrow_down);
-        prefEdit.putBoolean("breakOnlyCountUpMode", false);
+        upDown_arrow_one.setTag(COUNTING_DOWN);
+      }
+    } else {
+      //Moving to COUNT UP mode.
+      if (!breaksAreCountingUp) {
+        breaksUp = true;
+        upDown_arrow_two.setTag(COUNTING_UP);
+        upDown_arrow_two.setImageResource(R.drawable.arrow_up);
+      } else {
+        //Moving to COUNT DOWN mode.
+        breaksUp = false;
+        upDown_arrow_two.setTag(COUNTING_DOWN);
+        upDown_arrow_two.setImageResource(R.drawable.arrow_down);
+        prefEdit.putBoolean("breakCountUpMode", false);
         cycleRoundsAdapter.countingUpBreaks(false);
       }
     }
@@ -1646,83 +1644,63 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
   }
 
-  public void adjustCustom(boolean adding) {
+  public void adjustCustom(boolean adding, int type) {
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       setEditValues();
-      switch (mode) {
-        case 1:
-          if (customSetTime.size() < 8) {
-            customSetTime.add(setValue * 1000);
-            customBreakTime.add(breakValue * 1000);
-            //String array that is used to convert to a single gSon String to store in database.
-            convertedSetsList.add(convertSeconds(setValue));
-            convertedBreaksList.add(convertSeconds(breakValue));
-          } else {
-            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-            //Return to save on resources. Also to avoid unnecessary fading in Pom mode.
-            return;
+
+      if (mode==1) {
+        if (workoutTime.size()<16) {
+          //Adds 1-4 for type of round anytime we're adding a round.
+          typeOfRound.add(type);
+          switch (type) {
+            case 1:
+              workoutTime.add(setValue * 1000);
+              convertedWorkoutTime.add(convertSeconds(setValue));
+              break;
+            case 2:
+              workoutTime.add(breakValue * 1000);
+              convertedWorkoutTime.add(convertSeconds(breakValue));
+              break;
+            case 3: case 4:
+              workoutTime.add(0);
+              convertedWorkoutTime.add("0");
+              break;
           }
-          break;
-        case 2:
-          if (breaksOnlyTime.size() < 8) {
-            breaksOnlyTime.add(breaksOnlyValue * 1000);
-            //String array that is used to convert to a single gSon String to store in database.
-            convertedBreaksOnlyList.add(convertSeconds(breaksOnlyValue));
-          } else {
-            Toast.makeText(getApplicationContext(), "Max rounds reached!", Toast.LENGTH_SHORT).show();
-            return;
+        } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
+
+      }
+      if (mode==3) {
+        if (pomValuesTime.size() == 0) {
+          for (int i = 0; i < 3; i++) {
+            pomValuesTime.add(pomValue1 * 1000);
+            pomValuesTime.add(pomValue2 * 1000);
           }
-          break;
-        case 3:
-          if (pomValuesTime.size() == 0) {
-            for (int i = 0; i < 3; i++) {
-              pomValuesTime.add(pomValue1 * 1000);
-              pomValuesTime.add(pomValue2 * 1000);
-            }
-            pomValuesTime.add(pomValue1* 1000);
-            pomValuesTime.add(pomValue3 * 1000);
-            for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
-          } else {
-            Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
+          pomValuesTime.add(pomValue1* 1000);
+          pomValuesTime.add(pomValue3 * 1000);
+          for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
+        } else {
+          Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
+          return;
+        }
       }
     } else {
-      switch (mode) {
-        case 1:
-          if (customSetTime.size() > 0) {
-            customSetTime.remove(customSetTime.size() - 1);
-            customBreakTime.remove(customBreakTime.size() - 1);
-
-            convertedSetsList.remove(convertedSetsList.size()-1);
-            convertedBreaksList.remove(convertedBreaksList.size()-1);
-          } else {
-            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
-        case 2:
-          if (breaksOnlyTime.size() > 0) {
-            breaksOnlyTime.remove(breaksOnlyTime.size() - 1);
-
-            convertedBreaksOnlyList.remove(convertedBreaksOnlyList.size()-1);
-          } else {
-            Toast.makeText(getApplicationContext(), "Nothing left to remove!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
-        case 3:
-          //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
-          if (pomValuesTime.size() != 0) {
-            pomValuesTime.clear();
-            convertedPomList.clear();
-          } else {
-            Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
-            return;
-          }
-          break;
+      if (mode==1) {
+        if (workoutTime.size()>0) {
+          typeOfRound.remove(typeOfRound.size()-1);
+          workoutTime.remove(workoutTime.size()-1);
+          convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
+        } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
+      }
+      if (mode==3) {
+        //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
+        if (pomValuesTime.size() != 0) {
+          pomValuesTime.clear();
+          convertedPomList.clear();
+        } else {
+          Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+          return;
+        }
       }
     }
     //Updates our recyclerView list via adapter after each addition/subtraction of round.

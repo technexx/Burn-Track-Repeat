@@ -412,10 +412,8 @@
         app:layout_constraintTop_toBottomOf="@id/add_cycle"
         app:layout_constraintBottom_toBottomOf="parent"
         android:background="@drawable/lap_recycler_border"
-        android:layout_marginTop="5dp"
         android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="2dp">
+        android:paddingEnd="10dp">
     </androidx.recyclerview.widget.RecyclerView>
 
     <ImageButton

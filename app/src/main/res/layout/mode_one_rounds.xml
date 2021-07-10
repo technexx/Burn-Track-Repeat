@@ -4,57 +4,15 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <View
-        android:id="@+id/center_anchor_one"
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-    </View>
-
     <TextView
-        android:id="@+id/round_sets"
+        android:id="@+id/workout_rounds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/center_anchor_one"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="2dp"
         android:textColor="@color/green"
         android:textSize="22sp">
     </TextView>
-
-    <TextView
-        android:id="@+id/round_breaks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/center_anchor_one"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="24dp"
-        android:textColor="@color/red"
-        android:textSize="22sp">
-    </TextView>
-
-    <ImageView
-        android:id="@+id/infinity_green_rounds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/round_sets"
-        app:layout_constraintTop_toTopOf="@id/round_sets"
-        app:layout_constraintBottom_toBottomOf="@id/round_sets"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/infinity_icon_green">
-    </ImageView>
-
-    <ImageView
-        android:id="@+id/infinity_red_rounds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/round_breaks"
-        app:layout_constraintTop_toTopOf="@id/round_breaks"
-        app:layout_constraintBottom_toBottomOf="@id/round_breaks"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/infinity_icon_red">
-    </ImageView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

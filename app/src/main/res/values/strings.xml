@@ -47,4 +47,6 @@
     <string name="total_work">Total Work Time:</string>
     <string name="string_up_arrow">"\u25B2"</string>
     <string name="string_down_arrow">"\u25BC"</string>
+
+    <string name="round_numbers">%1$s - %2$s</string>
 </resources>
