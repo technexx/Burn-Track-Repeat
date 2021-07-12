@@ -2,6 +2,10 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -23,24 +28,13 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_ONE = 1;
   public static final int MODE_THREE = 3;
   int mMode = 1;
-  public boolean mSetsUp;
-  public boolean mBreaksUp;
 
-  //Todo: Type of round so we can color / differentiate visually in display.
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
     this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; mPomList = pomList;
   }
 
   public void setMode(int mode) {
     mMode = mode;
-  }
-
-  public void countingUpSets(boolean setsUp) {
-    mSetsUp = setsUp;
-  }
-
-  public void countingUpBreaks(boolean breaksUp) {
-    mBreaksUp = breaksUp;
   }
 
   @NonNull
@@ -62,8 +56,12 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
       //Sets our round textViews.
-      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position)));
-      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+//      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position+1)));
+//      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+
+      Spannable newTemp = new SpannableString((mContext.getString(R.string.round_test, String.valueOf(position+1), mWorkOutList.get(position))));
+      newTemp.setSpan(new ForegroundColorSpan(Color.BLACK), 0, 3, 0);
+      modeOneRounds.workout_rounds.setText(newTemp);
 
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
       switch (mTypeOfRound.get(position)) {
@@ -88,6 +86,11 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
           modeOneRounds.infinity_rounds.setColorFilter(Color.RED);
           break;
       }
+      ConstraintLayout.LayoutParams countParams = (ConstraintLayout.LayoutParams) modeOneRounds.round_count.getLayoutParams();
+//      countParams.leftMargin = 150;
+      countParams.startToStart = R.id.workout_views_start_anchor;
+      countParams.endToEnd = R.id.workout_views_end_anchor;
+
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));

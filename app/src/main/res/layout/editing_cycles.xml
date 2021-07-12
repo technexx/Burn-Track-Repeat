@@ -405,7 +405,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/round_list_recycler"
-        android:layout_width="235dp"
+        android:layout_width="240dp"
         android:layout_height="240dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -28,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -83,8 +84,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   List<PomCycles> pomCyclesList;
   boolean isNewCycle;
 
-  CycleRoundsAdapter cycleRoundsAdapter;
+  RecyclerView roundRecycler;
   RecyclerView savedCycleRecycler;
+  CycleRoundsAdapter cycleRoundsAdapter;
   SavedCycleAdapter savedCycleAdapter;
   View deleteCyclePopupView;
   View sortCyclePopupView;
@@ -230,6 +232,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
   Intent intent;
+  View roundView;
+  TextView round_count;
+  TextView round_value;
 
   //Todo: Combining modes 1 and 2 still seems like best option. Simpler UI as well. Think we should be able to mix/match sets and breaks. Use numbered rows for dotDraws? More versatile, good for super sets, etc. Can also add "tandem" button to sync up sets/breaks automatically. We'd also be able to remove the infinity toggle.
       //Todo: Either one single list (append w/ marker?), or keep current lists and draw from each in a certain order. Latter seems easier if we have correct formula. We can just create a second list w/ markers, like 0/1/2/3 for set/break/setUp/breakUp in the correct order.
@@ -399,6 +404,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
 
     cl = new ConstraintLayout(this);
+    roundView = inflater.inflate(R.layout.mode_one_rounds, null);
+    round_count = roundView.findViewById(R.id.round_count);
+    round_value = roundView.findViewById(R.id.workout_rounds);
+
     cycle_name_text = editCyclesPopupView.findViewById(R.id.cycle_name_text);
     cycle_name_edit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
     s1 = editCyclesPopupView.findViewById(R.id.s1);
@@ -594,7 +603,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Adapter and Recycler for round views within our editCycles popUp.
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
-    RecyclerView roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
+    roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
     cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), convertedWorkoutTime, typeOfRound, convertedPomList);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecycler.setLayoutManager(lm);
