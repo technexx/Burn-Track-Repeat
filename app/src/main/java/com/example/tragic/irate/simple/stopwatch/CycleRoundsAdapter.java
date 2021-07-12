@@ -62,8 +62,32 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
       //Sets our round textViews.
-      String roundTime = appendSeconds(mWorkOutList.get(position));
-      modeOneRounds.workout_rounds.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position), roundTime));
+      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position)));
+      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+
+      //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
+      switch (mTypeOfRound.get(position)) {
+        case 1:
+          modeOneRounds.infinity_rounds.setVisibility(View.INVISIBLE);
+          modeOneRounds.workout_rounds.setVisibility(View.VISIBLE);
+          modeOneRounds.workout_rounds.setTextColor(Color.GREEN);
+          break;
+        case 2:
+          modeOneRounds.infinity_rounds.setVisibility(View.VISIBLE);
+          modeOneRounds.workout_rounds.setVisibility(View.INVISIBLE);
+          modeOneRounds.infinity_rounds.setColorFilter(Color.GREEN);
+          break;
+        case 3:
+          modeOneRounds.infinity_rounds.setVisibility(View.INVISIBLE);
+          modeOneRounds.workout_rounds.setVisibility(View.VISIBLE);
+          modeOneRounds.workout_rounds.setTextColor(Color.RED);
+          break;
+        case 4:
+          modeOneRounds.workout_rounds.setVisibility(View.INVISIBLE);
+          modeOneRounds.infinity_rounds.setVisibility(View.VISIBLE);
+          modeOneRounds.infinity_rounds.setColorFilter(Color.RED);
+          break;
+      }
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
@@ -94,11 +118,15 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   }
 
   public class ModeOneRounds extends RecyclerView.ViewHolder {
+    public TextView round_count;
     public TextView workout_rounds;
+    public ImageView infinity_rounds;
 
     public ModeOneRounds(@NonNull View itemView) {
       super(itemView);
+      round_count = itemView.findViewById(R.id.round_count);
       workout_rounds = itemView.findViewById(R.id.workout_rounds);
+      infinity_rounds = itemView.findViewById(R.id.round_infinity);
     }
   }
 

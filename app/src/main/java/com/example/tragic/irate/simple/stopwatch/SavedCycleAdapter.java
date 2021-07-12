@@ -76,11 +76,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mOnHighlightListener = xOnHighlightListener;
   }
 
-  public void setInfinityToggle(onInfinityToggleListener xOnInfinityToggleListener) {
+  public void setsInfinityToggle(onInfinityToggleListener xOnInfinityToggleListener) {
     this.mOnInfinityToggleListener = xOnInfinityToggleListener;
   }
 
-  public void setInfinityToggleTwo(onInfinityToggleListenerTwo xOnInfinityToggleListenerTwo) {
+  public void setsInfinityToggleTwo(onInfinityToggleListenerTwo xOnInfinityToggleListenerTwo) {
     this.mOnInfinityToggleListenerTwo = xOnInfinityToggleListenerTwo;
   }
 

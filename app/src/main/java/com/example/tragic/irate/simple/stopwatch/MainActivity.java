@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -150,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton minus_third_value;
   Button add_cycle;
   Button sub_cycle;
-  ImageButton upDown_arrow_one;
-  ImageButton upDown_arrow_two;
+  ImageButton setsInfinity;
+  ImageButton breaksInfinity;
   View top_anchor;
   ImageButton start_timer;
 
@@ -160,12 +161,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> workoutTitle;
   ArrayList<String> workoutConcatArray;
   ArrayList<Integer> typeOfRound;
-  int SETS_DOWN = 1;
-  int BREAKS_DOWN = 2;
-  int SETS_UP = 3;
-  int BREAKS_UP = 4;
   boolean setsUp;
   boolean breaksUp;
+  boolean setsSelected;
+  boolean breaksSelected;
+  int roundType;
 
   ArrayList<Integer> customSetTime;
   ArrayList<Integer> customBreakTime;
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int incrementTimer = 10;
   boolean minReached;
   boolean maxReached;
-  float editPosX;
+  float editTextViewPosX;
 
   Handler mHandler;
   Runnable valueSpeed;
@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Combining modes 1 and 2 still seems like best option. Simpler UI as well. Think we should be able to mix/match sets and breaks. Use numbered rows for dotDraws? More versatile, good for super sets, etc. Can also add "tandem" button to sync up sets/breaks automatically. We'd also be able to remove the infinity toggle.
       //Todo: Either one single list (append w/ marker?), or keep current lists and draw from each in a certain order. Latter seems easier if we have correct formula. We can just create a second list w/ markers, like 0/1/2/3 for set/break/setUp/breakUp in the correct order.
 
+  //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Setting infinity mode when creating cycle doesn't work (goes to count down regardless).
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
@@ -423,10 +424,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_sep = editCyclesPopupView.findViewById(R.id.third_value_sep);
     add_cycle = editCyclesPopupView.findViewById(R.id.add_cycle);
     sub_cycle = editCyclesPopupView.findViewById(R.id.subtract_cycle);
-    upDown_arrow_one = editCyclesPopupView.findViewById(R.id.s1_up);
-    upDown_arrow_two = editCyclesPopupView.findViewById(R.id.s2_up);
+    setsInfinity = editCyclesPopupView.findViewById(R.id.s1_up);
+    breaksInfinity = editCyclesPopupView.findViewById(R.id.s2_up);
     top_anchor = editCyclesPopupView.findViewById(R.id.top_anchor);
     start_timer = editCyclesPopupView.findViewById(R.id.start_timer);
+    setsInfinity.setAlpha(0.3f);
+    breaksInfinity.setAlpha(0.3f);
 
     sortAccessed = sortCyclePopupView.findViewById(R.id.sort_last_accessed);
     sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
@@ -574,8 +577,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Instantiating callbacks from adapter.
           savedCycleAdapter.setItemClick(MainActivity.this);
           savedCycleAdapter.setHighlight(MainActivity.this);
-          savedCycleAdapter.setInfinityToggle(MainActivity.this);
-          savedCycleAdapter.setInfinityToggleTwo(MainActivity.this);
+          savedCycleAdapter.setsInfinityToggle(MainActivity.this);
+          savedCycleAdapter.setsInfinityToggleTwo(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
 
@@ -597,9 +600,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setLayoutManager(lm);
     //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
     cycleRoundsAdapter.setMode(mode);
-
-    //Instantiates count up/count down methods.
-    countUpMode(true); countUpMode(false);
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
     removeEditViews(false);
@@ -703,7 +703,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
     });
 
-  //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
+    //Sets a listener on our editCycles popup.
+    editCyclesPopupView.setOnTouchListener((v, event) -> {
+      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
+      removeEditViews(true);
+      if (event.getAction()==MotionEvent.ACTION_DOWN) {
+        float xPos = event.getX();
+        float yPos = event.getY();
+        if (xPos<=350) {
+          if (yPos>=150 && yPos<=275) {
+            setsSelected = true;
+            s1.setTextColor(Color.GREEN);
+          } else {
+            setsSelected = false;
+            s1.setTextColor(Color.WHITE);
+          }
+          if (yPos>=300 && yPos<=425) {
+            breaksSelected = true;
+            s2.setTextColor(Color.RED);
+          } else {
+            breaksSelected = false;
+            s2.setTextColor(Color.WHITE);
+          }
+        }
+        //Hides soft keyboard by using a token of the current editCycleView.
+        inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+      }
+      return false;
+    });
+
+
+    //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
     cycle_name_edit.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
@@ -881,17 +911,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ////--ActionBar Item onClicks END--////
 
     ////--EditCycles Menu Item onClicks START--////
-    //Sets a listener on our editCycles popup.
-    editCyclesPopupView.setOnTouchListener((v, event) -> {
-      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
-      removeEditViews(true);
-      if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        //Hides soft keyboard by using a token of the current editCycleView.
-        inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-      }
-      return false;
-    });
-
     //Launched from editCyclePopUp and calls TimerInterface. Boolean is set to FALSE by default (launching an existing cycle, used primarily in editing), and set to TRUE from the Fab button.
     start_timer.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
@@ -899,23 +918,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
-    upDown_arrow_one.setImageResource(R.drawable.arrow_down);
-    upDown_arrow_one.setTag(1);
-    upDown_arrow_two.setImageResource(R.drawable.arrow_down);
-    upDown_arrow_two.setTag(1);
-
-    upDown_arrow_one.setOnClickListener(v -> {
-      countUpMode(true);
+    setsInfinity.setOnClickListener(v -> {
+      if (setsInfinity.getAlpha()==1.0f) setsInfinity.setAlpha(0.3f); else setsInfinity.setAlpha(1.0f);
     });
 
-    upDown_arrow_two.setOnClickListener(v -> {
-      countUpMode(false);
+    breaksInfinity.setOnClickListener(v -> {
+      if (breaksInfinity.getAlpha()==1.0f) breaksInfinity.setAlpha(0.3f); else breaksInfinity.setAlpha(1.0f);
+    });
+
+    //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
+    add_cycle.setOnClickListener(v -> {
+      adjustCustom(true);
+    });
+
+    sub_cycle.setOnClickListener(v -> {
+      adjustCustom(false);
     });
 
     //Grabs the x-axis value of textView, and uses that determine whether we replace it with the minutes or seconds editText.
     first_value_textView.setOnTouchListener((v, event) -> {
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        editPosX = event.getX();
+        editTextViewPosX = event.getX();
         editAndTextSwitch(true, 1);
       }
       return true;
@@ -923,7 +946,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     second_value_textView.setOnTouchListener((v, event) -> {
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        editPosX = event.getX();
+        editTextViewPosX = event.getX();
         editAndTextSwitch(true, 2);
       }
       return true;
@@ -931,7 +954,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     third_value_textView.setOnTouchListener((v, event) -> {
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        editPosX = event.getX();
+        editTextViewPosX = event.getX();
         editAndTextSwitch(true, 3);
       }
       return true;
@@ -1089,16 +1112,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       third_value_textView.setText(convertCustomTextView(pomValue3));
       return true;
-    });
-
-
-    //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
-    add_cycle.setOnClickListener(v -> {
-      if (!setsUp) adjustCustom(true, 1); else adjustCustom(true, 2);
-    });
-
-    sub_cycle.setOnClickListener(v -> {
-      if (breaksUp) adjustCustom(false, 3); else adjustCustom(false, 4);
     });
     ////--EditCycles Menu Item OnClicks END--////
 
@@ -1339,7 +1352,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         //Used to request focus, and then show the soft keyboard. Using x-axis values to determine whether we focus on minutes or seconds.
-        if (editPosX<=75) {
+        if (editTextViewPosX<=75) {
           first_value_edit.requestFocus();
           inputMethodManager.showSoftInput(first_value_edit, 0);
         } else {
@@ -1365,7 +1378,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             third_value_textView.setVisibility(View.VISIBLE);
           }
         }
-        if (editPosX<=75) {
+        if (editTextViewPosX<=75) {
           second_value_edit.requestFocus();
           inputMethodManager.showSoftInput(second_value_edit, 0);
         } else {
@@ -1390,7 +1403,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_edit_two.setVisibility(View.VISIBLE);
         third_value_sep.setVisibility(View.VISIBLE);
       }
-      if (editPosX<=75) {
+      if (editTextViewPosX<=75) {
         third_value_edit.requestFocus();
         inputMethodManager.showSoftInput(third_value_edit, 0);
       } else {
@@ -1543,8 +1556,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         minus_third_value.setVisibility(View.INVISIBLE);
         plus_second_value.setVisibility(View.VISIBLE);
         minus_second_value.setVisibility(View.VISIBLE);
-        upDown_arrow_one.setVisibility(View.VISIBLE);
-        upDown_arrow_two.setVisibility(View.VISIBLE);
+        setsInfinity.setVisibility(View.VISIBLE);
+        breaksInfinity.setVisibility(View.VISIBLE);
         second_value_textView.setVisibility(View.VISIBLE);
         //Shared String between modes 1 and 2.
         s2.setText(R.string.break_time);
@@ -1564,7 +1577,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           first_value_textView.setVisibility(View.INVISIBLE);
           plus_first_value.setVisibility(View.INVISIBLE);
           minus_first_value.setVisibility(View.INVISIBLE);
-          upDown_arrow_two.setVisibility(View.GONE);
+          breaksInfinity.setVisibility(View.GONE);
           //Value exclusive to mode 2.
           second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
         }
@@ -1586,8 +1599,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_textView.setVisibility(View.VISIBLE);
         plus_third_value.setVisibility(View.VISIBLE);
         minus_third_value.setVisibility(View.VISIBLE);
-        upDown_arrow_one.setVisibility(View.GONE);
-        upDown_arrow_two.setVisibility(View.GONE);
+        setsInfinity.setVisibility(View.GONE);
+        breaksInfinity.setVisibility(View.GONE);
         s1.setText(R.string.work_time);
         s2.setText(R.string.small_break);
         s3.setText(R.string.long_break);
@@ -1611,64 +1624,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void countUpMode(boolean onSet) {
-    if (onSet) {
-      //Moving to COUNT UP mode.
-      if (!setsAreCountingUp) {
-        setsUp = true;
-        upDown_arrow_one.setTag(COUNTING_UP);
-        upDown_arrow_one.setImageResource(R.drawable.arrow_up);;
-      } else {
-        //Moving to COUNT DOWN mode.
-        setsUp = false;
-        upDown_arrow_one.setTag(COUNTING_DOWN);
-        upDown_arrow_one.setImageResource(R.drawable.arrow_down);
-        upDown_arrow_one.setTag(COUNTING_DOWN);
-      }
-    } else {
-      //Moving to COUNT UP mode.
-      if (!breaksAreCountingUp) {
-        breaksUp = true;
-        upDown_arrow_two.setTag(COUNTING_UP);
-        upDown_arrow_two.setImageResource(R.drawable.arrow_up);
-      } else {
-        //Moving to COUNT DOWN mode.
-        breaksUp = false;
-        upDown_arrow_two.setTag(COUNTING_DOWN);
-        upDown_arrow_two.setImageResource(R.drawable.arrow_down);
-        prefEdit.putBoolean("breakCountUpMode", false);
-        cycleRoundsAdapter.countingUpBreaks(false);
-      }
-    }
-    prefEdit.apply();
-    cycleRoundsAdapter.notifyDataSetChanged();
-  }
-
-  public void adjustCustom(boolean adding, int type) {
+  public void adjustCustom(boolean adding) {
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       setEditValues();
-
       if (mode==1) {
         if (workoutTime.size()<16) {
+          //If Sets are highlighted green, check if its infinity mode is also highlighted. Use 1/2 for yes/no.
+          if (s1.getCurrentTextColor()==Color.GREEN) {
+            if (setsInfinity.getAlpha()!=1.0f) roundType = 1; else roundType = 2;
+          }
+          //If Breaks are highlighted red, check if its infinity mode is also highlighted. Use 3/4 for yes/no.
+          if (s2.getCurrentTextColor()==Color.RED) {
+            if (breaksInfinity.getAlpha()!=1.0f) roundType = 3; else roundType = 4;
+          }
           //Adds 1-4 for type of round anytime we're adding a round.
-          typeOfRound.add(type);
-          switch (type) {
+          switch (roundType) {
             case 1:
               workoutTime.add(setValue * 1000);
               convertedWorkoutTime.add(convertSeconds(setValue));
               break;
-            case 2:
+            case 3:
               workoutTime.add(breakValue * 1000);
               convertedWorkoutTime.add(convertSeconds(breakValue));
               break;
-            case 3: case 4:
+            case 2: case 4:
               workoutTime.add(0);
               convertedWorkoutTime.add("0");
               break;
+            default:
+              //Returns from method so we don't add a roundType entry to our list, and the list stays in sync w/ the rounds we are actually adding.
+              Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
+              return;
           }
+          typeOfRound.add(roundType);
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
-
       }
       if (mode==3) {
         if (pomValuesTime.size() == 0) {

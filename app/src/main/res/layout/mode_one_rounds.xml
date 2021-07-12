@@ -5,14 +5,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/workout_rounds"
+        android:id="@+id/round_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
+        android:textSize="22sp"
+        android:textColor="@color/white">
+    </TextView>
+
+    <TextView
+        android:id="@+id/workout_rounds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/round_count"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="2dp"
         android:textColor="@color/green"
         android:textSize="22sp">
     </TextView>
+
+    <ImageView
+        android:id="@+id/round_infinity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/round_count"
+        android:layout_marginStart="2dp"
+        android:src="@drawable/infinity_icon_green">
+    </ImageView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
