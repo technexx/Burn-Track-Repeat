@@ -10,6 +10,7 @@ public class Cycles {
     public int id;
     public String title;
     public String workoutRounds;
+    public String roundType;
 
     public long timeAdded;
     public long timeAccessed;
@@ -44,6 +45,14 @@ public class Cycles {
 
     public void setWorkoutRounds(String workoutRounds) {
         this.workoutRounds = workoutRounds;
+    }
+
+    public String getRoundType() {
+        return roundType;
+    }
+
+    public void setRoundType(String roundType) {
+        this.roundType = roundType;
     }
 
     public long getTimeAdded() {

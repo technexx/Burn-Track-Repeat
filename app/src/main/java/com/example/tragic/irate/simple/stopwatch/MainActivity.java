@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Fix DB saves for new lists.
+  //Todo: Need to save rountType in DB - empty list when trying to retrieve
 
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Setting infinity mode when creating cycle doesn't work (goes to count down regardless).
@@ -1695,9 +1695,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     clearTimerArrays();
     switch (mode) {
       case 1:
+        //Getting instance of Cycles at selected position, creating a String Array from its concatenated String, and creating an Integer Array from that for use in our Timer and adapter displays.
         Cycles cycles = cyclesList.get(receivedPos);
         String[] tempSets = cycles.getWorkoutRounds().split(" - ");
         for (int i=0; i<tempSets.length; i++) workoutTime.add(Integer.parseInt(tempSets[i]));
+        String[] tempRoundTypes = cycles.getRoundType().split(" - ");
+        for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
         retrievedID = cyclesList.get(receivedPos).getId();
         cycleTitle = cycles.getTitle();
         break;
@@ -1730,7 +1733,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //If cycle editText is empty, use the set its String to the current date/time by default. Otherwise, use what is there.
       if (cycle_name_edit.getText().toString().isEmpty()) cycleTitle = date;
       else cycleTitle = cycle_name_edit.getText().toString();
-      //Todo: Saves are greyed out here.
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
       //Updates the adapter display of saved cycles, since we are adding to it.
@@ -1776,6 +1778,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Sets up Strings to save into database.
     Gson gson = new Gson();
     String workoutString = "";
+    String roundTypeString = "";
     String pomString = "";
     if (titleChanged) cycleTitle = cycle_name_edit.getText().toString();
     int cycleID = 0;
@@ -1790,10 +1793,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
         workoutString = gson.toJson(workoutTime);
         workoutString = friendlyString(workoutString);
+        roundTypeString = gson.toJson(typeOfRound);
+        roundTypeString = friendlyString(roundTypeString);
         //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
         if (!workoutString.equals("")) {
           //Adding and inserting into database.
           cycles.setWorkoutRounds(workoutString);
+          cycles.setRoundType(roundTypeString);
           //Setting most recent time accessed for sort mode.
           cycles.setTimeAccessed(System.currentTimeMillis());
           cycles.setItemCount(workoutTime.size());
