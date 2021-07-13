@@ -50,19 +50,20 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else return null;
   }
 
+  //Todo: Center views @ <=8 rounds, then populate second set of views @ >8 while constraining first set to left. Second set are perm constrained to end.
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     if (holder instanceof ModeOneRounds) {
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
       //Sets our round textViews.
-//      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position+1)));
-//      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position+1)));
+      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
 
       //Since we can't convert Span->String (can only setText a Spannable), we use appendSeconds here.
-      Spannable newTemp = new SpannableString(appendSeconds(mContext.getString(R.string.workout_rounds, String.valueOf(position+1), mWorkOutList.get(position))));
-      newTemp.setSpan(new ForegroundColorSpan(Color.BLACK), 0, 3, 0);
-      modeOneRounds.workout_rounds.setText(newTemp);
+//      Spannable newTemp = new SpannableString(appendSeconds(mContext.getString(R.string.workout_rounds, String.valueOf(position+1), mWorkOutList.get(position))));
+//      newTemp.setSpan(new ForegroundColorSpan(Color.BLACK), 0, 3, 0);
+//      modeOneRounds.workout_rounds.setText(newTemp);
 
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
       switch (mTypeOfRound.get(position)) {
@@ -88,8 +89,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
           break;
       }
       ConstraintLayout.LayoutParams countParams = (ConstraintLayout.LayoutParams) modeOneRounds.round_count.getLayoutParams();
-      countParams.startToStart = R.id.workout_views_start_anchor;
-      countParams.endToEnd = R.id.workout_views_end_anchor;
+//      countParams.startToStart = R.id.workout_views_start_anchor;
+//      countParams.endToEnd = R.id.workout_views_end_anchor;
 
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
@@ -124,12 +125,18 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public TextView round_count;
     public TextView workout_rounds;
     public ImageView infinity_rounds;
+    public TextView round_count_2;
+    public TextView workout_rounds_2;
+    public ImageView infinity_rounds_2;
 
     public ModeOneRounds(@NonNull View itemView) {
       super(itemView);
       round_count = itemView.findViewById(R.id.round_count);
       workout_rounds = itemView.findViewById(R.id.workout_rounds);
       infinity_rounds = itemView.findViewById(R.id.round_infinity);
+      round_count_2 = itemView.findViewById(R.id.round_count_2);
+      workout_rounds_2 = itemView.findViewById(R.id.workout_rounds_2);
+      infinity_rounds_2 = itemView.findViewById(R.id.round_infinity_2);
     }
   }
 
@@ -142,7 +149,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
   }
 
-  //Todo: Needs to take in Spannable if we're sticking w/ a single String.
   public String appendSeconds(String seconds) {
     if (seconds.length()==1) seconds = "0:0" + seconds;
     else if (seconds.length()==2) seconds = "0:" + seconds;

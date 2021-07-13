@@ -39,7 +39,6 @@
         app:layout_constraintStart_toEndOf="@id/round_count"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
-        android:textColor="@color/green"
         android:textSize="22sp">
     </TextView>
 
@@ -50,6 +49,35 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/round_count"
         android:layout_marginStart="2dp"
+        android:src="@drawable/infinity_icon_green">
+    </ImageView>
+
+    <TextView
+        android:id="@+id/round_count_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/workout_rounds_2"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="2dp"
+        android:textSize="22sp"
+        android:textColor="@color/white">
+    </TextView>
+
+    <TextView
+        android:id="@+id/workout_rounds_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="22sp">
+    </TextView>
+
+    <ImageView
+        android:id="@+id/round_infinity_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/infinity_icon_green">
     </ImageView>
 
