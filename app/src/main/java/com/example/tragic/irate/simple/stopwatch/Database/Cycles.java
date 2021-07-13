@@ -9,8 +9,8 @@ public class Cycles {
 
     public int id;
     public String title;
-    public String sets;
-    public String breaks;
+    public String workoutRounds;
+
     public long timeAdded;
     public long timeAccessed;
     public int itemCount;
@@ -38,20 +38,12 @@ public class Cycles {
         this.id = id;
     }
 
-    public String getSets() {
-        return sets;
+    public String getWorkoutRounds() {
+        return workoutRounds;
     }
 
-    public void setSets(String sets) {
-        this.sets = sets;
-    }
-
-    public String getBreaks() {
-        return breaks;
-    }
-
-    public void setBreaks(String breaks) {
-        this.breaks = breaks;
+    public void setWorkoutRounds(String workoutRounds) {
+        this.workoutRounds = workoutRounds;
     }
 
     public long getTimeAdded() {

@@ -59,7 +59,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 //      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position+1)));
 //      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
 
-      Spannable newTemp = new SpannableString((mContext.getString(R.string.round_test, String.valueOf(position+1), mWorkOutList.get(position))));
+      //Since we can't convert Span->String (can only setText a Spannable), we use appendSeconds here.
+      Spannable newTemp = new SpannableString(appendSeconds(mContext.getString(R.string.workout_rounds, String.valueOf(position+1), mWorkOutList.get(position))));
       newTemp.setSpan(new ForegroundColorSpan(Color.BLACK), 0, 3, 0);
       modeOneRounds.workout_rounds.setText(newTemp);
 
@@ -87,7 +88,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
           break;
       }
       ConstraintLayout.LayoutParams countParams = (ConstraintLayout.LayoutParams) modeOneRounds.round_count.getLayoutParams();
-//      countParams.leftMargin = 150;
       countParams.startToStart = R.id.workout_views_start_anchor;
       countParams.endToEnd = R.id.workout_views_end_anchor;
 
@@ -142,6 +142,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
   }
 
+  //Todo: Needs to take in Spannable if we're sticking w/ a single String.
   public String appendSeconds(String seconds) {
     if (seconds.length()==1) seconds = "0:0" + seconds;
     else if (seconds.length()==2) seconds = "0:" + seconds;

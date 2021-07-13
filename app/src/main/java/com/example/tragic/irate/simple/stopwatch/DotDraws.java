@@ -28,25 +28,23 @@ public class DotDraws extends View {
   int mBreakCount;
   int mSetReduce;
   int mBreakReduce;
-  int mBreakOnlyCount;
-  int mBreakOnlyReduce;
+
+  int mRoundCount;
+  int mRoundReduction;
+  ArrayList<String> mRoundTimes;
 
   int mAlpha = 255;
   int mAlpha2;
   int cycle;
-  int mFadeDone;
+  int mFadeVar;
   int mMode;
   int mPomDotCounter;
-  ArrayList<String> mSetTime;
-  ArrayList<String> mBreakTime;
-  ArrayList<String> mBreakOnlyTime;
+
   ArrayList<String> mPomTime;
 
-  sendPosition mSendPosition;
   sendAlpha mSendAlpha;
   boolean mGoingUpSets;
   boolean mGoingUpBreaks;
-  boolean mGoingUpBreaksOnly;
   boolean mAddSubFade;
   boolean mFadeUp;
 
@@ -56,11 +54,6 @@ public class DotDraws extends View {
 
   public interface sendAlpha {
     void sendAlphaValue(int alpha);
-  }
-
-  //Todo: Make sure to instantiate this in TimerInterface if you want to use it.
-  public void onPositionSelect(sendPosition xSendPosition) {
-    this.mSendPosition = xSendPosition;
   }
 
   public void onAlphaSend(sendAlpha xSendAlpha) {
@@ -92,62 +85,23 @@ public class DotDraws extends View {
     mMode = mode;
   }
 
-  //Called from Main and determines whether we are counting up or down.
-  public void countingUpSets(boolean goingUpSets) {
-    mGoingUpSets = goingUpSets;
+  public void workOutRounds(int roundCount, int roundReduction, int fadeVar) {
+    this.mRoundCount = roundCount;  this.mRoundReduction = roundReduction; this.mFadeVar = fadeVar;
   }
 
-  //Called from Main and determines whether we are counting up or down.
-  public void countingUpBreaks(boolean goingUpBreaks) {
-    mGoingUpBreaks = goingUpBreaks;
+  //Updates list every time it is called w/ a String conversion of our long millis value.
+  public void workOutTimes(ArrayList<Integer> roundTimes) {
+    mRoundTimes = new ArrayList<>();
+    for (int i=0; i<roundTimes.size(); i++) mRoundTimes.add(convertSeconds(roundTimes.get(i)/1000));
   }
 
-  public void countingUpBreaksOnly(boolean goingUpBreaksOnly) {
-    mGoingUpBreaksOnly = goingUpBreaksOnly;
-  }
-
-  public void customDrawSet(int setCount, int setReduce, int fadeDone) {
-    this.mSetCount = setCount; this.mSetReduce = setReduce; this.mFadeDone = fadeDone;
-    invalidate();
-  }
-
-  public void customDrawBreak(int breakCount, int breakReduce) {
-    this.mBreakCount = breakCount; this.mBreakReduce = breakReduce;
-    invalidate();
-  }
-
-  public void breaksOnlyDraw(int breakOnlyCount, int breakOnlyReduce, int fadeDone) {
-    this.mBreakOnlyCount = breakOnlyCount; this.mBreakOnlyReduce = breakOnlyReduce; this.mFadeDone = fadeDone;
-    invalidate();
-  }
 
   public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime, int fadeDone) {
     mPomTime = new ArrayList<>();
     for (int i=0; i<pomTime.size(); i++) mPomTime.add(convertSeconds(pomTime.get(i)/1000));
-    this.mPomDotCounter = pomDotCounter; this.mFadeDone = fadeDone;
+    this.mPomDotCounter = pomDotCounter; this.mFadeVar = fadeDone;
     setupPaint();
     invalidate();
-  }
-  //Updates list every time it is called w/ a String conversion of our long millis value.
-  public void setTime(ArrayList<Integer> setTime) {
-    mSetTime = new ArrayList<>();
-    for (int i=0; i<setTime.size(); i++) {
-      mSetTime.add(convertSeconds(setTime.get(i)/1000));
-    }
-  }
-
-  public void breakTime(ArrayList<Integer> breakTime) {
-    mBreakTime = new ArrayList<>();
-    for (int i=0; i<breakTime.size(); i++) {
-      mBreakTime.add(convertSeconds(breakTime.get(i)/1000));
-    }
-  }
-
-  public void breakOnlyTime(ArrayList<Integer> breakOnlyTime) {
-    mBreakOnlyTime = new ArrayList<>();
-    for (int i=0; i<breakOnlyTime.size(); i++) {
-      mBreakOnlyTime.add(convertSeconds(breakOnlyTime.get(i)/1000));
-    }
   }
 
   public void setAlpha() {
@@ -184,48 +138,19 @@ public class DotDraws extends View {
       case 1:
         encloseDots(mY-10, mY+260);
         //Filled or stroked dots depending on count up/down.
-        setDotStyle(mGoingUpSets);
+//        setDotStyle(mGoingUpSets);
 
         //Using mSetTime array size for loop instead of int constructor value.
-        for (int i=0; i<mSetTime.size(); i++) {
+        for (int i=0; i<mRoundTimes.size(); i++) {
           mPaint.setColor(Color.GREEN);
-          if (mSetTime.size() - mSetReduce == i) {
-            if (mFadeDone == 1) fadeDot();
-          } else if (mSetReduce + i < mSetTime.size()){
+          if (mRoundTimes.size() - mRoundReduction == i) {
+            if (mFadeVar == 1) fadeDot();
+          } else if (mRoundReduction + i < mRoundTimes.size()){
             mPaint.setAlpha(100);
           } else mPaint.setAlpha(255);
           mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
-          drawText(mSetTime, mX+16, mY+62, i);
+          drawText(mRoundTimes, mX+16, mY+62, i);
           mX += 132;
-        }
-        for (int i=0; i<mBreakTime.size(); i++) {
-          mPaint.setColor(Color.RED);
-          if (mGoingUpBreaks) setDotStyle(true); else setDotStyle(false);
-          if (mBreakTime.size() - mBreakReduce == i) {
-            if (mFadeDone == 2) fadeDot();
-          } else if (mBreakReduce + i <  mBreakTime.size()) {
-            mPaint.setAlpha(100);
-          } else mPaint.setAlpha(255);
-          mCanvas.drawCircle(mX2+20, mY2+60, 55, mPaint);
-          drawText(mBreakTime, mX2+16, mY2+62, i);
-          mX2 += 132;
-        }
-        break;
-      case 2:
-        mX2 = 15;
-        encloseDots(mY-30, mY+160);
-        if (mGoingUpBreaksOnly) setDotStyle(true); else setDotStyle(false);
-
-        for (int i=0; i<mBreakOnlyCount; i++) {
-          mPaint.setColor(Color.RED);
-          if (mBreakOnlyCount - mBreakOnlyReduce == i) {
-            if (mFadeDone == 3) fadeDot();
-          } else if (mBreakOnlyReduce + i <  mBreakOnlyCount) {
-            mPaint.setAlpha(100);
-          } else mPaint.setAlpha(255);
-          mCanvas.drawRoundRect(mX2+7, mY2-130, mX2+115, mY2+5, 100, 100, mPaint);
-          drawText(mBreakOnlyTime, mX2+60, mY2-60, i);
-          mX2 += 132;
         }
         break;
       case 3:
@@ -245,7 +170,7 @@ public class DotDraws extends View {
       case 0: case 2: case 4: case 6:
         mPaint.setColor(Color.GREEN);
         //Must be called AFTER color is changed, otherwise alpha will reset to 255.
-        if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade && mFadeVar == 4) fadeDot(); else mPaint.setAlpha(alpha);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         mCanvas.drawCircle(mX, 575, 62, mPaint);
         if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
@@ -253,7 +178,7 @@ public class DotDraws extends View {
         break;
       case 1: case 3: case 5:
         mPaint.setColor(Color.RED);
-        if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade && mFadeVar == 4) fadeDot(); else mPaint.setAlpha(alpha);
         mCanvas.drawCircle(mX2, 575, 50 , mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
@@ -261,7 +186,7 @@ public class DotDraws extends View {
         break;
       case 7:
         mPaint.setColor(Color.RED);
-        if (fade && mFadeDone == 4) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade && mFadeVar == 4) fadeDot(); else mPaint.setAlpha(alpha);
         mCanvas.drawRect(mX-170, 520, mX-60, 630, mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);

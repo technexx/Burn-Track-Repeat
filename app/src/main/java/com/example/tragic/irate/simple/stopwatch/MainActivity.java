@@ -63,7 +63,7 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onInfinityToggleListener, SavedCycleAdapter.onInfinityToggleListenerTwo {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener{
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -160,30 +160,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ArrayList<Integer> workoutTime;
   ArrayList<String> convertedWorkoutTime;
-  ArrayList<String> workoutTitle;
   ArrayList<String> workoutConcatArray;
+  ArrayList<String> workoutTitle;
+  ArrayList<String> workoutTitleArray;
+  ArrayList<Integer> pomValuesTime;
+  ArrayList<String> convertedPomList;
+  ArrayList<String> pomTitleArray;
+  ArrayList<String> pomArray;
+
   ArrayList<Integer> typeOfRound;
-  boolean setsUp;
-  boolean breaksUp;
   boolean setsSelected;
   boolean breaksSelected;
   int roundType;
-
-  ArrayList<Integer> customSetTime;
-  ArrayList<Integer> customBreakTime;
-  ArrayList<Integer> breaksOnlyTime;
-  ArrayList<Integer> pomValuesTime;
-  ArrayList<String> convertedSetsList;
-  ArrayList<String> convertedBreaksList;
-  ArrayList<String> convertedBreaksOnlyList;
-  ArrayList<String> convertedPomList;
-  ArrayList<String> customTitleArray;
-  ArrayList<String> breaksOnlyTitleArray;
-  ArrayList<String> pomTitleArray;
-  ArrayList<String> setsArray;
-  ArrayList<String> breaksArray;
-  ArrayList<String> breaksOnlyArray;
-  ArrayList<String> pomArray;
 
   int setValue;
   int breakValue;
@@ -236,8 +224,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Combining modes 1 and 2 still seems like best option. Simpler UI as well. Think we should be able to mix/match sets and breaks. Use numbered rows for dotDraws? More versatile, good for super sets, etc. Can also add "tandem" button to sync up sets/breaks automatically. We'd also be able to remove the infinity toggle.
-      //Todo: Either one single list (append w/ marker?), or keep current lists and draw from each in a certain order. Latter seems easier if we have correct formula. We can just create a second list w/ markers, like 0/1/2/3 for set/break/setUp/breakUp in the correct order.
+  //Todo: Fix DB saves for new lists.
 
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Setting infinity mode when creating cycle doesn't work (goes to count down regardless).
@@ -307,20 +294,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Received from SavedCycleAdapter via a single adapter position onClick. Sets our count up/down mode to correspond to whether infinity is on/off. This callback executes WITH onCycleClick, which launches our timer.
-  @Override
-  public void onInfinityToggle(ArrayList<Integer> toggleSets, ArrayList<Integer> toggleBreaks, int position) {
-    infinityArrayOne = toggleSets; infinityArrayTwo = toggleBreaks;
-    if (infinityArrayOne.get(position)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
-    if (infinityArrayTwo.get(position)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
-  }
-
-  @Override
-  public void onInfinityToggleTwo(ArrayList<Integer> toggleBreaksOnly, int position) {
-    infinityArrayThree = toggleBreaksOnly;
-    if (infinityArrayThree.get(position)==0) breaksOnlyAreCountingUp = false; else breaksOnlyAreCountingUp = true;
-  }
-
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
     MenuInflater inflater = getMenuInflater();
@@ -357,8 +330,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabView = findViewById(R.id.tabLayout);
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
-    tabLayout.addTab(tabLayout.newTab().setText("Sets+"));
-    tabLayout.addTab(tabLayout.newTab().setText("Breaks"));
+    tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
     fab = findViewById(R.id.fab);
@@ -474,23 +446,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     typeOfRound = new ArrayList<>();
 
     //These Integer Lists hold our millis values for each round.
-    customSetTime = new ArrayList<>();
-    customBreakTime = new ArrayList<>();
-    breaksOnlyTime = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
     //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes in recyclerView via adapter.
-    convertedSetsList = new ArrayList<>();
-    convertedBreaksList = new ArrayList<>();
-    convertedBreaksOnlyList = new ArrayList<>();
     convertedPomList = new ArrayList<>();
     //These String lists hold concatenated Strings of COMPLETE cycles (e.g. [2:00, 4:30., 3:15] etc.), used for storing the cycles in our database.
-    setsArray = new ArrayList<>();
-    breaksArray = new ArrayList<>();
-    breaksOnlyArray = new ArrayList<>();
     pomArray = new ArrayList<>();
     //These String lists hold each cycle's title.
-    customTitleArray = new ArrayList<>();
-    breaksOnlyTitleArray = new ArrayList<>();
+    workoutTitleArray = new ArrayList<>();
     pomTitleArray = new ArrayList<>();
     //If highlighting cycles for deletion, contains all POSITIONS (not IDs) of cycles highlighted.
     receivedHighlightPositions = new ArrayList<>();
@@ -555,39 +517,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
         populateCycleList();
         runOnUiThread(()-> {
-          infinityArrayOne = new ArrayList<>();
-          infinityArrayTwo = new ArrayList<>();
-
-          //FOR REFERENCE: Main (intent-> Timer) ---> Timer (intent->Main) && (callback to adapter for saved toggles).
-          //Receives infinity arrays from Timer class, which are the same ones we passed into Timer when launching it from Main. This is done to prevent them being lost when our activity is recreated.
-          if (intent!= null) {
-            infinityArrayOne = intent.getIntegerArrayListExtra("infiniteOne");
-            if (infinityArrayOne == null) infinityArrayOne = new ArrayList<>();
-            infinityArrayTwo = intent.getIntegerArrayListExtra("infiniteTwo");
-            if (infinityArrayTwo == null) infinityArrayTwo = new ArrayList<>();
-            infinityArrayThree = intent.getIntegerArrayListExtra("infiniteThree");
-            if (infinityArrayThree == null) infinityArrayThree = new ArrayList<>();
-          }
-
-          //If we do not receive anything above, we are likely coming from an app start. Populate infinity lists w/ 0's (off mode) for each db row.
-          if (infinityArrayOne.isEmpty()) {
-            for (int i=0; i<setsArray.size(); i++) {
-              infinityArrayOne.add(0);
-              infinityArrayTwo.add(0);
-            }
-          }
-          if (infinityArrayThree.isEmpty()) for (int i=0; i<breaksOnlyArray.size(); i++) infinityArrayThree.add(0);
-
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), setsArray, breaksArray, breaksOnlyArray, pomArray, customTitleArray, breaksOnlyTitleArray, pomTitleArray);
+          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutConcatArray, pomArray, workoutTitleArray, pomTitleArray);
           savedCycleRecycler.setAdapter(savedCycleAdapter);
           savedCycleRecycler.setLayoutManager(lm2);
           //Instantiating callbacks from adapter.
           savedCycleAdapter.setItemClick(MainActivity.this);
           savedCycleAdapter.setHighlight(MainActivity.this);
-          savedCycleAdapter.setsInfinityToggle(MainActivity.this);
-          savedCycleAdapter.setsInfinityToggleTwo(MainActivity.this);
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
 
@@ -665,11 +602,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       cycleRoundsAdapter.setMode(1);
                       break;
                   case 1:
-                      mode = 2;
-                      savedCycleAdapter.setView(2);
-                      cycleRoundsAdapter.setMode(2);
-                      break;
-                  case 2:
                       mode = 3;
                       savedCycleAdapter.setView(3);
                       cycleRoundsAdapter.setMode(3);
@@ -837,11 +769,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
         switch (mode) {
           case 1:
-            for (int i=0; i<customSetTime.size(); i++) convertedSetsList.add(convertSeconds(customSetTime.get(i)/1000));
-            for (int i=0; i<customBreakTime.size(); i++) convertedBreaksList.add(convertSeconds(customBreakTime.get(i)/1000));
-            break;
-          case 2:
-            for (int i=0; i<breaksOnlyTime.size(); i++) convertedBreaksOnlyList.add(convertSeconds(breaksOnlyTime.get(i)/1000));
+            for (int i=0; i<workoutTime.size(); i++) convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
             break;
           case 3:
             for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
@@ -1170,13 +1098,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Clears both timer millis arrays and their converted String arrays.
   public void clearTimerArrays() {
-    customSetTime.clear();
-    customBreakTime.clear();
-    breaksOnlyTime.clear();
+    workoutTime.clear();
+    convertedWorkoutTime.clear();
     pomValuesTime.clear();
-    convertedSetsList.clear();
-    convertedBreaksList.clear();
-    convertedBreaksOnlyList.clear();
     convertedPomList.clear();
   }
 
@@ -1729,17 +1653,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   case 7: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
               }
               break;
-          case 2:
-              switch (sortModeBO) {
-                  case 1: cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesBOLastAccessed(); break;
-                  case 2: cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesBOAlphaStart(); break;
-                  case 3: cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesBOAlphaEnd(); break;
-                  case 4: cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostRecentBO(); break;
-                  case 5: cyclesBOList = cyclesDatabase.cyclesDao().loadCycleLeastRecentBO(); break;
-                  case 6: cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesMostItemsBO(); break;
-                  case 7: cyclesBOList = cyclesDatabase.cyclesDao().loadCyclesLeastItemsBO(); break;
-              }
-              break;
           case 3:
               switch (sortModePom) {
                   case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomLastAccessed(); break;
@@ -1757,21 +1670,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void populateCycleList() {
     switch (mode) {
       case 1:
-        setsArray.clear();
-        breaksArray.clear();
-        customTitleArray.clear();
+        workoutConcatArray.clear();
+        workoutTitleArray.clear();
         for (int i=0; i<cyclesList.size(); i++) {
-          setsArray.add(cyclesList.get(i).getSets());
-          breaksArray.add(cyclesList.get(i).getBreaks());
-          customTitleArray.add(cyclesList.get(i).getTitle());
-        }
-        break;
-      case 2:
-        breaksOnlyArray.clear();
-        if (breaksOnlyTitleArray!=null) breaksOnlyTitleArray.clear();
-        for (int i=0; i<cyclesBOList.size(); i++) {
-          breaksOnlyArray.add(cyclesBOList.get(i).getBreaksOnly());
-          breaksOnlyTitleArray.add(cyclesBOList.get(i).getTitle());
+          workoutConcatArray.add(cyclesList.get(i).getWorkoutRounds());
+          workoutTitleArray.add(cyclesList.get(i).getTitle());
+          Log.i("testSave", String.valueOf(workoutConcatArray));
         }
         break;
       case 3:
@@ -1792,19 +1696,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         Cycles cycles = cyclesList.get(receivedPos);
-        String[] tempSets = cycles.getSets().split(" - ");
-        for (int i=0; i<tempSets.length; i++) customSetTime.add(Integer.parseInt(tempSets[i]));
-        String[] tempBreaks = cycles.getBreaks().split(" - ");
-        for (int i=0; i<tempBreaks.length; i++) customBreakTime.add(Integer.parseInt(tempBreaks[i]));
+        String[] tempSets = cycles.getWorkoutRounds().split(" - ");
+        for (int i=0; i<tempSets.length; i++) workoutTime.add(Integer.parseInt(tempSets[i]));
         retrievedID = cyclesList.get(receivedPos).getId();
         cycleTitle = cycles.getTitle();
-        break;
-      case 2:
-        CyclesBO cyclesBO = cyclesBOList.get(receivedPos);
-        String[] tempBreaksOnly = cyclesBO.getBreaksOnly().split(" - ");
-        for (int i=0; i<tempBreaksOnly.length; i++) breaksOnlyTime.add(Integer.parseInt(tempBreaksOnly[i]));
-        retrievedID = cyclesBOList.get(receivedPos).getId();
-        cycleTitle = cyclesBO.getTitle();
         break;
       case 3:
         PomCycles pomCycles = pomCyclesList.get(receivedPos);
@@ -1828,13 +1723,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String date = dateFormat.format(calendar.getTime());
 
       //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
-      if ((mode==1 && customSetTime.size()==0) || (mode==2 && breaksOnlyTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
+      if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
         return;
       }
       //If cycle editText is empty, use the set its String to the current date/time by default. Otherwise, use what is there.
       if (cycle_name_edit.getText().toString().isEmpty()) cycleTitle = date;
       else cycleTitle = cycle_name_edit.getText().toString();
+      //Todo: Saves are greyed out here.
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
       //Updates the adapter display of saved cycles, since we are adding to it.
@@ -1848,23 +1744,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
     switch (mode) {
       case 1:
-        //receivedPos is received from onCycleClick callback, which in turn executes launchCycles(). Before this callback, receivedPos is always 0.
-        if (infinityArrayOne.size()>0) if (infinityArrayOne.get(receivedPos)==0) setsAreCountingUp = false; else setsAreCountingUp = true;
-        if (infinityArrayTwo.size()>0) if (infinityArrayTwo.get(receivedPos)==0) breaksAreCountingUp = false; else breaksAreCountingUp = true;
-
-        intent.putIntegerArrayListExtra("setList", customSetTime);
-        intent.putExtra("setsAreCountingUp", setsAreCountingUp);
-        intent.putIntegerArrayListExtra("breakList", customBreakTime);
-        intent.putExtra("breaksAreCountingUp", breaksAreCountingUp);
-        //Sends infinity toggle arrays to Timer, so they can be sent back to Main when we come back. This is necessary because we are not using Shared Preferences, and our Main activity is set to recreate itself when exiting from Timer.
-        intent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-        intent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-        break;
-      case 2:
-        if (infinityArrayThree.size()>0) if (infinityArrayThree.get(receivedPos)==0) breaksOnlyAreCountingUp = false; else breaksOnlyAreCountingUp = true;
-        intent.putIntegerArrayListExtra("breakOnlyList", breaksOnlyTime);
-        intent.putExtra("breaksOnlyAreCountingUp", breaksOnlyAreCountingUp);
-        intent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
+        intent.putIntegerArrayListExtra("workoutTime", workoutTime);
+        intent.putIntegerArrayListExtra("typeOfRound", typeOfRound);
         break;
       case 3:
         intent.putIntegerArrayListExtra("pomList", pomValuesTime);
@@ -1894,9 +1775,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Sets up Strings to save into database.
     Gson gson = new Gson();
-    String setString = "";
-    String breakString  = "";
-    String breakOnlyString = "";
+    String workoutString = "";
     String pomString = "";
     if (titleChanged) cycleTitle = cycle_name_edit.getText().toString();
     int cycleID = 0;
@@ -1909,18 +1788,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         ///*----All of this occurs whether we are saving a new cycle, or launching a cycle currently in the database.----*///
         //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
-        setString = gson.toJson(customSetTime);
-        setString = friendlyString(setString);
-        breakString = gson.toJson(customBreakTime);
-        breakString = friendlyString(breakString);
+        workoutString = gson.toJson(workoutTime);
         //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
-        if (!setString.equals("")) {
+        if (!workoutString.equals("")) {
           //Adding and inserting into database.
-          cycles.setSets(setString);
-          cycles.setBreaks(breakString);
+          cycles.setWorkoutRounds(workoutString);
+
+          //[XXX,XXX,XXX]
+          Log.i("testSave", workoutString);
           //Setting most recent time accessed for sort mode.
           cycles.setTimeAccessed(System.currentTimeMillis());
-          cycles.setItemCount(customSetTime.size());
+          cycles.setItemCount(workoutTime.size());
           if (!cycleTitle.isEmpty()) cycles.setTitle(cycleTitle); else cycles.setTitle(date);
           //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
           if (newCycle) {
@@ -1932,29 +1810,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           //If cycle is new, insert a new row. Otherwise, update current row.
           if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
-        }
-        break;
-      case 2:
-        //If coming from FAB button, create a new instance of CyclesBO. If coming from a position in our database, get the instance of CyclesBO in that position.
-        if (newCycle) cyclesBO = new CyclesBO(); else if (cyclesBOList.size()>0) {
-          cycleID = cyclesBOList.get(receivedPos).getId();
-          cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
-        }
-        breakOnlyString = gson.toJson(breaksOnlyTime);
-        breakOnlyString = friendlyString(breakOnlyString);
-
-        if (!breakOnlyString.equals("")) {
-          cyclesBO.setBreaksOnly(breakOnlyString);
-          cyclesBO.setTimeAccessed(System.currentTimeMillis());;
-          cyclesBO.setItemCount(breaksOnlyTime.size());
-          if (!cycleTitle.isEmpty()) cyclesBO.setTitle(cycleTitle); else cyclesBO.setTitle(date);
-          if (newCycle) {
-            cyclesBO.setTimeAdded(System.currentTimeMillis());
-            cyclesBO.setTotalBOTime(0);
-            cyclesBO.setCyclesCompleted(0);
-          }
-          //If cycle is new, insert a new row. Otherwise, update current row.
-          if (newCycle) cyclesDatabase.cyclesDao().insertBOCycle(cyclesBO); else cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
         }
         break;
       case 3:
@@ -1987,13 +1842,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deleteCycle(cycles);
         } else if (cyclesList.size()>0) cyclesDatabase.cyclesDao().deleteAllCycles(); else emptyCycle = true;
-        break;
-      case 2:
-        if (!deleteAll) {
-          cycleID = cyclesBOList.get(receivedPos).getId();
-          cyclesBO = cyclesDatabase.cyclesDao().loadSingleCycleBO(cycleID).get(0);
-          cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO);
-        } else if (cyclesBOList.size()>0) cyclesDatabase.cyclesDao().deleteAllBOCycles(); else emptyCycle = true;
         break;
       case 3:
         if (!deleteAll) {
