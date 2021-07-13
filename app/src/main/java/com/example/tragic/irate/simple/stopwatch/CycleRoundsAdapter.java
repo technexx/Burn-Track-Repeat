@@ -137,6 +137,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       round_count_2 = itemView.findViewById(R.id.round_count_2);
       workout_rounds_2 = itemView.findViewById(R.id.workout_rounds_2);
       infinity_rounds_2 = itemView.findViewById(R.id.round_infinity_2);
+      //Set to invisible until a we have 9+ rounds in list.
+      round_count_2.setVisibility(View.INVISIBLE);
+      workout_rounds_2.setVisibility(View.INVISIBLE);
+      infinity_rounds_2.setVisibility(View.INVISIBLE);
     }
   }
 

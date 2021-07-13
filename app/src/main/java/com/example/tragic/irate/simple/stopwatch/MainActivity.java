@@ -1789,13 +1789,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ///*----All of this occurs whether we are saving a new cycle, or launching a cycle currently in the database.----*///
         //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
         workoutString = gson.toJson(workoutTime);
+        workoutString = friendlyString(workoutString);
         //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
         if (!workoutString.equals("")) {
           //Adding and inserting into database.
           cycles.setWorkoutRounds(workoutString);
-
-          //[XXX,XXX,XXX]
-          Log.i("testSave", workoutString);
           //Setting most recent time accessed for sort mode.
           cycles.setTimeAccessed(System.currentTimeMillis());
           cycles.setItemCount(workoutTime.size());

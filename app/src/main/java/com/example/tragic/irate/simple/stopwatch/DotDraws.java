@@ -24,14 +24,12 @@ public class DotDraws extends View {
   float mX2;
   float mY;
   float mY2;
-  int mSetCount;
-  int mBreakCount;
-  int mSetReduce;
-  int mBreakReduce;
 
   int mRoundCount;
   int mRoundReduction;
   ArrayList<String> mRoundTimes;
+  ArrayList<Integer> mRoundType;
+  ArrayList<String> mPomTime;
 
   int mAlpha = 255;
   int mAlpha2;
@@ -40,11 +38,7 @@ public class DotDraws extends View {
   int mMode;
   int mPomDotCounter;
 
-  ArrayList<String> mPomTime;
-
   sendAlpha mSendAlpha;
-  boolean mGoingUpSets;
-  boolean mGoingUpBreaks;
   boolean mAddSubFade;
   boolean mFadeUp;
 
@@ -90,9 +84,12 @@ public class DotDraws extends View {
   }
 
   //Updates list every time it is called w/ a String conversion of our long millis value.
-  public void workOutTimes(ArrayList<Integer> roundTimes) {
+  public void workOutTimes(ArrayList<Integer> roundTimes, ArrayList<Integer> roundType) {
+    //Populates our String Array of round times from the Integer Array of values received from Timer class.
     mRoundTimes = new ArrayList<>();
     for (int i=0; i<roundTimes.size(); i++) mRoundTimes.add(convertSeconds(roundTimes.get(i)/1000));
+    //Sets our global mRoundType list to the one received from Timer class.
+    mRoundType = roundType;
   }
 
 
@@ -117,7 +114,7 @@ public class DotDraws extends View {
     mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
   }
 
-  //Used w/ mGoingUpSets and mGoingUpBreaks w/ in Canvas to change dot/dot text based on count up/ count down mode.
+  //Used to clear or filled dot for counting up/counting down.
   public void setDotStyle(boolean countingUp) {
     if (countingUp) {
       mPaint.setStyle(Paint.Style.STROKE);
@@ -137,12 +134,11 @@ public class DotDraws extends View {
     switch (mMode) {
       case 1:
         encloseDots(mY-10, mY+260);
-        //Filled or stroked dots depending on count up/down.
-//        setDotStyle(mGoingUpSets);
-
-        //Using mSetTime array size for loop instead of int constructor value.
         for (int i=0; i<mRoundTimes.size(); i++) {
-          mPaint.setColor(Color.GREEN);
+          //If type 1 or 2 (sets), color is green. Otherwise, color is red.
+          if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) mPaint.setColor(Color.GREEN); else mPaint.setColor(Color.RED);
+          //if type 1 or 3 (counting down), dots are filled. Otherwise, they are hollow.
+          if (mRoundType.get(i)==1 || mRoundType.get(i)==3) setDotStyle(false); else setDotStyle(true);
           if (mRoundTimes.size() - mRoundReduction == i) {
             if (mFadeVar == 1) fadeDot();
           } else if (mRoundReduction + i < mRoundTimes.size()){

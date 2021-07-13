@@ -245,7 +245,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
   }
 
-  //Todo: Put in onPrepareOptions. Also shift layout constraints.
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
     MenuInflater inflater = getMenuInflater();
@@ -1222,7 +1221,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   public void drawDots(int fadeVar) {
     switch (mode) {
       case 1:
-        dotDraws.workOutTimes(workoutTime);
+        dotDraws.workOutTimes(workoutTime, typeOfRound);
         dotDraws.workOutRounds(startRounds, numberOfRoundsLeft, fadeVar);
         break;
       case 3:

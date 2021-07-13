@@ -314,8 +314,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     for (int i=0; i<time.size(); i++) {
       //Getting each String entry from String Array.
       listConv = String.valueOf(time.get(i));
-      listConv = listConv.replace("[", "");
-      listConv = listConv.replace("]", "");
+//      listConv = listConv.replace("[", "");
+//      listConv = listConv.replace("]", "");
       //Splitting into String[] entries.
       newSplit = listConv.split(",", 0);
 
