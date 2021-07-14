@@ -204,11 +204,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean editListener;
   InputMethodManager inputMethodManager;
 
-  boolean setsAreCountingUp;
-  boolean breaksAreCountingUp;
-  boolean breaksOnlyAreCountingUp;
-  int COUNTING_DOWN = 1;
-  int COUNTING_UP = 2;
   boolean onNewCycle;
   public ArrayList<Integer> infinityArrayOne;
   public ArrayList<Integer> infinityArrayTwo;
@@ -224,8 +219,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Need to save rountType in DB - empty list when trying to retrieve
-
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Setting infinity mode when creating cycle doesn't work (goes to count down regardless).
   //Todo: Should initial date/subsequence sort be updated by recent access time?
@@ -237,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: Load/draw canvas in aSync for performance?
   //Todo: Test dot text w/ different char numbers, tho there will be min values (e.g. in Pom) that will make some adjustment unnecessary.
   //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
   //Todo: Preset timer selections.

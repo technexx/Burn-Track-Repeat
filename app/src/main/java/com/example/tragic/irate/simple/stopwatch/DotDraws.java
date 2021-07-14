@@ -20,6 +20,7 @@ public class DotDraws extends View {
   Paint mPaint;
   Paint mPaintBox;
   Paint mPaintText;
+  Paint mPaintNumbers;
   float mX;
   float mX2;
   float mY;
@@ -68,6 +69,11 @@ public class DotDraws extends View {
 
     mPaintText = new Paint();
     mPaintText.setAntiAlias(true);
+
+    mPaintNumbers = new Paint();
+    mPaintNumbers.setAntiAlias(true);
+    mPaintNumbers.setColor(Color.WHITE);
+    mPaintNumbers.setTextSize(40f);
 
     mPaintBox = new Paint();
     mPaintBox.setColor(Color.WHITE);
@@ -133,7 +139,8 @@ public class DotDraws extends View {
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
     switch (mMode) {
       case 1:
-        encloseDots(mY-10, mY+125);
+        if (mRoundTimes.size()<=8) encloseDots(mY-10, mY+175); else encloseDots(mY-70, mY+280);
+
         for (int i=0; i<mRoundTimes.size(); i++) {
           //If type 1 or 2 (sets), color is green. Otherwise, color is red.
           if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) mPaint.setColor(Color.GREEN); else mPaint.setColor(Color.RED);
@@ -144,9 +151,27 @@ public class DotDraws extends View {
           } else if (mRoundReduction + i < mRoundTimes.size()){
             mPaint.setAlpha(100);
           } else mPaint.setAlpha(255);
-          mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
-          drawText(mRoundTimes, mX+16, mY+62, i);
-          mX += 132;
+
+          if (mRoundTimes.size()<=8) {
+            mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
+            drawText(mRoundTimes, mX+16, mY+62, i);
+            mCanvas.drawText(String.valueOf(i+1), mX+5, mY+155, mPaintNumbers);
+            mX += 132;
+          } else {
+            if (i<=7) {
+              mCanvas.drawCircle(mX+20, mY, 55, mPaint);
+              drawText(mRoundTimes, mX+16, mY+4, i);
+              mCanvas.drawText(String.valueOf(i+1), mX+9, mY+95, mPaintNumbers);
+              mX += 132;
+              //Resetting mX after 8th round so the second row begins on top of first.
+              if (i==7) mX = 58;
+            } else {
+              mCanvas.drawCircle(mX+20, mY+175, 55, mPaint);
+              drawText(mRoundTimes, mX+16, mY+180, i);
+              if (i==8) mCanvas.drawText(String.valueOf(i+1), mX+9, mY+270, mPaintNumbers); else mCanvas.drawText(String.valueOf(i+1), mX-2, mY+270, mPaintNumbers);
+              mX += 132;
+            }
+          }
         }
         break;
       case 3:
