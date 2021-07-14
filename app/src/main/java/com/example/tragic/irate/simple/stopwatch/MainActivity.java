@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ArrayList<Integer> workoutTime;
   ArrayList<String> convertedWorkoutTime;
-  ArrayList<String> workoutConcatArray;
+  ArrayList<String> workoutCyclesArray;
   ArrayList<String> workoutTitle;
   ArrayList<String> workoutTitleArray;
   ArrayList<Integer> pomValuesTime;
@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     workoutTime = new ArrayList<>();
     convertedWorkoutTime = new ArrayList<>();
     workoutTitle = new ArrayList<>();
-    workoutConcatArray = new ArrayList<>();
+    workoutCyclesArray = new ArrayList<>();
     typeOfRound = new ArrayList<>();
 
     //These Integer Lists hold our millis values for each round.
@@ -508,12 +508,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
         //Calls instance of Cycle entity list based on sort mode.
         queryCycles();
+
         //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
         populateCycleList();
         runOnUiThread(()-> {
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutConcatArray, pomArray, workoutTitleArray, pomTitleArray);
+          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRound, pomArray, workoutTitleArray, pomTitleArray);
           savedCycleRecycler.setAdapter(savedCycleAdapter);
           savedCycleRecycler.setLayoutManager(lm2);
           //Instantiating callbacks from adapter.
@@ -1664,12 +1665,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void populateCycleList() {
     switch (mode) {
       case 1:
-        workoutConcatArray.clear();
+        workoutCyclesArray.clear();
+        typeOfRound.clear();
         workoutTitleArray.clear();
         for (int i=0; i<cyclesList.size(); i++) {
-          workoutConcatArray.add(cyclesList.get(i).getWorkoutRounds());
+          //Adds the concatenated String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
+          workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+          //Splits the concatenated String of Integer values for round type pulled from our database into a String Array.
+          String[] tempRoundTypes = cyclesList.get(i).getRoundType().split(" - ");
+          //Using the length of that String Array (each item being a String version of an Integer), we convert and then add it to our Integer Array.
+          for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
+          //Retrieves title for use when editing a cycle.
           workoutTitleArray.add(cyclesList.get(i).getTitle());
-          Log.i("testSave", String.valueOf(workoutConcatArray));
         }
         break;
       case 3:
@@ -1729,8 +1736,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else cycleTitle = cycle_name_edit.getText().toString();
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
-      //Updates the adapter display of saved cycles, since we are adding to it.
-      runOnUiThread(() -> populateCycleList());
       //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
     } else {
       retrieveCycle();

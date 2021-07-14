@@ -397,6 +397,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     switch (mode) {
       case 1:
         workoutTime = intent.getIntegerArrayListExtra("workoutTime");
+        //Todo: Receiving un-updated list.
         typeOfRound = intent.getIntegerArrayListExtra("typeOfRound");
         //Since we begin on Sets, we are getting the millis value of our first round.
 //        setMillis = customSetTime.get(0);

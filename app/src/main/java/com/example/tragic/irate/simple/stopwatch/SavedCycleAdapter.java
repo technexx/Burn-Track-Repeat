@@ -29,6 +29,7 @@ import java.util.List;
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
   Context mContext;
   ArrayList<String> mWorkoutList;
+  ArrayList<Integer> mRoundType;
   ArrayList<String> mWorkoutTitle;
   ArrayList<String> mPomList;
   ArrayList<String> mPomTitle;
@@ -66,8 +67,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
-  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> pomList, ArrayList<String> workoutTitle, ArrayList<String> pomTitle) {
-    this.mContext = context; mWorkoutList = workoutList; this.mPomList = pomList; this.mWorkoutTitle = workoutTitle; this.mPomTitle = pomTitle;
+  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<Integer> roundType, ArrayList<String> pomList, ArrayList<String> workoutTitle, ArrayList<String> pomTitle) {
+    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mPomList = pomList; this.mWorkoutTitle = workoutTitle; this.mPomTitle = pomTitle;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
@@ -115,6 +116,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (holder instanceof WorkoutHolder) {
       WorkoutHolder workoutHolder = (WorkoutHolder) holder;
       workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
+      if (mRoundType.get(position)==1|| mRoundType.get(position)==2) workoutHolder.workOutCycle.setTextColor(Color.GREEN); else workoutHolder.workOutCycle.setTextColor(Color.RED);
       workoutHolder.workOutCycle.setText(convertTime(mWorkoutList).get(position));
 
       if (mHighlightDeleted) {

@@ -98,7 +98,6 @@ public class DotDraws extends View {
     mRoundType = roundType;
   }
 
-
   public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime, int fadeDone) {
     mPomTime = new ArrayList<>();
     for (int i=0; i<pomTime.size(); i++) mPomTime.add(convertSeconds(pomTime.get(i)/1000));
