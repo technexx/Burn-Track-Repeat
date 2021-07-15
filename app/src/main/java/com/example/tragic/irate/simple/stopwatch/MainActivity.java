@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> pomArray;
 
   ArrayList<Integer> typeOfRound;
+  ArrayList<String> typeOfRoundArray;
   boolean setsSelected;
   boolean breaksSelected;
   int roundType;
@@ -205,9 +206,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   InputMethodManager inputMethodManager;
 
   boolean onNewCycle;
-  public ArrayList<Integer> infinityArrayOne;
-  public ArrayList<Integer> infinityArrayTwo;
-  public ArrayList<Integer> infinityArrayThree;
   TextWatcher titleTextWatcher;
   boolean titleChanged;
   boolean editingCycle;
@@ -230,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: Test dot text w/ different char numbers, tho there will be min values (e.g. in Pom) that will make some adjustment unnecessary.
   //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
@@ -438,6 +437,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     workoutTitle = new ArrayList<>();
     workoutCyclesArray = new ArrayList<>();
     typeOfRound = new ArrayList<>();
+    typeOfRoundArray = new ArrayList<>();
 
     //These Integer Lists hold our millis values for each round.
     pomValuesTime = new ArrayList<>();
@@ -450,10 +450,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomTitleArray = new ArrayList<>();
     //If highlighting cycles for deletion, contains all POSITIONS (not IDs) of cycles highlighted.
     receivedHighlightPositions = new ArrayList<>();
-    infinityArrayOne = new ArrayList<>();
-    infinityArrayTwo = new ArrayList<>();
-    infinityArrayThree = new ArrayList<>();
-
     //Database entity lists.
     cyclesList = new ArrayList<>();
     cyclesBOList = new ArrayList<>();
@@ -514,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> {
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRound, pomArray, workoutTitleArray, pomTitleArray);
+          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, pomArray, workoutTitleArray, pomTitleArray);
           savedCycleRecycler.setAdapter(savedCycleAdapter);
           savedCycleRecycler.setLayoutManager(lm2);
           //Instantiating callbacks from adapter.
@@ -523,10 +519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Setting mode from savedPref so we are on whichever one was previously used.
           savedCycleAdapter.setView(mode);
 
-          //Sends infinity arrays to our saved cycle adapter.
-          savedCycleAdapter.receiveInfinityMode(infinityArrayOne, infinityArrayTwo);
-          //Sends infinity arrays to our saved cycle adapter.
-          savedCycleAdapter.receiveInfinityModeTwo(infinityArrayThree);
           //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
           savedCycleAdapter.notifyDataSetChanged();
         });
@@ -1625,6 +1617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+    Log.i("testsize", "list size is " + typeOfRound.size());
   }
 
   public String friendlyString(String altString) {
@@ -1669,14 +1662,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         typeOfRound.clear();
         workoutTitleArray.clear();
         for (int i=0; i<cyclesList.size(); i++) {
-          //Adds the concatenated String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
+          //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
           workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-          //Splits the concatenated String of Integer values for round type pulled from our database into a String Array.
-          String[] tempRoundTypes = cyclesList.get(i).getRoundType().split(" - ");
-          //Using the length of that String Array (each item being a String version of an Integer), we convert and then add it to our Integer Array.
-          for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
           //Retrieves title for use when editing a cycle.
           workoutTitleArray.add(cyclesList.get(i).getTitle());
+          //Adds concatenated roundType String used in each cycle.
+          typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+//          //Splits the concatenated String of Integer values for round type pulled from our database into a String Array.
+//          String[] tempRoundTypes = cyclesList.get(i).getRoundType().split(" - ");
+//          //Using the length of that String Array (each item being a String version of an Integer), we convert and then add it to our Integer Array.
+//          for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
         }
         break;
       case 3:
@@ -1685,6 +1680,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomArray.add(pomCyclesList.get(i).getFullCycle());
           pomTitleArray.add(pomCyclesList.get(i).getTitle());
         }
+        break;
     }
   }
 

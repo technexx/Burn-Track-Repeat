@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +30,7 @@ import java.util.List;
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
   Context mContext;
   ArrayList<String> mWorkoutList;
-  ArrayList<Integer> mRoundType;
+  ArrayList<String> mRoundType;
   ArrayList<String> mWorkoutTitle;
   ArrayList<String> mPomList;
   ArrayList<String> mPomTitle;
@@ -41,11 +42,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mHighlightDeleted;
   boolean mHighlightMode;
   List<String> mPositionList;
-  ArrayList<Integer> mInfinityArrayOne = new ArrayList<>();
-  ArrayList<Integer> mInfinityArrayTwo = new ArrayList<>();
-  ArrayList<Integer> mInfinityArrayThree = new ArrayList<>();
-  float mPosX;
   ArrayList<Integer> mSizeToggle = new ArrayList<>();
+  CharSequence permSpan = "";
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -67,7 +65,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
-  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<Integer> roundType, ArrayList<String> pomList, ArrayList<String> workoutTitle, ArrayList<String> pomTitle) {
+  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> pomList, ArrayList<String> workoutTitle, ArrayList<String> pomTitle) {
     this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mPomList = pomList; this.mWorkoutTitle = workoutTitle; this.mPomTitle = pomTitle;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
@@ -88,14 +86,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (cancelMode) mHighlightMode = false;
   }
 
-  public void receiveInfinityMode(ArrayList<Integer> infinityListOne, ArrayList<Integer> infinityListTwo) {
-    mInfinityArrayOne = infinityListOne; mInfinityArrayTwo = infinityListTwo;
-  }
-
-  public void receiveInfinityModeTwo(ArrayList<Integer> infinityListThree) {
-    mInfinityArrayThree = infinityListThree;
-  }
-
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -109,6 +99,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else return null;
   }
 
+  //Todo: roundType not being passed in. We need to retrieve it from the DB as a series of concatenated String lists when coming back to Main from Timer, as each saved cycle needs to have one applied.
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -116,8 +107,27 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (holder instanceof WorkoutHolder) {
       WorkoutHolder workoutHolder = (WorkoutHolder) holder;
       workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
-      if (mRoundType.get(position)==1|| mRoundType.get(position)==2) workoutHolder.workOutCycle.setTextColor(Color.GREEN); else workoutHolder.workOutCycle.setTextColor(Color.RED);
-      workoutHolder.workOutCycle.setText(convertTime(mWorkoutList).get(position));
+
+      //Retrieves the concatenated String of workout TIMES from current position.
+      String tempWorkoutString = convertTime(mWorkoutList).get(position);
+      //Retrieves the concatenated String of ROUND TYPES from current position.
+      String tempTypeString = mRoundType.get(position);
+      //Splits concatenated workout String into String Array.
+      String[] tempWorkoutArray = tempWorkoutString.split(mContext.getString(R.string.bullet), 0);
+      //Splits concatenated round type String into String Array.
+      String[] tempTypeArray = tempTypeString.split(" - ");
+      //Spannable object that will correspond to each object in workout array.
+      Spannable span;
+      //Iterates through the length of our split roundType array, which will always correspond to the length of our split workout array.
+      for (int j=0; j<tempTypeArray.length; j++) {
+        //For each object in the roundType array, we create a new spannable object from its corresponding item in the workout array.
+        span = new SpannableString(tempWorkoutArray[j]);
+        //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
+        if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, span.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE); else span.setSpan(new ForegroundColorSpan(Color.RED), 0, span.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
+        permSpan = TextUtils.concat(permSpan, span);
+      }
+      workoutHolder.workOutCycle.setText(permSpan);
 
       if (mHighlightDeleted) {
         //Clears highlight list.
@@ -130,22 +140,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
       }
 
-      //Grabs our X-axis value so we can limit the area that onClick triggers.
-      //Return values: TRUE consumes (ends) event, so onClick does not trigger. FALSE allows further methods (e.g. onClick) to continue.
-      workoutHolder.fullView.setOnTouchListener((v, event) -> {
-        if (event.getAction()==MotionEvent.ACTION_DOWN) {
-          mPosX = event.getX();
-        }
-        return false;
-      });
-
       workoutHolder.fullView.setOnClickListener(v -> {
         boolean changed = false;
         //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
-        if (!mHighlightMode) {
-          //Excludes the X-axis where we keep our infinity symbols from launching timer cycle.
-          if (mPosX<900) mOnCycleClickListener.onCycleClick(position);
-        } else {
+        if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
           ArrayList<String> tempList = new ArrayList<>(mPositionList);
           //Iterate through every cycle in list.
           for (int i = 0; i < mWorkoutList.size(); i++) {
@@ -316,8 +314,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     for (int i=0; i<time.size(); i++) {
       //Getting each String entry from String Array.
       listConv = String.valueOf(time.get(i));
-//      listConv = listConv.replace("[", "");
-//      listConv = listConv.replace("]", "");
       //Splitting into String[] entries.
       newSplit = listConv.split(" - ", 0);
 
