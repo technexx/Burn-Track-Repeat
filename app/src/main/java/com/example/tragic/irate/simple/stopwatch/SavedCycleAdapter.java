@@ -99,7 +99,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else return null;
   }
 
-  //Todo: roundType not being passed in. We need to retrieve it from the DB as a series of concatenated String lists when coming back to Main from Timer, as each saved cycle needs to have one applied.
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -113,7 +112,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //Retrieves the concatenated String of ROUND TYPES from current position.
       String tempTypeString = mRoundType.get(position);
       //Splits concatenated workout String into String Array.
-      String[] tempWorkoutArray = tempWorkoutString.split(mContext.getString(R.string.bullet), 0);
+      String[] tempWorkoutArray = tempWorkoutString.split(mContext.getString(R.string.bullet));
       //Splits concatenated round type String into String Array.
       String[] tempTypeArray = tempTypeString.split(" - ");
       //Spannable object that will correspond to each object in workout array.

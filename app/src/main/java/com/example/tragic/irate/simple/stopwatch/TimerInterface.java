@@ -71,7 +71,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   TextView cycle_header_text;
   TextView cycles_completed;
-  Button cycle_reset;
   ImageButton new_lap;
   ImageButton next_round;
   ImageButton reset_total_times;
@@ -128,7 +127,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   String displayTime = "0";
   String newEntries;
   String savedEntries;
-  String resetEntries;
   int newMsConvert;
   int savedMsConvert;
   ArrayList<String> currentLapList;
@@ -222,7 +220,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   CyclesDatabase cyclesDatabase;
   List<Cycles> cyclesList;
-  List<CyclesBO> cyclesBOList;
   List<PomCycles> pomCyclesList;
   Cycles cycles;
   CyclesBO cyclesBO;
@@ -397,10 +394,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     switch (mode) {
       case 1:
         workoutTime = intent.getIntegerArrayListExtra("workoutTime");
-        //Todo: Receiving un-updated list.
         typeOfRound = intent.getIntegerArrayListExtra("typeOfRound");
-        //Since we begin on Sets, we are getting the millis value of our first round.
-//        setMillis = customSetTime.get(0);
         break;
       case 3:
         pomValuesTime = intent.getIntegerArrayListExtra("pomList");
@@ -438,7 +432,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             break;
         }
       } else {
-        //Todo: Will crash here if we do not update db save in Main.
         //If a new cycle, retrieve the most recently added db entry (the one we just created in Main), pull its ID, and assign an instance of the db entity class to it so we can save total set/break time and total cycles to it when we exit.
         int id = 0;
         switch (mode) {
@@ -1468,30 +1461,33 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void populateTimerUI() {
+    //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
-        if (customSetTime.size() > 0) {
-          setMillis = customSetTime.get(0);
-          breakMillis = customBreakTime.get(0);
-        }
-        if (!setsAreCountingUp) {
-          if (customSetTime.size() > 0) {
-            timePaused.setText(convertSeconds((setMillis + 999) / 1000));
-            timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
+        if (workoutTime.size()>0) {
+          switch (typeOfRound.get(0)) {
+            case 1:
+              setMillis = workoutTime.get(0);
+              timePaused.setText(convertSeconds((setMillis + 999) / 1000));
+              timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
+              setTextSize(setMillis);
+              break;
+            case 3:
+              breakMillis = workoutTime.get(0);
+              timePaused.setText(convertSeconds((breakMillis + 999) / 1000));
+              timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
+              setTextSize(breakMillis);
+              break;
+            case 2: case 4:
+              timeLeft.setText("0");
+              timePaused.setText("0");
+              setTextSize(0);
+              break;
           }
-        } else {
-          //Sets all zero arrays back to 0.
-          for (int i=0; i<zeroArraySets.size(); i++) {
-            zeroArraySets.set(i, 0); zeroArrayBreaks.set(i, 0);
-          }
-          timeLeft.setText("0");
-          timePaused.setText("0");
         }
-
+        //Setting total number of rounds.
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
-        //Sets initial text size.
-//        setTextSize(setMillis);
         break;
       case 3:
         //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
