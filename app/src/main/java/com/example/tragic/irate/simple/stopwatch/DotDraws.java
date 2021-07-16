@@ -35,7 +35,6 @@ public class DotDraws extends View {
   int mAlpha = 255;
   int mAlpha2;
   int cycle;
-  int mFadeVar;
   int mMode;
   int mPomDotCounter;
 
@@ -85,8 +84,8 @@ public class DotDraws extends View {
     mMode = mode;
   }
 
-  public void workOutRounds(int roundCount, int roundReduction, int fadeVar) {
-    this.mRoundCount = roundCount;  this.mRoundReduction = roundReduction; this.mFadeVar = fadeVar;
+  public void workOutRounds(int roundCount, int roundReduction) {
+    this.mRoundCount = roundCount;  this.mRoundReduction = roundReduction;
   }
 
   //Updates list every time it is called w/ a String conversion of our long millis value.
@@ -98,10 +97,10 @@ public class DotDraws extends View {
     mRoundType = roundType;
   }
 
-  public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime, int fadeDone) {
+  public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime) {
     mPomTime = new ArrayList<>();
     for (int i=0; i<pomTime.size(); i++) mPomTime.add(convertSeconds(pomTime.get(i)/1000));
-    this.mPomDotCounter = pomDotCounter; this.mFadeVar = fadeDone;
+    this.mPomDotCounter = pomDotCounter;
     setupPaint();
     invalidate();
   }
@@ -146,7 +145,7 @@ public class DotDraws extends View {
           //if type 1 or 3 (counting down), dots are filled. Otherwise, they are hollow.
           if (mRoundType.get(i)==1 || mRoundType.get(i)==3) setDotStyle(false); else setDotStyle(true);
           if (mRoundTimes.size() - mRoundReduction == i) {
-            if (mFadeVar == 1) fadeDot();
+            fadeDot();
           } else if (mRoundReduction + i < mRoundTimes.size()){
             mPaint.setAlpha(100);
           } else mPaint.setAlpha(255);
@@ -190,7 +189,7 @@ public class DotDraws extends View {
       case 0: case 2: case 4: case 6:
         mPaint.setColor(Color.GREEN);
         //Must be called AFTER color is changed, otherwise alpha will reset to 255.
-        if (fade && mFadeVar == 4) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade) fadeDot(); else mPaint.setAlpha(alpha);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         mCanvas.drawCircle(mX, 575, 62, mPaint);
         if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
@@ -198,7 +197,7 @@ public class DotDraws extends View {
         break;
       case 1: case 3: case 5:
         mPaint.setColor(Color.RED);
-        if (fade && mFadeVar == 4) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade) fadeDot(); else mPaint.setAlpha(alpha);
         mCanvas.drawCircle(mX2, 575, 50 , mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
@@ -206,7 +205,7 @@ public class DotDraws extends View {
         break;
       case 7:
         mPaint.setColor(Color.RED);
-        if (fade && mFadeVar == 4) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade) fadeDot(); else mPaint.setAlpha(alpha);
         mCanvas.drawRect(mX-170, 520, mX-60, 630, mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
