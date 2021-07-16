@@ -27,7 +27,7 @@ public class DotDraws extends View {
   float mY2;
 
   int mRoundCount;
-  int mRoundReduction;
+  int mRoundsLeft;
   ArrayList<String> mRoundTimes;
   ArrayList<Integer> mRoundType;
   ArrayList<String> mPomTime;
@@ -84,12 +84,12 @@ public class DotDraws extends View {
     mMode = mode;
   }
 
-  public void workOutRounds(int roundCount, int roundReduction) {
-    this.mRoundCount = roundCount;  this.mRoundReduction = roundReduction;
+  public void updateWorkoutRoundCount(int roundCount, int roundsLeft) {
+    this.mRoundCount = roundCount;  this.mRoundsLeft = roundsLeft;
   }
 
   //Updates list every time it is called w/ a String conversion of our long millis value.
-  public void workOutTimes(ArrayList<Integer> roundTimes, ArrayList<Integer> roundType) {
+  public void updateWorkoutTimes(ArrayList<Integer> roundTimes, ArrayList<Integer> roundType) {
     //Populates our String Array of round times from the Integer Array of values received from Timer class.
     mRoundTimes = new ArrayList<>();
     for (int i=0; i<roundTimes.size(); i++) mRoundTimes.add(convertSeconds(roundTimes.get(i)/1000));
@@ -105,7 +105,11 @@ public class DotDraws extends View {
     invalidate();
   }
 
-  public void setAlpha() {
+  public void reDraw() {
+    invalidate();
+  }
+
+  public void resetDotAlpha() {
     mAlpha = 255; cycle = 0;
   }
 
@@ -134,6 +138,7 @@ public class DotDraws extends View {
     setupPaint();
     this.mCanvas = canvas;
 
+    //Todo: Not fading reds.
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
     switch (mMode) {
       case 1:
@@ -144,11 +149,11 @@ public class DotDraws extends View {
           if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) mPaint.setColor(Color.GREEN); else mPaint.setColor(Color.RED);
           //if type 1 or 3 (counting down), dots are filled. Otherwise, they are hollow.
           if (mRoundType.get(i)==1 || mRoundType.get(i)==3) setDotStyle(false); else setDotStyle(true);
-          if (mRoundTimes.size() - mRoundReduction == i) {
-            fadeDot();
-          } else if (mRoundReduction + i < mRoundTimes.size()){
-            mPaint.setAlpha(100);
-          } else mPaint.setAlpha(255);
+          if (mRoundTimes.size() - mRoundsLeft == i) fadeDot();
+
+          else if (mRoundsLeft + i < mRoundTimes.size()) mPaint.setAlpha(100);
+          else mPaint.setAlpha(255);
+          Log.i("testFade", "list size is " + mRoundTimes.size() + " and rounds left is " + mRoundsLeft + " and i is " + i);
 
           if (mRoundTimes.size()<=8) {
             mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);

@@ -217,18 +217,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Dots not fading.
-  //Todo: Update pause/resume.
+  //Todo: Total times off @ round end.
+  //Todo: Cycle display combines rounds from different cycles. Might just need to clear spannable list.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
-  //Todo: "BLIP" in textView when starting timer likely due to the timeLEFT not being same value as timerPaused.
+  //Todo: "BLIP" in textView when starting timer likely due to the timeLEFT not being same value as timerIsPaused.
   //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: Remove overtime vars completely or re-implement?
   //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: Test dot text w/ different char numbers, tho there will be min values (e.g. in Pom) that will make some adjustment unnecessary.
