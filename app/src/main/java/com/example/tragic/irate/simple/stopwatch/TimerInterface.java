@@ -377,10 +377,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 1:
         workoutTime = intent.getIntegerArrayListExtra("workoutTime");
         typeOfRound = intent.getIntegerArrayListExtra("typeOfRound");
-        //Establishes round count and numberOfRounds left, then passes those into our dotDraws class. Necessary for canvas to draw correctly.
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
+        //Sets timer values and round counts.
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
         break;
       case 3:
         pomValuesTime = intent.getIntegerArrayListExtra("pomList");
@@ -1250,7 +1251,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
               setTextSize(breakMillis);
               break;
-            case 2: case 4:
+            case 2:
+            case 4:
               timeLeft.setText("0");
               timePaused.setText("0");
               setTextSize(0);
