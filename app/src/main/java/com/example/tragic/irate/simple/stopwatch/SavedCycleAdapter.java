@@ -43,7 +43,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mHighlightMode;
   List<String> mPositionList;
   ArrayList<Integer> mSizeToggle = new ArrayList<>();
-  CharSequence permSpan = "";
+  CharSequence permSpan;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -107,6 +107,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       WorkoutHolder workoutHolder = (WorkoutHolder) holder;
       workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
 
+      //Clearing Spannable object, since it will re-populate for every position passed in through this method.
+      permSpan = "";
       //Retrieves the concatenated String of workout TIMES from current position.
       String tempWorkoutString = convertTime(mWorkoutList).get(position);
       //Retrieves the concatenated String of ROUND TYPES from current position.

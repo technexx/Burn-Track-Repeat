@@ -377,11 +377,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 1:
         workoutTime = intent.getIntegerArrayListExtra("workoutTime");
         typeOfRound = intent.getIntegerArrayListExtra("typeOfRound");
-        startRounds = workoutTime.size();
-        numberOfRoundsLeft = startRounds;
-        //Sets timer values and round counts.
-        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
         break;
       case 3:
         pomValuesTime = intent.getIntegerArrayListExtra("pomList");
@@ -1082,8 +1077,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       currentRound++;
       //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
       timerDisabled = false;
-      //Ends our alpha animation sequence.
-      endAnimation.cancel();
       //Resets the alpha value we use to fade dots back to 255 (fully opaque).
       dotDraws.resetDotAlpha();
       //Updates dotDraws class w/ round count.
@@ -1106,6 +1099,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             mHandler.post(secondsUpBreakRunnable);
             break;
         }
+        //Ends our alpha animation sequence if we are not on the last round.
+        endAnimation.cancel();
         //If number of rounds left is 0, do the following.
       } else {
         //Resets current round counter.
@@ -1237,6 +1232,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
+        //Sets timer values and round counts. populateTimerUI() is called at app startup and when resetting timer, so this handles both.
+        startRounds = workoutTime.size();
+        numberOfRoundsLeft = startRounds;
+        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
         if (workoutTime.size()>0) {
           switch (typeOfRound.get(0)) {
             case 1:

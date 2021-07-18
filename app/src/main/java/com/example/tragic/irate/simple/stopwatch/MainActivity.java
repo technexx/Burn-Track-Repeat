@@ -217,8 +217,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
+  //Todo: Skip round fixes.
+  //Todo: Empty (white) progressBar for count up?
   //Todo: Total times off @ round end.
-  //Todo: Cycle display combines rounds from different cycles. Might just need to clear spannable list.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
