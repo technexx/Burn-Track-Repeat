@@ -217,7 +217,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Skip round fixes.
+  //Todo: Text should either (a)not fade when round ends or (b)also fade when skipping round (X -> 0).
+  //Todo: Was getting some "double (fast) fading" in dots w/ Skip. Can't immediately replicate. Might be multiple clicks on nextRound. Super fast clicks bug it.
   //Todo: Empty (white) progressBar for count up?
   //Todo: Total times off @ round end.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
@@ -1620,7 +1621,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-    Log.i("testsize", "list size is " + typeOfRound.size());
   }
 
   public String friendlyString(String altString) {

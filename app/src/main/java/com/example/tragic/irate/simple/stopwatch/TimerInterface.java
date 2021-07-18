@@ -385,17 +385,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
     }
 
-
-
     /////---------Testing pom round iterations---------------/////////
 //    if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 70000);
-
-    toggleNextRoundRunnable = () -> {
-      if (nextRoundToggleIsActive) {
-        nextRoundToggleIsActive = false;
-        next_round.setEnabled(true);
-      }
-    };
 
     //Loads database of saved cycles. Since we are on a specific cycle, we can access it via its unique ID here.
     AsyncTask.execute(() -> {
@@ -528,6 +519,28 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     };
 
+    toggleNextRoundRunnable = () -> {
+      if (nextRoundToggleIsActive) {
+        nextRoundToggleIsActive = false;
+        next_round.setEnabled(true);
+      }
+    };
+
+    //Disables button for 1 second after push. Re-enables it through runnable after that.
+    next_round.setOnClickListener(v -> {
+      setNextRound(true);
+      if (!nextRoundToggleIsActive) {
+        next_round.setEnabled(false);
+        //If one round remains on click, disable the button entirely and exit method. The last round will be subtracted after runnable delay in setNextRound().
+        if (numberOfRoundsLeft==1) {
+          next_round.setAlpha(0.3f);
+          return;
+        }
+        nextRoundToggleIsActive = true;
+        mHandler.postDelayed(toggleNextRoundRunnable, 1000);
+      }
+    });
+
     reset.setOnClickListener(v -> {
       if (mode != 3) resetTimer();
       else {
@@ -537,16 +550,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           reset.setText(R.string.reset);
           resetTimer();
         }
-      }
-    });
-
-    //Disables button for 1 second after push. Re-enables it through runnable after that.
-    next_round.setOnClickListener(v -> {
-      setNextRound(true);
-      if (!nextRoundToggleIsActive) {
-        next_round.setEnabled(false);
-        nextRoundToggleIsActive = true;
-        mHandler.postDelayed(toggleNextRoundRunnable, 1000);
       }
     });
 
@@ -926,18 +929,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-//  public void drawDots() {
-//    switch (mode) {
-//      case 1:
-//        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-//        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-//        break;
-//      case 3:
-//        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
-//        break;
-//    }
-//  }
-
   //This works for Pom. Just *60 to have the value reflect each minute's seconds.
   private String convertSeconds(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
@@ -1013,12 +1004,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
+  //Todo: For Pom (Mode 3). Prolly should also pass a typeOfRound list in.
   public void setNextRound(boolean endingEarly) {
     ////!!--Executes for all round types--!!////
     //If skipping round manually, cancel timer and objectAnimator.
     if (endingEarly) {
       if (timer != null) timer.cancel();
       if (objectAnimator != null) objectAnimator.cancel();
+      timeLeft.setText("0");
+      timePaused.setText("0");
+      progressBar.setProgress(0);
     }
     //Fade out effect for text only.
     timeLeft.startAnimation(fadeOut);
@@ -1168,7 +1163,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                   break;
               }
             }
-            Log.i("testPause", "type is " + typeOfRound.get(currentRound));
           } else {
             //If cycle has run its course, reset the cycle and re-enable the next_round button.
             resetTimer();
@@ -1302,6 +1296,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     if (timer != null) timer.cancel();
     if (objectAnimator != null) objectAnimator.cancel();
     endAnimation.cancel();
+    next_round.setEnabled(true);
+    next_round.setAlpha(1.0f);
     //Stores cumulative time valuation.
     saveTotalTimes();
     switch (mode) {
