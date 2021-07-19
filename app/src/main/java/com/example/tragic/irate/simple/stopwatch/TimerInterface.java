@@ -139,7 +139,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   boolean modeThreeTimerEnded;
   boolean onBreak;
   boolean timerDisabled;
-  boolean pomTimerDisabled;
   boolean timerIsPaused = true;
 
   ObjectAnimator fadeInObj;
@@ -732,7 +731,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
 
         timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-        if (pomMillis<500) pomTimerDisabled = true;
+        if (pomMillis<500) timerDisabled = true;
 
         //Switches total time count depending on which round we're on.
         switch (pomDotCounter) {
@@ -764,7 +763,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           //Ensures any features meant for a running timer cannot be executed here.
           timerIsPaused = true;
           //Disabling pause/resume clicks until animation finishes.
-          pomTimerDisabled = true;
+          timerDisabled = true;
           //Smooths out end fade.
           mHandler.post(endFade);
 
@@ -789,7 +788,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             pomDotCounter++;
             pomMillis = newMillis(false);
             //Re-enabling timer clicks. Used regardless of number of rounds left.
-            pomTimerDisabled = false;
+            timerDisabled = false;
 
             if (pomDotCounter < 9) {
               endAnimation.cancel();
@@ -901,7 +900,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           pomDotCounter++;
           pomMillis = newMillis(false);
           endAnimation.cancel();
-          pomTimerDisabled = false;
+          timerDisabled = false;
 
           if (timerIsPaused) {
             timeLeft.setText(convertSeconds((pomMillis) / 1000));
@@ -990,15 +989,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   //Todo: For Pom (Mode 3). Prolly should also pass a typeOfRound list in.
-  //Todo: Need conditional for which text is visible (timeLeft or timePaused) depending on pause/resume status, OR just remove timePaused altogether
   public void setNextRound(boolean endingEarly) {
     ////!!--Executes for all round types--!!////
+    timerDisabled = true;
     //If skipping round manually, cancel timer and objectAnimator.
     if (endingEarly) {
       if (timer != null) timer.cancel();
       if (objectAnimator != null) objectAnimator.cancel();
       progressBar.setProgress(0);
     }
+
     switch (typeOfRound.get(currentRound)) {
       case 1:
         //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
@@ -1035,12 +1035,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
         mHandler.removeCallbacks(secondsUpBreakRunnable);
     }
-
-    //Fade out effect for text only.
-    timeLeft.startAnimation(fadeOut);
     //Fade out effect for text AND progressBar.
     animateEnding(true);
-//    timeLeft.startAnimation(fadeOut);
+
     //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
     mHandler.post(endFade);
     //Saves total set/break times.
@@ -1053,8 +1050,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       numberOfRoundsLeft--;
       //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
       currentRound++;
-      //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
-      timerDisabled = false;
       //Resets the alpha value we use to fade dots back to 255 (fully opaque).
       dotDraws.resetDotAlpha();
       //Updates dotDraws class w/ round count.
@@ -1089,12 +1084,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         customCyclesDone++;
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
       }
+      //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
+      timerDisabled = false;
     },750);
   }
 
   public void pauseAndResumeTimer(int pausing) {
     //disabledTimer booleans are to prevent ANY action being taken.
-    if ((!timerDisabled && mode == 1) || (!pomTimerDisabled && mode == 3) || mode == 4) {
+    if (!timerDisabled) {
       if (fadeInObj != null) fadeInObj.cancel();
       if (fadeOutObj != null) fadeOutObj.cancel();
       switch (mode) {
@@ -1228,7 +1225,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-          pomTimerDisabled = false;
+          timerDisabled = false;
           //Sets initial text size.
           setTextSize(pomMillis);
         }

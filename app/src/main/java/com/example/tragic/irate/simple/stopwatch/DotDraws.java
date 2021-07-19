@@ -154,6 +154,10 @@ public class DotDraws extends View {
           else if (mRoundsLeft + i < mRoundTimes.size()) mPaint.setAlpha(100);
           else mPaint.setAlpha(255);
 
+//          Log.i("testFade", "size is " + mRoundTimes.size());
+//          Log.i("testFade", "remaining is " + mRoundsLeft);
+//          Log.i("testFade", "(i) is " + i);
+
           if (mRoundTimes.size()<=8) {
             mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
             drawText(mRoundTimes, mX+16, mY+62, i);

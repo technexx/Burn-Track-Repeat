@@ -217,8 +217,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
+  //Todo: Fade first dot bug is back.
   //Todo: Text should either (a)not fade when round ends or (b)also fade when skipping round (X -> 0).
-  //Todo: Was getting some "double (fast) fading" in dots w/ Skip. Can't immediately replicate. Might be multiple clicks on nextRound. Super fast clicks bug it.
+  //Todo: nextRound() clickable should be more closely tied to the runnable delay within it, lest we get stuff out of sync.
+  //Todo: Test countUp rounds + up/down alternating.
   //Todo: Empty (white) progressBar for count up?
   //Todo: Total times off @ round end.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
@@ -237,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test dot text w/ different char numbers, tho there will be min values (e.g. in Pom) that will make some adjustment unnecessary.
   //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
   //Todo: Preset timer selections.
-  //Todo: No rounds added defaults to a default Cycle instead of staying blank.
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Variable set count-up timer, for use w/ TDEE.
   //Todo: Variable set only mode? Again, for TDEE.
@@ -250,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add onOptionsSelected dots for About, etc.
   //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
   //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
-  //Todo: Make sure canvas'd over clickables in stopwatch mode can't be triggered.
   //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
   //Todo: Test everything 10x.
 
