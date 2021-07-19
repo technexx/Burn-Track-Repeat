@@ -119,13 +119,21 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       String[] tempTypeArray = tempTypeString.split(" - ");
       //Spannable object that will correspond to each object in workout array.
       Spannable span;
+      //Var used to determine spannable spacing.
+      int tempSpace = 0;
       //Iterates through the length of our split roundType array, which will always correspond to the length of our split workout array.
       for (int j=0; j<tempTypeArray.length; j++) {
-        //For each object in the roundType array, we create a new spannable object from its corresponding item in the workout array. For every position except the last, add a bullet separator.
-        if (j<tempTypeArray.length-1) span = new SpannableString( tempWorkoutArray[j] + mContext.getString(R.string.bullet));
-        else span = new SpannableString(tempWorkoutArray[j]);
+        //For each object in the roundType array, we create a new spannable object from its corresponding item in the workout array. For every position except the last, add a bullet separator and avoid coloring the last two spaces (for white bullet).
+        if (j<tempTypeArray.length-1) {
+          span = new SpannableString( tempWorkoutArray[j] + mContext.getString(R.string.bullet));
+          tempSpace = span.length()-2;
+        }
+        else {
+          span = new SpannableString(tempWorkoutArray[j]);
+          tempSpace = span.length();
+        }
         //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
-        if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, span.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE); else span.setSpan(new ForegroundColorSpan(Color.RED), 0, span.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE); else span.setSpan(new ForegroundColorSpan(Color.RED), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
         permSpan = TextUtils.concat(permSpan, span);
       }
