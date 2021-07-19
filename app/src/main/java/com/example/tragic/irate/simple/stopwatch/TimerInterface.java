@@ -450,6 +450,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     };
 
+    //Todo: Pass updated mRoundTimes list w/ in these runnables.
     //These three runnables act as our timers for "count up" rounds.
     secondsUpSetRunnable = new Runnable() {
       @Override
@@ -459,7 +460,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         countUpMillisSets += 50;
         //Sets the current index of our initial "zero array" to the millis value being counted up. When counting down, this is a static value. Here, it will change each tick. In either case, drawDots() uses this to populate the dot text.
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
-        dotDraws.reDraw();
+        //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, countUpMillisSets);
+        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         //Temporary value for current round, using totalSetMillis which is our permanent value.
         tempSetMillis = totalSetMillis + countUpMillisSets;
         total_set_time.setText(convertSeconds(tempSetMillis / 1000));
@@ -473,7 +476,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         animateTextSize(countUpMillisBreaks);
         countUpMillisBreaks += 50;
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
-        dotDraws.reDraw();
+        //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, countUpMillisBreaks);
+        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
         tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
         total_break_time.setText(convertSeconds(tempBreakMillis / 1000));

@@ -86,6 +86,7 @@ public class DotDraws extends View {
 
   public void updateWorkoutRoundCount(int roundCount, int roundsLeft) {
     this.mRoundCount = roundCount;  this.mRoundsLeft = roundsLeft;
+    invalidate();
   }
 
   //Updates list every time it is called w/ a String conversion of our long millis value.
@@ -95,6 +96,7 @@ public class DotDraws extends View {
     for (int i=0; i<roundTimes.size(); i++) mRoundTimes.add(convertSeconds(roundTimes.get(i)/1000));
     //Sets our global mRoundType list to the one received from Timer class.
     mRoundType = roundType;
+    invalidate();
   }
 
   public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime) {
