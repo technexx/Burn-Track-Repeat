@@ -217,19 +217,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
+  //Todo: Cycle display needs distinguishing features for count-up rounds.
+  //Todo: Re-add bullets to cycle display.
   //Todo: Smooth out progressBar switches.
-  //Todo: Should gray out text in count-up dots when round is over, or also during count.
   //Todo: First timer click from count-down -> up SKIP doesn't pause, but resumes.
   //Todo: Need to reset count-up rounds on cycle reset.
   //Todo: First dot fade bug.
-  //Todo: Cycle display needs distinguishing features for count-up rounds.
-  //Todo: Fade first dot bug is back. May just be invalidate() not being called on reset.
   //Todo: Text should either (a)not fade when round ends or (b)also fade when skipping round (X -> 0).
   //Todo: nextRound() clickable should be more closely tied to the runnable delay within it, lest we get stuff out of sync.
-  //Todo: Test countUp rounds + up/down alternating.
   //Todo: Should we show the actual vs. expected round time iterated for skipped rounds?
-  //Todo: Empty (white) progressBar for count up?
   //Todo: Total times off @ round end.
+  //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?

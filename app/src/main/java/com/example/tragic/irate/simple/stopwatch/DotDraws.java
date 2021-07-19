@@ -164,7 +164,7 @@ public class DotDraws extends View {
           else {
             //If neither of the previous conditions are true, retain a static full alpha value (i.e. an unreached round).
             mPaint.setAlpha(255);
-            //If posiition is a "count up" round, also retain the text's full alpha value.
+            //If position is a "count up" round, also retain the text's full alpha value.
             if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(255);
           }
 
