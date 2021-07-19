@@ -217,7 +217,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Count-up mode double-fading coming from count-down. Dot not iterating up.
+  //Todo: Smooth out progressBar switches.
+  //Todo: Should gray out text in count-up dots when round is over, or also during count.
+  //Todo: First timer click from count-down -> up SKIP doesn't pause, but resumes.
+  //Todo: Need to reset count-up rounds on cycle reset.
+  //Todo: First dot fade bug.
   //Todo: Cycle display needs distinguishing features for count-up rounds.
   //Todo: Fade first dot bug is back. May just be invalidate() not being called on reset.
   //Todo: Text should either (a)not fade when round ends or (b)also fade when skipping round (X -> 0).

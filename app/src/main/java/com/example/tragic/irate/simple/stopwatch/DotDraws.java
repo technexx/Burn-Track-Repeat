@@ -140,7 +140,6 @@ public class DotDraws extends View {
     setupPaint();
     this.mCanvas = canvas;
 
-    //Todo: Not fading reds.
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
     switch (mMode) {
       case 1:
@@ -151,10 +150,23 @@ public class DotDraws extends View {
           if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) mPaint.setColor(Color.GREEN); else mPaint.setColor(Color.RED);
           //if type 1 or 3 (counting down), dots are filled. Otherwise, they are hollow.
           if (mRoundType.get(i)==1 || mRoundType.get(i)==3) setDotStyle(false); else setDotStyle(true);
-          if (mRoundTimes.size() - mRoundsLeft == i) fadeDot();
-
-          else if (mRoundsLeft + i < mRoundTimes.size()) mPaint.setAlpha(100);
-          else mPaint.setAlpha(255);
+          //If the rounds remaining subtracted from our total rounds equals the position in its list we are drawing, fade that position (i.e. our current round).
+          if (mRoundTimes.size() - mRoundsLeft == i) {
+            //If we are in a "count up" round, also fade the text.
+            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) fadeDot(true); else fadeDot(false);
+          }
+          //if our remaining rounds added to our current position in the round list is less than the size of the list, mute that position's alpha (i.e. completed rounds).
+          else if (mRoundsLeft + i < mRoundTimes.size()) {
+            mPaint.setAlpha(100);
+            //If position is a "count up" round, also mute the text's alpha.
+            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(100);
+          }
+          else {
+            //If neither of the previous conditions are true, retain a static full alpha value (i.e. an unreached round).
+            mPaint.setAlpha(255);
+            //If posiition is a "count up" round, also retain the text's full alpha value.
+            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(255);
+          }
 
 //          Log.i("testFade", "size is " + mRoundTimes.size());
 //          Log.i("testFade", "remaining is " + mRoundsLeft);
@@ -199,7 +211,7 @@ public class DotDraws extends View {
       case 0: case 2: case 4: case 6:
         mPaint.setColor(Color.GREEN);
         //Must be called AFTER color is changed, otherwise alpha will reset to 255.
-        if (fade) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         mCanvas.drawCircle(mX, 575, 62, mPaint);
         if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
@@ -207,7 +219,7 @@ public class DotDraws extends View {
         break;
       case 1: case 3: case 5:
         mPaint.setColor(Color.RED);
-        if (fade) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         mCanvas.drawCircle(mX2, 575, 50 , mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
@@ -215,7 +227,7 @@ public class DotDraws extends View {
         break;
       case 7:
         mPaint.setColor(Color.RED);
-        if (fade) fadeDot(); else mPaint.setAlpha(alpha);
+        if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         mCanvas.drawRect(mX-170, 520, mX-60, 630, mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
         if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
@@ -294,8 +306,9 @@ public class DotDraws extends View {
     }
   }
 
-  public void fadeDot() {
+  public void fadeDot(boolean fadeText) {
     mPaint.setAlpha(mAlpha);
+    if (fadeText) mPaintText.setAlpha(mAlpha);
     mSendAlpha.sendAlphaValue(mAlpha);
     if (mAlpha >=255) {
       mAlpha = 255;
