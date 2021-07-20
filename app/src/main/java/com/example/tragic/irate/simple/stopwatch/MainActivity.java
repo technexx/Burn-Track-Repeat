@@ -218,8 +218,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Smooth out progressBar switches.
-  //Todo: First timer click from count-down -> up SKIP doesn't pause, but resumes.
   //Todo: Need to reset count-up rounds on cycle reset.
   //Todo: First dot fade bug.
   //Todo: Text should either (a)not fade when round ends or (b)also fade when skipping round (X -> 0).

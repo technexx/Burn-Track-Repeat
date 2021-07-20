@@ -355,9 +355,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     fadeOut.setFillAfter(true);
 
     fadeProgressIn = new AlphaAnimation(0.0f, 1.0f);
-    fadeProgressOut = new AlphaAnimation(1.0f, 0.0f);
     fadeProgressIn.setDuration(500);
-    fadeProgressOut.setDuration(200);
 
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
@@ -1018,14 +1016,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         total_break_time.setText(convertSeconds(tempBreakMillis/1000));
         break;
       case 2:
-        //Infinite round has ended, so we set the timer textViews to most recent millis value, and cancel the runnable.
+        //Infinite round has ended, so we set the timer textViews to most recent millis value, cancel the runnable, and reset the millis value.
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         mHandler.removeCallbacks(secondsUpSetRunnable);
+        countUpMillisSets = 0;
         break;
       case 4:
-        //Infinite round has ended, so we set the timer textViews to most recent millis value, and cancel the runnable.
+        //Infinite round has ended, so we set the timer textViews to most recent millis value, cancel the runnable, and reset the millis value.
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
         mHandler.removeCallbacks(secondsUpBreakRunnable);
+        countUpMillisBreaks = 0;
     }
     //Fade out effect for text AND progressBar.
     animateEnding(true);
@@ -1200,11 +1200,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
+        //Sets the long value in our "count up" rounds back to 0.
+        for (int i=0; i<startRounds; i++) {
+          if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
+        }
         //Sets timer values and round counts. populateTimerUI() is called at app startup and when resetting timer, so this handles both.
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
+
         if (workoutTime.size()>0) {
           switch (typeOfRound.get(0)) {
             case 1:
