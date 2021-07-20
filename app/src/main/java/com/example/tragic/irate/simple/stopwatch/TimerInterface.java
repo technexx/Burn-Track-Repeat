@@ -522,26 +522,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     };
 
-    toggleNextRoundRunnable = () -> {
-      if (nextRoundToggleIsActive) {
-        nextRoundToggleIsActive = false;
-        next_round.setEnabled(true);
-      }
-    };
-
     //Disables button for 1 second after push. Re-enables it through runnable after that.
     next_round.setOnClickListener(v -> {
       setNextRound(true);
-      if (!nextRoundToggleIsActive) {
-        next_round.setEnabled(false);
-        //If one round remains on click, disable the button entirely and exit method. The last round will be subtracted after runnable delay in setNextRound().
-        if (numberOfRoundsLeft==1) {
-          next_round.setAlpha(0.3f);
-          return;
-        }
-        nextRoundToggleIsActive = true;
-        mHandler.postDelayed(toggleNextRoundRunnable, 1000);
-      }
     });
 
     reset.setOnClickListener(v -> {
@@ -983,6 +966,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   //Todo: For Pom (Mode 3). Prolly should also pass a typeOfRound list in.
   public void setNextRound(boolean endingEarly) {
     ////!!--Executes for all round types--!!////
+    //Disables button that calls this method so it doesn't execute twice.
+    next_round.setEnabled(false);
+    //Disables pause/resume button.
     timerDisabled = true;
     //If skipping round manually, cancel timer and objectAnimator.
     if (endingEarly) {
@@ -1091,6 +1077,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
       //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
       timerDisabled = false;
+      //Re-enables the button that calls this method, now that it has completed.
+      next_round.setEnabled(true);
     },750);
   }
 
@@ -1209,6 +1197,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         numberOfRoundsLeft = startRounds;
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
+        Log.i("testfade", "start are " + startRounds + " and left are " + numberOfRoundsLeft);
 
         if (workoutTime.size()>0) {
           switch (typeOfRound.get(0)) {
