@@ -218,9 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: First dot fade bug.
   //Todo: Text should either (a)not fade when round ends or (b)also fade when skipping round (X -> 0).
-  //Todo: nextRound() clickable should be more closely tied to the runnable delay within it, lest we get stuff out of sync. Can just set an enable/disable w/ in the nextRound method.
   //Todo: Should we show the actual vs. expected round time iterated for skipped rounds?
   //Todo: Total times off @ round end.
   //Todo: Possible drag/drop switch for round order.

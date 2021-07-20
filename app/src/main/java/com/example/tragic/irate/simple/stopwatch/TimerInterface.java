@@ -355,7 +355,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     fadeOut.setFillAfter(true);
 
     fadeProgressIn = new AlphaAnimation(0.0f, 1.0f);
-    fadeProgressIn.setDuration(500);
+    fadeProgressIn.setDuration(1000);
 
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
@@ -964,6 +964,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   //Todo: For Pom (Mode 3). Prolly should also pass a typeOfRound list in.
+  //Todo: Text fade in w/ setFillAfter to false should repeat w/ out incident.
   public void setNextRound(boolean endingEarly) {
     ////!!--Executes for all round types--!!////
     //Disables button that calls this method so it doesn't execute twice.
@@ -1034,8 +1035,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       progressBar.setProgress(maxProgress);
       //Ends our alpha animation sequence if we are not on the last round.
       endAnimation.cancel();
-      //Fade effect to smooth out progressBar after animation.
+      //Fade effect to smooth out progressBar and timer text after animation.
       progressBar.startAnimation(fadeProgressIn);
+      timeLeft.startAnimation(fadeProgressIn);
       //Executes next round based on which type is indicated in our typeOfRound list.
       if (numberOfRoundsLeft>0) {
         //Only executes if timer is in Paused mode. Otherwise, we want to move onto next round as also paused.
