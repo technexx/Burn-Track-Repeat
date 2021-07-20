@@ -3,6 +3,7 @@
     <array name="preloaded_fonts" translatable="false">
         <item>@font/archivo_narrow</item>
         <item>@font/archivo_narrow_bold</item>
+        <item>@font/hammersmith_one</item>
         <item>@font/roboto_medium</item>
     </array>
 </resources>

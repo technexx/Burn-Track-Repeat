@@ -4,11 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
@@ -106,7 +111,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (holder instanceof WorkoutHolder) {
       WorkoutHolder workoutHolder = (WorkoutHolder) holder;
       workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
-
       //Clearing Spannable object, since it will re-populate for every position passed in through this method.
       permSpan = "";
       //Retrieves the concatenated String of workout TIMES from current position.
@@ -125,18 +129,38 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       for (int j=0; j<tempTypeArray.length; j++) {
         //For each object in the roundType array, we create a new spannable object from its corresponding item in the workout array. For every position except the last, add a bullet separator and avoid coloring the last two spaces (for white bullet).
         if (j<tempTypeArray.length-1) {
-          span = new SpannableString( tempWorkoutArray[j] + mContext.getString(R.string.bullet));
-          tempSpace = span.length()-2;
+          if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
+            span = new SpannableString( tempWorkoutArray[j] + mContext.getString(R.string.bullet));
+            tempSpace = span.length()-2;
+          } else {
+            span = new SpannableString("♾ "+ mContext.getString(R.string.bullet));
+            tempSpace = span.length();
+          }
+        } else {
+          if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
+            span = new SpannableString(tempWorkoutArray[j]);
+            tempSpace = span.length();
+          } else {
+            span = new SpannableString("♾ ");
+            tempSpace = span.length();
+          }
         }
-        else {
-          span = new SpannableString(tempWorkoutArray[j]);
-          tempSpace = span.length();
-        }
+
+        //Todo: Kinda sorta. At least we can get in image in. Fix it later.
+        ImageSpan imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
         //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
-        if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE); else span.setSpan(new ForegroundColorSpan(Color.RED), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
+          span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        } else span.setSpan(new ForegroundColorSpan(Color.RED), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
+          span.setSpan(new AbsoluteSizeSpan(20, true),0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+          span.setSpan(imageSpan, 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        }
+
         //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
         permSpan = TextUtils.concat(permSpan, span);
       }
+      workoutHolder.workOutCycle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
       workoutHolder.workOutCycle.setText(permSpan);
 
       if (mHighlightDeleted) {
@@ -289,6 +313,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public class WorkoutHolder extends RecyclerView.ViewHolder {
     public TextView workoutName;
     public TextView workOutCycle;
+    public ImageView infinityRounds;
     public View fullView;
 
     @SuppressLint("ResourceAsColor")

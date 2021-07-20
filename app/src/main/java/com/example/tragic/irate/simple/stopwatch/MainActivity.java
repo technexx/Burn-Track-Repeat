@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -218,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_value;
 
   //Todo: Cycle display needs distinguishing features for count-up rounds.
-  //Todo: Re-add bullets to cycle display.
   //Todo: Smooth out progressBar switches.
   //Todo: First timer click from count-down -> up SKIP doesn't pause, but resumes.
   //Todo: Need to reset count-up rounds on cycle reset.
@@ -1676,6 +1676,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTitleArray.add(cyclesList.get(i).getTitle());
           //Adds concatenated roundType String used in each cycle.
           typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+          //Todo: This may be fixed. Did not have 'else' conditional on save/update in saveCycles.
+          Log.i("testRound", "value is " + cyclesList.get(i).getRoundType());
 //          //Splits the concatenated String of Integer values for round type pulled from our database into a String Array.
 //          String[] tempRoundTypes = cyclesList.get(i).getRoundType().split(" - ");
 //          //Using the length of that String Array (each item being a String version of an Integer), we convert and then add it to our Integer Array.
@@ -1816,7 +1818,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setCyclesCompleted(0);
           }
           //If cycle is new, insert a new row. Otherwise, update current row.
-          if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); cyclesDatabase.cyclesDao().updateCycles(cycles);
+          if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); else cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
         break;
       case 3:
