@@ -155,6 +155,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ValueAnimator valueAnimatorUp;
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
+  AlphaAnimation fadeProgressIn;
+  AlphaAnimation fadeProgressOut;
   boolean textSizeIncreased;
   //Always true initially, since infinity mode starts at 0.
   boolean textSizeReduced = true;
@@ -351,6 +353,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     fadeOut.setDuration(1000);
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
+
+    fadeProgressIn = new AlphaAnimation(0.0f, 1.0f);
+    fadeProgressOut = new AlphaAnimation(1.0f, 0.0f);
+    fadeProgressIn.setDuration(500);
+    fadeProgressOut.setDuration(200);
 
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
@@ -1029,8 +1036,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     saveTotalTimes();
 
     mHandler.postDelayed(() -> {
-      //Fade in effect for text only. Overrides the fadeOut that occurs when timer first ends, before this delayed runnable kicks in.
-//      timeLeft.startAnimation(fadeIn);
       //Subtracts from rounds remaining.
       numberOfRoundsLeft--;
       //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
@@ -1043,6 +1048,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       progressBar.setProgress(maxProgress);
       //Ends our alpha animation sequence if we are not on the last round.
       endAnimation.cancel();
+      //Fade effect to smooth out progressBar after animation.
+      progressBar.startAnimation(fadeProgressIn);
       //Executes next round based on which type is indicated in our typeOfRound list.
       if (numberOfRoundsLeft>0) {
         //Only executes if timer is in Paused mode. Otherwise, we want to move onto next round as also paused.

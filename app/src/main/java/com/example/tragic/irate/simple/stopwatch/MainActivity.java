@@ -218,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Cycle display needs distinguishing features for count-up rounds.
   //Todo: Smooth out progressBar switches.
   //Todo: First timer click from count-down -> up SKIP doesn't pause, but resumes.
   //Todo: Need to reset count-up rounds on cycle reset.

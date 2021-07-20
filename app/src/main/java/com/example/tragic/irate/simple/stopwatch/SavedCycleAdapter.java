@@ -146,7 +146,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           }
         }
 
-        //Todo: Kinda sorta. At least we can get in image in. Fix it later.
+        //Todo: Kinda sorta. At least we can get in image in. Fix it later. Should be the same logic as String version.
         ImageSpan imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
         //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
         if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
