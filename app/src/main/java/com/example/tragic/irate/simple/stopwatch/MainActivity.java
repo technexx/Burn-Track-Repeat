@@ -218,9 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Text should either (a)not fade when round ends or (b)also fade when skipping round (X -> 0).
   //Todo: Should we show the actual vs. expected round time iterated for skipped rounds?
-  //Todo: Total times off @ round end.
   //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Should initial date/subsequence sort be updated by recent access time?

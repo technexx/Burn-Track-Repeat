@@ -49,6 +49,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   List<String> mPositionList;
   ArrayList<Integer> mSizeToggle = new ArrayList<>();
   CharSequence permSpan;
+  Spannable span;
+  ImageSpan imageSpan;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -121,40 +123,50 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       String[] tempWorkoutArray = tempWorkoutString.split(mContext.getString(R.string.bullet));
       //Splits concatenated round type String into String Array.
       String[] tempTypeArray = tempTypeString.split(" - ");
-      //Spannable object that will correspond to each object in workout array.
-      Spannable span;
       //Var used to determine spannable spacing.
       int tempSpace = 0;
       //Iterates through the length of our split roundType array, which will always correspond to the length of our split workout array.
       for (int j=0; j<tempTypeArray.length; j++) {
+        //Empty span w/ placeholders that can be filled w/ imageSpan. Used for counting up. Counting down sets span differently below.
+        span = new SpannableString("   " + mContext.getString(R.string.bullet));
+        tempSpace = 2;
         //For each object in the roundType array, we create a new spannable object from its corresponding item in the workout array. For every position except the last, add a bullet separator and avoid coloring the last two spaces (for white bullet).
         if (j<tempTypeArray.length-1) {
           if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
             span = new SpannableString( tempWorkoutArray[j] + mContext.getString(R.string.bullet));
             tempSpace = span.length()-2;
           } else {
-            span = new SpannableString("♾ "+ mContext.getString(R.string.bullet));
-            tempSpace = span.length();
+            if (tempTypeArray[j].contains("2")) {
+              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
+            } else if (tempTypeArray[j].contains("4")) {
+              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
+            }
           }
         } else {
+          //If on final spannable object, do not draw a bullet separator.
           if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
             span = new SpannableString(tempWorkoutArray[j]);
             tempSpace = span.length();
           } else {
-            span = new SpannableString("♾ ");
-            tempSpace = span.length();
+            //If on final spannable object, do not draw a bullet separator.
+            span = new SpannableString("   ");
+            if (tempTypeArray[j].contains("2")) {
+              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
+            } else if (tempTypeArray[j].contains("4")) {
+              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
+            }
           }
         }
 
-        //Todo: Kinda sorta. At least we can get in image in. Fix it later. Should be the same logic as String version.
-        ImageSpan imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
         //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
         if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
           span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         } else span.setSpan(new ForegroundColorSpan(Color.RED), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
+          //If using infinity drawable, increase its size.
           span.setSpan(new AbsoluteSizeSpan(20, true),0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-          span.setSpan(imageSpan, 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+          //Setting our Spannable, which can be concatenated w/ permSpan object in TextUtils below, to our imageSpan. We run from index 1-2 inclusive because 0 is used as an empty separator space (see: original Spannable span creation above).
+          span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         }
 
         //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
