@@ -125,46 +125,35 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       String[] tempTypeArray = tempTypeString.split(" - ");
       //Var used to determine spannable spacing.
       int tempSpace = 0;
+      //Bullet string. Cleared if on final round.
+      String bullet = mContext.getString(R.string.bullet);
       //Iterates through the length of our split roundType array, which will always correspond to the length of our split workout array.
       for (int j=0; j<tempTypeArray.length; j++) {
-        //Empty span w/ placeholders that can be filled w/ imageSpan. Used for counting up. Counting down sets span differently below.
-        span = new SpannableString("   " + mContext.getString(R.string.bullet));
-        tempSpace = 2;
-        //For each object in the roundType array, we create a new spannable object from its corresponding item in the workout array. For every position except the last, add a bullet separator and avoid coloring the last two spaces (for white bullet).
-        if (j<tempTypeArray.length-1) {
-          if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
-            span = new SpannableString( tempWorkoutArray[j] + mContext.getString(R.string.bullet));
-            tempSpace = span.length()-2;
-          } else {
-            if (tempTypeArray[j].contains("2")) {
-              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
-            } else if (tempTypeArray[j].contains("4")) {
-              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
-            }
-          }
+        //If we are on the last round object, clear our bullet String so the view does not end with one.
+        if (j==tempTypeArray.length-1) bullet = "";
+
+        //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
+        if (tempTypeArray[j].contains("1") || (tempTypeArray[j].contains("3"))) {
+          span = new SpannableString( tempWorkoutArray[j] + bullet);
+          //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone).
+          tempSpace = span.length()-2;
         } else {
-          //If on final spannable object, do not draw a bullet separator.
-          if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
-            span = new SpannableString(tempWorkoutArray[j]);
-            tempSpace = span.length();
-          } else {
-            //If on final spannable object, do not draw a bullet separator.
-            span = new SpannableString("   ");
-            if (tempTypeArray[j].contains("2")) {
-              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
-            } else if (tempTypeArray[j].contains("4")) {
-              imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
-            }
-          }
+          span = new SpannableString("   " + bullet);
+          //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
+          tempSpace = 2;
+          //If roundType is 2 (sets), use green infinity drawable for ImageSpan. If roundType is 4 (breaks), use red.
+          if (tempTypeArray[j].contains("2")) imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
+          else imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
         }
 
+        //Todo: Clean this up. 1/2 types are sets/breaks, NOT count-up/count-down. Therefore, if our tempSpace is set to an invalid default (above), a type 2 below for green will not change it, since we only use 1/3.
         //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
         if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
           span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         } else span.setSpan(new ForegroundColorSpan(Color.RED), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
           //If using infinity drawable, increase its size.
-          span.setSpan(new AbsoluteSizeSpan(20, true),0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+          span.setSpan(new AbsoluteSizeSpan(18, true),0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           //Setting our Spannable, which can be concatenated w/ permSpan object in TextUtils below, to our imageSpan. We run from index 1-2 inclusive because 0 is used as an empty separator space (see: original Spannable span creation above).
           span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         }
