@@ -95,6 +95,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   long tempBreakMillis;
   long permBreakMillis;
 
+  long countUpMillisHolder;
   long pomMillis;
 
   int maxProgress = 10000;
@@ -177,9 +178,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> zeroArrayBreaks;
 
   boolean activePomCycle;
-  boolean setBegun;
-  boolean breakBegun;
-  boolean pomBegun;
   boolean isOvertimeRunning;
 
   SharedPreferences sharedPreferences;
@@ -462,6 +460,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Animates text size change when timer gets to 60 seconds.
         animateTextSize(countUpMillisSets);
         countUpMillisSets += 50;
+        //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
+        countUpMillisHolder -= 50;
         //Sets the current index of our initial "zero array" to the millis value being counted up. When counting down, this is a static value. Here, it will change each tick. In either case, drawDots() uses this to populate the dot text.
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
@@ -479,6 +479,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       public void run() {
         animateTextSize(countUpMillisBreaks);
         countUpMillisBreaks += 50;
+        //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
+        countUpMillisHolder -= 50;
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, countUpMillisBreaks);
@@ -486,6 +488,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
         tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
         total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
+        Log.i("testmillis", "value is " + countUpMillisHolder);
+
         mHandler.postDelayed(this, 50);
       }
     };
@@ -571,19 +575,27 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     });
   }
 
+
+  public void defineObjectAnimator(long duration) {
+    //Todo: maxProgress here will always reset bar to 100% blue.
+    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+    objectAnimator.setInterpolator(new LinearInterpolator());
+    objectAnimator.setDuration(duration);
+    objectAnimator.start();
+  }
+
   public void startObjectAnimator() {
     switch (mode) {
       case 1:
         customProgressPause = maxProgress;
         if (typeOfRound.get(currentRound).equals(1)) {
-          if (!setBegun) {
-            //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
+          //If progress bar is at max value, round has not begun.
+          if (progressBar.getProgress()==maxProgress) {
+            //Starts object animator.
+            defineObjectAnimator(setMillis);
+            //Used for pause/resume toggle.
             timerIsPaused = false;
-            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-            objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.setDuration(setMillis);
-            objectAnimator.start();
-            setBegun = true;
+            //Used in pause/resume. If timer HAS ended, that method calls reset. Otherwise, it pauses or resumes timer.
             modeOneTimerEnded = false;
             //Unchanging start point of setMillis used to count total set time over multiple rounds.
             permSetMillis = setMillis;
@@ -592,14 +604,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             if (objectAnimator != null) objectAnimator.resume();
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
-          if (!breakBegun) {
+          if (progressBar.getProgress()==maxProgress) {
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
-            objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-            objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.setDuration(breakMillis);
-            objectAnimator.start();
-            breakBegun = true;
+            //Starts object animator.
+            defineObjectAnimator(breakMillis);
             //Unchanging start point of breakMillis used to count total set time over multiple rounds.
             permBreakMillis = breakMillis;
           } else {
@@ -609,15 +618,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
         break;
       case 3:
-        if (!pomBegun) {
+        if (progressBar.getProgress()==maxProgress){
           //Ensures any features meant for running timer cannot be executed here.
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter - 1);
-          objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) pomProgressPause, 0);
-          objectAnimator.setInterpolator(new LinearInterpolator());
-          objectAnimator.setDuration(pomMillis);
-          objectAnimator.start();
-          pomBegun = true;
+          //Starts object animator.
+          defineObjectAnimator(pomMillis);
           activePomCycle = true;
           modeThreeTimerEnded = false;
           //Unchanging start point of pomMillis used to count total set time over multiple rounds. Using SET and BREAK vars since modes are exclusive, and it saves on variable creation.
@@ -719,16 +725,22 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         }
 
         timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-        if (pomMillis<500) timerDisabled = true;
+        if (pomMillis < 500) timerDisabled = true;
 
         //Switches total time count depending on which round we're on.
         switch (pomDotCounter) {
-          case 1: case 3: case 5: case 7:
+          case 1:
+          case 3:
+          case 5:
+          case 7:
             setMillisHolder = permSetMillis - pomMillis;
             tempSetMillis = totalSetMillis + setMillisHolder;
             total_set_time.setText(convertSeconds(tempSetMillis / 1000));
             break;
-          case 2: case 4: case 6: case 8:
+          case 2:
+          case 4:
+          case 6:
+          case 8:
             breakMillisHolder = permBreakMillis - pomMillis;
             tempBreakMillis = totalBreakMillis + breakMillisHolder;
             total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
@@ -742,7 +754,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       public void onFinish() {
         //Ensures any features meant for a running timer cannot be executed here.
         timerIsPaused = true;
-        pomBegun = false;
         timeLeft.setText("0");
         pomProgressPause = maxProgress;
         animateEnding(true);
@@ -756,15 +767,21 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           mHandler.post(endFade);
 
           switch (pomDotCounter) {
-            case 1: case 3: case 5: case 7:
+            case 1:
+            case 3:
+            case 5:
+            case 7:
               totalSetMillis = totalSetMillis + setMillisHolder;
               tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
-              total_set_time.setText(convertSeconds(tempSetMillis/1000));
+              total_set_time.setText(convertSeconds(tempSetMillis / 1000));
               break;
-            case 2: case 4: case 6: case 8:
+            case 2:
+            case 4:
+            case 6:
+            case 8:
               totalBreakMillis = totalBreakMillis + breakMillisHolder;
               tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
-              total_break_time.setText(convertSeconds(tempBreakMillis/1000));
+              total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
               break;
           }
           //Fade out effect at end of round, fading in after runnable posts on delay.
@@ -868,8 +885,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         pomProgressPause = maxProgress;
-//        //Ensures objectAnimator sets millis value to NEW round value.
-        pomBegun = false;
 
         mHandler.postDelayed(() -> {
           pomDotCounter++;
@@ -964,13 +979,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   //Todo: For Pom (Mode 3). Prolly should also pass a typeOfRound list in.
-  //Todo: Text fade in w/ setFillAfter to false should repeat w/ out incident.
   public void setNextRound(boolean endingEarly) {
     ////!!--Executes for all round types--!!////
     //Disables button that calls this method so it doesn't execute twice.
     next_round.setEnabled(false);
     //Disables pause/resume button.
     timerDisabled = true;
+    //Resets default base (30 sec) for count-up rounds.
+    countUpMillisHolder = 30000;
     //If skipping round manually, cancel timer and objectAnimator.
     if (endingEarly) {
       if (timer != null) timer.cancel();
@@ -981,7 +997,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     switch (typeOfRound.get(currentRound)) {
       case 1:
         //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
-        setBegun = false;
         //End of round, setting textView to 0.
         timeLeft.setText("0");
 
@@ -992,7 +1007,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         total_set_time.setText(convertSeconds(tempSetMillis/1000));
         break;
       case 3:
-        breakBegun = false;
         timerIsPaused = true;
         timeLeft.setText("0");
 
@@ -1095,6 +1109,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             if (pausing == PAUSING_TIMER) {
               //Boolean that determines whether we are pausing or resuming timer.
               timerIsPaused = true;
+              //Cancels timer object (need to recreate) and pauses object animator.
               if (timer != null) timer.cancel();
               if (objectAnimator != null) objectAnimator.pause();
               reset.setVisibility(View.VISIBLE);
@@ -1127,9 +1142,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                   startBreakTimer();
                   break;
                 case 2:
+                  defineObjectAnimator(countUpMillisHolder);
                   mHandler.post(secondsUpSetRunnable);
                   break;
                 case 4:
+                  defineObjectAnimator(countUpMillisHolder);
                   mHandler.post(secondsUpBreakRunnable);
                   break;
               }
@@ -1190,6 +1207,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
+        //Resets base progressBar duration for count-up rounds.
+        countUpMillisHolder = 30000;
         //Sets the long value in our "count up" rounds back to 0.
         for (int i=0; i<startRounds; i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
@@ -1199,7 +1218,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         numberOfRoundsLeft = startRounds;
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-        Log.i("testfade", "start are " + startRounds + " and left are " + numberOfRoundsLeft);
 
         if (workoutTime.size()>0) {
           switch (typeOfRound.get(0)) {
@@ -1270,8 +1288,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 1:
         customProgressPause = maxProgress;
         modeOneTimerEnded = false;
-        setBegun = false;
-        breakBegun = false;
         onBreak = false;
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
@@ -1288,7 +1304,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 3:
         pomDotCounter = 1;
         modeThreeTimerEnded = false;
-        pomBegun = false;
         pomProgressPause = maxProgress;
         activePomCycle = false;
         if (objectAnimator != null) objectAnimator.cancel();

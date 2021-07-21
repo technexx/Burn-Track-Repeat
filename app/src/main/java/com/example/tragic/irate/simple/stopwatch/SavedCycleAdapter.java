@@ -146,7 +146,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           else imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
         }
 
-        //Todo: Clean this up. 1/2 types are sets/breaks, NOT count-up/count-down. Therefore, if our tempSpace is set to an invalid default (above), a type 2 below for green will not change it, since we only use 1/3.
         //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
         if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
           span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
