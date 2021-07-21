@@ -212,9 +212,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> infinityArrayTwo;
   ArrayList<Integer> infinityArrayThree;
 
-  Runnable toggleNextRoundRunnable;
-  boolean nextRoundToggleIsActive;
   boolean resetMenu;
+  long baseTime;
 
   @Override
   public void onBackPressed() {
@@ -358,6 +357,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
+    baseTime = System.currentTimeMillis();
+
     //Receives lists passed in from Main.
     Intent intent = getIntent();
     if (intent != null) {
@@ -453,16 +454,17 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       }
     };
 
-    //These three runnables act as our timers for "count up" rounds.
+
+    //These two runnables act as our timers for "count up" rounds.
     secondsUpSetRunnable = new Runnable() {
       @Override
       public void run() {
         //Animates text size change when timer gets to 60 seconds.
         animateTextSize(countUpMillisSets);
-        countUpMillisSets += 50;
+        //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
+        countUpMillisSets = (int) (System.currentTimeMillis() - baseTime);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        countUpMillisHolder -= 50;
-        //Sets the current index of our initial "zero array" to the millis value being counted up. When counting down, this is a static value. Here, it will change each tick. In either case, drawDots() uses this to populate the dot text.
+        countUpMillisHolder = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, countUpMillisSets);
@@ -478,9 +480,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         animateTextSize(countUpMillisBreaks);
-        countUpMillisBreaks += 50;
+        //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
+        countUpMillisBreaks = (int) (System.currentTimeMillis() - baseTime);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        countUpMillisHolder -= 50;
+        countUpMillisHolder = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, countUpMillisBreaks);
@@ -488,8 +491,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
         tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
         total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
-        Log.i("testmillis", "value is " + countUpMillisHolder);
-
         mHandler.postDelayed(this, 50);
       }
     };
@@ -577,7 +578,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
 
   public void defineObjectAnimator(long duration) {
-    //Todo: maxProgress here will always reset bar to 100% blue.
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
     objectAnimator.setInterpolator(new LinearInterpolator());
     objectAnimator.setDuration(duration);
@@ -1142,11 +1142,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                   startBreakTimer();
                   break;
                 case 2:
-                  defineObjectAnimator(countUpMillisHolder);
+                  //Uses the current time as a base for our count-up rounds.
+                  baseTime = System.currentTimeMillis();
+                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(countUpMillisHolder); else if (objectAnimator!=null) objectAnimator.resume();
                   mHandler.post(secondsUpSetRunnable);
                   break;
                 case 4:
-                  defineObjectAnimator(countUpMillisHolder);
+                  baseTime = System.currentTimeMillis();
+                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(countUpMillisHolder); else if (objectAnimator!=null) objectAnimator.resume();
                   mHandler.post(secondsUpBreakRunnable);
                   break;
               }
