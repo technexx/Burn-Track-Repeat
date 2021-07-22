@@ -218,9 +218,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: NextRound() needs to reset timer and obj anim for progessBar in new count-up style.
+  //Todo: Make Pom mode fully functional.
   //Todo: We have some DB issues w/ ROUND TYPE merging but other columns staying the same.
-  //Todo: Should we show the actual vs. expected round time iterated for skipped rounds?
   //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Should initial date/subsequence sort be updated by recent access time?
@@ -466,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
+    //Default values in WHOLE seconds. Multiplied * 1000 for our millis values.
     setValue = sharedPreferences.getInt("setValue", 30);
     breakValue = sharedPreferences.getInt("breakValue", 30);
     breaksOnlyValue = sharedPreferences.getInt("breakOnlyValue", 30);
@@ -898,7 +898,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 3:
             if (incrementValues) pomValue1 += 5;
             else pomValue1 -= 5;
-            prefEdit.putInt("pomValue1", pomValue1);
             break;
         }
         mHandler.postDelayed(this, incrementTimer * 10);
@@ -916,17 +915,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 1:
             if (incrementValues) breakValue += 1;
             else breakValue -= 1;
-            prefEdit.putInt("breakValue", breakValue);
-            break;
-          case 2:
-            if (incrementValues) breaksOnlyValue += 1;
-            else breaksOnlyValue -= 1;
-            prefEdit.putInt("breakOnlyValue", breaksOnlyValue);
             break;
           case 3:
             if (incrementValues) pomValue2 += 5;
             else pomValue2 -= 5;
-            prefEdit.putInt("pomValue2", pomValue2);
             break;
         }
         mHandler.postDelayed(this, incrementTimer * 10);
@@ -1101,6 +1093,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
         mHandler.postDelayed(runnable, 25);
         mHandler.postDelayed(valueSpeed, 25);
+
         break;
       case MotionEvent.ACTION_UP:
         mHandler.removeCallbacksAndMessages(null);
@@ -1161,16 +1154,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editPomSecondsTwo = convertEditTextToLong(second_value_edit_two);
       editPomMinutesThree = convertEditTextToLong(third_value_edit);
       editPomSecondsThree = convertEditTextToLong(third_value_edit_two);
-
-      toastBounds(15, 90, pomValue1);
-      toastBounds(3, 10, pomValue2);
-      toastBounds(10, 60, pomValue3);
-      if (pomValue1 > 90) pomValue1 = 90;
-      if (pomValue1 < 15) pomValue1 = 15;
-      if (pomValue2 > 10) pomValue2 = 10;
-      if (pomValue2 < 3) pomValue2 = 3;
-      if (pomValue3 < 10) pomValue3 = 10;
-      if (pomValue3 > 60) pomValue3 = 60;
     }
     setTimerValueBounds();
   }
@@ -1589,7 +1572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomValuesTime.add(pomValue1 * 1000);
             pomValuesTime.add(pomValue2 * 1000);
           }
-          pomValuesTime.add(pomValue1* 1000);
+          pomValuesTime.add(pomValue1 * 1000);
           pomValuesTime.add(pomValue3 * 1000);
           for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
         } else {
@@ -1620,6 +1603,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+
   }
 
   public String friendlyString(String altString) {
@@ -1670,8 +1654,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTitleArray.add(cyclesList.get(i).getTitle());
           //Adds concatenated roundType String used in each cycle.
           typeOfRoundArray.add(cyclesList.get(i).getRoundType());
-          //Todo: This may be fixed. Did not have 'else' conditional on save/update in saveCycles.
-          Log.i("testRound", "value is " + cyclesList.get(i).getRoundType());
 //          //Splits the concatenated String of Integer values for round type pulled from our database into a String Array.
 //          String[] tempRoundTypes = cyclesList.get(i).getRoundType().split(" - ");
 //          //Using the length of that String Array (each item being a String version of an Integer), we convert and then add it to our Integer Array.

@@ -1272,7 +1272,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-          timerDisabled = false;
+          timerDisabled = false ;
+          dotDraws.pomDraw(pomDotCounter,pomValuesTime);
           //Sets initial text size.
           setTextSize(pomMillis);
         }

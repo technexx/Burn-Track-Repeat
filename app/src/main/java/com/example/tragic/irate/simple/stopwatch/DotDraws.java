@@ -168,10 +168,6 @@ public class DotDraws extends View {
             if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(255);
           }
 
-//          Log.i("testFade", "size is " + mRoundTimes.size());
-//          Log.i("testFade", "remaining is " + mRoundsLeft);
-//          Log.i("testFade", "(i) is " + i);
-
           if (mRoundTimes.size()<=8) {
             mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
             drawText(mRoundTimes, mX+16, mY+62, i);
