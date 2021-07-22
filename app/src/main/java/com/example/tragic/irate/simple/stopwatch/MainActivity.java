@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Use a base of 30 seconds for count-up progressBar? This way, something is moving.
+  //Todo: NextRound() needs to reset timer and obj anim for progessBar in new count-up style.
   //Todo: We have some DB issues w/ ROUND TYPE merging but other columns staying the same.
   //Todo: Should we show the actual vs. expected round time iterated for skipped rounds?
   //Todo: Possible drag/drop switch for round order.

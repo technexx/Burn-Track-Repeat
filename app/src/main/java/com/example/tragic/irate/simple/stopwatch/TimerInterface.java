@@ -95,7 +95,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   long tempBreakMillis;
   long permBreakMillis;
 
-  long countUpMillisHolder;
+  long progressBarValueHolder;
   long pomMillis;
 
   int maxProgress = 10000;
@@ -185,8 +185,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   int receivedAlpha;
   MaterialButton pauseResumeButton;
 
-  int countUpMillisSets;
-  int countUpMillisBreaks;
+  long countUpMillisSets;
+  long countUpMillisBreaks;
   public Runnable secondsUpSetRunnable;
   public Runnable secondsUpBreakRunnable;
 
@@ -214,6 +214,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   boolean resetMenu;
   long baseTime;
+  long countUpMillisHolder;
 
   @Override
   public void onBackPressed() {
@@ -351,8 +352,27 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
 
-    fadeProgressIn = new AlphaAnimation(0.0f, 1.0f);
-    fadeProgressIn.setDuration(1000);
+    fadeProgressIn = new AlphaAnimation(0.3f, 1.0f);
+    fadeProgressOut = new AlphaAnimation(1.0f, 0.3f);
+    fadeProgressIn.setDuration(300);
+    fadeProgressOut.setDuration(300);
+
+    //Listens to our fadeOut animation, and runs fadeIn when it's done.
+    fadeProgressOut.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        progressBar.startAnimation(fadeProgressIn);
+        timeLeft.startAnimation(fadeProgressIn);
+        //Resets progressBar to max (full blue) value at same time we fade it back in (looks nicer).
+        progressBar.setProgress(maxProgress);
+      }
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
 
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
@@ -428,9 +448,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Implements callback for end-of-round alpha fade on dots.
     dotDraws.onAlphaSend(TimerInterface.this);
 
-    //Animation that plays when round completes. Creating one for initial use.
-    animateEnding(false);
-
     //Recycler view for our stopwatch laps.
     lapLayout = new LinearLayoutManager(getApplicationContext());
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
@@ -462,16 +479,22 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Animates text size change when timer gets to 60 seconds.
         animateTextSize(countUpMillisSets);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
-        countUpMillisSets = (int) (System.currentTimeMillis() - baseTime);
+        countUpMillisSets = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - baseTime);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        countUpMillisHolder = maxProgress - countUpMillisBreaks;
+        progressBarValueHolder = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, countUpMillisSets);
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) countUpMillisSets);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         //Temporary value for current round, using totalSetMillis which is our permanent value.
         tempSetMillis = totalSetMillis + countUpMillisSets;
         total_set_time.setText(convertSeconds(tempSetMillis / 1000));
+        //Once progressBar value hits 0, animate bar/text, reset bar's progress value to max, and restart the objectAnimator that uses it.
+        if (progressBar.getProgress()<=0) {
+          progressBar.startAnimation(fadeProgressOut);
+          timeLeft.startAnimation(fadeProgressOut);
+          objectAnimator.start();
+        }
         mHandler.postDelayed(this, 50);
       }
     };
@@ -480,17 +503,22 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         animateTextSize(countUpMillisBreaks);
-        //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
-        countUpMillisBreaks = (int) (System.currentTimeMillis() - baseTime);
+        //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
+        countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - baseTime);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        countUpMillisHolder = maxProgress - countUpMillisBreaks;
+        progressBarValueHolder = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, countUpMillisBreaks);
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) countUpMillisBreaks);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
         tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
         total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
+        if (progressBar.getProgress()<=0) {
+          progressBar.startAnimation(fadeProgressOut);
+          timeLeft.startAnimation(fadeProgressOut);
+          objectAnimator.start();
+        }
         mHandler.postDelayed(this, 50);
       }
     };
@@ -756,7 +784,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         timerIsPaused = true;
         timeLeft.setText("0");
         pomProgressPause = maxProgress;
-        animateEnding(true);
+        animateEnding();
 
         if (pomDotCounter < 9) {
           //Ensures any features meant for a running timer cannot be executed here.
@@ -813,17 +841,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
-  private void animateEnding(boolean setAnimation) {
+  private void animateEnding() {
     endAnimation = new AlphaAnimation(1.0f, 0.0f);
-    endAnimation.setDuration(400);
-    endAnimation.setStartOffset(0);
+    endAnimation.setDuration(300);
+    endAnimation.setStartOffset(100);
     endAnimation.setRepeatMode(Animation.REVERSE);
     endAnimation.setRepeatCount(Animation.INFINITE);
-
-    if (setAnimation) {
-      progressBar.startAnimation(endAnimation);
-      timeLeft.startAnimation(endAnimation);
-    }
+    progressBar.startAnimation(endAnimation);
+    timeLeft.startAnimation(endAnimation);
   }
 
   public void changeTextSize(ValueAnimator va, TextView textView) {
@@ -875,7 +900,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   //Ends the current round and moves onto the next one.
   public void nextRound() {
     //Animates timer and progressBar.
-    animateEnding(true);
+    animateEnding();
     //Stores cumulative time valuation.
     saveTotalTimes();
     switch (mode) {
@@ -986,7 +1011,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Disables pause/resume button.
     timerDisabled = true;
     //Resets default base (30 sec) for count-up rounds.
-    countUpMillisHolder = 30000;
+    progressBarValueHolder = 30000;
     //If skipping round manually, cancel timer and objectAnimator.
     if (endingEarly) {
       if (timer != null) timer.cancel();
@@ -999,7 +1024,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Used in startObjectAnimator to determine whether we're using a new animator + millis, or resuming one from a pause.
         //End of round, setting textView to 0.
         timeLeft.setText("0");
-
         //Adds current round elapsed millis to saved total.
         totalSetMillis = totalSetMillis + setMillisHolder;
         //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
@@ -1021,15 +1045,21 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         mHandler.removeCallbacks(secondsUpSetRunnable);
         countUpMillisSets = 0;
+        countUpMillisHolder = 0;
+        baseTime = System.currentTimeMillis();
         break;
       case 4:
         //Infinite round has ended, so we set the timer textViews to most recent millis value, cancel the runnable, and reset the millis value.
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
         mHandler.removeCallbacks(secondsUpBreakRunnable);
         countUpMillisBreaks = 0;
+        countUpMillisHolder = 0;
+        baseTime = System.currentTimeMillis();
+        break;
     }
-    //Fade out effect for text AND progressBar.
-    animateEnding(true);
+    //Fade effect to smooth out progressBar and timer text after animation.
+    progressBar.startAnimation(fadeProgressOut);
+    timeLeft.startAnimation(fadeProgressOut);
 
     //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
     mHandler.post(endFade);
@@ -1045,13 +1075,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       dotDraws.resetDotAlpha();
       //Updates dotDraws class w/ round count.
       dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-      //Resets progress bar.
-      progressBar.setProgress(maxProgress);
-      //Ends our alpha animation sequence if we are not on the last round.
-      endAnimation.cancel();
-      //Fade effect to smooth out progressBar and timer text after animation.
-      progressBar.startAnimation(fadeProgressIn);
-      timeLeft.startAnimation(fadeProgressIn);
       //Executes next round based on which type is indicated in our typeOfRound list.
       if (numberOfRoundsLeft>0) {
         //Only executes if timer is in Paused mode. Otherwise, we want to move onto next round as also paused.
@@ -1125,6 +1148,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                   mHandler.removeCallbacks(secondsUpSetRunnable);
                   break;
                 case 4:
+                  countUpMillisHolder = countUpMillisBreaks;
                   mHandler.removeCallbacks(secondsUpBreakRunnable);
                   break;
               }
@@ -1144,12 +1168,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
                 case 2:
                   //Uses the current time as a base for our count-up rounds.
                   baseTime = System.currentTimeMillis();
-                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(countUpMillisHolder); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(progressBarValueHolder); else if (objectAnimator!=null) objectAnimator.resume();
+                  countUpMillisSets = countUpMillisHolder;
                   mHandler.post(secondsUpSetRunnable);
                   break;
                 case 4:
                   baseTime = System.currentTimeMillis();
-                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(countUpMillisHolder); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
+                  countUpMillisBreaks = countUpMillisHolder;
                   mHandler.post(secondsUpBreakRunnable);
                   break;
               }
@@ -1168,7 +1194,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
               pomMillisUntilFinished = pomMillis;
               if (objectAnimator != null) objectAnimator.pause();
               if (timer != null) timer.cancel();
-              String pausedTime2 = (convertSeconds((pomMillisUntilFinished + 999) / 1000));
               reset.setVisibility(View.VISIBLE);
             } else if (pausing == RESUMING_TIMER) {
               reset.setVisibility(View.INVISIBLE);
@@ -1211,7 +1236,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     switch (mode) {
       case 1:
         //Resets base progressBar duration for count-up rounds.
-        countUpMillisHolder = 30000;
+        progressBarValueHolder = 30000;
         //Sets the long value in our "count up" rounds back to 0.
         for (int i=0; i<startRounds; i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
@@ -1282,7 +1307,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     progressBar.setProgress(10000);
     if (timer != null) timer.cancel();
     if (objectAnimator != null) objectAnimator.cancel();
-    endAnimation.cancel();
+    if (endAnimation!=null) endAnimation.cancel();
     next_round.setEnabled(true);
     next_round.setAlpha(1.0f);
     //Stores cumulative time valuation.
@@ -1295,6 +1320,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;
+        countUpMillisHolder = 0;
         //Removing timer callbacks for count up mode.
         mHandler.removeCallbacks(secondsUpSetRunnable);
         mHandler.removeCallbacks(secondsUpBreakRunnable);
