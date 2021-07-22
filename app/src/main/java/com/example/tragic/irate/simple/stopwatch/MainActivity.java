@@ -224,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
-  //Todo: "BLIP" in textView when starting timer likely due to the timeLEFT not being same value as timerIsPaused.
   //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
   //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?

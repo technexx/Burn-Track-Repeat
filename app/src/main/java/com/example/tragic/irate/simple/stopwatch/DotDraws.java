@@ -202,6 +202,7 @@ public class DotDraws extends View {
     }
   }
 
+  //Used to draw shape, text, and alpha values (including fades) on Pom objects. Called in canvas draw above.
   public void pomFill(int i, boolean fade, int alpha) {
     switch (i) {
       case 0: case 2: case 4: case 6:
