@@ -218,7 +218,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Make Pom mode fully functional.
+  //Todo: Option to set "base" progressBar for count-up.
+  //Todo: Count-up bug w/ dots having value even after reset. Related to base 30. Pause/resume issues w/ dot value and progressBar movement.
+  //Todo: Coloring issue w/ cycle list.
+  //Todo: Auto save feature (mainly for total times) when force-closing app.
   //Todo: We have some DB issues w/ ROUND TYPE merging but other columns staying the same.
   //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
@@ -937,7 +940,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setTimerValueBounds();
         fadeCap(third_value_textView);
         editAndTextSwitch(false, 3);
-        prefEdit.putInt("pomValue3", pomValue3);
         prefEdit.apply();
       }
     };
