@@ -987,36 +987,32 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         countUpMillisBreaks = 0;
         countUpMillisHolder = 0;
         baseTime = System.currentTimeMillis();
+        //Next round begins active by default, so we set our paused mode to false.
+        timerIsPaused = false;
         //Executes next round based on which type is indicated in our typeOfRound list.
         if (numberOfRoundsLeft>0) {
-          //Todo: pauseResume() is what starts objectAnimator for these two modes. When we move rounds from here (as we always do), it doesn't get called.
-          //Only executes if timer is in Paused mode. Otherwise, we want to move onto next round as also paused.
           switch (typeOfRound.get(currentRound)) {
             case 1:
               setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
               timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
-              if (!timerIsPaused) {
-                startObjectAnimator();
-                startSetTimer();
-              }
+              startObjectAnimator();
+              startSetTimer();
               break;
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
               timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
-              if (!timerIsPaused) {
-                startObjectAnimator();
-                startBreakTimer();
-              }
+              startObjectAnimator();
+              startBreakTimer();
               break;
             case 2:
               timeLeft.setText("0");
               defineObjectAnimator(30000);
-              if (!timerIsPaused) mHandler.post(secondsUpSetRunnable);
+              mHandler.post(secondsUpSetRunnable);
               break;
             case 4:
               timeLeft.setText("0");
               defineObjectAnimator(30000);
-              if (!timerIsPaused) mHandler.post(secondsUpBreakRunnable);
+              mHandler.post(secondsUpBreakRunnable);
               break;
           }
           //If number of rounds left is 0, do the following.
