@@ -500,6 +500,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         animateTextSize(countUpMillisBreaks);
+        //Todo: Basetime may not be reset to currentTimeMillis, so very little is sub'd.
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - baseTime);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
@@ -516,6 +517,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           timeLeft.startAnimation(fadeProgressOut);
           objectAnimator.start();
         }
+        Log.i("testmil", "countUpMillis is " + countUpMillisBreaks);
+        Log.i("testmil", "tempTotalMillis is " + tempBreakMillis);
         mHandler.postDelayed(this, 50);
       }
     };
@@ -938,6 +941,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
     ///------------------------////////
 
+    //Todo: Remember, anything that happens here before our postDelay uses OLD ROUND values, since we don't alter the list position reference until the handler kicks in.
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1:
@@ -947,7 +951,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           totalSetMillis = totalSetMillis + setMillisHolder;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
-          total_set_time.setText(convertSeconds(tempSetMillis/1000));
+//          total_set_time.setText(convertSeconds(tempSetMillis/1000));
           break;
         case 3:
           //End of round, setting textView to 0.
@@ -956,27 +960,19 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           totalBreakMillis = totalBreakMillis + breakMillisHolder;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
-          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
+//          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
         case 2:
-          //Infinite round has ended, so we set the timer textViews to most recent millis value, cancel the runnable, and reset the millis value.
-          timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
-          mHandler.removeCallbacks(secondsUpSetRunnable);
-          countUpMillisSets = 0;
-          countUpMillisHolder = 0;
-          baseTime = System.currentTimeMillis();
-          total_set_time.setText(convertSeconds(tempSetMillis/1000));
+          //Infinite round has ended, so we cancel the runnable
+         mHandler.removeCallbacks(secondsUpSetRunnable);
           break;
         case 4:
-          //Infinite round has ended, so we set the timer textViews to most recent millis value, cancel the runnable, and reset the millis value.
-          timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
+          //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(secondsUpBreakRunnable);
-          countUpMillisBreaks = 0;
-          countUpMillisHolder = 0;
-          baseTime = System.currentTimeMillis();
-          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
       }
+
+
       mHandler.postDelayed(() -> {
         //Subtracts from rounds remaining.
         numberOfRoundsLeft--;
@@ -986,6 +982,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
         //Resets the alpha value we use to fade dots back to 255 (fully opaque).
         dotDraws.resetDotAlpha();
+        //Resetting values for count-up modes. Simpler to keep them out of switch statement.
+        countUpMillisSets = 0;
+        countUpMillisBreaks = 0;
+        countUpMillisHolder = 0;
+        baseTime = System.currentTimeMillis();
         //Executes next round based on which type is indicated in our typeOfRound list.
         if (numberOfRoundsLeft>0) {
           //Todo: pauseResume() is what starts objectAnimator for these two modes. When we move rounds from here (as we always do), it doesn't get called.

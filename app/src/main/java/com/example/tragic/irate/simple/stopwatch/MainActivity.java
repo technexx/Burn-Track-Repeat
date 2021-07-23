@@ -218,7 +218,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Option to set "base" progressBar for count-up.
+  //Todo: Paused CD - > C-UP (a)start active (b)first click tries to resume and (c)doesn't trigger timer text change.
+  //Todo: Total times out of sync w/ timer when moving from count-down to count-up (prolly vice-versa too).
+  //Todo: Should probably use currentMillisTime for stopwatch as well, since it's using only runnable method, tho it DOES work fine.
+  //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
   //Todo: We have some DB issues w/ ROUND TYPE merging but other columns staying the same.
   //Todo: Possible drag/drop switch for round order.
@@ -227,16 +230,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
   //Todo: Letter -> Number soft kb is a bit choppy.
-  //Todo: For now, onBackPressed w/ zero rounds ignores any save/update, retaining original values - should we disallow zero in any case exception initial FAB population?
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
-  //Todo: Remove overtime vars completely or re-implement?
   //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: Test dot text w/ different char numbers, tho there will be min values (e.g. in Pom) that will make some adjustment unnecessary.
-  //Todo: FAB button overlaps infinity toggles on bottom-most cycle entry.
-  //Todo: Preset timer selections.
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Variable set count-up timer, for use w/ TDEE.
   //Todo: Variable set only mode? Again, for TDEE.
