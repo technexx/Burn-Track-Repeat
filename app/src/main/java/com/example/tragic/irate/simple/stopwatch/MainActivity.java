@@ -218,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Paused CD - > C-UP (a)start active (b)first click tries to resume and (c)doesn't trigger timer text change.
   //Todo: Total times out of sync w/ timer when moving from count-down to count-up (prolly vice-versa too).
   //Todo: Should probably use currentMillisTime for stopwatch as well, since it's using only runnable method, tho it DOES work fine.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.

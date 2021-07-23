@@ -500,7 +500,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         animateTextSize(countUpMillisBreaks);
-        //Todo: Basetime may not be reset to currentTimeMillis, so very little is sub'd.
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - baseTime);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
@@ -517,8 +516,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           timeLeft.startAnimation(fadeProgressOut);
           objectAnimator.start();
         }
-        Log.i("testmil", "countUpMillis is " + countUpMillisBreaks);
-        Log.i("testmil", "tempTotalMillis is " + tempBreakMillis);
         mHandler.postDelayed(this, 50);
       }
     };
@@ -941,37 +938,39 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
     ///------------------------////////
 
-    //Todo: Remember, anything that happens here before our postDelay uses OLD ROUND values, since we don't alter the list position reference until the handler kicks in.
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1:
           //End of round, setting textView to 0.
           timeLeft.setText("0");
-          //Adds current round elapsed millis to saved total.
-          totalSetMillis = totalSetMillis + setMillisHolder;
+          //tempMillis is used to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
+          totalSetMillis = tempSetMillis;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
-//          total_set_time.setText(convertSeconds(tempSetMillis/1000));
+          total_set_time.setText(convertSeconds(tempSetMillis/1000));
           break;
         case 3:
           //End of round, setting textView to 0.
           timeLeft.setText("0");
-          //Adds current round elapsed millis to saved total.
-          totalBreakMillis = totalBreakMillis + breakMillisHolder;
+          //tempMillis is used to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
+          totalBreakMillis = tempBreakMillis;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
-//          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
+          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
         case 2:
+          totalSetMillis = tempSetMillis;
           //Infinite round has ended, so we cancel the runnable
-         mHandler.removeCallbacks(secondsUpSetRunnable);
+          mHandler.removeCallbacks(secondsUpSetRunnable);
+          total_set_time.setText(convertSeconds(tempSetMillis/1000));
           break;
         case 4:
+          totalBreakMillis = tempBreakMillis;
           //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(secondsUpBreakRunnable);
+          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
       }
-
 
       mHandler.postDelayed(() -> {
         //Subtracts from rounds remaining.
@@ -1305,12 +1304,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     populateTimerUI();
   }
 
+  //Todo: Watch this, if the save value doesn't align w/ what we're displaying from tempSetMillis.
   public void saveTotalTimes() {
     switch (mode) {
       //Re-using set/break vars for work/break in Pom mode since modes are exclusive.
       case 1: case 3:
         //Sets our total millis to the temp value iterated up in our runnable.
         totalSetMillis = tempSetMillis;
+        //Todo: Do we still want this?
         //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
         tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
         total_set_time.setText(convertSeconds(tempSetMillis/1000));
