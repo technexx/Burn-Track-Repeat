@@ -219,8 +219,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_value;
 
   //Todo: Option to set "base" progressBar for count-up.
-  //Todo: Count-up bug w/ dots having value even after reset. Related to base 30. Pause/resume issues w/ dot value and progressBar movement.
-  //Todo: Coloring issue w/ cycle list.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
   //Todo: We have some DB issues w/ ROUND TYPE merging but other columns staying the same.
   //Todo: Possible drag/drop switch for round order.

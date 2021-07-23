@@ -135,8 +135,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
         if (tempTypeArray[j].contains("1") || (tempTypeArray[j].contains("3"))) {
           span = new SpannableString( tempWorkoutArray[j] + bullet);
-          //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone).
-          tempSpace = span.length()-2;
+          //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone). If on LAST spanable, use the full length so we do not fall short in coloring, since there is no space+bullet after.
+          if (j==tempTypeArray.length-1) tempSpace = span.length()-2; else tempSpace = span.length();
         } else {
           span = new SpannableString("   " + bullet);
           //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
