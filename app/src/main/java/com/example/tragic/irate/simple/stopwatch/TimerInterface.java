@@ -137,7 +137,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   int currentRound;
 
   boolean timerEnded;
-  boolean onBreak;
   boolean timerDisabled;
   boolean timerIsPaused = true;
 
@@ -925,7 +924,17 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void setNextRound(boolean endingEarly) {
-    ///---Executes for all Modes---///
+    //If no rounds left, remove our endFade runnable, reset timer, and return before executing anything else. The button tied to this method will be disabled until the proper rounded subtraction can occur.
+    if (mode==1) {
+      if (numberOfRoundsLeft==0) {
+        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
+        mHandler.removeCallbacks(endFade);
+        resetTimer();
+        return;
+      }
+      ///---Executes for all Modes---///
+    //Always starting new rounds active, so reset button will not be available.
+    reset.setVisibility(View.INVISIBLE);
     //Disables button that calls this method so it doesn't execute twice.
     next_round.setEnabled(false);
     //Disables pause/resume button.
@@ -948,7 +957,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
     ///------------------------////////
 
-    if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1:
           //End of round, setting textView to 0.
@@ -1197,6 +1205,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         //Sets timer values and round counts. populateTimerUI() is called at app startup and when resetting timer, so this handles both.
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
+
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
 
@@ -1225,13 +1234,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-          timerDisabled = false ;
           dotDraws.pomDraw(pomDotCounter,pomValuesTime);
           //Sets initial text size.
           setTextSize(pomMillis);
         }
         break;
       case 4:
+        timerDisabled = false ;
         total_set_header.setVisibility(View.INVISIBLE);
         total_set_time.setVisibility(View.INVISIBLE);
         total_break_header.setVisibility(View.INVISIBLE);
@@ -1249,10 +1258,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         lapRecyclerParams.topMargin = 60;
         //Stopwatch always starts at 0.
         setTextSize(0);
+        break;
     }
-    dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-    dotDraws.resetDotAlpha();
-    dotDraws.reDraw();
   }
 
   public void resetTimer() {
@@ -1264,13 +1271,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     if (objectAnimator != null) objectAnimator.cancel();
     if (endAnimation!=null) endAnimation.cancel();
     next_round.setEnabled(true);
-    next_round.setAlpha(1.0f);
     //Stores cumulative time valuation.
     saveTotalTimes();
     switch (mode) {
       case 1:
         customProgressPause = maxProgress;
-        onBreak = false;
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;
@@ -1314,7 +1319,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     populateTimerUI();
   }
 
-  //Todo: Watch this, if the save value doesn't align w/ what we're displaying from tempSetMillis.
   public void saveTotalTimes() {
     switch (mode) {
       //Re-using set/break vars for work/break in Pom mode since modes are exclusive.

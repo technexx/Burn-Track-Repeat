@@ -86,6 +86,7 @@ public class DotDraws extends View {
 
   public void updateWorkoutRoundCount(int roundCount, int roundsLeft) {
     this.mRoundCount = roundCount;  this.mRoundsLeft = roundsLeft;
+//    Log.i("testFade", "vals are " + roundCount + " and " + roundsLeft);
     invalidate();
   }
 
@@ -151,12 +152,12 @@ public class DotDraws extends View {
           //if type 1 or 3 (counting down), dots are filled. Otherwise, they are hollow.
           if (mRoundType.get(i)==1 || mRoundType.get(i)==3) setDotStyle(false); else setDotStyle(true);
           //If the rounds remaining subtracted from our total rounds equals the position in its list we are drawing, fade that position (i.e. our current round).
-          if (mRoundTimes.size() - mRoundsLeft == i) {
+          if (mRoundCount - mRoundsLeft == i) {
             //If we are in a "count up" round, also fade the text.
             if (mRoundType.get(i)==2 || mRoundType.get(i)==4) fadeDot(true); else fadeDot(false);
           }
           //if our remaining rounds added to our current position in the round list is less than the size of the list, mute that position's alpha (i.e. completed rounds).
-          else if (mRoundsLeft + i < mRoundTimes.size()) {
+          else if (mRoundsLeft + i < mRoundCount) {
             mPaint.setAlpha(105);
             //If position is a "count up" round, also mute the text's alpha.
             if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(105);

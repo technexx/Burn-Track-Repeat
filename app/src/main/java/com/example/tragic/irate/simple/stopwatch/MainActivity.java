@@ -218,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
+  //Todo: First dot start fade bug. Seems to only happen at end of cycles after giving delayed runnable time to execute.
+  //Todo: Proper adapter display when coming back from modes 1/3 + stopwatch
   //Todo: Center infinity symbol in editCycles.
   //Todo: Least/most round count sort borked.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
