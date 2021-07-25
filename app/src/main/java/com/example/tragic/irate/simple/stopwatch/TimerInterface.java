@@ -463,7 +463,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void run() {
         dotDraws.reDraw();
-        if (receivedAlpha <= 90) {
+        if (receivedAlpha <= 105) {
           mHandler.removeCallbacks(this);
         } else mHandler.postDelayed(this, 50);
       }
@@ -549,6 +549,16 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         timeLeft.setText(displayTime);
         msTime.setText(displayMs);
         mHandler.postDelayed(this, 10);
+
+        //        stopWatchMsCounter = (System.currentTimeMillis() - baseTime);
+        //        tempStopwatchMs = totalStopwatchMs + stopWatchMsCounter;
+        //        displayTime = convertStopwatch((long)tempStopwatchMs/1000);
+        //        timeLeft.setText(displayTime);
+        //
+        //        //Takes a whole number division result (tempSeconds) from our current stopwatch millis value, multiplies it by 1000, and subtracts that from our current stopwatch millis value to get our ms display value (e.g. 8400 / 1000 = 8 -> 8*1000 = 8000 -> 8400 - 8000 == 400 -> 400/10).
+        //        long tempSeconds = tempStopwatchMs/1000;
+        //        if (tempSeconds>0) msDisplay = (tempStopwatchMs - (tempSeconds*1000)) / 10; else msDisplay = stopWatchMsCounter/10;
+        //        msTime.setText(String.valueOf(msDisplay));
       }
     };
 

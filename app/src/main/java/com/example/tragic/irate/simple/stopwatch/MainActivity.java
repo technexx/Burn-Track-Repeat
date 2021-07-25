@@ -218,14 +218,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Total times out of sync w/ timer when moving from count-down to count-up (prolly vice-versa too).
-  //Todo: Should probably use currentMillisTime for stopwatch as well, since it's using only runnable method, tho it DOES work fine.
+  //Todo: Center infinity symbol in editCycles.
+  //Todo: Least/most round count sort borked.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
   //Todo: We have some DB issues w/ ROUND TYPE merging but other columns staying the same.
   //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
-  //Todo: Should initial date/subsequence sort be updated by recent access time?
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
   //Todo: Letter -> Number soft kb is a bit choppy.

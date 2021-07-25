@@ -157,9 +157,9 @@ public class DotDraws extends View {
           }
           //if our remaining rounds added to our current position in the round list is less than the size of the list, mute that position's alpha (i.e. completed rounds).
           else if (mRoundsLeft + i < mRoundTimes.size()) {
-            mPaint.setAlpha(100);
+            mPaint.setAlpha(105);
             //If position is a "count up" round, also mute the text's alpha.
-            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(100);
+            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(105);
           }
           else {
             //If neither of the previous conditions are true, retain a static full alpha value (i.e. an unreached round).
@@ -196,7 +196,7 @@ public class DotDraws extends View {
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
           if (mPomDotCounter == i) pomFill(i, true, 255);
-          else if (i - mPomDotCounter <=0) pomFill(i, false, 100); else pomFill(i, false, 255);
+          else if (i - mPomDotCounter <=0) pomFill(i, false, 105); else pomFill(i, false, 255);
         }
         break;
     }
