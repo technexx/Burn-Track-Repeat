@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int mode = 1;
   int savedMode;
   int sortMode = 1;
-  int sortModeBO = 1;
   int sortModePom = 1;
   int sortHolder = 1;
   int receivedPos;
@@ -218,8 +217,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: First dot start fade bug. Seems to only happen at end of cycles after giving delayed runnable time to execute.
-  //Todo: Proper adapter display when coming back from modes 1/3 + stopwatch
   //Todo: Center infinity symbol in editCycles.
   //Todo: Least/most round count sort borked.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -472,7 +469,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomValue2 = sharedPreferences.getInt("pomValue2", 300);
     pomValue3 = sharedPreferences.getInt("pomValue3", 900);
     sortMode = sharedPreferences.getInt("sortMode", 1);
-    sortModeBO = sharedPreferences.getInt("sortModeBO", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
@@ -489,11 +485,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     intent = getIntent();
     if (intent!= null) {
       //Last mode selected.
+      savedMode = intent.getIntExtra("savedMode", 0);
       mode = intent.getIntExtra("mode", 1);
       //If stopwatch is launched, mode is 4. Since we only update our respective adapter lists in modes 1 - 3, we reset the mode to the last one used so that the proper lists can be updated.
-      savedMode = intent.getIntExtra("savedMode", 0);
       if (mode==4) mode = savedMode;
-      TabLayout.Tab tab = tabLayout.getTabAt(mode - 1);
+      TabLayout.Tab tab = null;
+      //Sets tab to last one used.
+      if (mode==1) tab = tabLayout.getTabAt(0); else if (mode==3) tab = tabLayout.getTabAt(1);
       if (tab != null){
         tab.select();
       }
@@ -688,6 +686,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       intent = new Intent(MainActivity.this, TimerInterface.class);
       //Retaining whichever cycle mode we're on when launching the stopwatch. This is necessary for the correct adapter refresh when coming back to Main.
       intent.putExtra("savedMode", mode);
+      Log.i("testmode", "savedMode sent via stopwatch is " + mode);
+
       intent.putExtra("mode", 4);
       startActivity(intent);
     });
@@ -716,7 +716,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 6;
           if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 7;
           //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
-          if (mode==1) sortMode = sortHolder; else if (mode==2) sortModeBO = sortHolder; else if (mode==3) sortModePom = sortHolder;
+          if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
         });
         //Slight delay to ensure sortMode sets correctly. Without it, queryCycles() will fetch the old cycles list.
         mHandler.postDelayed(()-> {
@@ -732,7 +732,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           });
           //Saves sort mode so it defaults to chosen whenever we create this activity.
           prefEdit.putInt("sortMode", sortMode);
-          prefEdit.putInt("sortModeBO", sortModeBO);
           prefEdit.putInt("sortModePom", sortModePom);
           prefEdit.apply();
         },10);

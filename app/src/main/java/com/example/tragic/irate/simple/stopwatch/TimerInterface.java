@@ -1325,7 +1325,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       case 1: case 3:
         //Sets our total millis to the temp value iterated up in our runnable.
         totalSetMillis = tempSetMillis;
-        //Todo: Do we still want this?
         //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
         tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
         total_set_time.setText(convertSeconds(tempSetMillis/1000));
@@ -1343,6 +1342,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
+  //Todo: Need to send savedMode back.
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
@@ -1373,6 +1373,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
     } else if (mode == 2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
     exitIntent.putExtra("mode", mode);
+    exitIntent.putExtra("savedMode", savedMode);
     startActivity(exitIntent);
   }
 
