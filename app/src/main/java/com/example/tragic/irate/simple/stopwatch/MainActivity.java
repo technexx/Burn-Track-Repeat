@@ -217,11 +217,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Center infinity symbol in editCycles.
+  //Todo: Last 2 chars in first round have white text in cycle list.
   //Todo: Least/most round count sort borked.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
-  //Todo: We have some DB issues w/ ROUND TYPE merging but other columns staying the same.
   //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Save total sets/breaks and completed by day option?
@@ -232,10 +231,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
-  //Todo: Test dot text w/ different char numbers, tho there will be min values (e.g. in Pom) that will make some adjustment unnecessary.
   //Todo: TDEE in sep popup w/ tabs.
-  //Todo: Variable set count-up timer, for use w/ TDEE.
-  //Todo: Variable set only mode? Again, for TDEE.
   //Todo: Make sure sort checkmark positions work on different size screens.
   //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
   //Todo: Add taskbar notification for timers.
@@ -986,9 +982,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           second_value_textView.setText(convertCustomTextView(breakValue));
           break;
-        case 2:
-          second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-          break;
         case 3:
           second_value_textView.setText(convertCustomTextView(pomValue2));
           break;
@@ -1003,9 +996,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       switch (mode) {
         case 1:
           second_value_textView.setText(convertCustomTextView(breakValue));
-          break;
-        case 2:
-          second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
           break;
         case 3:
           second_value_textView.setText(convertCustomTextView(pomValue2));
@@ -1165,10 +1155,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (breakValue < 5) breakValue = 5;
         if (setValue > 300) setValue = 300;
         if (breakValue > 300) breakValue = 300;
-      case 2:
-        toastBounds(5, 300, breaksOnlyValue);
-        if (breaksOnlyValue < 5) breaksOnlyValue = 5;
-        if (breaksOnlyValue > 300) breaksOnlyValue = 300;
         break;
       case 3:
         toastBounds(900, 5400, pomValue1);
@@ -1316,7 +1302,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       //If moving from editText -> textView.
       switch (mode) {
-        case 1: case 2:
+        case 1:
           if (viewRemoved == 1) {
             //If first is shown, second and separator are also shown.
             if (first_value_edit.isShown()) {
@@ -1450,7 +1436,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     convertEditTime(true);
     switch (mode) {
-      case 1: case 2:
+      case 1:
         //All shared visibilities between modes 1 and 2.
         s2.setVisibility(View.VISIBLE);
         s3.setVisibility(View.GONE);
@@ -1464,26 +1450,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         second_value_textView.setVisibility(View.VISIBLE);
         //Shared String between modes 1 and 2.
         s2.setText(R.string.break_time);
-        if (mode==1) {
-          //Visibilities exclusive to mode 1.
-          s1.setVisibility(View.VISIBLE);
-          first_value_textView.setVisibility(View.VISIBLE);
-          plus_first_value.setVisibility(View.VISIBLE);
-          minus_first_value.setVisibility(View.VISIBLE);
-          //Strings and values exclusive to mode 1.
-          s1.setText(R.string.set_time);
-          first_value_textView.setText(convertCustomTextView(setValue));
-          second_value_textView.setText(convertCustomTextView(breakValue));
-        } else {
-          //Visibilities exclusive to mode 2.
-          s1.setVisibility(View.INVISIBLE);
-          first_value_textView.setVisibility(View.INVISIBLE);
-          plus_first_value.setVisibility(View.INVISIBLE);
-          minus_first_value.setVisibility(View.INVISIBLE);
-          breaksInfinity.setVisibility(View.GONE);
-          //Value exclusive to mode 2.
-          second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-        }
+        s1.setVisibility(View.VISIBLE);
+        first_value_textView.setVisibility(View.VISIBLE);
+        plus_first_value.setVisibility(View.VISIBLE);
+        minus_first_value.setVisibility(View.VISIBLE);
+        //Strings and values exclusive to mode 1.
+        s1.setText(R.string.set_time);
+        first_value_textView.setText(convertCustomTextView(setValue));
+        second_value_textView.setText(convertCustomTextView(breakValue));
         //If in mode 1 or 2, constraining our add/remove buttons to the "s2" line of objects.
         addParams.topToBottom = R.id.s2;
         addParams.topMargin = 30;
@@ -1651,10 +1625,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTitleArray.add(cyclesList.get(i).getTitle());
           //Adds concatenated roundType String used in each cycle.
           typeOfRoundArray.add(cyclesList.get(i).getRoundType());
-//          //Splits the concatenated String of Integer values for round type pulled from our database into a String Array.
-//          String[] tempRoundTypes = cyclesList.get(i).getRoundType().split(" - ");
-//          //Using the length of that String Array (each item being a String version of an Integer), we convert and then add it to our Integer Array.
-//          for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
         }
         break;
       case 3:

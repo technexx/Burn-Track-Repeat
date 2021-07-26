@@ -86,7 +86,6 @@ public class DotDraws extends View {
 
   public void updateWorkoutRoundCount(int roundCount, int roundsLeft) {
     this.mRoundCount = roundCount;  this.mRoundsLeft = roundsLeft;
-//    Log.i("testFade", "vals are " + roundCount + " and " + roundsLeft);
     invalidate();
   }
 

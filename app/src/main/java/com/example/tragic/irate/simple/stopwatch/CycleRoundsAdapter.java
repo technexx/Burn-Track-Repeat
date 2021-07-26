@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -28,9 +29,11 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_ONE = 1;
   public static final int MODE_THREE = 3;
   int mMode = 1;
+  List<Integer> mPositionList;
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
     this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; mPomList = pomList;
+    mPositionList = new ArrayList<>();
   }
 
   public void setMode(int mode) {
@@ -50,20 +53,14 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else return null;
   }
 
-  //Todo: Center views @ <=8 rounds, then populate second set of views @ >8 while constraining first set to left. Second set are perm constrained to end.
+  //Todo: Why not just use a separate recyclerView adjacent to first? Ideally should be just a list, but fine for now. Careful, since we have our border set as a background to current recyclerView.
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     if (holder instanceof ModeOneRounds) {
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
-      //Sets our round textViews.
-      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position+1)));
-      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-
-      //Since we can't convert Span->String (can only setText a Spannable), we use appendSeconds here.
-//      Spannable newTemp = new SpannableString(appendSeconds(mContext.getString(R.string.workout_rounds, String.valueOf(position+1), mWorkOutList.get(position))));
-//      newTemp.setSpan(new ForegroundColorSpan(Color.BLACK), 0, 3, 0);
-//      modeOneRounds.workout_rounds.setText(newTemp);
+      ConstraintLayout.LayoutParams countParams = (ConstraintLayout.LayoutParams) modeOneRounds.round_count.getLayoutParams();
+      mPositionList.add(position);
 
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
       switch (mTypeOfRound.get(position)) {
@@ -88,10 +85,28 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
           modeOneRounds.infinity_rounds.setColorFilter(Color.RED);
           break;
       }
-      ConstraintLayout.LayoutParams countParams = (ConstraintLayout.LayoutParams) modeOneRounds.round_count.getLayoutParams();
-//      countParams.startToStart = R.id.workout_views_start_anchor;
-//      countParams.endToEnd = R.id.workout_views_end_anchor;
 
+      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
+      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+
+//      for (int i=0; i<8; i++) {
+//        if (i>=position) {
+//          modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
+//          modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+//        }
+//      }
+//      for (int i=0; i<8; i++) {
+//        if (i>=position+8) {
+//          modeOneRounds.round_count_2.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
+//          modeOneRounds.workout_rounds_2.setText(appendSeconds(mWorkOutList.get(position)));
+//        }
+//      }
+//
+//      if (mWorkOutList.size()<=8) {
+//        countParams.setMarginStart(200);
+//      } else {
+//        countParams.setMarginStart(0);
+//      }
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
@@ -137,9 +152,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       round_count_2 = itemView.findViewById(R.id.round_count_2);
       workout_rounds_2 = itemView.findViewById(R.id.workout_rounds_2);
       infinity_rounds_2 = itemView.findViewById(R.id.round_infinity_2);
+
       //Set to invisible until a we have 9+ rounds in list.
-      round_count_2.setVisibility(View.INVISIBLE);
-      workout_rounds_2.setVisibility(View.INVISIBLE);
+//      round_count_2.setVisibility(View.INVISIBLE);
+//      workout_rounds_2.setVisibility(View.INVISIBLE);
       infinity_rounds_2.setVisibility(View.INVISIBLE);
     }
   }

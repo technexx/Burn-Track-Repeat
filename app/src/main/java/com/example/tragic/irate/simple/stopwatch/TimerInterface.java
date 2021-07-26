@@ -206,9 +206,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   int passedID;
   boolean isNewCycle;
   SavedCycleAdapter savedCycleAdapter;
-  ArrayList<Integer> infinityArrayOne;
-  ArrayList<Integer> infinityArrayTwo;
-  ArrayList<Integer> infinityArrayThree;
 
   boolean resetMenu;
   long baseTime;
@@ -293,9 +290,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     breaksOnlyArray = new ArrayList<>();
     pomArray = new ArrayList<>();
     pomValuesTime = new ArrayList<>();
-    infinityArrayOne = new ArrayList<>();
-    infinityArrayTwo = new ArrayList<>();
-    infinityArrayThree = new ArrayList<>();
 
     reset = findViewById(R.id.reset);
     cycle_header_text = findViewById(R.id.cycle_header_text);
@@ -1353,11 +1347,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         cycles.setCyclesCompleted(customCyclesDone);
         cyclesDatabase.cyclesDao().updateCycles(cycles);
         break;
-      case 2:
-        cyclesBO.setTotalBOTime((int) tempBreakMillis / 1000);
-        cyclesBO.setCyclesCompleted(breaksOnlyCyclesDone);
-        cyclesDatabase.cyclesDao().updateBOCycles(cyclesBO);
-        break;
       case 3:
         pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
         pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
@@ -1368,10 +1357,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     //Since we re-create our Main activity and do not used saved preferences for these arrays, we re-send the values back to thr activity so they have them.
     Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
-    if (mode == 1) {
-      exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-      exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-    } else if (mode == 2) exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
     exitIntent.putExtra("mode", mode);
     exitIntent.putExtra("savedMode", savedMode);
     startActivity(exitIntent);
@@ -1388,19 +1373,12 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       switch (mode) {
         case 1:
           cyclesDatabase.cyclesDao().deleteCycle(cycles); break;
-        case 2:
-          cyclesDatabase.cyclesDao().deleteBOCycle(cyclesBO); break;
         case 3:
           cyclesDatabase.cyclesDao().deletePomCycle(pomCycles); break;
       }
       //Kicks us back to Main, since our current cycle has been deleted.
       runOnUiThread(() -> {
         Intent exitIntent = new Intent(TimerInterface.this, MainActivity.class);
-        if (mode == 1) {
-          exitIntent.putIntegerArrayListExtra("infiniteOne", infinityArrayOne);
-          exitIntent.putIntegerArrayListExtra("infiniteTwo", infinityArrayTwo);
-        } else if (mode == 2)
-          exitIntent.putIntegerArrayListExtra("infiniteThree", infinityArrayThree);
         exitIntent.putExtra("mode", mode);
         startActivity(exitIntent);
       });
@@ -1409,8 +1387,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       switch (mode) {
         case 1:
           cyclesDatabase.cyclesDao().deleteTotalTimesCycle(); break;
-        case 2:
-          cyclesDatabase.cyclesDao().deleteTotalTimesCycleBO(); break;
         case 3:
           cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
       }
