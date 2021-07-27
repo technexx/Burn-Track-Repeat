@@ -704,6 +704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> {
           //Casting View used by listener to textView, which we then check against its String value.
           TextView textButton = (TextView) view;
+          //Handles checkmark views.
           if (textButton.getText().toString().equals("Last Accessed")) sortHolder = 1;
           if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 2;
           if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 3;
@@ -1616,7 +1617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         workoutCyclesArray.clear();
-        typeOfRound.clear();
+        typeOfRoundArray.clear();
         workoutTitleArray.clear();
         for (int i=0; i<cyclesList.size(); i++) {
           //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.

@@ -123,6 +123,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       String[] tempWorkoutArray = tempWorkoutString.split(mContext.getString(R.string.bullet));
       //Splits concatenated round type String into String Array.
       String[] tempTypeArray = tempTypeString.split(" - ");
+
       //Var used to determine spannable spacing.
       int tempSpace = 0;
       //Bullet string. Cleared if on final round.
