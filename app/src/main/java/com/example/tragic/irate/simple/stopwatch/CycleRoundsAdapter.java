@@ -53,7 +53,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else return null;
   }
 
-  //Todo: Why not just use a separate recyclerView adjacent to first? Ideally should be just a list, but fine for now. Careful, since we have our border set as a background to current recyclerView.
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     if (holder instanceof ModeOneRounds) {
@@ -88,19 +87,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-
-//      for (int i=0; i<8; i++) {
-//        if (i>=position) {
-//          modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
-//          modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-//        }
-//      }
-//      for (int i=0; i<8; i++) {
-//        if (i>=position+8) {
-//          modeOneRounds.round_count_2.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
-//          modeOneRounds.workout_rounds_2.setText(appendSeconds(mWorkOutList.get(position)));
-//        }
-//      }
 //
 //      if (mWorkOutList.size()<=8) {
 //        countParams.setMarginStart(200);
@@ -140,23 +126,12 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public TextView round_count;
     public TextView workout_rounds;
     public ImageView infinity_rounds;
-    public TextView round_count_2;
-    public TextView workout_rounds_2;
-    public ImageView infinity_rounds_2;
 
     public ModeOneRounds(@NonNull View itemView) {
       super(itemView);
       round_count = itemView.findViewById(R.id.round_count);
       workout_rounds = itemView.findViewById(R.id.workout_rounds);
       infinity_rounds = itemView.findViewById(R.id.round_infinity);
-      round_count_2 = itemView.findViewById(R.id.round_count_2);
-      workout_rounds_2 = itemView.findViewById(R.id.workout_rounds_2);
-      infinity_rounds_2 = itemView.findViewById(R.id.round_infinity_2);
-
-      //Set to invisible until a we have 9+ rounds in list.
-//      round_count_2.setVisibility(View.INVISIBLE);
-//      workout_rounds_2.setVisibility(View.INVISIBLE);
-      infinity_rounds_2.setVisibility(View.INVISIBLE);
     }
   }
 

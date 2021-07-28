@@ -42,6 +42,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TableRow;
@@ -88,8 +89,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean isNewCycle;
 
   RecyclerView roundRecycler;
+  RecyclerView roundRecyclerTwo;
   RecyclerView savedCycleRecycler;
   CycleRoundsAdapter cycleRoundsAdapter;
+  CycleRoundsAdapterTwo cycleRoundsAdapterTwo;
   SavedCycleAdapter savedCycleAdapter;
   View deleteCyclePopupView;
   View sortCyclePopupView;
@@ -176,6 +179,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean setsSelected;
   boolean breaksSelected;
   int roundType;
+  ArrayList<String> roundHolderOne;
+  ArrayList<String> roundHolderTwo;
+  ArrayList<Integer> typeHolderOne;
+  ArrayList<Integer> typeHolderTwo;
 
   int setValue;
   int breakValue;
@@ -439,6 +446,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     typeOfRound = new ArrayList<>();
     typeOfRoundArray = new ArrayList<>();
 
+    roundHolderOne = new ArrayList<>();
+    roundHolderTwo = new ArrayList<>();
+    typeHolderOne = new ArrayList<>();
+    typeHolderTwo = new ArrayList<>();
+
     //These Integer Lists hold our millis values for each round.
     pomValuesTime = new ArrayList<>();
     //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes in recyclerView via adapter.
@@ -479,6 +491,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeOut.setDuration(750);
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
+
+    //Todo: Probably still want a custom adapter, at least for coloring, etc w/ roundType list.
+    //Todo: So, two listViews, two very similar adapters. side by side w/ layout changing if pos is <7 and >7
+//    testAdapter = new ArrayAdapter<> (this, android.R.layout.simple_list_item_1, convertedWorkoutTime);
+//    testListView.setAdapter(testAdapter);
 
     //Retrieves checkmark position for sort popup.
     setSortCheckmark();
@@ -529,12 +546,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Adapter and Recycler for round views within our editCycles popUp.
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
-    roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
-    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), convertedWorkoutTime, typeOfRound, convertedPomList);
-    roundRecycler.setAdapter(cycleRoundsAdapter);
-    roundRecycler.setLayoutManager(lm);
-    //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
+    LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
+
+    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
+    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(),roundHolderTwo, typeHolderTwo);
     cycleRoundsAdapter.setMode(mode);
+
+    roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
+    roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
+    roundRecycler.setAdapter(cycleRoundsAdapter);
+    roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
+    roundRecycler.setLayoutManager(lm);
+    roundRecyclerTwo.setLayoutManager(lm2);
+    //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
     removeEditViews(false);
@@ -1546,6 +1570,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               return;
           }
           typeOfRound.add(roundType);
+          //If total rounds are <=8, also add them to our holder lists (used for separating viewHolders into two columns.
+          if (convertedWorkoutTime.size()<=8) {
+            roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+            typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
+          } else {
+            roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+            typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
+          }
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
       }
       if (mode==3) {
@@ -1568,6 +1600,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRound.remove(typeOfRound.size()-1);
           workoutTime.remove(workoutTime.size()-1);
           convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
+          //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
+          if (convertedWorkoutTime.size()<=7) {
+            roundHolderOne.remove(roundHolderOne.size()-1);
+            typeHolderOne.remove(typeHolderOne.size()-1);
+          } else {
+            roundHolderTwo.remove(roundHolderTwo.size()-1);
+            typeHolderTwo.remove(typeHolderTwo.size()-1);
+          }
         } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
       }
       if (mode==3) {
@@ -1583,6 +1623,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     //Updates our recyclerView list via adapter after each addition/subtraction of round.
     cycleRoundsAdapter.notifyDataSetChanged();
+    cycleRoundsAdapterTwo.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
