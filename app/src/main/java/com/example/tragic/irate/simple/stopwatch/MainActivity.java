@@ -220,8 +220,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Drop down settings menu from left side.
-  //Todo: Remove delete all in main options, or move it to a button within a larger options menu?
   //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
@@ -339,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, 500, WindowManager.LayoutParams.MATCH_PARENT, true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
@@ -676,9 +674,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    //Todo: popUp constrained to top left.
     global_settings.setOnClickListener(v-> {
-      settingsPopupWindow.showAtLocation(cl, Gravity.START, 0, 0);
+      settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
     });
 
       //Brings up editCycle popUp to create new Cycle.
