@@ -1187,6 +1187,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void populateTimerUI() {
+    dotDraws.resetDotAlpha();
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:

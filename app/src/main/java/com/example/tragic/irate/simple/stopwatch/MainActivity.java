@@ -8,6 +8,7 @@ import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -33,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -93,12 +95,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View sortCyclePopupView;
   View savedCyclePopupView;
   View editCyclesPopupView;
+  View settingsPopupView;
   boolean currentCycleEmpty;
 
   PopupWindow sortPopupWindow;
   PopupWindow savedCyclePopupWindow;
   PopupWindow deleteCyclePopupWindow;
   PopupWindow editCyclesPopupWindow;
+  PopupWindow settingsPopupWindow;
 
   TextView sortAccessed;
   TextView sortAlphaStart;
@@ -115,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
   TextView sort_text;
-  Spinner sort_spinner;
+  ImageView global_settings;
 
   int mode = 1;
   int savedMode;
@@ -127,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String cycleTitle;
   List<String> receivedHighlightPositions;
 
-  String cycle_name = "";
   TextView cycle_name_text;
   EditText cycle_name_edit;
   TextView s1;
@@ -217,8 +220,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_count;
   TextView round_value;
 
-  //Todo: Last 2 chars in first round have white text in cycle list.
-  //Todo: Least/most round count sort borked.
+  //Todo: Drop down settings menu from left side.
+  //Todo: Remove delete all in main options, or move it to a button within a larger options menu?
+  //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
   //Todo: Possible drag/drop switch for round order.
@@ -292,18 +296,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.delete_all_cycles:
-              AsyncTask.execute(()-> {
-                //Get instance of cycles/cyclesBO/pomCycles.
-                queryCycles();
-                //if instance is empty, pop a Toast and return. Otherwise, show popUp window to confirm cycle deletion.
-                runOnUiThread(()-> {
-                  if (currentCycleEmpty) {
-                    Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
-                  } else deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
-                });
+          case R.id.delete_all_cycles:
+            AsyncTask.execute(()-> {
+              //Get instance of cycles/cyclesBO/pomCycles.
+              queryCycles();
+              //if instance is empty, pop a Toast and return. Otherwise, show popUp window to confirm cycle deletion.
+              runOnUiThread(()-> {
+                if (currentCycleEmpty) {
+                  Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
+                } else deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
               });
-              break;
+            });
+            break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -329,11 +333,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
+    settingsPopupView = inflater.inflate(R.layout.settings_popup, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, 500, WindowManager.LayoutParams.MATCH_PARENT, true);
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
@@ -359,8 +365,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    sortPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimation);
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    settingsPopupWindow.setAnimationStyle(R.style.SlideLeftAnimation);
 
     cl = new ConstraintLayout(this);
     roundView = inflater.inflate(R.layout.mode_one_rounds, null);
@@ -421,6 +428,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
     sort_text = findViewById(R.id.sort_text);
+    global_settings = findViewById(R.id.global_settings);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -668,6 +676,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
+    //Todo: popUp constrained to top left.
+    global_settings.setOnClickListener(v-> {
+      settingsPopupWindow.showAtLocation(cl, Gravity.START, 0, 0);
+    });
+
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
       //Clears timer arrays so they can be freshly populated.
@@ -690,7 +703,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sort_text.setOnClickListener(v-> {
-      sortPopupWindow.showAtLocation(mainView, Gravity.END, 0, -650);
+      sortPopupWindow.showAsDropDown(cl, 800, 0, Gravity.END);
     });
 
     sortRecent.setOnClickListener(v-> {
