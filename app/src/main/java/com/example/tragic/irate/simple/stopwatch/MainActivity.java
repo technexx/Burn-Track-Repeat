@@ -226,7 +226,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View roundView;
   TextView round_count;
   TextView round_value;
+  ConstraintLayout.LayoutParams recyclerLayoutOne;
+  ConstraintLayout.LayoutParams recyclerLayoutTwo;
 
+  //Todo: Make sure to populate and test holder lists when editing previous cycle rounds.
   //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
@@ -492,11 +495,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
 
-    //Todo: Probably still want a custom adapter, at least for coloring, etc w/ roundType list.
-    //Todo: So, two listViews, two very similar adapters. side by side w/ layout changing if pos is <7 and >7
-//    testAdapter = new ArrayAdapter<> (this, android.R.layout.simple_list_item_1, convertedWorkoutTime);
-//    testListView.setAdapter(testAdapter);
-
     //Retrieves checkmark position for sort popup.
     setSortCheckmark();
 
@@ -559,6 +557,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setLayoutManager(lm);
     roundRecyclerTwo.setLayoutManager(lm2);
     //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
+
+    //Rounds begin unpopulated, so remove second recycler view.
+    roundRecyclerTwo.setVisibility(View.GONE);
+    //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
+    recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
+    recyclerLayoutTwo = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
+    //Using exclusively programmatic layout params for round recyclerViews. Setting defaults. Second will never change.
+    recyclerLayoutOne.leftMargin = 240;
+    recyclerLayoutTwo.leftMargin = 450;
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
     removeEditViews(false);
@@ -776,6 +783,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
+    //Todo: Test and make sure both adapters work here.
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
       editCyclesPopupWindow.showAsDropDown(tabLayout);
@@ -802,6 +810,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycle_name_edit.setText(cycleTitle);
           //Updating adapter views.
           cycleRoundsAdapter.notifyDataSetChanged();
+          cycleRoundsAdapterTwo.notifyDataSetChanged();
           //Removing highlights.
           savedCycleAdapter.removeHighlight(true);
           //Boolean set to false indicates that a current database-saved cycle is populating our editCyclesPopup.
@@ -1536,6 +1545,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Change layout positions based on round numbers (<=8 or other).
   public void adjustCustom(boolean adding) {
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
@@ -1578,6 +1588,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
           }
+          //If moving from one list to two, set its visibility and change layout params.
+          if (convertedWorkoutTime.size()==9) {
+            roundRecyclerTwo.setVisibility(View.VISIBLE);
+            recyclerLayoutOne.leftMargin = 5;
+          }
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
       }
       if (mode==3) {
@@ -1607,6 +1622,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           } else {
             roundHolderTwo.remove(roundHolderTwo.size()-1);
             typeHolderTwo.remove(typeHolderTwo.size()-1);
+          }
+          //If moving from two lists to one, set its visibility and change layout params.
+          if (convertedWorkoutTime.size()==8) {
+            roundRecyclerTwo.setVisibility(View.GONE);
+            recyclerLayoutOne.leftMargin = 240;
           }
         } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
       }

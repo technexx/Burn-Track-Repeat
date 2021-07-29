@@ -58,7 +58,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (holder instanceof ModeOneRounds) {
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
-      ConstraintLayout.LayoutParams countParams = (ConstraintLayout.LayoutParams) modeOneRounds.round_count.getLayoutParams();
       mPositionList.add(position);
 
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
@@ -87,12 +86,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-//
-//      if (mWorkOutList.size()<=8) {
-//        countParams.setMarginStart(200);
-//      } else {
-//        countParams.setMarginStart(0);
-//      }
+
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));

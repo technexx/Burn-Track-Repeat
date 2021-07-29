@@ -39,7 +39,6 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         //Casts our custom recyclerView to generic recyclerView class.
         CycleRoundsAdapterTwo.ModeOneRounds modeOneRounds = (CycleRoundsAdapterTwo.ModeOneRounds) holder;
-        ConstraintLayout.LayoutParams countParams = (ConstraintLayout.LayoutParams) modeOneRounds.round_count.getLayoutParams();
 
         //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
         switch (mTypeOfRound.get(position)) {
@@ -65,15 +64,9 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
+        //Todo: Position 0 (first in this adapter, 9th round overall) should have additional space after round_count to align it w/ double digit round counts.
         modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-//
-//      if (mWorkOutList.size()<=8) {
-//        countParams.setMarginStart(200);
-//      } else {
-//        countParams.setMarginStart(0);
-//      }
-
     }
 
     @Override
