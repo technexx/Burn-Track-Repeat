@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
 
-  //Todo: Make sure to populate and test holder lists when editing previous cycle rounds.
+  //Todo: Shoot for 8 per row in cycle adapter display vs. 9.
   //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
@@ -241,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: There is a lingering sync issue between type of rounds and workout rounds.
   //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: TDEE in sep popup w/ tabs.
@@ -288,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         appHeader.startAnimation(fadeOut);
         sort_text.startAnimation(fadeOut);
-
         edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
     }
   }
@@ -788,6 +788,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle.setOnClickListener(v-> {
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       AsyncTask.execute(()-> {
+        //Grabs current database list of cycles.
         queryCycles();
         //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
         receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
@@ -1545,7 +1546,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Change layout positions based on round numbers (<=8 or other).
   public void adjustCustom(boolean adding) {
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.

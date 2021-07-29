@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -113,6 +114,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (holder instanceof WorkoutHolder) {
       WorkoutHolder workoutHolder = (WorkoutHolder) holder;
       workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
+
       //Clearing Spannable object, since it will re-populate for every position passed in through this method.
       permSpan = "";
       //Retrieves the concatenated String of workout TIMES from current position.
@@ -124,6 +126,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //Splits concatenated round type String into String Array.
       String[] tempTypeArray = tempTypeString.split(" - ");
 
+//      Log.i("testlist", "wo string is " + tempWorkoutString);
+//      Log.i("testlist", "wo array is " + Arrays.toString(tempWorkoutArray));
+//      Log.i("testlist", "wo length is " + tempWorkoutArray.length);
+
       //Var used to determine spannable spacing.
       int tempSpace = 0;
       //Bullet string. Cleared if on final round.
@@ -132,16 +138,23 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       for (int j=0; j<tempTypeArray.length; j++) {
         //If we are on the last round object, clear our bullet String so the view does not end with one.
         if (j==tempTypeArray.length-1) bullet = "";
-
         //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
         if (tempTypeArray[j].contains("1") || (tempTypeArray[j].contains("3"))) {
           span = new SpannableString( tempWorkoutArray[j] + bullet);
           //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone). If on LAST spanable, use the full length so we do not fall short in coloring, since there is no space+bullet after.
           if (j!=tempTypeArray.length-1) tempSpace = span.length()-2; else tempSpace = span.length();
         } else {
-          span = new SpannableString("   " + bullet);
-          //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
-          tempSpace = 2;
+          //Uses slightly different spacing for first round entry.
+          if (j!=0) {
+            span = new SpannableString("   " + bullet);
+            //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
+            tempSpace = 2;
+          } else {
+            span = new SpannableString(" " + bullet);
+            //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
+            tempSpace = 1;
+          }
+
           //If roundType is 2 (sets), use green infinity drawable for ImageSpan. If roundType is 4 (breaks), use red.
           if (tempTypeArray[j].contains("2")) imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
           else imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
@@ -155,11 +168,28 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           //If using infinity drawable, increase its size.
           span.setSpan(new AbsoluteSizeSpan(18, true),0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           //Setting our Spannable, which can be concatenated w/ permSpan object in TextUtils below, to our imageSpan. We run from index 1-2 inclusive because 0 is used as an empty separator space (see: original Spannable span creation above).
-          span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+          //Using different placement of image in spannable for first round, since we do not want it spaced out (i.e. indented).
+          if (j!=0) span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+          else span.setSpan(imageSpan, 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         }
 
         //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
         permSpan = TextUtils.concat(permSpan, span);
+      }
+
+      //Adds extra spacing between textView lines if second line does not automatically space due to infinity sign.
+      boolean spacingChanged = false;
+      for (int k = 0; k < tempTypeArray.length; k++) {
+        if (k >= 8) {
+          if (!spacingChanged) {
+            if (tempTypeArray[k].contains("2") || tempTypeArray[k].contains("4")) {
+              k = tempTypeArray.length;
+            } else {
+              workoutHolder.workOutCycle.setLineSpacing(0, 1.3f);
+              spacingChanged = true;
+            }
+          }
+        }
       }
       workoutHolder.workOutCycle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
       workoutHolder.workOutCycle.setText(permSpan);
@@ -207,8 +237,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //Highlight cycle on long click and make visible action bar buttons. Sets mHighlightMode to true so no cycles can be launched in timer.
       workoutHolder.fullView.setOnLongClickListener(v -> {
         if (!mHighlightMode) {
+          //Adds position of clicked item to position list.
           mPositionList.add(String.valueOf(position));
+          //Sets background of list item to gray, to indicate it is selected.
           workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+          //Sets highlight mode to true, since at least one item is selected.
           mHighlightMode = true;
           //Calls back for initial highlighted position, Also to set actionBar views for highlight mode.
           mOnHighlightListener.onCycleHighlight(mPositionList, true);
@@ -314,7 +347,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public class WorkoutHolder extends RecyclerView.ViewHolder {
     public TextView workoutName;
     public TextView workOutCycle;
-    public ImageView infinityRounds;
     public View fullView;
 
     @SuppressLint("ResourceAsColor")
