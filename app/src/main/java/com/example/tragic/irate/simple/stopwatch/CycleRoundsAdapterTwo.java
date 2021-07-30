@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -23,6 +25,8 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     Context mContext;
     ArrayList<String> mWorkOutList;
     ArrayList<Integer> mTypeOfRound;
+    int lastPosition = -1;
+    int positionCount;
 
     public CycleRoundsAdapterTwo(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound) {
         this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; }
@@ -64,9 +68,11 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
-        //Todo: Position 0 (first in this adapter, 9th round overall) should have additional space after round_count to align it w/ double digit round counts.
+
         modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+        setAnimation(modeOneRounds.round_count, position);
+        setAnimation(modeOneRounds.workout_rounds, position);
     }
 
     @Override
@@ -86,6 +92,21 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             infinity_rounds = itemView.findViewById(R.id.round_infinity);
         }
     }
+
+    public void setAnimation(TextView textView, int position) {
+        if (position>lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+            textView.startAnimation(animation);
+            //Forces this method to execute twice before resetting the lastPosition var, so it will execute for both textViews in onBindView.
+            positionCount++;
+            if (positionCount==2) {
+                lastPosition = position;
+                positionCount = 0;
+            }
+        }
+    }
+
+
 
     public String appendSeconds(String seconds) {
         if (seconds.length()==1) seconds = "0:0" + seconds;

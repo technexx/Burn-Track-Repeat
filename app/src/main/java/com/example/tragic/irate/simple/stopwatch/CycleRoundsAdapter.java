@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,6 +32,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_THREE = 3;
   int mMode = 1;
   List<Integer> mPositionList;
+  int lastPosition = -1;
+  int positionCount;
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
     this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; mPomList = pomList;
@@ -86,6 +90,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+      setAnimation(modeOneRounds.round_count, position);
+      setAnimation(modeOneRounds.workout_rounds, position);
 
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
@@ -135,6 +141,19 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public ModeThreeRounds(@NonNull View itemView) {
       super(itemView);
       round_pomodoro = itemView.findViewById(R.id.round_pomodoro);
+    }
+  }
+
+  public void setAnimation(TextView textView, int position) {
+    if (position>lastPosition) {
+      Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+      textView.startAnimation(animation);
+      //Forces this method to execute twice before resetting the lastPosition var, so it will execute for both textViews in onBindView.
+      positionCount++;
+      if (positionCount==2) {
+        lastPosition = position;
+        positionCount = 0;
+      }
     }
   }
 

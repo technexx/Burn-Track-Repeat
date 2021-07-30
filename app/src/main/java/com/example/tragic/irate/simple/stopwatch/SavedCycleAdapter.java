@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -52,6 +54,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   CharSequence permSpan;
   Spannable span;
   ImageSpan imageSpan;
+  Animation fadeIn;
+  Animation fadeOut;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -177,20 +181,23 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         permSpan = TextUtils.concat(permSpan, span);
       }
 
-      //Adds extra spacing between textView lines if second line does not automatically space due to infinity sign.
+      //Adds extra spacing between textView lines if second line has no infinity symbols. These symbols' imageViews create an automatic spacing greater than just text.
       boolean spacingChanged = false;
-      for (int k = 0; k < tempTypeArray.length; k++) {
-        if (k >= 8) {
-          if (!spacingChanged) {
-            if (tempTypeArray[k].contains("2") || tempTypeArray[k].contains("4")) {
-              k = tempTypeArray.length;
-            } else {
-              workoutHolder.workOutCycle.setLineSpacing(0, 1.3f);
-              spacingChanged = true;
+      if (tempTypeArray.length>=9) {
+        for (int k = 0; k < tempTypeArray.length; k++) {
+          if (k >= 8) {
+            if (!spacingChanged) {
+              if (tempTypeArray[k].contains("2") || tempTypeArray[k].contains("4")) {
+                k = tempTypeArray.length;
+              } else {
+                workoutHolder.workOutCycle.setLineSpacing(0, 1.3f);
+                spacingChanged = true;
+              }
             }
           }
         }
       }
+
       workoutHolder.workOutCycle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
       workoutHolder.workOutCycle.setText(permSpan);
 
