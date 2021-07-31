@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RecyclerView savedCycleRecycler;
   CycleRoundsAdapter cycleRoundsAdapter;
   CycleRoundsAdapterTwo cycleRoundsAdapterTwo;
+  View roundListDivider;
   SavedCycleAdapter savedCycleAdapter;
   View deleteCyclePopupView;
   View sortCyclePopupView;
@@ -229,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
 
-  //Todo: Add vertical divider + fade effect for transition from 8->9 rounds.
+  //Todo: Add fade effect for transition from 8->9 rounds.
   //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
@@ -559,6 +560,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Only first adapter is used for Pom mode, so only needs to be set here.
     cycleRoundsAdapter.setMode(mode);
 
+    roundListDivider = editCyclesPopupView.findViewById(R.id.round_list_divider);
+    roundListDivider.setVisibility(View.GONE);
     roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
     roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
     roundRecycler.setAdapter(cycleRoundsAdapter);
@@ -828,9 +831,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (workoutTime.size()<=8) {
               roundRecyclerTwo.setVisibility(View.GONE);
               recyclerLayoutOne.leftMargin = 240;
+              roundListDivider.setVisibility(View.GONE);
             } else {
               roundRecyclerTwo.setVisibility(View.VISIBLE);
               recyclerLayoutOne.leftMargin = 5;
+              roundListDivider.setVisibility(View.VISIBLE);
             }
             break;
           case 3:
@@ -1630,6 +1635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (workoutTime.size()==9) {
             roundRecyclerTwo.setVisibility(View.VISIBLE);
             recyclerLayoutOne.leftMargin = 5;
+            roundListDivider.setVisibility(View.VISIBLE);
           }
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
       }
@@ -1665,6 +1671,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (workoutTime.size()==8) {
             roundRecyclerTwo.setVisibility(View.GONE);
             recyclerLayoutOne.leftMargin = 240;
+            roundListDivider.setVisibility(View.GONE);
           }
         } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
       }
