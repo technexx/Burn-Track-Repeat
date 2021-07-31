@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
 
-  //Todo: highlight edit is concatenating roundType from diff. cycles, likely using one in first position.
+  //Todo: Round edits don't save or do anything.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
   //Todo: #9 round still need to move further right.
@@ -788,6 +788,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
+      //Turns edit mode on. When on, we do not clear the our round array lists, since we need their values to edit.
+      editingCycle = true;
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       AsyncTask.execute(()-> {
         //Grabs current database list of cycles.
@@ -797,6 +799,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Uses this single position to retrieve cycle and populate timer arrays.
         retrieveCycle();
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
+
+        //Clears old array values.
+        clearTimerArrays();
         switch (mode) {
           case 1:
             //Populating String ArrayLists used to display rounds in editCycle popUp.
@@ -832,7 +837,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeHighlight(true);
           //Boolean set to false indicates that a current database-saved cycle is populating our editCyclesPopup.
           onNewCycle = false;
-          editingCycle = true;
         });
       });
     });
@@ -1128,9 +1132,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Clears both timer millis arrays and their converted String arrays.
   public void clearTimerArrays() {
-    workoutTime.clear();
+    //Todo: workOuttime clearing doesn't let lists populate w/ in edit_highlight_cycle. Now tho, we're getting massive overpop even when deleting.
+    //Todo: retrieveCycles() gets us these two commented out values.
+//    workoutTime.clear();
+//    typeOfRound.clear();
     convertedWorkoutTime.clear();
-    typeOfRound.clear();
     roundHolderOne.clear();
     roundHolderTwo.clear();
     typeHolderOne.clear();
@@ -1733,16 +1739,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Gets instance of our database entity class based on which mode we're in. Converts its String into Integers and populates our timer arrays with them.
   public void retrieveCycle() {
+    //Clears the two lists we are populating.
+    workoutTime.clear();
+    typeOfRound.clear();
     //Calling cycleList instance based on sort mode.
     queryCycles();
-    //Clears old array values.
-    clearTimerArrays();
     switch (mode) {
       case 1:
         //Getting instance of Cycles at selected position, creating a String Array from its concatenated String, and creating an Integer Array from that for use in our Timer and adapter displays.
         Cycles cycles = cyclesList.get(receivedPos);
         String[] tempSets = cycles.getWorkoutRounds().split(" - ");
-        //Todo: Parsing full ms value into list.
         for (int i=0; i<tempSets.length; i++) workoutTime.add(Integer.parseInt(tempSets[i]));
         String[] tempRoundTypes = cycles.getRoundType().split(" - ");
         for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
@@ -1785,7 +1791,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       saveCycles(true);
       //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
     } else {
-      retrieveCycle();
+      //Only calls retrieveCycle() if NOT editing, since it also clears our round lists and we need them retained.
+      if (!editingCycle) retrieveCycle();
+      //Todo: This should trigger when coming from edit highlight.
       saveCycles(false);
     }
 
@@ -1809,6 +1817,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Sends the current cycle's database position so we can delete it from the Timer class if desired.
       intent.putExtra("passedID", retrievedID);
     }
+    Log.i("testList", "workout time list in LAUNCH is " + workoutTime);
     //Starts Timer class.
     startActivity(intent);
   }
