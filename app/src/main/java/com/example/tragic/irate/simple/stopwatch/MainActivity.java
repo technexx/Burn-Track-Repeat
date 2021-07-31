@@ -799,13 +799,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
         switch (mode) {
           case 1:
-            //Todo: Need these values in round one/two holder lists. workOutTime is pulled as an Integer Array in retrieveCycle()
-            //Todo: Only difference is now instead of convertLists, we need to use our roundHolder lists.
+            //Populating String ArrayLists used to display rounds in editCycle popUp.
             for (int i=0; i<workoutTime.size(); i++) {
+              //Aggregate list of rounds. Necessary since adjustCustom() uses it.
+              convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
+              //If 8 or less rounds, add to first round adapter's String Array (and roundType).
               if (i<=7) {
                 roundHolderOne.add(convertSeconds(workoutTime.get(i)/1000));
                 typeHolderOne.add(typeOfRound.get(i));
               }
+              //If 8 or less rounds, add to second round adapter's String Array (and roundType).
               else {
                 roundHolderTwo.add(convertSeconds(workoutTime.get(i)/1000));
                 typeHolderTwo.add(typeOfRound.get(i));
