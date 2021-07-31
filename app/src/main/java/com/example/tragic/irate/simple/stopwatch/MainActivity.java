@@ -229,7 +229,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
 
-  //Todo: Round edits don't save or do anything.
+  //Todo: Add vertical divider + fade effect for transition from 8->9 rounds.
+  //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
   //Todo: #9 round still need to move further right.
@@ -351,27 +352,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
+
+    //Todo: All this occurs when editPopup is removed. For now, we just want the round values retained in lists for adapter display.
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
       titleChanged = false;
+      savedCycleAdapter.notifyDataSetChanged();
+
       //If a cycle has been selected via highlight to edit, we automatically update its contents. If not, we do nothing.
-      if (editingCycle) {
-          AsyncTask.execute(() -> {
-              saveCycles(false);
-              //Calling queryCycles() to fetch the latest post-save list our cycles.
-              queryCycles();
-              //Populates the savedCycleAdapter's array lists, formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
-              runOnUiThread(() -> {
-                  //Populates savedCycleAdapter's array lists from new database entry and updates adapter view.
-                  populateCycleList();
-                  savedCycleAdapter.notifyDataSetChanged();
-                  //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
-                  clearTimerArrays();
-                  editingCycle = false;
-              });
-          });
-      }
+//      if (editingCycle) {
+//          AsyncTask.execute(() -> {
+//              //Calling queryCycles() to fetch the latest post-save list our cycles.
+//              queryCycles();
+//              //Populates the savedCycleAdapter's array lists, formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
+//              runOnUiThread(() -> {
+//                  //Populates savedCycleAdapter's array lists from new database entry and updates adapter view.
+//                  populateCycleList();
+//                  savedCycleAdapter.notifyDataSetChanged();
+//                  //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
+//                  clearTimerArrays();
+//                  editingCycle = false;
+//              });
+//          });
+//      }
     });
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -549,8 +553,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
     LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
 
+    //Our two cycle round adapters.
     cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
-    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(),roundHolderTwo, typeHolderTwo);
+    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
+    //Only first adapter is used for Pom mode, so only needs to be set here.
     cycleRoundsAdapter.setMode(mode);
 
     roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
@@ -813,11 +819,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 roundHolderOne.add(convertSeconds(workoutTime.get(i)/1000));
                 typeHolderOne.add(typeOfRound.get(i));
               }
-              //If 8 or less rounds, add to second round adapter's String Array (and roundType).
-              else {
+              //If 9 or more rounds, add to second round adapter's String Array (and roundType).
+              if (i>=8) {
                 roundHolderTwo.add(convertSeconds(workoutTime.get(i)/1000));
                 typeHolderTwo.add(typeOfRound.get(i));
               }
+            }
+            if (workoutTime.size()<=8) {
+              roundRecyclerTwo.setVisibility(View.GONE);
+              recyclerLayoutOne.leftMargin = 240;
+            } else {
+              roundRecyclerTwo.setVisibility(View.VISIBLE);
+              recyclerLayoutOne.leftMargin = 5;
             }
             break;
           case 3:
@@ -1132,10 +1145,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Clears both timer millis arrays and their converted String arrays.
   public void clearTimerArrays() {
-    //Todo: workOuttime clearing doesn't let lists populate w/ in edit_highlight_cycle. Now tho, we're getting massive overpop even when deleting.
-    //Todo: retrieveCycles() gets us these two commented out values.
-//    workoutTime.clear();
-//    typeOfRound.clear();
     convertedWorkoutTime.clear();
     roundHolderOne.clear();
     roundHolderTwo.clear();
@@ -1610,7 +1619,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Adds 1-4 for type of round anytime we're adding a round.
           typeOfRound.add(roundType);
           //If total rounds are <=8, also add them to our holder lists (used for separating viewHolders into two columns.
-          if (convertedWorkoutTime.size()<=8) {
+          if (workoutTime.size()<=8) {
             roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
           } else {
@@ -1618,7 +1627,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
           }
           //If moving from one list to two, set its visibility and change layout params.
-          if (convertedWorkoutTime.size()==9) {
+          if (workoutTime.size()==9) {
             roundRecyclerTwo.setVisibility(View.VISIBLE);
             recyclerLayoutOne.leftMargin = 5;
           }
@@ -1645,7 +1654,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTime.remove(workoutTime.size()-1);
           convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
           //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
-          if (convertedWorkoutTime.size()<=7) {
+          if (workoutTime.size()<=7) {
             roundHolderOne.remove(roundHolderOne.size()-1);
             typeHolderOne.remove(typeHolderOne.size()-1);
           } else {
@@ -1653,7 +1662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             typeHolderTwo.remove(typeHolderTwo.size()-1);
           }
           //If moving from two lists to one, set its visibility and change layout params.
-          if (convertedWorkoutTime.size()==8) {
+          if (workoutTime.size()==8) {
             roundRecyclerTwo.setVisibility(View.GONE);
             recyclerLayoutOne.leftMargin = 240;
           }
@@ -1793,7 +1802,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       //Only calls retrieveCycle() if NOT editing, since it also clears our round lists and we need them retained.
       if (!editingCycle) retrieveCycle();
-      //Todo: This should trigger when coming from edit highlight.
+      //Updates any changes made to cycles.
       saveCycles(false);
     }
 

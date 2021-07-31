@@ -90,6 +90,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+      //
       setAnimation(modeOneRounds.round_count, position);
       setAnimation(modeOneRounds.workout_rounds, position);
 
