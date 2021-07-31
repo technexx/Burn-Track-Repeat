@@ -229,6 +229,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
 
+  //Todo: highlight edit is concatenating roundType from diff. cycles, likely using one in first position.
+  //Todo: Round fading in overlap w/ infinity visibility.
+  //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
+  //Todo: #9 round still need to move further right.
   //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
@@ -782,7 +786,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Todo: Test and make sure both adapters work here.
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
       editCyclesPopupWindow.showAsDropDown(tabLayout);
@@ -796,7 +799,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
         switch (mode) {
           case 1:
-            for (int i=0; i<workoutTime.size(); i++) convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
+            //Todo: Need these values in round one/two holder lists. workOutTime is pulled as an Integer Array in retrieveCycle()
+            //Todo: Only difference is now instead of convertLists, we need to use our roundHolder lists.
+            for (int i=0; i<workoutTime.size(); i++) {
+              if (i<=7) {
+                roundHolderOne.add(convertSeconds(workoutTime.get(i)/1000));
+                typeHolderOne.add(typeOfRound.get(i));
+              }
+              else {
+                roundHolderTwo.add(convertSeconds(workoutTime.get(i)/1000));
+                typeHolderTwo.add(typeOfRound.get(i));
+              }
+            }
             break;
           case 3:
             for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
@@ -1113,6 +1127,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void clearTimerArrays() {
     workoutTime.clear();
     convertedWorkoutTime.clear();
+    typeOfRound.clear();
+    roundHolderOne.clear();
+    roundHolderTwo.clear();
+    typeHolderOne.clear();
+    typeHolderTwo.clear();
+
     pomValuesTime.clear();
     convertedPomList.clear();
   }
@@ -1559,7 +1579,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (s2.getCurrentTextColor()==Color.RED) {
             if (breaksInfinity.getAlpha()!=1.0f) roundType = 3; else roundType = 4;
           }
-          //Adds 1-4 for type of round anytime we're adding a round.
+          //ConvertedWorkoutTime still used because we add converted values from different variables (set/breaks).
           switch (roundType) {
             case 1:
               workoutTime.add(setValue * 1000);
@@ -1578,6 +1598,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
               return;
           }
+          //Adds 1-4 for type of round anytime we're adding a round.
           typeOfRound.add(roundType);
           //If total rounds are <=8, also add them to our holder lists (used for separating viewHolders into two columns.
           if (convertedWorkoutTime.size()<=8) {
@@ -1645,7 +1666,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-
   }
 
   public String friendlyString(String altString) {
@@ -1719,12 +1739,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Getting instance of Cycles at selected position, creating a String Array from its concatenated String, and creating an Integer Array from that for use in our Timer and adapter displays.
         Cycles cycles = cyclesList.get(receivedPos);
         String[] tempSets = cycles.getWorkoutRounds().split(" - ");
+        //Todo: Parsing full ms value into list.
         for (int i=0; i<tempSets.length; i++) workoutTime.add(Integer.parseInt(tempSets[i]));
         String[] tempRoundTypes = cycles.getRoundType().split(" - ");
         for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
+
+        //Primary key ID of position selected.
         retrievedID = cyclesList.get(receivedPos).getId();
         cycleTitle = cycles.getTitle();
         break;
+        //Todo: Adapter for cycleList still uses converted var for Pom.
       case 3:
         PomCycles pomCycles = pomCyclesList.get(receivedPos);
         pomValuesTime.clear();
