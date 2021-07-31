@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
 
+  //Todo: Need to clear rounds when using FAB.
   //Todo: Add fade effect for transition from 8->9 rounds.
   //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
@@ -372,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //                  populateCycleList();
 //                  savedCycleAdapter.notifyDataSetChanged();
 //                  //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
-//                  clearTimerArrays();
+//                  clearRoundAdapterArrays();
 //                  editingCycle = false;
 //              });
 //          });
@@ -723,8 +724,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
-      //Clears timer arrays so they can be freshly populated.
-//      clearTimerArrays();
+      //Clears round adapter arrays so they can be freshly populated.
+      clearRoundAdapterArrays();
+      //Clears the two lists of actual timer values we are populating.
+      workoutTime.clear();
+      typeOfRound.clear();
+      //Updates round adapters so lists show as cleared.
+      cycleRoundsAdapter.notifyDataSetChanged();
+      cycleRoundsAdapterTwo.notifyDataSetChanged();
+      //Removed round divider.
+      roundListDivider.setVisibility(View.GONE);
       //Brings up menu to add/subtract rounds to new cycle.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       //Boolean set to true indicates a new, non-database-saved cycle is populating our editCyclesPopup. This is primarily used for onBackPressed, to determine whether to save it as a new entry, or update its current position in the database.
@@ -810,7 +819,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
 
         //Clears old array values.
-        clearTimerArrays();
+        clearRoundAdapterArrays();
         switch (mode) {
           case 1:
             //Populating String ArrayLists used to display rounds in editCycle popUp.
@@ -1149,7 +1158,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Clears both timer millis arrays and their converted String arrays.
-  public void clearTimerArrays() {
+  public void clearRoundAdapterArrays() {
     convertedWorkoutTime.clear();
     roundHolderOne.clear();
     roundHolderTwo.clear();
@@ -1755,7 +1764,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Gets instance of our database entity class based on which mode we're in. Converts its String into Integers and populates our timer arrays with them.
   public void retrieveCycle() {
-    //Clears the two lists we are populating.
+    //Clears the two lists of actual timer values we are populating.
     workoutTime.clear();
     typeOfRound.clear();
     //Calling cycleList instance based on sort mode.
@@ -1773,7 +1782,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrievedID = cyclesList.get(receivedPos).getId();
         cycleTitle = cycles.getTitle();
         break;
-        //Todo: Adapter for cycleList still uses converted var for Pom.
       case 3:
         PomCycles pomCycles = pomCyclesList.get(receivedPos);
         pomValuesTime.clear();
