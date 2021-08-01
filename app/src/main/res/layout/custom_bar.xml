@@ -41,6 +41,16 @@
     </ImageButton>
 
     <ImageButton
+        android:id="@+id/save_highlighted_cycle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/delete_highlighted_cycles"
+        android:backgroundTint="@color/black"
+        android:src="@drawable/save_icon">
+    </ImageButton>
+
+    <ImageButton
         android:id="@+id/delete_highlighted_cycles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

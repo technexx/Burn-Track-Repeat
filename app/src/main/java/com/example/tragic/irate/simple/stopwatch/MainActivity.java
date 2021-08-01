@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Button delete_all_cancel;
   TextView appHeader;
   ImageButton edit_highlighted_cycle;
+  ImageButton save_highlighted_cycle;
   ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
   TextView sort_text;
@@ -229,9 +230,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_value;
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
+  ConstraintLayout roundRecyclerLayout;
 
-  //Todo: Need to clear rounds when using FAB.
-  //Todo: Add fade effect for transition from 8->9 rounds.
+  //Todo: Disabled sort button still taking focus away from delete button. Listener for fade animations to set GONE after?
   //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
@@ -295,7 +296,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         appHeader.startAnimation(fadeOut);
         sort_text.startAnimation(fadeOut);
+        //If at least one item in our cycle list, enable the edit button.
         edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
+        //Disabling sort button since it is faded out and still active.
+        sort_text.setEnabled(false);
     }
   }
 
@@ -355,13 +359,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
 
-    //Todo: All this occurs when editPopup is removed. For now, we just want the round values retained in lists for adapter display.
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
       titleChanged = false;
       savedCycleAdapter.notifyDataSetChanged();
+      //If editing a cycle, call its removal method.
+      removeEditCycleMode(false);
 
+      //Todo: This should be called when saving cycles in edit mode, or in onBackPressed. As long as cycle adapter is updated.
       //If a cycle has been selected via highlight to edit, we automatically update its contents. If not, we do nothing.
 //      if (editingCycle) {
 //          AsyncTask.execute(() -> {
@@ -442,10 +448,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportActionBar().setCustomView(R.layout.custom_bar);
     appHeader = findViewById(R.id.app_header);
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
+    save_highlighted_cycle = findViewById(R.id.save_highlighted_cycle);
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
     sort_text = findViewById(R.id.sort_text);
     global_settings = findViewById(R.id.global_settings);
+    save_highlighted_cycle.setVisibility(View.INVISIBLE);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -571,6 +579,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerTwo.setLayoutManager(lm2);
     //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
 
+    roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     //Rounds begin unpopulated, so remove second recycler view.
     roundRecyclerTwo.setVisibility(View.GONE);
     //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
@@ -581,7 +590,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     recyclerLayoutTwo.leftMargin = 450;
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-    removeEditViews(false);
+    removeEditTimerViews(false);
     editCycleViews();
     convertEditTime(true);
     setEditValues();
@@ -644,7 +653,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               //UI views change, so running on main thread.
               runOnUiThread(()-> {
                   //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-                  removeEditViews(false);
+                  removeEditTimerViews(false);
                   editCycleViews();
                   populateCycleList();
                   savedCycleAdapter.notifyDataSetChanged();
@@ -680,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Sets a listener on our editCycles popup.
     editCyclesPopupView.setOnTouchListener((v, event) -> {
       //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
-      removeEditViews(true);
+      removeEditTimerViews(true);
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
         float xPos = event.getX();
         float yPos = event.getY();
@@ -837,6 +846,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 typeHolderTwo.add(typeOfRound.get(i));
               }
             }
+            break;
+          case 3:
+            for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
+            break;
+        }
+        runOnUiThread(()-> {
+          //Changes view layout depending on +/- 8 round count.
+          if (mode==1) {
+            edit_highlighted_cycle.setVisibility(View.INVISIBLE);
+            save_highlighted_cycle.setVisibility(View.VISIBLE);
             if (workoutTime.size()<=8) {
               roundRecyclerTwo.setVisibility(View.GONE);
               recyclerLayoutOne.leftMargin = 240;
@@ -846,12 +865,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               recyclerLayoutOne.leftMargin = 5;
               roundListDivider.setVisibility(View.VISIBLE);
             }
-            break;
-          case 3:
-            for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
-            break;
-        }
-        runOnUiThread(()-> {
+          }
           cycle_name_text.setVisibility(View.VISIBLE);
           cycle_name_edit.setVisibility(View.INVISIBLE);
           cycle_name_text.setText(cycleTitle);
@@ -880,6 +894,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_name_edit.setOnLongClickListener(v-> {
       cycle_name_edit.selectAll();
       return true;
+    });
+
+    save_highlighted_cycle.setOnClickListener(v-> {
+      saveCycles(false);
     });
 
     delete_highlighted_cycle.setOnClickListener(v-> {
@@ -911,15 +929,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Turns off our cycle highlight mode from adapter.
     cancelHighlight.setOnClickListener(v-> {
-        edit_highlighted_cycle.startAnimation(fadeOut);
-        cancelHighlight.startAnimation(fadeOut);
-        delete_highlighted_cycle.startAnimation(fadeOut);
-
-        appHeader.startAnimation(fadeIn);
-        sort_text.startAnimation(fadeIn);
-
-        savedCycleAdapter.removeHighlight(true);
-        savedCycleAdapter.notifyDataSetChanged();
+      removeEditCycleMode(true);
     });
     ////--ActionBar Item onClicks END--////
 
@@ -1136,6 +1146,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Removes confirmation window.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
+  }
+
+  public void removeEditCycleMode(boolean fadeButtons) {
+    //Boolean used to keep launchCycles() from calling retrieveCycles(), which replace our current timer array list w/ one fetched from DB.
+    editingCycle = false;
+    //Switches off highlight mode logic from cycle adapter
+    savedCycleAdapter.removeHighlight(true);
+    //Updates cycle adapter.
+    savedCycleAdapter.notifyDataSetChanged();
+    //Re-enabling sort button now that edit mode has exited.
+    sort_text.setEnabled(true);
+    //If displaying cycle adapter, fade transitions between action bar image buttons. If displaying edit cycle popup, simply switch visibilities.
+    if (fadeButtons) {
+      edit_highlighted_cycle.startAnimation(fadeOut);
+      cancelHighlight.startAnimation(fadeOut);
+      delete_highlighted_cycle.startAnimation(fadeOut);
+      appHeader.startAnimation(fadeIn);
+      sort_text.startAnimation(fadeIn);
+    } else {
+      //Animations must be cleared to set visibilities.
+      appHeader.clearAnimation();
+      sort_text.clearAnimation();
+      edit_highlighted_cycle.clearAnimation();
+      delete_highlighted_cycle.clearAnimation();
+      appHeader.setVisibility(View.VISIBLE);
+      sort_text.setVisibility(View.VISIBLE);
+      edit_highlighted_cycle.setVisibility(View.GONE);
+      save_highlighted_cycle.setVisibility(View.GONE);
+      delete_highlighted_cycle.setVisibility(View.GONE);
+    }
   }
 
   public void setSortCheckmark() {
@@ -1503,7 +1543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Sets all of our editTexts to Invisible.
-  public void removeEditViews(boolean reinstateText) {
+  public void removeEditTimerViews(boolean reinstateText) {
     first_value_edit.setVisibility(View.GONE);
     first_value_sep.setVisibility(View.GONE);
     first_value_edit.setVisibility(View.GONE);
@@ -1642,6 +1682,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           //If moving from one list to two, set its visibility and change layout params.
           if (workoutTime.size()==9) {
+//            roundRecyclerLayout.startAnimation(fadeIn);
             roundRecyclerTwo.setVisibility(View.VISIBLE);
             recyclerLayoutOne.leftMargin = 5;
             roundListDivider.setVisibility(View.VISIBLE);
@@ -1815,6 +1856,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       saveCycles(true);
       //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
     } else {
+      //Todo: This can simply update db w/ arrays. Better for speed if we don't call retrieveCycle().
       //Only calls retrieveCycle() if NOT editing, since it also clears our round lists and we need them retained.
       if (!editingCycle) retrieveCycle();
       //Updates any changes made to cycles.
