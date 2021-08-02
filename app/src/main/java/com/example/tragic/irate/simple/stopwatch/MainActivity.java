@@ -231,6 +231,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
   ConstraintLayout roundRecyclerLayout;
+  int FADE_IN_HIGHLIGHT_MODE = 1;
+  int FADE_OUT_HIGHLIGHT_MODE = 2;
+  int FADE_IN_EDIT_CYCLE = 3;
+  int FADE_OUT_EDIT_CYCLE = 4;
 
   //Todo: Disabled sort button still taking focus away from delete button. Listener for fade animations to set GONE after?
   //Todo: Round fading only works once for each round.
@@ -288,18 +292,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
     //Receives list of cycle positions highlighted.
     receivedHighlightPositions = listOfPositions;
-    //Sets "highlight mode" actionBar buttons to Visible if entering mode.
+    //Sets "highlight mode" actionBar buttons to Visible if entering mode (i.e. selecting first item).
     if (addButtons) {
-        edit_highlighted_cycle.startAnimation(fadeIn);
-        delete_highlighted_cycle.startAnimation(fadeIn);
-        cancelHighlight.startAnimation(fadeIn);
-
-        appHeader.startAnimation(fadeOut);
-        sort_text.startAnimation(fadeOut);
-        //If at least one item in our cycle list, enable the edit button.
-        edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
-        //Disabling sort button since it is faded out and still active.
-        sort_text.setEnabled(false);
+      //If at least one item in our cycle list, enable the edit button.
+      edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
+      //Fading app name text + sort button out, edit and delete buttons in.
+      fadeEditCycleButtonsIn(FADE_IN_HIGHLIGHT_MODE);
     }
   }
 
@@ -358,33 +356,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
-
-    //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
-    editCyclesPopupWindow.setOnDismissListener(() -> {
-      //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
-      titleChanged = false;
-      savedCycleAdapter.notifyDataSetChanged();
-      //If editing a cycle, call its removal method.
-      removeEditCycleMode(false);
-
-      //Todo: This should be called when saving cycles in edit mode, or in onBackPressed. As long as cycle adapter is updated.
-      //If a cycle has been selected via highlight to edit, we automatically update its contents. If not, we do nothing.
-//      if (editingCycle) {
-//          AsyncTask.execute(() -> {
-//              //Calling queryCycles() to fetch the latest post-save list our cycles.
-//              queryCycles();
-//              //Populates the savedCycleAdapter's array lists, formally updates recyclerView for saved cycles, dismisses edit popUp and then clears arrays for both saved cycles and rounds.
-//              runOnUiThread(() -> {
-//                  //Populates savedCycleAdapter's array lists from new database entry and updates adapter view.
-//                  populateCycleList();
-//                  savedCycleAdapter.notifyDataSetChanged();
-//                  //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
-//                  clearRoundAdapterArrays();
-//                  editingCycle = false;
-//              });
-//          });
-//      }
-    });
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -813,10 +784,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
+    //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
+    editCyclesPopupWindow.setOnDismissListener(() -> {
+      //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
+      titleChanged = false;
+      savedCycleAdapter.notifyDataSetChanged();
+      //Calls method that sets views for our edit cycles mode.
+      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+    });
+
+    //Todo: Here, edit popup is displayed. Add Save button vis/enable and make sure trash work (already visible if we were in edit mode on cycle main).
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
-      //Turns edit mode on. When on, we do not clear the our round array lists, since we need their values to edit.
-      editingCycle = true;
+      fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
+      //Displays edit cycles popUp.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       AsyncTask.execute(()-> {
         //Grabs current database list of cycles.
@@ -854,8 +835,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> {
           //Changes view layout depending on +/- 8 round count.
           if (mode==1) {
-            edit_highlighted_cycle.setVisibility(View.INVISIBLE);
-            save_highlighted_cycle.setVisibility(View.VISIBLE);
             if (workoutTime.size()<=8) {
               roundRecyclerTwo.setVisibility(View.GONE);
               recyclerLayoutOne.leftMargin = 240;
@@ -882,22 +861,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
-    //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
-    cycle_name_text.setOnClickListener(v-> {
-      cycle_name_text.setVisibility(View.INVISIBLE);
-      cycle_name_edit.setVisibility(View.VISIBLE);
-      cycle_name_edit.requestFocus();
-      inputMethodManager.showSoftInput(cycle_name_edit, 0);
+    //Turns off our cycle highlight mode from adapter.
+    cancelHighlight.setOnClickListener(v-> {
+      savedCycleAdapter.removeHighlight(true);
+      savedCycleAdapter.notifyDataSetChanged();
+      fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
     });
 
-    //Selects all text when long clicking in editText.
-    cycle_name_edit.setOnLongClickListener(v-> {
-      cycle_name_edit.selectAll();
-      return true;
-    });
-
+    //Todo: This dismisses window on click because of focus (probably).
+    //Todo; Not saving.
     save_highlighted_cycle.setOnClickListener(v-> {
-      saveCycles(false);
+      AsyncTask.execute(()-> {
+        saveCycles(false);
+        runOnUiThread(()-> {
+          populateCycleList();
+          savedCycleAdapter.notifyDataSetChanged();
+          //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
+          clearRoundAdapterArrays();
+          Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+        });
+      });
     });
 
     delete_highlighted_cycle.setOnClickListener(v-> {
@@ -927,10 +910,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
-    //Turns off our cycle highlight mode from adapter.
-    cancelHighlight.setOnClickListener(v-> {
-      removeEditCycleMode(true);
+    //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
+    cycle_name_text.setOnClickListener(v-> {
+      cycle_name_text.setVisibility(View.INVISIBLE);
+      cycle_name_edit.setVisibility(View.VISIBLE);
+      cycle_name_edit.requestFocus();
+      inputMethodManager.showSoftInput(cycle_name_edit, 0);
     });
+
+    //Selects all text when long clicking in editText.
+    cycle_name_edit.setOnLongClickListener(v-> {
+      cycle_name_edit.selectAll();
+      return true;
+    });
+
     ////--ActionBar Item onClicks END--////
 
     ////--EditCycles Menu Item onClicks START--////
@@ -1148,33 +1141,59 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  public void removeEditCycleMode(boolean fadeButtons) {
-    //Boolean used to keep launchCycles() from calling retrieveCycles(), which replace our current timer array list w/ one fetched from DB.
+  //Fades action bar buttons in/out depending on whether we are editing cycles or not.
+  public void fadeEditCycleButtonsIn(int typeOfFade) {
+    //Clearing all animations. If we don't, their alphas tend to get reset.
+    edit_highlighted_cycle.clearAnimation();
+    save_highlighted_cycle.clearAnimation();
+    delete_highlighted_cycle.clearAnimation();
+    cancelHighlight.clearAnimation();
+    appHeader.clearAnimation();
+    sort_text.clearAnimation();
+    //Only needs to be true if editor is active, which is only the case where it is set to true below.
     editingCycle = false;
-    //Switches off highlight mode logic from cycle adapter
-    savedCycleAdapter.removeHighlight(true);
-    //Updates cycle adapter.
-    savedCycleAdapter.notifyDataSetChanged();
-    //Re-enabling sort button now that edit mode has exited.
-    sort_text.setEnabled(true);
-    //If displaying cycle adapter, fade transitions between action bar image buttons. If displaying edit cycle popup, simply switch visibilities.
-    if (fadeButtons) {
+    if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
+      //Boolean used to keep launchCycles() from calling retrieveCycles(), which replace our current timer array list w/ one fetched from DB.
+      edit_highlighted_cycle.startAnimation(fadeIn);
+      delete_highlighted_cycle.startAnimation(fadeIn);
+      cancelHighlight.startAnimation(fadeIn);
+      appHeader.startAnimation(fadeOut);
+      sort_text.startAnimation(fadeOut);
+      //Disabling sort button since it is faded out and still active.
+      sort_text.setEnabled(false);
+      //Enabling edit/delete buttons.
+      edit_highlighted_cycle.setEnabled(true);
+      delete_highlighted_cycle.setEnabled(true);
+      //Views for not-in-edit-mode.
+    }
+    if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
+      //Boolean used to keep launchCycles() from calling retrieveCycles(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeOut);
-      cancelHighlight.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
+      cancelHighlight.startAnimation(fadeOut);
       appHeader.startAnimation(fadeIn);
       sort_text.startAnimation(fadeIn);
-    } else {
-      //Animations must be cleared to set visibilities.
-      appHeader.clearAnimation();
-      sort_text.clearAnimation();
-      edit_highlighted_cycle.clearAnimation();
-      delete_highlighted_cycle.clearAnimation();
-      appHeader.setVisibility(View.VISIBLE);
-      sort_text.setVisibility(View.VISIBLE);
-      edit_highlighted_cycle.setVisibility(View.GONE);
-      save_highlighted_cycle.setVisibility(View.GONE);
-      delete_highlighted_cycle.setVisibility(View.GONE);
+      //Re-enabling sort button now that edit mode has exited.
+      sort_text.setEnabled(true);
+      //Disabling edit/delete buttons.
+      edit_highlighted_cycle.setEnabled(false);
+      delete_highlighted_cycle.setEnabled(false);
+    }
+    if (typeOfFade==FADE_IN_EDIT_CYCLE) {
+      editingCycle = true;
+      save_highlighted_cycle.startAnimation(fadeIn);
+      edit_highlighted_cycle.startAnimation(fadeOut);
+      edit_highlighted_cycle.setEnabled(false);
+      save_highlighted_cycle.setEnabled(true);
+      delete_highlighted_cycle.setEnabled(true);
+    }
+    if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
+      appHeader.startAnimation(fadeIn);
+      sort_text.startAnimation(fadeIn);
+      save_highlighted_cycle.startAnimation(fadeOut);
+      delete_highlighted_cycle.startAnimation(fadeOut);
+      save_highlighted_cycle.setEnabled(false);
+      delete_highlighted_cycle.setEnabled(false);
     }
   }
 
