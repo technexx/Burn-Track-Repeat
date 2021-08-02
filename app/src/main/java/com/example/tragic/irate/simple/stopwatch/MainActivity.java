@@ -252,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: editCycle popUp precludes action bar button use at the moment because it retains app focus. We can't remove that without borking other stuff (e.g. soft keyboard use).
   //Todo: There is a lingering sync issue between type of rounds and workout rounds.
   //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
@@ -806,8 +807,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
         //Uses this single position to retrieve cycle and populate timer arrays.
         retrieveCycle();
-        //Our convertedXX lists are used to populate the recyclerView we use in our editCycles popUp. We retrieve their values here from the database entry received above.
-
         //Clears old array values.
         clearRoundAdapterArrays();
         switch (mode) {
@@ -868,20 +867,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
     });
 
-    //Todo: This dismisses window on click because of focus (probably).
-    //Todo; Not saving.
-    save_highlighted_cycle.setOnClickListener(v-> {
-      AsyncTask.execute(()-> {
-        saveCycles(false);
-        runOnUiThread(()-> {
-          populateCycleList();
-          savedCycleAdapter.notifyDataSetChanged();
-          //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
-          clearRoundAdapterArrays();
-          Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
-        });
-      });
-    });
+//    save_highlighted_cycle.setOnClickListener(v-> {
+//      AsyncTask.execute(()-> {
+//        saveCycles(false);
+//        runOnUiThread(()-> {
+//          populateCycleList();
+//          savedCycleAdapter.notifyDataSetChanged();
+//          //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
+//          clearRoundAdapterArrays();
+//          Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+//        });
+//      });
+//    });
 
     delete_highlighted_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
@@ -1145,7 +1142,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void fadeEditCycleButtonsIn(int typeOfFade) {
     //Clearing all animations. If we don't, their alphas tend to get reset.
     edit_highlighted_cycle.clearAnimation();
-    save_highlighted_cycle.clearAnimation();
     delete_highlighted_cycle.clearAnimation();
     cancelHighlight.clearAnimation();
     appHeader.clearAnimation();
@@ -1181,18 +1177,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (typeOfFade==FADE_IN_EDIT_CYCLE) {
       editingCycle = true;
-      save_highlighted_cycle.startAnimation(fadeIn);
-      edit_highlighted_cycle.startAnimation(fadeOut);
-      edit_highlighted_cycle.setEnabled(false);
-      save_highlighted_cycle.setEnabled(true);
+//      edit_highlighted_cycle.startAnimation(fadeOut);
+//      edit_highlighted_cycle.setEnabled(false);
       delete_highlighted_cycle.setEnabled(true);
+      edit_highlighted_cycle.setVisibility(View.GONE);
+      sort_text.setVisibility(View.GONE);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-      appHeader.startAnimation(fadeIn);
-      sort_text.startAnimation(fadeIn);
-      save_highlighted_cycle.startAnimation(fadeOut);
-      delete_highlighted_cycle.startAnimation(fadeOut);
-      save_highlighted_cycle.setEnabled(false);
+//      appHeader.startAnimation(fadeIn);
+//      sort_text.startAnimation(fadeIn);
+      sort_text.setVisibility(View.VISIBLE);
+      delete_highlighted_cycle.setVisibility(View.GONE);
       delete_highlighted_cycle.setEnabled(false);
     }
   }
@@ -1877,6 +1872,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       //Todo: This can simply update db w/ arrays. Better for speed if we don't call retrieveCycle().
       //Only calls retrieveCycle() if NOT editing, since it also clears our round lists and we need them retained.
+      //Todo: DB saves use a converted workoutTime and typeOfRound array. They must be populated to update cycles. Why not just populate these lists w/ the db values from retrieved cycle?
       if (!editingCycle) retrieveCycle();
       //Updates any changes made to cycles.
       saveCycles(false);
@@ -1902,7 +1898,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Sends the current cycle's database position so we can delete it from the Timer class if desired.
       intent.putExtra("passedID", retrievedID);
     }
-    Log.i("testList", "workout time list in LAUNCH is " + workoutTime);
     //Starts Timer class.
     startActivity(intent);
   }
@@ -1935,6 +1930,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutString = friendlyString(workoutString);
         roundTypeString = gson.toJson(typeOfRound);
         roundTypeString = friendlyString(roundTypeString);
+        Log.i("testsave", "db workout times are  " + cycles.getWorkoutRounds());
+        Log.i("testsave", "workoutTime is " + workoutTime);
         //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
         if (!workoutString.equals("")) {
           //Adding and inserting into database.
