@@ -243,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
+  //Todo: We may be getting extra cycle saves on app close/relaunch.
   //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
@@ -1964,7 +1965,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Setting most recent time accessed for sort mode.
           cycles.setTimeAccessed(System.currentTimeMillis());
           cycles.setItemCount(workoutTime.size());
-          if (!cycleTitle.isEmpty()) cycles.setTitle(cycleTitle); else cycles.setTitle(date);
           //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
           if (newCycle) {
             //Only setting timeAdded for NEW cycle. We want our (sort by date) to use the initial time/date.
@@ -1972,11 +1972,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTotalSetTime(0);
             cycles.setTotalBreakTime(0);
             cycles.setCyclesCompleted(0);
+            //If cycle is new, set title to given, or to current date/time if none given. If cycle is NOT new, only set to what has been entered (or keep old one if unchanged).
+            if (!cycleTitle.isEmpty()) cycles.setTitle(cycleTitle); else cycles.setTitle(date);
+            //If cycle is new, insert a new row.
+            cyclesDatabase.cyclesDao().insertCycle(cycles);
+          } else {
+            if (cycleTitle.isEmpty()) cycles.setTitle(cycleTitle);
+            //If cycle is old, update current row.
+            cyclesDatabase.cyclesDao().updateCycles(cycles);
           }
-          //If cycle is new, insert a new row. Otherwise, update current row.
-          if (newCycle) cyclesDatabase.cyclesDao().insertCycle(cycles); else cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
         break;
+        //Todo: Repeat date fix.
       case 3:
         //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
         if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
@@ -1989,9 +1996,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!pomString.equals("")) {
           pomCycles.setFullCycle(pomString);
           pomCycles.setTimeAccessed(System.currentTimeMillis());;
-          if (newCycle) pomCycles.setTimeAdded(System.currentTimeMillis());
-          if (!cycleTitle.isEmpty()) pomCycles.setTitle(cycleTitle); else pomCycles.setTitle(date);
-          if (newCycle) cyclesDatabase.cyclesDao().insertPomCycle(pomCycles); else cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+          if (newCycle) {
+            pomCycles.setTimeAdded(System.currentTimeMillis());
+            if (!cycleTitle.isEmpty()) pomCycles.setTitle(cycleTitle); else pomCycles.setTitle(date);
+            cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
+          } else {
+            if (!cycleTitle.isEmpty()) pomCycles.setTitle(cycleTitle);
+            cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+          }
         }
         break;
     }
