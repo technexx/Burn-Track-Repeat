@@ -243,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
-  //Todo: Disabled sort button still taking focus away from delete button. Listener for fade animations to set GONE after?
   //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
@@ -511,69 +510,66 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    //Todo: Diff. solution other than post-delay. May also be responsible for some of the lag.
-    mHandler.postDelayed(() -> {
-      AsyncTask.execute(() -> {
-        //Loads database of saved cycles.
-        cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-        //Calls instance of Cycle entity list based on sort mode.
-        queryCycles();
+    AsyncTask.execute(() -> {
+      //Loads database of saved cycles.
+      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+      //Calls instance of Cycle entity list based on sort mode.
+      queryCycles();
 
-        //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
-        populateCycleList(true);
-        runOnUiThread(()-> {
-          //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
-          LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-          savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, pomArray, workoutTitleArray, pomTitleArray);
-          savedCycleRecycler.setAdapter(savedCycleAdapter);
-          savedCycleRecycler.setLayoutManager(lm2);
-          //Instantiating callbacks from adapter.
-          savedCycleAdapter.setItemClick(MainActivity.this);
-          savedCycleAdapter.setHighlight(MainActivity.this);
-          //Setting mode from savedPref so we are on whichever one was previously used.
-          savedCycleAdapter.setView(mode);
+      //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
+      populateCycleList(true);
+      runOnUiThread(()-> {
+        //Adapter and Recycler for round views within our editCycles popUp.
+        LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
 
-          //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
-          savedCycleAdapter.notifyDataSetChanged();
-        });
+        //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
+        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, pomArray, workoutTitleArray, pomTitleArray);
+        savedCycleRecycler.setAdapter(savedCycleAdapter);
+        savedCycleRecycler.setLayoutManager(lm);
+        //Instantiating callbacks from adapter.
+        savedCycleAdapter.setItemClick(MainActivity.this);
+        savedCycleAdapter.setHighlight(MainActivity.this);
+        //Setting mode from savedPref so we are on whichever one was previously used.
+        savedCycleAdapter.setView(mode);
+
+        //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
+        savedCycleAdapter.notifyDataSetChanged();
+
+        //Our two cycle round adapters.
+        cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
+        cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
+        //Only first adapter is used for Pom mode, so only needs to be set here.
+        cycleRoundsAdapter.setMode(mode);
+
+        roundListDivider = editCyclesPopupView.findViewById(R.id.round_list_divider);
+        roundListDivider.setVisibility(View.GONE);
+        roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
+        roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
+        roundRecycler.setAdapter(cycleRoundsAdapter);
+        roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
+        roundRecycler.setLayoutManager(lm2);
+        roundRecyclerTwo.setLayoutManager(lm3);
+        //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
+
+        roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
+        //Rounds begin unpopulated, so remove second recycler view.
+        roundRecyclerTwo.setVisibility(View.GONE);
+        //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
+        recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
+        recyclerLayoutTwo = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
+        //Using exclusively programmatic layout params for round recyclerViews. Setting defaults. Second will never change.
+        recyclerLayoutOne.leftMargin = 240;
+        recyclerLayoutTwo.leftMargin = 450;
+
+        //Sets all editTexts to GONE, and then populates them + textViews based on mode.
+        removeEditTimerViews(false);
+        editCycleViews();
+        convertEditTime(true);
+        setEditValues();
       });
-    },50);
-
-    //Adapter and Recycler for round views within our editCycles popUp.
-    LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
-    LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-
-    //Our two cycle round adapters.
-    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
-    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
-    //Only first adapter is used for Pom mode, so only needs to be set here.
-    cycleRoundsAdapter.setMode(mode);
-
-    roundListDivider = editCyclesPopupView.findViewById(R.id.round_list_divider);
-    roundListDivider.setVisibility(View.GONE);
-    roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
-    roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
-    roundRecycler.setAdapter(cycleRoundsAdapter);
-    roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
-    roundRecycler.setLayoutManager(lm);
-    roundRecyclerTwo.setLayoutManager(lm2);
-    //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
-
-    roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
-    //Rounds begin unpopulated, so remove second recycler view.
-    roundRecyclerTwo.setVisibility(View.GONE);
-    //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
-    recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
-    recyclerLayoutTwo = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
-    //Using exclusively programmatic layout params for round recyclerViews. Setting defaults. Second will never change.
-    recyclerLayoutOne.leftMargin = 240;
-    recyclerLayoutTwo.leftMargin = 450;
-
-    //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-    removeEditTimerViews(false);
-    editCycleViews();
-    convertEditTime(true);
-    setEditValues();
+    });
 
     //Listens to cycle title for changes.
     titleTextWatcher = new TextWatcher() {
