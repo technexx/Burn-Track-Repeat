@@ -175,6 +175,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> convertedPomList;
   ArrayList<String> pomTitleArray;
   ArrayList<String> pomArray;
+  String workoutString;
+  String roundTypeString;
+  String pomString;
 
   ArrayList<Integer> typeOfRound;
   ArrayList<String> typeOfRoundArray;
@@ -512,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryCycles();
 
         //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
-        populateCycleList();
+        populateCycleList(true);
         runOnUiThread(()-> {
           //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
           LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -627,7 +630,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   //Sets all editTexts to GONE, and then populates them + textViews based on mode.
                   removeEditTimerViews(false);
                   editCycleViews();
-                  populateCycleList();
+                  populateCycleList(true);
                   savedCycleAdapter.notifyDataSetChanged();
                   if (mode==1||mode==2) {
                       sortHigh.setVisibility(View.VISIBLE);
@@ -764,7 +767,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           queryCycles();
           runOnUiThread(()-> {
             //Populates adapter arrays.
-            populateCycleList();
+            populateCycleList(true);
             //Refreshes adapter.
             savedCycleAdapter.notifyDataSetChanged();
             //Sets checkmark view.
@@ -787,14 +790,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-      //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
-      titleChanged = false;
-      savedCycleAdapter.notifyDataSetChanged();
-      //Calls method that sets views for our edit cycles mode.
-      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+      AsyncTask.execute(()-> {
+        //If at least one round exists, insert or update cycle list in database.
+        if (workoutTime.size()>0) if (!editingCycle) saveCycles(true); else saveCycles(false);
+         runOnUiThread(()-> {
+           Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+           //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
+           titleChanged = false;
+           //Todo: Only save if values changed. Set listeners?
+           //Saves edited cycle to database.
+           saveCycles(false);
+           //Updates our cycle list adapter's arrayList w/ out querying database.
+           populateCycleList(false);
+           //Updates our cycle list.
+           savedCycleAdapter.notifyDataSetChanged();
+           //Calls method that sets views for our edit cycles mode.
+           fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+         });
+      });
     });
 
-    //Todo: Here, edit popup is displayed. Add Save button vis/enable and make sure trash work (already visible if we were in edit mode on cycle main).
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
@@ -867,19 +882,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
     });
 
-//    save_highlighted_cycle.setOnClickListener(v-> {
-//      AsyncTask.execute(()-> {
-//        saveCycles(false);
-//        runOnUiThread(()-> {
-//          populateCycleList();
-//          savedCycleAdapter.notifyDataSetChanged();
-//          //Clears the individual round arrays, so re-opening this popUp will show blank rounds instead of the ones we just edited and saved.
-//          clearRoundAdapterArrays();
-//          Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
-//        });
-//      });
-//    });
-
     delete_highlighted_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
         ArrayList<String> tempPos = new ArrayList<>(receivedHighlightPositions);
@@ -892,7 +894,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Calls new database entries and updates our adapter's recyclerView.
         runOnUiThread(() -> {
           queryCycles();
-          populateCycleList();
+          populateCycleList(true);
           savedCycleAdapter.notifyDataSetChanged();
           receivedHighlightPositions = tempPos;
           //If there are no cycles left, cancel highlight mode. If there are any left, simply remove all highlights.
@@ -1126,7 +1128,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryCycles();
         runOnUiThread(()->{
           //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-          populateCycleList();
+          populateCycleList(true);
           savedCycleAdapter.notifyDataSetChanged();
         });
       });
@@ -1792,20 +1794,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
   //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
-  public void populateCycleList() {
+  public void populateCycleList(boolean queryDB) {
     switch (mode) {
       case 1:
-        workoutCyclesArray.clear();
-        typeOfRoundArray.clear();
-        workoutTitleArray.clear();
-        for (int i=0; i<cyclesList.size(); i++) {
-          //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
-          workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-          //Retrieves title for use when editing a cycle.
-          workoutTitleArray.add(cyclesList.get(i).getTitle());
-          //Adds concatenated roundType String used in each cycle.
-          typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+        //If we need to fetch values from database, do this.
+        if (queryDB) {
+          workoutCyclesArray.clear();
+          typeOfRoundArray.clear();
+          workoutTitleArray.clear();
+          for (int i=0; i<cyclesList.size(); i++) {
+            //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
+            workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+            //Retrieves title for use when editing a cycle.
+            workoutTitleArray.add(cyclesList.get(i).getTitle());
+            //Adds concatenated roundType String used in each cycle.
+            typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+          }
+        } else {
+          //If we have the values in our workOutTime and typeOFRound arrays already, simply pass them into cycleList's adapter arrays.
+          workoutCyclesArray.set(receivedPos, workoutString);
+          typeOfRoundArray.set(receivedPos, roundTypeString);
+          workoutTitleArray.set(receivedPos, cycleTitle);
         }
+
         break;
       case 3:
         pomArray.clear();
@@ -1870,9 +1881,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       saveCycles(true);
       //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
     } else {
-      //Todo: This can simply update db w/ arrays. Better for speed if we don't call retrieveCycle().
       //Only calls retrieveCycle() if NOT editing, since it also clears our round lists and we need them retained.
-      //Todo: DB saves use a converted workoutTime and typeOfRound array. They must be populated to update cycles. Why not just populate these lists w/ the db values from retrieved cycle?
       if (!editingCycle) retrieveCycle();
       //Updates any changes made to cycles.
       saveCycles(false);
@@ -1912,9 +1921,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Sets up Strings to save into database.
     Gson gson = new Gson();
-    String workoutString = "";
-    String roundTypeString = "";
-    String pomString = "";
+    workoutString = "";
+    roundTypeString = "";
+    pomString = "";
     if (titleChanged) cycleTitle = cycle_name_edit.getText().toString();
     int cycleID = 0;
     switch (mode) {
@@ -1930,8 +1939,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutString = friendlyString(workoutString);
         roundTypeString = gson.toJson(typeOfRound);
         roundTypeString = friendlyString(roundTypeString);
-        Log.i("testsave", "db workout times are  " + cycles.getWorkoutRounds());
-        Log.i("testsave", "workoutTime is " + workoutTime);
         //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
         if (!workoutString.equals("")) {
           //Adding and inserting into database.
