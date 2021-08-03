@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SharedPreferences.Editor prefEdit;
   View tabView;
   View mainView;
+  Gson gson;
 
   ImageButton fab;
   ImageButton stopwatch;
@@ -238,6 +239,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int FADE_OUT_HIGHLIGHT_MODE = 2;
   int FADE_IN_EDIT_CYCLE = 3;
   int FADE_OUT_EDIT_CYCLE = 4;
+  String timeCompare;
+  String typeCompare;
+  String titleCompare;
 
   //Todo: Disabled sort button still taking focus away from delete button. Listener for fade animations to set GONE after?
   //Todo: Round fading only works once for each round.
@@ -344,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
+    gson = new Gson();
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
@@ -790,6 +795,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
+      //Removes highlight when exiting edit mode.
+      savedCycleAdapter.removeHighlight(true);
+      savedCycleAdapter.notifyDataSetChanged();
+      //Calls method that sets views for our edit cycles mode.
+      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+      //If all fetched values equal current values (i.e. no changes have been made), exit method.
+      if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) return;
+
       AsyncTask.execute(()-> {
         //If at least one round exists, insert or update cycle list in database.
         if (workoutTime.size()>0) if (!editingCycle) saveCycles(true); else saveCycles(false);
@@ -797,15 +810,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
            Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
            //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
            titleChanged = false;
-           //Todo: Only save if values changed. Set listeners?
            //Saves edited cycle to database.
            saveCycles(false);
            //Updates our cycle list adapter's arrayList w/ out querying database.
            populateCycleList(false);
            //Updates our cycle list.
            savedCycleAdapter.notifyDataSetChanged();
-           //Calls method that sets views for our edit cycles mode.
-           fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
          });
       });
     });
@@ -841,6 +851,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 typeHolderTwo.add(typeOfRound.get(i));
               }
             }
+            //Title has already been retrieved via retrieveCycle().
             break;
           case 3:
             for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
@@ -1178,6 +1189,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(false);
     }
     if (typeOfFade==FADE_IN_EDIT_CYCLE) {
+      //Set to false by default, and true only with this conditional.
       editingCycle = true;
 //      edit_highlighted_cycle.startAnimation(fadeOut);
 //      edit_highlighted_cycle.setEnabled(false);
@@ -1830,6 +1842,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Gets instance of our database entity class based on which mode we're in. Converts its String into Integers and populates our timer arrays with them.
   public void retrieveCycle() {
+    //Resetting comparison vars.
+    timeCompare = "";
+    typeCompare = "";
+    titleCompare = "";
     //Clears the two lists of actual timer values we are populating.
     workoutTime.clear();
     typeOfRound.clear();
@@ -1847,6 +1863,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Primary key ID of position selected.
         retrievedID = cyclesList.get(receivedPos).getId();
         cycleTitle = cycles.getTitle();
+
+        //Retrieved cycle values from database. Used to compare to ones when in edit mode when determining whether we save/update db in (a) exiting edit back to main or (b) launching cycle.
+        timeCompare = gson.toJson(workoutTime);
+        typeCompare = gson.toJson(typeOfRound);
+        titleCompare = cycleTitle;
         break;
       case 3:
         PomCycles pomCycles = pomCyclesList.get(receivedPos);
