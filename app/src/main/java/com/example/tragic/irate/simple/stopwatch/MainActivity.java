@@ -259,8 +259,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: Centered "nothing saved" if cycle list empty.
   //Todo: editCycle popUp precludes action bar button use at the moment because it retains app focus. We can't remove that without borking other stuff (e.g. soft keyboard use).
-  //Todo: There is a lingering sync issue between type of rounds and workout rounds.
   //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: TDEE in sep popup w/ tabs.
@@ -792,28 +792,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-      //Removes highlight when exiting edit mode.
-      savedCycleAdapter.removeHighlight(true);
-      savedCycleAdapter.notifyDataSetChanged();
-      //Calls method that sets views for our edit cycles mode.
-      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
-      //If all fetched values equal current values (i.e. no changes have been made), exit method.
-      if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) return;
+
+      if (workoutTime.size()>0) {
+        //Removes highlight when exiting edit mode.
+        savedCycleAdapter.removeHighlight(true);
+        savedCycleAdapter.notifyDataSetChanged();
+        //Calls method that sets views for our edit cycles mode.
+        fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+        //If all fetched values equal current values (i.e. no changes have been made), exit method.
+        if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) return;
+      }
 
       AsyncTask.execute(()-> {
         //If at least one round exists, insert or update cycle list in database.
-        if (workoutTime.size()>0) if (!editingCycle) saveCycles(true); else saveCycles(false);
-         runOnUiThread(()-> {
-           Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
-           //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
-           titleChanged = false;
-           //Saves edited cycle to database.
-           saveCycles(false);
-           //Updates our cycle list adapter's arrayList w/ out querying database.
-           populateCycleList(false);
-           //Updates our cycle list.
-           savedCycleAdapter.notifyDataSetChanged();
-         });
+        if (workoutTime.size()>0) {
+          if (!editingCycle) saveCycles(true); else saveCycles(false);
+          runOnUiThread(()-> {
+            Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+            //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
+            titleChanged = false;
+            //Saves edited cycle to database.
+            saveCycles(false);
+            //Updates our cycle list adapter's arrayList w/ out querying database.
+            populateCycleList(false);
+            //Updates our cycle list.
+            savedCycleAdapter.notifyDataSetChanged();
+          });
+        }
+
       });
     });
 
@@ -1707,7 +1713,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           //If moving from one list to two, set its visibility and change layout params.
           if (workoutTime.size()==9) {
-//            roundRecyclerLayout.startAnimation(fadeIn);
             roundRecyclerTwo.setVisibility(View.VISIBLE);
             recyclerLayoutOne.leftMargin = 5;
             roundListDivider.setVisibility(View.VISIBLE);
@@ -1729,27 +1734,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     } else {
-      if (mode==1) {
-        if (workoutTime.size()>0) {
-          typeOfRound.remove(typeOfRound.size()-1);
-          workoutTime.remove(workoutTime.size()-1);
-          convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
-          //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
-          if (workoutTime.size()<=7) {
-            roundHolderOne.remove(roundHolderOne.size()-1);
-            typeHolderOne.remove(typeHolderOne.size()-1);
-          } else {
-            roundHolderTwo.remove(roundHolderTwo.size()-1);
-            typeHolderTwo.remove(typeHolderTwo.size()-1);
-          }
-          //If moving from two lists to one, set its visibility and change layout params.
-          if (workoutTime.size()==8) {
-            roundRecyclerTwo.setVisibility(View.GONE);
-            recyclerLayoutOne.leftMargin = 240;
-            roundListDivider.setVisibility(View.GONE);
-          }
-        } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
-      }
+      cycleRoundsAdapter.notifyDataSetChanged();
+      mHandler.postDelayed(()-> {
+        if (mode==1) {
+          if (workoutTime.size()>0) {
+            typeOfRound.remove(typeOfRound.size()-1);
+            workoutTime.remove(workoutTime.size()-1);
+            convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
+            //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
+            if (workoutTime.size()<=7) {
+              roundHolderOne.remove(roundHolderOne.size()-1);
+              typeHolderOne.remove(typeHolderOne.size()-1);
+            } else {
+              roundHolderTwo.remove(roundHolderTwo.size()-1);
+              typeHolderTwo.remove(typeHolderTwo.size()-1);
+            }
+            //If moving from two lists to one, set its visibility and change layout params.
+            if (workoutTime.size()==8) {
+              roundRecyclerTwo.setVisibility(View.GONE);
+              recyclerLayoutOne.leftMargin = 240;
+              roundListDivider.setVisibility(View.GONE);
+            }
+          } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
+        }
+        cycleRoundsAdapter.notifyDataSetChanged();
+      },500);
+
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
         if (pomValuesTime.size() != 0) {
@@ -1762,8 +1772,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     //Updates our recyclerView list via adapter after each addition/subtraction of round.
-    cycleRoundsAdapter.notifyDataSetChanged();
-    cycleRoundsAdapterTwo.notifyDataSetChanged();
+//    cycleRoundsAdapter.notifyDataSetChanged();
+//    cycleRoundsAdapterTwo.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
   }
@@ -1983,7 +1993,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         break;
-        //Todo: Repeat date fix.
       case 3:
         //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
         if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
