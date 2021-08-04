@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortHolder = 1;
   int receivedPos;
   int retrievedID;
-  String cycleTitle;
+  String cycleTitle = "";
   List<String> receivedHighlightPositions;
 
   TextView cycle_name_text;
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
-  //Todo: We may be getting extra cycle saves on app close/relaunch.
+  //Todo: Auto-save on editDismiss is updating first row instead of new cycle.
   //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
@@ -792,7 +792,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-
       if (workoutTime.size()>0) {
         //Removes highlight when exiting edit mode.
         savedCycleAdapter.removeHighlight(true);
@@ -811,8 +810,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
             //Resets titleChanged boolean, which will be set to true again if our title's editText is touched.
             titleChanged = false;
-            //Saves edited cycle to database.
-            saveCycles(false);
+            //Saves new or update old cycle. Boolean is true if using FAB, false if coming from edit highlight.
+            saveCycles(isNewCycle);
             //Updates our cycle list adapter's arrayList w/ out querying database.
             populateCycleList(false);
             //Updates our cycle list.
@@ -1983,6 +1982,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTotalBreakTime(0);
             cycles.setCyclesCompleted(0);
             //If cycle is new, set title to given, or to current date/time if none given. If cycle is NOT new, only set to what has been entered (or keep old one if unchanged).
+            //Todo: Fetches null because it's being set to value in editText.
             if (!cycleTitle.isEmpty()) cycles.setTitle(cycleTitle); else cycles.setTitle(date);
             //If cycle is new, insert a new row.
             cyclesDatabase.cyclesDao().insertCycle(cycles);
