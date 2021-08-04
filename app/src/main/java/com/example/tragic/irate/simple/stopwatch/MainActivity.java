@@ -1707,9 +1707,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (workoutTime.size()<=8) {
             roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
+            cycleRoundsAdapter.notifyDataSetChanged();
           } else {
             roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
+            cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
           //If moving from one list to two, set its visibility and change layout params.
           if (workoutTime.size()==9) {
@@ -1734,31 +1736,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     } else {
-      cycleRoundsAdapter.notifyDataSetChanged();
-      mHandler.postDelayed(()-> {
-        if (mode==1) {
-          if (workoutTime.size()>0) {
-            typeOfRound.remove(typeOfRound.size()-1);
-            workoutTime.remove(workoutTime.size()-1);
-            convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
-            //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
-            if (workoutTime.size()<=7) {
-              roundHolderOne.remove(roundHolderOne.size()-1);
-              typeHolderOne.remove(typeHolderOne.size()-1);
-            } else {
-              roundHolderTwo.remove(roundHolderTwo.size()-1);
-              typeHolderTwo.remove(typeHolderTwo.size()-1);
-            }
-            //If moving from two lists to one, set its visibility and change layout params.
-            if (workoutTime.size()==8) {
-              roundRecyclerTwo.setVisibility(View.GONE);
-              recyclerLayoutOne.leftMargin = 240;
-              roundListDivider.setVisibility(View.GONE);
-            }
-          } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
-        }
-        cycleRoundsAdapter.notifyDataSetChanged();
-      },500);
+      if (mode==1) {
+        if (workoutTime.size()>0) {
+          typeOfRound.remove(typeOfRound.size()-1);
+          workoutTime.remove(workoutTime.size()-1);
+          convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
+          //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
+          if (workoutTime.size()<=7) {
+            roundHolderOne.remove(roundHolderOne.size()-1);
+            typeHolderOne.remove(typeHolderOne.size()-1);
+            cycleRoundsAdapter.notifyDataSetChanged();
+          } else {
+            roundHolderTwo.remove(roundHolderTwo.size()-1);
+            typeHolderTwo.remove(typeHolderTwo.size()-1);
+            cycleRoundsAdapterTwo.notifyDataSetChanged();
+          }
+          //If moving from two lists to one, set its visibility and change layout params.
+          if (workoutTime.size()==8) {
+            roundRecyclerTwo.setVisibility(View.GONE);
+            recyclerLayoutOne.leftMargin = 240;
+            roundListDivider.setVisibility(View.GONE);
+          }
+        } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
+      }
 
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().

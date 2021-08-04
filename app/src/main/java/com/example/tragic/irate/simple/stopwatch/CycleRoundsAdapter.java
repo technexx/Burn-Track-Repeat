@@ -93,7 +93,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-      //
+
       setAnimation(modeOneRounds.round_count, position);
       setAnimation(modeOneRounds.workout_rounds, position);
 
@@ -152,17 +152,18 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (position>lastPosition) {
       Animation animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
       textView.startAnimation(animateIn);
+      positionCount++;
+      //Forces this method to execute twice before resetting the lastPosition var, so it will execute for both textViews in onBindView.
+      if (positionCount==2) {
+        lastPosition = position;
+        positionCount = 0;
+      }
       //Todo: This is true for multiple positions because each iteration we change the lastPosition value. Also, remember that to fade out a row we need an instance of it, which we do not have if passing in the new (abridged) list instantly. Delay handler (in adjustCustom) may be best option, but we'd have to refresh twice.
-    } else if (position==mPositionHolder) {
-      Animation animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
-      textView.startAnimation(animateOut);
     }
-    positionCount++;
-    //Forces this method to execute twice before resetting the lastPosition var, so it will execute for both textViews in onBindView.
-    if (positionCount==2) {
-      lastPosition = position;
-      positionCount = 0;
-    }
+//    else if (position==mPositionHolder) {
+//      Animation animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+//      textView.startAnimation(animateOut);
+//    }
   }
 
   public String appendSeconds(String seconds) {
