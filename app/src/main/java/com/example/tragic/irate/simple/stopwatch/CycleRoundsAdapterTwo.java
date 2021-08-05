@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,18 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     Context mContext;
     ArrayList<String> mWorkOutList;
     ArrayList<Integer> mTypeOfRound;
-    int lastPosition = -1;
     int positionCount;
+    int mPosAddHolder;
+    int mPosSubHolder;
 
     public CycleRoundsAdapterTwo(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound) {
-        this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; }
+        this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound;
+    }
+
+    public void setFadePositions(int sub, int add) {
+        mPosSubHolder = sub; mPosAddHolder = add;
+        Log.i("testFade", "add holder is " + mPosAddHolder + " and sub holder is " + mPosSubHolder);
+    }
 
     @NonNull
     @Override
@@ -68,9 +76,9 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
-
         modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
+
         setAnimation(modeOneRounds.round_count, position);
         setAnimation(modeOneRounds.workout_rounds, position);
     }
@@ -94,19 +102,18 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     public void setAnimation(TextView textView, int position) {
-        if (position>lastPosition) {
-            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
-            textView.startAnimation(animation);
-            //Forces this method to execute twice before resetting the lastPosition var, so it will execute for both textViews in onBindView.
+        if (position==mPosAddHolder) {
+            Animation animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+            if (textView.getAnimation()!=animateIn) textView.startAnimation(animateIn);
             positionCount++;
-            if (positionCount==2) {
-                lastPosition = position;
-                positionCount = 0;
-            }
+            Log.i("testFade", "add true!");
+        } else if (position==mPosSubHolder) {
+            Animation animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+            if (textView.getAnimation()!=animateOut) textView.startAnimation(animateOut);
+            positionCount++;
+            Log.i("testFade", "sub true!");
         }
     }
-
-
 
     public String appendSeconds(String seconds) {
         if (seconds.length()==1) seconds = "0:0" + seconds;

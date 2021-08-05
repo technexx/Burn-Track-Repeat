@@ -32,11 +32,9 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_THREE = 3;
   int mMode = 1;
   List<Integer> mPositionList;
-  int lastPosition = -1;
   int positionCount;
   int mPosAddHolder;
   int mPosSubHolder;
-  boolean mFadeRound;
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
     this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; mPomList = pomList;
@@ -155,19 +153,12 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public void setAnimation(TextView textView, int position) {
     if (position==mPosAddHolder) {
       Animation animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
-      textView.startAnimation(animateIn);
+      if (textView.getAnimation()!=animateIn) textView.startAnimation(animateIn);
       positionCount++;
-      Log.i("testfade", "IN!");
     } else if (position==mPosSubHolder) {
       Animation animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
-      textView.startAnimation(animateOut);
+      if (textView.getAnimation()!=animateOut) textView.startAnimation(animateOut);
       positionCount++;
-      Log.i("testfade", "OUT!");
-    }
-    //Forces this method to execute twice before resetting the lastPosition var, so it will execute for both textViews in onBindView.
-    if (positionCount==2) {
-      lastPosition = position;
-      positionCount = 0;
     }
   }
 
