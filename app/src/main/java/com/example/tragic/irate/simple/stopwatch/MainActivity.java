@@ -409,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setsInfinity.setAlpha(0.3f);
     breaksInfinity.setAlpha(0.3f);
 
-    sortAccessed = sortCyclePopupView.findViewById(R.id.sort_last_accessed);
     sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
     sortAlphaEnd = sortCyclePopupView.findViewById(R.id.sort_title_end);
     sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
@@ -728,43 +727,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Uses single view for all sort buttons. Queries the appropriate cycle sort via the DAO and sets checkmark.
     View.OnClickListener sortListener = view -> {
+      //Must run this first to get sort mode.
+      //Casting View used by listener to textView, which we then check against its String value.
+      TextView textButton = (TextView) view;
+      //Handles checkmark views.
+      if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 1;
+      if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 2;
+      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 3;
+      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 4;
+      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
+      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
+      //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
+      if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(()-> {
-        //Must run this first to get sort mode.
+        queryCycles();
         runOnUiThread(()-> {
-          //Casting View used by listener to textView, which we then check against its String value.
-          TextView textButton = (TextView) view;
-          //Handles checkmark views.
-          if (textButton.getText().toString().equals("Last Accessed")) sortHolder = 7;
-          if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 1;
-          if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 2;
-          if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 3;
-          if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 4;
-          if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
-          if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
-          //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
-          if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
-        });
-        //Slight delay to ensure sortMode sets correctly. Without it, queryCycles() will fetch the old cycles list.
-        mHandler.postDelayed(()-> {
+          //Populates adapter arrays.
+          populateCycleList(true);
+          //Refreshes adapter.
+          savedCycleAdapter.notifyDataSetChanged();
+          //Sets checkmark view.
+          setSortCheckmark();
           sortPopupWindow.dismiss();
-          queryCycles();
-          runOnUiThread(()-> {
-            //Populates adapter arrays.
-            populateCycleList(true);
-            //Refreshes adapter.
-            savedCycleAdapter.notifyDataSetChanged();
-            //Sets checkmark view.
-            setSortCheckmark();
-          });
-          //Saves sort mode so it defaults to chosen whenever we create this activity.
-          prefEdit.putInt("sortMode", sortMode);
-          prefEdit.putInt("sortModePom", sortModePom);
-          prefEdit.apply();
-        },10);
+        });
+        //Saves sort mode so it defaults to chosen whenever we create this activity.
+        prefEdit.putInt("sortMode", sortMode);
+        prefEdit.putInt("sortModePom", sortModePom);
+        prefEdit.apply();
       });
     };
-    sortAccessed.setOnClickListener(sortListener);
     sortAlphaStart.setOnClickListener(sortListener);
     sortAlphaEnd.setOnClickListener(sortListener);
     sortRecent.setOnClickListener(sortListener);
@@ -1209,8 +1201,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortCheckmark.setY(398); break;
       case 6:
         sortCheckmark.setY(494); break;
-      case 7:
-        sortCheckmark.setY(590); break;
     }
   }
 
@@ -1782,7 +1772,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 4: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
                 case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
                 case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
-                case 7: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLastAccessed(); break;
               }
               break;
           case 3:
@@ -1791,7 +1780,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
                 case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
                 case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
-                case 5: pomCyclesList = cyclesDatabase.cyclesDao().loadPomLastAccessed(); break;
               }
               break;
       }
