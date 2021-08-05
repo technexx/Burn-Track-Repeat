@@ -243,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
-  //Todo: Double db saves on first entry. Not updating adapter views.
   //Todo: Round fading only works once for each round.
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
@@ -1679,6 +1678,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           //Adds 1-4 for type of round anytime we're adding a round.
           typeOfRound.add(roundType);
+          //Sets fade positions for rounds. Most recent for addition, and -1 (out of bounds) for subtraction.
+          cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
           //If total rounds are <=8, also add them to our holder lists (used for separating viewHolders into two columns.
           if (workoutTime.size()<=8) {
             roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
@@ -1712,29 +1713,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     } else {
-      if (mode==1) {
-        if (workoutTime.size()>0) {
-          typeOfRound.remove(typeOfRound.size()-1);
-          workoutTime.remove(workoutTime.size()-1);
-          convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
-          //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
-          if (workoutTime.size()<=7) {
-            roundHolderOne.remove(roundHolderOne.size()-1);
-            typeHolderOne.remove(typeHolderOne.size()-1);
-            cycleRoundsAdapter.notifyDataSetChanged();
-          } else {
-            roundHolderTwo.remove(roundHolderTwo.size()-1);
-            typeHolderTwo.remove(typeHolderTwo.size()-1);
-            cycleRoundsAdapterTwo.notifyDataSetChanged();
-          }
-          //If moving from two lists to one, set its visibility and change layout params.
-          if (workoutTime.size()==8) {
-            roundRecyclerTwo.setVisibility(View.GONE);
-            recyclerLayoutOne.leftMargin = 240;
-            roundListDivider.setVisibility(View.GONE);
-          }
-        } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
-      }
+      //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
+      cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
+      cycleRoundsAdapter.notifyDataSetChanged();
+
+      //Refreshing the rounds adapter after a round has been removed. Above, we created a fade effect using the unmodified list values, and below on a delay handler, after the effect is finished, we re-draw.
+      mHandler.postDelayed(()-> {
+        if (mode==1) {
+          if (workoutTime.size()>0) {
+            typeOfRound.remove(typeOfRound.size()-1);
+            workoutTime.remove(workoutTime.size()-1);
+            convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
+            //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
+            if (workoutTime.size()<=7) {
+              roundHolderOne.remove(roundHolderOne.size()-1);
+              typeHolderOne.remove(typeHolderOne.size()-1);
+              cycleRoundsAdapter.notifyDataSetChanged();
+            } else {
+              roundHolderTwo.remove(roundHolderTwo.size()-1);
+              typeHolderTwo.remove(typeHolderTwo.size()-1);
+              cycleRoundsAdapterTwo.notifyDataSetChanged();
+            }
+            //If moving from two lists to one, set its visibility and change layout params.
+            if (workoutTime.size()==8) {
+              roundRecyclerTwo.setVisibility(View.GONE);
+              recyclerLayoutOne.leftMargin = 240;
+              roundListDivider.setVisibility(View.GONE);
+            }
+            //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
+            cycleRoundsAdapter.setFadePositions(-1, -1);
+            savedCycleAdapter.notifyDataSetChanged();
+          } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
+        }
+      },300);
+
 
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
@@ -1788,7 +1800,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
   //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
   public void populateCycleList(boolean queryList) {
-    //Todo: This doesn't query database. It simply uses the cycleList instance previously pulled out of it.
     switch (mode) {
       case 1:
         //If we need to fetch values from database, do this.
