@@ -243,10 +243,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
-  //Crash calling cycle when going to Timer class. Likely sort related.
-  //Todo: Round fading only works once for each round.
+  //Todo: Sort bug when launching cycle right after addition (wrong one launched)
   //Todo: Round fading in overlap w/ infinity visibility.
-  //Todo: Set delay or temp disable for round additions to prevent fade ghosting.
   //Todo: #9 round still need to move further right.
   //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -785,8 +783,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           });
         });
       } else {
-        //Todo: Automatic sort of DB entries according to last accessed causes incorrect row selection immediately after new cycle save (since arrays are being added to in LAST position, yet the database refers to the FIRST position because of auto-sort).
-        //Todo: Simply remove last accessed sort. Defaults to that at moment, which is very fluid. SharePref will save any change, so simply use another sortMode.
         AsyncTask.execute(()-> {
           //If at least one round exists, insert cycle list in database.
           if (workoutTime.size()>0) {
@@ -1912,8 +1908,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
     } else {
       //Only calls retrieveRoundList() if NOT editing, since it also clears our round lists and we need them retained.
-      //Todo: Watch this.
-//      if (!editingCycle) retrieveRoundList();
+      if (!editingCycle) retrieveRoundList();
       //Updates any changes made to cycles.
       saveCycles(false);
     }
