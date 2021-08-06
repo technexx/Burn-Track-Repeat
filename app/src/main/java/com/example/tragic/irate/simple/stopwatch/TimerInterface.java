@@ -457,6 +457,8 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       public void run() {
         dotDraws.reDraw();
         if (receivedAlpha <= 105) {
+          dotDraws.setAlpha(105);
+          dotDraws.reDraw();
           mHandler.removeCallbacks(this);
         } else mHandler.postDelayed(this, 50);
       }

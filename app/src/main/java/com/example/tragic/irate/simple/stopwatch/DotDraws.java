@@ -42,10 +42,6 @@ public class DotDraws extends View {
   boolean mAddSubFade;
   boolean mFadeUp;
 
-  public interface sendPosition {
-    void sendPos(int pos);
-  }
-
   public interface sendAlpha {
     void sendAlphaValue(int alpha);
   }
@@ -58,6 +54,10 @@ public class DotDraws extends View {
     super(context, attrs);
     setFocusable(true);
     setWillNotDraw(false);
+  }
+
+  public void setAlpha(int alpha) {
+    this.mAlpha = alpha;
   }
 
   private void setupPaint(){

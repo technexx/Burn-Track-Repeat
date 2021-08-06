@@ -243,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
-  //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: #9 round still need to move further right.
   //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
