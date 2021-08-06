@@ -241,10 +241,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
-  //Todo: editDismiss not removing highlight.
   //Todo: #9 round still need to move further right.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
-  //Todo: Auto save feature (mainly for total times) when force-closing app.
+  //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
   //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Save total sets/breaks and completed by day option?
@@ -769,7 +768,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //If editing cycle, we will save a blank if there are no rounds.
       if (editingCycle) {
         AsyncTask.execute(()->{
-
           saveCycles(false);
           populateCycleList(false);
           runOnUiThread(()-> {
@@ -1749,7 +1747,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
           } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
         }
-      },300);
+      },400);
 
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().

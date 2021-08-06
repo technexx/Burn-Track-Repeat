@@ -76,7 +76,8 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
-        modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
+        if (position==0) modeOneRounds.round_count.setText(" " + holder.itemView.getContext().getString(R.string.round_numbers_two, String.valueOf(position + 9), " ")); else
+            modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
 
         setAnimation(modeOneRounds.round_count, position);
