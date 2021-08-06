@@ -243,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
-  //Todo: Sort bug when launching cycle right after addition (wrong one launched)
   //Todo: Round fading in overlap w/ infinity visibility.
   //Todo: #9 round still need to move further right.
   //Todo: More safeguards for endFade, or a replacement for it.
@@ -739,7 +738,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(()-> {
-        queryCycles();
+        sortCycles();
         runOnUiThread(()-> {
           //Populates adapter arrays.
           populateCycleList(true);
@@ -1640,7 +1639,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Repeat for second rounds adapter.
   public void adjustCustom(boolean adding) {
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
@@ -1765,9 +1763,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     }
-    //Updates our recyclerView list via adapter after each addition/subtraction of round.
-//    cycleRoundsAdapter.notifyDataSetChanged();
-//    cycleRoundsAdapterTwo.notifyDataSetChanged();
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
   }
@@ -1780,27 +1775,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
+  //Queries database for all cycles in last updated order.
   public void queryCycles() {
       switch (mode) {
           case 1:
-              switch (sortMode) {
-                case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
-                case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
-                case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
-                case 4: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
-                case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
-                case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
-              }
-              break;
+            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
           case 3:
-              switch (sortModePom) {
-                case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
-                case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
-                case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
-                case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
-              }
+            pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
               break;
       }
+  }
+
+  //Queries database for cycles and then sorta them in a particular order.
+  public void sortCycles() {
+    switch (mode) {
+      case 1:
+        switch (sortMode) {
+          case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
+          case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
+          case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
+          case 4: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
+          case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
+          case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+        }
+        break;
+      case 3:
+        switch (sortModePom) {
+          case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
+          case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+          case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
+          case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
+        }
+        break;
+    }
   }
 
   //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
