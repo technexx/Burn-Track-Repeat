@@ -53,21 +53,30 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
     animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
 
+//    animateIn.setAnimationListener(new Animation.AnimationListener() {
+//      @Override
+//      public void onAnimationStart(Animation animation) {
+//      }
+//      @Override
+//      public void onAnimationEnd(Animation animation) {
+//        mOnFadeFinished.fadeHasFinished();
+//      }
+//      @Override
+//      public void onAnimationRepeat(Animation animation) {
+//      }
+//    });
+
     //Used to trigger callback to Main when animation has finished.
     animateOut.setAnimationListener(new Animation.AnimationListener() {
       @Override
       public void onAnimationStart(Animation animation) {
-
       }
-
       @Override
       public void onAnimationEnd(Animation animation) {
         mOnFadeFinished.fadeHasFinished();
       }
-
       @Override
       public void onAnimationRepeat(Animation animation) {
-
       }
     });
   }
@@ -183,9 +192,11 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public void setAnimation(TextView textView, int position) {
     if (position==mPosAddHolder) {
+      textView.clearAnimation();
       textView.startAnimation(animateIn);
       positionCount++;
     } else if (position==mPosSubHolder) {
+      textView.clearAnimation();
       textView.startAnimation(animateOut);
       positionCount++;
     }

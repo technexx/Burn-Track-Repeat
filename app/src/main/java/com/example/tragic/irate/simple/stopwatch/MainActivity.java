@@ -1701,9 +1701,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (workoutTime.size()<=8) {
             roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
-            //Sets fade positions for rounds. Most recent for addition, and -1 (out of bounds) for subtraction.
-            cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
-            cycleRoundsAdapter.notifyDataSetChanged();
+            if (!roundIsFading) {
+              //Sets fade positions for rounds. Most recent for addition, and -1 (out of bounds) for subtraction.
+              cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
+              cycleRoundsAdapter.notifyDataSetChanged();
+//              roundIsFading = true;
+            }
           } else {
             roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
@@ -1781,6 +1784,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               recyclerLayoutOne.leftMargin = 240;
               roundListDivider.setVisibility(View.GONE);
             }
+            //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
             roundIsFading = false;
           } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
         }
