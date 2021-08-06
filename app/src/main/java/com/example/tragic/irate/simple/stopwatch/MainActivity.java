@@ -222,8 +222,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   InputMethodManager inputMethodManager;
 
   boolean onNewCycle;
-  TextWatcher titleTextWatcher;
-  boolean titleChanged;
   boolean editingCycle;
 
   AlphaAnimation fadeIn;
@@ -243,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
 
+  //Todo: editDismiss not removing highlight.
   //Todo: #9 round still need to move further right.
-  //Todo: More safeguards for endFade, or a replacement for it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app.
   //Todo: Possible drag/drop switch for round order.
@@ -587,7 +585,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     second_value_edit_two.addTextChangedListener(textWatcher);
     third_value_edit.addTextChangedListener(textWatcher);
     third_value_edit_two.addTextChangedListener(textWatcher);
-    cycle_name_edit.addTextChangedListener(titleTextWatcher);
 
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
@@ -762,19 +759,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
+      savedCycleAdapter.removeHighlight(true);
+      //If all fetched values equal current values (i.e. no changes have been made), exit method.
+      if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) {
+        //Calls notify so highlight removal is shown.
+        savedCycleAdapter.notifyDataSetChanged();
+        return;
+      }
       //If editing cycle, we will save a blank if there are no rounds.
       if (editingCycle) {
         AsyncTask.execute(()->{
-          //If all fetched values equal current values (i.e. no changes have been made), exit method.
-          if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) return;
-          else {
-            saveCycles(false);
-            populateCycleList(false);
-          }
+
+          saveCycles(false);
+          populateCycleList(false);
           runOnUiThread(()-> {
             Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
             //Removes highlight when exiting edit mode.
-            savedCycleAdapter.removeHighlight(true);
             //Calls method that sets views for our edit cycles mode.
             fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
             savedCycleAdapter.notifyDataSetChanged();

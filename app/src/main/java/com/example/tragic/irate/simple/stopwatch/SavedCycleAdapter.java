@@ -172,7 +172,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           if (j!=0) span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           else span.setSpan(imageSpan, 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         }
-
         //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
         permSpan = TextUtils.concat(permSpan, span);
       }
@@ -203,9 +202,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
         mHighlightMode = false;
         //Sets all of our backgrounds to black (unhighlighted).
-        for (int i = 0; i < mWorkoutList.size(); i++) {
-          workoutHolder.fullView.setBackgroundColor(Color.BLACK);
-        }
+        workoutHolder.fullView.setBackgroundColor(Color.BLACK);
       }
 
       workoutHolder.fullView.setOnClickListener(v -> {
