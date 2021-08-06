@@ -67,7 +67,7 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener{
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -218,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable changeFirstValue;
   Runnable changeSecondValue;
   Runnable changeThirdValue;
+  Runnable adjustRoundDelay;
+
   boolean editListener;
   InputMethodManager inputMethodManager;
 
@@ -240,6 +242,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timeCompare;
   String typeCompare;
   String titleCompare;
+  boolean roundIsFading;
+  int roundSubDelay;
 
   //Todo: #9 round still need to move further right.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -300,6 +304,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Fading app name text + sort button out, edit and delete buttons in.
       fadeEditCycleButtonsIn(FADE_IN_HIGHLIGHT_MODE);
     }
+  }
+
+  //This callback method works for both round adapters.
+  @Override
+  public void fadeHasFinished() {
+    roundIsFading = false;
   }
 
   @Override
@@ -533,6 +543,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Our two cycle round adapters.
         cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
         cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
+        cycleRoundsAdapter.fadeFinished(MainActivity.this);
+        cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
         //Only first adapter is used for Pom mode, so only needs to be set here.
         cycleRoundsAdapter.setMode(mode);
 
@@ -927,10 +939,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
     add_cycle.setOnClickListener(v -> {
       adjustCustom(true);
+//      add_cycle.setClickable(false);
+//      sub_cycle.setClickable(false);
+//      mHandler.postDelayed(adjustRoundDelay, 300);
     });
 
     sub_cycle.setOnClickListener(v -> {
       adjustCustom(false);
+//      add_cycle.setClickable(false);
+//      sub_cycle.setClickable(false);
+//      mHandler.postDelayed(adjustRoundDelay, 300);
     });
 
     //Grabs the x-axis value of textView, and uses that determine whether we replace it with the minutes or seconds editText.
@@ -957,6 +975,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       return true;
     });
+
+    adjustRoundDelay = new Runnable() {
+      @Override
+      public void run() {
+        add_cycle.setClickable(true);
+        sub_cycle.setClickable(true);
+      }
+    };
 
     changeFirstValue = new Runnable() {
       @Override
@@ -1709,13 +1735,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     } else {
       if (workoutTime.size()<=8) {
-        //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-        cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
-        cycleRoundsAdapter.notifyDataSetChanged();
+        //If round is not currently fading out, tell adapter to begin fade animation and set the delay for post-subtraction round display to 400.
+        if (!roundIsFading) {
+          //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
+          cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
+          cycleRoundsAdapter.notifyDataSetChanged();
+          roundSubDelay = 400;
+          roundIsFading = true;
+          //If round is already fading, we do not begin another animation, and we set the delay to show the next updated round count (below) to 0.
+        } else roundSubDelay = 0;
       } else {
-        //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-        cycleRoundsAdapterTwo.setFadePositions(workoutTime.size()-9, -1);
-        cycleRoundsAdapterTwo.notifyDataSetChanged();
+        if (!roundIsFading) {
+          //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
+          cycleRoundsAdapterTwo.setFadePositions(workoutTime.size()-9, -1);
+          cycleRoundsAdapterTwo.notifyDataSetChanged();
+          roundSubDelay = 400;
+          roundIsFading = true;
+        } else roundSubDelay = 0;
       }
 
       //Refreshing the rounds adapter after a round has been removed. Above, we created a fade effect using the unmodified list values, and below on a delay handler, after the effect is finished, we re-draw.
@@ -1745,9 +1781,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               recyclerLayoutOne.leftMargin = 240;
               roundListDivider.setVisibility(View.GONE);
             }
+            roundIsFading = false;
           } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
         }
-      },400);
+      },roundSubDelay);
 
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().

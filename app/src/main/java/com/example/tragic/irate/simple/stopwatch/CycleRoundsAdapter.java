@@ -35,10 +35,41 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   int positionCount;
   int mPosAddHolder;
   int mPosSubHolder;
+  Animation animateIn;
+  Animation animateOut;
+  onFadeFinished mOnFadeFinished;
+
+  public interface onFadeFinished {
+    void fadeHasFinished();
+  }
+
+  public void fadeFinished(onFadeFinished xOnFadeFinished) {
+    this.mOnFadeFinished = xOnFadeFinished;
+  }
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
     this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; mPomList = pomList;
     mPositionList = new ArrayList<>();
+    animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+    animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+
+    //Used to trigger callback to Main when animation has finished.
+    animateOut.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        mOnFadeFinished.fadeHasFinished();
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+
+      }
+    });
   }
 
   public void setMode(int mode) {
@@ -152,12 +183,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public void setAnimation(TextView textView, int position) {
     if (position==mPosAddHolder) {
-      Animation animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
-      if (textView.getAnimation()!=animateIn) textView.startAnimation(animateIn);
+      textView.startAnimation(animateIn);
       positionCount++;
     } else if (position==mPosSubHolder) {
-      Animation animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
-      if (textView.getAnimation()!=animateOut) textView.startAnimation(animateOut);
+      textView.startAnimation(animateOut);
       positionCount++;
     }
   }

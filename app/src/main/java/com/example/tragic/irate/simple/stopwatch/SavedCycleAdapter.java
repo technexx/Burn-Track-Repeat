@@ -54,8 +54,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   CharSequence permSpan;
   Spannable span;
   ImageSpan imageSpan;
-  Animation fadeIn;
-  Animation fadeOut;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
