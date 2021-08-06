@@ -2,6 +2,10 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,17 +54,13 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         animateOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-
             }
-
             @Override
             public void onAnimationEnd(Animation animation) {
                 mOnFadeFinished.fadeHasFinished();
             }
-
             @Override
             public void onAnimationRepeat(Animation animation) {
-
             }
         });
     }
@@ -106,8 +106,13 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
-        if (position==0) modeOneRounds.round_count.setText(" " + holder.itemView.getContext().getString(R.string.round_numbers_two, String.valueOf(position + 9), " ")); else
-            modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
+        //For moment, using "09" on first round of this adapter, and setting "0" to same color as background.
+        if (position==0) {
+            Spannable spannable = new SpannableString("09 -");
+            spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#37474F")), 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            modeOneRounds.round_count.setText(spannable);
+        } else
+        modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
 
         setAnimation(modeOneRounds.round_count, position);
@@ -134,9 +139,11 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
 
     public void setAnimation(TextView textView, int position) {
         if (position==mPosAddHolder) {
+            textView.clearAnimation();
             textView.startAnimation(animateIn);
             positionCount++;
         } else if (position==mPosSubHolder) {
+            textView.clearAnimation();
             textView.startAnimation(animateOut);
             positionCount++;
         }
