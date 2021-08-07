@@ -1740,7 +1740,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       if (workoutTime.size()<=8) {
         //If round is not currently fading out, tell adapter to begin fade animation and set the delay for post-subtraction round display to 400.
-        if (!roundIsFading) {
+        //If list size is 0, set the delay handler to 0 so "Empty" Toast triggers right away.
+        if (!roundIsFading && workoutTime.size()!=0) {
           //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
           cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
           cycleRoundsAdapter.notifyDataSetChanged();
@@ -1787,9 +1788,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
             //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
             roundIsFading = false;
-          } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
+            //Only want this Toast triggering if there is no delay set, which we handle above.
+          } else if (roundSubDelay==0) Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
         }
-      },roundSubDelay);
+      }, roundSubDelay);
 
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().

@@ -106,7 +106,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
-        //For moment, using "09" on first round of this adapter, and setting "0" to same color as background.
+        //For moment, using "09" on first round of this adapter, and setting "0" to same color as background. Trouble aligning otherwise.
         if (position==0) {
             Spannable spannable = new SpannableString("09 -");
             spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#37474F")), 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
