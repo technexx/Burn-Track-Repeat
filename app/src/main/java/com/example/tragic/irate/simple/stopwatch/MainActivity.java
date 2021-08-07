@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow editCyclesPopupWindow;
   PopupWindow settingsPopupWindow;
 
-  TextView sortAccessed;
   TextView sortAlphaStart;
   TextView sortAlphaEnd;
   TextView sortRecent;
@@ -212,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean minReached;
   boolean maxReached;
   float editTextViewPosX;
+  boolean firstRowHighlighted;
+  boolean secondRowHighlighted;
+  boolean thirdRowHighlighted;
 
   Handler mHandler;
   Runnable valueSpeed;
@@ -239,13 +241,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int FADE_OUT_HIGHLIGHT_MODE = 2;
   int FADE_IN_EDIT_CYCLE = 3;
   int FADE_OUT_EDIT_CYCLE = 4;
+
   String timeCompare;
   String typeCompare;
   String titleCompare;
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: Sub bug: delay b0rks toast message going from 1->0 rounds. Also, adding after that doesn't refresh correctly for first adapter list.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
   //Todo: Possible drag/drop switch for round order.
@@ -657,23 +659,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView.setOnTouchListener((v, event) -> {
       //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
       removeEditTimerViews(true);
+      //Toggles coloring and row selection.
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
         float xPos = event.getX();
         float yPos = event.getY();
         if (xPos<=350) {
           if (yPos>=150 && yPos<=275) {
-            setsSelected = true;
-            s1.setTextColor(Color.GREEN);
-          } else {
-            setsSelected = false;
-            s1.setTextColor(Color.WHITE);
+            if (!firstRowHighlighted) {
+              setsSelected = true;
+              firstRowHighlighted = true;
+              secondRowHighlighted = false;
+              rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
+              rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
+            } else {
+              setsSelected = false;
+              firstRowHighlighted = false;
+              rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
+            }
           }
           if (yPos>=300 && yPos<=425) {
-            breaksSelected = true;
-            s2.setTextColor(Color.RED);
-          } else {
-            breaksSelected = false;
-            s2.setTextColor(Color.WHITE);
+            if (!secondRowHighlighted) {
+              breaksSelected = true;
+              secondRowHighlighted = true;
+              firstRowHighlighted = false;
+              rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
+              rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
+            } else {
+              breaksSelected = false;
+              secondRowHighlighted = false;
+              rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
+            }
           }
         }
         //Hides soft keyboard by using a token of the current editCycleView.
@@ -681,7 +696,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       return false;
     });
-
 
     //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
     cycle_name_edit.setOnTouchListener(new View.OnTouchListener() {
@@ -1150,6 +1164,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  public void rowSelect(TextView header, TextView textVal, EditText editOne, EditText editTwo, TextView editSep, ImageView plus, ImageView minus, int color) {
+    header.setTextColor(color);
+    textVal.setTextColor(color);
+    editOne.setTextColor(color);
+    editTwo.setTextColor(color);
+    editSep.setTextColor(color);
+    plus.setColorFilter(color);
+    minus.setColorFilter(color);
+  }
+
   //Fades action bar buttons in/out depending on whether we are editing cycles or not.
   public void fadeEditCycleButtonsIn(int typeOfFade) {
     //Clearing all animations. If we don't, their alphas tend to get reset.
@@ -1190,15 +1214,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (typeOfFade==FADE_IN_EDIT_CYCLE) {
       //Set to false by default, and true only with this conditional.
       editingCycle = true;
-//      edit_highlighted_cycle.startAnimation(fadeOut);
-//      edit_highlighted_cycle.setEnabled(false);
       delete_highlighted_cycle.setEnabled(true);
       edit_highlighted_cycle.setVisibility(View.GONE);
       sort_text.setVisibility(View.GONE);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-//      appHeader.startAnimation(fadeIn);
-//      sort_text.startAnimation(fadeIn);
       sort_text.setVisibility(View.VISIBLE);
       delete_highlighted_cycle.setVisibility(View.GONE);
       delete_highlighted_cycle.setEnabled(false);
