@@ -161,8 +161,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton minus_third_value;
   Button add_cycle;
   Button sub_cycle;
-  ImageButton setsInfinity;
-  ImageButton breaksInfinity;
+  ImageView setsInfinity;
+  ImageView breaksInfinity;
   View top_anchor;
   ImageButton start_timer;
 
@@ -248,7 +248,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: Reset row selection / values on any instance of editCycles (FAB or edit).
+  //Todo: 0:00 time fades in along w/ infinity when adding rounds.
+  //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
   //Todo: Possible drag/drop switch for round order.
@@ -665,30 +666,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         float xPos = event.getX();
         float yPos = event.getY();
         if (xPos<=350) {
+          //Sets highlights and infinity modes for first row.
           if (yPos>=150 && yPos<=275) {
             if (!firstRowHighlighted) {
+              breaksSelected = false;
               setsSelected = true;
               firstRowHighlighted = true;
               secondRowHighlighted = false;
+              //If first row is highlighted, second row should un-highlight.
+              breaksInfinity.setAlpha(0.3f);
               rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
               rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
-            } else {
-              setsSelected = false;
-              firstRowHighlighted = false;
-              rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
             }
           }
+          //Sets highlights and infinity modes for first row.
           if (yPos>=300 && yPos<=425) {
             if (!secondRowHighlighted) {
+              setsSelected = false;
               breaksSelected = true;
               secondRowHighlighted = true;
               firstRowHighlighted = false;
+              setsInfinity.setAlpha(0.3f);
               rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
               rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
-            } else {
-              breaksSelected = false;
-              secondRowHighlighted = false;
-              rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
             }
           }
         }
@@ -945,26 +945,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     setsInfinity.setOnClickListener(v -> {
-      if (setsInfinity.getAlpha()==1.0f) setsInfinity.setAlpha(0.3f); else setsInfinity.setAlpha(1.0f);
+      if (setsSelected) if (setsInfinity.getAlpha()==1.0f) setsInfinity.setAlpha(0.3f); else setsInfinity.setAlpha(1.0f);
     });
 
     breaksInfinity.setOnClickListener(v -> {
-      if (breaksInfinity.getAlpha()==1.0f) breaksInfinity.setAlpha(0.3f); else breaksInfinity.setAlpha(1.0f);
+      if (breaksSelected) if (breaksInfinity.getAlpha()==1.0f) breaksInfinity.setAlpha(0.3f); else breaksInfinity.setAlpha(1.0f);
     });
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
     add_cycle.setOnClickListener(v -> {
       adjustCustom(true);
-//      add_cycle.setClickable(false);
-//      sub_cycle.setClickable(false);
-//      mHandler.postDelayed(adjustRoundDelay, 300);
     });
 
     sub_cycle.setOnClickListener(v -> {
       adjustCustom(false);
-//      add_cycle.setClickable(false);
-//      sub_cycle.setClickable(false);
-//      mHandler.postDelayed(adjustRoundDelay, 300);
     });
 
     //Grabs the x-axis value of textView, and uses that determine whether we replace it with the minutes or seconds editText.
