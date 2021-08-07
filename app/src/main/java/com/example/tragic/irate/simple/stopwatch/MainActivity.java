@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
+  //Todo: Reset row selection / values on any instance of editCycles (FAB or edit).
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
   //Todo: Possible drag/drop switch for round order.
@@ -714,6 +715,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+      resetRows();
       //Clears round adapter arrays so they can be freshly populated.
       clearRoundAdapterArrays();
       //Clears the two lists of actual timer values we are populating.
@@ -1164,6 +1166,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  //Resets row selection and editText/textView values.
+  public void resetRows() {
+    rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
+    //Our editText fields have listeners attached which call setEditValues(), which set our edit values AND setValue/breakValue vars to the values within the editText box itself. Here, we use 0:30 for both.
+    first_value_edit.setText(String.valueOf(0));
+    first_value_edit_two.setText(elongateEditSeconds(30));
+    second_value_edit.setText(String.valueOf(0));
+    second_value_edit_two.setText(elongateEditSeconds(30));
+    first_value_textView.setText(convertCustomTextView(setValue));
+    second_value_textView.setText(convertCustomTextView(breakValue));
+  }
+
+  //Colors rows.
   public void rowSelect(TextView header, TextView textVal, EditText editOne, EditText editTwo, TextView editSep, ImageView plus, ImageView minus, int color) {
     header.setTextColor(color);
     textVal.setTextColor(color);
@@ -1271,7 +1286,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Passes current editText values into variables, and then sets min/max bounds on them.
   public void setEditValues() {
-    if (mode==1 || mode==2) {
+    if (mode==1) {
       editSetMinutes = convertEditTextToLong(first_value_edit);
       editSetSeconds = convertEditTextToLong(first_value_edit_two);
       if (editSetSeconds > 59) {
@@ -1282,6 +1297,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editSetMinutes <= 0) editSetMinutes = 0;
       if (editSetSeconds <= 0 || editSetMinutes == 5) editSetSeconds = 0;
       if (editSetSeconds < 5 && editSetMinutes == 0) editSetSeconds = 0;
+      //Sets our timer values to the values in editText.
       setValue = (int) ((editSetMinutes * 60) + editSetSeconds);
       first_value_textView.setText(convertCustomTextView(setValue));
 
