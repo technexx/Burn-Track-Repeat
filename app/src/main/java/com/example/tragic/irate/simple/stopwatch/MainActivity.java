@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: #9 round still need to move further right.
+  //Todo: Sub bug: delay b0rks toast message going from 1->0 rounds. Also, adding after that doesn't refresh correctly for first adapter list.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
   //Todo: Possible drag/drop switch for round order.
@@ -1704,14 +1704,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (!roundIsFading) {
               //Sets fade positions for rounds. Most recent for addition, and -1 (out of bounds) for subtraction.
               cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
-              cycleRoundsAdapter.notifyDataSetChanged();
-//              roundIsFading = true;
             }
+            cycleRoundsAdapter.notifyDataSetChanged();
           } else {
             roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
-            //Sets fade positions for rounds. Most recent for addition, and -1 (out of bounds) for subtraction.
-            cycleRoundsAdapterTwo.setFadePositions(-1, workoutTime.size()-9);
+            if (!roundIsFading) {
+              //Sets fade positions for rounds. Most recent for addition, and -1 (out of bounds) for subtraction.
+              cycleRoundsAdapterTwo.setFadePositions(-1, workoutTime.size()-9);
+            }
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
           //If moving from one list to two, set its visibility and change layout params.
