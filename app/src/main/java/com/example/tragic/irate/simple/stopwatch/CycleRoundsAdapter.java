@@ -32,7 +32,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_THREE = 3;
   int mMode = 1;
   List<Integer> mPositionList;
-  int positionCount;
   int mPosAddHolder;
   int mPosSubHolder;
   Animation animateIn;
@@ -123,8 +122,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
 
-      setAnimation(modeOneRounds.round_count, position);
-      setAnimation(modeOneRounds.workout_rounds, position);
+      if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) {
+        setAnimation(modeOneRounds.round_count, position);
+        setAnimation(modeOneRounds.workout_rounds, position);
+      } else setAnimationTwo(modeOneRounds.infinity_rounds, position);
 
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
@@ -181,11 +182,19 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (position==mPosAddHolder) {
       textView.clearAnimation();
       textView.startAnimation(animateIn);
-      positionCount++;
     } else if (position==mPosSubHolder) {
       textView.clearAnimation();
       textView.startAnimation(animateOut);
-      positionCount++;
+    }
+  }
+
+  public void setAnimationTwo(ImageView imageView, int position) {
+    if (position==mPosAddHolder) {
+      imageView.clearAnimation();
+      imageView.startAnimation(animateIn);
+    } else if (position==mPosSubHolder) {
+      imageView.clearAnimation();
+      imageView.startAnimation(animateOut);
     }
   }
 

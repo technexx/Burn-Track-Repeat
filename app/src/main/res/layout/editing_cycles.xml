@@ -351,7 +351,11 @@
         app:layout_constraintTop_toTopOf="@id/minus_first_value"
         app:layout_constraintBottom_toBottomOf="@id/minus_first_value"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="15dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:src="@drawable/infinity_icon_green"
         android:backgroundTint="@color/dark_grey">
     </ImageView>
@@ -363,7 +367,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/minus_second_value"
         app:layout_constraintBottom_toBottomOf="@id/minus_second_value"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="15dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:src="@drawable/infinity_icon_red"
         android:backgroundTint="@color/dark_grey">
     </ImageView>

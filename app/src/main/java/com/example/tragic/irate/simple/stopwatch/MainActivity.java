@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ArrayList<Integer> typeOfRound;
   ArrayList<String> typeOfRoundArray;
-  boolean setsSelected;
+  boolean setsSelected = true;
   boolean breaksSelected;
   int roundType;
   ArrayList<String> roundHolderOne;
