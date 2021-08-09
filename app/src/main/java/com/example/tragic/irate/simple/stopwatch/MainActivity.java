@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: Retain sort mode on new cycle entries.
+  //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -336,7 +336,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               runOnUiThread(()-> {
                 if (currentCycleEmpty) {
                   Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
-                } else deleteCyclePopupWindow.showAtLocation(cl, 0, 0, Gravity.CENTER);
+                } else {
+                  delete_all_text.setText(R.string.delete_all_cycles);
+                  deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER, 0, 0);
+                }
               });
             });
             break;
@@ -1968,9 +1971,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
         return;
       }
-      //If cycle editText is empty, use the set its String to the current date/time by default. Otherwise, use what is there.
-      if (cycle_name_edit.getText().toString().isEmpty()) cycleTitle = date;
-      else cycleTitle = cycle_name_edit.getText().toString();
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
       //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
@@ -2012,6 +2012,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
     String date = dateFormat.format(calendar.getTime());
+    //Fetches title from editText.
+    cycleTitle = cycle_name_edit.getText().toString();
 
     //Sets up Strings to save into database.
     Gson gson = new Gson();
