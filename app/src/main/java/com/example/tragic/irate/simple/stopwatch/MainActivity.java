@@ -248,7 +248,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: 0:00 time fades in along w/ infinity when adding rounds.
+  //Todo: Retain sort mode on new cycle entries.
+  //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
@@ -751,17 +752,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Casting View used by listener to textView, which we then check against its String value.
       TextView textButton = (TextView) view;
       //Handles checkmark views.
-      if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 1;
-      if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 2;
-      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 3;
-      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 4;
+      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 1;
+      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 2;
+      if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 3;
+      if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 4;
       if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
       if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
       //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(()-> {
-        sortCycles();
+        queryCycles();
         runOnUiThread(()-> {
           //Populates adapter arrays.
           populateCycleList(true);
@@ -1846,36 +1847,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
-  //Queries database for all cycles in last updated order.
+  //Queries database for all cycles, using last chosen sort order.
   public void queryCycles() {
-      switch (mode) {
-          case 1:
-            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-          case 3:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-              break;
-      }
-  }
-
-  //Queries database for cycles and then sorta them in a particular order.
-  public void sortCycles() {
     switch (mode) {
       case 1:
         switch (sortMode) {
-          case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
-          case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
-          case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
-          case 4: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
+          case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
+          case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
+          case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
+          case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
           case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
           case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
         }
         break;
       case 3:
         switch (sortModePom) {
-          case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
-          case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
-          case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
-          case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
+          case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
+          case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
+          case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
+          case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
         }
         break;
     }
