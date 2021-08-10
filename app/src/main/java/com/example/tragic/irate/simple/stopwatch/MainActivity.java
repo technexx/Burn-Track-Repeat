@@ -249,9 +249,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: No editText in edit mode. Also not highlighting sets to start.
-  //Todo: Title updating to blank after saving correctly.
-  //Todo: Sort issues coming back from Timer.
+  //Todo: Sort issues coming back from Timer. Default sort works for timer, but not kicking in right after save/update.
   //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -645,7 +643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       cycleRoundsAdapter.setMode(3);
                       break;
               }
-              //Todo: This can probably go, since switching tabs doesn't change database.
+              //Todo: This can probably go, since switching tabs doesn't change database. Issue would be initial population of other modes (just pom for now)
               queryCycles();
               //UI views change, so running on main thread.
               runOnUiThread(()-> {
@@ -823,7 +821,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         AsyncTask.execute(()->{
           saveCycles(false);
-          populateCycleList(false);
+          queryCycles();
+          populateCycleList(true);
           runOnUiThread(()-> {
             Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
             //Removes highlight when exiting edit mode.
@@ -838,7 +837,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //If at least one round exists, insert cycle list in database.
           if (workoutTime.size()>0) {
             saveCycles(true);
-            populateCycleList(false);
+            queryCycles();
+            populateCycleList(true);
             runOnUiThread(()-> {
               Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
               //Updates our cycle list.
@@ -1910,6 +1910,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
   //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
+  //Todo: Can probably nix false boolean, since we're going with full db queries, especially since we want to call the proper sorting method on each adapter refresh.
   public void populateCycleList(boolean queryList) {
     switch (mode) {
       case 1:
@@ -2053,8 +2054,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
     String date = dateFormat.format(calendar.getTime());
-    //Fetches title from editText.
-//    cycleTitle = cycle_name_edit.getText().toString();
 
     //Sets up Strings to save into database.
     Gson gson = new Gson();
