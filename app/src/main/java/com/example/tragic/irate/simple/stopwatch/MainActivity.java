@@ -248,9 +248,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String titleCompare;
   boolean roundIsFading;
   int roundSubDelay;
-  Runnable aSyncRunQuery;
 
-  //Todo: Re-use runnable for all aSync tasks (since none need to be concurrent).
+  //Todo: No editText in edit mode. Also not highlighting sets to start.
+  //Todo: Title updating to blank after saving correctly.
+  //Todo: Sort issues coming back from Timer.
   //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -590,7 +591,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     //Listens to all editTexts for changes.
-    TextWatcher textWatcher = new TextWatcher() {
+    TextWatcher editTextWatcher = new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
       }
@@ -603,12 +604,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editListener) setEditValues();
       }
     };
-    first_value_edit.addTextChangedListener(textWatcher);
-    first_value_edit_two.addTextChangedListener(textWatcher);
-    second_value_edit.addTextChangedListener(textWatcher);
-    second_value_edit_two.addTextChangedListener(textWatcher);
-    third_value_edit.addTextChangedListener(textWatcher);
-    third_value_edit_two.addTextChangedListener(textWatcher);
+
+    //Watches editText title box and passes its value into the String that gets saved/updated in database.
+    TextWatcher titleTextWatcher = new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+      }
+      @Override
+      public void afterTextChanged(Editable s) {
+        cycleTitle = cycle_name_edit.getText().toString();
+      }
+    };
+
+    cycle_name_edit.addTextChangedListener(titleTextWatcher);
+    first_value_edit.addTextChangedListener(editTextWatcher);
+    first_value_edit_two.addTextChangedListener(editTextWatcher);
+    second_value_edit.addTextChangedListener(editTextWatcher);
+    second_value_edit_two.addTextChangedListener(editTextWatcher);
+    third_value_edit.addTextChangedListener(editTextWatcher);
+    third_value_edit_two.addTextChangedListener(editTextWatcher);
 
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
@@ -628,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       cycleRoundsAdapter.setMode(3);
                       break;
               }
-              //Todo: This can probably go.
+              //Todo: This can probably go, since switching tabs doesn't change database.
               queryCycles();
               //UI views change, so running on main thread.
               runOnUiThread(()-> {
@@ -660,13 +677,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTabReselected(TabLayout.Tab tab) {
       }
     });
-
-    aSyncRunQuery = new Runnable() {
-      @Override
-      public void run() {
-        //Todo: queryCycles method. Essentially a local repository doing it this way, or move it to another class.
-      }
-    };
 
     //Caps and sets editText values when clicking outside (exiting) the editText box.
     editCyclesPopupView.setOnClickListener(v-> {
@@ -887,8 +897,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               roundListDivider.setVisibility(View.VISIBLE);
             }
           }
-          cycle_name_text.setVisibility(View.VISIBLE);
-          cycle_name_edit.setVisibility(View.INVISIBLE);
+          cycle_name_text.setVisibility(View.INVISIBLE);
+          cycle_name_edit.setVisibility(View.VISIBLE);
           cycle_name_text.setText(cycleTitle);
           //Setting editText title.
           cycle_name_edit.setText(cycleTitle);
@@ -1975,7 +1985,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String[] tempPom = pomCycles.getFullCycle().split(" - ");
         for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
         retrievedID = pomCyclesList.get(receivedPos).getId();
-        cycleTitle = pomCycles.getTitle();
+//        cycleTitle = pomCycles.getTitle();
         break;
     }
   }
@@ -2044,7 +2054,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
     String date = dateFormat.format(calendar.getTime());
     //Fetches title from editText.
-    cycleTitle = cycle_name_edit.getText().toString();
+//    cycleTitle = cycle_name_edit.getText().toString();
 
     //Sets up Strings to save into database.
     Gson gson = new Gson();

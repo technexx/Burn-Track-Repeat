@@ -54,6 +54,7 @@
         android:layout_marginStart="6dp"
         android:layout_marginBottom="3dp"
         android:src="@drawable/stopwatch_icon"
+        android:background="@drawable/rounded"
         app:elevation="8dp">
     </ImageButton>
 
