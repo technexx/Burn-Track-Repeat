@@ -248,9 +248,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String titleCompare;
   boolean roundIsFading;
   int roundSubDelay;
-  Runnable aSyncRun;
+  Runnable aSyncRunQuery;
 
-  //Todo: Title saving blank if empty (again)
   //Todo: Re-use runnable for all aSync tasks (since none need to be concurrent).
   //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
@@ -662,6 +661,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
+    aSyncRunQuery = new Runnable() {
+      @Override
+      public void run() {
+        //Todo: queryCycles method. Essentially a local repository doing it this way, or move it to another class.
+      }
+    };
+
     //Caps and sets editText values when clicking outside (exiting) the editText box.
     editCyclesPopupView.setOnClickListener(v-> {
       convertEditTime(true);
@@ -794,7 +800,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Todo: We don't need to to check empty on launch, since we'll come back to Main anyway. Just dismissal (i.e. no need to put it in saveCycles()).
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -2076,13 +2081,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTotalBreakTime(0);
             cycles.setCyclesCompleted(0);
             //If cycle is new, set title to given, or to current date/time if none given. If cycle is NOT new, only set to what has been entered (or keep old one if unchanged).
-            if (!cycleTitle.isEmpty()) {
-              cycles.setTitle(cycleTitle);
-            } else cycles.setTitle(date);
+            if (cycleTitle.isEmpty()) cycleTitle = date;
+            cycles.setTitle(cycleTitle);
             //If cycle is new, insert a new row.
             cyclesDatabase.cyclesDao().insertCycle(cycles);
           } else {
-            if (cycleTitle.isEmpty()) cycles.setTitle(cycleTitle);
+            cycles.setTitle(cycleTitle);
             //If cycle is old, update current row.
             cyclesDatabase.cyclesDao().updateCycles(cycles);
           }
@@ -2111,11 +2115,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
     }
-//    //Re-queries database each time a cycle is added, so we always have a reference to the most recent.
-//    queryCycles();
-//    runOnUiThread(()->{
-//      checkEmptyCycles();
-//    });
   }
 
   private void deleteCycle(boolean deleteAll) {
