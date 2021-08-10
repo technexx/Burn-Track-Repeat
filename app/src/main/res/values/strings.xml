@@ -49,4 +49,6 @@
 
     <string name="round_numbers">%1$s - </string>
     <string name="workout_rounds">%1$s - %2$s</string>
+
+    <string name="empty_cycle_list">Nothing here!</string>
 </resources>

@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton fab;
   ImageButton stopwatch;
   ImageView sortCheckmark;
+  TextView emptyCycleList;
 
   CyclesDatabase cyclesDatabase;
   Cycles cycles;
@@ -247,7 +248,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String titleCompare;
   boolean roundIsFading;
   int roundSubDelay;
+  Runnable aSyncRun;
 
+  //Todo: Title saving blank if empty (again)
+  //Todo: Re-use runnable for all aSync tasks (since none need to be concurrent).
   //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -362,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     gson = new Gson();
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
+    emptyCycleList = findViewById(R.id.empty_cycle_list);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -524,12 +529,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(() -> {
       //Loads database of saved cycles.
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-      //Calls instance of Cycle entity list based on sort mode.
+      //Calls instance of Cycle entity list based on sort mode.v
       queryCycles();
 
       //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
       populateCycleList(true);
       runOnUiThread(()-> {
+        checkEmptyCycles();
         //Adapter and Recycler for round views within our editCycles popUp.
         LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -788,17 +794,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
+    //Todo: We don't need to to check empty on launch, since we'll come back to Main anyway. Just dismissal (i.e. no need to put it in saveCycles()).
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-      savedCycleAdapter.removeHighlight(true);
-      //If all fetched values equal current values (i.e. no changes have been made), exit method.
-      if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) {
-        //Calls notify so highlight removal is shown.
-        savedCycleAdapter.notifyDataSetChanged();
-        return;
-      }
-      //If editing cycle, we will save a blank if there are no rounds.
+      //If closing edit cycle popUp after editing a cycle, do the following.
       if (editingCycle) {
+        savedCycleAdapter.removeHighlight(true);
+        //If all fetched values equal current values (i.e. no changes have been made), exit method.
+        if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) {
+          //Calls notify so highlight removal is shown.
+          savedCycleAdapter.notifyDataSetChanged();
+          return;
+        }
         AsyncTask.execute(()->{
           saveCycles(false);
           populateCycleList(false);
@@ -810,6 +817,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedCycleAdapter.notifyDataSetChanged();
           });
         });
+        //If closing edit cycle popUp after adding a new cycle, do the following.
       } else {
         AsyncTask.execute(()-> {
           //If at least one round exists, insert cycle list in database.
@@ -1147,7 +1155,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryCycles();
         //Deletes all cycles.
         deleteCycle(true);
-        //Todo: Here we can simply use new Array.
         //Mew instance (which will be empty) of whichever Cycles entity we're on.
         queryCycles();
         runOnUiThread(()->{
@@ -1162,6 +1169,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Removes confirmation window.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
+  }
+
+  public void checkEmptyCycles() {
+    if (mode==1) {
+      if (cyclesList.size()!=0) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        emptyCycleList.setVisibility(View.GONE);
+      } else {
+        savedCycleRecycler.setVisibility(View.GONE);
+        emptyCycleList.setVisibility(View.VISIBLE);
+      }
+    }
   }
 
   //Resets row selection and editText/textView values.
@@ -2006,6 +2025,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void saveCycles(boolean newCycle) {
+    //We will have at least one cycle populated when this method completes, so we set our views for it.
+    runOnUiThread(()->{
+      if (savedCycleRecycler.getVisibility()!=View.VISIBLE) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        emptyCycleList.setVisibility(View.GONE);
+      }
+    });
     //sets boolean used in launchCycles.
     isNewCycle = newCycle;
     //Gets current date for use in empty titles.
@@ -2085,6 +2111,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
     }
+//    //Re-queries database each time a cycle is added, so we always have a reference to the most recent.
+//    queryCycles();
+//    runOnUiThread(()->{
+//      checkEmptyCycles();
+//    });
   }
 
   private void deleteCycle(boolean deleteAll) {
@@ -2106,6 +2137,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (pomCyclesList.size()>0) cyclesDatabase.cyclesDao().deleteAllPomCycles(); else emptyCycle = true;
         break;
     }
+    queryCycles();
+    runOnUiThread(()-> {
+      //Sets textView for empty cycle list to visible and recyclerView to gone.
+      checkEmptyCycles();
+    });
     if (emptyCycle){
       runOnUiThread(() -> {
         Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show();
