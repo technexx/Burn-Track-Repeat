@@ -249,7 +249,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: Sort issues coming back from Timer. Default sort works for timer, but not kicking in right after save/update.
+  //Todo: Color all textView rows for pom edit, since we don't need to toggle between set/break.
+  //Todo: Add fade to pom rounds (quick successive from 1->8 rounds).
   //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -643,14 +644,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       cycleRoundsAdapter.setMode(3);
                       break;
               }
-              //Todo: This can probably go, since switching tabs doesn't change database. Issue would be initial population of other modes (just pom for now)
               queryCycles();
               //UI views change, so running on main thread.
-              runOnUiThread(()-> {
+            //Todo: Empty cycles text should toggle here.
+            runOnUiThread(()-> {
                   //Sets all editTexts to GONE, and then populates them + textViews based on mode.
                   removeEditTimerViews(false);
                   editCycleViews();
                   populateCycleList(true);
+                  checkEmptyCycles();
                   savedCycleAdapter.notifyDataSetChanged();
                   if (mode==1) {
                       sortHigh.setVisibility(View.VISIBLE);
@@ -835,7 +837,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         AsyncTask.execute(()-> {
           //If at least one round exists, insert cycle list in database.
-          if (workoutTime.size()>0) {
+          if ((mode==1 && workoutTime.size()>0) || (mode==3 && pomValuesTime.size()>0)) {
             saveCycles(true);
             queryCycles();
             populateCycleList(true);
@@ -1189,6 +1191,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void checkEmptyCycles() {
     if (mode==1) {
       if (cyclesList.size()!=0) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        emptyCycleList.setVisibility(View.GONE);
+      } else {
+        savedCycleRecycler.setVisibility(View.GONE);
+        emptyCycleList.setVisibility(View.VISIBLE);
+      }
+      //Todo: We're going to change adapter/recycler for this.
+    } else if (mode==3) {
+      if (pomCyclesList.size()!=0) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
         emptyCycleList.setVisibility(View.GONE);
       } else {
@@ -1792,7 +1803,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
       }
       if (mode==3) {
-        if (pomValuesTime.size() == 0) {
+        if (pomValuesTime.size()==0) {
           for (int i = 0; i < 3; i++) {
             pomValuesTime.add(pomValue1 * 1000);
             pomValuesTime.add(pomValue2 * 1000);
@@ -1800,6 +1811,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomValuesTime.add(pomValue1 * 1000);
           pomValuesTime.add(pomValue3 * 1000);
           for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
+
+          cycleRoundsAdapter.setPomFade(true);
+          cycleRoundsAdapter.notifyDataSetChanged();
         } else {
           Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
           return;
@@ -1866,6 +1880,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomValuesTime.size() != 0) {
           pomValuesTime.clear();
           convertedPomList.clear();
+          //Todo: Will likely have same empty list issue as mode 1.
+          cycleRoundsAdapter.setPomFade(true);
+          cycleRoundsAdapter.notifyDataSetChanged();
         } else {
           Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
           return;
@@ -1986,7 +2003,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String[] tempPom = pomCycles.getFullCycle().split(" - ");
         for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
         retrievedID = pomCyclesList.get(receivedPos).getId();
-//        cycleTitle = pomCycles.getTitle();
+
+        timeCompare = gson.toJson(pomValuesTime);
+        titleCompare = cycleTitle;
         break;
     }
   }

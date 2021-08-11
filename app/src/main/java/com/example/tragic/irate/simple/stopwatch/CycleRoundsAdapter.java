@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   Animation animateIn;
   Animation animateOut;
   onFadeFinished mOnFadeFinished;
+  boolean mPomFadingIn;
 
   public interface onFadeFinished {
     void fadeHasFinished();
@@ -52,19 +54,21 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
     animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
 
-    //Used to trigger callback to Main when animation has finished.
-    animateOut.setAnimationListener(new Animation.AnimationListener() {
-      @Override
-      public void onAnimationStart(Animation animation) {
-      }
-      @Override
-      public void onAnimationEnd(Animation animation) {
-        mOnFadeFinished.fadeHasFinished();
-      }
-      @Override
-      public void onAnimationRepeat(Animation animation) {
-      }
-    });
+    //Used to trigger callback to Main when animation has finished. Only needed in Mode 1.
+    if (mMode==1) {
+      animateOut.setAnimationListener(new Animation.AnimationListener() {
+        @Override
+        public void onAnimationStart(Animation animation) {
+        }
+        @Override
+        public void onAnimationEnd(Animation animation) {
+          mOnFadeFinished.fadeHasFinished();
+        }
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+        }
+      });
+    }
   }
 
   public void setMode(int mode) {
@@ -73,6 +77,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public void setFadePositions(int sub, int add) {
     mPosSubHolder = sub; mPosAddHolder = add;
+  }
+
+  public void setPomFade(boolean fadingIn) {
+    this.mPomFadingIn = fadingIn;
   }
 
   @NonNull
@@ -133,6 +141,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
       //Sets work texts to green and break to red.
       if (position%2==0) modeThreeRounds.round_pomodoro.setTextColor(Color.GREEN); else modeThreeRounds.round_pomodoro.setTextColor(Color.RED);
+      setAnimationThree(modeThreeRounds.round_pomodoro, position);
     }
   }
 
@@ -179,6 +188,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
   }
 
+  //Animates each round in or out depending on args received from Main.
   public void setAnimation(TextView textView, int position) {
     if (position==mPosAddHolder) {
       textView.clearAnimation();
@@ -196,6 +206,19 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else if (position==mPosSubHolder) {
       imageView.clearAnimation();
       imageView.startAnimation(animateOut);
+    }
+  }
+
+  //Loads new animation for each position, and increases start delay by 100ms for each successive position.
+  public void setAnimationThree(TextView textView, int position) {
+    if (mPomFadingIn) {
+      animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+      animateIn.setStartOffset(100*position);
+      textView.startAnimation(animateIn);
+    } else {
+      animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+      animateOut.setStartOffset(100*position);
+      textView.startAnimation(animateOut);
     }
   }
 
