@@ -250,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int roundSubDelay;
 
   //Todo: Color all textView rows for pom edit, since we don't need to toggle between set/break.
-  //Todo: Add fade to pom rounds (quick successive from 1->8 rounds).
   //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -264,9 +263,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
-  //Todo: Centered "nothing saved" if cycle list empty.
   //Todo: editCycle popUp precludes action bar button use at the moment because it retains app focus. We can't remove that without borking other stuff (e.g. soft keyboard use).
-  //Todo: For retrievals in adapter: Add exception if position doesn't exist? While title/rounds/etc should always sync since they add/update in the same methods, it may be safer not to try to populate a position of nothing exists there.
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Make sure sort checkmark positions work on different size screens.
@@ -281,7 +278,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
   //Todo: Test everything 10x.
 
-   //Todo: REMEMBER, All notifyDataSetChanged() has to be called on main UI thread, since that is the one where we created the views it is refreshing.
    //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
    //Todo: REMINDER, Try next app w/ Kotlin.
 
@@ -646,12 +642,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               queryCycles();
               //UI views change, so running on main thread.
-            //Todo: Empty cycles text should toggle here.
             runOnUiThread(()-> {
                   //Sets all editTexts to GONE, and then populates them + textViews based on mode.
                   removeEditTimerViews(false);
                   editCycleViews();
                   populateCycleList(true);
+                  //Toggles "empty cycle" text if adapter list is empty.
                   checkEmptyCycles();
                   savedCycleAdapter.notifyDataSetChanged();
                   if (mode==1) {
@@ -1211,14 +1207,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Resets row selection and editText/textView values.
   public void resetRows() {
-    rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
-    //Our editText fields have listeners attached which call setEditValues(), which set our edit values AND setValue/breakValue vars to the values within the editText box itself. Here, we use 0:30 for both.
-    first_value_edit.setText(String.valueOf(0));
-    first_value_edit_two.setText(elongateEditSeconds(30));
-    second_value_edit.setText(String.valueOf(0));
-    second_value_edit_two.setText(elongateEditSeconds(30));
-    first_value_textView.setText(convertCustomTextView(setValue));
-    second_value_textView.setText(convertCustomTextView(breakValue));
+    if (mode==1) {
+      rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
+      //Our editText fields have listeners attached which call setEditValues(), which set our edit values AND setValue/breakValue vars to the values within the editText box itself. Here, we use 0:30 for both.
+      first_value_edit.setText(String.valueOf(0));
+      first_value_edit_two.setText(elongateEditSeconds(30));
+      second_value_edit.setText(String.valueOf(0));
+      second_value_edit_two.setText(elongateEditSeconds(30));
+      first_value_textView.setText(convertCustomTextView(setValue));
+      second_value_textView.setText(convertCustomTextView(breakValue));
+    }
+    else if (mode==3) {
+      rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
+      rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
+      rowSelect(s3, third_value_textView, third_value_edit, third_value_edit_two, third_value_sep, plus_third_value, minus_third_value, R.color.blue);
+    }
   }
 
   //Colors rows.
@@ -1841,6 +1844,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else roundSubDelay = 0;
       }
 
+      //Todo: We might want to move the timer value lists (not adapter display ones) away from delay handler so they get deleted instantly.
       //Refreshing the rounds adapter after a round has been removed. Above, we created a fade effect using the unmodified list values, and below on a delay handler, after the effect is finished, we re-draw.
       mHandler.postDelayed(()-> {
         if (mode==1) {
@@ -1878,11 +1882,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
         if (pomValuesTime.size() != 0) {
+          cycleRoundsAdapter.setPomFade(false);
+          cycleRoundsAdapter.notifyDataSetChanged();
+
+          mHandler.postDelayed(()->{
           pomValuesTime.clear();
           convertedPomList.clear();
-          //Todo: Will likely have same empty list issue as mode 1.
-          cycleRoundsAdapter.setPomFade(true);
-          cycleRoundsAdapter.notifyDataSetChanged();
+          },400);
         } else {
           Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
           return;

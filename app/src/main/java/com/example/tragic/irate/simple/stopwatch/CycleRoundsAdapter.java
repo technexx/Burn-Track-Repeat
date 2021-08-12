@@ -39,6 +39,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   Animation animateOut;
   onFadeFinished mOnFadeFinished;
   boolean mPomFadingIn;
+  int mPomFadePosition;
 
   public interface onFadeFinished {
     void fadeHasFinished();
@@ -79,6 +80,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     mPosSubHolder = sub; mPosAddHolder = add;
   }
 
+  //Todo: This executes for full loop before onBind is called, so only final entry (0) gets passed in. Logic needs to be localized here. Probably better just to do a full fade at once for Pom.
   public void setPomFade(boolean fadingIn) {
     this.mPomFadingIn = fadingIn;
   }
@@ -141,7 +143,17 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
       //Sets work texts to green and break to red.
       if (position%2==0) modeThreeRounds.round_pomodoro.setTextColor(Color.GREEN); else modeThreeRounds.round_pomodoro.setTextColor(Color.RED);
+
       setAnimationThree(modeThreeRounds.round_pomodoro, position);
+
+//      if (mPomFadingIn) setAnimationThree(modeThreeRounds.round_pomodoro, position); else
+//        //Todo: This will still order up from 0 because all positions will be called 8 times.
+//        for (int i=0; i<mPomList.size(); i++) {
+//          if (position==mPomList.size()-(i+1)) {
+//            Log.i("testpos", "position TRUE is " + (mPomList.size()-(i+1)));
+//            setAnimationThree(modeThreeRounds.round_pomodoro, position);
+//          }
+//        }
     }
   }
 
@@ -178,6 +190,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       infinity_rounds = itemView.findViewById(R.id.round_infinity);
     }
   }
+
 
   public class ModeThreeRounds extends RecyclerView.ViewHolder {
     public TextView round_pomodoro;
