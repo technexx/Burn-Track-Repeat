@@ -314,6 +314,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void fadeHasFinished() {
     roundIsFading = false;
+    //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
+    if (mode==3) {
+      pomValuesTime.clear();
+      convertedPomList.clear();
+      cycleRoundsAdapter.notifyDataSetChanged();
+    }
   }
 
   @Override
@@ -1220,7 +1226,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else if (mode==3) {
       rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
       rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
-      rowSelect(s3, third_value_textView, third_value_edit, third_value_edit_two, third_value_sep, plus_third_value, minus_third_value, R.color.blue);
+      rowSelect(s3, third_value_textView, third_value_edit, third_value_edit_two, third_value_sep, plus_third_value, minus_third_value, R.color.teal_200);
     }
   }
 
@@ -1884,11 +1890,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomValuesTime.size() != 0) {
           cycleRoundsAdapter.setPomFade(false);
           cycleRoundsAdapter.notifyDataSetChanged();
-
-          mHandler.postDelayed(()->{
-          pomValuesTime.clear();
-          convertedPomList.clear();
-          },400);
         } else {
           Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
           return;

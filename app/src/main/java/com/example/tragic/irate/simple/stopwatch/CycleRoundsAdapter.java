@@ -55,22 +55,22 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
     animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
 
+    //Todo: These listeners are nixxed when re-instantiating object in setAnimation method.
     //Used to trigger callback to Main when animation has finished. Only needed in Mode 1.
-    if (mMode==1) {
-      animateOut.setAnimationListener(new Animation.AnimationListener() {
-        @Override
-        public void onAnimationStart(Animation animation) {
-        }
-        @Override
-        public void onAnimationEnd(Animation animation) {
-          mOnFadeFinished.fadeHasFinished();
-        }
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-        }
-      });
-    }
+    animateOut.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        mOnFadeFinished.fadeHasFinished();
+      }
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
   }
+
 
   public void setMode(int mode) {
     mMode = mode;
@@ -145,15 +145,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       if (position%2==0) modeThreeRounds.round_pomodoro.setTextColor(Color.GREEN); else modeThreeRounds.round_pomodoro.setTextColor(Color.RED);
 
       setAnimationThree(modeThreeRounds.round_pomodoro, position);
-
-//      if (mPomFadingIn) setAnimationThree(modeThreeRounds.round_pomodoro, position); else
-//        //Todo: This will still order up from 0 because all positions will be called 8 times.
-//        for (int i=0; i<mPomList.size(); i++) {
-//          if (position==mPomList.size()-(i+1)) {
-//            Log.i("testpos", "position TRUE is " + (mPomList.size()-(i+1)));
-//            setAnimationThree(modeThreeRounds.round_pomodoro, position);
-//          }
-//        }
     }
   }
 
@@ -191,7 +182,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
   }
 
-
   public class ModeThreeRounds extends RecyclerView.ViewHolder {
     public TextView round_pomodoro;
 
@@ -222,15 +212,14 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
   }
 
-  //Loads new animation for each position, and increases start delay by 100ms for each successive position.
   public void setAnimationThree(TextView textView, int position) {
     if (mPomFadingIn) {
+      //Loads new animation for each position, and increases start delay by 100ms for each successive position.
       animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
       animateIn.setStartOffset(100*position);
       textView.startAnimation(animateIn);
     } else {
-      animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
-      animateOut.setStartOffset(100*position);
+      //Fades out all rounds at once when removing cycle.
       textView.startAnimation(animateOut);
     }
   }
