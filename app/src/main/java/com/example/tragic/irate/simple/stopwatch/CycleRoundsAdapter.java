@@ -32,14 +32,12 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   public static final int MODE_ONE = 1;
   public static final int MODE_THREE = 3;
   int mMode = 1;
-  List<Integer> mPositionList;
   int mPosAddHolder;
   int mPosSubHolder;
   Animation animateIn;
   Animation animateOut;
   onFadeFinished mOnFadeFinished;
   boolean mPomFadingIn;
-  int mPomFadePosition;
 
   public interface onFadeFinished {
     void fadeHasFinished();
@@ -51,11 +49,11 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
     this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound; mPomList = pomList;
-    mPositionList = new ArrayList<>();
     animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
     animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+    animateIn.setDuration(300);
+    animateOut.setDuration(300);
 
-    //Todo: These listeners are nixxed when re-instantiating object in setAnimation method.
     //Used to trigger callback to Main when animation has finished. Only needed in Mode 1.
     animateOut.setAnimationListener(new Animation.AnimationListener() {
       @Override
@@ -71,7 +69,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     });
   }
 
-
   public void setMode(int mode) {
     mMode = mode;
   }
@@ -80,9 +77,13 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     mPosSubHolder = sub; mPosAddHolder = add;
   }
 
-  //Todo: This executes for full loop before onBind is called, so only final entry (0) gets passed in. Logic needs to be localized here. Probably better just to do a full fade at once for Pom.
   public void setPomFade(boolean fadingIn) {
     this.mPomFadingIn = fadingIn;
+  }
+
+  public void endFade() {
+    animateIn.cancel();
+    animateOut.cancel();
   }
 
   @NonNull
@@ -103,7 +104,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (holder instanceof ModeOneRounds) {
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
-      mPositionList.add(position);
 
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
       switch (mTypeOfRound.get(position)) {

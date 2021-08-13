@@ -49,6 +49,8 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound;
         animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
         animateOut = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_out_right);
+        animateIn.setDuration(300);
+        animateOut.setDuration(300);
 
         //Used to trigger callback to Main when animation has finished.
         animateOut.setAnimationListener(new Animation.AnimationListener() {
@@ -111,12 +113,13 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             Spannable spannable = new SpannableString("09 -");
             spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#37474F")), 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             modeOneRounds.round_count.setText(spannable);
-        } else
-        modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
+        } else modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-
+        //Sets animation of round number.
         setAnimation(modeOneRounds.round_count, position);
-        setAnimation(modeOneRounds.workout_rounds, position);
+        //Animates round value (either infinity or timer value).
+        if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
+        else setAnimationTwo(modeOneRounds.infinity_rounds, position);
     }
 
     @Override
@@ -146,6 +149,16 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             textView.clearAnimation();
             textView.startAnimation(animateOut);
             positionCount++;
+        }
+    }
+
+    public void setAnimationTwo(ImageView imageView, int position) {
+        if (position==mPosAddHolder) {
+            imageView.clearAnimation();
+            imageView.startAnimation(animateIn);
+        } else if (position==mPosSubHolder) {
+            imageView.clearAnimation();
+            imageView.startAnimation(animateOut);
         }
     }
 

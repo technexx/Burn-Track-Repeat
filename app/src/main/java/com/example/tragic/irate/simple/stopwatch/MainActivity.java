@@ -313,7 +313,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //This callback method works for both round adapters.
   @Override
   public void fadeHasFinished() {
-    roundIsFading = false;
+    //When adapter fade on round has finished, execute method to remove the round from adapter list/holders and refresh the adapter display. If we click to remove another round before fade is done, fade gets cancelled, restarted on next position, and this method is also called to remove previous round.
+    removeRound();
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode==3) {
       pomValuesTime.clear();
@@ -1751,6 +1752,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void adjustCustom(boolean adding) {
+    //Hides soft keyboard by using a token of the current editCycleView.
+    inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+    //Todo: Use same callback method for add's fading.
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       setEditValues();
@@ -1829,62 +1833,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     } else {
-      if (workoutTime.size()<=8) {
-        //If round is not currently fading out, tell adapter to begin fade animation and set the delay for post-subtraction round display to 400.
-        //If list size is 0, set the delay handler to 0 so "Empty" Toast triggers right away.
-        if (!roundIsFading && workoutTime.size()!=0) {
-          //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-          cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
-          cycleRoundsAdapter.notifyDataSetChanged();
-          roundSubDelay = 400;
-          roundIsFading = true;
-          //If round is already fading, we do not begin another animation, and we set the delay to show the next updated round count (below) to 0.
-        } else roundSubDelay = 0;
-      } else {
-        if (!roundIsFading) {
-          //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-          cycleRoundsAdapterTwo.setFadePositions(workoutTime.size()-9, -1);
-          cycleRoundsAdapterTwo.notifyDataSetChanged();
-          roundSubDelay = 400;
-          roundIsFading = true;
-        } else roundSubDelay = 0;
+      if (mode==1) {
+        //If clicking to subtract round while a fading animation for a previous removal is active, call method to cancel animation and remove current round. Otherwise, end of animation will trigger a callback in adapter that will call this same method. Either way, round is removed.
+        if (roundIsFading) removeRound();
+
+        //If at least one round is present, call fade animation in adapter.
+        if (workoutTime.size()>0) {
+          if (workoutTime.size()<=8) {
+            //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
+            cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
+            cycleRoundsAdapter.notifyDataSetChanged();
+            roundIsFading = true;
+          } else {
+            //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
+            cycleRoundsAdapterTwo.setFadePositions(workoutTime.size()-9, -1);
+            cycleRoundsAdapterTwo.notifyDataSetChanged();
+            roundIsFading = true;
+          }
+        } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
       }
-
-      //Todo: We might want to move the timer value lists (not adapter display ones) away from delay handler so they get deleted instantly.
-      //Refreshing the rounds adapter after a round has been removed. Above, we created a fade effect using the unmodified list values, and below on a delay handler, after the effect is finished, we re-draw.
-      mHandler.postDelayed(()-> {
-        if (mode==1) {
-          if (workoutTime.size()>0) {
-            typeOfRound.remove(typeOfRound.size()-1);
-            workoutTime.remove(workoutTime.size()-1);
-            convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
-            //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
-            if (workoutTime.size()<=7) {
-              roundHolderOne.remove(roundHolderOne.size()-1);
-              typeHolderOne.remove(typeHolderOne.size()-1);
-              //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
-              cycleRoundsAdapter.setFadePositions(-1, -1);
-              cycleRoundsAdapter.notifyDataSetChanged();
-            } else {
-              roundHolderTwo.remove(roundHolderTwo.size()-1);
-              typeHolderTwo.remove(typeHolderTwo.size()-1);
-              //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
-              cycleRoundsAdapterTwo.setFadePositions(-1,  -1);
-              cycleRoundsAdapterTwo.notifyDataSetChanged();
-            }
-            //If moving from two lists to one, set its visibility and change layout params.
-            if (workoutTime.size()==8) {
-              roundRecyclerTwo.setVisibility(View.GONE);
-              recyclerLayoutOne.leftMargin = 240;
-              roundListDivider.setVisibility(View.GONE);
-            }
-            //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
-            roundIsFading = false;
-            //Only want this Toast triggering if there is no delay set, which we handle above.
-          } else if (roundSubDelay==0) Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
-        }
-      }, roundSubDelay);
-
       if (mode==3) {
         //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
         if (pomValuesTime.size() != 0) {
@@ -1896,8 +1863,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     }
-    //Hides soft keyboard by using a token of the current editCycleView.
-    inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+  }
+
+  public void removeRound () {
+    //Cancels animation if we click to remove a round while removal animation for previous one is active.
+    cycleRoundsAdapter.endFade();
+    //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
+    if (mode==1) {
+      typeOfRound.remove(typeOfRound.size()-1);
+      workoutTime.remove(workoutTime.size()-1);
+      convertedWorkoutTime.remove(convertedWorkoutTime.size()-1);
+      //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
+      if (workoutTime.size()<=7) {
+        roundHolderOne.remove(roundHolderOne.size()-1);
+        typeHolderOne.remove(typeHolderOne.size()-1);
+        //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
+        cycleRoundsAdapter.setFadePositions(-1, -1);
+        cycleRoundsAdapter.notifyDataSetChanged();
+      } else {
+        roundHolderTwo.remove(roundHolderTwo.size()-1);
+        typeHolderTwo.remove(typeHolderTwo.size()-1);
+        //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
+        cycleRoundsAdapterTwo.setFadePositions(-1,  -1);
+        cycleRoundsAdapterTwo.notifyDataSetChanged();
+      }
+      //If moving from two lists to one, set its visibility and change layout params.
+      if (workoutTime.size()==8) {
+        roundRecyclerTwo.setVisibility(View.GONE);
+        recyclerLayoutOne.leftMargin = 240;
+        roundListDivider.setVisibility(View.GONE);
+      }
+      //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
+      roundIsFading = false;
+    }
   }
 
   public String friendlyString(String altString) {
