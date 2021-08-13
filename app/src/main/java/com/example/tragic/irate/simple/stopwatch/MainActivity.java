@@ -249,8 +249,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: Color all textView rows for pom edit, since we don't need to toggle between set/break.
+  //Todo: Could long svg files be a lag contributor?
+  //Todo: Add "deleted" toast to highlight mode deletes.
   //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
+  //Todo: End animation not playing w/ pom rounds (either skip or natural ending).
   //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -1754,7 +1756,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void adjustCustom(boolean adding) {
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-    //Todo: Use same callback method for add's fading.
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       setEditValues();

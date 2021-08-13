@@ -47,14 +47,14 @@
 
     <ImageButton
         android:id="@+id/stopwatch_button"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="6dp"
         android:layout_marginBottom="3dp"
-        android:src="@drawable/stopwatch_icon"
-        android:background="@drawable/rounded"
+        android:src="@drawable/ic_black_pointer"
+        android:background="@drawable/fab_circle"
         app:elevation="8dp">
     </ImageButton>
 
