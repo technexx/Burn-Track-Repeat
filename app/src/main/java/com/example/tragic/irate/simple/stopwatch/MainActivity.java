@@ -247,9 +247,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String typeCompare;
   String titleCompare;
   boolean roundIsFading;
-  int roundSubDelay;
 
-  //Todo: End animation not playing w/ pom rounds (either skip or natural ending).
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.

@@ -559,7 +559,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     //Disables button for 1 second after push. Re-enables it through runnable after that.
     next_round.setOnClickListener(v -> {
-      setNextRound(true);
+      nextRound(true);
     });
 
     reset.setOnClickListener(v -> {
@@ -701,7 +701,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       @Override
       public void onFinish() {
-        setNextRound(false);
+        nextRound(false);
       }
     }.start();
   }
@@ -734,7 +734,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         @Override
         public void onFinish() {
-          setNextRound(false);
+          nextRound(false);
         }
       }.start();
     }
@@ -782,7 +782,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       @Override
       public void onFinish() {
-        setNextRound(false);
+        nextRound(false);
       }
     }.start();
   }
@@ -919,7 +919,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
-  public void setNextRound(boolean endingEarly) {
+  public void nextRound(boolean endingEarly) {
+    //Todo: If we want end of cycle to avoid blue progressBar entirely, we need to change this for last round execution.
+    //Fade effect to smooth out progressBar and timer text after animation.
+    progressBar.startAnimation(fadeProgressOut);
+    timeLeft.startAnimation(fadeProgressOut);
     //If no rounds left, remove our endFade runnable, reset timer, and return before executing anything else. The button tied to this method will be disabled until the proper rounded subtraction can occur.
     if (mode==1) {
       if (numberOfRoundsLeft==0) {
@@ -937,10 +941,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     timerDisabled = true;
     //Resets default base (30 sec) for count-up rounds.
     progressBarValueHolder = 30000;
-    //Todo: If we want end of cycle to avoid blue progressBar entirely, we need to change this for last round execution.
-    //Fade effect to smooth out progressBar and timer text after animation.
-    progressBar.startAnimation(fadeProgressOut);
-    timeLeft.startAnimation(fadeProgressOut);
     //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
     mHandler.post(endFade);
     //Saves total set/break times.
@@ -1050,6 +1050,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
     if (mode==3) {
       timeLeft.setText("0");
+      mHandler.post(endFade);
+      //If skipping round manually, cancel timer and objectAnimator.
+      if (endingEarly) {
+        if (timer != null) timer.cancel();
+        if (objectAnimator != null) objectAnimator.cancel();
+        progressBar.setProgress(0);
+      }
 
       mHandler.postDelayed(()-> {
         pomDotCounter++;
@@ -1058,12 +1065,9 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
         if (pomDotCounter<=7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
-          if (timerIsPaused) {
-            timeLeft.setText(convertSeconds((pomMillis) / 1000));
-          } else {
-            startObjectAnimator();
-            startPomTimer();
-          }
+          timeLeft.setText(convertSeconds((pomMillis) / 1000));
+          startObjectAnimator();
+          startPomTimer();
         } else {
           //Continuous animation for end of cycle.
           animateEnding();
