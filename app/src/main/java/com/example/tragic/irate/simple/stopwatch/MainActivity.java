@@ -249,11 +249,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   int roundSubDelay;
 
-  //Todo: Could long svg files be a lag contributor?
-  //Todo: Add "deleted" toast to highlight mode deletes.
-  //Todo: Stopwatch button should be either a)rounded in its button layout or b)translucent in the middle (like FAB, w/ a circle shape drawn around a plus sign).
   //Todo: End animation not playing w/ pom rounds (either skip or natural ending).
-  //Todo: Ideally, sub round fades should animate next round even after quick clicks, just like add fades.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
@@ -266,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
   //Todo: editCycle popUp precludes action bar button use at the moment because it retains app focus. We can't remove that without borking other stuff (e.g. soft keyboard use).
+  //Todo: Could long svg files be a lag contributor?
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Make sure sort checkmark positions work on different size screens.
@@ -949,6 +946,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             delete_highlighted_cycle.setVisibility(View.INVISIBLE);
             appHeader.setVisibility(View.VISIBLE);
             savedCycleAdapter.removeHighlight(true);
+            Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
           }
         });
       });
