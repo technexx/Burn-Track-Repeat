@@ -395,6 +395,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
     }
 
+    //Todo: No values passed in on edit.
     /////---------Testing pom round iterations---------------/////////
     if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 6000);
 

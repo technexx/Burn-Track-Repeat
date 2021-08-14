@@ -248,6 +248,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String titleCompare;
   boolean roundIsFading;
 
+  //Todo: Title not showing in Timer for pom. Also, 0 index to retrieve for edit.
+  //Todo: Removed "saved" toast for pom when not changing values.
+  //Todo: Reset round layout when moving to mode 3.
+  //Todo: Minimize aSync threads for performance.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
@@ -314,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeRound();
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode==3) {
+      //Todo: This triggers when trying to edit cycles. Because we don't use a conditional to fade a certain position in mode 3 (as we do in mode 1), the fade method triggers either IN or OUT -every time- the adapter refreshes.
       pomValuesTime.clear();
       convertedPomList.clear();
       cycleRoundsAdapter.notifyDataSetChanged();
@@ -880,9 +885,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 typeHolderTwo.add(typeOfRound.get(i));
               }
             }
-            //Title has already been retrieved via retrieveRoundList().
             break;
           case 3:
+            //Since our fade animation listener clears our timer and adapter lists, we disable it here when we need to pull up saved cycles.
+            cycleRoundsAdapter.disablePomFade();
             for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
             break;
         }
@@ -905,12 +911,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Setting editText title.
           cycle_name_edit.setText(cycleTitle);
           //Updating adapter views.
+          //Todo: First adapter called twice. Adapter values are fine.
           cycleRoundsAdapter.notifyDataSetChanged();
           cycleRoundsAdapterTwo.notifyDataSetChanged();
           //Removing highlights.
           savedCycleAdapter.removeHighlight(true);
           //Boolean set to false indicates that a current database-saved cycle is populating our editCyclesPopup.
           onNewCycle = false;
+          Log.i("testPom", "pomValuesTime is " + pomValuesTime);
+          Log.i("testPom", "pomConverted is " + convertedPomList);
         });
       });
     });
@@ -1316,7 +1325,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     typeHolderOne.clear();
     typeHolderTwo.clear();
 
-    pomValuesTime.clear();
     convertedPomList.clear();
   }
 
@@ -1813,6 +1821,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
       }
       if (mode==3) {
+        Log.i("testPom", "pomValuesTime IN ADJUST is " + pomValuesTime);
         if (pomValuesTime.size()==0) {
           for (int i = 0; i < 3; i++) {
             pomValuesTime.add(pomValue1 * 1000);
@@ -2136,10 +2145,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomCycles.setTimeAccessed(System.currentTimeMillis());;
           if (newCycle) {
             pomCycles.setTimeAdded(System.currentTimeMillis());
-            if (!cycleTitle.isEmpty()) pomCycles.setTitle(cycleTitle); else pomCycles.setTitle(date);
+            if (cycleTitle.isEmpty()) cycleTitle = date;
+            pomCycles.setTitle(cycleTitle);
             cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
           } else {
-            if (!cycleTitle.isEmpty()) pomCycles.setTitle(cycleTitle);
+            pomCycles.setTitle(cycleTitle);
             cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
           }
         }

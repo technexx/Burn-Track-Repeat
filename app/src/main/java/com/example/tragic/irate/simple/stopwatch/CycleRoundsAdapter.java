@@ -38,6 +38,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   Animation animateOut;
   onFadeFinished mOnFadeFinished;
   boolean mPomFadingIn;
+  boolean mFadePom;
 
   public interface onFadeFinished {
     void fadeHasFinished();
@@ -77,8 +78,14 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     mPosSubHolder = sub; mPosAddHolder = add;
   }
 
+  public void disablePomFade() {
+    mFadePom = false;
+  }
+
   public void setPomFade(boolean fadingIn) {
     this.mPomFadingIn = fadingIn;
+    //Determines whether we want an active animation. Since animateOut's listener clears our adapter lists at fade'a end, we don't want it triggered unless we are actively adding/removing a list.
+    mFadePom = true;
   }
 
   public void endFade() {
@@ -213,14 +220,16 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   }
 
   public void setAnimationThree(TextView textView, int position) {
-    if (mPomFadingIn) {
-      //Loads new animation for each position, and increases start delay by 100ms for each successive position.
-      animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
-      animateIn.setStartOffset(100*position);
-      textView.startAnimation(animateIn);
-    } else {
-      //Fades out all rounds at once when removing cycle.
-      textView.startAnimation(animateOut);
+    if (mFadePom) {
+      if (mPomFadingIn) {
+        //Loads new animation for each position, and increases start delay by 100ms for each successive position.
+        animateIn = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+        animateIn.setStartOffset(100*position);
+        textView.startAnimation(animateIn);
+      } else {
+        //Fades out all rounds at once when removing cycle.
+        textView.startAnimation(animateOut);
+      }
     }
   }
 
