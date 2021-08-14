@@ -248,8 +248,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String titleCompare;
   boolean roundIsFading;
 
-  //Todo: Title not showing in Timer for pom. Also, 0 index to retrieve for edit.
-  //Todo: Removed "saved" toast for pom when not changing values.
   //Todo: Reset round layout when moving to mode 3.
   //Todo: Minimize aSync threads for performance.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -318,7 +316,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeRound();
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode==3) {
-      //Todo: This triggers when trying to edit cycles. Because we don't use a conditional to fade a certain position in mode 3 (as we do in mode 1), the fade method triggers either IN or OUT -every time- the adapter refreshes.
       pomValuesTime.clear();
       convertedPomList.clear();
       cycleRoundsAdapter.notifyDataSetChanged();
@@ -821,10 +818,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editingCycle) {
         savedCycleAdapter.removeHighlight(true);
         //If all fetched values equal current values (i.e. no changes have been made), exit method.
-        if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) {
-          //Calls notify so highlight removal is shown.
-          savedCycleAdapter.notifyDataSetChanged();
-          return;
+        if (mode==1) {
+          if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) {
+            //Calls notify so highlight removal is shown.
+            savedCycleAdapter.notifyDataSetChanged();
+            return;
+          }
+        }
+        if (mode==3) {
+          if (gson.toJson(pomValuesTime).equals(timeCompare) && cycleTitle.equals(titleCompare)) {
+            //Calls notify so highlight removal is shown.
+            savedCycleAdapter.notifyDataSetChanged();
+            return;
+          }
         }
         AsyncTask.execute(()->{
           saveCycles(false);
@@ -911,15 +917,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Setting editText title.
           cycle_name_edit.setText(cycleTitle);
           //Updating adapter views.
-          //Todo: First adapter called twice. Adapter values are fine.
           cycleRoundsAdapter.notifyDataSetChanged();
           cycleRoundsAdapterTwo.notifyDataSetChanged();
           //Removing highlights.
           savedCycleAdapter.removeHighlight(true);
           //Boolean set to false indicates that a current database-saved cycle is populating our editCyclesPopup.
           onNewCycle = false;
-          Log.i("testPom", "pomValuesTime is " + pomValuesTime);
-          Log.i("testPom", "pomConverted is " + convertedPomList);
         });
       });
     });
