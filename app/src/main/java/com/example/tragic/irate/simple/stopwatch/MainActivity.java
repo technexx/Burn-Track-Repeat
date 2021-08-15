@@ -23,6 +23,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +35,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -248,19 +250,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String titleCompare;
   boolean roundIsFading;
 
-  //Todo: Reset round layout when moving to mode 3.
-  //Todo: Minimize aSync threads for performance.
-  //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
+  float popUpDensityPixelsHeight;
+  float popUpDensityPixelsWWidth;
+
+  //Todo: Test layouts w/ emulator. Right now, popups aren't in dp
+  // (i.e. edit cycle takes up less screen in emulator, round list goes off screen, Timer Canvas is too small).
+  //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
+  //Todo: Instead of drag/drop switch for round order, option to highlight and replace.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
-  //Todo: Possible drag/drop switch for round order.
   //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
   //Todo: Letter -> Number soft kb is a bit choppy.
-  //Todo: For performance: minimize db calls (e.g. if a list has already been saved and you just need an adapter populated, simply use new array lists).
-  //Todo: Make sure when using intents, especially from Timer -> Main, that they're sent every time we exit the class (e.g. deleting the current cycle, onBackPressed, exitTimer(), etc.)
 
+  //Todo: Minimize aSync threads for performance.
   //Todo: editCycle popUp precludes action bar button use at the moment because it retains app focus. We can't remove that without borking other stuff (e.g. soft keyboard use).
   //Todo: Could long svg files be a lag contributor?
   //Todo: Load/draw canvas in aSync for performance?
@@ -380,7 +384,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1430, true);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, setDensityPixels(480), true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -508,6 +512,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
 
+//    popUpDensityPixelsHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 400, getResources().getDisplayMetrics());
+//    popUpDensityPixelsWWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
+
     //Retrieves checkmark position for sort popup.
     setSortCheckmark();
 
@@ -582,6 +589,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Using exclusively programmatic layout params for round recyclerViews. Setting defaults. Second will never change.
         recyclerLayoutOne.leftMargin = 240;
         recyclerLayoutTwo.leftMargin = 450;
+
+        Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
+        slide_left.setDuration(500);
+        savedCycleRecycler.startAnimation(slide_left);
 
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.
         removeEditTimerViews(false);
@@ -660,8 +671,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       sortHigh.setVisibility(View.VISIBLE);
                       sortLow.setVisibility(View.VISIBLE);
                   } else {
-                      sortHigh.setVisibility(View.GONE);
-                      sortLow.setVisibility(View.GONE);
+                    sortHigh.setVisibility(View.GONE);
+                    sortLow.setVisibility(View.GONE);
+                    //Since mode 3 only uses one adapter layout, set it here.
+                    roundRecyclerTwo.setVisibility(View.GONE);
+                    recyclerLayoutOne.leftMargin = 240;
+                    roundListDivider.setVisibility(View.GONE);
                   }
               });
           });
@@ -1199,6 +1214,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Removes confirmation window.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
+  }
+
+  public int setDensityPixels(float pixels) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
   }
 
   public void checkEmptyCycles() {
@@ -1824,7 +1843,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
       }
       if (mode==3) {
-        Log.i("testPom", "pomValuesTime IN ADJUST is " + pomValuesTime);
         if (pomValuesTime.size()==0) {
           for (int i = 0; i < 3; i++) {
             pomValuesTime.add(pomValue1 * 1000);
