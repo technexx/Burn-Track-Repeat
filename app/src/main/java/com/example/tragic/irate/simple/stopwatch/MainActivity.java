@@ -384,7 +384,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, setDensityPixels(480), true);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+//    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, setDensityPixels(480), true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);

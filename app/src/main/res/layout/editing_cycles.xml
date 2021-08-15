@@ -462,4 +462,12 @@
         android:background="@drawable/start_cycle">
     </ImageButton>
 
+    <!--Empty view constrained to bottom so we can get a fullscreen editPopup w/ just wrap_content.-->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </View>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
