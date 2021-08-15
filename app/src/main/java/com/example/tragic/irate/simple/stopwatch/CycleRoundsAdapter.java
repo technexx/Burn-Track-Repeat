@@ -88,11 +88,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     mFadePom = true;
   }
 
-  public void endFade() {
-    animateIn.cancel();
-    animateOut.cancel();
-  }
-
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -198,6 +193,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
   }
 
+  //Todo: Animations get called 2x (for round # and times), so two callbacks from here->Main for removeRound().
   //Animates each round in or out depending on args received from Main.
   public void setAnimation(TextView textView, int position) {
     if (position==mPosAddHolder) {

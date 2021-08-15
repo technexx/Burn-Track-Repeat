@@ -253,8 +253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelsWWidth;
 
-  //Todo: Test layouts w/ emulator. Right now, popups aren't in dp
-  // (i.e. edit cycle takes up less screen in emulator, round list goes off screen, Timer Canvas is too small).
+  //Todo: Sub rounds is removing 2 ronds.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
   //Todo: Instead of drag/drop switch for round order, option to highlight and replace.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -279,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
   //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
   //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
+  //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
 
    //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
@@ -317,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void fadeHasFinished() {
     //When adapter fade on round has finished, execute method to remove the round from adapter list/holders and refresh the adapter display. If we click to remove another round before fade is done, fade gets cancelled, restarted on next position, and this method is also called to remove previous round.
+    //Todo: Executing twice per click.
     removeRound();
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode==3) {
@@ -1863,7 +1864,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       if (mode==1) {
         //If clicking to subtract round while a fading animation for a previous removal is active, call method to cancel animation and remove current round. Otherwise, end of animation will trigger a callback in adapter that will call this same method. Either way, round is removed.
-        if (roundIsFading) removeRound();
+        if (roundIsFading) {
+          removeRound();
+        }
 
         //If at least one round is present, call fade animation in adapter.
         if (workoutTime.size()>0) {
@@ -1895,7 +1898,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void removeRound () {
     //Cancels animation if we click to remove a round while removal animation for previous one is active.
-    cycleRoundsAdapter.endFade();
+//    cycleRoundsAdapter.endFade();
     //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
     if (mode==1) {
       typeOfRound.remove(typeOfRound.size()-1);
