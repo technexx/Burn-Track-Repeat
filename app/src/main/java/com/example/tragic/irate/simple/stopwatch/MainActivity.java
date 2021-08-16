@@ -69,7 +69,7 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -314,7 +314,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void fadeHasFinished() {
     //When adapter fade on round has finished, execute method to remove the round from adapter list/holders and refresh the adapter display. If we click to remove another round before fade is done, fade gets cancelled, restarted on next position, and this method is also called to remove previous round.
-    //Todo: Executing twice per click.
     removeRound();
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode==3) {
@@ -322,6 +321,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertedPomList.clear();
       cycleRoundsAdapter.notifyDataSetChanged();
     }
+  }
+
+  @Override
+  public void roundSelected(int position) {
+
   }
 
   @Override
@@ -566,6 +570,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
         cycleRoundsAdapter.fadeFinished(MainActivity.this);
         cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
+        //Todo: Remember to set this for second adapter once callback is live.
+        cycleRoundsAdapter.selectedRound(MainActivity.this);
         //Only first adapter is used for Pom mode, so only needs to be set here.
         cycleRoundsAdapter.setMode(mode);
 

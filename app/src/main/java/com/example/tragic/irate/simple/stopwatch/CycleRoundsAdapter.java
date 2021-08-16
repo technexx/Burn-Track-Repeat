@@ -30,7 +30,8 @@ import java.util.List;
 public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
   Context mContext;
-  View fullView;
+  onFadeFinished mOnFadeFinished;
+  onRoundSelected mOnRoundSelected;
   ArrayList<String> mWorkOutList;
   ArrayList<Integer> mTypeOfRound;
   ArrayList<String> mPomList;
@@ -41,16 +42,27 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   int mPosSubHolder;
   Animation animateIn;
   Animation animateOut;
-  onFadeFinished mOnFadeFinished;
+
   boolean mPomFadingIn;
   boolean mFadePom;
+
+  boolean mRoundSelected;
+  int mPositionOfSelectedRound;
 
   public interface onFadeFinished {
     void fadeHasFinished();
   }
 
+  public interface onRoundSelected {
+    void roundSelected(int position);
+  }
+
   public void fadeFinished(onFadeFinished xOnFadeFinished) {
     this.mOnFadeFinished = xOnFadeFinished;
+  }
+
+  public void selectedRound(onRoundSelected xOnRoundSelected) {
+    this.mOnRoundSelected = xOnRoundSelected;
   }
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
@@ -111,12 +123,26 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (holder instanceof ModeOneRounds) {
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
-
       //No bullets visible unless a round is selected.
       modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+
+      //If a round has been selected (and boolean set to true), set only that position's bullet to visible.
+      if (mRoundSelected) if (position==mPositionOfSelectedRound) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
+      //On last iteration of this method (i.e. the adapter's last position), reset selectedRound boolean to false.
+      if (position==mWorkOutList.size()-1) mRoundSelected = false;
+
       modeOneRounds.fullView.setOnClickListener(v -> {
-        if (modeOneRounds.selection_bullet.getVisibility()==View.INVISIBLE) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
-        else modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+        //Toggles bullet appearance next to each round, and de-selects a round if another is selected.
+        if (modeOneRounds.selection_bullet.getVisibility()==View.INVISIBLE) {
+          modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
+          //This var is used to make visible the correct bullet position when we re-draw this adapter's list.
+          mPositionOfSelectedRound = position;
+          //Used to indicate a round has been selected.
+          mRoundSelected = true;
+          //Since we need to remove the previous bullet when selecting a new round, we need to re-draw the list.
+          notifyDataSetChanged();
+          //If position we are clicking on shows a bullet, remove it.
+        } else modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
       });
 
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
@@ -146,6 +172,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
 
+      //Todo: Remember, animation will execute every time list is refreshed.
       //Animates round number.
       setAnimation(modeOneRounds.round_count, position);
       //Animates round value (either infinity or timer value).
@@ -187,7 +214,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public TextView round_count;
     public TextView workout_rounds;
     public ImageView infinity_rounds;
-    public TextView selection_bullet;
+    public ImageView selection_bullet;
     public View fullView;
 
     public ModeOneRounds(@NonNull View itemView) {
