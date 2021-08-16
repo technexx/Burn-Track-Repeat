@@ -36,13 +36,26 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     Animation animateIn;
     Animation animateOut;
     onFadeFinished mOnFadeFinished;
+    onRoundSelected mOnRoundSelected;
+
+    boolean mRunRoundAnimation;
+    boolean mRoundSelected;
+    int mPositionOfSelectedRound;
 
     public interface onFadeFinished {
         void fadeHasFinished();
     }
 
+    public interface onRoundSelected {
+        void roundSelected(int position);
+    }
+
     public void fadeFinished(onFadeFinished xOnFadeFinished) {
         this.mOnFadeFinished = xOnFadeFinished;
+    }
+
+    public void selectedRound(onRoundSelected xOnRoundSelected) {
+        this.mOnRoundSelected = xOnRoundSelected;
     }
 
     public CycleRoundsAdapterTwo(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound) {
@@ -68,7 +81,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     public void setFadePositions(int sub, int add) {
-        mPosSubHolder = sub; mPosAddHolder = add;
+        mPosSubHolder = sub; mPosAddHolder = add; mRunRoundAnimation = true;
     }
 
     @NonNull
@@ -83,6 +96,26 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         //Casts our custom recyclerView to generic recyclerView class.
         CycleRoundsAdapterTwo.ModeOneRounds modeOneRounds = (CycleRoundsAdapterTwo.ModeOneRounds) holder;
+        modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+
+        //If a round has been selected (and boolean set to true), set only that position's bullet to visible.
+        if (mRoundSelected) if (position==mPositionOfSelectedRound) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
+        //On last iteration of this method (i.e. the adapter's last position), reset selectedRound boolean to false.
+        if (position==mWorkOutList.size()-1) mRoundSelected = false;
+
+        modeOneRounds.fullView.setOnClickListener(v -> {
+            //Toggles bullet appearance next to each round, and de-selects a round if another is selected.
+            if (modeOneRounds.selection_bullet.getVisibility()==View.INVISIBLE) {
+                modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
+                //This var is used to make visible the correct bullet position when we re-draw this adapter's list.
+                mPositionOfSelectedRound = position;
+                //Used to indicate a round has been selected.
+                mRoundSelected = true;
+                //Since we need to remove the previous bullet when selecting a new round, we need to re-draw the list.
+                notifyDataSetChanged();
+                //If position we are clicking on shows a bullet, remove it.
+            } else modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+        });
 
         //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
         switch (mTypeOfRound.get(position)) {
@@ -108,6 +141,15 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
+        //Only runs fade animation if adding/subtracting rounds.
+        if (mRunRoundAnimation) {
+            //Sets animation of round number.
+            setAnimation(modeOneRounds.round_count, position);
+            //Animates round value (either infinity or timer value).
+            if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
+            else setAnimationTwo(modeOneRounds.infinity_rounds, position);
+        }
+
         //For moment, using "09" on first round of this adapter, and setting "0" to same color as background. Trouble aligning otherwise.
         if (position==0) {
             Spannable spannable = new SpannableString("09 -");
@@ -115,11 +157,8 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             modeOneRounds.round_count.setText(spannable);
         } else modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-        //Sets animation of round number.
-        setAnimation(modeOneRounds.round_count, position);
-        //Animates round value (either infinity or timer value).
-        if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
-        else setAnimationTwo(modeOneRounds.infinity_rounds, position);
+        //Last adapter position has been iterated through, and we set our fade animation boolean back to false.
+        if (position==mWorkOutList.size()-1) mRunRoundAnimation = false;
     }
 
     @Override
@@ -131,12 +170,16 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         public TextView round_count;
         public TextView workout_rounds;
         public ImageView infinity_rounds;
+        public ImageView selection_bullet;
+        public View fullView;
 
         public ModeOneRounds(@NonNull View itemView) {
             super(itemView);
             round_count = itemView.findViewById(R.id.round_count);
             workout_rounds = itemView.findViewById(R.id.workout_rounds);
             infinity_rounds = itemView.findViewById(R.id.round_infinity);
+            selection_bullet = itemView.findViewById(R.id.selection_bullet);
+            fullView = itemView;
         }
     }
 

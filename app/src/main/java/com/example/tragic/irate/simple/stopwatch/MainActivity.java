@@ -69,7 +69,7 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -323,6 +323,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //This callback method works for both round adapters.
+  //Receives position of selected round from adapter.
   @Override
   public void roundSelected(int position) {
 
@@ -570,8 +572,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
         cycleRoundsAdapter.fadeFinished(MainActivity.this);
         cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
-        //Todo: Remember to set this for second adapter once callback is live.
         cycleRoundsAdapter.selectedRound(MainActivity.this);
+        cycleRoundsAdapterTwo.selectedRound(MainActivity.this);
         //Only first adapter is used for Pom mode, so only needs to be set here.
         cycleRoundsAdapter.setMode(mode);
 

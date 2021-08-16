@@ -170,9 +170,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
           break;
       }
 
-      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
-      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
-
       //Only runs fade animation if adding/subtracting rounds.
       if (mRunRoundAnimation) {
         //Animates round number.
@@ -181,16 +178,18 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
         else setAnimationTwo(modeOneRounds.infinity_rounds, position);
       }
+      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
+      modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
       //Last adapter position has been iterated through, and we set our fade animation boolean back to false.
       if (position==mWorkOutList.size()-1) mRunRoundAnimation = false;
 
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
       modeThreeRounds.round_pomodoro.setText(mPomList.get(position));
-      //Sets work texts to green and break to red.
-      if (position%2==0) modeThreeRounds.round_pomodoro.setTextColor(Color.GREEN); else modeThreeRounds.round_pomodoro.setTextColor(Color.RED);
 
       setAnimationThree(modeThreeRounds.round_pomodoro, position);
+      //Sets work texts to green and break to red.
+      if (position%2==0) modeThreeRounds.round_pomodoro.setTextColor(Color.GREEN); else modeThreeRounds.round_pomodoro.setTextColor(Color.RED);
     }
   }
 
