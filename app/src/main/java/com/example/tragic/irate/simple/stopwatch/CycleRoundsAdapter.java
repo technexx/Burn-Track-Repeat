@@ -42,7 +42,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   int mPosSubHolder;
   Animation animateIn;
   Animation animateOut;
-
+  boolean mRunRoundAnimation;
   boolean mPomFadingIn;
   boolean mFadePom;
 
@@ -91,8 +91,9 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     mMode = mode;
   }
 
+  //Receives position from Main to fade (or not), and also sets our fade animation boolean to true.
   public void setFadePositions(int sub, int add) {
-    mPosSubHolder = sub; mPosAddHolder = add;
+    mPosSubHolder = sub; mPosAddHolder = add; mRunRoundAnimation = true;
   }
 
   public void disablePomFade() {
@@ -172,12 +173,16 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
 
-      //Todo: Remember, animation will execute every time list is refreshed.
-      //Animates round number.
-      setAnimation(modeOneRounds.round_count, position);
-      //Animates round value (either infinity or timer value).
-      if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
-      else setAnimationTwo(modeOneRounds.infinity_rounds, position);
+      //Only runs fade animation if adding/subtracting rounds.
+      if (mRunRoundAnimation) {
+        //Animates round number.
+        setAnimation(modeOneRounds.round_count, position);
+        //Animates round value (either infinity or timer value).
+        if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
+        else setAnimationTwo(modeOneRounds.infinity_rounds, position);
+      }
+      //Last adapter position has been iterated through, and we set our fade animation boolean back to false.
+      if (position==mWorkOutList.size()-1) mRunRoundAnimation = false;
 
     } else if (holder instanceof ModeThreeRounds) {
       ModeThreeRounds modeThreeRounds = (ModeThreeRounds) holder;
