@@ -250,10 +250,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String titleCompare;
   boolean roundIsFading;
 
-  float popUpDensityPixelsHeight;
-  float popUpDensityPixelsWWidth;
-
-  //Todo: Sub rounds is removing 2 ronds.
+  //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
   //Todo: Instead of drag/drop switch for round order, option to highlight and replace.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -590,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         recyclerLayoutTwo = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
         //Using exclusively programmatic layout params for round recyclerViews. Setting defaults. Second will never change.
         recyclerLayoutOne.leftMargin = 240;
-        recyclerLayoutTwo.leftMargin = 450;
+//        recyclerLayoutTwo.leftMargin = 450;
 
         Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
         slide_left.setDuration(500);

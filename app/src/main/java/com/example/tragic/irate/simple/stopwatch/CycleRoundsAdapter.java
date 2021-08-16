@@ -2,6 +2,8 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -15,9 +17,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -26,6 +30,7 @@ import java.util.List;
 public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
   Context mContext;
+  View fullView;
   ArrayList<String> mWorkOutList;
   ArrayList<Integer> mTypeOfRound;
   ArrayList<String> mPomList;
@@ -107,6 +112,13 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
 
+      //No bullets visible unless a round is selected.
+      modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+      modeOneRounds.fullView.setOnClickListener(v -> {
+        if (modeOneRounds.selection_bullet.getVisibility()==View.INVISIBLE) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
+        else modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+      });
+
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.
       switch (mTypeOfRound.get(position)) {
         case 1:
@@ -175,25 +187,30 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public TextView round_count;
     public TextView workout_rounds;
     public ImageView infinity_rounds;
+    public TextView selection_bullet;
+    public View fullView;
 
     public ModeOneRounds(@NonNull View itemView) {
       super(itemView);
       round_count = itemView.findViewById(R.id.round_count);
       workout_rounds = itemView.findViewById(R.id.workout_rounds);
       infinity_rounds = itemView.findViewById(R.id.round_infinity);
+      selection_bullet = itemView.findViewById(R.id.selection_bullet);
+      fullView = itemView;
     }
   }
 
   public class ModeThreeRounds extends RecyclerView.ViewHolder {
     public TextView round_pomodoro;
+    public View fullView;
 
     public ModeThreeRounds(@NonNull View itemView) {
       super(itemView);
       round_pomodoro = itemView.findViewById(R.id.round_pomodoro);
+      fullView = itemView;
     }
   }
 
-  //Todo: Animations get called 2x (for round # and times), so two callbacks from here->Main for removeRound().
   //Animates each round in or out depending on args received from Main.
   public void setAnimation(TextView textView, int position) {
     if (position==mPosAddHolder) {
