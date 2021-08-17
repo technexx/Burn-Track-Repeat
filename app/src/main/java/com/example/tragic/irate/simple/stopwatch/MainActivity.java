@@ -1788,7 +1788,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void adjustCustom(boolean adding) {
-    Log.i("testlist", "selected boolean is " + roundIsSelected);
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
@@ -1805,13 +1804,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Adds OR replaces (depending on if a round is selected) values in both Integer (timer) Array and String (display) lists.
           switch (roundType) {
             case 1:
-              editRounds(setValue, roundIsSelected);
+              addOrReplaceRounds(setValue, roundIsSelected);
               break;
             case 3:
-              editRounds(breakValue, roundIsSelected);
+              addOrReplaceRounds(breakValue, roundIsSelected);
               break;
             case 2: case 4:
-              editRounds(0, roundIsSelected);
+              addOrReplaceRounds(0, roundIsSelected);
               break;
             default:
               //Returns from method so we don't add a roundType entry to our list, and the list stays in sync w/ the rounds we are actually adding.
@@ -1862,6 +1861,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
+    Log.i("testlist", "START integer list is " + workoutTime);
+    Log.i("testlist", "START string list is " + convertedWorkoutTime);
+    //If adding a round.
+    if (!replacingValue) {
+      workoutTime.add(integerValue * 1000);
+      convertedWorkoutTime.add(convertSeconds(integerValue));
+      typeOfRound.add(roundType);
+      if (workoutTime.size()<=8) {
+        roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+        typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
+      } else {
+        roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+        typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
+      }
+      //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
+      if (workoutTime.size()==9) {
+        roundRecyclerTwo.setVisibility(View.VISIBLE);
+        recyclerLayoutOne.leftMargin = 5;
+        roundListDivider.setVisibility(View.VISIBLE);
+      }
+      //if replacing a round. Done via add button. Subtract will always subtract.
+    } else {
+      workoutTime.set(roundSelectedPosition, integerValue*1000);
+      convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
+      typeOfRound.set(roundSelectedPosition, roundType);
+      if (workoutTime.size()<=8) {
+        //Todo: Holder lists adding wrong times.
+        roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
+        typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
+      } else {
+        roundHolderTwo.set(roundSelectedPosition, convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+        typeHolderTwo.set(roundSelectedPosition, typeOfRound.get(typeOfRound.size()-1));
+      }
+      //Resets round selection boolean.
+      roundIsSelected = false;
+    }
+  }
+
   public void removeRound () {
     //Cancels animation if we click to remove a round while removal animation for previous one is active.
 //    cycleRoundsAdapter.endFade();
@@ -1901,42 +1939,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleRoundsAdapter.setPomFade(false);
         cycleRoundsAdapter.notifyDataSetChanged();
       } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
-    }
-  }
-
-  public void editRounds(int integerValue, boolean replacingValue) {
-    //If adding a round.
-    if (!replacingValue) {
-      workoutTime.add(integerValue * 1000);
-      convertedWorkoutTime.add(convertSeconds(integerValue));
-      typeOfRound.add(roundType);
-      if (workoutTime.size()<=8) {
-        roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-        typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
-      } else {
-        roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-        typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
-      }
-      //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
-      if (workoutTime.size()==9) {
-        roundRecyclerTwo.setVisibility(View.VISIBLE);
-        recyclerLayoutOne.leftMargin = 5;
-        roundListDivider.setVisibility(View.VISIBLE);
-      }
-      //if replacing a round. Done via add button. Subtract will always subtract.
-    } else {
-      workoutTime.set(roundSelectedPosition, integerValue);
-      convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
-      typeOfRound.set(roundSelectedPosition, roundType);
-      if (workoutTime.size()<=8) {
-        roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-        typeHolderOne.set(roundSelectedPosition, typeOfRound.get(typeOfRound.size()-1));
-      } else {
-        roundHolderTwo.set(roundSelectedPosition, convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-        typeHolderTwo.set(roundSelectedPosition, typeOfRound.get(typeOfRound.size()-1));
-      }
-      //Resets round selection boolean.
-      roundIsSelected = false;
     }
   }
 
