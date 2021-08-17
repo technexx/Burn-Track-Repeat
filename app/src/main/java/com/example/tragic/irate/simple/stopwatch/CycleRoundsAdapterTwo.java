@@ -111,6 +111,8 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 mPositionOfSelectedRound = position;
                 //Used to indicate a round has been selected.
                 mRoundSelected = true;
+                //Passes position to Main activity.
+                mOnRoundSelected.roundSelected(position);
                 //Since we need to remove the previous bullet when selecting a new round, we need to re-draw the list.
                 notifyDataSetChanged();
                 //If position we are clicking on shows a bullet, remove it.
@@ -149,6 +151,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
             else setAnimationTwo(modeOneRounds.infinity_rounds, position);
         }
+        if (position==mWorkOutList.size()-1) mRunRoundAnimation = false;
 
         //For moment, using "09" on first round of this adapter, and setting "0" to same color as background. Trouble aligning otherwise.
         if (position==0) {
@@ -158,7 +161,6 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         } else modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
         //Last adapter position has been iterated through, and we set our fade animation boolean back to false.
-        if (position==mWorkOutList.size()-1) mRunRoundAnimation = false;
     }
 
     @Override
