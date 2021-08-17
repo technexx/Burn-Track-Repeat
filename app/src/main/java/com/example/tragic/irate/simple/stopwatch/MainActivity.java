@@ -1817,13 +1817,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
               return;
           }
-          if (workoutTime.size()<=8) {
-            if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
-            cycleRoundsAdapter.notifyDataSetChanged();
-          } else {
-            if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, workoutTime.size()-9);
-            cycleRoundsAdapterTwo.notifyDataSetChanged();
-          }
         } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
       }
       if (mode==3) {
@@ -1840,7 +1833,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
           Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
-          return;
         }
       }
     } else {
@@ -1862,19 +1854,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
-    Log.i("testlist", "START integer list is " + workoutTime);
-    Log.i("testlist", "START string list is " + convertedWorkoutTime);
     //If adding a round.
     if (!replacingValue) {
       workoutTime.add(integerValue * 1000);
       convertedWorkoutTime.add(convertSeconds(integerValue));
       typeOfRound.add(roundType);
+      //Adds and sends to adapter the newest addition round position to fade.
       if (workoutTime.size()<=8) {
         roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
         typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
+        if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
+        cycleRoundsAdapter.notifyDataSetChanged();
       } else {
         roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
         typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
+        if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, workoutTime.size()-9);
+        cycleRoundsAdapterTwo.notifyDataSetChanged();
       }
       //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
       if (workoutTime.size()==9) {
@@ -1884,16 +1879,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       //if replacing a round. Done via add button. Subtract will always subtract.
     } else {
+      //Replaces and sends to adapter that replaced position to fade.
       workoutTime.set(roundSelectedPosition, integerValue*1000);
       convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
       typeOfRound.set(roundSelectedPosition, roundType);
       if (workoutTime.size()<=8) {
-        //Todo: Holder lists adding wrong times.
         roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
         typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
+        if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, roundSelectedPosition);
+        cycleRoundsAdapter.notifyDataSetChanged();
       } else {
         roundHolderTwo.set(roundSelectedPosition, convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
         typeHolderTwo.set(roundSelectedPosition, typeOfRound.get(typeOfRound.size()-1));
+        if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, roundSelectedPosition);
+        cycleRoundsAdapterTwo.notifyDataSetChanged();
       }
       //Resets round selection boolean.
       roundIsSelected = false;
