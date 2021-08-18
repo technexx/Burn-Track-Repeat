@@ -253,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
-  //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
   //Todo: Instead of drag/drop switch for round order, option to highlight and replace.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -263,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
   //Todo: Letter -> Number soft kb is a bit choppy.
 
+  //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Minimize aSync threads for performance.
   //Todo: editCycle popUp precludes action bar button use at the moment because it retains app focus. We can't remove that without borking other stuff (e.g. soft keyboard use).
   //Todo: Could long svg files be a lag contributor?
@@ -370,7 +370,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     mainView = findViewById(R.id.main_layout);
-    //Todo: Does this need to be set as a View to constrain edit popup as a drop-down?
     tabView = findViewById(R.id.tabLayout);
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);

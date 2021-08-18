@@ -55,7 +55,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ImageView stopWatchView;
   TextView timeLeft;
   TextView msTime;
-  TextView msTimePaused;
   CountDownTimer timer;
   TextView reset;
   ObjectAnimator objectAnimator;
@@ -310,7 +309,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     stopWatchView = findViewById(R.id.stopWatchView);
     timeLeft = findViewById(R.id.timeLeft);
     msTime = findViewById(R.id.msTime);
-    msTimePaused = findViewById(R.id.msTimePaused);
     dotDraws = findViewById(R.id.dotdraws);
     lapRecycler = findViewById(R.id.lap_recycler);
     overtime = findViewById(R.id.overtime);
@@ -1169,9 +1167,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           if (fadeInObj != null) fadeInObj.cancel();
           if (pausing == RESUMING_TIMER) {
             reset.setVisibility(View.INVISIBLE);
-            timeLeft.setAlpha(1);
-            msTime.setAlpha(1);
-            msTimePaused.setAlpha(0);
             timerIsPaused = false;
             new_lap.setAlpha(1.0f);
             new_lap.setEnabled(true);
@@ -1179,10 +1174,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
             mHandler.post(stopWatchRunnable);
           } else if (pausing == PAUSING_TIMER) {
             reset.setVisibility(View.VISIBLE);
-            timeLeft.setAlpha(0);
-            msTime.setAlpha(0);
-            msTimePaused.setAlpha(1);
-            msTimePaused.setText(msTime.getText());
             mHandler.removeCallbacksAndMessages(null);
             timerIsPaused = true;
             new_lap.setAlpha(0.3f);
@@ -1307,10 +1298,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         minutes = 0;
         timeLeft.setAlpha(1);
         timeLeft.setText("0");
-        msTime.setAlpha(0);
-        msTimePaused.setAlpha(1);
         msTime.setText("00");
-        msTimePaused.setText("00");
         if (currentLapList.size() > 0) currentLapList.clear();
         if (savedLapList.size() > 0) savedLapList.clear();
         lapsNumber = 0;
