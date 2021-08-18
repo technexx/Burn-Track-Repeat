@@ -250,6 +250,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsFading;
   boolean roundIsSelected;
   int roundSelectedPosition;
+  float popUpDensityPixelsHeight;
+  float popUpDensityPixelWidth;
 
   //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
@@ -368,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     mainView = findViewById(R.id.main_layout);
+    //Todo: Does this need to be set as a View to constrain edit popup as a drop-down?
     tabView = findViewById(R.id.tabLayout);
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
@@ -387,10 +390,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
     settingsPopupView = inflater.inflate(R.layout.settings_popup, null);
 
+    popUpDensityPixelsHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 475, getResources().getDisplayMetrics());
+    popUpDensityPixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
+
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, (int) popUpDensityPixelsHeight, true);
 //    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, setDensityPixels(480), true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
 
@@ -519,9 +525,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
 
-//    popUpDensityPixelsHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 400, getResources().getDisplayMetrics());
-//    popUpDensityPixelsWWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
-
     //Retrieves checkmark position for sort popup.
     setSortCheckmark();
 
@@ -589,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerTwo.setLayoutManager(lm3);
         //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
 
-        roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
+//        roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
         //Rounds begin unpopulated, so remove second recycler view.
         roundRecyclerTwo.setVisibility(View.GONE);
         //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
@@ -1529,7 +1532,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Used to request focus, and then show the soft keyboard. Using x-axis values to determine whether we focus on minutes or seconds.
         if (editTextViewPosX<=75) {
           first_value_edit.requestFocus();
-          inputMethodManager.showSoftInput(first_value_edit, 0);
+          inputMethodManager.showSoftInput(first_value_edit,  0);
         } else {
           first_value_edit_two.requestFocus();
           inputMethodManager.showSoftInput(first_value_edit_two, 0);
