@@ -180,9 +180,19 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        >
+        android:paddingBottom="10dp">
     </androidx.recyclerview.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/empty_laps_text"
+        android:text="@string/empty_laps_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/lap_recycler"
+        app:layout_constraintBottom_toBottomOf="@id/lap_recycler"
+        app:layout_constraintStart_toStartOf="@id/lap_recycler"
+        app:layout_constraintEnd_toEndOf="@id/lap_recycler">
+    </TextView>
 
     <TextView
         android:id="@+id/reset"

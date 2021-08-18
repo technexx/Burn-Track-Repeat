@@ -75,6 +75,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   TextView total_break_header;
   TextView total_set_time;
   TextView total_break_time;
+  TextView empty_laps;
 
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
@@ -317,6 +318,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     pauseResumeButton.setRippleColor(null);
     exit_timer = findViewById(R.id.exit_timer);
     reset_total_times = findViewById(R.id.reset_total_times);
+    empty_laps = findViewById(R.id.empty_laps_text);
 
     stopWatchView.setVisibility(View.GONE);
     lapRecycler.setVisibility(View.GONE);
@@ -393,7 +395,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         break;
     }
 
-    //Todo: No values passed in on edit.
     /////---------Testing pom round iterations---------------/////////
     if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 6000);
 
@@ -876,6 +877,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   }
 
   public void newLap() {
+    if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
     double newSeconds = msReset / 60;
     double newMinutes = newSeconds / 60;
 
@@ -1304,6 +1306,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         lapsNumber = 0;
         cycles_completed.setText(getString(R.string.laps_completed, "0"));
         lapAdapter.notifyDataSetChanged();
+        empty_laps.setVisibility(View.VISIBLE);
         break;
     }
     populateTimerUI();
