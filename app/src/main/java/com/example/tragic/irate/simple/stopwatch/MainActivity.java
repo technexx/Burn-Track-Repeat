@@ -253,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
+  //Todo: Clipped sort dropdown.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
   //Todo: Instead of drag/drop switch for round order, option to highlight and replace.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -796,7 +797,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sort_text.setOnClickListener(v-> {
-      sortPopupWindow.showAsDropDown(cl, 800, 0, Gravity.END);
+      sortPopupWindow.showAtLocation(cl, Gravity.END|Gravity.TOP, 0, 0);
     });
 
     //Uses single view for all sort buttons. Queries the appropriate cycle sort via the DAO and sets checkmark.
