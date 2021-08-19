@@ -257,10 +257,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public void setAnimationTwo(ImageView imageView, int position) {
     if (position==mPosAddHolder) {
-      imageView.clearAnimation();
+//      imageView.clearAnimation();
       imageView.startAnimation(animateIn);
     } else if (position==mPosSubHolder) {
-      imageView.clearAnimation();
+//      imageView.clearAnimation();
       imageView.startAnimation(animateOut);
     }
   }

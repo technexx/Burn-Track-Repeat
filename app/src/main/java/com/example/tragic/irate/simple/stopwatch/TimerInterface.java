@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -444,6 +445,21 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
     lapRecycler.setAdapter(lapAdapter);
     lapRecycler.setLayoutManager(lapLayout);
+
+    //Listener that executes method that retrieves visible positions from recyclerView and passes them into adapter for use in fading effect.
+    lapRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
+        getVisibleLapPositions();
+      }
+
+      @Override
+      public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+        super.onScrolled(recyclerView, dx, dy);
+        getVisibleLapPositions();
+      }
+    });
 
     //Sets all progress bars to their start value.
     progressBar.setProgress(maxProgress);
@@ -876,6 +892,13 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     }
   }
 
+  //Retrieves visible positions from recyclerView and passes them into adapter for use in fading effect.
+  public void getVisibleLapPositions() {
+    int first = lapLayout.findFirstVisibleItemPosition();
+    int last = lapLayout.findLastVisibleItemPosition();
+    lapAdapter.receiveVisiblePositions(first, last);
+  }
+
   public void newLap() {
     if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
     double newSeconds = msReset / 60;
@@ -917,6 +940,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       msReset = 0;
       msConvert2 = 0;
+
+      //Todo: These will always be one behind.
+//      int firstPos = lapLayout.findFirstVisibleItemPosition();
+//      int lastPos = lapLayout.findLastVisibleItemPosition();
+//      lapAdapter.receiveVisiblePositions(firstPos, lastPos);
     }
   }
 
