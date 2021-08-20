@@ -20,9 +20,10 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   Context mContext;
   List<String> mCurrentLap;
   List<String> mSavedLap;
-  float newAlpha = 1;
   int mFirstPos;
   int mLastPos;
+  boolean mIsScrolling;
+  Animation slideInAnimation;
 
   public LapAdapter(Context context, List<String> currentLap, List<String> savedLap) {
     mContext = context; mCurrentLap = currentLap; mSavedLap = savedLap;
@@ -31,6 +32,10 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   //Receives visible positions in its layout.
   public void receiveVisiblePositions(int first, int last) {
     this.mFirstPos = first; this.mLastPos = last;
+  }
+
+  public void listIsScrolling(boolean isScrolling) {
+    this.mIsScrolling = isScrolling;
   }
 
   @NonNull
@@ -44,19 +49,23 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     return lapViewHolder;
   }
 
-  //Todo: Last bound position is always one ahead of first/last vars returned.
-  //Todo: On 7th position (#8 lap), position 3 (#4 lap) turns same alpha.
+  //This gets called when scrolling w/ out any listener attached.
   @Override
   public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
     holder.currentLap.setText(mCurrentLap.get(position));
     holder.savedLapTime.setText(mSavedLap.get(position));
     holder.lapNumber.setText("# " + (position+1));
 
+    Log.i("testfade", "position is " + position);
+    Log.i("testfade", "first position is " + mFirstPos);
+    Log.i("testfade", "last position is " + mLastPos);
+
     //Default (full) alpha for every position.
     holder.fullView.setAlpha(1.0f);
 
-    //If at least 7 laps exist, fade the last one to 0.3f and the second-to-last one to 0.7f.
+    //When adding to list, if at least 7 laps exist, fade the last one to 0.3f and the second-to-last one to 0.7f.
     if (position>=6) if (position==(mLastPos)) holder.fullView.setAlpha(0.7f); else if (position==mLastPos+1) holder.fullView.setAlpha(0.3f);
+
   }
 
   @Override

@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -451,13 +452,14 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
         super.onScrollStateChanged(recyclerView, newState);
-        getVisibleLapPositions();
       }
 
+      //This listens everywhere. It's bindView that restricts its refresh to top 2/bottom 2 rows.
       @Override
       public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
         getVisibleLapPositions();
+        if (dy!=0) lapAdapter.listIsScrolling(true);
       }
     });
 
@@ -467,7 +469,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Populates UI elements at app start.
     populateTimerUI();
 
-    //Used in all timers to smooth out end fade. Keeping received
+    //Used in all timers to smooth out end fade.
     endFade = new Runnable() {
       @Override
       public void run() {
