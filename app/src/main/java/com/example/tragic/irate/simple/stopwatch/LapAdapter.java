@@ -24,9 +24,18 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   int mLastPos;
   boolean mIsScrolling;
   Animation slideInAnimation;
+  onPositionCallback mOnPositionCallback;
 
   public LapAdapter(Context context, List<String> currentLap, List<String> savedLap) {
     mContext = context; mCurrentLap = currentLap; mSavedLap = savedLap;
+  }
+
+  public interface onPositionCallback {
+    void positionCallback(int position);
+  }
+
+  public void passPosition (onPositionCallback xOnPositionCallback) {
+    this.mOnPositionCallback = xOnPositionCallback;
   }
 
   //Receives visible positions in its layout.
@@ -56,15 +65,20 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     holder.savedLapTime.setText(mSavedLap.get(position));
     holder.lapNumber.setText("# " + (position+1));
 
-    Log.i("testfade", "position is " + position);
-    Log.i("testfade", "first position is " + mFirstPos);
-    Log.i("testfade", "last position is " + mLastPos);
-
     //Default (full) alpha for every position.
     holder.fullView.setAlpha(1.0f);
 
     //When adding to list, if at least 7 laps exist, fade the last one to 0.3f and the second-to-last one to 0.7f.
     if (position>=6) if (position==(mLastPos)) holder.fullView.setAlpha(0.7f); else if (position==mLastPos+1) holder.fullView.setAlpha(0.3f);
+
+    //Callback passes in FIRST populated position (i.e. 0 for first 8 rows, ++ thereafter), and if layout is entirely unhindered, bindView DOES call all view positions on screen.
+    Log.i("testpos", "Calling back at " + position);
+    mOnPositionCallback.positionCallback(position);
+
+    Log.i("testfade", "position is " + position);
+    Log.i("testfade", "first position is " + mFirstPos);
+    Log.i("testfade", "last position is " + mLastPos);
+
 
   }
 

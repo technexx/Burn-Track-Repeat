@@ -255,12 +255,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Need lap fades to remain while scrolling.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
-  //Todo: Instead of drag/drop switch for round order, option to highlight and replace.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
-  //Todo: Auto save feature (mainly for total times) when force-closing app. Best way may simply be to use sharedPref and constantly update it.
-  //Todo: Highlight sets/breaks and have a single set of up/down and +/- buttons for whichever is selected.
   //Todo: Save total sets/breaks and completed by day option?
-  //Todo: Add fades to adapterView lists (i.e. like Google's stopwatch).
   //Todo: Letter -> Number soft kb is a bit choppy.
 
   //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
@@ -397,7 +393,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, (int) popUpDensityPixelsHeight, true);
-//    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, setDensityPixels(480), true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -603,7 +598,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        recyclerLayoutTwo.leftMargin = 450;
 
         Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
-        slide_left.setDuration(500);
+        slide_left.setDuration(400);
         savedCycleRecycler.startAnimation(slide_left);
 
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.

@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TimerInterface extends AppCompatActivity implements DotDraws.sendAlpha {
+public class TimerInterface extends AppCompatActivity implements DotDraws.sendAlpha, LapAdapter.onPositionCallback {
 
   ProgressBar progressBar;
   ImageView stopWatchView;
@@ -178,7 +178,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   ArrayList<Integer> zeroArrayBreaks;
 
   boolean activePomCycle;
-  boolean isOvertimeRunning;
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
@@ -212,6 +211,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   boolean resetMenu;
   long baseTime;
   long countUpMillisHolder;
+  int scrollPosition;
 
   @Override
   public void onBackPressed() {
@@ -260,6 +260,11 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   @Override
   public void sendAlphaValue(int alpha) {
     receivedAlpha = alpha;
+  }
+
+  @Override
+  public void positionCallback(int position) {
+    scrollPosition = position;
   }
 
   protected void onCreate(Bundle savedInstanceState) {
@@ -321,6 +326,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     exit_timer = findViewById(R.id.exit_timer);
     reset_total_times = findViewById(R.id.reset_total_times);
     empty_laps = findViewById(R.id.empty_laps_text);
+    if (mode!=4) empty_laps.setVisibility(View.INVISIBLE);
 
     stopWatchView.setVisibility(View.GONE);
     lapRecycler.setVisibility(View.GONE);
@@ -446,6 +452,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
     lapRecycler.setAdapter(lapAdapter);
     lapRecycler.setLayoutManager(lapLayout);
+    lapAdapter.passPosition(TimerInterface.this);
 
     //Listener that executes method that retrieves visible positions from recyclerView and passes them into adapter for use in fading effect.
     lapRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -458,6 +465,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
+        Log.i("testpos", "received position is " + scrollPosition);
         getVisibleLapPositions();
         if (dy!=0) lapAdapter.listIsScrolling(true);
       }
