@@ -253,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
+  //Todo: Remove not working for Pom.
   //Todo: Need lap fades to remain while scrolling.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -320,6 +321,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomValuesTime.clear();
       convertedPomList.clear();
       cycleRoundsAdapter.notifyDataSetChanged();
+      cycleRoundsAdapter.disablePomFade();
+      sub_cycle.setClickable(true);
     }
   }
 
@@ -1834,66 +1837,75 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     } else {
-      if (roundIsFading) removeRound();
-
-      if (workoutTime.size()>0) {
-        if (workoutTime.size()<=8) {
-          //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-          cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
-          cycleRoundsAdapter.notifyDataSetChanged();
-        } else {
-          //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-          cycleRoundsAdapterTwo.setFadePositions(workoutTime.size()-9, -1);
-          cycleRoundsAdapterTwo.notifyDataSetChanged();
+      if (mode==1) {
+        if (roundIsFading) removeRound();
+        if (workoutTime.size()>0) {
+          if (workoutTime.size()<=8) {
+            //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
+            cycleRoundsAdapter.setFadePositions(workoutTime.size()-1, -1);
+            cycleRoundsAdapter.notifyDataSetChanged();
+          } else {
+            //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
+            cycleRoundsAdapterTwo.setFadePositions(workoutTime.size()-9, -1);
+            cycleRoundsAdapterTwo.notifyDataSetChanged();
+          }
+          roundIsFading = true;
         }
-        roundIsFading = true;
+      } else if (mode==3) {
+        if (pomValuesTime.size() != 0) {
+          cycleRoundsAdapter.setPomFade(false);
+          cycleRoundsAdapter.notifyDataSetChanged();
+          sub_cycle.setClickable(false);
+        } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
       }
     }
   }
 
   public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
-    //If adding a round.
-    if (!replacingValue) {
-      workoutTime.add(integerValue * 1000);
-      convertedWorkoutTime.add(convertSeconds(integerValue));
-      typeOfRound.add(roundType);
-      //Adds and sends to adapter the newest addition round position to fade.
-      if (workoutTime.size()<=8) {
-        roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-        typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
-        if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
-        cycleRoundsAdapter.notifyDataSetChanged();
+    if (mode==1) {
+      //If adding a round.
+      if (!replacingValue) {
+        workoutTime.add(integerValue * 1000);
+        convertedWorkoutTime.add(convertSeconds(integerValue));
+        typeOfRound.add(roundType);
+        //Adds and sends to adapter the newest addition round position to fade.
+        if (workoutTime.size()<=8) {
+          roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+          typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
+          if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
+          cycleRoundsAdapter.notifyDataSetChanged();
+        } else {
+          roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+          typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
+          if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, workoutTime.size()-9);
+          cycleRoundsAdapterTwo.notifyDataSetChanged();
+        }
+        //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
+        if (workoutTime.size()==9) {
+          roundRecyclerTwo.setVisibility(View.VISIBLE);
+          recyclerLayoutOne.leftMargin = 5;
+          roundListDivider.setVisibility(View.VISIBLE);
+        }
+        //if replacing a round. Done via add button. Subtract will always subtract.
       } else {
-        roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-        typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
-        if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, workoutTime.size()-9);
-        cycleRoundsAdapterTwo.notifyDataSetChanged();
+        //Replaces and sends to adapter that replaced position to fade.
+        workoutTime.set(roundSelectedPosition, integerValue*1000);
+        convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
+        typeOfRound.set(roundSelectedPosition, roundType);
+        if (workoutTime.size()<=8) {
+          roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
+          typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
+          if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, roundSelectedPosition);
+          cycleRoundsAdapter.notifyDataSetChanged();
+        } else {
+          roundHolderTwo.set(roundSelectedPosition, convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+          typeHolderTwo.set(roundSelectedPosition, typeOfRound.get(typeOfRound.size()-1));
+          if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, roundSelectedPosition);
+          cycleRoundsAdapterTwo.notifyDataSetChanged();
+        }
+        //Resets round selection boolean.
+        roundIsSelected = false;
       }
-      //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
-      if (workoutTime.size()==9) {
-        roundRecyclerTwo.setVisibility(View.VISIBLE);
-        recyclerLayoutOne.leftMargin = 5;
-        roundListDivider.setVisibility(View.VISIBLE);
-      }
-      //if replacing a round. Done via add button. Subtract will always subtract.
-    } else {
-      //Replaces and sends to adapter that replaced position to fade.
-      workoutTime.set(roundSelectedPosition, integerValue*1000);
-      convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
-      typeOfRound.set(roundSelectedPosition, roundType);
-      if (workoutTime.size()<=8) {
-        roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
-        typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
-        if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, roundSelectedPosition);
-        cycleRoundsAdapter.notifyDataSetChanged();
-      } else {
-        roundHolderTwo.set(roundSelectedPosition, convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-        typeHolderTwo.set(roundSelectedPosition, typeOfRound.get(typeOfRound.size()-1));
-        if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, roundSelectedPosition);
-        cycleRoundsAdapterTwo.notifyDataSetChanged();
-      }
-      //Resets round selection boolean.
-      roundIsSelected = false;
     }
   }
 
@@ -1929,13 +1941,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
         roundIsFading = false;
       } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
-    }
-    if (mode==3) {
-      //If a cycle exists, disable the timer because we are removing the cycle via our fadeOutDot runnable which will not complete until the fade is done. Adding a cycle will re-enable the timer through populateTimerUI().
-      if (pomValuesTime.size() != 0) {
-        cycleRoundsAdapter.setPomFade(false);
-        cycleRoundsAdapter.notifyDataSetChanged();
-      } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
     }
   }
 

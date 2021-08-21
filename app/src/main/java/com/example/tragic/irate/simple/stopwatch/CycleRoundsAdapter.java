@@ -257,10 +257,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public void setAnimationTwo(ImageView imageView, int position) {
     if (position==mPosAddHolder) {
-//      imageView.clearAnimation();
       imageView.startAnimation(animateIn);
     } else if (position==mPosSubHolder) {
-//      imageView.clearAnimation();
       imageView.startAnimation(animateOut);
     }
   }
@@ -276,6 +274,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         //Fades out all rounds at once when removing cycle.
         textView.startAnimation(animateOut);
       }
+      //Todo: Setting mPomFade to false will b0rk all rows after 1, since this method draws itself 8x for Pom.
     }
   }
 
