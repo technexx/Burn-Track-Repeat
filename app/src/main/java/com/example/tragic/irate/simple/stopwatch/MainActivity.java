@@ -253,7 +253,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
-  //Todo: Remove not working for Pom.
+  //Todo: Toast on empty rounds for mode 1;.
+  //Todo: "Saved" text when tabbing out from Pom, even if nothing there (don't want it regardless).
   //Todo: Need lap fades to remain while scrolling.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
@@ -395,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, (int) popUpDensityPixelsHeight, true);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -771,9 +772,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetRows();
       //Clears round adapter arrays so they can be freshly populated.
       clearRoundAdapterArrays();
-      //Clears the two lists of actual timer values we are populating.
+      //Clears the lists of actual timer values we are populating, since we intend to start w/ blank rounds on FAB press (for now).
       workoutTime.clear();
       typeOfRound.clear();
+      pomValuesTime.clear();
       //Updates round adapters so lists show as cleared.
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -837,6 +839,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
+    //Todo: No auto save. Manual save button + removal for dismiss. Need to address focus issue w / popup
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -1348,7 +1351,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Clears both timer millis arrays and their converted String arrays.
+  //Clears the String values of timer Arrays passed to adapter. We do NOT clear the Integer Arrays (i.e. workOutTime, typeOfRound), because we need them intact when editing cycles. The values we clear can be re-populated with these Integer Arrays.
   public void clearRoundAdapterArrays() {
     convertedWorkoutTime.clear();
     roundHolderOne.clear();
@@ -1746,10 +1749,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         first_value_textView.setText(convertCustomTextView(setValue));
         second_value_textView.setText(convertCustomTextView(breakValue));
         //If in mode 1 or 2, constraining our add/remove buttons to the "s2" line of objects.
+        //Todo: This overrides XML. Change here + mode 3 for revised edit layout.
         addParams.topToBottom = R.id.s2;
-        addParams.topMargin = 30;
+        addParams.topMargin = 60;
         subParams.topToBottom = R.id.s2;
-        subParams.topMargin = 30;
+        subParams.topMargin = 60;
         break;
       case 3:
         //Visibilities and values exclusive to mode 3.
@@ -1773,9 +1777,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_textView.setText(convertCustomTextView(pomValue3));
         //If in mode 3, constraining our add/remove buttons to the "s3" line of objects.
         addParams.topToBottom = R.id.s3;
-        addParams.topMargin = 30;
+        addParams.topMargin = 75;
         subParams.topToBottom = R.id.s3;
-        subParams.topMargin = 30;
+        subParams.topMargin = 75;
         break;
     }
     //If in mode 2, constraining views for a more compact interface.
@@ -1818,7 +1822,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
               return;
           }
-        } else Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
+        } else{
+          Toast toast = Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT);
+          toast.setGravity(Gravity.BOTTOM, 0, 0);
+          toast.show();
+        }
       }
       if (mode==3) {
         if (pomValuesTime.size()==0) {
@@ -1850,6 +1858,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
           roundIsFading = true;
+        } else {
+          Toast toast = Toast.makeText(getApplicationContext(), "No rounds to clear!", Toast.LENGTH_SHORT);
+          toast.setGravity(Gravity.BOTTOM, 0, 15);
+          toast.show();
         }
       } else if (mode==3) {
         if (pomValuesTime.size() != 0) {
