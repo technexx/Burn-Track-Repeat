@@ -625,7 +625,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void afterTextChanged(Editable s) {
         //We set editListener to FALSE to prevent setEditValues() from triggering when not desired. Right now, it's when we are using the +/- runnables to move our time.
+        Log.i("testwatch", "watching!");
         if (editListener) setEditValues();
+        if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
+        if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
       }
     };
 
@@ -786,6 +789,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       //Boolean set to true indicates a new, non-database-saved cycle is populating our editCyclesPopup. This is primarily used for onBackPressed, to determine whether to save it as a new entry, or update its current position in the database.
       onNewCycle = true;
+      //Default disabled state of edited cycle save, if nothing has changed.
+      save_edit_cycle.setEnabled(false);
+      save_edit_cycle.setAlpha(0.3f);
+
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -840,7 +847,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Todo: No auto save. Manual save button + removal for dismiss. Need to address focus issue w / popup
+    //Todo: Exit w/ out saving popup instead of auto save?
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -848,6 +855,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.removeHighlight(true);
         //If all fetched values equal current values (i.e. no changes have been made), exit method.
         if (mode==1) {
+          //Compare vars are set when pulling up a cycle for edit via retrieveCycle().
           if (gson.toJson(workoutTime).equals(timeCompare) && gson.toJson(typeOfRound).equals(typeCompare) && cycleTitle.equals(titleCompare)) {
             //Calls notify so highlight removal is shown.
             savedCycleAdapter.notifyDataSetChanged();
@@ -954,6 +962,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           onNewCycle = false;
         });
       });
+      //Default disabled state of edited cycle save, if nothing has changed.
+      save_edit_cycle.setEnabled(false);
+      save_edit_cycle.setAlpha(0.3f);
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -1804,6 +1815,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
+      //Enables save button now that cycle values have changed, or disables it if rounds @ 0.
+      if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
+      if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       setEditValues();
       if (mode==1) {
@@ -1853,6 +1867,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     } else {
       if (mode==1) {
+        if (workoutTime.size()>1) {
+          if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
+          if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
+        } else {
+          if (save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(false);
+          if (save_edit_cycle.getAlpha()==1) save_edit_cycle.setAlpha(0.3f);
+        }
         if (roundIsFading) removeRound();
         if (workoutTime.size()>0) {
           if (workoutTime.size()<=8) {
