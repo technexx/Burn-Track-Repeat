@@ -123,11 +123,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Button delete_all_cancel;
   TextView appHeader;
   ImageButton edit_highlighted_cycle;
-  ImageButton save_highlighted_cycle;
   ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
   TextView sort_text;
   ImageView global_settings;
+  TextView save_edit_cycle;
+  TextView delete_edit_cycle;
 
   int mode = 1;
   int savedMode;
@@ -253,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
-  //Todo: Toast on empty rounds for mode 1;.
+  //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
   //Todo: "Saved" text when tabbing out from Pom, even if nothing there (don't want it regardless).
   //Todo: Need lap fades to remain while scrolling.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
@@ -439,6 +440,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     breaksInfinity = editCyclesPopupView.findViewById(R.id.s2_up);
     top_anchor = editCyclesPopupView.findViewById(R.id.top_anchor);
     start_timer = editCyclesPopupView.findViewById(R.id.start_timer);
+    save_edit_cycle = editCyclesPopupView.findViewById(R.id.save_edit_cycle);
+    delete_edit_cycle = editCyclesPopupView.findViewById(R.id.delete_edit_cycle);
     setsInfinity.setAlpha(0.3f);
     breaksInfinity.setAlpha(0.3f);
 
@@ -460,12 +463,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportActionBar().setCustomView(R.layout.custom_bar);
     appHeader = findViewById(R.id.app_header);
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
-    save_highlighted_cycle = findViewById(R.id.save_highlighted_cycle);
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
     sort_text = findViewById(R.id.sort_text);
     global_settings = findViewById(R.id.global_settings);
-    save_highlighted_cycle.setVisibility(View.INVISIBLE);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -988,6 +989,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         });
       });
+    });
+
+    save_edit_cycle.setOnClickListener(v-> {
+
+    });
+
+    delete_edit_cycle.setOnClickListener(v-> {
+
     });
 
     //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
@@ -1749,7 +1758,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         first_value_textView.setText(convertCustomTextView(setValue));
         second_value_textView.setText(convertCustomTextView(breakValue));
         //If in mode 1 or 2, constraining our add/remove buttons to the "s2" line of objects.
-        //Todo: This overrides XML. Change here + mode 3 for revised edit layout.
         addParams.topToBottom = R.id.s2;
         addParams.topMargin = 60;
         subParams.topToBottom = R.id.s2;
@@ -1777,9 +1785,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_textView.setText(convertCustomTextView(pomValue3));
         //If in mode 3, constraining our add/remove buttons to the "s3" line of objects.
         addParams.topToBottom = R.id.s3;
-        addParams.topMargin = 75;
+        addParams.topMargin = 60;
         subParams.topToBottom = R.id.s3;
-        subParams.topMargin = 75;
+        subParams.topMargin = 60;
         break;
     }
     //If in mode 2, constraining views for a more compact interface.
@@ -1824,7 +1832,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         } else{
           Toast toast = Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT);
-          toast.setGravity(Gravity.BOTTOM, 0, 0);
           toast.show();
         }
       }
@@ -1860,7 +1867,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           roundIsFading = true;
         } else {
           Toast toast = Toast.makeText(getApplicationContext(), "No rounds to clear!", Toast.LENGTH_SHORT);
-          toast.setGravity(Gravity.BOTTOM, 0, 15);
           toast.show();
         }
       } else if (mode==3) {
