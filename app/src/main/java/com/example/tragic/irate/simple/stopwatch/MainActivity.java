@@ -625,10 +625,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void afterTextChanged(Editable s) {
         //We set editListener to FALSE to prevent setEditValues() from triggering when not desired. Right now, it's when we are using the +/- runnables to move our time.
-        Log.i("testwatch", "watching!");
         if (editListener) setEditValues();
-        if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
-        if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
       }
     };
 
@@ -643,6 +640,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void afterTextChanged(Editable s) {
         cycleTitle = cycle_name_edit.getText().toString();
+        //If round list in current mode is at least 1 and title has been changed, enable save button.
+        if ((mode==1 && workoutTime.size()>0) || ((mode==3 && pomValuesTime.size()>0))) {
+          if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
+          if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
+        }
       }
     };
 
