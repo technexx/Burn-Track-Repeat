@@ -405,45 +405,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       customCyclesDone = intent.getIntExtra("totalCycleCount", 0);
     }
 
+    //Todo: What we've done is removed any db query from launch of Timer class.
     /////---------Testing pom round iterations---------------/////////
     if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 6000);
 
-    //Todo: Should not be querying DB here. Can fetch total times + cycles from Main and pass here.
-    //Loads database of saved cycles. Since we are on a specific cycle, we can access it via its unique ID here.
-    AsyncTask.execute(() -> {
-      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-      //If not a new cycle, retrieve cycle based on its ID and get its total times + cycles completed.
-      if (!isNewCycle) {
-//        switch (mode) {
-//          case 1:
-//            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
-//            totalSetMillis = cycles.getTotalSetTime() * 1000;
-//            totalBreakMillis = cycles.getTotalBreakTime() * 1000;
-//            customCyclesDone = cycles.getCyclesCompleted();
-//            total_set_time.setText(convertSeconds(totalSetMillis / 1000));
-//            total_break_time.setText(convertSeconds(totalBreakMillis / 1000));
-//            break;
-//          case 3:
-//            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
-//            break;
-//        }
-      } else {
-        //If a new cycle, retrieve the most recently added db entry (the one we just created in Main), pull its ID, and assign an instance of the db entity class to it so we can save total set/break time and total cycles to it when we exit.
-        int id = 0;
-        switch (mode) {
-          case 1:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent();
-            id = cyclesList.get(0).getId();
-            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(id).get(0);
-            break;
-          case 3:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-            id = pomCyclesList.get(0).getId();
-            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(id).get(0);
-            break;
-        }
-      }
-    });
     //Draws dot display depending on which more we're on.
     dotDraws.setMode(mode);
     //Implements callback for end-of-round alpha fade on dots.
@@ -1373,7 +1338,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
-    //Todo: Retrieve ID of cycle from
     switch (mode) {
       case 1:
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);

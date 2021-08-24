@@ -724,49 +724,46 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    //Caps and sets editText values when clicking outside (exiting) the editText box.
     editCyclesPopupView.setOnClickListener(v-> {
+      //Caps and sets editText values when clicking outside (exiting) the editText box.
       convertEditTime(true);
+      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
+      removeEditTimerViews(true);
+      //Hides soft keyboard by using a token of the current editCycleView.
+      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     });
+
+    s1.setOnClickListener(v->{
+      //Toggles coloring and row selection.
+      if (!firstRowHighlighted) {
+        breaksSelected = false;
+        setsSelected = true;
+        firstRowHighlighted = true;
+        secondRowHighlighted = false;
+        //If first row is highlighted, second row should un-highlight.
+        breaksInfinity.setAlpha(0.3f);
+        rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
+        rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
+      }
+    });
+
+    s2.setOnClickListener(v-> {
+      //Toggles coloring and row selection.
+      if (!secondRowHighlighted) {
+        setsSelected = false;
+        breaksSelected = true;
+        secondRowHighlighted = true;
+        firstRowHighlighted = false;
+        setsInfinity.setAlpha(0.3f);
+        rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
+        rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
+      }
+    });
+
 
     //Sets a listener on our editCycles popup.
     editCyclesPopupView.setOnTouchListener((v, event) -> {
-      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
-      removeEditTimerViews(true);
       //Toggles coloring and row selection.
-      if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        float xPos = event.getX();
-        float yPos = event.getY();
-        if (xPos<=350) {
-          //Sets highlights and infinity modes for first row.
-          if (yPos>=150 && yPos<=275) {
-            if (!firstRowHighlighted) {
-              breaksSelected = false;
-              setsSelected = true;
-              firstRowHighlighted = true;
-              secondRowHighlighted = false;
-              //If first row is highlighted, second row should un-highlight.
-              breaksInfinity.setAlpha(0.3f);
-              rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
-              rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
-            }
-          }
-          //Sets highlights and infinity modes for first row.
-          if (yPos>=300 && yPos<=425) {
-            if (!secondRowHighlighted) {
-              setsSelected = false;
-              breaksSelected = true;
-              secondRowHighlighted = true;
-              firstRowHighlighted = false;
-              setsInfinity.setAlpha(0.3f);
-              rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
-              rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
-            }
-          }
-        }
-        //Hides soft keyboard by using a token of the current editCycleView.
-        inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-      }
       return false;
     });
 
@@ -861,7 +858,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Todo: Exit w/ out saving popup instead of auto save?
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //If closing edit cycle popUp after editing a cycle, do the following.
