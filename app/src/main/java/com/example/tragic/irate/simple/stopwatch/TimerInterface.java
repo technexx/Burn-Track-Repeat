@@ -1337,6 +1337,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
+    cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
     switch (mode) {
       case 1:

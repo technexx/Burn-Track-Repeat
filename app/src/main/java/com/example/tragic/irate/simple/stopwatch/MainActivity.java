@@ -879,13 +879,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
       //Displays edit cycles popUp.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
+      //Todo: This can be taken out of aSync thread since we've removed the db query.
       AsyncTask.execute(()-> {
         //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
         receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
-        //Uses this single position to retrieve cycle and populate timer arrays.
-        retrieveRoundList(false);
         //Clears old array values.
         clearRoundAdapterArrays();
+        //Uses this single position to retrieve cycle and populate timer arrays.
+        retrieveRoundList(false);
         switch (mode) {
           case 1:
             //Populating String ArrayLists used to display rounds in editCycle popUp.
@@ -991,8 +992,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
+    //Todo: Delete from db if editing, or simply clear if creating new cycle. Kick back to Main in either case.
     delete_edit_cycle.setOnClickListener(v-> {
+      if (!isNewCycle) {
 
+      } else {
+        clearRoundAdapterArrays();
+//        workoutTime.clear();
+//        typeOfRound.clear();
+//        pomValuesTime.clear();
+      }
+      editCyclesPopupWindow.dismiss();
+      Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
     });
 
     //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
@@ -1363,6 +1374,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundHolderTwo.clear();
     typeHolderOne.clear();
     typeHolderTwo.clear();
+
+    workoutTime.clear();
+    typeOfRound.clear();
+    pomValuesTime.clear();
 
     convertedPomList.clear();
   }
@@ -2073,8 +2088,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Clears the two lists of actual timer values we are populating.
     workoutTime.clear();
     typeOfRound.clear();
-    //Calling cycleList instance based on sort mode.
-//    queryCycles();
     switch (mode) {
       case 1:
         if (queryList) {
