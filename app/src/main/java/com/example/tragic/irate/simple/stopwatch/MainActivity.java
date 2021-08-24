@@ -789,10 +789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetRows();
       //Clears round adapter arrays so they can be freshly populated.
       clearRoundAdapterArrays();
-      //Clears the lists of actual timer values we are populating, since we intend to start w/ blank rounds on FAB press (for now).
-      workoutTime.clear();
-      typeOfRound.clear();
-      pomValuesTime.clear();
       //Updates round adapters so lists show as cleared.
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -951,15 +947,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
         ArrayList<String> tempPos = new ArrayList<>(receivedHighlightPositions);
+        //First query to get current list of rows.
         queryCycles();
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
           receivedPos = Integer.parseInt(receivedHighlightPositions.get(i));
           deleteCycle(false);
           tempPos.remove(String.valueOf(receivedPos));
         }
+        //Second query to get updated (post-delete) list of rows.
+        queryCycles();
         //Calls new database entries and updates our adapter's recyclerView.
         runOnUiThread(() -> {
-          queryCycles();
           populateCycleList(true);
           savedCycleAdapter.notifyDataSetChanged();
           receivedHighlightPositions = tempPos;
@@ -992,15 +990,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
-    //Todo: Delete from db if editing, or simply clear if creating new cycle. Kick back to Main in either case.
     delete_edit_cycle.setOnClickListener(v-> {
       if (!isNewCycle) {
-
+        AsyncTask.execute(()-> {
+          queryCycles();
+          deleteCycle(false);
+          queryCycles();
+          populateCycleList(true);
+          runOnUiThread(()-> {
+            savedCycleAdapter.notifyDataSetChanged();
+          });
+        });
       } else {
         clearRoundAdapterArrays();
-//        workoutTime.clear();
-//        typeOfRound.clear();
-//        pomValuesTime.clear();
       }
       editCyclesPopupWindow.dismiss();
       Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
@@ -2293,7 +2295,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (pomCyclesList.size()>0) cyclesDatabase.cyclesDao().deleteAllPomCycles(); else emptyCycle = true;
         break;
     }
-    queryCycles();
     runOnUiThread(()-> {
       //Sets textView for empty cycle list to visible and recyclerView to gone.
       checkEmptyCycles();

@@ -384,7 +384,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       savedMode = intent.getIntExtra("savedMode", 0);
       cycle_title = intent.getStringExtra("cycleTitle");
       //The primary key ID of our current cycle row.
-//      passedID = intent.getIntExtra("passedID", 0);
       passedID = intent.getIntExtra("primaryID", 0);
       cycle_header_text.setText(cycle_title);
 
@@ -1337,6 +1336,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
+    //Only place we query database is exiting timer, so we instantiate it here.
     cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
     switch (mode) {
