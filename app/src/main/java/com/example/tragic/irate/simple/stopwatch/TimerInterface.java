@@ -131,7 +131,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
   int customCyclesDone;
   int breaksOnlyCyclesDone;
-  int pomCyclesDone;
   int lapsNumber;
 
   int startRounds;
@@ -380,51 +379,54 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
     //Receives lists passed in from Main.
     Intent intent = getIntent();
     if (intent != null) {
-      isNewCycle = intent.getBooleanExtra("isNewCycle", false);
       mode = intent.getIntExtra("mode", 0);
       //Used as a reference to the mode we launched Stopwatch from, if we did.
       savedMode = intent.getIntExtra("savedMode", 0);
       cycle_title = intent.getStringExtra("cycleTitle");
       //The primary key ID of our current cycle row.
-      passedID = intent.getIntExtra("passedID", 0);
-    }
-    cycle_header_text.setText(cycle_title);
+//      passedID = intent.getIntExtra("passedID", 0);
+      passedID = intent.getIntExtra("primaryID", 0);
+      cycle_header_text.setText(cycle_title);
 
-    //Retrieves our list of Timer values for each round in the cycle.
-    switch (mode) {
-      case 1:
-        workoutTime = intent.getIntegerArrayListExtra("workoutTime");
-        typeOfRound = intent.getIntegerArrayListExtra("typeOfRound");
-        break;
-      case 3:
-        pomValuesTime = intent.getIntegerArrayListExtra("pomList");
-        //Replaces "total set time" w/ "work time".
-        total_set_header.setText(R.string.total_work);
-        break;
+      //Retrieves our list of Timer values for each round in the cycle.
+      switch (mode) {
+        case 1:
+          workoutTime = intent.getIntegerArrayListExtra("workoutTime");
+          typeOfRound = intent.getIntegerArrayListExtra("typeOfRound");
+          break;
+        case 3:
+          pomValuesTime = intent.getIntegerArrayListExtra("pomList");
+          //Replaces "total set time" w/ "work time".
+          total_set_header.setText(R.string.total_work);
+          break;
+      }
+      totalSetMillis = intent.getIntExtra("totalSetMillis", 0);
+      totalBreakMillis = intent.getIntExtra("totalBreakMillis", 0);
+      customCyclesDone = intent.getIntExtra("totalCycleCount", 0);
     }
 
     /////---------Testing pom round iterations---------------/////////
     if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 6000);
 
+    //Todo: Should not be querying DB here. Can fetch total times + cycles from Main and pass here.
     //Loads database of saved cycles. Since we are on a specific cycle, we can access it via its unique ID here.
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
       //If not a new cycle, retrieve cycle based on its ID and get its total times + cycles completed.
       if (!isNewCycle) {
-        switch (mode) {
-          case 1:
-            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
-            totalSetMillis = cycles.getTotalSetTime() * 1000;
-            totalBreakMillis = cycles.getTotalBreakTime() * 1000;
-            customCyclesDone = cycles.getCyclesCompleted();
-            total_set_time.setText(convertSeconds(totalSetMillis / 1000));
-            total_break_time.setText(convertSeconds(totalBreakMillis / 1000));
-            break;
-          case 3:
-            //Todo: Retrieval here.
-            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
-            break;
-        }
+//        switch (mode) {
+//          case 1:
+//            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
+//            totalSetMillis = cycles.getTotalSetTime() * 1000;
+//            totalBreakMillis = cycles.getTotalBreakTime() * 1000;
+//            customCyclesDone = cycles.getCyclesCompleted();
+//            total_set_time.setText(convertSeconds(totalSetMillis / 1000));
+//            total_break_time.setText(convertSeconds(totalBreakMillis / 1000));
+//            break;
+//          case 3:
+//            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
+//            break;
+//        }
       } else {
         //If a new cycle, retrieve the most recently added db entry (the one we just created in Main), pull its ID, and assign an instance of the db entity class to it so we can save total set/break time and total cycles to it when we exit.
         int id = 0;
@@ -950,11 +952,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
 
       msReset = 0;
       msConvert2 = 0;
-
-      //Todo: These will always be one behind.
-//      int firstPos = lapLayout.findFirstVisibleItemPosition();
-//      int lastPos = lapLayout.findLastVisibleItemPosition();
-//      lapAdapter.receiveVisiblePositions(firstPos, lastPos);
     }
   }
 
@@ -1112,7 +1109,7 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
           animateEnding();
           progressBar.setProgress(0);
           timerEnded = true;
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(pomCyclesDone)));
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
         }
         timerDisabled = false;
         next_round.setEnabled(true);
@@ -1376,17 +1373,20 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
+    //Todo: Retrieve ID of cycle from
     switch (mode) {
       case 1:
+        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
         cycles.setTotalSetTime((int) tempSetMillis / 1000);
         cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
         cycles.setCyclesCompleted(customCyclesDone);
         cyclesDatabase.cyclesDao().updateCycles(cycles);
         break;
       case 3:
+        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
         pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
         pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
-        pomCycles.setCyclesCompleted(pomCyclesDone);
+        pomCycles.setCyclesCompleted(customCyclesDone);
         cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         break;
     }
@@ -1435,16 +1435,10 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
         totalBreakMillis = 0;
         tempBreakMillis = 0;
 
-        if (mode==1) {
-          permSetMillis = ((setMillis+100) / 1000) * 1000;
-          permBreakMillis = ((breakMillis+100) / 1000) * 1000;
-          customCyclesDone = 0;
-        } else if (mode==2) {
-          permBreakMillis = ((breaksOnlyMillis+100) / 1000) * 1000;
-          breaksOnlyCyclesDone = 0;
-        } else if (mode==3) {
-          pomCyclesDone = 0;
-        }
+        permSetMillis = ((setMillis+100) / 1000) * 1000;
+        permBreakMillis = ((breakMillis+100) / 1000) * 1000;
+        customCyclesDone = 0;
+
         total_set_time.setText("0");
         total_break_time.setText("0");
         cycles_completed.setText(getString(R.string.cycles_done, "0"));
