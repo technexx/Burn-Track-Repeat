@@ -196,7 +196,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int setValue;
   int breakValue;
-  int breaksOnlyValue;
   int pomValue1;
   int pomValue2;
   int pomValue3;
@@ -258,14 +257,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
-  //Todo: Re-visit querying db on switching tabs.
+  //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
+  //Todo: Some other indication in edit mode that a cycle is part of db and not new.
+  //Todo: On edited cycles, show textView instead of editText first.
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
-  //Todo: "Saved" text when tabbing out from Pom, even if nothing there (don't want it regardless).
   //Todo: Need lap fades to remain while scrolling.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Letter -> Number soft kb is a bit choppy.
+  //Todo: Infinity mode for Pom?
 
   //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Minimize aSync threads for performance.
@@ -523,7 +524,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Default values in WHOLE seconds. Multiplied * 1000 for our millis values.
     setValue = sharedPreferences.getInt("setValue", 30);
     breakValue = sharedPreferences.getInt("breakValue", 30);
-    breaksOnlyValue = sharedPreferences.getInt("breakOnlyValue", 30);
     pomValue1 = sharedPreferences.getInt("pomValue1", 1500);
     pomValue2 = sharedPreferences.getInt("pomValue2", 300);
     pomValue3 = sharedPreferences.getInt("pomValue3", 900);
@@ -620,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.
         removeEditTimerViews(false);
-        editCycleViews();
+        defaultEditRoundViews();
         convertEditTime(true);
         setEditValues();
       });
@@ -691,7 +691,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             runOnUiThread(()-> {
                   //Sets all editTexts to GONE, and then populates them + textViews based on mode.
                   removeEditTimerViews(false);
-                  editCycleViews();
+                  defaultEditRoundViews();
                   populateCycleList(true);
                   //Toggles "empty cycle" text if adapter list is empty.
                   checkEmptyCycles();
@@ -713,6 +713,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onTabUnselected(TabLayout.Tab tab) {
+        //since modes use same String, clear it between tab switches.
+        cycleTitle = "";
         //Dismisses editCycle popup when switching tabs.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Turning highlight mode off since we are moving to a new tab.
@@ -725,6 +727,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     editCyclesPopupView.setOnClickListener(v-> {
+      //Default row selection.
+      resetRows();
       //Caps and sets editText values when clicking outside (exiting) the editText box.
       convertEditTime(true);
       //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
@@ -758,13 +762,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
         rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
       }
-    });
-
-
-    //Sets a listener on our editCycles popup.
-    editCyclesPopupView.setOnTouchListener((v, event) -> {
-      //Toggles coloring and row selection.
-      return false;
     });
 
     //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
@@ -1284,9 +1281,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       second_value_textView.setText(convertCustomTextView(breakValue));
     }
     else if (mode==3) {
-      rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
-      rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
-      rowSelect(s3, third_value_textView, third_value_edit, third_value_edit_two, third_value_sep, plus_third_value, minus_third_value, R.color.teal_200);
+      rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
+      rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
+      rowSelect(s3, third_value_textView, third_value_edit, third_value_edit_two, third_value_sep, plus_third_value, minus_third_value, Color.WHITE);
     }
   }
 
@@ -1427,25 +1424,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editBreakSeconds <=0 || editBreakMinutes == 5) editBreakSeconds = 0;
       if (editBreakSeconds < 5 && editBreakMinutes == 0) editBreakSeconds = 0;
 
+      breakValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
+      second_value_textView.setText(convertCustomTextView(breakValue));
       //Sets value of editBreakMinutes to either breakValue, or breakOnlyValue, depending on which mode we're on.
-      if (mode == 1) {
-        breakValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
-        second_value_textView.setText(convertCustomTextView(breakValue));
-      }
-      else if (mode == 2) {
-        breaksOnlyValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
-        second_value_textView.setText(convertCustomTextView(breaksOnlyValue));
-      }
 
       toastBounds(5, 300, setValue);
       toastBounds(5, 300, breakValue);
-      toastBounds(5, 300, breaksOnlyValue);
       if (setValue < 5) setValue = 5;
       if (breakValue < 5) breakValue = 5;
-      if (breaksOnlyValue < 5) breaksOnlyValue = 5;
       if (setValue > 300) setValue = 300;
       if (breakValue > 300) breakValue = 300;
-      if (breaksOnlyValue > 300) breaksOnlyValue = 300;
     } else if (mode==3) {
       editPomMinutesOne = convertEditTextToLong(first_value_edit);
       editPomSecondsOne = convertEditTextToLong(first_value_edit_two);
@@ -1486,16 +1474,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void convertEditTime(boolean setEditViews) {
     //Used to turn off editText listener's execution of setEditValues(), which overrides setValue and breakValue when trying to change them via +/- runnables, which call this function.
     editListener = false;
-    if (mode==1 || mode==2) {
+    if (mode==1) {
       editSetSeconds = setValue % 60;
       editSetMinutes = setValue / 60;
-      if (mode == 1) {
-        editBreakSeconds = breakValue % 60;
-        editBreakMinutes = breakValue / 60;
-      } else {
-        editBreakSeconds = breaksOnlyValue % 60;
-        editBreakMinutes = breaksOnlyValue / 60;
-      }
+      editBreakSeconds = breakValue % 60;
+      editBreakMinutes = breakValue / 60;
       if (setEditViews) {
         first_value_edit.setText(String.valueOf(editSetMinutes));
         first_value_edit_two.setText(elongateEditSeconds(editSetSeconds));
@@ -1702,14 +1685,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
     long remainingSeconds;
-//        if (mode==3) totalSeconds = totalSeconds*60;
     minutes = totalSeconds / 60;
 
     remainingSeconds = totalSeconds % 60;
     if (totalSeconds >= 60) {
       String formattedSeconds = df.format(remainingSeconds);
       if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
-      return (minutes + " : " + formattedSeconds);
+      if (mode==1 || totalSeconds>=600) return (minutes + " : " + formattedSeconds);
+      else return ("0" + minutes + " : " + formattedSeconds);
     } else {
       String totalStringSeconds = String.valueOf(totalSeconds);
       if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
@@ -1739,8 +1722,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void editCycleViews() {
+  public void defaultEditRoundViews() {
     //Instance of layout objects we can set programmatically based on which mode we're on.
+    ConstraintLayout.LayoutParams s1ParamsAdd = (ConstraintLayout.LayoutParams) plus_first_value.getLayoutParams();
+    ConstraintLayout.LayoutParams s1ParamsSub = (ConstraintLayout.LayoutParams) minus_first_value.getLayoutParams();
     ConstraintLayout.LayoutParams s2ParamsAdd = (ConstraintLayout.LayoutParams) plus_second_value.getLayoutParams();
     ConstraintLayout.LayoutParams s2ParamsSub = (ConstraintLayout.LayoutParams) minus_second_value.getLayoutParams();
     ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) add_cycle.getLayoutParams();
@@ -1775,6 +1760,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         addParams.topMargin = 60;
         subParams.topToBottom = R.id.s2;
         subParams.topMargin = 60;
+//        s1ParamsAdd.topMargin = 100;
+//        s1ParamsSub.topMargin = 100;
         break;
       case 3:
         //Visibilities and values exclusive to mode 3.

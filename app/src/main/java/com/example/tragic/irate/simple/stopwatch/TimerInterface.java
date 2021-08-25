@@ -431,7 +431,6 @@ public class TimerInterface extends AppCompatActivity implements DotDraws.sendAl
       @Override
       public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
-        Log.i("testpos", "received position is " + scrollPosition);
         getVisibleLapPositions();
         if (dy!=0) lapAdapter.listIsScrolling(true);
       }
