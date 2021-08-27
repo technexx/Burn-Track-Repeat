@@ -238,7 +238,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_value;
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
-  ConstraintLayout roundRecyclerLayout;
   int FADE_IN_HIGHLIGHT_MODE = 1;
   int FADE_OUT_HIGHLIGHT_MODE = 2;
   int FADE_IN_EDIT_CYCLE = 3;
@@ -257,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
+  //Todo: Don't CLOSE Main or Timer activities. It's the re-opening that does it. Use Fragments or just have Timer be in a popup Class.
+  //Todo: Intro splash screen
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
@@ -2162,13 +2163,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Mode used for type of timer.
     intent.putExtra("mode", mode);
     //If cycle is new, tell Timer so that it doesn't try to fetch an ID. Also, don't send an ID that will default to 0 since nothing is received in onCycleClick().
-    if (newCycle) intent.putExtra("isNewCycle", true); else {
+    if (newCycle) {
+      intent.putExtra("isNewCycle", true);
+      //Sends most recently added primary ID over (since we added the most recent row).
+      intent.putExtra("primaryID", primaryIDArray.get(primaryIDArray.size()-1));
+    } else {
       intent.putExtra("isNewCycle", false);
       //Sends the current cycle's database position so we can delete it from the Timer class if desired.
       intent.putExtra("passedID", retrievedID);
       intent.putExtra("totalSetMillis", totalSetMillisArray.get(receivedPos)*1000);
       intent.putExtra("totalBreakMillis", totalBreakMillisArray.get(receivedPos)*1000);
       intent.putExtra("totalCycleCount", totalCycleCountArray.get(receivedPos));
+      //Sends primary ID of the selected cycle over.
       intent.putExtra("primaryID", primaryIDArray.get(receivedPos));
 
     }

@@ -9,7 +9,7 @@
     <View
         android:id="@+id/edit_header"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/edit_cycles_header">
@@ -70,7 +70,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="64dp"
         android:textColor="@color/white"
         android:textSize="22sp">
     </TextView>
@@ -83,7 +83,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="64dp"
         android:textColorHint="@color/circular_progress_default_subtitle"
         android:textColor="@color/white"
         android:textSize="22sp"
