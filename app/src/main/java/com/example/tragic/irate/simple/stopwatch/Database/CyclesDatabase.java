@@ -14,7 +14,7 @@ public abstract class CyclesDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), CyclesDatabase.class, "cycles_database")
 //                    .allowMainThreadQueries()
-                    .fallbackToDestructiveMigration()
+//                    .fallbackToDestructiveMigration()
                     .build();
         }
         return INSTANCE;
