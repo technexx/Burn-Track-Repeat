@@ -395,8 +395,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Button cancel_delete;
   TextView delete_text;
 
-  int passedID;
-
   boolean resetMenu;
   long baseTime;
   long countUpMillisHolder;
@@ -764,12 +762,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
     savedCycleAdapter = new SavedCycleAdapter();
-    deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
-    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
-    deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    delete_text = deleteCyclePopupView.findViewById(R.id.delete_text);
-    confirm_delete = deleteCyclePopupView.findViewById(R.id.confirm_yes);
-    cancel_delete = deleteCyclePopupView.findViewById(R.id.confirm_no);
 
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
     fadeOut = new AlphaAnimation(1.0f, 0.0f);
@@ -1660,15 +1652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
-    confirm_delete.setOnClickListener(v -> {
-      //If popUp text contains delete_total_times or delete_total_laps String, execute that part of the function. Otherwise, we're deleting the current cycle.
-      AsyncTask.execute(() -> {
-        if (delete_text.getText().equals(getString(R.string.delete_total_times))) deleteCycle(DELETING_TIMES);
-        else deleteCycle(DELETING_CYCLE);
-      });
-    });
-
-    cancel_delete.setOnClickListener(v -> {
+    delete_all_cancel.setOnClickListener(v -> {
       //Removes our delete confirm popUp if we cancel.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
@@ -2563,6 +2547,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mHandler.postDelayed(()-> {
       editCyclesPopupWindow.dismiss();
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+      populateTimerUI();
     },0);
 
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
@@ -3319,7 +3304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Resets base progressBar duration for count-up rounds.
         progressBarValueHolder = 30000;
         //Sets the long value in our "count up" rounds back to 0.
-        for (int i=0; i<startRounds; i++) {
+        for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
         //Sets timer values and round counts. populateTimerUI() is called at app startup and when resetting timer, so this handles both.
@@ -3467,14 +3452,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
     switch (mode) {
       case 1:
-        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(passedID).get(0);
+        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(retrievedID).get(0);
         cycles.setTotalSetTime((int) tempSetMillis / 1000);
         cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
         cycles.setCyclesCompleted(customCyclesDone);
         cyclesDatabase.cyclesDao().updateCycles(cycles);
         break;
       case 3:
-        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(passedID).get(0);
+        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(retrievedID).get(0);
         pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
         pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
         pomCycles.setCyclesCompleted(customCyclesDone);
@@ -3488,41 +3473,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
   }
 
-  public void deleteCycle(int typeOfDeletion) {
-    //Deletes the currently displayed cycle.
-    if (typeOfDeletion == DELETING_CYCLE) {
-      switch (mode) {
-        case 1:
-          cyclesDatabase.cyclesDao().deleteCycle(cycles); break;
-        case 3:
-          cyclesDatabase.cyclesDao().deletePomCycle(pomCycles); break;
-      }
-
-      //Deletes total set/break/pom times and cycles completed.
-    } else if (typeOfDeletion == DELETING_TIMES) {
-      switch (mode) {
-        case 1:
-          cyclesDatabase.cyclesDao().deleteTotalTimesCycle(); break;
-        case 3:
-          cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
-      }
-
-      runOnUiThread(() -> {
-        deleteCyclePopupWindow.dismiss();
-        //Resets all total times to 0.
-        totalSetMillis = 0;
-        tempSetMillis = 0;
-        totalBreakMillis = 0;
-        tempBreakMillis = 0;
-
-        permSetMillis = ((setMillis+100) / 1000) * 1000;
-        permBreakMillis = ((breakMillis+100) / 1000) * 1000;
-        customCyclesDone = 0;
-
-        total_set_time.setText("0");
-        total_break_time.setText("0");
-        cycles_completed.setText(getString(R.string.cycles_done, "0"));
-      });
-    }
-  }
+  //Todo: Redundandtly named method formerly in Timer class. Need altered one for deleting total times/cycles.
+//  public void deleteCycle(int typeOfDeletion) {
+//    //Deletes the currently displayed cycle.
+//    if (typeOfDeletion == DELETING_CYCLE) {
+//      switch (mode) {
+//        case 1:
+//          cyclesDatabase.cyclesDao().deleteCycle(cycles); break;
+//        case 3:
+//          cyclesDatabase.cyclesDao().deletePomCycle(pomCycles); break;
+//      }
+//
+//      //Deletes total set/break/pom times and cycles completed.
+//    } else if (typeOfDeletion == DELETING_TIMES) {
+//      switch (mode) {
+//        case 1:
+//          cyclesDatabase.cyclesDao().deleteTotalTimesCycle(); break;
+//        case 3:
+//          cyclesDatabase.cyclesDao().deleteTotalTimesPom();  break;
+//      }
+//
+//      runOnUiThread(() -> {
+//        deleteCyclePopupWindow.dismiss();
+//        //Resets all total times to 0.
+//        totalSetMillis = 0;
+//        tempSetMillis = 0;
+//        totalBreakMillis = 0;
+//        tempBreakMillis = 0;
+//
+//        permSetMillis = ((setMillis+100) / 1000) * 1000;
+//        permBreakMillis = ((breakMillis+100) / 1000) * 1000;
+//        customCyclesDone = 0;
+//
+//        total_set_time.setText("0");
+//        total_break_time.setText("0");
+//        cycles_completed.setText(getString(R.string.cycles_done, "0"));
+//      });
+//    }
+//  }
 }
