@@ -1487,7 +1487,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
-    //Todo: What we've done is removed any db query from launch of Timer class.
     /////---------Testing pom round iterations---------------/////////
     if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 6000);
 
@@ -1646,10 +1645,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
+    //Todo: Re-implement exitTimer(), w/ just the saving aspect. Also add to onBackPressed().
+    //Todo: Need an instance of retrievedID for exitTimer() for newly added cycle when launching it. It has been saved in DB and has its ID, but we need to call that row for total times + cycle save when exiting.
     exit_timer.setOnClickListener(v -> {
       AsyncTask.execute(()->{
         exitTimer();
       });
+      //Minimizes activity. Clone of onBackPressed override.
+      moveTaskToBack(true);
     });
 
     delete_all_cancel.setOnClickListener(v -> {
@@ -3447,19 +3450,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
   public void exitTimer() {
-    //Only place we query database is exiting timer, so we instantiate it here.
-    cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
     switch (mode) {
       case 1:
-        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(retrievedID).get(0);
+        //Todo: Since we're integrating classes, we can remove the database fetch here since we should already have a current instance of our cycles class.
+        if (!isNewCycle) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(retrievedID).get(0);
         cycles.setTotalSetTime((int) tempSetMillis / 1000);
         cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
         cycles.setCyclesCompleted(customCyclesDone);
         cyclesDatabase.cyclesDao().updateCycles(cycles);
+//        Log.i("testdb", "set rounds are " + cycles.getWorkoutRounds() + " and total set millis is " + tempSetMillis/1000);
         break;
       case 3:
-        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(retrievedID).get(0);
+        if (!isNewCycle) pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(retrievedID).get(0);
         pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
         pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
         pomCycles.setCyclesCompleted(customCyclesDone);
@@ -3473,7 +3476,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
   }
 
-  //Todo: Redundandtly named method formerly in Timer class. Need altered one for deleting total times/cycles.
+  //Todo: Redundantly named method formerly in Timer class. Need altered one for deleting total times/cycles.
 //  public void deleteCycle(int typeOfDeletion) {
 //    //Deletes the currently displayed cycle.
 //    if (typeOfDeletion == DELETING_CYCLE) {
