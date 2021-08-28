@@ -143,7 +143,7 @@ public class DotDraws extends View {
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
     switch (mMode) {
       case 1:
-        if (mRoundTimes.size()<=8) encloseDots(mY-10, mY+175); else encloseDots(mY-70, mY+280);
+        if (mRoundTimes.size()<=8) encloseDots(mY+130 , mY+335); else encloseDots(mY+70, mY+430);
 
         for (int i=0; i<mRoundTimes.size(); i++) {
           //If type 1 or 2 (sets), color is green. Otherwise, color is red.
@@ -169,22 +169,25 @@ public class DotDraws extends View {
           }
 
           if (mRoundTimes.size()<=8) {
-            mCanvas.drawCircle(mX+20, mY+60, 55, mPaint);
-            drawText(mRoundTimes, mX+16, mY+62, i);
-            mCanvas.drawText(String.valueOf(i+1), mX+5, mY+155, mPaintNumbers);
+            //Draws dot, timer value, and round count.
+            mCanvas.drawCircle(mX+20, mY+210, 55, mPaint);
+            drawText(mRoundTimes, mX+16, mY+212, i);
+            mCanvas.drawText(String.valueOf(i+1), mX+5, mY+315, mPaintNumbers);
             mX += 132;
           } else {
+            //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
-              mCanvas.drawCircle(mX+20, mY, 55, mPaint);
-              drawText(mRoundTimes, mX+16, mY+4, i);
-              mCanvas.drawText(String.valueOf(i+1), mX+9, mY+95, mPaintNumbers);
+              mCanvas.drawCircle(mX+20, mY+140, 55, mPaint);
+              drawText(mRoundTimes, mX+16, mY+144, i);
+              mCanvas.drawText(String.valueOf(i+1), mX+9, mY+235, mPaintNumbers);
               mX += 132;
               //Resetting mX after 8th round so the second row begins on top of first.
               if (i==7) mX = 58;
             } else {
-              mCanvas.drawCircle(mX+20, mY+175, 55, mPaint);
-              drawText(mRoundTimes, mX+16, mY+180, i);
-              if (i==8) mCanvas.drawText(String.valueOf(i+1), mX+9, mY+270, mPaintNumbers); else mCanvas.drawText(String.valueOf(i+1), mX-2, mY+270, mPaintNumbers);
+              mCanvas.drawCircle(mX+20, mY+320, 55, mPaint);
+              drawText(mRoundTimes, mX+16, mY+325, i);
+              //Position 8 (first pos, second row), has to be indented slightly.
+              if (i==8) mCanvas.drawText(String.valueOf(i+1), mX+9, mY+415, mPaintNumbers); else mCanvas.drawText(String.valueOf(i+1), mX-2, mY+415, mPaintNumbers);
               mX += 132;
             }
           }

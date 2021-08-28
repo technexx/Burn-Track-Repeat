@@ -1308,7 +1308,7 @@ public class TimerInterface extends AppCompatActivity {
 //        total_set_time.setText(convertSeconds(tempSetMillis/1000));
 //        //Sets our totalMillis to the new, revised and rounded tempMillis so when it's used again, it syncs up.
 //        totalSetMillis = tempSetMillis;
-//
+//z
 //        //Sets our total millis to the temp value iterated up in our runnable.
 //        totalBreakMillis = tempBreakMillis;
 //        //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.

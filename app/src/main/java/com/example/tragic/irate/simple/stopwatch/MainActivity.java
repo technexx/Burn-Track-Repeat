@@ -249,9 +249,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int FADE_IN_EDIT_CYCLE = 3;
   int FADE_OUT_EDIT_CYCLE = 4;
 
-  String timeCompare;
-  String typeCompare;
-  String titleCompare;
   boolean roundIsFading;
   boolean roundIsSelected;
   List<Integer> primaryIDArray;
@@ -275,8 +272,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Animation endAnimation;
   TextView lastTextView;
 
-  String cycle_title;
-  int overSeconds;
   TextView overtime;
 
   TextView cycle_header_text;
@@ -340,7 +335,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable stopWatchRunnable;
 
   int customCyclesDone;
-  int breaksOnlyCyclesDone;
   int lapsNumber;
 
   int startRounds;
@@ -388,8 +382,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public Runnable secondsUpSetRunnable;
   public Runnable secondsUpBreakRunnable;
 
-  ImageButton exit_timer;
-
   ConstraintLayout timerInterface;
   Button confirm_delete;
   Button cancel_delete;
@@ -400,8 +392,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisHolder;
   int scrollPosition;
 
-  //Todo: Don't CLOSE Main or Timer activities. It's the re-opening that does it. Use Fragments or just have Timer be in a popup Class.
-  //Todo: Intro splash screen
+  //Todo: Calling soft keyboard during edit cycles causes ghosting w/ Main view.
+  //Todo: Quick presses of FAB area on edit (when launch button comes up) causes blank timer + bugs.
+  //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
@@ -415,7 +408,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Minimize aSync threads for performance.
-  //Todo: editCycle popUp precludes action bar button use at the moment because it retains app focus. We can't remove that without borking other stuff (e.g. soft keyboard use).
   //Todo: Could long svg files be a lag contributor?
   //Todo: Load/draw canvas in aSync for performance?
   //Todo: TDEE in sep popup w/ tabs.
@@ -437,7 +429,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
-    //Minimizes activity.
+    AsyncTask.execute(()->{
+      exitTimer();
+    });
+    //Minimizes activity. Clone of onBackPressed override.
     moveTaskToBack(true);
   }
 
@@ -748,7 +743,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
     pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
     pauseResumeButton.setRippleColor(null);
-    exit_timer = timerPopUpView.findViewById(R.id.exit_timer);
     reset_total_times = timerPopUpView.findViewById(R.id.reset_total_times);
     empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
     if (mode!=4) empty_laps.setVisibility(View.INVISIBLE);
@@ -960,29 +954,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     s1.setOnClickListener(v->{
-      //Toggles coloring and row selection.
-      if (!firstRowHighlighted) {
-        breaksSelected = false;
-        setsSelected = true;
-        firstRowHighlighted = true;
-        secondRowHighlighted = false;
-        //If first row is highlighted, second row should un-highlight.
-        breaksInfinity.setAlpha(0.3f);
-        rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
-        rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
+      if (mode==1) {
+        //Toggles coloring and row selection.
+        if (!firstRowHighlighted) {
+          breaksSelected = false;
+          setsSelected = true;
+          firstRowHighlighted = true;
+          secondRowHighlighted = false;
+          //If first row is highlighted, second row should un-highlight.
+          breaksInfinity.setAlpha(0.3f);
+          rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
+          rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
+        }
       }
     });
 
     s2.setOnClickListener(v-> {
-      //Toggles coloring and row selection.
-      if (!secondRowHighlighted) {
-        setsSelected = false;
-        breaksSelected = true;
-        secondRowHighlighted = true;
-        firstRowHighlighted = false;
-        setsInfinity.setAlpha(0.3f);
-        rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
-        rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
+      if (mode==1) {
+        //Toggles coloring and row selection.
+        if (!secondRowHighlighted) {
+          setsSelected = false;
+          breaksSelected = true;
+          secondRowHighlighted = true;
+          firstRowHighlighted = false;
+          setsInfinity.setAlpha(0.3f);
+          rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.RED);
+          rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.WHITE);
+        }
       }
     });
 
@@ -1003,10 +1001,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+      //Brings up menu to add/subtract rounds to new cycle.
+      editCyclesPopupWindow.showAsDropDown(tabLayout);
       fab.setEnabled(false);
       //Used when deciding whether to save a new cycle or retrieve/update a current one. FAB will always create a new one.
       isNewCycle = true;
       resetRows();
+      //Todo: May want to move this to onBackPressed() if edit window is open.
       //Clears round adapter arrays so they can be freshly populated.
       clearRoundAdapterArrays();
       //Updates round adapters so lists show as cleared.
@@ -1014,12 +1015,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycleRoundsAdapterTwo.notifyDataSetChanged();
       //Removed round divider.
       roundListDivider.setVisibility(View.GONE);
-      //Brings up menu to add/subtract rounds to new cycle.
-      editCyclesPopupWindow.showAsDropDown(tabLayout);
       //Default disabled state of edited cycle save, if nothing has changed.
       save_edit_cycle.setEnabled(false);
       save_edit_cycle.setAlpha(0.3f);
-
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -1521,9 +1519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Sets all progress bars to their start value.
     progressBar.setProgress(maxProgress);
 
-    //Populates UI elements at app start.
-    populateTimerUI();
-
     //Used in all timers to smooth out end fade.
     endFade = new Runnable() {
       @Override
@@ -1645,16 +1640,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
-    //Todo: Re-implement exitTimer(), w/ just the saving aspect. Also add to onBackPressed().
-    //Todo: Need an instance of retrievedID for exitTimer() for newly added cycle when launching it. It has been saved in DB and has its ID, but we need to call that row for total times + cycle save when exiting.
-    exit_timer.setOnClickListener(v -> {
-      AsyncTask.execute(()->{
-        exitTimer();
-      });
-      //Minimizes activity. Clone of onBackPressed override.
-      moveTaskToBack(true);
-    });
-
     delete_all_cancel.setOnClickListener(v -> {
       //Removes our delete confirm popUp if we cancel.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
@@ -1692,7 +1677,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Resets row selection and editText/textView values.
   public void resetRows() {
     if (mode==1) {
+      //Default selection of Set.
+      firstRowHighlighted = true;
       rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
+      rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
       //Our editText fields have listeners attached which call setEditValues(), which set our edit values AND setValue/breakValue vars to the values within the editText box itself. Here, we use 0:30 for both.
       first_value_edit.setText(String.valueOf(0));
       first_value_edit_two.setText(elongateEditSeconds(30));
@@ -2491,10 +2479,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Populates round list from single cycle.
   public void retrieveRoundList(boolean queryList) {
-    //Resetting comparison vars.
-    timeCompare = "";
-    typeCompare = "";
-    titleCompare = "";
     //Clears the two lists of actual timer values we are populating.
     workoutTime.clear();
     typeOfRound.clear();
@@ -2520,15 +2504,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
           for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           cycleTitle = fetchedTitle;
-          Log.i("testPop", "round array is " + workoutTime);
-          Log.i("testPop", "roundType array is " + typeOfRound);
-          Log.i("testPop", "title is " + cycleTitle);
-
         }
-        //Retrieved cycle values from database. Used to compare to ones when in edit mode when determining whether we save/update db in (a) exiting edit back to main or (b) launching cycle.
-        timeCompare = gson.toJson(workoutTime);
-        typeCompare = gson.toJson(typeOfRound);
-        titleCompare = cycleTitle;
         break;
       case 3:
         PomCycles pomCycles = pomCyclesList.get(receivedPos);
@@ -2536,9 +2512,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String[] tempPom = pomCycles.getFullCycle().split(" - ");
         for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
         retrievedID = pomCyclesList.get(receivedPos).getId();
-
-        timeCompare = gson.toJson(pomValuesTime);
-        titleCompare = cycleTitle;
         break;
     }
   }
@@ -2556,11 +2529,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
     // If we are launching a new cycle, set a conditional for an empty title, a conditional for an empty list, and run the saveCycles() method to automatically save it in our database. For both new and old cycles, send all necessary intents to our Timer class.
     if (newCycle) {
-      //Gets current date for use as title in new cycles where title is left empty.
-      Calendar calendar = Calendar.getInstance();
-      SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-      String date = dateFormat.format(calendar.getTime());
-
       //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
       if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
@@ -2575,40 +2543,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Updates changes made to cycle if we are launching it.
       if (saveToDB) saveCycles(false);
     }
-
-//    //For both NEW and RETRIEVED cycles, we send the following intents to TimerInterface.
-//    switch (mode) {
-//      case 1:
-//        intent.putIntegerArrayListExtra("workoutTime", workoutTime);
-//        intent.putIntegerArrayListExtra("typeOfRound", typeOfRound);
-//        break;
-//      case 3:
-//        intent.putIntegerArrayListExtra("pomList", pomValuesTime);
-//        break;
-//    }
-//    //Sends the title.
-//    intent.putExtra("cycleTitle", cycleTitle);
-//    //Mode used for type of timer.
-//    intent.putExtra("mode", mode);
-//    //If cycle is new, tell Timer so that it doesn't try to fetch an ID. Also, don't send an ID that will default to 0 since nothing is received in onCycleClick().
-//    if (newCycle) {
-//      intent.putExtra("isNewCycle", true);
-//      //Sends most recently added primary ID over (since we added the most recent row).
-//      intent.putExtra("primaryID", primaryIDArray.get(primaryIDArray.size()-1));
-//    } else {
-//      intent.putExtra("isNewCycle", false);
-//      //Sends the current cycle's database position so we can delete it from the Timer class if desired.
-//      intent.putExtra("passedID", retrievedID);
-//      intent.putExtra("totalSetMillis", totalSetMillisArray.get(receivedPos)*1000);
-//      intent.putExtra("totalBreakMillis", totalBreakMillisArray.get(receivedPos)*1000);
-//      intent.putExtra("totalCycleCount", totalCycleCountArray.get(receivedPos));
-//      //Sends primary ID of the selected cycle over.
-//      intent.putExtra("primaryID", primaryIDArray.get(receivedPos));
-//
-//    }
-    //Starts Timer class.
-//    startActivity(intent);
   }
+
 
   private void saveCycles(boolean newCycle) {
     //We will have at least one cycle populated when this method completes, so we set our views for it.
@@ -3080,7 +3016,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 3:
           //End of round, setting textView to 0.
           timeLeft.setText("0");
-          //tempMillis is used to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
+          //tempMillis is used ]to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
           totalBreakMillis = tempBreakMillis;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
@@ -3300,6 +3236,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void populateTimerUI() {
+    cycle_header_text.setText(cycleTitle);
     dotDraws.resetDotAlpha();
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
@@ -3453,16 +3390,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
     switch (mode) {
       case 1:
-        //Todo: Since we're integrating classes, we can remove the database fetch here since we should already have a current instance of our cycles class.
-        if (!isNewCycle) cycles = cyclesDatabase.cyclesDao().loadSingleCycle(retrievedID).get(0);
         cycles.setTotalSetTime((int) tempSetMillis / 1000);
         cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
         cycles.setCyclesCompleted(customCyclesDone);
         cyclesDatabase.cyclesDao().updateCycles(cycles);
-//        Log.i("testdb", "set rounds are " + cycles.getWorkoutRounds() + " and total set millis is " + tempSetMillis/1000);
         break;
       case 3:
-        if (!isNewCycle) pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(retrievedID).get(0);
         pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
         pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
         pomCycles.setCyclesCompleted(customCyclesDone);
