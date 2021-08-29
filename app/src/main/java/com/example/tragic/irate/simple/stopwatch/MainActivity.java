@@ -270,7 +270,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView reset;
   ObjectAnimator objectAnimator;
   Animation endAnimation;
-  TextView lastTextView;
 
   TextView overtime;
 
@@ -393,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
 
   //Todo: Calling soft keyboard during edit cycles causes ghosting w/ Main view.
-  //Todo: Quick presses of FAB area on edit (when launch button comes up) causes blank timer + bugs.
+  //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
@@ -429,11 +428,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
-    AsyncTask.execute(()->{
-      exitTimer();
-    });
-    //Minimizes activity. Clone of onBackPressed override.
-    moveTaskToBack(true);
+    //Todo: Retain either mode 1 or 3, switching out from 4 if stopwatch used.
+    //If Timer popup is active, call exitTimer(). Popup will automatically close even w/ override.
+    if (timerPopUpWindow.isShowing()) {
+      AsyncTask.execute(()->{
+        exitTimer();
+      });
+    }
   }
 
   @Override
@@ -452,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()-> {
       receivedPos = position;
       //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
-      retrieveRoundList(false);
+      retrieveRoundList();
       //If clicking on a cycle to launch, it will always be an existing one, and we do not want to call a save method since it is unedited.
       launchTimerCycle(false, false);
     });
@@ -895,11 +896,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       //Sets the recyclerView classes for each mode adapters.
                       savedCycleAdapter.setView(1);
                       cycleRoundsAdapter.setMode(1);
+                      dotDraws.setMode(1);
                       break;
                   case 1:
                       mode = 3;
                       savedCycleAdapter.setView(3);
                       cycleRoundsAdapter.setMode(3);
+                      dotDraws.setMode(3);
                       break;
               }
               queryCycles();
@@ -1021,11 +1024,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopwatch.setOnClickListener(v-> {
-      intent = new Intent(MainActivity.this, TimerInterface.class);
-      //Retaining whichever cycle mode we're on when launching the stopwatch. This is necessary for the correct adapter refresh when coming back to Main.
-      intent.putExtra("savedMode", mode);
-      intent.putExtra("mode", 4);
-      startActivity(intent);
+      mode = 4;
+      dotDraws.setMode(4);
+      populateTimerUI();
+      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
     });
 
     //Showing sort popup window.
@@ -1101,7 +1103,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Clears old array values.
         clearRoundAdapterArrays();
         //Uses this single position to retrieve cycle and populate timer arrays.
-        retrieveRoundList(false);
+        retrieveRoundList();
         switch (mode) {
           case 1:
             //Populating String ArrayLists used to display rounds in editCycle popUp.
@@ -2478,33 +2480,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Populates round list from single cycle.
-  public void retrieveRoundList(boolean queryList) {
+  public void retrieveRoundList() {
     //Clears the two lists of actual timer values we are populating.
     workoutTime.clear();
     typeOfRound.clear();
     switch (mode) {
       case 1:
-        if (queryList) {
-          queryCycles();
-          //Getting instance of Cycles at selected position, creating a String Array from its concatenated String, and creating an Integer Array from that for use in our Timer and adapter displays.
-          Cycles cycles = cyclesList.get(receivedPos);
-          String[] tempSets = cycles.getWorkoutRounds().split(" - ");
-          for (int i=0; i<tempSets.length; i++) workoutTime.add(Integer.parseInt(tempSets[i]));
-          String[] tempRoundTypes = cycles.getRoundType().split(" - ");
-          for (int j=0; j<tempRoundTypes.length; j++) typeOfRound.add(Integer.parseInt(tempRoundTypes[j]));
-          //Primary key ID of position selected.
-          retrievedID = cyclesList.get(receivedPos).getId();
-          cycleTitle = cycles.getTitle();
-        } else {
-          //Populating our current cycle's list of rounds via Integer Arrays directly with adapter String list values, instead of querying them from the database. This is used whenever we do not need a db query, such as editing or adding a new cycle.
-          String[] fetchedRounds = workoutCyclesArray.get(receivedPos).split(" - ");
-          String[] fetchedRoundType = typeOfRoundArray.get(receivedPos).split(" - ");
-          String fetchedTitle = workoutTitleArray.get(receivedPos);
+        //Populating our current cycle's list of rounds via Integer Arrays directly with adapter String list values, instead of querying them from the database. This is used whenever we do not need a db query, such as editing or adding a new cycle.
+        String[] fetchedRounds = workoutCyclesArray.get(receivedPos).split(" - ");
+        String[] fetchedRoundType = typeOfRoundArray.get(receivedPos).split(" - ");
+        String fetchedTitle = workoutTitleArray.get(receivedPos);
 
-          for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
-          for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
-          cycleTitle = fetchedTitle;
-        }
+        for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
+        for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
+        cycleTitle = fetchedTitle;
         break;
       case 3:
         PomCycles pomCycles = pomCyclesList.get(receivedPos);
@@ -2517,15 +2506,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean newCycle, boolean saveToDB) {
-    //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
-    editCyclesPopupWindow.setFocusable(false);
-
-    mHandler.postDelayed(()-> {
-      editCyclesPopupWindow.dismiss();
-      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-      populateTimerUI();
-    },0);
-
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
     // If we are launching a new cycle, set a conditional for an empty title, a conditional for an empty list, and run the saveCycles() method to automatically save it in our database. For both new and old cycles, send all necessary intents to our Timer class.
     if (newCycle) {
@@ -2534,12 +2514,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
         return;
       }
+      //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
+      editCyclesPopupWindow.setFocusable(false);
+      mHandler.postDelayed(()-> {
+        editCyclesPopupWindow.dismiss();
+        timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+        populateTimerUI();
+      },0);
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
       //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
     } else {
       //Only calls retrieveRoundList() if NOT editing, since it also clears our round lists and we need them retained.
-      if (!editingCycle) retrieveRoundList(false);
+      if (!editingCycle) retrieveRoundList();
       //Updates changes made to cycle if we are launching it.
       if (saveToDB) saveCycles(false);
     }
@@ -3238,6 +3225,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void populateTimerUI() {
     cycle_header_text.setText(cycleTitle);
     dotDraws.resetDotAlpha();
+    //Default views for Timer.
+    total_set_header.setVisibility(View.VISIBLE);
+    total_set_time.setVisibility(View.VISIBLE);
+    total_break_header.setVisibility(View.VISIBLE);
+    total_break_time.setVisibility(View.VISIBLE);
+    lapRecycler.setVisibility(View.INVISIBLE);
+    next_round.setVisibility(View.VISIBLE);
+    reset_total_times.setVisibility(View.VISIBLE);
+    new_lap.setVisibility(View.INVISIBLE);
+
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
@@ -3285,7 +3282,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
-        timerDisabled = false ;
+        timerDisabled = false;
+        //Views for stopwatch.
         total_set_header.setVisibility(View.INVISIBLE);
         total_set_time.setVisibility(View.INVISIBLE);
         total_break_header.setVisibility(View.INVISIBLE);

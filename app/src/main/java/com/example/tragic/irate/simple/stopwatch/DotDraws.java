@@ -195,7 +195,7 @@ public class DotDraws extends View {
         break;
       case 3:
         mX = 82; mX2=mX+125;
-        encloseDots(mY-30, mY+160);
+        encloseDots(mY+110 , mY+320);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
           if (mPomDotCounter == i) pomFill(i, true, 255);
