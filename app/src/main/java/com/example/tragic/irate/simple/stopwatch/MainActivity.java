@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable changeThirdValue;
   Runnable adjustRoundDelay;
 
-  boolean editListener;
+  boolean activeEditListener;
   InputMethodManager inputMethodManager;
 
   boolean editingCycle;
@@ -382,11 +382,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public Runnable secondsUpBreakRunnable;
 
   ConstraintLayout timerInterface;
-  Button confirm_delete;
-  Button cancel_delete;
   TextView delete_text;
 
-  boolean resetMenu;
   long baseTime;
   long countUpMillisHolder;
   int scrollPosition;
@@ -558,9 +555,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+    //Todo: Lack of resize due to match_parent, but tearing still occurs when resized.
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+//    editCyclesPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -853,8 +852,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       @Override
       public void afterTextChanged(Editable s) {
-        //We set editListener to FALSE to prevent setEditValues() from triggering when not desired. Right now, it's when we are using the +/- runnables to move our time.
-        if (editListener) setEditValues();
+        //We set activeEditListener to FALSE to prevent setEditValues() from triggering when not desired. Right now, it's when we are using the +/- runnables to move our time.
+        if (activeEditListener) setEditValues();
       }
     };
 
@@ -946,8 +945,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     editCyclesPopupView.setOnClickListener(v-> {
-      //Default row selection.
-      resetRows();
       //Caps and sets editText values when clicking outside (exiting) the editText box.
       convertEditTime(true);
       //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
@@ -1004,6 +1001,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+      //Default row selection.
+      resetRows();
       //Brings up menu to add/subtract rounds to new cycle.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       fab.setEnabled(false);
@@ -1091,6 +1090,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
+      //Default row selection.
+      resetRows();
       //Used when deciding whether to save a new cycle or retrieve/update a current one. Editing will always pull an existing one.
       isNewCycle = false;
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
@@ -1845,6 +1846,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (breakValue < 5) breakValue = 5;
       if (setValue > 300) setValue = 300;
       if (breakValue > 300) breakValue = 300;
+      Log.i("testval", "textView's setValue is " + setValue);
+      Log.i("testval", "editSetSeconds is " + editSetSeconds);
     } else if (mode==3) {
       editPomMinutesOne = convertEditTextToLong(first_value_edit);
       editPomSecondsOne = convertEditTextToLong(first_value_edit_two);
@@ -1884,7 +1887,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Converts and sets our minute and second edit values from raw time values.
   public void convertEditTime(boolean setEditViews) {
     //Used to turn off editText listener's execution of setEditValues(), which overrides setValue and breakValue when trying to change them via +/- runnables, which call this function.
-    editListener = false;
+    activeEditListener = false;
     if (mode==1) {
       editSetSeconds = setValue % 60;
       editSetMinutes = setValue / 60;
@@ -1913,7 +1916,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         third_value_edit_two.setText(elongateEditSeconds(editPomSecondsThree));
       }
     }
-    editListener = true;
+    activeEditListener = true;
   }
 
   public long convertEditTextToLong(EditText editVar) {
@@ -2531,7 +2534,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (saveToDB) saveCycles(false);
     }
   }
-
 
   private void saveCycles(boolean newCycle) {
     //We will have at least one cycle populated when this method completes, so we set our views for it.
