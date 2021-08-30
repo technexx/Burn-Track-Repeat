@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisHolder;
   int scrollPosition;
 
-  //Todo: Calling soft keyboard during edit cycles causes ghosting w/ Main view.
+  //Todo: Main layout should not be shown between edit - > timer popups.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -427,6 +427,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onBackPressed() {
     //Todo: Retain either mode 1 or 3, switching out from 4 if stopwatch used.
     //If Timer popup is active, call exitTimer(). Popup will automatically close even w/ override.
+    //Todo: Check if this works. Popup may have focus over it.
     if (timerPopUpWindow.isShowing()) {
       AsyncTask.execute(()->{
         exitTimer();
@@ -841,15 +842,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
-    //Once editPopUp is on screen, change Main's background color to match it and remove Main's recyclerView view. This prevents the soft keyboard's "tear" through Main's layout from being visible.
-    editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-      @Override
-      public void onSystemUiVisibilityChange(int visibility) {
-        savedCycleRecycler.setVisibility(View.GONE);
-        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
-      }
-    });
-
     //Listens to all editTexts for changes.
     TextWatcher editTextWatcher = new TextWatcher() {
       @Override
@@ -952,15 +944,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    editCyclesPopupView.setOnClickListener(v-> {
-      //Caps and sets editText values when clicking outside (exiting) the editText box.
-      convertEditTime(true);
-      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
-      removeEditTimerViews(true);
-      //Hides soft keyboard by using a token of the current editCycleView.
-      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-    });
-
     s1.setOnClickListener(v->{
       if (mode==1) {
         //Toggles coloring and row selection.
@@ -1009,8 +992,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
-//      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
-//      savedCycleRecycler.setVisibility(View.GONE);
       //Default row selection.
       resetRows();
       //Brings up menu to add/subtract rounds to new cycle.
@@ -1018,15 +999,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fab.setEnabled(false);
       //Used when deciding whether to save a new cycle or retrieve/update a current one. FAB will always create a new one.
       isNewCycle = true;
-      resetRows();
-      //Todo: May want to move this to onBackPressed() if edit window is open.
-      //Clears round adapter arrays so they can be freshly populated.
-      clearRoundAdapterArrays();
-      //Updates round adapters so lists show as cleared.
-      cycleRoundsAdapter.notifyDataSetChanged();
-      cycleRoundsAdapterTwo.notifyDataSetChanged();
-      //Removed round divider.
-      roundListDivider.setVisibility(View.GONE);
       //Default disabled state of edited cycle save, if nothing has changed.
       save_edit_cycle.setEnabled(false);
       save_edit_cycle.setAlpha(0.3f);
@@ -1083,6 +1055,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
+     editCyclesPopupView.setOnClickListener(v-> {
+      //Caps and sets editText values when clicking outside (exiting) the editText box.
+      convertEditTime(true);
+      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
+      removeEditTimerViews(true);
+      //Hides soft keyboard by using a token of the current editCycleView.
+      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+    });
+
+    //Once editPopUp is on screen, change Main's background color to match it and remove Main's recyclerView view. This prevents the soft keyboard's "tear" through Main's layout from being visible.
+    editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+      @Override
+      public void onSystemUiVisibilityChange(int visibility) {
+        savedCycleRecycler.setVisibility(View.GONE);
+        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
+      }
+    });
+
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       //Resets Main's background color and recyclerView visibility.
@@ -1100,6 +1090,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveHasOccurred = false;
         savedCycleAdapter.notifyDataSetChanged();
       }
+      //Clears round adapter arrays so they can be freshly populated.
+      clearRoundAdapterArrays();
+      //Updates round adapters so lists show as cleared.
+      cycleRoundsAdapter.notifyDataSetChanged();
+      cycleRoundsAdapterTwo.notifyDataSetChanged();
+      //Removed round divider.
+      roundListDivider.setVisibility(View.GONE);
     });
 
     ////--ActionBar Item onClicks START--////
@@ -1212,7 +1209,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     save_edit_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()->{
-        //Todo: Blank title saving if nothing entered (instead of date).
         saveCycles(isNewCycle);
         //Used to call notifyDataSetChanged() in SavedCycleAdapter. No need if db has not been changed.
         saveHasOccurred = true;
@@ -1792,7 +1788,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Clears the String values of timer Arrays passed to adapter. We do NOT clear the Integer Arrays (i.e. workOutTime, typeOfRound), because we need them intact when editing cycles. The values we clear can be re-populated with these Integer Arrays.
+  //Clears the String values of timer Arrays passed to adapter.
   public void clearRoundAdapterArrays() {
     convertedWorkoutTime.clear();
     roundHolderOne.clear();
