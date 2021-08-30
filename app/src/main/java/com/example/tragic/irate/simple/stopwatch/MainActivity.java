@@ -189,6 +189,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String workoutString;
   String roundTypeString;
   String pomString;
+  int ADDING_CYCLE = 1;
+  int EDITING_CYCLE = 2;
+  int DELETING_CYCLE = 3;
 
   ArrayList<Integer> typeOfRound;
   ArrayList<String> typeOfRoundArray;
@@ -230,15 +233,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable changeSecondValue;
   Runnable changeThirdValue;
   Runnable adjustRoundDelay;
-
   boolean activeEditListener;
-  InputMethodManager inputMethodManager;
-
   boolean editingCycle;
+  InputMethodManager inputMethodManager;
 
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
-  Intent intent;
   View roundView;
   TextView round_count;
   TextView round_value;
@@ -283,11 +283,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView total_set_time;
   TextView total_break_time;
   TextView empty_laps;
+  TextView delete_text;
 
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
-  int DELETING_CYCLE = 1;
-  int DELETING_TIMES = 2;
 
   long setMillis;
   long totalSetMillis;
@@ -311,7 +310,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long breakMillisUntilFinished;
   long pomMillisUntilFinished;
   Runnable endFade;
-  Runnable ot;
   int pomDotCounter;
 
   double ms;
@@ -371,8 +369,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<Integer> zeroArraySets;
   ArrayList<Integer> zeroArrayBreaks;
 
-  boolean activePomCycle;
-
   int receivedAlpha;
   MaterialButton pauseResumeButton;
 
@@ -381,14 +377,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public Runnable secondsUpSetRunnable;
   public Runnable secondsUpBreakRunnable;
 
-  ConstraintLayout timerInterface;
-  TextView delete_text;
-
   long baseTime;
   long countUpMillisHolder;
   int scrollPosition;
 
-  //Todo: Main layout should not be shown between edit - > timer popups. Still shows a bit. One option is to only set its recyclerView + bg color if timer popUp is not being displayed. Other is to set a different view (timer's) for the edit popUp.
+  //Todo: Grey, populasted recyclerView in Main after FIRST post-edit launch, but not second. Likely just need to change color.
+  //Todo: cycle adapter update may be reinstating view when we need it invisible (i.e. when launching timer). either way, it's happening.
+  //Todo: Remember, db calls are really only needed on app launch. Sort mode re-populates arrayLists anyway, so these lists can be manipulated w/ out db access the rest of the time. Delete methods can just subtract from Array, as add/edit do their own thing.
   //Todo: Cycle adapter doesn't refresh from edit->timer->back pressed.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
@@ -426,6 +421,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
+    if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
     //Todo: Retain either mode 1 or 3, switching out from 4 if stopwatch used.
     //If Timer popup is active, call exitTimer(). Popup will automatically close even w/ override.
     //Todo: Check if this works. Popup may have focus over it.
@@ -452,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()-> {
       receivedPos = position;
       //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
-      retrieveRoundList();
+      populateRoundList();
       //If clicking on a cycle to launch, it will always be an existing one, and we do not want to call a save method since it is unedited.
       launchTimerCycle(false, false);
     });
@@ -560,7 +556,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-//    editCyclesPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+//        emptyCycleList.setVisibility(View.GONE);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -692,8 +689,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeOut.setFillAfter(true);
 
     ///////////////////////////////////////////////////////////////////////////
-    //Object to access our layout.
-    timerInterface = new ConstraintLayout(this);
     mHandler = new Handler();
 
     valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
@@ -780,7 +775,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       queryCycles();
 
       //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
-      populateCycleList(true);
+      populateCycleList();
       runOnUiThread(()-> {
         checkEmptyCycles();
         //Adapter and Recycler for round views within our editCycles popUp.
@@ -911,7 +906,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   //Sets all editTexts to GONE, and then populates them + textViews based on mode.
                   removeEditTimerViews(false);
                   defaultEditRoundViews();
-                  populateCycleList(true);
+                  populateCycleList();
                   //Toggles "empty cycle" text if adapter list is empty.
                   checkEmptyCycles();
                   savedCycleAdapter.notifyDataSetChanged();
@@ -1038,7 +1033,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryCycles();
         runOnUiThread(()-> {
           //Populates adapter arrays.
-          populateCycleList(true);
+          populateCycleList();
           //Refreshes adapter.
           savedCycleAdapter.notifyDataSetChanged();
           //Sets checkmark view.
@@ -1060,6 +1055,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      checkEmptyCycles();
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       savedCycleRecycler.setVisibility(View.VISIBLE);
     });
@@ -1079,11 +1075,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onSystemUiVisibilityChange(int visibility) {
         savedCycleRecycler.setVisibility(View.GONE);
         cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
+        emptyCycleList.setVisibility(View.GONE);
       }
     });
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
+      checkEmptyCycles();
       //Resets Main's background color and recyclerView visibility if we are not launching timer popUp. If we are, keeping background grey for smoother transition between popups.
       if (!timerPopUpWindow.isShowing()) {
         cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
@@ -1105,6 +1103,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Updates round adapters so lists show as cleared.
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapterTwo.notifyDataSetChanged();
+//      savedCycleAdapter.notifyDataSetChanged();
       //Removed round divider.
       roundListDivider.setVisibility(View.GONE);
     });
@@ -1118,62 +1117,60 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
       //Displays edit cycles popUp.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
-      //Todo: This can be taken out of aSync thread since we've removed the db query.
-      AsyncTask.execute(()-> {
-        //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
-        receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
-        //Clears old array values.
-        clearRoundAdapterArrays();
-        //Uses this single position to retrieve cycle and populate timer arrays.
-        retrieveRoundList();
-        switch (mode) {
-          case 1:
-            //Populating String ArrayLists used to display rounds in editCycle popUp.
-            for (int i=0; i<workoutTime.size(); i++) {
-              //Aggregate list of rounds. Necessary since adjustCustom() uses it.
-              convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
-              //If 8 or less rounds, add to first round adapter's String Array (and roundType).
-              if (i<=7) {
-                roundHolderOne.add(convertSeconds(workoutTime.get(i)/1000));
-                typeHolderOne.add(typeOfRound.get(i));
-              }
-              //If 9 or more rounds, add to second round adapter's String Array (and roundType).
-              if (i>=8) {
-                roundHolderTwo.add(convertSeconds(workoutTime.get(i)/1000));
-                typeHolderTwo.add(typeOfRound.get(i));
-              }
+
+      //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
+      receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
+      //Clears old array values.
+      clearRoundAdapterArrays();
+      //Uses this single position to retrieve cycle and populate timer arrays.
+      populateRoundList();
+      switch (mode) {
+        case 1:
+          //Populating String ArrayLists used to display rounds in editCycle popUp.
+          for (int i=0; i<workoutTime.size(); i++) {
+            //Aggregate list of rounds. Necessary since adjustCustom() uses it.
+            convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
+            //If 8 or less rounds, add to first round adapter's String Array (and roundType).
+            if (i<=7) {
+              roundHolderOne.add(convertSeconds(workoutTime.get(i)/1000));
+              typeHolderOne.add(typeOfRound.get(i));
             }
-            break;
-          case 3:
-            //Since our fade animation listener clears our timer and adapter lists, we disable it here when we need to pull up saved cycles.
-            cycleRoundsAdapter.disablePomFade();
-            for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
-            break;
-        }
-        runOnUiThread(()-> {
-          //Changes view layout depending on +/- 8 round count.
-          if (mode==1) {
-            if (workoutTime.size()<=8) {
-              roundRecyclerTwo.setVisibility(View.GONE);
-              recyclerLayoutOne.leftMargin = 240;
-              roundListDivider.setVisibility(View.GONE);
-            } else {
-              roundRecyclerTwo.setVisibility(View.VISIBLE);
-              recyclerLayoutOne.leftMargin = 5;
-              roundListDivider.setVisibility(View.VISIBLE);
+            //If 9 or more rounds, add to second round adapter's String Array (and roundType).
+            if (i>=8) {
+              roundHolderTwo.add(convertSeconds(workoutTime.get(i)/1000));
+              typeHolderTwo.add(typeOfRound.get(i));
             }
           }
-          cycle_name_text.setVisibility(View.INVISIBLE);
-          cycle_name_edit.setVisibility(View.VISIBLE);
-          cycle_name_text.setText(cycleTitle);
-          //Setting editText title.
-          cycle_name_edit.setText(cycleTitle);
-          //Updating adapter views.
-          cycleRoundsAdapter.notifyDataSetChanged();
-          cycleRoundsAdapterTwo.notifyDataSetChanged();
-          //Removing highlights.
-          savedCycleAdapter.removeHighlight(true);
-        });
+          break;
+        case 3:
+          //Since our fade animation listener clears our timer and adapter lists, we disable it here when we need to pull up saved cycles.
+          cycleRoundsAdapter.disablePomFade();
+          for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
+          break;
+      }
+      runOnUiThread(()-> {
+        //Changes view layout depending on +/- 8 round count.
+        if (mode==1) {
+          if (workoutTime.size()<=8) {
+            roundRecyclerTwo.setVisibility(View.GONE);
+            recyclerLayoutOne.leftMargin = 240;
+            roundListDivider.setVisibility(View.GONE);
+          } else {
+            roundRecyclerTwo.setVisibility(View.VISIBLE);
+            recyclerLayoutOne.leftMargin = 5;
+            roundListDivider.setVisibility(View.VISIBLE);
+          }
+        }
+        cycle_name_text.setVisibility(View.INVISIBLE);
+        cycle_name_edit.setVisibility(View.VISIBLE);
+        cycle_name_text.setText(cycleTitle);
+        //Setting editText title.
+        cycle_name_edit.setText(cycleTitle);
+        //Updating adapter views.
+        cycleRoundsAdapter.notifyDataSetChanged();
+        cycleRoundsAdapterTwo.notifyDataSetChanged();
+        //Removing highlights.
+        savedCycleAdapter.removeHighlight(true);
       });
       //Default disabled state of edited cycle save, if nothing has changed.
       save_edit_cycle.setEnabled(false);
@@ -1191,17 +1188,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         ArrayList<String> tempPos = new ArrayList<>(receivedHighlightPositions);
         //First query to get current list of rows.
-        queryCycles();
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
           receivedPos = Integer.parseInt(receivedHighlightPositions.get(i));
           deleteCycle(false);
           tempPos.remove(String.valueOf(receivedPos));
         }
-        //Second query to get updated (post-delete) list of rows.
-        queryCycles();
         //Calls new database entries and updates our adapter's recyclerView.
         runOnUiThread(() -> {
-          populateCycleList(true);
+          editCycleList(DELETING_CYCLE);
           savedCycleAdapter.notifyDataSetChanged();
           receivedHighlightPositions = tempPos;
           //If there are no cycles left, cancel highlight mode. If there are any left, simply remove all highlights.
@@ -1220,9 +1214,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     save_edit_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()->{
         saveCycles(isNewCycle);
+        if (isNewCycle) editCycleList(ADDING_CYCLE); else editCycleList(EDITING_CYCLE);
         //Used to call notifyDataSetChanged() in SavedCycleAdapter. No need if db has not been changed.
         saveHasOccurred = true;
-        populateCycleList(false);
         runOnUiThread(()-> {
           //Disables save button. Any change in rounds or title will re-activate it.
           save_edit_cycle.setEnabled(false);
@@ -1232,13 +1226,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
+    //Todo: Watch this.
     delete_edit_cycle.setOnClickListener(v-> {
       if (!isNewCycle) {
         AsyncTask.execute(()-> {
-          queryCycles();
-          deleteCycle(false);
-          queryCycles();
-          populateCycleList(true);
+          editCycleList(DELETING_CYCLE);
           runOnUiThread(()-> {
             savedCycleAdapter.notifyDataSetChanged();
           });
@@ -1469,17 +1461,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Removes confirmation window.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
       AsyncTask.execute(() -> {
-        //Retrieved current database values.
-        queryCycles();
         //Deletes all cycles.
         deleteCycle(true);
         //Mew instance (which will be empty) of whichever Cycles entity we're on.
-        queryCycles();
-        runOnUiThread(()->{
-          //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-          populateCycleList(true);
-          savedCycleAdapter.notifyDataSetChanged();
-        });
       });
     });
 
@@ -1677,23 +1661,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
   }
 
+  //Todo: This check needs to rely on arrayLists, not cycleList instance.
   public void checkEmptyCycles() {
     if (mode==1) {
-      if (cyclesList.size()!=0) {
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        emptyCycleList.setVisibility(View.GONE);
-      } else {
-        savedCycleRecycler.setVisibility(View.GONE);
-        emptyCycleList.setVisibility(View.VISIBLE);
-      }
-    } else if (mode==3) {
-      if (pomCyclesList.size()!=0) {
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        emptyCycleList.setVisibility(View.GONE);
-      } else {
-        savedCycleRecycler.setVisibility(View.GONE);
-        emptyCycleList.setVisibility(View.VISIBLE);
-      }
+      if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
+    }
+    if (mode==3) {
+      if (pomArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
     }
   }
 
@@ -1702,6 +1676,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       //Default selection of Set.
       firstRowHighlighted = true;
+      secondRowHighlighted = false;
       rowSelect(s1, first_value_textView, first_value_edit, first_value_edit_two, first_value_sep, plus_first_value, minus_first_value, Color.GREEN);
       rowSelect(s2, second_value_textView, second_value_edit, second_value_edit_two, second_value_sep, plus_second_value, minus_second_value, Color.WHITE);
       //Our editText fields have listeners attached which call setEditValues(), which set our edit values AND setValue/breakValue vars to the values within the editText box itself. Here, we use 0:30 for both.
@@ -1741,7 +1716,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Only needs to be true if editor is active, which is only the case where it is set to true below.
     editingCycle = false;
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
-      //Boolean used to keep launchCycles() from calling retrieveRoundLists(), which replace our current timer array list w/ one fetched from DB.
+      //Boolean used to keep launchCycles() from calling populateRoundLists(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeIn);
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
@@ -1755,7 +1730,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Views for not-in-edit-mode.
     }
     if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
-      //Boolean used to keep launchCycles() from calling retrieveRoundLists(), which replace our current timer array list w/ one fetched from DB.
+      //Boolean used to keep launchCycles() from calling populateRoundLists(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
       cancelHighlight.startAnimation(fadeOut);
@@ -2438,54 +2413,61 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void editCycleList(int action) {
+    if (action == ADDING_CYCLE) {
+      //If we are adding a new cycle, no need to query the DB for values after save. Just use what has been passed into them from Arrays. This will add them as the correct last position.
+      workoutTitleArray.add(cycleTitle);
+      typeOfRoundArray.add(roundTypeString);
+      workoutCyclesArray.add(workoutString);
+
+      //Adding another array item so lists reflect size of database. Counts are 0 because no times have been logged for latest added cycle/
+      totalSetMillisArray.add(0);
+      totalBreakMillisArray.add(0);
+      totalCycleCountArray.add(0);
+      //For primary key id, getting the highest value in the array and then adding one, since that is what the next iteration will be.
+      int max = 0;
+      if (primaryIDArray.size()>0) {
+        max = primaryIDArray.get(0);
+        for (int i=0; i<primaryIDArray.size(); i++) if (primaryIDArray.get(i) > max) max = primaryIDArray.get(i);
+      }
+      primaryIDArray.add(max+1);
+    }
+    else if (action == EDITING_CYCLE) {
+      //If we have the values in our workOutTime and typeOFRound arrays already, simply pass them into cycleList's adapter arrays.
+      workoutTitleArray.set(receivedPos, cycleTitle);
+      workoutCyclesArray.set(receivedPos, workoutString);
+      typeOfRoundArray.set(receivedPos, roundTypeString);
+    } else if (action == DELETING_CYCLE) {
+      workoutTitleArray.remove(receivedPos);
+      typeOfRoundArray.remove(receivedPos);
+      workoutCyclesArray.remove(receivedPos);
+    }
+  }
+
   //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
   //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
-  public void populateCycleList(boolean queryList) {
+  public void populateCycleList() {
     switch (mode) {
       case 1:
-        //If we need to fetch values from database, do this.
-        if (queryList) {
-          workoutCyclesArray.clear();
-          typeOfRoundArray.clear();
-          workoutTitleArray.clear();
-          totalSetMillisArray.clear();
-          totalBreakMillisArray.clear();
-          totalCycleCountArray.clear();
-          primaryIDArray.clear();
-          for (int i=0; i<cyclesList.size(); i++) {
-            //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
-            workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-            //Retrieves title for use when editing a cycle.
-            workoutTitleArray.add(cyclesList.get(i).getTitle());
-            //Adds concatenated roundType String used in each cycle.
-            typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+        workoutCyclesArray.clear();
+        typeOfRoundArray.clear();
+        workoutTitleArray.clear();
+        totalSetMillisArray.clear();
+        totalBreakMillisArray.clear();
+        totalCycleCountArray.clear();
+        primaryIDArray.clear();
+        for (int i=0; i<cyclesList.size(); i++) {
+          //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
+          workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+          //Retrieves title for use when editing a cycle.
+          workoutTitleArray.add(cyclesList.get(i).getTitle());
+          //Adds concatenated roundType String used in each cycle.
+          typeOfRoundArray.add(cyclesList.get(i).getRoundType());
 
-            totalSetMillisArray.add(cyclesList.get(i).getTotalSetTime());
-            totalBreakMillisArray.add(cyclesList.get(i).getTotalBreakTime());
-            totalCycleCountArray.add(cyclesList.get(i).getCyclesCompleted());
-            primaryIDArray.add(cyclesList.get(i).getId());
-          }
-        } else {
-          if (editingCycle) {
-            //If we have the values in our workOutTime and typeOFRound arrays already, simply pass them into cycleList's adapter arrays.
-            workoutTitleArray.set(receivedPos, cycleTitle);
-            workoutCyclesArray.set(receivedPos, workoutString);
-            typeOfRoundArray.set(receivedPos, roundTypeString);
-          } else {
-            //If we are adding a new cycle, no need to query the DB for values after save. Just use what has been passed into them from Arrays. This will add them as the correct last position.
-            workoutTitleArray.add(cycleTitle);
-            typeOfRoundArray.add(roundTypeString);
-            workoutCyclesArray.add(workoutString);
-
-            //Adding another array item so lists reflect size of database. Counts are 0 because no times have been logged for latest added cycle/
-            totalSetMillisArray.add(0);
-            totalBreakMillisArray.add(0);
-            totalCycleCountArray.add(0);
-            //For primary key id, getting the highest value in the array and then adding one, since that is what the next iteration will be.
-            int max = primaryIDArray.get(0);
-            for (int i=0; i<primaryIDArray.size(); i++) if (primaryIDArray.get(i) > max) max = primaryIDArray.get(i);
-            primaryIDArray.add(max+1);
-          }
+          totalSetMillisArray.add(cyclesList.get(i).getTotalSetTime());
+          totalBreakMillisArray.add(cyclesList.get(i).getTotalBreakTime());
+          totalCycleCountArray.add(cyclesList.get(i).getCyclesCompleted());
+          primaryIDArray.add(cyclesList.get(i).getId());
         }
         break;
       case 3:
@@ -2503,7 +2485,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Populates round list from single cycle.
-  public void retrieveRoundList() {
+  public void populateRoundList() {
     //Clears the two lists of actual timer values we are populating.
     workoutTime.clear();
     typeOfRound.clear();
@@ -2537,32 +2519,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
         return;
       }
-      //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
-      editCyclesPopupWindow.setFocusable(false);
-      mHandler.postDelayed(()-> {
-        timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-        editCyclesPopupWindow.dismiss();
-        populateTimerUI();
-      },0);
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
-      //If selecting an existing cycle, call its info and set timer value arrays. Also, pass in FALSE to saveCycles.
     } else {
-      //Only calls retrieveRoundList() if NOT editing, since it also clears our round lists and we need them retained.
-      if (!editingCycle) retrieveRoundList();
+      //Only calls populateRoundList() if NOT editing, since it also clears our round lists and we need them retained.
+      if (!editingCycle) populateRoundList();
       //Updates changes made to cycle if we are launching it.
       if (saveToDB) saveCycles(false);
     }
+    //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
+    editCyclesPopupWindow.setFocusable(false);
+    mHandler.postDelayed(()-> {
+      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+      editCyclesPopupWindow.dismiss();
+      populateTimerUI();
+    },10);
   }
 
   private void saveCycles(boolean newCycle) {
-    //We will have at least one cycle populated when this method completes, so we set our views for it.
-    runOnUiThread(()->{
-      if (savedCycleRecycler.getVisibility()!=View.VISIBLE) {
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        emptyCycleList.setVisibility(View.GONE);
-      }
-    });
     //sets boolean used in launchCycles.
     isNewCycle = newCycle;
     //Gets current date for use in empty titles.
@@ -2575,6 +2549,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     workoutString = "";
     roundTypeString = "";
     pomString = "";
+
     int cycleID = 0;
     switch (mode) {
       case 1:
@@ -2609,10 +2584,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTitle(cycleTitle);
             //If cycle is new, insert a new row.
             cyclesDatabase.cyclesDao().insertCycle(cycles);
+            editCycleList(ADDING_CYCLE);
           } else {
             cycles.setTitle(cycleTitle);
             //If cycle is old, update current row.
             cyclesDatabase.cyclesDao().updateCycles(cycles);
+            editCycleList(EDITING_CYCLE);
           }
         }
         break;
@@ -2643,6 +2620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteCycle(boolean deleteAll) {
+    queryCycles();
     int cycleID;
     boolean emptyCycle = false;
     switch (mode) {
@@ -2651,7 +2629,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleID = cyclesList.get(receivedPos).getId();
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deleteCycle(cycles);
-        } else if (cyclesList.size()>0) cyclesDatabase.cyclesDao().deleteAllCycles(); else emptyCycle = true;
+        } else if (cyclesList.size()>0) {
+          cyclesDatabase.cyclesDao().deleteAllCycles();
+          runOnUiThread(()->{
+            //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
+            workoutCyclesArray.clear();
+            typeOfRoundArray.clear();
+            workoutTitleArray.clear();
+            totalSetMillisArray.clear();
+            totalBreakMillisArray.clear();
+            totalCycleCountArray.clear();
+            primaryIDArray.clear();
+            savedCycleAdapter.notifyDataSetChanged();
+          });
+        } else emptyCycle = true;
         break;
       case 3:
         if (!deleteAll) {
@@ -2721,7 +2712,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomMillis = pomValuesTime.get(pomDotCounter);
           //Starts object animator.
           defineObjectAnimator(pomMillis);
-          activePomCycle = true;
           timerEnded = false;
           //Unchanging start point of pomMillis used to count total set time over multiple rounds. Using SET and BREAK vars since modes are exclusive, and it saves on variable creation.
           switch (pomDotCounter) {
@@ -3357,7 +3347,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 3:
         pomDotCounter = 0;
         pomProgressPause = maxProgress;
-        activePomCycle = false;
         if (objectAnimator != null) objectAnimator.cancel();
         break;
       case 4:
@@ -3426,7 +3415,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void deleteTotalTimes() {
     if (mode!=4) delete_text.setText(R.string.delete_total_times); else delete_text.setText(R.string.delete_total_laps);
-    deleteCyclePopupWindow.showAtLocation(timerInterface, Gravity.CENTER_HORIZONTAL, 0, -100);
+    deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER_HORIZONTAL, 0, -100);
   }
 
   //Todo: Redundantly named method formerly in Timer class. Need altered one for deleting total times/cycles.
