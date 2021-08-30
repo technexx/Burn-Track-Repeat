@@ -381,10 +381,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisHolder;
   int scrollPosition;
 
-  //Todo: Grey, populasted recyclerView in Main after FIRST post-edit launch, but not second. Likely just need to change color.
-  //Todo: cycle adapter update may be reinstating view when we need it invisible (i.e. when launching timer). either way, it's happening.
-  //Todo: Remember, db calls are really only needed on app launch. Sort mode re-populates arrayLists anyway, so these lists can be manipulated w/ out db access the rest of the time. Delete methods can just subtract from Array, as add/edit do their own thing.
-  //Todo: Cycle adapter doesn't refresh from edit->timer->back pressed.
+  //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -392,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: On edited cycles, show textView instead of editText first.
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
   //Todo: Need lap fades to remain while scrolling.
-  //Todo: Add fade/ripple effects to buttons and other stuff that would like it. May also help w/ minimizing choppiness if performance slows.
+  //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Letter -> Number soft kb is a bit choppy.
@@ -423,13 +420,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onBackPressed() {
     if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
     //Todo: Retain either mode 1 or 3, switching out from 4 if stopwatch used.
-    //If Timer popup is active, call exitTimer(). Popup will automatically close even w/ override.
-    //Todo: Check if this works. Popup may have focus over it.
-    if (timerPopUpWindow.isShowing()) {
-      AsyncTask.execute(()->{
-        exitTimer();
-      });
-    }
   }
 
   @Override
@@ -1058,6 +1048,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       checkEmptyCycles();
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       savedCycleRecycler.setVisibility(View.VISIBLE);
+
+      //Saves total times + cycle count.
+      AsyncTask.execute(()->{
+        exitTimer();
+      });
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
@@ -1082,11 +1077,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       checkEmptyCycles();
-      //Resets Main's background color and recyclerView visibility if we are not launching timer popUp. If we are, keeping background grey for smoother transition between popups.
-      if (!timerPopUpWindow.isShowing()) {
-        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-      }
+      //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
+      if (!timerPopUpWindow.isShowing()) savedCycleRecycler.setVisibility(View.VISIBLE);
+      //Color reset to black, also for smooth transition to timer. Grey only necessary to prevent soft kb tearing.
+      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -2243,8 +2237,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               return;
           }
         } else{
-          Toast toast = Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT);
-          toast.show();
+          Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
         }
       }
       if (mode==3) {
@@ -2255,7 +2248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           pomValuesTime.add(pomValue1 * 1000);
           pomValuesTime.add(pomValue3 * 1000);
-          for (int j=0; j<pomValuesTime.size(); j++)  convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
+          for (int j=0; j<pomValuesTime.size(); j++) convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
 
           cycleRoundsAdapter.setPomFade(true);
           cycleRoundsAdapter.notifyDataSetChanged();
