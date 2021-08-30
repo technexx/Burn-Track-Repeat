@@ -418,8 +418,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
-    if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
-    //Todo: Retain either mode 1 or 3, switching out from 4 if stopwatch used.
+    //Used to minimize activity. Will only be called if no popUps have focus.
+    moveTaskToBack(false);
   }
 
   @Override
