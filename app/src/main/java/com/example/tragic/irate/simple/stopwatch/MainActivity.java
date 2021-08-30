@@ -388,7 +388,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisHolder;
   int scrollPosition;
 
-  //Todo: Main layout should not be shown between edit - > timer popups.
+  //Todo: Main layout should not be shown between edit - > timer popups. Still shows a bit. One option is to only set its recyclerView + bg color if timer popUp is not being displayed. Other is to set a different view (timer's) for the edit popUp.
+  //Todo: Cycle adapter doesn't refresh from edit->timer->back pressed.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -1002,6 +1003,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Default disabled state of edited cycle save, if nothing has changed.
       save_edit_cycle.setEnabled(false);
       save_edit_cycle.setAlpha(0.3f);
+      //Clears round adapter arrays so they can be freshly populated.
+      clearRoundAdapterArrays();
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -1055,6 +1058,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
+    //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
+    timerPopUpWindow.setOnDismissListener(() -> {
+      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+      savedCycleRecycler.setVisibility(View.VISIBLE);
+    });
+
      editCyclesPopupView.setOnClickListener(v-> {
       //Caps and sets editText values when clicking outside (exiting) the editText box.
       convertEditTime(true);
@@ -1075,9 +1084,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-      //Resets Main's background color and recyclerView visibility.
-      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-      savedCycleRecycler.setVisibility(View.VISIBLE);
+      //Resets Main's background color and recyclerView visibility if we are not launching timer popUp. If we are, keeping background grey for smoother transition between popups.
+      if (!timerPopUpWindow.isShowing()) {
+        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+      }
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -1090,8 +1101,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveHasOccurred = false;
         savedCycleAdapter.notifyDataSetChanged();
       }
-      //Clears round adapter arrays so they can be freshly populated.
-      clearRoundAdapterArrays();
+
       //Updates round adapters so lists show as cleared.
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -2530,8 +2540,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
       editCyclesPopupWindow.setFocusable(false);
       mHandler.postDelayed(()-> {
-        editCyclesPopupWindow.dismiss();
         timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+        editCyclesPopupWindow.dismiss();
         populateTimerUI();
       },0);
       //Since this is a new Cycle, we automatically save it to database.
