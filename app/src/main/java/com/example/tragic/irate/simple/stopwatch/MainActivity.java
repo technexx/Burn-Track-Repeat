@@ -555,11 +555,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    //Todo: Lack of resize due to match_parent, but tearing still occurs when resized.
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-//    editCyclesPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+//    editCyclesPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -568,7 +567,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupWindow.setAnimationStyle(R.style.SlideLeftAnimation);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
-    cl = new ConstraintLayout(this);
+    cl = findViewById(R.id.main_layout);
     roundView = inflater.inflate(R.layout.mode_one_rounds, null);
     round_count = roundView.findViewById(R.id.round_count);
     round_value = roundView.findViewById(R.id.workout_rounds);
@@ -842,6 +841,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
+    //Once editPopUp is on screen, change Main's background color to match it and remove Main's recyclerView view. This prevents the soft keyboard's "tear" through Main's layout from being visible.
+    editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+      @Override
+      public void onSystemUiVisibilityChange(int visibility) {
+        savedCycleRecycler.setVisibility(View.GONE);
+        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
+      }
+    });
+
     //Listens to all editTexts for changes.
     TextWatcher editTextWatcher = new TextWatcher() {
       @Override
@@ -1001,6 +1009,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+//      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
+//      savedCycleRecycler.setVisibility(View.GONE);
       //Default row selection.
       resetRows();
       //Brings up menu to add/subtract rounds to new cycle.
@@ -1075,6 +1085,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
+      //Resets Main's background color and recyclerView visibility.
+      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+      savedCycleRecycler.setVisibility(View.VISIBLE);
+      //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
       if (editingCycle) {
