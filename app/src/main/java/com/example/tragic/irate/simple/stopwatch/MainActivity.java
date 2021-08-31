@@ -382,9 +382,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
+  //Todo: Check multiple deletions.
+  //Todo: Index exception on delete is probably quick button succession - should disable button.
+  //Todo: Sort button may be preventing delete highlighted click.
+  //Todo: onBack from edit popup minimizes activity. Losing focus on popup?
   //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
+  //Todo: We had a flashing progressBar w/ full time (should always be 0) at some point. Couldn't replicate.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
@@ -1185,18 +1190,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_highlighted_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
-        ArrayList<String> tempPos = new ArrayList<>(receivedHighlightPositions);
         //First query to get current list of rows.
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
           receivedPos = Integer.parseInt(receivedHighlightPositions.get(i));
+          //Using each received position, deletes the cycle from the database.
           deleteCycle(false);
-          tempPos.remove(String.valueOf(receivedPos));
-        }
-        //Calls new database entries and updates our adapter's recyclerView.
-        runOnUiThread(() -> {
+          //Using each received position, deletes the cycle's values from its adapter arrays.
           editCycleList(DELETING_CYCLE);
+        }
+        runOnUiThread(() -> {
+          //Since we have deleted every position in selected list, clear the list.
+          receivedHighlightPositions.clear();
           savedCycleAdapter.notifyDataSetChanged();
-          receivedHighlightPositions = tempPos;
+//          receivedHighlightPositions = tempPos;
           //If there are no cycles left, cancel highlight mode. If there are any left, simply remove all highlights.
           if (receivedHighlightPositions.size()>0) savedCycleAdapter.removeHighlight(false); else {
             cancelHighlight.setVisibility(View.INVISIBLE);
@@ -2409,6 +2415,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Since we are only updating our adapter's lists, we do not need to reference variables not shown in list (i.e. total times/total cycles). We will only update these in database if they change.
   public void editCycleList(int action) {
     if (action == ADDING_CYCLE) {
       //If we are adding a new cycle, no need to query the DB for values after save. Just use what has been passed into them from Arrays. This will add them as the correct last position.
@@ -2624,6 +2631,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (!deleteAll) {
+          //Todo: db updated. need to update array lists and refresh adapter.
           cycleID = cyclesList.get(receivedPos).getId();
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deleteCycle(cycles);
