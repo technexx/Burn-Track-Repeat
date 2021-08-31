@@ -382,9 +382,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Check multiple deletions.
+  //Todo: Highlight bar transitions.
   //Todo: Index exception on delete is probably quick button succession - should disable button.
-  //Todo: Sort button may be preventing delete highlighted click.
   //Todo: onBack from edit popup minimizes activity. Losing focus on popup?
   //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
@@ -453,6 +452,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Receives highlighted positions from our adapter.
   @Override
   public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
+    //Re-enables delete button.
+    delete_highlighted_cycle.setEnabled(true);
     //Receives list of cycle positions highlighted.
     receivedHighlightPositions = listOfPositions;
     //Sets "highlight mode" actionBar buttons to Visible if entering mode (i.e. selecting first item).
@@ -1189,6 +1190,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     delete_highlighted_cycle.setOnClickListener(v-> {
+      //Disables button until next highlight enables it (to prevent index errors).
+      delete_highlighted_cycle.setEnabled(false);
+      fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
       AsyncTask.execute(()-> {
         //First query to get current list of rows.
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
