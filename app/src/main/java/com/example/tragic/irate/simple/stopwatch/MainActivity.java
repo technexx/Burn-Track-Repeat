@@ -382,8 +382,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Remember, db calls are really only needed on app launch and sort.
+  //Todo: Tab swtich should set taskbar back to default.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
+  //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo: We had a flashing progressBar w/ full time (should always be 0) at some point. Couldn't replicate.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -870,6 +871,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_edit.addTextChangedListener(editTextWatcher);
     third_value_edit_two.addTextChangedListener(editTextWatcher);
 
+    //Todo: Populate all mode lists from db on app start, and then just refer to lists when switching between tabs. No need for db queries.
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
@@ -2444,8 +2446,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Clears STRING arrays, used to populate adapter views, and re-populates them with database values.
-  //Remember, if the database has changed we need to call queryCycles() before this or new values will not be retrieved.
+  //Clears adapter arrays and re-populates them with database values. Since this relies on a database query we ONLY call it when:
+  //(A)We launch the app for the first time, and (B)We SORT our list, which requires a reshuffling which is easier to do w/ Room commands.
+  //All other updates and retrievals can be done directly through arrayLists and their item positions.
   public void populateCycleList() {
     switch (mode) {
       case 1:
@@ -2472,6 +2475,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         pomArray.clear();
+        pomTitleArray.clear();
         for (int i=0; i<pomCyclesList.size(); i++) {
           pomArray.add(pomCyclesList.get(i).getFullCycle());
           pomTitleArray.add(pomCyclesList.get(i).getTitle());
