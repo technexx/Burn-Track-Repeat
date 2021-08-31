@@ -382,9 +382,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Highlight bar transitions.
-  //Todo: Index exception on delete is probably quick button succession - should disable button.
-  //Todo: onBack from edit popup minimizes activity. Losing focus on popup?
   //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
@@ -553,8 +550,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-
-//        emptyCycleList.setVisibility(View.GONE);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -811,9 +806,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
         roundRecycler.setLayoutManager(lm2);
         roundRecyclerTwo.setLayoutManager(lm3);
-        //Sets round adapter view to correct mode (necessary when coming back via Intent from a timer).
 
-//        roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
         //Rounds begin unpopulated, so remove second recycler view.
         roundRecyclerTwo.setVisibility(View.GONE);
         //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
@@ -2537,7 +2530,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (saveToDB) saveCycles(false);
     }
     //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
-    editCyclesPopupWindow.setFocusable(false);
     mHandler.postDelayed(()-> {
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
       editCyclesPopupWindow.dismiss();
