@@ -380,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long baseTime;
   long countUpMillisHolder;
   int scrollPosition;
+  boolean launchingTimer;
 
   //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
@@ -1045,10 +1046,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
+      savedCycleRecycler.setVisibility(View.VISIBLE);
+      savedCycleAdapter.notifyDataSetChanged();
+      launchingTimer = false;
       checkEmptyCycles();
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-      savedCycleRecycler.setVisibility(View.VISIBLE);
-
       //Saves total times + cycle count.
       AsyncTask.execute(()->{
         exitTimer();
@@ -1069,8 +1072,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
         savedCycleRecycler.setVisibility(View.GONE);
-        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
         emptyCycleList.setVisibility(View.GONE);
+        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
       }
     });
 
@@ -1078,7 +1081,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setOnDismissListener(() -> {
       checkEmptyCycles();
       //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
-      if (!timerPopUpWindow.isShowing()) savedCycleRecycler.setVisibility(View.VISIBLE);
+      if (!launchingTimer) {
+        savedCycleAdapter.notifyDataSetChanged();
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+      }
       //Color reset to black, also for smooth transition to timer. Grey only necessary to prevent soft kb tearing.
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
@@ -1097,7 +1103,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Updates round adapters so lists show as cleared.
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapterTwo.notifyDataSetChanged();
-//      savedCycleAdapter.notifyDataSetChanged();
       //Removed round divider.
       roundListDivider.setVisibility(View.GONE);
     });
@@ -1835,8 +1840,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (breakValue < 5) breakValue = 5;
       if (setValue > 300) setValue = 300;
       if (breakValue > 300) breakValue = 300;
-      Log.i("testval", "textView's setValue is " + setValue);
-      Log.i("testval", "editSetSeconds is " + editSetSeconds);
     } else if (mode==3) {
       editPomMinutesOne = convertEditTextToLong(first_value_edit);
       editPomSecondsOne = convertEditTextToLong(first_value_edit_two);
@@ -2504,6 +2507,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean newCycle, boolean saveToDB) {
+    //Used to toggle views/updates on Main for visually smooth transitions between popUps.
+    launchingTimer = true;
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
     // If we are launching a new cycle, set a conditional for an empty title, a conditional for an empty list, and run the saveCycles() method to automatically save it in our database. For both new and old cycles, send all necessary intents to our Timer class.
     if (newCycle) {
