@@ -48,6 +48,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -101,10 +102,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RecyclerView roundRecycler;
   RecyclerView roundRecyclerTwo;
   RecyclerView savedCycleRecycler;
+  RecyclerView savedPomCycleRecycler;
   CycleRoundsAdapter cycleRoundsAdapter;
   CycleRoundsAdapterTwo cycleRoundsAdapterTwo;
   View roundListDivider;
   SavedCycleAdapter savedCycleAdapter;
+  SavedPomCycleAdapter savedPomCycleAdapter;
   View deleteCyclePopupView;
   View sortCyclePopupView;
   View savedCyclePopupView;
@@ -380,8 +383,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo:
-  //Todo: Pom saving, just not populating adapter on launch. Need to query both modes 1 + 3 on launch, and then just use adapter lists from there.
+  //Todo: Separate adapter for Pom lists.
   //Todo: Timers + dots active when exiting Timer. Need to auto-cancel on popUp dismissal.
   //Todo: Test delete on edit popUp for both modes.
   //Todo: Remember, db calls are really only needed on app launch and sort.
@@ -526,6 +528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopwatch = findViewById(R.id.stopwatch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
+    savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
@@ -736,8 +739,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
-    savedCycleAdapter = new SavedCycleAdapter();
-
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
     fadeOut = new AlphaAnimation(1.0f, 0.0f);
     fadeIn.setDuration(1000);
@@ -766,16 +767,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
         LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
         //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
-        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, pomArray, workoutTitleArray, pomTitleArray);
+        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
         savedCycleRecycler.setAdapter(savedCycleAdapter);
         savedCycleRecycler.setLayoutManager(lm);
         //Instantiating callbacks from adapter.
         savedCycleAdapter.setItemClick(MainActivity.this);
         savedCycleAdapter.setHighlight(MainActivity.this);
-        //Setting mode from savedPref so we are on whichever one was previously used.
-        savedCycleAdapter.setView(mode);
+
+        //Todo: Callbacks.
+        savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
+        savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
+        savedPomCycleRecycler.setLayoutManager(lm4);
 
         //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
         savedCycleAdapter.notifyDataSetChanged();
@@ -869,13 +874,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 0:
             mode = 1;
             //Sets the recyclerView classes for each mode adapters.
-            savedCycleAdapter.setView(1);
             cycleRoundsAdapter.setMode(1);
             dotDraws.setMode(1);
             break;
           case 1:
             mode = 3;
-            savedCycleAdapter.setView(3);
             cycleRoundsAdapter.setMode(3);
             dotDraws.setMode(3);
             break;
@@ -885,11 +888,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         defaultEditRoundViews();
         //Toggles "empty cycle" text if adapter list is empty.
         checkEmptyCycles();
-        //Todo: This might be faster if we had a separate adapter, because we wouldn't need to refresh it on tab switch.
-//        savedCycleAdapter.notifyDataSetChanged();
         if (mode==1) {
           sortHigh.setVisibility(View.VISIBLE);
           sortLow.setVisibility(View.VISIBLE);
+          savedCycleRecycler.setVisibility(View.VISIBLE);
+          savedPomCycleRecycler.setVisibility(View.GONE);
         } else {
           sortHigh.setVisibility(View.GONE);
           sortLow.setVisibility(View.GONE);
@@ -897,6 +900,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           roundRecyclerTwo.setVisibility(View.GONE);
           recyclerLayoutOne.leftMargin = 240;
           roundListDivider.setVisibility(View.GONE);
+          savedCycleRecycler.setVisibility(View.GONE);
+          savedPomCycleRecycler.setVisibility(View.VISIBLE);
         }
       }
 

@@ -32,6 +32,17 @@
         android:paddingBottom="40dp">
     </androidx.recyclerview.widget.RecyclerView>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pom_list_recycler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="10dp"
+        android:paddingBottom="40dp">
+    </androidx.recyclerview.widget.RecyclerView>
+
     <ImageButton
         android:id="@+id/fab"
         android:layout_width="48dp"
