@@ -251,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean roundIsFading;
   boolean roundIsSelected;
-  List<Integer> primaryIDArray;
   List<Integer> totalSetMillisArray;
   List<Integer> totalBreakMillisArray;
   List<Integer> totalCycleCountArray;
@@ -382,8 +381,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Tab swtich should set taskbar back to default.
-  //Todo: Avoid queries in tab switch. Rather, query within that tab if we're doing something that requires it.
+  //Todo: Test Pom stuff. Test delete on edit popUp for both modes.
   //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo: We had a flashing progressBar w/ full time (should always be 0) at some point. Couldn't replicate.
@@ -634,7 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalSetMillisArray = new ArrayList<>();
     totalBreakMillisArray = new ArrayList<>();
     totalCycleCountArray = new ArrayList<>();
-    primaryIDArray = new ArrayList<>();
 
     roundHolderOne = new ArrayList<>();
     roundHolderTwo = new ArrayList<>();
@@ -871,56 +868,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     third_value_edit.addTextChangedListener(editTextWatcher);
     third_value_edit_two.addTextChangedListener(editTextWatcher);
 
-    //Todo: Populate all mode lists from db on app start, and then just refer to lists when switching between tabs. No need for db queries.
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
-          //Running on another thread because we're fetching DB values and we want to keep the UI in sync.
-          AsyncTask.execute(()-> {
-              switch (tab.getPosition()) {
-                  case 0:
-                      mode = 1;
-                      //Sets the recyclerView classes for each mode adapters.
-                      savedCycleAdapter.setView(1);
-                      cycleRoundsAdapter.setMode(1);
-                      dotDraws.setMode(1);
-                      break;
-                  case 1:
-                      mode = 3;
-                      savedCycleAdapter.setView(3);
-                      cycleRoundsAdapter.setMode(3);
-                      dotDraws.setMode(3);
-                      break;
-              }
-              queryCycles();
-              //UI views change, so running on main thread.
-            runOnUiThread(()-> {
-                  //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-                  removeEditTimerViews(false);
-                  defaultEditRoundViews();
-                  populateCycleList();
-                  //Toggles "empty cycle" text if adapter list is empty.
-                  checkEmptyCycles();
-                  savedCycleAdapter.notifyDataSetChanged();
-                  if (mode==1) {
-                      sortHigh.setVisibility(View.VISIBLE);
-                      sortLow.setVisibility(View.VISIBLE);
-                  } else {
-                    sortHigh.setVisibility(View.GONE);
-                    sortLow.setVisibility(View.GONE);
-                    //Since mode 3 only uses one adapter layout, set it here.
-                    roundRecyclerTwo.setVisibility(View.GONE);
-                    recyclerLayoutOne.leftMargin = 240;
-                    roundListDivider.setVisibility(View.GONE);
-                  }
-              });
-          });
+        switch (tab.getPosition()) {
+          case 0:
+            mode = 1;
+            //Sets the recyclerView classes for each mode adapters.
+            savedCycleAdapter.setView(1);
+            cycleRoundsAdapter.setMode(1);
+            dotDraws.setMode(1);
+            break;
+          case 1:
+            mode = 3;
+            savedCycleAdapter.setView(3);
+            cycleRoundsAdapter.setMode(3);
+            dotDraws.setMode(3);
+            break;
+        }
+        //Sets all editTexts to GONE, and then populates them + textViews based on mode.
+        removeEditTimerViews(false);
+        defaultEditRoundViews();
+        //Toggles "empty cycle" text if adapter list is empty.
+        checkEmptyCycles();
+        savedCycleAdapter.notifyDataSetChanged();
+        if (mode==1) {
+          sortHigh.setVisibility(View.VISIBLE);
+          sortLow.setVisibility(View.VISIBLE);
+        } else {
+          sortHigh.setVisibility(View.GONE);
+          sortLow.setVisibility(View.GONE);
+          //Since mode 3 only uses one adapter layout, set it here.
+          roundRecyclerTwo.setVisibility(View.GONE);
+          recyclerLayoutOne.leftMargin = 240;
+          roundListDivider.setVisibility(View.GONE);
+        }
       }
 
       @Override
       public void onTabUnselected(TabLayout.Tab tab) {
         //since modes use same String, clear it between tab switches.
         cycleTitle = "";
+        //If in highlight mode (most easily denoted by enabled state of sort_text), exit out its view since we are switching tabs.
+        if (!sort_text.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
         //Dismisses editCycle popup when switching tabs.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Turning highlight mode off since we are moving to a new tab.
@@ -2417,32 +2407,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Since we are only updating our adapter's lists, we do not need to reference variables not shown in list (i.e. total times/total cycles). We will only update these in database if they change.
   public void editCycleList(int action) {
     if (action == ADDING_CYCLE) {
-      //If we are adding a new cycle, no need to query the DB for values after save. Just use what has been passed into them from Arrays. This will add them as the correct last position.
-      workoutTitleArray.add(cycleTitle);
-      typeOfRoundArray.add(roundTypeString);
-      workoutCyclesArray.add(workoutString);
+      if (mode==1) {
+        //If we are adding a new cycle, no need to query the DB for values after save. Just use what has been passed into them from Arrays. This will add them as the correct last position.
+        workoutTitleArray.add(cycleTitle);
+        typeOfRoundArray.add(roundTypeString);
+        workoutCyclesArray.add(workoutString);
 
-      //Adding another array item so lists reflect size of database. Counts are 0 because no times have been logged for latest added cycle/
-      totalSetMillisArray.add(0);
-      totalBreakMillisArray.add(0);
-      totalCycleCountArray.add(0);
-      //For primary key id, getting the highest value in the array and then adding one, since that is what the next iteration will be.
-      int max = 0;
-      if (primaryIDArray.size()>0) {
-        max = primaryIDArray.get(0);
-        for (int i=0; i<primaryIDArray.size(); i++) if (primaryIDArray.get(i) > max) max = primaryIDArray.get(i);
+        //Adding another array item so lists reflect size of database. Counts are 0 because no times have been logged for latest added cycle/
+        totalSetMillisArray.add(0);
+        totalBreakMillisArray.add(0);
+        totalCycleCountArray.add(0);
       }
-      primaryIDArray.add(max+1);
+      if (mode==3) {
+        pomTitleArray.add(cycleTitle);
+        pomArray.add(pomString);
+      }
     }
     else if (action == EDITING_CYCLE) {
-      //If we have the values in our workOutTime and typeOFRound arrays already, simply pass them into cycleList's adapter arrays.
-      workoutTitleArray.set(receivedPos, cycleTitle);
-      workoutCyclesArray.set(receivedPos, workoutString);
-      typeOfRoundArray.set(receivedPos, roundTypeString);
+      if (mode==1) {
+        //If we have the values in our workOutTime and typeOFRound arrays already, simply pass them into cycleList's adapter arrays.
+        workoutTitleArray.set(receivedPos, cycleTitle);
+        workoutCyclesArray.set(receivedPos, workoutString);
+        typeOfRoundArray.set(receivedPos, roundTypeString);
+      }
+      if (mode==3) {
+        pomTitleArray.set(receivedPos, cycleTitle);
+        pomArray.set(receivedPos, pomString);
+      }
     } else if (action == DELETING_CYCLE) {
-      workoutTitleArray.remove(receivedPos);
-      typeOfRoundArray.remove(receivedPos);
-      workoutCyclesArray.remove(receivedPos);
+      if (mode==1) {
+        workoutTitleArray.remove(receivedPos);
+        typeOfRoundArray.remove(receivedPos);
+        workoutCyclesArray.remove(receivedPos);
+      }
+      if (mode==3) {
+        pomTitleArray.remove(receivedPos);
+        pomArray.remove(receivedPos);
+      }
     }
   }
 
@@ -2458,7 +2459,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalSetMillisArray.clear();
         totalBreakMillisArray.clear();
         totalCycleCountArray.clear();
-        primaryIDArray.clear();
         for (int i=0; i<cyclesList.size(); i++) {
           //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
           workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
@@ -2470,7 +2470,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalSetMillisArray.add(cyclesList.get(i).getTotalSetTime());
           totalBreakMillisArray.add(cyclesList.get(i).getTotalBreakTime());
           totalCycleCountArray.add(cyclesList.get(i).getCyclesCompleted());
-          primaryIDArray.add(cyclesList.get(i).getId());
         }
         break;
       case 3:
@@ -2589,11 +2588,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTitle(cycleTitle);
             //If cycle is new, insert a new row.
             cyclesDatabase.cyclesDao().insertCycle(cycles);
+            //Adding to adapter list.
             editCycleList(ADDING_CYCLE);
           } else {
             cycles.setTitle(cycleTitle);
             //If cycle is old, update current row.
             cyclesDatabase.cyclesDao().updateCycles(cycles);
+            //Editing adapter list.
             editCycleList(EDITING_CYCLE);
           }
         }
@@ -2615,9 +2616,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (cycleTitle.isEmpty()) cycleTitle = date;
             pomCycles.setTitle(cycleTitle);
             cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
+            //Adding to adapter list.
+            editCycleList(ADDING_CYCLE);
           } else {
             pomCycles.setTitle(cycleTitle);
             cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+            editCycleList(EDITING_CYCLE);
           }
         }
         break;
@@ -2645,7 +2649,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             totalSetMillisArray.clear();
             totalBreakMillisArray.clear();
             totalCycleCountArray.clear();
-            primaryIDArray.clear();
             savedCycleAdapter.notifyDataSetChanged();
           });
         } else emptyCycle = true;
