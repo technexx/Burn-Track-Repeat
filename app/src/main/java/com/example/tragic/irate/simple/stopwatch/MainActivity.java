@@ -760,7 +760,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       queryCycles(true);
 
       //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
-      populateCycleList();
       runOnUiThread(()-> {
         checkEmptyCycles();
         //Adapter and Recycler for round views within our editCycles popUp.
@@ -886,7 +885,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         defaultEditRoundViews();
         //Toggles "empty cycle" text if adapter list is empty.
         checkEmptyCycles();
-        savedCycleAdapter.notifyDataSetChanged();
+        //Todo: This might be faster if we had a separate adapter, because we wouldn't need to refresh it on tab switch.
+//        savedCycleAdapter.notifyDataSetChanged();
         if (mode==1) {
           sortHigh.setVisibility(View.VISIBLE);
           sortLow.setVisibility(View.VISIBLE);
@@ -1009,8 +1009,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         queryCycles(false);
         runOnUiThread(()-> {
-          //Populates adapter arrays.
-          populateCycleList();
           //Refreshes adapter.
           savedCycleAdapter.notifyDataSetChanged();
           //Sets checkmark view.
@@ -2376,6 +2374,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Queries database for all cycles, using last chosen sort order.
+  //Clears adapter arrays and re-populates them with database values. Since this relies on a database query we ONLY call it when:
+  //(A)We launch the app for the first time, and (B)We SORT our list, which requires a reshuffling which is easier to do w/ Room commands.
+  //All other updates and retrievals can be done directly through arrayLists and their item positions.
   public void queryCycles(boolean queryAll) {
     if (mode==1 || queryAll) {
       switch (sortMode) {
@@ -2386,6 +2387,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
         case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
       }
+
+      workoutCyclesArray.clear();
+      typeOfRoundArray.clear();
+      workoutTitleArray.clear();
+      totalSetMillisArray.clear();
+      totalBreakMillisArray.clear();
+      totalCycleCountArray.clear();
+      for (int i=0; i<cyclesList.size(); i++) {
+        //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
+        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+        //Retrieves title for use when editing a cycle.
+        workoutTitleArray.add(cyclesList.get(i).getTitle());
+        //Adds concatenated roundType String used in each cycle.
+        typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+
+        totalSetMillisArray.add(cyclesList.get(i).getTotalSetTime());
+        totalBreakMillisArray.add(cyclesList.get(i).getTotalBreakTime());
+        totalCycleCountArray.add(cyclesList.get(i).getCyclesCompleted());
+      }
     }
     if (mode==3 || queryAll) {
       switch (sortModePom) {
@@ -2393,6 +2413,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
         case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
         case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+      }
+      pomArray.clear();
+      pomTitleArray.clear();
+      for (int i=0; i<pomCyclesList.size(); i++) {
+        pomArray.add(pomCyclesList.get(i).getFullCycle());
+        pomTitleArray.add(pomCyclesList.get(i).getTitle());
+
+        totalSetMillisArray.add(pomCyclesList.get(i).getTotalWorkTime());
+        totalBreakMillisArray.add(pomCyclesList.get(i).getTotalBreakTime());
+        totalCycleCountArray.add(pomCyclesList.get(i).getCyclesCompleted());
       }
     }
   }
@@ -2437,46 +2467,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTitleArray.remove(receivedPos);
         pomArray.remove(receivedPos);
       }
-    }
-  }
-
-  //Clears adapter arrays and re-populates them with database values. Since this relies on a database query we ONLY call it when:
-  //(A)We launch the app for the first time, and (B)We SORT our list, which requires a reshuffling which is easier to do w/ Room commands.
-  //All other updates and retrievals can be done directly through arrayLists and their item positions.
-  public void populateCycleList() {
-    switch (mode) {
-      case 1:
-        workoutCyclesArray.clear();
-        typeOfRoundArray.clear();
-        workoutTitleArray.clear();
-        totalSetMillisArray.clear();
-        totalBreakMillisArray.clear();
-        totalCycleCountArray.clear();
-        for (int i=0; i<cyclesList.size(); i++) {
-          //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
-          workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-          //Retrieves title for use when editing a cycle.
-          workoutTitleArray.add(cyclesList.get(i).getTitle());
-          //Adds concatenated roundType String used in each cycle.
-          typeOfRoundArray.add(cyclesList.get(i).getRoundType());
-
-          totalSetMillisArray.add(cyclesList.get(i).getTotalSetTime());
-          totalBreakMillisArray.add(cyclesList.get(i).getTotalBreakTime());
-          totalCycleCountArray.add(cyclesList.get(i).getCyclesCompleted());
-        }
-        break;
-      case 3:
-        pomArray.clear();
-        pomTitleArray.clear();
-        for (int i=0; i<pomCyclesList.size(); i++) {
-          pomArray.add(pomCyclesList.get(i).getFullCycle());
-          pomTitleArray.add(pomCyclesList.get(i).getTitle());
-
-          totalSetMillisArray.add(pomCyclesList.get(i).getTotalWorkTime());
-          totalBreakMillisArray.add(pomCyclesList.get(i).getTotalBreakTime());
-          totalCycleCountArray.add(pomCyclesList.get(i).getCyclesCompleted());
-        }
-        break;
     }
   }
 
