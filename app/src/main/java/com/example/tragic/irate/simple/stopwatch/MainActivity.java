@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View savedCyclePopupView;
   View editCyclesPopupView;
   View settingsPopupView;
-  boolean currentCycleEmpty;
   boolean saveHasOccurred;
 
   PopupWindow sortPopupWindow;
@@ -381,7 +380,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Test Pom stuff. Test delete on edit popUp for both modes.
+  //Todo:
+  //Todo: Pom saving, just not populating adapter on launch. Need to query both modes 1 + 3 on launch, and then just use adapter lists from there.
+  //Todo: Timers + dots active when exiting Timer. Need to auto-cancel on popUp dismissal.
+  //Todo: Test delete on edit popUp for both modes.
   //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo: We had a flashing progressBar w/ full time (should always be 0) at some point. Couldn't replicate.
@@ -496,19 +498,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
           case R.id.delete_all_cycles:
-            AsyncTask.execute(()-> {
-              //Get instance of cycles/cyclesBO/pomCycles.
-              queryCycles();
-              //if instance is empty, pop a Toast and return. Otherwise, show popUp window to confirm cycle deletion.
-              runOnUiThread(()-> {
-                if (currentCycleEmpty) {
-                  Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
-                } else {
-                  delete_all_text.setText(R.string.delete_all_cycles);
-                  deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER, 0, 0);
-                }
-              });
-            });
+            if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
+              Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
+            } else {
+              delete_all_text.setText(R.string.delete_all_cycles);
+              deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER, 0, 0);
+            }
             break;
         }
         return super.onOptionsItemSelected(item);
@@ -762,7 +757,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Loads database of saved cycles.
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
       //Calls instance of Cycle entity list based on sort mode.
-      queryCycles();
+      queryCycles(true);
 
       //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
       populateCycleList();
@@ -1012,7 +1007,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(()-> {
-        queryCycles();
+        queryCycles(false);
         runOnUiThread(()-> {
           //Populates adapter arrays.
           populateCycleList();
@@ -2381,26 +2376,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Queries database for all cycles, using last chosen sort order.
-  public void queryCycles() {
-    switch (mode) {
-      case 1:
-        switch (sortMode) {
-          case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
-          case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
-          case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
-          case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
-          case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
-          case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
-        }
-        break;
-      case 3:
-        switch (sortModePom) {
-          case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
-          case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
-          case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
-          case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
-        }
-        break;
+  public void queryCycles(boolean queryAll) {
+    if (mode==1 || queryAll) {
+      switch (sortMode) {
+        case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
+        case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
+        case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
+        case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
+        case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
+        case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+      }
+    }
+    if (mode==3 || queryAll) {
+      switch (sortModePom) {
+        case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
+        case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
+        case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
+        case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+      }
     }
   }
 
@@ -2489,26 +2482,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Populates round list from single cycle.
   public void populateRoundList() {
-    //Clears the two lists of actual timer values we are populating.
-    workoutTime.clear();
-    typeOfRound.clear();
     switch (mode) {
       case 1:
+        //Clears the two lists of actual timer values we are populating.
+        workoutTime.clear();
+        typeOfRound.clear();
         //Populating our current cycle's list of rounds via Integer Arrays directly with adapter String list values, instead of querying them from the database. This is used whenever we do not need a db query, such as editing or adding a new cycle.
         String[] fetchedRounds = workoutCyclesArray.get(receivedPos).split(" - ");
         String[] fetchedRoundType = typeOfRoundArray.get(receivedPos).split(" - ");
-        String fetchedTitle = workoutTitleArray.get(receivedPos);
 
         for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
         for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
-        cycleTitle = fetchedTitle;
+        cycleTitle = workoutTitleArray.get(receivedPos);
         break;
       case 3:
-        PomCycles pomCycles = pomCyclesList.get(receivedPos);
         pomValuesTime.clear();
-        String[] tempPom = pomCycles.getFullCycle().split(" - ");
-        for (int i=0; i<tempPom.length; i++) pomValuesTime.add(Integer.parseInt(tempPom[i]));
-        retrievedID = pomCyclesList.get(receivedPos).getId();
+        String[] fetchedPomCycle = pomArray.get(receivedPos).split(" - ");
+        for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
+        cycleTitle = pomTitleArray.get(receivedPos);
         break;
     }
   }
@@ -2629,7 +2620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteCycle(boolean deleteAll) {
-    queryCycles();
+    queryCycles(false);
     int cycleID;
     boolean emptyCycle = false;
     switch (mode) {
