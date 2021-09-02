@@ -6,6 +6,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,17 +25,41 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     Context mContext;
     ArrayList<String> mPomList;
     ArrayList<String> mPomTitle;
-    SavedCycleAdapter.onCycleClickListener mOnCycleClickListener;
-    SavedCycleAdapter.onHighlightListener mOnHighlightListener;
+    onCycleClickListener mOnCycleClickListener;
+    onHighlightListener mOnHighlightListener;
     boolean mHighlightDeleted;
     boolean mHighlightMode;
     List<String> mPositionList;
     ArrayList<Integer> mSizeToggle = new ArrayList<>();
 
+    public interface onCycleClickListener {
+        void onCycleClick (int position);
+    }
+
+    public interface onHighlightListener {
+        void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
+    }
+
+    public void setItemClick(onCycleClickListener xOnCycleClickListener) {
+        this.mOnCycleClickListener = xOnCycleClickListener;
+    }
+
+    public void setHighlight(onHighlightListener xOnHighlightListener) {
+        this.mOnHighlightListener = xOnHighlightListener;
+    }
+
     public SavedPomCycleAdapter(Context context, ArrayList<String> pomList, ArrayList<String> pomTitle) {
-        this.mPomList = pomList; this.mPomTitle = pomTitle;
+        this.mContext = context; this.mPomList = pomList; this.mPomTitle = pomTitle;
         //Populates a toggle list for Pom's spannable colors so we can simply replace them at will w/ out resetting the list. This should only be called in our initial adapter instantiation.
         if (mSizeToggle.size()==0) for (int i=0; i<8; i++) mSizeToggle.add(0);
+    }
+
+
+    public void removeHighlight(boolean cancelMode) {
+        //If boolean is false, highlight has simply been deleted and we clear the highlight list while turning all backgrounds black.
+        mHighlightDeleted = true;
+        //If boolean is true, we have canceled the highlight process entirely, which does the above but also removes the Trash/Back buttons (done in Main) and sets the next row click to launch a timer instead of highlight (done here).
+        if (cancelMode) mHighlightMode = false;
     }
 
     @NonNull
@@ -48,8 +73,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PomHolder pomHolder = (PomHolder) holder;
-        pomHolder.pomName.setText(mPomTitle.get(position));
+        Log.i("testpos", "true!");
+        Log.i("testpos", "positions are " + position);
 
+        pomHolder.pomName.setText(mPomTitle.get(position));
         String tempPom = (convertTime(mPomList).get(position));
         tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
         Spannable pomSpan = new SpannableString(tempPom);

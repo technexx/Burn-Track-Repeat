@@ -65,9 +65,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mOnHighlightListener = xOnHighlightListener;
   }
 
-  public SavedCycleAdapter() {
-  }
-
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
   public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle) {
     this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle;
@@ -121,7 +118,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
       if (tempTypeArray[j].contains("1") || (tempTypeArray[j].contains("3"))) {
         span = new SpannableString(tempWorkoutArray[j] + bullet);
-        //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone). If on LAST spanable, use the full length so we do not fall short in coloring, since there is no space+bullet after.
+        //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone). If on LAST spannable, use the full length so we do not fall short in coloring, since there is no space+bullet after.
         if (j != tempTypeArray.length - 1) tempSpace = span.length() - 2;
         else tempSpace = span.length();
       } else {

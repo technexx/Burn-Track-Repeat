@@ -76,7 +76,7 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, LapAdapter.onPositionCallback {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, LapAdapter.onPositionCallback {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -383,7 +383,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Separate adapter for Pom lists.
+  //Todo: delete_edit_cycle should call same db deletion as delete_highlighted. We can't omit the db update for any deletions. Call notifyDataSetChanged w/ in the onClick, we are omitting it from the method itself.
+  //Todo: Need separate total times + cycles arrays for Pom since we are relying on these lists instead of db queries.
+  //Todo: Delete-all for pom not working.
   //Todo: Timers + dots active when exiting Timer. Need to auto-cancel on popUp dismissal.
   //Todo: Test delete on edit popUp for both modes.
   //Todo: Remember, db calls are really only needed on app launch and sort.
@@ -732,6 +734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode!=4) empty_laps.setVisibility(View.INVISIBLE);
 
     stopWatchView.setVisibility(View.GONE);
+    savedPomCycleRecycler.setVisibility(View.GONE);
     lapRecycler.setVisibility(View.GONE);
     overtime.setVisibility(View.INVISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
@@ -777,10 +780,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.setItemClick(MainActivity.this);
         savedCycleAdapter.setHighlight(MainActivity.this);
 
-        //Todo: Callbacks.
         savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
         savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
         savedPomCycleRecycler.setLayoutManager(lm4);
+        //Instantiating callbacks from adapter.
+        savedPomCycleAdapter.setItemClick(MainActivity.this);
+        savedPomCycleAdapter.setHighlight(MainActivity.this);
 
         //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
         savedCycleAdapter.notifyDataSetChanged();
@@ -915,6 +920,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Turning highlight mode off since we are moving to a new tab.
         savedCycleAdapter.removeHighlight(true);
+        //Resets callback vars for clicked positions and highlighted positions when switching tabs.
+        receivedPos = 0;
+        receivedHighlightPositions.clear();
       }
 
       @Override
@@ -1036,8 +1044,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
-      savedCycleRecycler.setVisibility(View.VISIBLE);
-      savedCycleAdapter.notifyDataSetChanged();
+      if (mode==1) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        savedCycleAdapter.notifyDataSetChanged();
+      } else {
+        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
+
       launchingTimer = false;
       checkEmptyCycles();
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
@@ -1071,8 +1085,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       checkEmptyCycles();
       //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
       if (!launchingTimer) {
-        savedCycleAdapter.notifyDataSetChanged();
-        savedCycleRecycler.setVisibility(View.VISIBLE);
+        if (mode==1) {
+          savedCycleAdapter.notifyDataSetChanged();
+          savedCycleRecycler.setVisibility(View.VISIBLE);
+        }
+        if (mode==3) {
+          savedPomCycleAdapter.notifyDataSetChanged();
+          savedPomCycleRecycler.setVisibility(View.VISIBLE);
+        }
+      }
+      if (saveHasOccurred) {
+        saveHasOccurred = false;
+        if (mode==1) savedCycleAdapter.notifyDataSetChanged(); if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
       }
       //Color reset to black, also for smooth transition to timer. Grey only necessary to prevent soft kb tearing.
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
@@ -1083,10 +1107,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.removeHighlight(true);
         //Calls method that sets views for our edit cycles mode.
         fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
-      }
-      if (saveHasOccurred) {
-        saveHasOccurred = false;
-        savedCycleAdapter.notifyDataSetChanged();
       }
 
       //Updates round adapters so lists show as cleared.
@@ -1167,8 +1187,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Turns off our cycle highlight mode from adapter.
     cancelHighlight.setOnClickListener(v-> {
-      savedCycleAdapter.removeHighlight(true);
-      savedCycleAdapter.notifyDataSetChanged();
+      if (mode==1) {
+        savedCycleAdapter.removeHighlight(true);
+        savedCycleAdapter.notifyDataSetChanged();
+      }
+      if (mode==3) {
+        savedPomCycleAdapter.removeHighlight(true);
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
     });
 
@@ -1188,8 +1214,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(() -> {
           //Since we have deleted every position in selected list, clear the list.
           receivedHighlightPositions.clear();
-          savedCycleAdapter.notifyDataSetChanged();
-//          receivedHighlightPositions = tempPos;
           //If there are no cycles left, cancel highlight mode. If there are any left, simply remove all highlights.
           if (receivedHighlightPositions.size()>0) savedCycleAdapter.removeHighlight(false); else {
             cancelHighlight.setVisibility(View.INVISIBLE);
@@ -1223,9 +1247,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!isNewCycle) {
         AsyncTask.execute(()-> {
           editCycleList(DELETING_CYCLE);
-          runOnUiThread(()-> {
-            savedCycleAdapter.notifyDataSetChanged();
-          });
         });
       } else {
         clearRoundAdapterArrays();
@@ -1455,7 +1476,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(() -> {
         //Deletes all cycles.
         deleteCycle(true);
-        //Mew instance (which will be empty) of whichever Cycles entity we're on.
       });
     });
 
@@ -2621,10 +2641,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (!deleteAll) {
-          //Todo: db updated. need to update array lists and refresh adapter.
           cycleID = cyclesList.get(receivedPos).getId();
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deleteCycle(cycles);
+          runOnUiThread(()-> {
+            savedCycleAdapter.notifyDataSetChanged();
+          });
         } else if (cyclesList.size()>0) {
           cyclesDatabase.cyclesDao().deleteAllCycles();
           runOnUiThread(()->{
@@ -2644,7 +2666,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleID = pomCyclesList.get(receivedPos).getId();
           pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
-        } else if (pomCyclesList.size()>0) cyclesDatabase.cyclesDao().deleteAllPomCycles(); else emptyCycle = true;
+          runOnUiThread(()-> {
+            savedPomCycleAdapter.notifyDataSetChanged();
+          });
+        } else if (pomCyclesList.size()>0) {
+          cyclesDatabase.cyclesDao().deleteAllPomCycles();
+          runOnUiThread(()->{
+            //Todo: When we have them, total time + cycles arrays get cleared here.
+            pomArray.clear();
+            pomTitleArray.clear();
+            savedPomCycleAdapter.notifyDataSetChanged();
+          });
+        } else emptyCycle = true;
         break;
     }
     runOnUiThread(()-> {
