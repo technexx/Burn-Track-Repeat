@@ -384,9 +384,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean launchingTimer;
 
   //Todo: Need separate total times + cycles arrays for Pom since we are relying on these lists instead of db queries.
-  //Todo: Timers + dots active when exiting Timer. Need to auto-cancel on popUp dismissal.
-  //Todo: Test delete on edit popUp for both modes.
-  //Todo: Remember, db calls are really only needed on app launch and sort.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo: We had a flashing progressBar w/ full time (should always be 0) at some point. Couldn't replicate.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -1048,6 +1045,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      resetTimer();
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
