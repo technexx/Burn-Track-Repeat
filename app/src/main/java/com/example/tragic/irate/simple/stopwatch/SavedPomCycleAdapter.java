@@ -52,6 +52,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.mContext = context; this.mPomList = pomList; this.mPomTitle = pomTitle;
         //Populates a toggle list for Pom's spannable colors so we can simply replace them at will w/ out resetting the list. This should only be called in our initial adapter instantiation.
         if (mSizeToggle.size()==0) for (int i=0; i<8; i++) mSizeToggle.add(0);
+        //Must be instantiated here so it does not loop and reset in onBindView.
+        mPositionList = new ArrayList<>();
     }
 
 

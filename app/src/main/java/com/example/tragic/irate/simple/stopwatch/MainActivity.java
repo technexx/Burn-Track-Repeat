@@ -384,7 +384,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean launchingTimer;
 
   //Todo: Need separate total times + cycles arrays for Pom since we are relying on these lists instead of db queries.
-  //Todo: Delete-all for pom not working.
   //Todo: Timers + dots active when exiting Timer. Need to auto-cancel on popUp dismissal.
   //Todo: Test delete on edit popUp for both modes.
   //Todo: Remember, db calls are really only needed on app launch and sort.
@@ -925,6 +924,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Turning highlight mode off since we are moving to a new tab.
         savedCycleAdapter.removeHighlight(true);
+        savedPomCycleAdapter.removeHighlight(true);
         //Resets callback vars for clicked positions and highlighted positions when switching tabs.
         receivedPos = 0;
         receivedHighlightPositions.clear();
@@ -1169,10 +1169,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             roundRecyclerTwo.setVisibility(View.GONE);
             recyclerLayoutOne.leftMargin = 240;
             roundListDivider.setVisibility(View.GONE);
+            savedCycleAdapter.removeHighlight(true);
           } else {
             roundRecyclerTwo.setVisibility(View.VISIBLE);
             recyclerLayoutOne.leftMargin = 5;
             roundListDivider.setVisibility(View.VISIBLE);
+            savedPomCycleAdapter.removeHighlight(true);
           }
         }
         cycle_name_text.setVisibility(View.INVISIBLE);
@@ -1183,8 +1185,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Updating adapter views.
         cycleRoundsAdapter.notifyDataSetChanged();
         cycleRoundsAdapterTwo.notifyDataSetChanged();
-        //Removing highlights.
-        savedCycleAdapter.removeHighlight(true);
       });
       //Default disabled state of edited cycle save, if nothing has changed.
       save_edit_cycle.setEnabled(false);
@@ -1226,7 +1226,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             edit_highlighted_cycle.setVisibility(View.INVISIBLE);
             delete_highlighted_cycle.setVisibility(View.INVISIBLE);
             appHeader.setVisibility(View.VISIBLE);
-            savedCycleAdapter.removeHighlight(true);
+
+            if (mode==1) savedCycleAdapter.removeHighlight(true);
+            if (mode==3) savedPomCycleAdapter.removeHighlight(true);
             Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
           }
         });
