@@ -383,7 +383,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: delete_edit_cycle should call same db deletion as delete_highlighted. We can't omit the db update for any deletions. Call notifyDataSetChanged w/ in the onClick, we are omitting it from the method itself.
   //Todo: Need separate total times + cycles arrays for Pom since we are relying on these lists instead of db queries.
   //Todo: Delete-all for pom not working.
   //Todo: Timers + dots active when exiting Timer. Need to auto-cancel on popUp dismissal.
@@ -454,8 +453,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Receives highlighted positions from our adapter.
   @Override
   public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
-    //Re-enables delete button.
-    delete_highlighted_cycle.setEnabled(true);
     //Receives list of cycle positions highlighted.
     receivedHighlightPositions = listOfPositions;
     //Sets "highlight mode" actionBar buttons to Visible if entering mode (i.e. selecting first item).
@@ -464,6 +461,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
       //Fading app name text + sort button out, edit and delete buttons in.
       fadeEditCycleButtonsIn(FADE_IN_HIGHLIGHT_MODE);
+    }
+    //Enables edit cycle button if we have exactly 1 row selected, disables otherwise.
+    if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
+      edit_highlighted_cycle.setAlpha(1.0f);
+      edit_highlighted_cycle.setEnabled(true);
+    } else if (edit_highlighted_cycle.getAlpha()==1 && receivedHighlightPositions.size()!=1) {
+      edit_highlighted_cycle.setAlpha(0.4f);
+      edit_highlighted_cycle.setEnabled(false);
     }
   }
 
@@ -761,7 +766,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Loads database of saved cycles.
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
       //Calls instance of Cycle entity list based on sort mode.
-      queryCycles(true);
+      queryCycles(true, false);
 
       //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
       runOnUiThread(()-> {
@@ -1020,7 +1025,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(()-> {
-        queryCycles(false);
+        queryCycles(false, true);
         runOnUiThread(()-> {
           //Refreshes adapter.
           savedCycleAdapter.notifyDataSetChanged();
@@ -1070,7 +1075,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     });
 
-    //Once editPopUp is on screen, change Main's background color to match it and remove Main's recyclerView view. This prevents the soft keyboard's "tear" through Main's layout from being visible.
+    //Once editPopUp is on screen, change Main's background color to match it and remove Main's recyclerView view. This prevents the soft keyb
+    // oard's "tear" through Main's layout from being visible.
     editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
@@ -1227,6 +1233,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
+    delete_edit_cycle.setOnClickListener(v-> {
+      //If on a saved edit cycle, delete it from database. Otherwise, simply clear the adapter array lists since nothing is actually saved.
+      if (!isNewCycle) {
+        AsyncTask.execute(()-> {
+          //Position of the
+          receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
+          deleteCycle(false);
+          editCycleList(DELETING_CYCLE);
+        });
+      } else {
+        clearRoundAdapterArrays();
+      }
+      editCyclesPopupWindow.dismiss();
+      Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+    });
+
     save_edit_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()->{
         saveCycles(isNewCycle);
@@ -1240,19 +1262,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
       });
-    });
-
-    //Todo: Watch this.
-    delete_edit_cycle.setOnClickListener(v-> {
-      if (!isNewCycle) {
-        AsyncTask.execute(()-> {
-          editCycleList(DELETING_CYCLE);
-        });
-      } else {
-        clearRoundAdapterArrays();
-      }
-      editCyclesPopupWindow.dismiss();
-      Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
     });
 
     //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
@@ -2402,16 +2411,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Clears adapter arrays and re-populates them with database values. Since this relies on a database query we ONLY call it when:
   //(A)We launch the app for the first time, and (B)We SORT our list, which requires a reshuffling which is easier to do w/ Room commands.
   //All other updates and retrievals can be done directly through arrayLists and their item positions.
-  public void queryCycles(boolean queryAll) {
+  public void queryCycles(boolean queryAll, boolean sort) {
+
     if (mode==1 || queryAll) {
-      switch (sortMode) {
-        case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
-        case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
-        case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
-        case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
-        case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
-        case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
-      }
+      if (sort) {
+        switch (sortMode) {
+          case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
+          case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
+          case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
+          case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
+          case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
+          case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+        }
+      } else cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
 
       workoutCyclesArray.clear();
       typeOfRoundArray.clear();
@@ -2433,12 +2445,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     if (mode==3 || queryAll) {
-      switch (sortModePom) {
-        case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
-        case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
-        case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
-        case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
-      }
+      if (sort) {
+        switch (sortModePom) {
+          case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
+          case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
+          case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
+          case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+        }
+      } else pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+
       pomArray.clear();
       pomTitleArray.clear();
       for (int i=0; i<pomCyclesList.size(); i++) {
@@ -2635,7 +2650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteCycle(boolean deleteAll) {
-    queryCycles(false);
+    queryCycles(false, false);
     int cycleID;
     boolean emptyCycle = false;
     switch (mode) {
