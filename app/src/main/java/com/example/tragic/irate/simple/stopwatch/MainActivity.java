@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortModePom = 1;
   int sortHolder = 1;
   int receivedPos;
-  int retrievedID;
   String cycleTitle = "";
   List<String> receivedHighlightPositions;
 
@@ -246,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_value;
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
+  ConstraintLayout.LayoutParams cycleTitleLayout;
   int FADE_IN_HIGHLIGHT_MODE = 1;
   int FADE_OUT_HIGHLIGHT_MODE = 2;
   int FADE_IN_EDIT_CYCLE = 3;
@@ -272,9 +272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ObjectAnimator objectAnimator;
   Animation endAnimation;
 
-  TextView overtime;
-
-  TextView cycle_header_text;
+  TextView cycle_title_textView;
   TextView cycles_completed;
   ImageButton new_lap;
   ImageButton next_round;
@@ -382,7 +380,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Remove timer title in stopwatch mode.
   //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo: We had a flashing progressBar w/ full time (should always be 0) at some point. Couldn't replicate.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -706,7 +703,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomValuesTime = new ArrayList<>();
 
     reset = timerPopUpView.findViewById(R.id.reset);
-    cycle_header_text = timerPopUpView.findViewById(R.id.cycle_header_text);
+    cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
 
     cycles_completed = timerPopUpView.findViewById(R.id.cycles_completed);
     next_round = timerPopUpView.findViewById(R.id.next_round);
@@ -726,7 +723,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     msTime = timerPopUpView.findViewById(R.id.msTime);
     dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     lapRecycler = timerPopUpView.findViewById(R.id.lap_recycler);
-    overtime = timerPopUpView.findViewById(R.id.overtime);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
     pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
     pauseResumeButton.setRippleColor(null);
@@ -734,10 +730,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
     if (mode!=4) empty_laps.setVisibility(View.INVISIBLE);
 
+    cycleTitleLayout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
+
     stopWatchView.setVisibility(View.GONE);
     savedPomCycleRecycler.setVisibility(View.GONE);
     lapRecycler.setVisibility(View.GONE);
-    overtime.setVisibility(View.INVISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
 
     cycles_completed.setText(R.string.cycles_done);
@@ -995,10 +992,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopwatch.setOnClickListener(v-> {
+      savedMode = mode;
       mode = 4;
       dotDraws.setMode(4);
       populateTimerUI();
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+      cycleTitleLayout.topMargin = -25;
+      cycle_title_textView.setVisibility(View.INVISIBLE);
     });
 
     //Showing sort popup window.
@@ -1046,6 +1046,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
       resetTimer();
+      //If stopwatch is active (mode 4), set our mode back to whichever tab we were on previously, saved w/ in our stopwatch launch onClick.
+      if (mode==4) mode = savedMode;
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -3278,7 +3280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void populateTimerUI() {
-    cycle_header_text.setText(cycleTitle);
+    cycle_title_textView.setText(cycleTitle);
     dotDraws.resetDotAlpha();
     //Default views for Timer.
     total_set_header.setVisibility(View.VISIBLE);
