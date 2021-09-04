@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton edit_highlighted_cycle;
   ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
-  TextView sort_text;
+  TextView sortButton;
   ImageView global_settings;
   TextView save_edit_cycle;
   TextView delete_edit_cycle;
@@ -364,7 +364,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Intro splash screen, perhaps w/ logo. Smooths opening while app loads.
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
@@ -377,9 +376,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Infinity mode for Pom?
 
   //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
-  //Todo: Minimize aSync threads for performance.
   //Todo: Could long svg files be a lag contributor?
-  //Todo: Load/draw canvas in aSync for performance?
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Make sure sort checkmark positions work on different size screens.
   //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
@@ -588,7 +585,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
     delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_text);
 
-
     //Custom Action Bar.
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -597,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
-    sort_text = findViewById(R.id.sort_text);
+    sortButton = findViewById(R.id.sortButton);
     global_settings = findViewById(R.id.global_settings);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
@@ -895,8 +891,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTabUnselected(TabLayout.Tab tab) {
         //since modes use same String, clear it between tab switches.
         cycleTitle = "";
-        //If in highlight mode (most easily denoted by enabled state of sort_text), exit out its view since we are switching tabs.
-        if (!sort_text.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
+        //If in highlight mode (most easily denoted by enabled state of sortButton), exit out its view since we are switching tabs.
+        if (!sortButton.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
         //Dismisses editCycle popup when switching tabs.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
         //Turning highlight mode off since we are moving to a new tab.
@@ -985,7 +981,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     //Showing sort popup window.
-    sort_text.setOnClickListener(v-> {
+    sortButton.setOnClickListener(v-> {
       sortPopupWindow.showAtLocation(cl, Gravity.END|Gravity.TOP, 0, 0);
     });
 
@@ -1718,7 +1714,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle.clearAnimation();
     cancelHighlight.clearAnimation();
     appHeader.clearAnimation();
-    sort_text.clearAnimation();
+    sortButton.clearAnimation();
     //Only needs to be true if editor is active, which is only the case where it is set to true below.
     editingCycle = false;
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
@@ -1727,9 +1723,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
       appHeader.startAnimation(fadeOut);
-      sort_text.startAnimation(fadeOut);
+      sortButton.startAnimation(fadeOut);
       //Disabling sort button since it is faded out and still active.
-      sort_text.setEnabled(false);
+      sortButton.setEnabled(false);
       //Enabling edit/delete buttons.
       edit_highlighted_cycle.setEnabled(true);
       delete_highlighted_cycle.setEnabled(true);
@@ -1741,9 +1737,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.startAnimation(fadeOut);
       cancelHighlight.startAnimation(fadeOut);
       appHeader.startAnimation(fadeIn);
-      sort_text.startAnimation(fadeIn);
+      sortButton.startAnimation(fadeIn);
       //Re-enabling sort button now that edit mode has exited.
-      sort_text.setEnabled(true);
+      sortButton.setEnabled(true);
       //Disabling edit/delete buttons.
       edit_highlighted_cycle.setEnabled(false);
       delete_highlighted_cycle.setEnabled(false);
@@ -1753,10 +1749,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editingCycle = true;
       delete_highlighted_cycle.setEnabled(true);
       edit_highlighted_cycle.setVisibility(View.GONE);
-      sort_text.setVisibility(View.GONE);
+      sortButton.setVisibility(View.GONE);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-      sort_text.setVisibility(View.VISIBLE);
+      sortButton.setVisibility(View.VISIBLE);
       delete_highlighted_cycle.setVisibility(View.GONE);
       delete_highlighted_cycle.setEnabled(false);
     }

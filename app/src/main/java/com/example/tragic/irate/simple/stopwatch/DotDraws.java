@@ -195,7 +195,7 @@ public class DotDraws extends View {
         break;
       case 3:
         mX = 82; mX2=mX+125;
-        encloseDots(mY+110 , mY+320);
+        encloseDots(mY+130 , mY+335);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
           if (mPomDotCounter == i) pomFill(i, true, 255);
@@ -213,24 +213,24 @@ public class DotDraws extends View {
         //Must be called AFTER color is changed, otherwise alpha will reset to 255.
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        mCanvas.drawCircle(mX, 575, 62, mPaint);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
+        mCanvas.drawCircle(mX, 740, 62, mPaint);
+        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY+165, i);
         mX+=260;
         break;
       case 1: case 3: case 5:
         mPaint.setColor(Color.RED);
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
-        mCanvas.drawCircle(mX2, 575, 50 , mPaint);
+        mCanvas.drawCircle(mX2, 740, 50 , mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
+        if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY+165, i);
         mX2=mX+130;
         break;
       case 7:
         mPaint.setColor(Color.RED);
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
-        mCanvas.drawRect(mX-170, 520, mX-60, 630, mPaint);
+        mCanvas.drawRect(mX-170, 685, mX-60, 795, mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY, i);
+        if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY+165, i);
         break;
     }
   }

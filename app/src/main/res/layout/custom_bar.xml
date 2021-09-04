@@ -65,7 +65,7 @@
     </ImageButton>
 
     <TextView
-        android:id="@+id/sort_text"
+        android:id="@+id/sortButton"
         android:text="Sort"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
