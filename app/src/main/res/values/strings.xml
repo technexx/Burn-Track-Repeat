@@ -52,4 +52,7 @@
 
     <string name="empty_cycle_list">Nothing here!</string>
     <string name="empty_laps_list">No laps yet!</string>
+
+    <string name="about">About</string>
+    <string name="settings">Settings</string>
 </resources>

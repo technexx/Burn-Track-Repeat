@@ -111,8 +111,8 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 mPositionOfSelectedRound = position;
                 //Used to indicate a round has been selected.
                 mRoundSelected = true;
-                //Passes position to Main activity.
-                mOnRoundSelected.roundSelected(position);
+                //Passes position to Main activity. +8 since we use the total workout list (up to 16 rounds/positions) as a conditional in Main.
+                mOnRoundSelected.roundSelected(position+8);
                 //Since we need to remove the previous bullet when selecting a new round, we need to re-draw the list.
                 notifyDataSetChanged();
                 //If position we are clicking on shows a bullet, remove it.

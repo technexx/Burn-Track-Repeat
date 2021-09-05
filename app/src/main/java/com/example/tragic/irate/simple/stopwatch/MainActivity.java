@@ -341,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean textSizeReduced = true;
 
   ArrayList<String> workoutArray;
-
   ArrayList<String> setsArray;
   ArrayList<String> breaksArray;
   ArrayList<String> breaksOnlyArray;
@@ -364,6 +363,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
+  //Todo: Fix specific (clicked on) Crash on line 2338 when trying to delete round, using first adapter list index instead of second (so if first adapter pos is 5, tries to delete from second (crash if it's less).
+  // round removal
   //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
@@ -391,7 +392,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
 
-   //Todo: REMEMBER, always call queryCycles() to get a cyclesList reference, otherwise it won't sync w/ the current sort mode.
    //Todo: REMINDER, Try next app w/ Kotlin.
 
   @Override
@@ -465,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void roundSelected(int position) {
     roundIsSelected = true;
     roundSelectedPosition = position;
+    Log.i("testPos", "position is " + position);
   }
 
   @Override
@@ -514,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
-    settingsPopupView = inflater.inflate(R.layout.settings_popup, null);
+    settingsPopupView = inflater.inflate(R.layout.sidebar_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
     popUpDensityPixelsHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 475, getResources().getDisplayMetrics());
@@ -524,7 +525,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, 700, 1540, true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, 600, 1540, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -2328,16 +2329,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.set(roundSelectedPosition, integerValue*1000);
         convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
         typeOfRound.set(roundSelectedPosition, roundType);
-        if (workoutTime.size()<=8) {
+        if (roundSelectedPosition<=7) {
           roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
           typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
           if (!roundIsFading) cycleRoundsAdapter.setFadePositions(-1, roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-          roundHolderTwo.set(roundSelectedPosition, convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-          typeHolderTwo.set(roundSelectedPosition, typeOfRound.get(typeOfRound.size()-1));
+          //Var is reduced by 8 so second adapter can make use of positions 8 through 15.
+          roundSelectedPosition = roundSelectedPosition -8;
+          //Since our workOutTime lists are independent of adapter and run from (up to) 0-15, we change the value of roundSelectedPosition back to original.
+          roundHolderTwo.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition+8));
+          typeHolderTwo.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition+8));
           if (!roundIsFading) cycleRoundsAdapterTwo.setFadePositions(-1, roundSelectedPosition);
           cycleRoundsAdapterTwo.notifyDataSetChanged();
+        }
+
+        if (workoutTime.size()<=8) {
+
+        } else {
+          //After we've used roundSelectedPosition to set our workout lists, we use it in two different adapters. Both adapters use positions 0-7, so here we change the position var for use in the second.
+
         }
         //Resets round selection boolean.
         roundIsSelected = false;
@@ -2345,6 +2356,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Not set up to remove selected rows.
   public void removeRound () {
     //Cancels animation if we click to remove a round while removal animation for previous one is active.
 //    cycleRoundsAdapter.endFade();
