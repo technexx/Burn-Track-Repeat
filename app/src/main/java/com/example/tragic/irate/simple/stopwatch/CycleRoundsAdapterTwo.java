@@ -43,7 +43,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     int mPositionOfSelectedRound;
 
     public interface onFadeFinished {
-        void fadeHasFinished();
+        void subtractionFadeHasFinished();
     }
 
     public interface onRoundSelected {
@@ -72,7 +72,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             }
             @Override
             public void onAnimationEnd(Animation animation) {
-                mOnFadeFinished.fadeHasFinished();
+                mOnFadeFinished.subtractionFadeHasFinished();
             }
             @Override
             public void onAnimationRepeat(Animation animation) {
