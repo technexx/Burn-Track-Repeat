@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
-        android:textSize="22sp"
+        android:textSize="23sp"
         android:textColor="@color/white">
     </TextView>
 
@@ -39,7 +39,7 @@
         app:layout_constraintStart_toEndOf="@id/round_count"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
-        android:textSize="22sp">
+        android:textSize="23sp">
     </TextView>
 
     <ImageView

@@ -330,6 +330,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RecyclerView lapRecycler;
   LapAdapter lapAdapter;
   LinearLayoutManager lapLayout;
+  ConstraintLayout roundRecyclerLayout;
 
   DotDraws dotDraws;
   ValueAnimator sizeAnimator;
@@ -364,7 +365,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Double entry in adapter lists.
+  //Todo: Long fade delays in adding mode 1 rounds after adding mode 3. Probably due to the delay iteration we set in adapter.
+  //Todo: Double rows in Pom for aesthetics and to fill shorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
@@ -591,6 +593,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     startTimer = editCyclesPopupView.findViewById(R.id.startTimer);
     save_edit_cycle = editCyclesPopupView.findViewById(R.id.save_edit_cycle);
     delete_edit_cycle = editCyclesPopupView.findViewById(R.id.delete_edit_cycle);
+    roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     toggleInfinityRoundsForSets.setAlpha(0.3f);
     toggleInfinityRoundsForBreaks.setAlpha(0.3f);
 
@@ -2148,16 +2151,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void defaultEditRoundViews() {
     //Instance of layout objects we can set programmatically based on which mode we're on.
-    ConstraintLayout.LayoutParams s1ParamsAdd = (ConstraintLayout.LayoutParams) firstRowAddButton.getLayoutParams();
-    ConstraintLayout.LayoutParams s1ParamsSub = (ConstraintLayout.LayoutParams) firstRowSubtractButton.getLayoutParams();
     ConstraintLayout.LayoutParams s2ParamsAdd = (ConstraintLayout.LayoutParams) secondRowAddButton.getLayoutParams();
     ConstraintLayout.LayoutParams s2ParamsSub = (ConstraintLayout.LayoutParams) secondRowSubtractButton.getLayoutParams();
     ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
     ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) SubtractRoundFromCycleButton.getLayoutParams();
+    ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
 
     convertEditTime(true);
     switch (mode) {
       case 1:
+        roundRecyclerLayoutParams.height = setDensityPixels(260);
         //All shared visibilities between modes 1 and 2.
         s2.setVisibility(View.VISIBLE);
         s3.setVisibility(View.GONE);
@@ -2179,15 +2182,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s1.setText(R.string.set_time);
         firstRowTextView.setText(convertCustomTextView(setValue));
         secondRowTextView.setText(convertCustomTextView(breakValue));
-        //If in mode 1 or 2, constraining our add/remove buttons to the "s2" line of objects.
-        addParams.topToBottom = R.id.s2;
-        addParams.topMargin = 60;
-        subParams.topToBottom = R.id.s2;
-        subParams.topMargin = 60;
-//        s1ParamsAdd.topMargin = 100;
-//        s1ParamsSub.topMargin = 100;
+        addParams.bottomMargin = setDensityPixels(32);
+        subParams.bottomMargin = setDensityPixels(32);
+        roundRecyclerLayoutParams.bottomMargin = setDensityPixels(32);
         break;
       case 3:
+        roundRecyclerLayoutParams.height = setDensityPixels(240);
         //Visibilities and values exclusive to mode 3.
         s1.setVisibility(View.VISIBLE);
         s3.setVisibility(View.VISIBLE);
@@ -2207,20 +2207,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRowTextView.setText(convertCustomTextView(pomValue1));
         secondRowTextView.setText(convertCustomTextView(pomValue2));
         thirdRowEditTextView.setText(convertCustomTextView(pomValue3));
-        //If in mode 3, constraining our add/remove buttons to the "s3" line of objects.
-        addParams.topToBottom = R.id.s3;
-        addParams.topMargin = 60;
-        subParams.topToBottom = R.id.s3;
-        subParams.topMargin = 60;
+        addParams.bottomMargin = setDensityPixels(20);
+        subParams.bottomMargin = setDensityPixels(20);
+        roundRecyclerLayoutParams.bottomMargin = setDensityPixels(10);
         break;
-    }
-    //If in mode 2, constraining views for a more compact interface.
-    if (mode==2) {
-      s2ParamsAdd.topToBottom = R.id.anchorViewForEditRows;
-      s2ParamsSub.topToBottom = R.id.anchorViewForEditRows;
-    } else {
-      s2ParamsAdd.topToBottom = R.id.firstRowAddButton;
-      s2ParamsSub.topToBottom = R.id.firstRowAddButton;
     }
   }
 
@@ -2633,7 +2623,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
-        //If coming from FAB button, create a new instance of PomCycles. If coming from a position in our database, get the instance of PomCycles in that position.
         if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
           cycleID = pomCyclesList.get(receivedPos).getId();
           pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
