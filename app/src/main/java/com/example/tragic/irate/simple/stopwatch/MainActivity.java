@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View savedCyclePopupView;
   View editCyclesPopupView;
   View settingsPopupView;
-  boolean saveHasOccurred;
 
   PopupWindow sortPopupWindow;
   PopupWindow savedCyclePopupWindow;
@@ -132,8 +131,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String cycleTitle = "";
   List<String> receivedHighlightPositions;
 
-  TextView cycle_name_text;
-  EditText cycle_name_edit;
+  TextView cycleNameText;
+  EditText cycleNameEdit;
   TextView s1;
   TextView s2;
   TextView s3;
@@ -365,9 +364,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Fix specific (clicked on) Crash on line 2338 when trying to delete round, using first adapter list index instead of second (so if first adapter pos is 5, tries to delete from second (crash if it's less).
-  // round removal
-  //Todo More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
+  //Todo: Double entry in adapter lists.
+  //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
@@ -375,7 +373,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Save total sets/breaks and completed by day option?
-  //Todo: Letter -> Number soft kb is a bit choppy.
   //Todo: Infinity mode for Pom?
 
   //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
@@ -385,7 +382,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
   //Todo: Add taskbar notification for timers.
   //Todo: Add color scheme options.
-  //Todo: All DB calls in aSync.
   //Todo: Rename app, of course.
   //Todo: Add onOptionsSelected dots for About, etc.
   //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
@@ -564,8 +560,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     round_count = roundView.findViewById(R.id.round_count);
     round_value = roundView.findViewById(R.id.workout_rounds);
 
-    cycle_name_text = editCyclesPopupView.findViewById(R.id.cycle_name_text);
-    cycle_name_edit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
+    cycleNameText = editCyclesPopupView.findViewById(R.id.cycle_name_text);
+    cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
     s1 = editCyclesPopupView.findViewById(R.id.s1);
     s2 = editCyclesPopupView.findViewById(R.id.s2);
     s3 = editCyclesPopupView.findViewById(R.id.s3);
@@ -623,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
-    cycle_name_text.setVisibility(View.INVISIBLE);
+    cycleNameText.setVisibility(View.INVISIBLE);
 
     workoutTime = new ArrayList<>();
     convertedWorkoutTime = new ArrayList<>();
@@ -857,7 +853,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       @Override
       public void afterTextChanged(Editable s) {
-        cycleTitle = cycle_name_edit.getText().toString();
+        cycleTitle = cycleNameEdit.getText().toString();
         //If round list in current mode is at least 1 and title has been changed, enable save button.
         if ((mode==1 && workoutTime.size()>0) || ((mode==3 && pomValuesTime.size()>0))) {
           if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
@@ -866,7 +862,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    cycle_name_edit.addTextChangedListener(titleTextWatcher);
+    cycleNameEdit.addTextChangedListener(titleTextWatcher);
     firstRowEditMinutes.addTextChangedListener(editTextWatcher);
     firstRowEditSeconds.addTextChangedListener(editTextWatcher);
     secondRowEditMinutes.addTextChangedListener(editTextWatcher);
@@ -965,7 +961,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
-    cycle_name_edit.setOnTouchListener(new View.OnTouchListener() {
+    cycleNameEdit.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         if (event.getAction()==MotionEvent.ACTION_DOWN) {
@@ -983,6 +979,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setOnClickListener(v -> {
       //Default row selection.
       resetRows();
+      cycleNameEdit.getText().clear();
       //Brings up menu to add/subtract rounds to new cycle.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       fab.setEnabled(false);
@@ -1079,8 +1076,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     });
 
-    //Once editPopUp is on screen, change Main's background color to match it and remove Main's recyclerView view. This prevents the soft keyb
-    // oard's "tear" through Main's layout from being visible.
     editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
@@ -1103,10 +1098,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleAdapter.notifyDataSetChanged();
           savedPomCycleRecycler.setVisibility(View.VISIBLE);
         }
-      }
-      if (saveHasOccurred) {
-        saveHasOccurred = false;
-        if (mode==1) savedCycleAdapter.notifyDataSetChanged(); if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
       }
       //Color reset to black, also for smooth transition to timer. Grey only necessary to prevent soft kb tearing.
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
@@ -1181,11 +1172,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedPomCycleAdapter.removeHighlight(true);
           }
         }
-        cycle_name_text.setVisibility(View.INVISIBLE);
-        cycle_name_edit.setVisibility(View.VISIBLE);
-        cycle_name_text.setText(cycleTitle);
+        cycleNameText.setVisibility(View.INVISIBLE);
+        cycleNameEdit.setVisibility(View.VISIBLE);
+        cycleNameText.setText(cycleTitle);
         //Setting editText title.
-        cycle_name_edit.setText(cycleTitle);
+        cycleNameEdit.setText(cycleTitle);
         //Updating adapter views.
         cycleRoundsAdapter.notifyDataSetChanged();
         cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -1272,29 +1263,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     save_edit_cycle.setOnClickListener(v-> {
       AsyncTask.execute(()->{
         saveCycles(isNewCycle);
-        if (isNewCycle) editCycleList(ADDING_CYCLE); else editCycleList(EDITING_CYCLE);
-        //Used to call notifyDataSetChanged() in SavedCycleAdapter. No need if db has not been changed.
-        saveHasOccurred = true;
         runOnUiThread(()-> {
           //Disables save button. Any change in rounds or title will re-activate it.
           save_edit_cycle.setEnabled(false);
           save_edit_cycle.setAlpha(0.3f);
+          if (mode==1) savedCycleAdapter.notifyDataSetChanged(); if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
           Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
       });
     });
 
     //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
-    cycle_name_text.setOnClickListener(v-> {
-      cycle_name_text.setVisibility(View.INVISIBLE);
-      cycle_name_edit.setVisibility(View.VISIBLE);
-      cycle_name_edit.requestFocus();
-      inputMethodManager.showSoftInput(cycle_name_edit, 0);
+    cycleNameText.setOnClickListener(v-> {
+      cycleNameText.setVisibility(View.INVISIBLE);
+      cycleNameEdit.setVisibility(View.VISIBLE);
+      cycleNameEdit.requestFocus();
+      inputMethodManager.showSoftInput(cycleNameEdit, 0);
     });
 
     //Selects all text when long clicking in editText.
-    cycle_name_edit.setOnLongClickListener(v-> {
-      cycle_name_edit.selectAll();
+    cycleNameEdit.setOnLongClickListener(v-> {
+      cycleNameEdit.selectAll();
       return true;
     });
 
@@ -1769,12 +1758,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setEnabled(false);
       delete_highlighted_cycle.setEnabled(false);
     }
+    //Todo: Remove all custom views here?
     if (typeOfFade==FADE_IN_EDIT_CYCLE) {
       //Set to false by default, and true only with this conditional.
-      editingCycle = true;
-      delete_highlighted_cycle.setEnabled(true);
-      edit_highlighted_cycle.setVisibility(View.GONE);
-      sortButton.setVisibility(View.GONE);
+//      editingCycle = true;
+//      delete_highlighted_cycle.setEnabled(true);
+//      edit_highlighted_cycle.setVisibility(View.GONE);
+//      sortButton.setVisibility(View.GONE);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
       sortButton.setVisibility(View.VISIBLE);
