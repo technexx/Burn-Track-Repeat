@@ -365,7 +365,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Long fade delays in adding mode 1 rounds after adding mode 3. Probably due to the delay iteration we set in adapter.
   //Todo: Double rows in Pom for aesthetics and to fill shorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
@@ -447,7 +446,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //This callback method works for both round adapters.
   @Override
   public void subtractionFadeHasFinished() {
-    //Todo: If deleting selected round, re-adjust adapters. Should happen BEFORE remove so we know what to move and have pre-removed size of second adapter.
     //When adapter fade on round has finished, execute method to remove the round from adapter list/holders and refresh the adapter display. If we click to remove another round before fade is done, fade gets cancelled, restarted on next position, and this method is also called to remove previous round.
     removeRound();
     if (consolidateRoundAdapterLists) {
@@ -1680,7 +1678,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
   }
 
-  //Todo: This check needs to rely on arrayLists, not cycleList instance.
   public void checkEmptyCycles() {
     if (mode==1) {
       if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
@@ -2276,7 +2273,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(false);
           if (save_edit_cycle.getAlpha()==1) save_edit_cycle.setAlpha(0.3f);
         }
-        //Todo: Need to resolve removeRound being called before roundSelectedPosition vars are set.
         //removeRound is called at end of fade set below. Here, we overwrite that and remove it beforehand if user clicks before fade is done.
         if (subtractedRoundIsFading) removeRound();
         if (workoutTime.size()>0) {
