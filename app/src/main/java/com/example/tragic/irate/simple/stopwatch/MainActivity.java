@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable changeThirdValue;
   Runnable adjustRoundDelay;
   boolean activeEditListener;
-  boolean editingCycle;
+  boolean currentlyEditingACycle;
   InputMethodManager inputMethodManager;
 
   AlphaAnimation fadeIn;
@@ -365,6 +365,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
+  //Todo: Out of place items in double adapters when mixing replace + add. Hard to replicate exactly, but in at least one instance, 7 items are in first column and 1 in seconds, and, second-to-last row fades instead of last row when adding/subtracting a round.
+  //Todo; Another bug: >8 rounds showing in edit list but not being saved/transferred to timer.
+  //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
   //Todo: Double rows in Pom for aesthetics and to fill shorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
@@ -1105,10 +1108,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
-      if (editingCycle) {
+      if (currentlyEditingACycle) {
         savedCycleAdapter.removeHighlight(true);
         //Calls method that sets views for our edit cycles mode.
         fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+        currentlyEditingACycle = false;
       }
 
       //Updates round adapters so lists show as cleared.
@@ -1120,6 +1124,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
+      currentlyEditingACycle = true;
       //Default row selection.
       resetRows();
       //Used when deciding whether to save a new cycle or retrieve/update a current one. Editing will always pull an existing one.
@@ -1729,8 +1734,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cancelHighlight.clearAnimation();
     appHeader.clearAnimation();
     sortButton.clearAnimation();
-    //Only needs to be true if editor is active, which is only the case where it is set to true below.
-    editingCycle = false;
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
       //Boolean used to keep launchCycles() from calling populateRoundLists(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeIn);
@@ -1757,14 +1760,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Disabling edit/delete buttons.
       edit_highlighted_cycle.setEnabled(false);
       delete_highlighted_cycle.setEnabled(false);
-    }
-    //Todo: Remove all custom views here?
-    if (typeOfFade==FADE_IN_EDIT_CYCLE) {
-      //Set to false by default, and true only with this conditional.
-//      editingCycle = true;
-//      delete_highlighted_cycle.setEnabled(true);
-//      edit_highlighted_cycle.setVisibility(View.GONE);
-//      sortButton.setVisibility(View.GONE);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
       sortButton.setVisibility(View.VISIBLE);
@@ -2181,7 +2176,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         secondRowTextView.setText(convertCustomTextView(breakValue));
         addParams.bottomMargin = setDensityPixels(32);
         subParams.bottomMargin = setDensityPixels(32);
-        roundRecyclerLayoutParams.bottomMargin = setDensityPixels(32);
+        roundRecyclerLayoutParams.bottomMargin = setDensityPixels(18);
         break;
       case 3:
         roundRecyclerLayoutParams.height = setDensityPixels(240);
@@ -2355,6 +2350,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapterTwo.notifyDataSetChanged();
         }
       }
+      Log.i("testlist", "workout time list is " + workoutTime);
     }
   }
 
@@ -2546,8 +2542,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Since this is a new Cycle, we automatically save it to database.
       saveCycles(true);
     } else {
-      //Only calls populateRoundList() if NOT editing, since it also clears our round lists and we need them retained.
-      if (!editingCycle) populateRoundList();
       //Updates changes made to cycle if we are launching it.
       if (saveToDB) saveCycles(false);
     }
@@ -2922,22 +2916,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         changeTextSize(valueAnimatorDown, timeLeft);
         textSizeReduced = false;
       }
-    }
-  }
-
-  public void hideCounter(boolean hiding) {
-    if (hiding) {
-      total_set_header.setVisibility(View.GONE);
-      total_set_time.setVisibility(View.GONE);
-      total_break_header.setVisibility(View.GONE);
-      total_break_time.setVisibility(View.GONE);
-      reset_total_times.setVisibility(View.GONE);
-    } else {
-      total_set_header.setVisibility(View.VISIBLE);
-      total_set_time.setVisibility(View.VISIBLE);
-      total_break_header.setVisibility(View.VISIBLE);
-      total_break_time.setVisibility(View.VISIBLE);
-      reset_total_times.setVisibility(View.VISIBLE);
     }
   }
 
