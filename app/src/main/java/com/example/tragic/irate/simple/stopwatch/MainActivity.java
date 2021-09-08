@@ -364,6 +364,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
+  //Todo: Break time textView disappearing in Pom edit after switching.
   //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
   //Todo: Double rows in Pom for aesthetics and to fill svohorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -897,15 +898,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           sortLow.setVisibility(View.VISIBLE);
           savedCycleRecycler.setVisibility(View.VISIBLE);
           savedPomCycleRecycler.setVisibility(View.GONE);
+          total_set_header.setText(R.string.total_sets);
         } else {
           sortHigh.setVisibility(View.GONE);
           sortLow.setVisibility(View.GONE);
-          //Since mode 3 only uses one adapter layout, set it here.
+//          //Since mode 3 only uses one adapter layout, set it here.
           roundRecyclerTwo.setVisibility(View.GONE);
           recyclerLayoutOne.leftMargin = 240;
           roundListDivider.setVisibility(View.GONE);
           savedCycleRecycler.setVisibility(View.GONE);
           savedPomCycleRecycler.setVisibility(View.VISIBLE);
+          total_set_header.setText(R.string.total_work);
         }
       }
 
@@ -1080,7 +1083,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
-        savedCycleRecycler.setVisibility(View.GONE);
+        //Prevents tearing when soft keyboard pushes up in editCycle popUp.
+        if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
+        if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
         emptyCycleList.setVisibility(View.GONE);
         cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
       }
@@ -2267,6 +2272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         //removeRound is called at end of fade set below. Here, we overwrite that and remove it beforehand if user clicks before fade is done.
         if (subtractedRoundIsFading) removeRound();
+
         if (workoutTime.size()>0) {
           //If round is not selected, default subtraction to latest round entry. Otherwise, keep the selected position.
           if (!roundIsSelected) roundSelectedPosition = workoutTime.size()-1;
@@ -2348,13 +2354,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void removeRound () {
     //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
     if (mode==1) {
-      //
-      if (!roundIsSelected) roundSelectedPosition = workoutTime.size()-1;
-
-      //Todo: Need proper conditional for roundSelected sub.
       if (workoutTime.size()>0) {
-        //Size conditionals to prevent index exceptions when fast-clicking remove.
+        //If round is not selected, default subtraction to latest round entry. Otherwise, keep the selected position. Needs to be declared here and in adjustCustom() to avoid occasional index errors w/ fase clicking.
+        if (!roundIsSelected) roundSelectedPosition = workoutTime.size()-1;
         if (workoutTime.size()-1>=roundSelectedPosition) {
+          //If workoutTime list has 8 or less items, or a round is selected and its position is in that first 8 items, remove item from first adapter.
           if (workoutTime.size()<=8 || (roundIsSelected && roundSelectedPosition<=7)) {
             if (roundHolderOne.size()-1>=roundSelectedPosition) {
               roundHolderOne.remove(roundSelectedPosition);
@@ -2376,7 +2380,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRound.remove(roundSelectedPosition);
           workoutTime.remove(roundSelectedPosition);
           convertedWorkoutTime.remove(roundSelectedPosition);
-
           //If moving from two lists to one, set its visibility and change layout params.
           if (workoutTime.size()==8) {
             roundRecyclerTwo.setVisibility(View.GONE);
