@@ -241,7 +241,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   List<Integer> totalBreakMillisArray;
   List<Integer> totalCycleCountArray;
   int roundSelectedPosition;
-  int roundSelectedPositionForSingleAdapter;
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
 
@@ -365,10 +364,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Out of place items in double adapters when mixing replace + add. Hard to replicate exactly, but in at least one instance, 7 items are in first column and 1 in seconds, and, second-to-last row fades instead of last row when adding/subtracting a round.
-  //Todo; Another bug: >8 rounds showing in edit list but not being saved/transferred to timer.
   //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
-  //Todo: Double rows in Pom for aesthetics and to fill shorter space? Consider nixxing the list aspect since it's always 8 rows.
+  //Todo: Double rows in Pom for aesthetics and to fill svohorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: On edited cycles, show textView instead of editText first.
@@ -2274,16 +2271,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //If round is not selected, default subtraction to latest round entry. Otherwise, keep the selected position.
           if (!roundIsSelected) roundSelectedPosition = workoutTime.size()-1;
           if (roundSelectedPosition<=7) {
-            //List and adapter both cap at 8 entries, so this adapter can use the selected position.
-            roundSelectedPositionForSingleAdapter = roundSelectedPosition;
             //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-            cycleRoundsAdapter.setFadePositions(roundSelectedPositionForSingleAdapter, -1);
+            cycleRoundsAdapter.setFadePositions(roundSelectedPosition, -1);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
-            //Subtracting to sync up total entries w/ second adapter list.
-            roundSelectedPositionForSingleAdapter = roundSelectedPosition-8;
             //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-            cycleRoundsAdapterTwo.setFadePositions(roundSelectedPositionForSingleAdapter, -1);
+            cycleRoundsAdapterTwo.setFadePositions(roundSelectedPosition-8, -1);
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
           subtractedRoundIsFading = true;
@@ -2341,55 +2334,58 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.setFadePositions(-1, roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-          //Var is reduced by 8 so second adapter can make use of positions 8 through 15.
-          roundSelectedPositionForSingleAdapter = roundSelectedPosition -8;
+
           //Since our workOutTime lists are independent of adapter and run from (up to) 0-15, we change the value of roundSelectedPosition back to original.
-          roundHolderTwo.set(roundSelectedPositionForSingleAdapter, convertedWorkoutTime.get(roundSelectedPosition));
-          typeHolderTwo.set(roundSelectedPositionForSingleAdapter, typeOfRound.get(roundSelectedPosition));
-          cycleRoundsAdapterTwo.setFadePositions(-1, roundSelectedPositionForSingleAdapter);
+          roundHolderTwo.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
+          typeHolderTwo.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
+          cycleRoundsAdapterTwo.setFadePositions(-1, roundSelectedPosition-8);
           cycleRoundsAdapterTwo.notifyDataSetChanged();
         }
       }
-      Log.i("testlist", "workout time list is " + workoutTime);
     }
   }
 
   public void removeRound () {
     //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
     if (mode==1) {
+      //
+      if (!roundIsSelected) roundSelectedPosition = workoutTime.size()-1;
+
+      //Todo: Need proper conditional for roundSelected sub.
       if (workoutTime.size()>0) {
         //Size conditionals to prevent index exceptions when fast-clicking remove.
         if (workoutTime.size()-1>=roundSelectedPosition) {
+          if (workoutTime.size()<=8 || (roundIsSelected && roundSelectedPosition<=7)) {
+            if (roundHolderOne.size()-1>=roundSelectedPosition) {
+              roundHolderOne.remove(roundSelectedPosition);
+              typeHolderOne.remove(roundSelectedPosition);
+              //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
+              cycleRoundsAdapter.setFadePositions(-1, -1);
+              cycleRoundsAdapter.notifyDataSetChanged();
+            }
+          } else {
+            if (roundHolderTwo.size()-1>=roundSelectedPosition-8) {
+              roundHolderTwo.remove(roundSelectedPosition-8);
+              typeHolderTwo.remove(roundSelectedPosition-8);
+              //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
+              cycleRoundsAdapterTwo.setFadePositions(-1,  -1);
+              cycleRoundsAdapterTwo.notifyDataSetChanged();
+            }
+          }
+
           typeOfRound.remove(roundSelectedPosition);
           workoutTime.remove(roundSelectedPosition);
           convertedWorkoutTime.remove(roundSelectedPosition);
-        }
-        //Removes rounds from our holder lists. Uses <=7 conditional since they are removed first above.
-        if (roundSelectedPosition<=7) {
-          if (roundHolderOne.size()-1>=roundSelectedPositionForSingleAdapter) {
-            roundHolderOne.remove(roundSelectedPositionForSingleAdapter);
-            typeHolderOne.remove(roundSelectedPositionForSingleAdapter);
-            //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
-            cycleRoundsAdapter.setFadePositions(-1, -1);
-            cycleRoundsAdapter.notifyDataSetChanged();
+
+          //If moving from two lists to one, set its visibility and change layout params.
+          if (workoutTime.size()==8) {
+            roundRecyclerTwo.setVisibility(View.GONE);
+            recyclerLayoutOne.leftMargin = 240;
+            roundListDivider.setVisibility(View.GONE);
           }
-        } else {
-          if (roundHolderTwo.size()-1>=roundSelectedPositionForSingleAdapter) {
-            roundHolderTwo.remove(roundSelectedPositionForSingleAdapter);
-            typeHolderTwo.remove(roundSelectedPositionForSingleAdapter);
-            //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
-            cycleRoundsAdapterTwo.setFadePositions(-1,  -1);
-            cycleRoundsAdapterTwo.notifyDataSetChanged();
-          }
+          //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
+          subtractedRoundIsFading = false;
         }
-        //If moving from two lists to one, set its visibility and change layout params.
-        if (workoutTime.size()==8) {
-          roundRecyclerTwo.setVisibility(View.GONE);
-          recyclerLayoutOne.leftMargin = 240;
-          roundListDivider.setVisibility(View.GONE);
-        }
-        //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
-        subtractedRoundIsFading = false;
       } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
     }
   }

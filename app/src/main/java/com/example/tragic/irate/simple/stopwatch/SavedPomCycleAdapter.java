@@ -75,8 +75,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PomHolder pomHolder = (PomHolder) holder;
-        Log.i("testpos", "true!");
-        Log.i("testpos", "positions are " + position);
 
         pomHolder.pomName.setText(mPomTitle.get(position));
         String tempPom = (convertTime(mPomList).get(position));
