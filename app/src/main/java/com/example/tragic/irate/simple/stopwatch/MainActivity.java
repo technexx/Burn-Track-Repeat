@@ -1651,7 +1651,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         displayMs = df2.format((msDisplay / 60) * 100);
         displayTime = convertStopwatch((long) seconds);
 
-        timeLeft.setText(displayTime);
+        if (mode==4) timeLeft.setText(displayTime);
         msTime.setText(displayMs);
         mHandler.postDelayed(this, 10);
       }
@@ -3280,6 +3280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setVisibility(View.VISIBLE);
     reset_total_times.setVisibility(View.VISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
+//    timeLeft.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
 
     //Setting values based on first round in cycle. Might make this is a global method.
@@ -3329,6 +3330,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
+        timeLeft.setVisibility(View.VISIBLE);
         timeLeft.setText(displayTime);
         msTime.setText(displayMs);
         cycles_completed.setText(R.string.laps_completed);
