@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
+  //Todo: Replace Laps completed w/ cycles when going from stopwatch to timer.
   //Todo: Should have separate timer for Stopwatch. Should be able to leave + come back to it and use it while using other timers.
   //Todo: Mode still sticking @ 4 sometimes and b0rking stuff. Also first tab will come back up w/ mode 3 adapter. Has to do w/ minimizing app.
   //Todo: Need to figure out how we're going to handle clicking out of + coming back to timers + if we want to keep mode 1/3 exclusive.
@@ -384,6 +384,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Infinity mode for Pom?
+  //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
   //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Could long svg files be a lag contributor?
@@ -494,7 +495,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void roundSelected(int position) {
     roundIsSelected = true;
     roundSelectedPosition = position;
-    Log.i("testPos", "position is " + position);
   }
 
   @Override
@@ -907,7 +907,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleRecycler.setVisibility(View.VISIBLE);
           savedPomCycleRecycler.setVisibility(View.GONE);
           total_set_header.setText(R.string.total_sets);
-        } else {
+        } else if (mode==3) {
           sortHigh.setVisibility(View.GONE);
           sortLow.setVisibility(View.GONE);
 //          //Since mode 3 only uses one adapter layout, set it here.
@@ -1011,10 +1011,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mode = 4;
       dotDraws.setMode(4);
       populateTimerUI();
+      timerDisabled = false;
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
       cycleTitleLayout.topMargin = -25;
       cycle_title_textView.setVisibility(View.INVISIBLE);
-      Log.i("testmode", "saved mode in stopwatch click is " + savedMode);
 
     });
 
@@ -1062,10 +1062,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      Log.i("testmode", "saved mode on dismiss is " + savedMode);
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
       startTimer.setEnabled(false);
       mode = savedMode;
+      dotDraws.setMode(mode);
       resetTimer();
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
@@ -3322,7 +3322,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
-        timerDisabled = false;
+        timeLeft.setText(displayTime);
+        msTime.setText(displayMs);
         //Views for stopwatch.
         total_set_header.setVisibility(View.INVISIBLE);
         total_set_time.setVisibility(View.INVISIBLE);
@@ -3332,14 +3333,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         next_round.setVisibility(View.INVISIBLE);
         reset_total_times.setVisibility(View.GONE);
         new_lap.setVisibility(View.VISIBLE);
-        timeLeft.setText("0");
-        cycles_completed.setText(getString(R.string.laps_completed, "0"));
-        //Modifies top layout.
         ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
         ConstraintLayout.LayoutParams lapRecyclerParams = (ConstraintLayout.LayoutParams) lapRecycler.getLayoutParams();
         completedLapsParam.topMargin = 0;
         lapRecyclerParams.topMargin = 60;
-        //Stopwatch always starts at 0.
         setTextSize(0);
         break;
     }
