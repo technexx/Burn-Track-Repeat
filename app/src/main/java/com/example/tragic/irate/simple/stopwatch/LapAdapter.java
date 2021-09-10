@@ -23,10 +23,7 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   List<String> mSavedLap;
   int mFirstPos;
   int mLastPos;
-  boolean mIsScrolling;
-  Animation slideInAnimation;
   onPositionCallback mOnPositionCallback;
-  int mPrevPosition;
 
   public LapAdapter(Context context, List<String> currentLap, List<String> savedLap) {
     mContext = context; mCurrentLap = currentLap; mSavedLap = savedLap;
@@ -45,10 +42,7 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     this.mFirstPos = first; this.mLastPos = last;
   }
 
-  public void listIsScrolling(boolean isScrolling) {
-    this.mIsScrolling = isScrolling;
-  }
-
+  //Todo: Drawable gradient animation onScroll?
   @NonNull
   @Override
   public LapViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -66,26 +60,6 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     holder.currentLap.setText(mCurrentLap.get(position));
     holder.savedLapTime.setText(mSavedLap.get(position));
     holder.lapNumber.setText("# " + (position+1));
-
-    //Default (full) alpha for every position.
-    holder.fullView.setAlpha(1.0f);
-
-    //When adding to list, if at least 7 laps exist, fade the last one to 0.3f and the second-to-last one to 0.7f.
-    if (mCurrentLap.size()>=7) if (position==(mLastPos)) holder.fullView.setAlpha(0.7f); else if (position==mLastPos+1) holder.fullView.setAlpha(0.3f);
-
-    //Todo: Find way to set others positions to full alpha.
-    if (mIsScrolling){
-      if (position>mPrevPosition) holder.fullView.setAlpha(0.7f); else holder.fullView.setAlpha(1.0f);
-      mPrevPosition = position;
-      mIsScrolling = false;
-    }
-
-    //Callback passes in FIRST populated position (i.e. 0 for first 8 rows, ++ thereafter), and if layout is entirely unhindered, bindView DOES call all view positions on screen.
-    mOnPositionCallback.positionCallback(position);
-
-    Log.i("testfade", "position is " + position);
-    Log.i("testfade", "first position is " + mFirstPos);
-    Log.i("testfade", "last position is " + mLastPos);
   }
 
   @Override

@@ -157,6 +157,19 @@
         app:cornerRadius="90dp">
     </com.google.android.material.button.MaterialButton>
 
+<!--    <View-->
+<!--        android:layout_width="240dp"-->
+<!--        android:layout_height="240dp"-->
+<!--        android:background="@drawable/black_gradient_background"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/cycles_completed"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:paddingStart="10dp"-->
+<!--        android:paddingEnd="10dp"-->
+<!--        android:paddingTop="10dp"-->
+<!--        android:paddingBottom="10dp">-->
+<!--    </View>-->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lap_recycler"
         android:layout_width="240dp"
@@ -164,11 +177,11 @@
         app:layout_constraintTop_toBottomOf="@id/cycles_completed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/recycler_border"
+        android:background="@drawable/black_gradient_background"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp">
     </androidx.recyclerview.widget.RecyclerView>
 
     <TextView

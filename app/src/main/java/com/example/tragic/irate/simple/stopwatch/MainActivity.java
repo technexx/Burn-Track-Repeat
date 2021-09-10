@@ -364,12 +364,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Break time textView disappearing in Pom edit after switching.
+  int prevFirst;
+  int prevLast;
+
+  //Todo: Color schemes.
+  //Todo: Lap adapter stuff.
+  //Todo: Minimize/maximize on stopwatch flashes Main briefly.
+  //Todo: Exiting stopwatch + relaunching resets time but also keeps it running.
+  //Todo: Text size on stopwatch doesn't change w/ more digits - may run outside of circle.
   //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
   //Todo: Double rows in Pom for aesthetics and to fill svohorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
-  //Todo: On edited cycles, show textView instead of editText first.
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
   //Todo: Need lap fades to remain while scrolling.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -888,6 +894,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.setMode(3);
             break;
         }
+        savedMode = mode;
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.
         removeEditTimerViews(false);
         defaultEditRoundViews();
@@ -1050,9 +1057,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      mode = savedMode;
       resetTimer();
-      //If stopwatch is active (mode 4), set our mode back to whichever tab we were on previously, saved w/ in our stopwatch launch onClick.
-      if (mode==4) mode = savedMode;
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -1223,17 +1229,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(() -> {
           //Since we have deleted every position in selected list, clear the list.
           receivedHighlightPositions.clear();
-          //If there are no cycles left, cancel highlight mode. If there are any left, simply remove all highlights.
-          if (receivedHighlightPositions.size()>0) savedCycleAdapter.removeHighlight(false); else {
-            cancelHighlight.setVisibility(View.INVISIBLE);
-            edit_highlighted_cycle.setVisibility(View.INVISIBLE);
-            delete_highlighted_cycle.setVisibility(View.INVISIBLE);
-            appHeader.setVisibility(View.VISIBLE);
+          cancelHighlight.setVisibility(View.INVISIBLE);
+          edit_highlighted_cycle.setVisibility(View.INVISIBLE);
+          delete_highlighted_cycle.setVisibility(View.INVISIBLE);
+          appHeader.setVisibility(View.VISIBLE);
 
-            if (mode==1) savedCycleAdapter.removeHighlight(true);
-            if (mode==3) savedPomCycleAdapter.removeHighlight(true);
-            Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-          }
+          if (mode==1) savedCycleAdapter.removeHighlight(true);
+          if (mode==3) savedPomCycleAdapter.removeHighlight(true);
+          Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
         });
       });
     });
@@ -1537,12 +1540,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         super.onScrollStateChanged(recyclerView, newState);
       }
 
-      //This listens everywhere. It's bindView that restricts its refresh to top 2/bottom 2 rows.
       @Override
       public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
-        getVisibleLapPositions();
-        if (dy!=0) lapAdapter.listIsScrolling(true);
       }
     });
 
@@ -2188,6 +2188,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRowTextView.setVisibility(View.VISIBLE);
         firstRowAddButton.setVisibility(View.VISIBLE);
         firstRowSubtractButton.setVisibility(View.VISIBLE);
+        secondRowTextView.setVisibility(View.VISIBLE);
         secondRowAddButton.setVisibility(View.VISIBLE);
         secondRowSubtractButton.setVisibility(View.VISIBLE);
         thirdRowEditTextView.setVisibility(View.VISIBLE);
@@ -2932,13 +2933,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (timeLeft.getTextSize() != 90f) timeLeft.setTextSize(90f);
       return df.format(seconds);
     }
-  }
-
-  //Retrieves visible positions from recyclerView and passes them into adapter for use in fading effect.
-  public void getVisibleLapPositions() {
-    int first = lapLayout.findFirstVisibleItemPosition();
-    int last = lapLayout.findLastVisibleItemPosition();
-    lapAdapter.receiveVisiblePositions(first, last);
   }
 
   public void newLap() {
