@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView delete_edit_cycle;
 
   int mode = 1;
-  int savedMode;
+  int savedMode = 1;
   int sortMode = 1;
   int sortModePom = 1;
   int sortHolder = 1;
@@ -252,8 +252,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView timeLeft;
   TextView msTime;
   CountDownTimer timer;
+  CountDownTimer timerPom;
   TextView reset;
   ObjectAnimator objectAnimator;
+  ObjectAnimator objectAnimatorPom;
   Animation endAnimation;
 
   TextView cycle_title_textView;
@@ -364,16 +366,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  int prevFirst;
-  int prevLast;
-
+  //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
+  //Todo: Should have separate timer for Stopwatch. Should be able to leave + come back to it and use it while using other timers.
+  //Todo: Mode still sticking @ 4 sometimes and b0rking stuff. Also first tab will come back up w/ mode 3 adapter. Has to do w/ minimizing app.
+  //Todo: Need to figure out how we're going to handle clicking out of + coming back to timers + if we want to keep mode 1/3 exclusive.
   //Todo: Color schemes.
   //Todo: Lap adapter stuff.
   //Todo: Minimize/maximize on stopwatch flashes Main briefly.
-  //Todo: Exiting stopwatch + relaunching resets time but also keeps it running.
   //Todo: Text size on stopwatch doesn't change w/ more digits - may run outside of circle.
   //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
-  //Todo: Double rows in Pom for aesthetics and to fill svohorter space? Consider nixxing the list aspect since it's always 8 rows.
+  //Todo: Double rows in Pom for aesthetics and to fill shorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new.
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
@@ -894,7 +896,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.setMode(3);
             break;
         }
-        savedMode = mode;
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.
         removeEditTimerViews(false);
         defaultEditRoundViews();
@@ -988,6 +989,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+      startTimer.setEnabled(true);
       //Default row selection.
       resetRows();
       cycleNameEdit.getText().clear();
@@ -1003,6 +1005,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAdapterArrays();
     });
 
+    //Todo: Once dismissed, mode gets set back to savedMode
     stopwatch.setOnClickListener(v-> {
       savedMode = mode;
       mode = 4;
@@ -1011,6 +1014,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
       cycleTitleLayout.topMargin = -25;
       cycle_title_textView.setVisibility(View.INVISIBLE);
+      Log.i("testmode", "saved mode in stopwatch click is " + savedMode);
+
     });
 
     //Showing sort popup window.
@@ -1057,6 +1062,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      Log.i("testmode", "saved mode on dismiss is " + savedMode);
+      //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
+      startTimer.setEnabled(false);
       mode = savedMode;
       resetTimer();
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
@@ -1132,6 +1140,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
+      //No potential index issues here, so enable timer start.
+      startTimer.setEnabled(true);
       currentlyEditingACycle = true;
       //Default row selection.
       resetRows();
@@ -2511,19 +2521,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Clears the two lists of actual timer values we are populating.
         workoutTime.clear();
         typeOfRound.clear();
-        //Populating our current cycle's list of rounds via Integer Arrays directly with adapter String list values, instead of querying them from the database. This is used whenever we do not need a db query, such as editing or adding a new cycle.
-        String[] fetchedRounds = workoutCyclesArray.get(receivedPos).split(" - ");
-        String[] fetchedRoundType = typeOfRoundArray.get(receivedPos).split(" - ");
 
-        for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
-        for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
-        cycleTitle = workoutTitleArray.get(receivedPos);
+        if (workoutCyclesArray.size()-1>=receivedPos) {
+          //Populating our current cycle's list of rounds via Integer Arrays directly with adapter String list values, instead of querying them from the database. This is used whenever we do not need a db query, such as editing or adding a new cycle.
+          String[] fetchedRounds = workoutCyclesArray.get(receivedPos).split(" - ");
+          String[] fetchedRoundType = typeOfRoundArray.get(receivedPos).split(" - ");
+
+          for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
+          for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
+          cycleTitle = workoutTitleArray.get(receivedPos);
+          startTimer.setEnabled(true);
+        }
         break;
       case 3:
         pomValuesTime.clear();
-        String[] fetchedPomCycle = pomArray.get(receivedPos).split(" - ");
-        for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
-        cycleTitle = pomTitleArray.get(receivedPos);
+        if (pomArray.size()-1>=receivedPos) {
+          String[] fetchedPomCycle = pomArray.get(receivedPos).split(" - ");
+          for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
+          cycleTitle = pomTitleArray.get(receivedPos);
+          startTimer.setEnabled(true);
+        }
         break;
     }
   }
