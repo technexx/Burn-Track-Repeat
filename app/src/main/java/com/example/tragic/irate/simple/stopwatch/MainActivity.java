@@ -1071,9 +1071,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
         savedCycleAdapter.notifyDataSetChanged();
-      } else {
+      } else if (mode==3){
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleAdapter.notifyDataSetChanged();
+      } else if (mode==4) {
+        //Todo: Different textView for stopwatch time since we're keeping it active on dismissal
       }
 
       launchingTimer = false;
@@ -1661,6 +1663,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     reset.setOnClickListener(v -> {
+      Log.i("testMode", "mode is " + mode);
       if (mode != 3) resetTimer();
       else {
         if (reset.getText().equals(getString(R.string.reset)))
@@ -3263,6 +3266,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void populateTimerUI() {
+    cycles_completed.setText(R.string.cycles_done);
+    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+
     cycle_title_textView.setText(cycleTitle);
     dotDraws.resetDotAlpha();
     //Default views for Timer.
@@ -3274,6 +3280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setVisibility(View.VISIBLE);
     reset_total_times.setVisibility(View.VISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
+    msTime.setVisibility(View.INVISIBLE);
 
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
@@ -3312,7 +3319,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
-        //Here is where we set the initial millis Value of first pomMillis. Set again on change on our value runnables.
+        //Here is where we set the initial millis Value  of first pomMillis. Set again on change on our value runnables.
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
@@ -3324,6 +3331,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 4:
         timeLeft.setText(displayTime);
         msTime.setText(displayMs);
+        cycles_completed.setText(R.string.laps_completed);
+        cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
         //Views for stopwatch.
         total_set_header.setVisibility(View.INVISIBLE);
         total_set_time.setVisibility(View.INVISIBLE);
@@ -3333,6 +3342,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         next_round.setVisibility(View.INVISIBLE);
         reset_total_times.setVisibility(View.GONE);
         new_lap.setVisibility(View.VISIBLE);
+        msTime.setVisibility(View.VISIBLE);
         ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
         ConstraintLayout.LayoutParams lapRecyclerParams = (ConstraintLayout.LayoutParams) lapRecycler.getLayoutParams();
         completedLapsParam.topMargin = 0;
@@ -3393,7 +3403,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         empty_laps.setVisibility(View.VISIBLE);
         break;
     }
-    populateTimerUI();
+    //Todo: This b0rks timeLeft in stopwatch.
+    if (mode!=4) populateTimerUI();
   }
 
   public void saveTotalTimes() {
