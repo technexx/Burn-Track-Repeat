@@ -325,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean timerEnded;
   boolean timerDisabled;
   boolean timerIsPaused = true;
+  boolean stopWatchIsPaused = true;
 
   ObjectAnimator fadeInObj;
   ObjectAnimator fadeOutObj;
@@ -366,9 +367,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Replace Laps completed w/ cycles when going from stopwatch to timer.
-  //Todo: Should have separate timer for Stopwatch. Should be able to leave + come back to it and use it while using other timers.
-  //Todo: Mode still sticking @ 4 sometimes and b0rking stuff. Also first tab will come back up w/ mode 3 adapter. Has to do w/ minimizing app.
   //Todo: Need to figure out how we're going to handle clicking out of + coming back to timers + if we want to keep mode 1/3 exclusive.
   //Todo: Color schemes.
   //Todo: Lap adapter stuff.
@@ -1005,17 +1003,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAdapterArrays();
     });
 
-    //Todo: Once dismissed, mode gets set back to savedMode
     stopwatch.setOnClickListener(v-> {
       savedMode = mode;
       mode = 4;
       dotDraws.setMode(4);
       populateTimerUI();
-      timerDisabled = false;
-      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-      cycleTitleLayout.topMargin = -25;
-      cycle_title_textView.setVisibility(View.INVISIBLE);
-
     });
 
     //Showing sort popup window.
@@ -1680,7 +1672,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     pauseResumeButton.setOnClickListener(v -> {
-      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+      if (mode!=4) if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+      else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
     delete_all_cancel.setOnClickListener(v -> {
@@ -2965,7 +2958,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     double savedMs = 0;
 
     String[] holder = null;
-    if (!timerIsPaused) {
+    if (!stopWatchIsPaused) {
       if (savedLapList.size() > 0) {
         holder = (savedLapList.get(savedLapList.size() - 1).split(":", 3));
         savedMinutes = newMinutes + Integer.parseInt(holder[0]);
@@ -3248,7 +3241,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (fadeInObj != null) fadeInObj.cancel();
           if (pausing == RESUMING_TIMER) {
             reset.setVisibility(View.INVISIBLE);
-            timerIsPaused = false;
+            stopWatchIsPaused = false;
             new_lap.setAlpha(1.0f);
             new_lap.setEnabled(true);
             //Main runnable for Stopwatch.
@@ -3256,7 +3249,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           } else if (pausing == PAUSING_TIMER) {
             reset.setVisibility(View.VISIBLE);
             mHandler.removeCallbacksAndMessages(null);
-            timerIsPaused = true;
+            stopWatchIsPaused = true;
             new_lap.setAlpha(0.3f);
             new_lap.setEnabled(false);
             break;
@@ -3350,6 +3343,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         completedLapsParam.topMargin = 0;
         lapRecyclerParams.topMargin = 60;
         setTextSize(0);
+
+        timerDisabled = false;
+        timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+        cycleTitleLayout.topMargin = -25;
+        cycle_title_textView.setVisibility(View.INVISIBLE);
+        if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
         break;
     }
   }
@@ -3401,11 +3400,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (savedLapList.size() > 0) savedLapList.clear();
         lapsNumber = 0;
         cycles_completed.setText(getString(R.string.laps_completed, "0"));
+
+        stopWatchIsPaused = true;
         lapAdapter.notifyDataSetChanged();
         empty_laps.setVisibility(View.VISIBLE);
         break;
     }
-    //Todo: This b0rks timeLeft in stopwatch.
+    //Base of 0 values for stopwatch means we don't want anything populated when resetting.
     if (mode!=4) populateTimerUI();
   }
 
