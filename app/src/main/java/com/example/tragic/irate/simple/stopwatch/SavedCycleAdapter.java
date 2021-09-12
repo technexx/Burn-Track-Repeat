@@ -48,6 +48,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   CharSequence permSpan;
   Spannable span;
   ImageSpan imageSpan;
+  boolean mActiveCycle;
+  int mPositionOfActiveCycle;
+  int mNumberOfRoundsCompleted;
 
   public interface onCycleClickListener {
     void onCycleClick (int position);
@@ -81,6 +84,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (cancelMode) mHighlightMode = false;
   }
 
+  public void activeCycle(int positionOfCycle, int numberOfRoundsCompleted) {
+    mActiveCycle = true; mPositionOfActiveCycle = positionOfCycle; mNumberOfRoundsCompleted = numberOfRoundsCompleted;
+    Log.i("testPos", "constructor position is " + mPositionOfActiveCycle);
+
+  }
+
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -94,8 +103,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     //Used to store highlighted positions that we callback to Main to delete.
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
-    workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
 
+    workoutHolder.resumeCycle.setVisibility(View.GONE);
+    workoutHolder.resetCycle.setVisibility(View.GONE);
+    //Adds text to resume/reset underneath active cycle.
+    if (mActiveCycle) {
+      if (position==mPositionOfActiveCycle) {
+        workoutHolder.resumeCycle.setVisibility(View.VISIBLE);
+        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+        //Todo: This is different after adding a cycle, but receivedPos in Main is same.
+        Log.i("testPos", "adapter position is " + mPositionOfActiveCycle);
+      }
+    }
+
+    workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.
     permSpan = "";
     //Retrieves the concatenated String of workout TIMES from current position.
@@ -129,7 +150,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           tempSpace = 2;
         } else {
           span = new SpannableString(" " + bullet);
-          //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
           tempSpace = 1;
         }
 
@@ -144,6 +164,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       } else
         span.setSpan(new ForegroundColorSpan(Color.RED), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
       if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
         //If using infinity drawable, increase its size.
         span.setSpan(new AbsoluteSizeSpan(18, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
@@ -151,6 +172,17 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         //Using different placement of image in spannable for first round, since we do not want it spaced out (i.e. indented).
         if (j != 0) span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         else span.setSpan(imageSpan, 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+      }
+
+      //If a cycle is active, change color of completed rounds to "greyed out" version of original color.
+      if (mActiveCycle) {
+        if (position==mPositionOfActiveCycle) {
+          if (j<=mNumberOfRoundsCompleted-1) {
+            if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")){
+              span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_green)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            } else span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_red)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+          }
+        }
       }
       //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
       permSpan = TextUtils.concat(permSpan, span);
@@ -240,6 +272,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView workoutName;
     public TextView workOutCycle;
     public View fullView;
+    public TextView resumeCycle;
+    public TextView resetCycle;
 
     @SuppressLint("ResourceAsColor")
     public WorkoutHolder(@NonNull View itemView) {
@@ -247,6 +281,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       fullView = itemView;
+      resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button);
+      resetCycle = itemView.findViewById(R.id.reset_active_cycle_button);
     }
   }
 

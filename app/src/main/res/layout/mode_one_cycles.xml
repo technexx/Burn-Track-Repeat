@@ -30,10 +30,34 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        app:layout_constraintTop_toBottomOf="@id/saved_custom_set_view"
+        app:layout_constraintTop_toBottomOf="@id/reset_active_cycle_button"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="2dp"
         android:background="@color/dark_grey">
     </View>
+
+    <TextView
+        android:text="Resume"
+        android:id="@+id/resume_active_cycle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/saved_custom_set_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/reset_active_cycle_button"
+        android:layout_marginTop="6dp"
+        android:textSize="15sp">
+    </TextView>
+
+    <TextView
+        android:text="Reset"
+        android:id="@+id/reset_active_cycle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/saved_custom_set_view"
+        app:layout_constraintStart_toEndOf="@id/resume_active_cycle_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="6dp"
+        android:textSize="15sp">
+    </TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

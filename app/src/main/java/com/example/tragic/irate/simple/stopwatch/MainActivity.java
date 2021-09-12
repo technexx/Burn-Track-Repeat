@@ -367,17 +367,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int scrollPosition;
   boolean launchingTimer;
 
-  //Todo: Need to figure out how we're going to handle clicking out of + coming back to timers + if we want to keep mode 1/3 exclusive.
+  //Todo: Use 3 button splash menu for timer/pom/stopwatch?
+  //Todo: Should actually, esp w/ below, have sep values for each mode. Also presents saving issue when exiting app.
+  //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
+  //Todo: Grey out completed rounds in Main for active timer.
   //Todo: Color schemes.
   //Todo: Lap adapter stuff.
-  //Todo: Minimize/maximize on stopwatch flashes Main briefly.
+  //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating.
   //Todo: Text size on stopwatch doesn't change w/ more digits - may run outside of circle.
   //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
   //Todo: Double rows in Pom for aesthetics and to fill shorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
-  //Todo: Some other indication in edit mode that a cycle is part of db and not new.
+  //Todo: Some other indication in edit mode that a cycle is part of db and not new (just an "editing" notation would work).
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
-  //Todo: Need lap fades to remain while scrolling.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change progressBarValueHolder.
   //Todo: Save total sets/breaks and completed by day option?
@@ -388,14 +390,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Could long svg files be a lag contributor?
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Make sure sort checkmark positions work on different size screens.
-  //Todo: Fade animation for all menus that don't have them yet (e.g. onOptions).
-  //Todo: Add taskbar notification for timers.
+  //Todo: Add taskbar notification for timers. Add vibrations.
   //Todo: Add color scheme options.
   //Todo: Rename app, of course.
   //Todo: Add onOptionsSelected dots for About, etc.
   //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
   //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
-  //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable.
+  //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable when re-orienting.
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
 
@@ -421,6 +422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onCycleClick(int position) {
     AsyncTask.execute(()-> {
+      isNewCycle = false;
       receivedPos = position;
       //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
       populateRoundList();
@@ -1054,6 +1056,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      if (!isNewCycle) {
+        savedCycleAdapter.activeCycle(receivedPos, workoutCyclesArray.size()-numberOfRoundsLeft);
+      } else savedCycleAdapter.activeCycle(workoutCyclesArray.size()-1, workoutCyclesArray.size()-numberOfRoundsLeft);
+      Log.i("testPos", "received pos is " + receivedPos);
+      Log.i("testPos", "list is " + workoutCyclesArray);
+      Log.i("testPos", "new cycle boolean is " + isNewCycle);
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
       startTimer.setEnabled(false);
       mode = savedMode;
@@ -1066,8 +1074,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else if (mode==3){
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleAdapter.notifyDataSetChanged();
-      } else if (mode==4) {
-        //Todo: Different textView for stopwatch time since we're keeping it active on dismissal
       }
 
       launchingTimer = false;
@@ -1655,7 +1661,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     reset.setOnClickListener(v -> {
-      Log.i("testMode", "mode is " + mode);
       if (mode != 3) resetTimer();
       else {
         if (reset.getText().equals(getString(R.string.reset)))

@@ -29,4 +29,6 @@
     <color name="test_grey">#616161</color>
     <color name="light_black">#263238</color>
     <color name="blue">#1976D2</color>
+    <color name="greyed_green">#004D40</color>
+    <color name="greyed_red">#B71C1C</color>
 </resources>
