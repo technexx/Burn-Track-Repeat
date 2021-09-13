@@ -367,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long baseTime;
   long countUpMillisHolder;
   int scrollPosition;
-  boolean launchingTimer;
+  boolean makeCycleAdapterVisible;
   int activeCyclePosition;
 
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
@@ -424,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
     if (resumingOrResetting==RESUMING_CYCLE) timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-
     else {
       savedCycleAdapter.removeActiveCycleLayout();
       savedCycleAdapter.notifyDataSetChanged();
@@ -432,9 +431,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Remove res/resume
   //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
+    savedCycleAdapter.removeActiveCycleLayout();
     isNewCycle = false;
     positionOfSelectedCycle = position;
     //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
@@ -751,6 +752,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset_total_times = timerPopUpView.findViewById(R.id.reset_total_times);
     empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
     if (mode!=4) empty_laps.setVisibility(View.INVISIBLE);
+    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
 
     cycleTitleLayout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
 
@@ -1069,17 +1071,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
-      savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
-      //Sets current active cycle to the one selected.
-      activeCyclePosition = positionOfSelectedCycle;
+      //Only shows restart/resume options of a cycle has been started.
+      if (objectAnimator.isStarted() || startRounds-numberOfRoundsLeft>0) {
+        if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
+        savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
+        //Sets current active cycle to the one selected.
+        activeCyclePosition = positionOfSelectedCycle;
+      }
 
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
       startTimer.setEnabled(false);
       mode = savedMode;
       dotDraws.setMode(mode);
-      //Todo: reset does other stuff too. may be easier to just save vars. populateUI resets other stuff we need to keep when resuming.
-//      resetTimer();
       pauseAndResumeTimer(PAUSING_TIMER);
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
@@ -1090,7 +1093,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       }
 
-      launchingTimer = false;
+      makeCycleAdapterVisible = false;
       checkEmptyCycles();
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Saves total times + cycle count.
@@ -1123,7 +1126,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setOnDismissListener(() -> {
       checkEmptyCycles();
       //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
-      if (!launchingTimer) {
+      if (!makeCycleAdapterVisible) {
         if (mode==1) {
           savedCycleAdapter.notifyDataSetChanged();
           savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -2561,9 +2564,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean newCycle, boolean saveToDB) {
+    //Resets and sets timer values.
     resetTimer();
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
-    launchingTimer = true;
+    makeCycleAdapterVisible = true;
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
     // If we are launching a new cycle, set a conditional for an empty title, a conditional for an empty list, and run the saveCycles() method to automatically save it in our database. For both new and old cycles, send all necessary intents to our Timer class.
     if (newCycle) {
