@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, LapAdapter.onPositionCallback {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, LapAdapter.onPositionCallback, SavedCycleAdapter.onResumeOrResetCycle {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortMode = 1;
   int sortModePom = 1;
   int sortHolder = 1;
-  int receivedPos;
+  int positionOfSelectedCycle;
   String cycleTitle = "";
   List<String> receivedHighlightPositions;
 
@@ -271,6 +271,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
+  int RESUMING_CYCLE = 1;
+  int RESETTING_CyCLE = 2;
 
   long setMillis;
   long totalSetMillis;
@@ -366,6 +368,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisHolder;
   int scrollPosition;
   boolean launchingTimer;
+  int activeCyclePosition;
 
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Should actually, esp w/ below, have sep values for each mode. Also presents saving issue when exiting app.
@@ -418,17 +421,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     scrollPosition = position;
   }
 
+  @Override
+  public void ResumeOrResetCycle(int resumingOrResetting) {
+    if (resumingOrResetting==RESUMING_CYCLE) timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+
+    else {
+      savedCycleAdapter.removeActiveCycleLayout();
+      savedCycleAdapter.notifyDataSetChanged();
+      resetTimer();
+    }
+  }
+
   //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
-    AsyncTask.execute(()-> {
-      isNewCycle = false;
-      receivedPos = position;
-      //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
-      populateRoundList();
-      //If clicking on a cycle to launch, it will always be an existing one, and we do not want to call a save method since it is unedited.
-      launchTimerCycle(false, false);
-    });
+    isNewCycle = false;
+    positionOfSelectedCycle = position;
+    //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
+    populateRoundList();
+    //If clicking on a cycle to launch, it will always be an existing one, and we do not want to call a save method since it is unedited.
+    launchTimerCycle(false, false);
   }
 
   //Receives highlighted positions from our adapter.
@@ -787,6 +799,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Instantiating callbacks from adapter.
         savedCycleAdapter.setItemClick(MainActivity.this);
         savedCycleAdapter.setHighlight(MainActivity.this);
+        savedCycleAdapter.setResumeOrResetCycle(MainActivity.this);
 
         savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
         savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
@@ -932,7 +945,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.removeHighlight(true);
         savedPomCycleAdapter.removeHighlight(true);
         //Resets callback vars for clicked positions and highlighted positions when switching tabs.
-        receivedPos = 0;
+        positionOfSelectedCycle = 0;
         receivedHighlightPositions.clear();
       }
 
@@ -1056,17 +1069,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      if (!isNewCycle) {
-        savedCycleAdapter.activeCycle(receivedPos, workoutCyclesArray.size()-numberOfRoundsLeft);
-      } else savedCycleAdapter.activeCycle(workoutCyclesArray.size()-1, workoutCyclesArray.size()-numberOfRoundsLeft);
-      Log.i("testPos", "received pos is " + receivedPos);
-      Log.i("testPos", "list is " + workoutCyclesArray);
-      Log.i("testPos", "new cycle boolean is " + isNewCycle);
+      if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
+      savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
+      //Sets current active cycle to the one selected.
+      activeCyclePosition = positionOfSelectedCycle;
+
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
       startTimer.setEnabled(false);
       mode = savedMode;
       dotDraws.setMode(mode);
-      resetTimer();
+      //Todo: reset does other stuff too. may be easier to just save vars. populateUI resets other stuff we need to keep when resuming.
+//      resetTimer();
+      pauseAndResumeTimer(PAUSING_TIMER);
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -1152,7 +1166,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.showAsDropDown(tabLayout);
 
       //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
-      receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
+      positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
       //Clears old array values.
       clearRoundAdapterArrays();
       //Uses this single position to retrieve cycle and populate timer arrays.
@@ -1230,7 +1244,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         //First query to get current list of rows.
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
-          receivedPos = Integer.parseInt(receivedHighlightPositions.get(i));
+          positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
           //Using each received position, deletes the cycle from the database.
           deleteCycle(false);
           //Using each received position, deletes the cycle's values from its adapter arrays.
@@ -1256,7 +1270,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!isNewCycle) {
         AsyncTask.execute(()-> {
           //Position of the
-          receivedPos = Integer.parseInt(receivedHighlightPositions.get(0));
+          positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
           deleteCycle(false);
           editCycleList(DELETING_CYCLE);
         });
@@ -2494,23 +2508,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else if (action == EDITING_CYCLE) {
       if (mode==1) {
         //If we have the values in our workOutTime and typeOFRound arrays already, simply pass them into cycleList's adapter arrays.
-        workoutTitleArray.set(receivedPos, cycleTitle);
-        workoutCyclesArray.set(receivedPos, workoutString);
-        typeOfRoundArray.set(receivedPos, roundTypeString);
+        workoutTitleArray.set(positionOfSelectedCycle, cycleTitle);
+        workoutCyclesArray.set(positionOfSelectedCycle, workoutString);
+        typeOfRoundArray.set(positionOfSelectedCycle, roundTypeString);
       }
       if (mode==3) {
-        pomTitleArray.set(receivedPos, cycleTitle);
-        pomArray.set(receivedPos, pomString);
+        pomTitleArray.set(positionOfSelectedCycle, cycleTitle);
+        pomArray.set(positionOfSelectedCycle, pomString);
       }
     } else if (action == DELETING_CYCLE) {
       if (mode==1) {
-        workoutTitleArray.remove(receivedPos);
-        typeOfRoundArray.remove(receivedPos);
-        workoutCyclesArray.remove(receivedPos);
+        workoutTitleArray.remove(positionOfSelectedCycle);
+        typeOfRoundArray.remove(positionOfSelectedCycle);
+        workoutCyclesArray.remove(positionOfSelectedCycle);
       }
       if (mode==3) {
-        pomTitleArray.remove(receivedPos);
-        pomArray.remove(receivedPos);
+        pomTitleArray.remove(positionOfSelectedCycle);
+        pomArray.remove(positionOfSelectedCycle);
       }
     }
   }
@@ -2523,23 +2537,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.clear();
         typeOfRound.clear();
 
-        if (workoutCyclesArray.size()-1>=receivedPos) {
+        if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
           //Populating our current cycle's list of rounds via Integer Arrays directly with adapter String list values, instead of querying them from the database. This is used whenever we do not need a db query, such as editing or adding a new cycle.
-          String[] fetchedRounds = workoutCyclesArray.get(receivedPos).split(" - ");
-          String[] fetchedRoundType = typeOfRoundArray.get(receivedPos).split(" - ");
+          String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
+          String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
 
           for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
           for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
-          cycleTitle = workoutTitleArray.get(receivedPos);
+          cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
           startTimer.setEnabled(true);
         }
         break;
       case 3:
         pomValuesTime.clear();
-        if (pomArray.size()-1>=receivedPos) {
-          String[] fetchedPomCycle = pomArray.get(receivedPos).split(" - ");
+        if (pomArray.size()-1>=positionOfSelectedCycle) {
+          String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
           for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
-          cycleTitle = pomTitleArray.get(receivedPos);
+          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
           startTimer.setEnabled(true);
         }
         break;
@@ -2547,6 +2561,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean newCycle, boolean saveToDB) {
+    resetTimer();
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     launchingTimer = true;
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
@@ -2558,16 +2573,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return;
       }
       //Since this is a new Cycle, we automatically save it to database.
-      saveCycles(true);
+      AsyncTask.execute(()-> saveCycles(true));
     } else {
       //Updates changes made to cycle if we are launching it.
-      if (saveToDB) saveCycles(false);
+      if (saveToDB) AsyncTask.execute(()-> saveCycles(false));
     }
     //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
     mHandler.postDelayed(()-> {
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
       editCyclesPopupWindow.dismiss();
-      populateTimerUI();
     },10);
   }
 
@@ -2590,7 +2604,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
         if (newCycle) cycles = new Cycles(); else if (cyclesList.size()>0) {
-          cycleID = cyclesList.get(receivedPos).getId();
+          cycleID = cyclesList.get(positionOfSelectedCycle).getId();
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
         }
         ///*----All of this occurs whether we are saving a new cycle, or launching a cycle currently in the database.----*///
@@ -2632,7 +2646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         if (newCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
-          cycleID = pomCyclesList.get(receivedPos).getId();
+          cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
           pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
         }
         pomString = gson.toJson(pomValuesTime);
@@ -2665,7 +2679,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (!deleteAll) {
-          cycleID = cyclesList.get(receivedPos).getId();
+          cycleID = cyclesList.get(positionOfSelectedCycle).getId();
           cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deleteCycle(cycles);
           runOnUiThread(()-> {
@@ -2687,7 +2701,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         if (!deleteAll) {
-          cycleID = pomCyclesList.get(receivedPos).getId();
+          cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
           pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
           cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
           runOnUiThread(()-> {

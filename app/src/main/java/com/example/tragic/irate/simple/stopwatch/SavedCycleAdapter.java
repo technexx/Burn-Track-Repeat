@@ -42,6 +42,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mWorkoutTitle;
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
+  onResumeOrResetCycle mOnResumeOrResetCycle;
+  int RESUMING_CYCLE = 1;
+  int RESETTING_CyCLE = 2;
   boolean mHighlightDeleted;
   boolean mHighlightMode;
   List<String> mPositionList;
@@ -60,12 +63,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
   }
 
+  public interface onResumeOrResetCycle{
+    void ResumeOrResetCycle(int resumingOrResetting);
+  }
+
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
     this.mOnCycleClickListener = xOnCycleClickListener;
   }
 
   public void setHighlight(onHighlightListener xOnHighlightListener) {
     this.mOnHighlightListener = xOnHighlightListener;
+  }
+
+  public void setResumeOrResetCycle(onResumeOrResetCycle xOnResumeOrResetCycle) {
+    this.mOnResumeOrResetCycle = xOnResumeOrResetCycle;
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
@@ -84,10 +95,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (cancelMode) mHighlightMode = false;
   }
 
-  public void activeCycle(int positionOfCycle, int numberOfRoundsCompleted) {
+  public void showActiveCycleLayout(int positionOfCycle, int numberOfRoundsCompleted) {
     mActiveCycle = true; mPositionOfActiveCycle = positionOfCycle; mNumberOfRoundsCompleted = numberOfRoundsCompleted;
-    Log.i("testPos", "constructor position is " + mPositionOfActiveCycle);
+  }
 
+  public void removeActiveCycleLayout() {
+    mActiveCycle = false;
   }
 
   @NonNull
@@ -111,8 +124,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resumeCycle.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
-        //Todo: This is different after adding a cycle, but receivedPos in Main is same.
-        Log.i("testPos", "adapter position is " + mPositionOfActiveCycle);
+        workoutHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE));
+        workoutHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CyCLE));
       }
     }
 
@@ -177,6 +190,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //If a cycle is active, change color of completed rounds to "greyed out" version of original color.
       if (mActiveCycle) {
         if (position==mPositionOfActiveCycle) {
+          Log.i("testPos", "number completed is " + mNumberOfRoundsCompleted);
           if (j<=mNumberOfRoundsCompleted-1) {
             if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")){
               span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_green)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);

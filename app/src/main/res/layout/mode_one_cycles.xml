@@ -45,6 +45,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reset_active_cycle_button"
         android:layout_marginTop="6dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:textSize="15sp">
     </TextView>
 
@@ -57,6 +59,8 @@
         app:layout_constraintStart_toEndOf="@id/resume_active_cycle_button"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="6dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:textSize="15sp">
     </TextView>
 
