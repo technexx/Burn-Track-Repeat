@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageView toggleInfinityRoundsForSets;
   ImageView toggleInfinityRoundsForBreaks;
   View anchorViewForEditRows;
-  ImageButton startTimer;
+  ImageButton buttonToLaunchTimer;
 
   ArrayList<Integer> workoutTime;
   ArrayList<String> convertedWorkoutTime;
@@ -346,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Always true initially, since infinity mode starts at 0.
   boolean textSizeReduced = true;
 
-  ArrayList<String> workoutArray;
   ArrayList<String> setsArray;
   ArrayList<String> breaksArray;
   ArrayList<String> breaksOnlyArray;
@@ -355,7 +354,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<Integer> breaksOnlyTime;
   ArrayList<Integer> zeroArraySets;
   ArrayList<Integer> zeroArrayBreaks;
-
   int receivedAlpha;
   MaterialButton pauseResumeButton;
 
@@ -363,12 +361,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisBreaks;
   public Runnable secondsUpSetRunnable;
   public Runnable secondsUpBreakRunnable;
+  public Runnable postRoundRunnableForFirstMode;
 
   long baseTime;
   long countUpMillisHolder;
   int scrollPosition;
   boolean makeCycleAdapterVisible;
   int activeCyclePosition;
+  boolean beginTimerForNextRound;
 
   //Todo: If dismissing timer during end animation, does not pause it.
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
@@ -425,7 +425,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //For resume/reset onClicks within cycle adapter.
   @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
-    if (resumingOrResetting==RESUMING_CYCLE) timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+    if (resumingOrResetting==RESUMING_CYCLE) {
+      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+      //Sets paused boolean to true, so next timer click will resume.
+      timerIsPaused = true;
+    }
     else if (resumingOrResetting==RESETTING_CyCLE){
       savedCycleAdapter.removeActiveCycleLayout();
       savedCycleAdapter.notifyDataSetChanged();
@@ -613,7 +617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRoundsForSets = editCyclesPopupView.findViewById(R.id.s1_up);
     toggleInfinityRoundsForBreaks = editCyclesPopupView.findViewById(R.id.s2_up);
     anchorViewForEditRows = editCyclesPopupView.findViewById(R.id.anchorViewForEditRows);
-    startTimer = editCyclesPopupView.findViewById(R.id.startTimer);
+    buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     save_edit_cycle = editCyclesPopupView.findViewById(R.id.save_edit_cycle);
     delete_edit_cycle = editCyclesPopupView.findViewById(R.id.delete_edit_cycle);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
@@ -1003,7 +1007,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
-      startTimer.setEnabled(true);
+      buttonToLaunchTimer.setEnabled(true);
       //Default row selection.
       resetRows();
       cycleNameEdit.getText().clear();
@@ -1077,12 +1081,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Sets current active cycle to the one selected.
         activeCyclePosition = positionOfSelectedCycle;
       }
+      //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
       //Removes runnable that begins next round.
-      mHandler.removeCallbacksAndMessages(this);
+      mHandler.removeCallbacksAndMessages(null);
+      timerDisabled = false;
+      //If between rounds, post runnable for next round without starting timer or object animator.
+      if (!objectAnimator.isStarted()) {
+        beginTimerForNextRound = false;
+        mHandler.post(postRoundRunnableForFirstMode);
+      }
+
 
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
-      startTimer.setEnabled(false);
+      buttonToLaunchTimer.setEnabled(false);
       mode = savedMode;
       dotDraws.setMode(mode);
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
@@ -1159,7 +1171,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
       //No potential index issues here, so enable timer start.
-      startTimer.setEnabled(true);
+      buttonToLaunchTimer.setEnabled(true);
       currentlyEditingACycle = true;
       //Default row selection.
       resetRows();
@@ -1328,8 +1340,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks END--////
 
+    instantiatePostRoundModeOneRunnable();
     ////--EditCycles Menu Item onClicks START--////
-    startTimer.setOnClickListener(v-> {
+    buttonToLaunchTimer.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
         //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
         launchTimerCycle(isNewCycle, true);
@@ -2549,7 +2562,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
           for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
-          startTimer.setEnabled(true);
+          buttonToLaunchTimer.setEnabled(true);
         }
         break;
       case 3:
@@ -2558,7 +2571,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
           for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
           cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
-          startTimer.setEnabled(true);
+          buttonToLaunchTimer.setEnabled(true);
         }
         break;
     }
@@ -3015,6 +3028,72 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void instantiatePostRoundModeOneRunnable() {
+    postRoundRunnableForFirstMode = new Runnable() {
+      @Override
+      public void run() {
+        //Updates dotDraws class w/ round count.
+        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
+        //Resets the alpha value we use to fade dots back to 255 (fully opaque).
+        dotDraws.resetDotAlpha();
+        //Resetting values for count-up modes. Simpler to keep them out of switch statement.
+        countUpMillisSets = 0;
+        countUpMillisBreaks = 0;
+        countUpMillisHolder = 0;
+        baseTime = System.currentTimeMillis();
+        //Next round begins active by default, so we set our paused mode to false.
+        timerIsPaused = false;
+        //Executes next round based on which type is indicated in our typeOfRound list.
+        if (numberOfRoundsLeft>0) {
+          switch (typeOfRound.get(currentRound)) {
+            case 1:
+              setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
+              timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
+              if (beginTimerForNextRound) {
+                startObjectAnimator();
+                startSetTimer();
+              }
+              break;
+            case 3:
+              breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
+              timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
+              if (beginTimerForNextRound) {
+                startObjectAnimator();
+                startBreakTimer();
+              }
+              break;
+            case 2:
+              timeLeft.setText("0");
+              defineObjectAnimator(30000);
+              if (beginTimerForNextRound) mHandler.post(secondsUpSetRunnable);
+              break;
+            case 4:
+              timeLeft.setText("0");
+              defineObjectAnimator(30000);
+              if (beginTimerForNextRound) mHandler.post(secondsUpBreakRunnable);
+              break;
+          }
+          //If number of rounds left is 0, do the following.
+        } else {
+          //Continuous animation for end of cycle.
+          animateEnding();
+          progressBar.setProgress(0);
+          //Resets current round counter.
+          currentRound = 0;
+          //Used to call resetTimer() in pause/resume method. Separate than our disable method.
+          timerEnded = true;
+          //Adds to cycles completed counter.
+          customCyclesDone++;
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+        }
+        //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
+        timerDisabled = false;
+        //Re-enables the button that calls this method, now that it has completed.
+        next_round.setEnabled(true);
+      }
+    };
+  }
+
   public void nextRound(boolean endingEarly) {
     //Todo: If we want end of cycle to avoid blue progressBar entirely, we need to change this for last round execution.
     //Fade effect to smooth out progressBar and timer text after animation.
@@ -3086,63 +3165,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       numberOfRoundsLeft--;
       //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
       currentRound++;
-      mHandler.postDelayed(() -> {
 
-        //Updates dotDraws class w/ round count.
-        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-        //Resets the alpha value we use to fade dots back to 255 (fully opaque).
-        dotDraws.resetDotAlpha();
-        //Resetting values for count-up modes. Simpler to keep them out of switch statement.
-        countUpMillisSets = 0;
-        countUpMillisBreaks = 0;
-        countUpMillisHolder = 0;
-        baseTime = System.currentTimeMillis();
-        //Next round begins active by default, so we set our paused mode to false.
-        timerIsPaused = false;
-        //Executes next round based on which type is indicated in our typeOfRound list.
-        if (numberOfRoundsLeft>0) {
-          switch (typeOfRound.get(currentRound)) {
-            case 1:
-              setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
-              startObjectAnimator();
-              startSetTimer();
-              break;
-            case 3:
-              breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
-              startObjectAnimator();
-              startBreakTimer();
-              break;
-            case 2:
-              timeLeft.setText("0");
-              defineObjectAnimator(30000);
-              mHandler.post(secondsUpSetRunnable);
-              break;
-            case 4:
-              timeLeft.setText("0");
-              defineObjectAnimator(30000);
-              mHandler.post(secondsUpBreakRunnable);
-              break;
-          }
-          //If number of rounds left is 0, do the following.
-        } else {
-          //Continuous animation for end of cycle.
-          animateEnding();
-          progressBar.setProgress(0);
-          //Resets current round counter.
-          currentRound = 0;
-          //Used to call resetTimer() in pause/resume method. Separate than our disable method.
-          timerEnded = true;
-          //Adds to cycles completed counter.
-          customCyclesDone++;
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-        }
-        //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
-        timerDisabled = false;
-        //Re-enables the button that calls this method, now that it has completed.
-        next_round.setEnabled(true);
-      },750);
+      mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
     }
 
     if (mode==3) {
@@ -3283,6 +3307,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void populateTimerUI() {
+    beginTimerForNextRound = true;
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
