@@ -370,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean makeCycleAdapterVisible;
   int activeCyclePosition;
 
+  //Todo: If dismissing timer during end animation, does not pause it.
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Should actually, esp w/ below, have sep values for each mode. Also presents saving issue when exiting app.
   //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
@@ -421,20 +422,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     scrollPosition = position;
   }
 
+  //For resume/reset onClicks within cycle adapter.
   @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
     if (resumingOrResetting==RESUMING_CYCLE) timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-    else {
+    else if (resumingOrResetting==RESETTING_CyCLE){
       savedCycleAdapter.removeActiveCycleLayout();
       savedCycleAdapter.notifyDataSetChanged();
       resetTimer();
     }
   }
 
-  //Todo: Remove res/resume
   //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
+    //Active cycle option will automatically be removed if accessing new cycle.
     savedCycleAdapter.removeActiveCycleLayout();
     isNewCycle = false;
     positionOfSelectedCycle = position;
@@ -442,6 +444,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     populateRoundList();
     //If clicking on a cycle to launch, it will always be an existing one, and we do not want to call a save method since it is unedited.
     launchTimerCycle(false, false);
+    resetTimer();
   }
 
   //Receives highlighted positions from our adapter.
@@ -706,10 +709,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
     valueAnimatorDown.setDuration(2000);
     valueAnimatorUp.setDuration(2000);
-
-    workoutArray = new ArrayList<>();
-    workoutTime = new ArrayList<>();
-    typeOfRound = new ArrayList<>();
 
     customSetTime = new ArrayList<>();
     customBreakTime = new ArrayList<>();
@@ -1078,12 +1077,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Sets current active cycle to the one selected.
         activeCyclePosition = positionOfSelectedCycle;
       }
+      pauseAndResumeTimer(PAUSING_TIMER);
+      //Removes runnable that begins next round.
+      mHandler.removeCallbacksAndMessages(this);
 
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
       startTimer.setEnabled(false);
       mode = savedMode;
       dotDraws.setMode(mode);
-      pauseAndResumeTimer(PAUSING_TIMER);
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -2564,8 +2565,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean newCycle, boolean saveToDB) {
-    //Resets and sets timer values.
-    resetTimer();
+    populateTimerUI();
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
     //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
@@ -3082,11 +3082,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
 
+      //Subtracts from rounds remaining.
+      numberOfRoundsLeft--;
+      //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
+      currentRound++;
       mHandler.postDelayed(() -> {
-        //Subtracts from rounds remaining.
-        numberOfRoundsLeft--;
-        //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
-        currentRound++;
+
         //Updates dotDraws class w/ round count.
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
         //Resets the alpha value we use to fade dots back to 255 (fully opaque).
@@ -3296,7 +3297,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setVisibility(View.VISIBLE);
     reset_total_times.setVisibility(View.VISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
-//    timeLeft.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
 
     //Setting values based on first round in cycle. Might make this is a global method.
