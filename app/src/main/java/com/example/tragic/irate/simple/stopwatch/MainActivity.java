@@ -1086,12 +1086,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Removes runnable that begins next round.
       mHandler.removeCallbacksAndMessages(null);
       timerDisabled = false;
+      beginTimerForNextRound = false;
       //If between rounds, post runnable for next round without starting timer or object animator.
-      if (!objectAnimator.isStarted()) {
-        beginTimerForNextRound = false;
-        mHandler.post(postRoundRunnableForFirstMode);
-      }
-
+      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
 
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
       buttonToLaunchTimer.setEnabled(false);
@@ -2748,7 +2745,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ///////////////////////////////////////////////////////////////////////////
 
-  public void defineObjectAnimator(long duration) {
+  public void instantiateAndStartObjectAnimator(long duration) {
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
     objectAnimator.setInterpolator(new LinearInterpolator());
     objectAnimator.setDuration(duration);
@@ -2763,7 +2760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //If progress bar is at max value, round has not begun.
           if (progressBar.getProgress()==maxProgress) {
             //Starts object animator.
-            defineObjectAnimator(setMillis);
+            instantiateAndStartObjectAnimator(setMillis);
             //Used for pause/resume toggle.
             timerIsPaused = false;
             //Used in pause/resume. If timer HAS ended, that method calls reset. Otherwise, it pauses or resumes timer.
@@ -2779,7 +2776,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
             //Starts object animator.
-            defineObjectAnimator(breakMillis);
+            instantiateAndStartObjectAnimator(breakMillis);
             //Unchanging start point of breakMillis used to count total set time over multiple rounds.
             permBreakMillis = breakMillis;
           } else {
@@ -2794,7 +2791,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter);
           //Starts object animator.
-          defineObjectAnimator(pomMillis);
+          instantiateAndStartObjectAnimator(pomMillis);
           timerEnded = false;
           //Unchanging start point of pomMillis used to count total set time over multiple rounds. Using SET and BREAK vars since modes are exclusive, and it saves on variable creation.
           switch (pomDotCounter) {
@@ -3064,13 +3061,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 2:
               timeLeft.setText("0");
-              defineObjectAnimator(30000);
-              if (beginTimerForNextRound) mHandler.post(secondsUpSetRunnable);
+              if (beginTimerForNextRound) {
+                instantiateAndStartObjectAnimator(30000);
+                mHandler.post(secondsUpSetRunnable);
+              }
               break;
             case 4:
               timeLeft.setText("0");
-              defineObjectAnimator(30000);
-              if (beginTimerForNextRound) mHandler.post(secondsUpBreakRunnable);
+              if (beginTimerForNextRound) {
+                instantiateAndStartObjectAnimator(30000);
+                mHandler.post(secondsUpBreakRunnable);
+              }
               break;
           }
           //If number of rounds left is 0, do the following.
@@ -3094,6 +3095,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Todo: Pause/resume Pom mode.
   public void nextRound(boolean endingEarly) {
     //Todo: If we want end of cycle to avoid blue progressBar entirely, we need to change this for last round execution.
     //Fade effect to smooth out progressBar and timer text after animation.
@@ -3250,13 +3252,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2:
                   //Uses the current time as a base for our count-up rounds.
                   baseTime = System.currentTimeMillis();
-                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(progressBarValueHolder); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (progressBar.getProgress()==maxProgress) instantiateAndStartObjectAnimator(progressBarValueHolder); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisSets = countUpMillisHolder;
                   mHandler.post(secondsUpSetRunnable);
                   break;
                 case 4:
                   baseTime = System.currentTimeMillis();
-                  if (progressBar.getProgress()==maxProgress) defineObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (progressBar.getProgress()==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisBreaks = countUpMillisHolder;
                   mHandler.post(secondsUpBreakRunnable);
                   break;
