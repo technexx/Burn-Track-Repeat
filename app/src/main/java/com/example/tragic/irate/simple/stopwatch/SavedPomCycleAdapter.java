@@ -7,7 +7,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-//Todo: Callbacks.
 public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mContext;
     ArrayList<String> mPomList;
@@ -31,6 +29,12 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     boolean mHighlightMode;
     List<String> mPositionList;
     ArrayList<Integer> mSizeToggle = new ArrayList<>();
+    onResumeOrResetCycle mOnResumeOrResetCycle;
+    int RESUMING_CYCLE = 1;
+    int RESETTING_CyCLE = 2;
+    boolean mActiveCycle;
+    int mPositionOfActiveCycle;
+    int mNumberOfRoundsCompleted;
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
@@ -38,6 +42,9 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public interface onHighlightListener {
         void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
+    }
+    public interface onResumeOrResetCycle{
+        void ResumeOrResetCycle(int resumingOrResetting);
     }
 
     public void setItemClick(onCycleClickListener xOnCycleClickListener) {
@@ -48,6 +55,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.mOnHighlightListener = xOnHighlightListener;
     }
 
+    public void setResumeOrResetCycle(onResumeOrResetCycle xOnResumeOrResetCycle) {
+        this.mOnResumeOrResetCycle = xOnResumeOrResetCycle;
+    }
+
     public SavedPomCycleAdapter(Context context, ArrayList<String> pomList, ArrayList<String> pomTitle) {
         this.mContext = context; this.mPomList = pomList; this.mPomTitle = pomTitle;
         //Populates a toggle list for Pom's spannable colors so we can simply replace them at will w/ out resetting the list. This should only be called in our initial adapter instantiation.
@@ -56,12 +67,19 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         mPositionList = new ArrayList<>();
     }
 
-
     public void removeHighlight(boolean cancelMode) {
         //If boolean is false, highlight has simply been deleted and we clear the highlight list while turning all backgrounds black.
         mHighlightDeleted = true;
         //If boolean is true, we have canceled the highlight process entirely, which does the above but also removes the Trash/Back buttons (done in Main) and sets the next row click to launch a timer instead of highlight (done here).
         if (cancelMode) mHighlightMode = false;
+    }
+
+    public void showActiveCycleLayout(int positionOfCycle, int numberOfRoundsCompleted) {
+        mActiveCycle = true; mPositionOfActiveCycle = positionOfCycle; mNumberOfRoundsCompleted = numberOfRoundsCompleted;
+    }
+
+    public void removeActiveCycleLayout() {
+        mActiveCycle = false;
     }
 
     @NonNull
@@ -75,6 +93,17 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PomHolder pomHolder = (PomHolder) holder;
+
+        pomHolder.resumeCycle.setVisibility(View.GONE);
+        pomHolder.resetCycle.setVisibility(View.GONE);
+        if (mActiveCycle) {
+            if (position==mPositionOfActiveCycle) {
+                pomHolder.resumeCycle.setVisibility(View.VISIBLE);
+                pomHolder.resetCycle.setVisibility(View.VISIBLE);
+                pomHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE));
+                pomHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CyCLE));
+            }
+        }
 
         pomHolder.pomName.setText(mPomTitle.get(position));
         String tempPom = (convertTime(mPomList).get(position));
@@ -154,12 +183,16 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         public TextView pomName;
         public TextView pomView;
         public View fullView;
+        public TextView resumeCycle;
+        public TextView resetCycle;
 
         public PomHolder(@NonNull View itemView) {
             super(itemView);
             pomName = itemView.findViewById(R.id.pom_header);
             pomView = itemView.findViewById(R.id.pom_view);
             fullView = itemView;
+            resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button_for_mode_3);
+            resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_3);
         }
     }
 

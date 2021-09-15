@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, LapAdapter.onPositionCallback, SavedCycleAdapter.onResumeOrResetCycle {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, LapAdapter.onPositionCallback, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -812,6 +812,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Instantiating callbacks from adapter.
         savedPomCycleAdapter.setItemClick(MainActivity.this);
         savedPomCycleAdapter.setHighlight(MainActivity.this);
+        savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
 
         //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
         savedCycleAdapter.notifyDataSetChanged();

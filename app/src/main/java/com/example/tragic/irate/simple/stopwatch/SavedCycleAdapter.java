@@ -190,7 +190,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //If a cycle is active, change color of completed rounds to "greyed out" version of original color.
       if (mActiveCycle) {
         if (position==mPositionOfActiveCycle) {
-          Log.i("testPos", "number completed is " + mNumberOfRoundsCompleted);
           if (j<=mNumberOfRoundsCompleted-1) {
             if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")){
               span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_green)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
@@ -295,8 +294,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       fullView = itemView;
-      resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button);
-      resetCycle = itemView.findViewById(R.id.reset_active_cycle_button);
+      resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button_for_mode_1);
+      resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
     }
   }
 
