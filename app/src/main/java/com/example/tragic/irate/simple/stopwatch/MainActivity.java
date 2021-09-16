@@ -362,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public Runnable secondsUpSetRunnable;
   public Runnable secondsUpBreakRunnable;
   public Runnable postRoundRunnableForFirstMode;
+  public Runnable postRoundRunnableForThirdMode;
 
   long baseTime;
   long countUpMillisHolder;
@@ -441,7 +442,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onCycleClick(int position) {
     //Active cycle option will automatically be removed if accessing new cycle.
-    savedCycleAdapter.removeActiveCycleLayout();
+    if (mode==1) savedCycleAdapter.removeActiveCycleLayout();
+    if (mode==3) savedPomCycleAdapter.removeActiveCycleLayout();
     isNewCycle = false;
     positionOfSelectedCycle = position;
     //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
@@ -857,6 +859,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
+    instantiatePostRoundModeOneRunnable();
+    instantiatePostRoundModeThreeRunnable();
+
     //Listens to all editTexts for changes.
     TextWatcher editTextWatcher = new TextWatcher() {
       @Override
@@ -1073,27 +1078,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
+    //Todo: Remember, we're going to have sep vars for each timer again.
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      //Only shows restart/resume options of a cycle has been started.
-      if (objectAnimator.isStarted() || startRounds-numberOfRoundsLeft>0) {
-        if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
-        savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
-        //Sets current active cycle to the one selected.
-        activeCyclePosition = positionOfSelectedCycle;
-      }
       //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
       //Removes runnable that begins next round.
       mHandler.removeCallbacksAndMessages(null);
       timerDisabled = false;
       beginTimerForNextRound = false;
-      //If between rounds, post runnable for next round without starting timer or object animator.
-      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
+
+      if (mode==1) {
+        //Only shows restart/resume options of a cycle has been started.
+        if (objectAnimator.isStarted() || startRounds-numberOfRoundsLeft>0) {
+          if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
+          savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
+        }
+        //If between rounds, post runnable for next round without starting timer or object animator.
+        if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
+      }
+
+      if (mode==3) {
+        if (objectAnimator.isStarted() || pomDotCounter > 0) {
+          if (isNewCycle) positionOfSelectedCycle = 7;
+          savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
+        }
+      }
 
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
       buttonToLaunchTimer.setEnabled(false);
-      mode = savedMode;
+      //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
+      if (mode==4) mode = savedMode;
       dotDraws.setMode(mode);
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
@@ -1338,7 +1353,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks END--////
 
-    instantiatePostRoundModeOneRunnable();
     ////--EditCycles Menu Item onClicks START--////
     buttonToLaunchTimer.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
@@ -3096,7 +3110,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Pause/resume Pom mode.
+  public void instantiatePostRoundModeThreeRunnable() {
+    postRoundRunnableForThirdMode = new Runnable() {
+      @Override
+      public void run() {
+        pomDotCounter++;
+        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
+        dotDraws.resetDotAlpha();
+
+        if (pomDotCounter<=7) {
+          pomMillis = pomValuesTime.get(pomDotCounter);
+          timeLeft.setText(convertSeconds((pomMillis) / 1000));
+          startObjectAnimator();
+          startPomTimer();
+        } else {
+          //Continuous animation for end of cycle.
+          animateEnding();
+          progressBar.setProgress(0);
+          timerEnded = true;
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+        }
+        timerDisabled = false;
+        next_round.setEnabled(true);
+      }
+    };
+  }
+
   public void nextRound(boolean endingEarly) {
     //Todo: If we want end of cycle to avoid blue progressBar entirely, we need to change this for last round execution.
     //Fade effect to smooth out progressBar and timer text after animation.

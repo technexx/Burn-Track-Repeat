@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.DecimalFormat;
@@ -25,6 +26,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     ArrayList<String> mPomTitle;
     onCycleClickListener mOnCycleClickListener;
     onHighlightListener mOnHighlightListener;
+
+    Spannable pomSpan;
     boolean mHighlightDeleted;
     boolean mHighlightMode;
     List<String> mPositionList;
@@ -108,17 +111,15 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         pomHolder.pomName.setText(mPomTitle.get(position));
         String tempPom = (convertTime(mPomList).get(position));
         tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
-        Spannable pomSpan = new SpannableString(tempPom);
+        pomSpan = new SpannableString(tempPom);
 
-        //Sets green/red alternating colors using text char indices.
-        int moving = 0;
-        int rangeStart = 0;
-        int rangeEnd = 4;
-        for (int i=0; i<8; i++) {
-            if (mSizeToggle.get(i)==1) rangeEnd = 5;
-            if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            if (mSizeToggle.get(i)==1) moving+=8; else moving+=7;
+        setPomCycleTextColors(Color.GREEN, Color.RED);
+        if (mActiveCycle) {
+            if (position==mPositionOfActiveCycle) {
+                if (mPomList.size()==mNumberOfRoundsCompleted-1) {
+                    setPomCycleTextColors(ContextCompat.getColor(mContext, R.color.greyed_green), ContextCompat.getColor(mContext, R.color.greyed_red));
+                }
+            }
         }
         pomHolder.pomView.setText(pomSpan);
 
@@ -193,6 +194,20 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             fullView = itemView;
             resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button_for_mode_3);
             resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_3);
+        }
+    }
+
+    public void setPomCycleTextColors(int colorOne, int colorTwo) {
+        //Sets green/red alternating colors using text char indices.
+        int moving = 0;
+        int rangeStart = 0;
+        int rangeEnd = 4;
+
+        for (int i=0; i<8; i++) {
+            if (mSizeToggle.get(i)==1) rangeEnd = 5;
+            if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(colorOne), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            else pomSpan.setSpan(new ForegroundColorSpan(colorTwo), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            if (mSizeToggle.get(i)==1) moving+=8; else moving+=7;
         }
     }
 
