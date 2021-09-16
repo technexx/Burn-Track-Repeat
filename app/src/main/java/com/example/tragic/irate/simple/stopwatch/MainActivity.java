@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Should actually, esp w/ below, have sep values for each mode. Also presents saving issue when exiting app.
   //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
-  //Todo: Grey out completed rounds in Main for active timer.
+  //Todo: BUG: Resetting pom (maybe mode 1, too), can add a second to total time.
   //Todo: Color schemes.
   //Todo: Lap adapter stuff.
   //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating.
@@ -734,7 +734,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     breaksArray = new ArrayList<>();
     breaksOnlyArray = new ArrayList<>();
     pomArray = new ArrayList<>();
-    pomValuesTime = new ArrayList<>();
 
     reset = timerPopUpView.findViewById(R.id.reset);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
@@ -864,7 +863,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setEditValues();
       });
     });
-
     instantiatePostRoundModeOneRunnable();
     instantiatePostRoundModeThreeRunnable();
 
@@ -1101,6 +1099,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
           savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
         }
+        //Todo: Runnable posts w/ beginTimer var still false, so it won't begin timer/animator at end of round.
+        //Todo: Should also only post in onClick callback to cycle.
         //If between rounds, post runnable for next round without starting timer or object animator.
         if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
       }
@@ -1110,6 +1110,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (isNewCycle) positionOfSelectedCycle = 7;
           savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
         }
+        if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
       }
 
       //Only enabling if Timer populated correctly, which uses conditional based on index positions so we don't crash.
@@ -1577,9 +1578,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
-
-    /////---------Testing pom round iterations---------------/////////
-    if (mode==3) for (int i=1; i<9; i++) if (i%2!=0) pomValuesTime.set(i-1, 4000); else pomValuesTime.set(i-1, 6000);
 
     //Draws dot display depending on which more we're on.
     dotDraws.setMode(mode);
@@ -2588,9 +2586,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         if (pomArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
-          for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
+//          for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
           cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
           buttonToLaunchTimer.setEnabled(true);
+
+          /////---------Testing pom round iterations---------------/////////
+          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(4000); else pomValuesTime.add(6000);
         }
         break;
     }
@@ -2615,6 +2616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (saveToDB) AsyncTask.execute(()-> saveCycles(false));
     }
     //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
+    //Todo: This still causing issues.
     mHandler.postDelayed(()-> {
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
       editCyclesPopupWindow.dismiss();
@@ -3215,7 +3217,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
       currentRound++;
       mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
+      //Ensures subsequent rounds will start automatically.
+      beginTimerForNextRound = true;
     }
+    //Todo: Issues when switching timers. Prolly due to shared variables.
+    //Todo: (A) No adapter color fades
     if (mode==3) {
       timeLeft.setText("0");
       mHandler.post(endFade);
@@ -3228,6 +3234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
     }
+    beginTimerForNextRound = true;
   }
 
   public void pauseAndResumeTimer(int pausing) {
