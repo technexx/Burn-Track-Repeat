@@ -432,8 +432,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIsPaused = true;
     }
     else if (resumingOrResetting==RESETTING_CyCLE){
-      savedCycleAdapter.removeActiveCycleLayout();
-      savedCycleAdapter.notifyDataSetChanged();
+      if (mode==1) {
+        savedCycleAdapter.removeActiveCycleLayout();
+        savedCycleAdapter.notifyDataSetChanged();
+      }
+      if (mode==3) {
+        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
       resetTimer();
     }
   }
@@ -1086,8 +1092,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Removes runnable that begins next round.
       mHandler.removeCallbacksAndMessages(null);
       timerDisabled = false;
-      beginTimerForNextRound = false;
 
+      //Prevents timer from starting. Runnable will just populate values of next round.
+      beginTimerForNextRound = false;
       if (mode==1) {
         //Only shows restart/resume options of a cycle has been started.
         if (objectAnimator.isStarted() || startRounds-numberOfRoundsLeft>0) {
@@ -3114,15 +3121,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     postRoundRunnableForThirdMode = new Runnable() {
       @Override
       public void run() {
-        pomDotCounter++;
         dotDraws.pomDraw(pomDotCounter, pomValuesTime);
         dotDraws.resetDotAlpha();
 
         if (pomDotCounter<=7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
           timeLeft.setText(convertSeconds((pomMillis) / 1000));
-          startObjectAnimator();
-          startPomTimer();
+          if (beginTimerForNextRound) {
+            startObjectAnimator();
+            startPomTimer();
+          }
         } else {
           //Continuous animation for end of cycle.
           animateEnding();
@@ -3202,45 +3210,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
       }
-
       //Subtracts from rounds remaining.
       numberOfRoundsLeft--;
       //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
       currentRound++;
-
       mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
     }
-
     if (mode==3) {
       timeLeft.setText("0");
       mHandler.post(endFade);
+      pomDotCounter++;
       //If skipping round manually, cancel timer and objectAnimator.
       if (endingEarly) {
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
       }
-
-      mHandler.postDelayed(()-> {
-        pomDotCounter++;
-        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
-        dotDraws.resetDotAlpha();
-
-        if (pomDotCounter<=7) {
-          pomMillis = pomValuesTime.get(pomDotCounter);
-          timeLeft.setText(convertSeconds((pomMillis) / 1000));
-          startObjectAnimator();
-          startPomTimer();
-        } else {
-          //Continuous animation for end of cycle.
-          animateEnding();
-          progressBar.setProgress(0);
-          timerEnded = true;
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
-        }
-        timerDisabled = false;
-        next_round.setEnabled(true);
-      },750);
+      mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
     }
   }
 
