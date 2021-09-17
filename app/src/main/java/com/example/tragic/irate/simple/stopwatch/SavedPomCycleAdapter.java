@@ -38,6 +38,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     boolean mActiveCycle;
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
+    int positionOfRound;
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
@@ -113,14 +114,25 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
         pomSpan = new SpannableString(tempPom);
 
-        setPomCycleTextColors(Color.GREEN, Color.RED);
-        if (mActiveCycle) {
-            if (position==mPositionOfActiveCycle) {
-                if (mPomList.size()==mNumberOfRoundsCompleted-1) {
-                    setPomCycleTextColors(ContextCompat.getColor(mContext, R.color.greyed_green), ContextCompat.getColor(mContext, R.color.greyed_red));
+        int moving = 0;
+        int rangeStart = 0;
+        int rangeEnd = 4;
+
+        for (int i=0; i<8; i++) {
+            if (mSizeToggle.get(i)==1) rangeEnd = 5;
+            if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            if (mActiveCycle) {
+                if (position==mPositionOfActiveCycle) {
+                    if (i<=mNumberOfRoundsCompleted-1) {
+                        if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_green)), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        else pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_red)), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    }
                 }
             }
+            if (mSizeToggle.get(i)==1) moving+=8; else moving+=7;
         }
+
         pomHolder.pomView.setText(pomSpan);
 
         if (mHighlightDeleted) {
@@ -194,20 +206,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             fullView = itemView;
             resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button_for_mode_3);
             resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_3);
-        }
-    }
-
-    public void setPomCycleTextColors(int colorOne, int colorTwo) {
-        //Sets green/red alternating colors using text char indices.
-        int moving = 0;
-        int rangeStart = 0;
-        int rangeEnd = 4;
-
-        for (int i=0; i<8; i++) {
-            if (mSizeToggle.get(i)==1) rangeEnd = 5;
-            if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(colorOne), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            else pomSpan.setSpan(new ForegroundColorSpan(colorTwo), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            if (mSizeToggle.get(i)==1) moving+=8; else moving+=7;
         }
     }
 
