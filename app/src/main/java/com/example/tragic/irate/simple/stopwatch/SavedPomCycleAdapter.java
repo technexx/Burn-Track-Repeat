@@ -122,8 +122,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             if (mActiveCycle) {
-                if (position==mPositionOfActiveCycle-1) {
-                    if (i<=mNumberOfRoundsCompleted) {
+                if (position==mPositionOfActiveCycle) {
+                    if (i<=mNumberOfRoundsCompleted-1) {
                         if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_green)), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                         else pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.greyed_red)), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     }

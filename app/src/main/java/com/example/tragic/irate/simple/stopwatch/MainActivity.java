@@ -1096,7 +1096,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Todo: Resume/restart position buttons in wrong row @ pom.
+    //Todo: Total times save for total of all cycles right now.
     //Todo: Need to fix title on switch.
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
