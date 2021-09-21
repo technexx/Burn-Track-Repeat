@@ -1096,7 +1096,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Todo: Progressbar doesn't resume after tab switch + resume button.
     //Todo: Resume/restart position buttons in wrong row @ pom.
     //Todo: Need to fix title on switch.
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
@@ -2801,7 +2800,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
       objectAnimator.setInterpolator(new LinearInterpolator());
       objectAnimator.setDuration(duration);
-      Log.i("testval", "val is " + objectAnimator.getDuration());
       objectAnimator.start();
     }
     if (mode==3) {
@@ -2827,7 +2825,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Unchanging start point of setMillis used to count total set time over multiple rounds.
             permSetMillis = setMillis;
           } else {
-            //Todo: Just clicking on cycle in Pom b0rks this.
             setMillis = setMillisUntilFinished;
             if (objectAnimator != null) objectAnimator.resume();
           }
@@ -3184,10 +3181,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void nextRound(boolean endingEarly) {
-    //Todo: If we want end of cycle to avoid blue progressBar entirely, we need to change this for last round execution.
     //Fade effect to smooth out progressBar and timer text after animation.
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
+    //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimator()).
+    progressBarPause = 10000;
     //If no rounds left, remove our endFade runnable, reset timer, and return before executing anything else. The button tied to this method will be disabled until the proper rounded subtraction can occur.
     if (mode==1) {
       if (numberOfRoundsLeft==0) {
@@ -3481,11 +3479,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (timer != null) timer.cancel();
     if (endAnimation!=null) endAnimation.cancel();
     next_round.setEnabled(true);
+    progressBarPause = 10000;
     //Stores cumulative time valuation.
     saveTotalTimes();
     switch (mode) {
       case 1:
-        progressBarPause = maxProgress;
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;
@@ -3502,7 +3500,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         pomDotCounter = 0;
-        progressBarPause = maxProgress;
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
         break;
       case 4:
