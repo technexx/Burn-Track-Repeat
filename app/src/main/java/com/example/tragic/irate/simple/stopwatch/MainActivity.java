@@ -366,8 +366,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
-  //Todo: Need to do db saves for total times w/ resume/reset.
-  //Todo: Total set/break will b0rk with shared variables at moment. As will resume/reset callback.
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Should actually, esp w/ below, have sep values for each mode. Also presents saving issue when exiting app.
   //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
@@ -1103,10 +1101,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               cycles = cyclesList.get(positionOfSelectedCycle);
               totalSetTime = cycles.getTotalSetTime();
               totalBreakTime = cycles.getTotalBreakTime();
-              Log.i("testval", "position is " + positionOfSelectedCycle);
-              for (int i=0; i<cyclesList.size(); i++) {
-                Log.i("testval", "vals are " + cyclesList.get(i).getTotalSetTime());
-              }
             }
             if (mode==3) {
               pomCycles = pomCyclesList.get(positionOfSelectedCycle);

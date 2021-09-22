@@ -162,7 +162,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
           tempSpace = 2;
         } else {
-          span = new SpannableString(" " + bullet);
+          span = new SpannableString("  " + bullet);
           tempSpace = 1;
         }
 
