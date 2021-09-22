@@ -237,9 +237,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean subtractedRoundIsFading;
   boolean roundIsSelected;
   boolean consolidateRoundAdapterLists;
-  List<Integer> totalSetMillisArray;
-  List<Integer> totalBreakMillisArray;
-  List<Integer> totalCycleCountArray;
   int roundSelectedPosition;
   float popUpDensityPixelsHeight;
   float popUpDensityPixelWidth;
@@ -369,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
+  //Todo: Need to do db saves for total times w/ resume/reset.
   //Todo: Total set/break will b0rk with shared variables at moment. As will resume/reset callback.
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Should actually, esp w/ below, have sep values for each mode. Also presents saving issue when exiting app.
@@ -665,9 +663,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     workoutCyclesArray = new ArrayList<>();
     typeOfRound = new ArrayList<>();
     typeOfRoundArray = new ArrayList<>();
-    totalSetMillisArray = new ArrayList<>();
-    totalBreakMillisArray = new ArrayList<>();
-    totalCycleCountArray = new ArrayList<>();
 
     roundHolderOne = new ArrayList<>();
     roundHolderTwo = new ArrayList<>();
@@ -1096,8 +1091,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Todo: Total times save for total of all cycles right now.
-    //Todo: Need to fix title on switch.
+    timerPopUpView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+      @Override
+      public void onSystemUiVisibilityChange(int visibility) {
+        AsyncTask.execute(()-> {
+          queryCycles(false, false);
+          runOnUiThread(()-> {
+            int totalSetTime = 0;
+            int totalBreakTime = 0;
+            if (mode==1) {
+              cycles = cyclesList.get(positionOfSelectedCycle);
+              totalSetTime = cycles.getTotalSetTime();
+              totalBreakTime = cycles.getTotalBreakTime();
+              Log.i("testval", "position is " + positionOfSelectedCycle);
+              for (int i=0; i<cyclesList.size(); i++) {
+                Log.i("testval", "vals are " + cyclesList.get(i).getTotalSetTime());
+              }
+            }
+            if (mode==3) {
+              pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+              totalSetTime = pomCycles.getTotalWorkTime();
+              totalBreakTime = pomCycles.getTotalBreakTime();
+            }
+            totalSetMillis = totalSetTime*1000;
+            totalBreakMillis = totalBreakTime*1000;
+            total_set_time.setText(convertSeconds(totalSetTime));
+            total_break_time.setText(convertSeconds(totalBreakTime));
+          });
+        });
+      }
+    });
+
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
       //Pauses timer.
@@ -2510,9 +2534,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutCyclesArray.clear();
       typeOfRoundArray.clear();
       workoutTitleArray.clear();
-      totalSetMillisArray.clear();
-      totalBreakMillisArray.clear();
-      totalCycleCountArray.clear();
       for (int i=0; i<cyclesList.size(); i++) {
         //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
@@ -2520,10 +2541,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTitleArray.add(cyclesList.get(i).getTitle());
         //Adds concatenated roundType String used in each cycle.
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
-
-        totalSetMillisArray.add(cyclesList.get(i).getTotalSetTime());
-        totalBreakMillisArray.add(cyclesList.get(i).getTotalBreakTime());
-        totalCycleCountArray.add(cyclesList.get(i).getCyclesCompleted());
       }
     }
     if (mode==3 || queryAll) {
@@ -2541,10 +2558,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i=0; i<pomCyclesList.size(); i++) {
         pomArray.add(pomCyclesList.get(i).getFullCycle());
         pomTitleArray.add(pomCyclesList.get(i).getTitle());
-
-        totalSetMillisArray.add(pomCyclesList.get(i).getTotalWorkTime());
-        totalBreakMillisArray.add(pomCyclesList.get(i).getTotalBreakTime());
-        totalCycleCountArray.add(pomCyclesList.get(i).getCyclesCompleted());
       }
     }
   }
@@ -2557,11 +2570,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTitleArray.add(cycleTitle);
         typeOfRoundArray.add(roundTypeString);
         workoutCyclesArray.add(workoutString);
-
-        //Adding another array item so lists reflect size of database. Counts are 0 because no times have been logged for latest added cycle/
-        totalSetMillisArray.add(0);
-        totalBreakMillisArray.add(0);
-        totalCycleCountArray.add(0);
       }
       if (mode==3) {
         pomTitleArray.add(cycleTitle);
@@ -2592,6 +2600,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: onCycleClick calls this, so we can just use our totalTimeArrays here.
   //Populates round list from single cycle.
   public void populateRoundList() {
     switch (mode) {
@@ -2615,12 +2624,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         if (pomArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
-//          for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
           cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
           buttonToLaunchTimer.setEnabled(true);
 
           /////---------Testing pom round iterations---------------/////////
           for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(8000); else pomValuesTime.add(10000);
+          //          for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
         }
         break;
     }
@@ -2759,9 +2768,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             workoutCyclesArray.clear();
             typeOfRoundArray.clear();
             workoutTitleArray.clear();
-            totalSetMillisArray.clear();
-            totalBreakMillisArray.clear();
-            totalCycleCountArray.clear();
             savedCycleAdapter.notifyDataSetChanged();
           });
         } else emptyCycle = true;
@@ -2874,7 +2880,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onTick(long millisUntilFinished) {
         progressBarPause = (int) objectAnimator.getAnimatedValue();
-//        Log.i("testprog", "prog is " + progressBarPause);
         setMillis = millisUntilFinished;
 
         //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
@@ -3220,7 +3225,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //End of round, setting textView to 0.
           timeLeft.setText("0");
           //tempMillis is used to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
-          totalSetMillis = tempSetMillis;
+//          totalSetMillis = tempSetMillis;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
           total_set_time.setText(convertSeconds(tempSetMillis/1000));
@@ -3229,19 +3234,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //End of round, setting textView to 0.
           timeLeft.setText("0");
           //tempMillis is used ]to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
-          totalBreakMillis = tempBreakMillis;
+//          totalBreakMillis = tempBreakMillis;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
           total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
         case 2:
-          totalSetMillis = tempSetMillis;
+//          totalSetMillis = tempSetMillis;
           //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(secondsUpSetRunnable);
           total_set_time.setText(convertSeconds(tempSetMillis/1000));
           break;
         case 4:
-          totalBreakMillis = tempBreakMillis;
+//          totalBreakMillis = tempBreakMillis;
           //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(secondsUpBreakRunnable);
           total_break_time.setText(convertSeconds(tempBreakMillis/1000));
@@ -3567,6 +3572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         break;
     }
+    saveTotalTimes();
   }
 
   //Using same popUp + textView as cycle deletion.
