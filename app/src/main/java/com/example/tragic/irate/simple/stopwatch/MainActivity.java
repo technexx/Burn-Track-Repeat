@@ -367,10 +367,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean beginTimerForNextRound;
 
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
-  //Todo: Should actually, esp w/ below, have sep values for each mode. Also presents saving issue when exiting app.
   //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
   //Todo: BUG: Resetting pom (maybe mode 1, too), can add a second to total time.
-  //Todo: First bullet for first infinity round not spaced.
   //Todo: Color schemes.
   //Todo: Lap adapter stuff.
   //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating.
@@ -1409,10 +1407,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--EditCycles Menu Item onClicks START--////
     buttonToLaunchTimer.setOnClickListener(v-> {
-      AsyncTask.execute(()-> {
-        //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
-        launchTimerCycle(isNewCycle, true);
-      });
+      //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
+      launchTimerCycle(isNewCycle, true);
     });
 
     toggleInfinityRoundsForSets.setOnClickListener(v -> {
@@ -2594,7 +2590,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: onCycleClick calls this, so we can just use our totalTimeArrays here.
   //Populates round list from single cycle.
   public void populateRoundList() {
     switch (mode) {
@@ -2647,12 +2642,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Updates changes made to cycle if we are launching it.
       if (saveToDB) AsyncTask.execute(()-> saveCycles(false));
     }
-    //Todo: editCycles can't launch this window. Set it as a popup from w/ in edit popup?
-    //Todo: This still causing issues.
-    mHandler.postDelayed(()-> {
-      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+    runOnUiThread(()-> {
       editCyclesPopupWindow.dismiss();
-    },10);
+      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+    });
   }
 
   private void saveCycles(boolean newCycle) {
