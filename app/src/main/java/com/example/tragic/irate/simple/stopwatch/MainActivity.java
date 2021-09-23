@@ -360,12 +360,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public Runnable postRoundRunnableForFirstMode;
   public Runnable postRoundRunnableForThirdMode;
 
-  long baseTime;
+  long defaultProgressBarDurationForInfinityRounds;
   long countUpMillisHolder;
   int scrollPosition;
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
+  //Todo: Retain progressBar value for infinity rounds.
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
   //Todo: BUG: Resetting pom (maybe mode 1, too), can add a second to total time.
@@ -789,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Populates our cycle arrays from the database, so our list of cycles are updated from our adapter and notifyDataSetChanged().
       runOnUiThread(()-> {
-        checkEmptyCycles();
+        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         //Adapter and Recycler for round views within our editCycles popUp.
         LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
         LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -916,8 +917,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.setMode(3);
             break;
         }
-        //Toggles "empty cycle" text if adapter list is empty.
-        checkEmptyCycles();
+        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         if (mode==1) {
           sortHigh.setVisibility(View.VISIBLE);
           sortLow.setVisibility(View.VISIBLE);
@@ -934,7 +934,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (mode==3) {
           sortHigh.setVisibility(View.GONE);
           sortLow.setVisibility(View.GONE);
-//          //Since mode 3 only uses one adapter layout, set it here.
           roundRecyclerTwo.setVisibility(View.GONE);
           recyclerLayoutOne.leftMargin = 240;
           roundListDivider.setVisibility(View.GONE);
@@ -1172,7 +1171,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       makeCycleAdapterVisible = false;
-      checkEmptyCycles();
+      replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Saves total times + cycle count.
       AsyncTask.execute(()->{
@@ -1202,7 +1201,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-      checkEmptyCycles();
+      replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
       if (!makeCycleAdapterVisible) {
         if (mode==1) {
@@ -1329,7 +1328,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Using each received position, deletes the cycle from the database.
           deleteCycle(false);
           //Using each received position, deletes the cycle's values from its adapter arrays.
-          editCycleList(DELETING_CYCLE);
+          editCycleArrayLists(DELETING_CYCLE);
         }
         runOnUiThread(() -> {
           //Since we have deleted every position in selected list, clear the list.
@@ -1353,7 +1352,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Position of the
           positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
           deleteCycle(false);
-          editCycleList(DELETING_CYCLE);
+          editCycleArrayLists(DELETING_CYCLE);
         });
       } else {
         clearRoundAdapterArrays();
@@ -1599,7 +1598,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       thirdRowEditTextView.setText(convertCustomTextView(pomValue3));
       return true;
     });
-    ////--EditCycles Menu Item OnClicks END--////
 
     //Listens to our fadeOut animation, and runs fadeIn when it's done.
     fadeProgressOut.setAnimationListener(new Animation.AnimationListener() {
@@ -1669,7 +1667,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Animates text size change when timer gets to 60 seconds.
         animateTextSize(countUpMillisSets);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
-        countUpMillisSets = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - baseTime);
+        countUpMillisSets = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
@@ -1694,7 +1692,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         animateTextSize(countUpMillisBreaks);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
-        countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - baseTime);
+        countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
@@ -1786,13 +1784,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
   }
 
-  public void checkEmptyCycles() {
-    if (mode==1) {
-      if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
-    }
-    if (mode==3) {
-      if (pomArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
-    }
+  public void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
+    if (mode==1) if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
+    if (mode==3) if (pomArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
   }
 
   //Resets row selection and editText/textView values.
@@ -2553,7 +2547,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Since we are only updating our adapter's lists, we do not need to reference variables not shown in list (i.e. total times/total cycles). We will only update these in database if they change.
-  public void editCycleList(int action) {
+  public void editCycleArrayLists(int action) {
     if (action == ADDING_CYCLE) {
       if (mode==1) {
         //If we are adding a new cycle, no need to query the DB for values after save. Just use what has been passed into them from Arrays. This will add them as the correct last position.
@@ -2628,20 +2622,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     populateTimerUI();
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
-    //Used for primary key ID of database position, passed into Timer class so we can delete the selected cycle.
-    // If we are launching a new cycle, set a conditional for an empty title, a conditional for an empty list, and run the saveCycles() method to automatically save it in our database. For both new and old cycles, send all necessary intents to our Timer class.
-    if (newCycle) {
-      //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
-      if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
-        runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
-        return;
-      }
-      //Since this is a new Cycle, we automatically save it to database.
-      AsyncTask.execute(()-> saveCycles(true));
-    } else {
-      //Updates changes made to cycle if we are launching it.
-      if (saveToDB) AsyncTask.execute(()-> saveCycles(false));
+    //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
+    if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
+      runOnUiThread(()-> Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show());
+      return;
     }
+    if (newCycle) AsyncTask.execute(()-> saveCycles(true));
+    else if (saveToDB) AsyncTask.execute(()-> saveCycles(false));
     runOnUiThread(()-> {
       editCyclesPopupWindow.dismiss();
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
@@ -2697,13 +2684,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //If cycle is new, insert a new row.
             cyclesDatabase.cyclesDao().insertCycle(cycles);
             //Adding to adapter list.
-            editCycleList(ADDING_CYCLE);
+            editCycleArrayLists(ADDING_CYCLE);
           } else {
             cycles.setTitle(cycleTitle);
             //If cycle is old, update current row.
             cyclesDatabase.cyclesDao().updateCycles(cycles);
             //Editing adapter list.
-            editCycleList(EDITING_CYCLE);
+            editCycleArrayLists(EDITING_CYCLE);
           }
         }
         break;
@@ -2724,11 +2711,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomCycles.setTitle(cycleTitle);
             cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
             //Adding to adapter list.
-            editCycleList(ADDING_CYCLE);
+            editCycleArrayLists(ADDING_CYCLE);
           } else {
             pomCycles.setTitle(cycleTitle);
             cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-            editCycleList(EDITING_CYCLE);
+            editCycleArrayLists(EDITING_CYCLE);
           }
         }
         break;
@@ -2779,7 +2766,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     runOnUiThread(()-> {
       //Sets textView for empty cycle list to visible and recyclerView to gone.
-      checkEmptyCycles();
+      replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
     if (emptyCycle){
       runOnUiThread(() -> {
@@ -3087,7 +3074,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;
         countUpMillisHolder = 0;
-        baseTime = System.currentTimeMillis();
+        defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
         //Next round begins active by default, so we set our paused mode to false.
         timerIsPaused = false;
         //Executes next round based on which type is indicated in our typeOfRound list.
@@ -3212,7 +3199,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //End of round, setting textView to 0.
           timeLeft.setText("0");
           //tempMillis is used to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
-//          totalSetMillis = tempSetMillis;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
           total_set_time.setText(convertSeconds(tempSetMillis/1000));
@@ -3221,19 +3207,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //End of round, setting textView to 0.
           timeLeft.setText("0");
           //tempMillis is used ]to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
-//          totalBreakMillis = tempBreakMillis;
           //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
           tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
           total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
         case 2:
-//          totalSetMillis = tempSetMillis;
           //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(secondsUpSetRunnable);
           total_set_time.setText(convertSeconds(tempSetMillis/1000));
           break;
         case 4:
-//          totalBreakMillis = tempBreakMillis;
           //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(secondsUpBreakRunnable);
           total_break_time.setText(convertSeconds(tempBreakMillis/1000));
@@ -3271,13 +3254,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
-              //Boolean that determines whether we are pausing or resuming timer.
               timerIsPaused = true;
-              //Cancels timer object (need to recreate) and pauses object animator.
               if (timer != null) timer.cancel();
-              if (objectAnimator != null) {
-                objectAnimator.pause();
-              }
+              if (objectAnimator != null) objectAnimator.pause();
               reset.setVisibility(View.VISIBLE);
 
               switch (typeOfRound.get(currentRound)) {
@@ -3311,23 +3290,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
                 case 2:
                   //Uses the current time as a base for our count-up rounds.
-                  baseTime = System.currentTimeMillis();
+                  defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
                   if (progressBar.getProgress()==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisSets = countUpMillisHolder;
                   mHandler.post(secondsUpSetRunnable);
                   break;
                 case 4:
-                  baseTime = System.currentTimeMillis();
+                  defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
                   if (progressBar.getProgress()==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisBreaks = countUpMillisHolder;
                   mHandler.post(secondsUpBreakRunnable);
                   break;
               }
             }
-          } else {
-            //If cycle has run its course, reset the cycle and re-enable the next_round button.
-            resetTimer();
-          }
+          } else resetTimer();
           break;
         case 3:
           if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
