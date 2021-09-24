@@ -367,13 +367,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
-  Runnable queryAllCyclesFromDatabase;
-  Runnable queryAndSortAllCyclesFromDatabase;
+  Runnable queryAllCyclesFromDatabaseRunnable;
+  Runnable queryAndSortAllCyclesFromDatabaseRunnable;
   Runnable deleteTotalCycleTimesASyncRunnable;
   Runnable deleteSingleCycleASyncRunnable;
   Runnable deleteAllCyclesASyncRunnable;
   Runnable saveCyclesASyncRunnable;
 
+  //Todo:: Crash @ getting Cycles instance from cycleList in timerPopUp if no cycles exist (0 index)
+  //Todo: First cycle added on app launch does not show title.
+  //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Need animateUp textSize for infinity rounds, also to test that it all works.
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
@@ -1069,7 +1072,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
-      AsyncTask.execute(queryAndSortAllCyclesFromDatabase);
+      AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable);
       savedCycleAdapter.notifyDataSetChanged();
       moveSortCheckmark();
       sortPopupWindow.dismiss();
@@ -1088,18 +1091,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
-        AsyncTask.execute(queryAndSortAllCyclesFromDatabase);
         int totalSetTime = 0;
         int totalBreakTime = 0;
-        if (mode==1) {
-          cycles = cyclesList.get(positionOfSelectedCycle);
-          totalSetTime = cycles.getTotalSetTime();
-          totalBreakTime = cycles.getTotalBreakTime();
-        }
-        if (mode==3) {
-          pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-          totalSetTime = pomCycles.getTotalWorkTime();
-          totalBreakTime = pomCycles.getTotalBreakTime();
+        if (!isNewCycle) {
+          if (mode==1) {
+            cycles = cyclesList.get(positionOfSelectedCycle);
+            totalSetTime = cycles.getTotalSetTime();
+            totalBreakTime = cycles.getTotalBreakTime();
+          }
+          if (mode==3) {
+            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+            totalSetTime = pomCycles.getTotalWorkTime();
+            totalBreakTime = pomCycles.getTotalBreakTime();
+          }
         }
         totalSetMillis = totalSetTime*1000;
         totalBreakMillis = totalBreakTime*1000;
@@ -1856,8 +1860,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
+    queryAllCyclesFromDatabaseRunnable = new Runnable() {
+      @Override
+      public void run() {
+        if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+        if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+      }
+    };
 
-    queryAndSortAllCyclesFromDatabase = new Runnable() {
+    queryAndSortAllCyclesFromDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
         if (mode==1) {
@@ -2019,7 +2030,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedPomCycleAdapter.notifyDataSetChanged();
           });
         }
-        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+        runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
     };
 
@@ -2868,7 +2879,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Consolidate w/ timerPopUp's setOnSystemUI call.
   public void launchTimerCycle(boolean saveToDB) {
+    AsyncTask.execute(queryAllCyclesFromDatabaseRunnable);
     populateTimerUI();
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
@@ -3362,6 +3375,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView.setText(cycleTitle);
     dotDraws.resetDotAlpha();
     //Default views for Timer.
+    cycle_title_textView.setVisibility(View.VISIBLE);
     total_set_header.setVisibility(View.VISIBLE);
     total_set_time.setVisibility(View.VISIBLE);
     total_break_header.setVisibility(View.VISIBLE);
