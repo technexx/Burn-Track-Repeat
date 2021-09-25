@@ -367,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
+  Runnable updateTotalTimesInDatabaseRunnable;
   Runnable queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes;
   Runnable queryAndSortAllCyclesFromDatabaseRunnable;
   Runnable deleteTotalCycleTimesASyncRunnable;
@@ -1088,6 +1089,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      updateTotalTimeVariables();
+      AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
       //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
       //Removes runnable that begins next round.
@@ -1144,10 +1147,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleAdapter.notifyDataSetChanged();
       }
-      //Saves total times + cycle count.
-      AsyncTask.execute(()->{
-        exitTimer();
-      });
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
@@ -1831,6 +1830,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         timerDisabled = false;
         next_round.setEnabled(true);
+      }
+    };
+
+    updateTotalTimesInDatabaseRunnable = new Runnable() {
+      @Override
+      public void run() {
+        switch (mode) {
+          case 1:
+            cycles.setTotalSetTime((int) tempSetMillis / 1000);
+            cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
+            cycles.setCyclesCompleted(cyclesCompleted);
+            cyclesDatabase.cyclesDao().updateCycles(cycles);
+            break;
+          case 3:
+            pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
+            pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
+            pomCycles.setCyclesCompleted(cyclesCompleted);
+            cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+            break;
+        }
       }
     };
 
@@ -2925,6 +2944,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerIsPaused = false;
             //Used in pause/resume. If timer HAS ended, that method calls reset. Otherwise, it pauses or resumes timer.
             timerEnded = false;
+
             //Unchanging start point of setMillis used to count total set time over multiple rounds.
             permSetMillis = setMillis;
           } else {
@@ -3211,7 +3231,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
       mHandler.post(endFade);
       //Saves total set/break times.
-      saveTotalTimes();
+      updateTotalTimeVariables();
       //If skipping round manually, cancel timer and objectAnimator.
       if (endingEarly) {
         if (timer != null) timer.cancel();
@@ -3476,7 +3496,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setEnabled(true);
     progressBarPause = 10000;
     //Stores cumulative time valuation.
-    saveTotalTimes();
+    updateTotalTimeVariables();
     switch (mode) {
       case 1:
         //Resetting millis values of count up mode to 0.
@@ -3522,7 +3542,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode!=4) populateTimerUI();
   }
 
-  public void saveTotalTimes() {
+  public void updateTotalTimeVariables() {
     switch (mode) {
       //Re-using set/break vars for work/break in Pom mode since modes are exclusive.
       case 1: case 3:
@@ -3543,25 +3563,5 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalBreakMillis = tempBreakMillis;
         break;
     }
-  }
-
-  //Contains all the stuff we want done when we exit our timer. Called in both onBackPressed and our exitTimer button.
-  public void exitTimer() {
-    //Saves total elapsed time for various rounds, as well as completed cycles. tempMillis vars are used since these are the ones that hold a constant reference to our values. In Main, we have inserted "0" values for new db entries, so we can simply use an update method here.
-    switch (mode) {
-      case 1:
-        cycles.setTotalSetTime((int) tempSetMillis / 1000);
-        cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
-        cycles.setCyclesCompleted(cyclesCompleted);
-        cyclesDatabase.cyclesDao().updateCycles(cycles);
-        break;
-      case 3:
-        pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
-        pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
-        pomCycles.setCyclesCompleted(cyclesCompleted);
-        cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-        break;
-    }
-    saveTotalTimes();
   }
 }
