@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> savedLapList;
   Runnable stopWatchRunnable;
 
-  int customCyclesDone;
+  int cyclesCompleted;
   int lapsNumber;
 
   int startRounds;
@@ -367,19 +367,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
-  Runnable queryAllCyclesFromDatabaseRunnable;
+  Runnable queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes;
   Runnable queryAndSortAllCyclesFromDatabaseRunnable;
   Runnable deleteTotalCycleTimesASyncRunnable;
   Runnable deleteSingleCycleASyncRunnable;
   Runnable deleteAllCyclesASyncRunnable;
   Runnable saveCyclesASyncRunnable;
+  Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo:: Crash @ getting Cycles instance from cycleList in timerPopUp if no cycles exist (0 index)
-  //Todo: First cycle added on app launch does not show title.
-  //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
-  //Todo: Need animateUp textSize for infinity rounds, also to test that it all works.
+  //Todo: Total times buggy w/ resume option.
+  //Todo: Refactor total time vars (permMillis, etc.)
+   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
-  //Todo: Resume/restart feature for single active timer (in Main)? Timer should always be active unless explicitly cancelled.
   //Todo: BUG: Resetting pom (maybe mode 1, too), can add a second to total time.
   //Todo: Color schemes.
   //Todo: Lap adapter stuff.
@@ -776,7 +775,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setVisibility(View.INVISIBLE);
 
     cycles_completed.setText(R.string.cycles_done);
-    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
 
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
     fadeOut = new AlphaAnimation(1.0f, 0.0f);
@@ -1087,30 +1085,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortNotRecent.setOnClickListener(sortListener);
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
-
-    timerPopUpView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-      @Override
-      public void onSystemUiVisibilityChange(int visibility) {
-        int totalSetTime = 0;
-        int totalBreakTime = 0;
-        if (!isNewCycle) {
-          if (mode==1) {
-            cycles = cyclesList.get(positionOfSelectedCycle);
-            totalSetTime = cycles.getTotalSetTime();
-            totalBreakTime = cycles.getTotalBreakTime();
-          }
-          if (mode==3) {
-            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-            totalSetTime = pomCycles.getTotalWorkTime();
-            totalBreakTime = pomCycles.getTotalBreakTime();
-          }
-        }
-        totalSetMillis = totalSetTime*1000;
-        totalBreakMillis = totalBreakTime*1000;
-        total_set_time.setText(convertSeconds(totalSetTime));
-        total_break_time.setText(convertSeconds(totalBreakTime));
-      }
-    });
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
@@ -1652,7 +1626,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         //Animates text size change when timer gets to 60 seconds.
-        animateTextSize(countUpMillisSets);
+        reduceTextSizeForInfinityRounds(countUpMillisSets);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         countUpMillisSets = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
@@ -1678,7 +1652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         progressBarPause = (int) objectAnimator.getAnimatedValue();
-        animateTextSize(countUpMillisBreaks);
+        reduceTextSizeForInfinityRounds(countUpMillisBreaks);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
@@ -1825,8 +1799,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Used to call resetTimer() in pause/resume method. Separate than our disable method.
           timerEnded = true;
           //Adds to cycles completed counter.
-          customCyclesDone++;
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+          cyclesCompleted++;
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
         }
         //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
         timerDisabled = false;
@@ -1853,18 +1827,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           animateEnding();
           progressBar.setProgress(0);
           timerEnded = true;
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
         }
         timerDisabled = false;
         next_round.setEnabled(true);
       }
     };
 
-    queryAllCyclesFromDatabaseRunnable = new Runnable() {
+    queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes = new Runnable() {
       @Override
       public void run() {
         if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
         if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+        runOnUiThread(retrieveTotalCycleTimesFromDatabaseObjectRunnable);
+      }
+    };
+
+    retrieveTotalCycleTimesFromDatabaseObjectRunnable = new Runnable() {
+      @Override
+      public void run() {
+        int totalSetTime = 0;
+        int totalBreakTime = 0;
+        if (!isNewCycle) {
+          if (mode==1) {
+            cycles = cyclesList.get(positionOfSelectedCycle);
+            totalSetTime = cycles.getTotalSetTime();
+            totalBreakTime = cycles.getTotalBreakTime();
+            cyclesCompleted = cycles.getCyclesCompleted();
+          }
+          if (mode==3) {
+            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+            totalSetTime = pomCycles.getTotalWorkTime();
+            totalBreakTime = pomCycles.getTotalBreakTime();
+            cyclesCompleted = pomCycles.getCyclesCompleted();
+          }
+        }
+        //Todo: permSetMillis in timer object affected by startObjectAnimator().
+        totalSetMillis = totalSetTime*1000;
+        totalBreakMillis = totalBreakTime*1000;
+        total_set_time.setText(convertSeconds(totalSetTime));
+        total_break_time.setText(convertSeconds(totalBreakTime));
+        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
       }
     };
 
@@ -1994,7 +1997,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           permSetMillis = ((setMillis+100) / 1000) * 1000;
           permBreakMillis = ((breakMillis+100) / 1000) * 1000;
-          customCyclesDone = 0;
+          cyclesCompleted = 0;
 
           total_set_time.setText("0");
           total_break_time.setText("0");
@@ -2879,10 +2882,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Consolidate w/ timerPopUp's setOnSystemUI call.
   public void launchTimerCycle(boolean saveToDB) {
-    AsyncTask.execute(queryAllCyclesFromDatabaseRunnable);
+    if (isNewCycle) resetTimer();
     populateTimerUI();
+    AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
     //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
@@ -2968,7 +2971,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void startSetTimer() {
-    setTextSize(setMillis);
+    setInitialTextSizeForRounds(setMillis);
 
     timer = new CountDownTimer(setMillis, 50) {
       @Override
@@ -3002,7 +3005,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void startBreakTimer() {
     if (mode == 1) {
-      setTextSize(breakMillis);
+      setInitialTextSizeForRounds(breakMillis);
 
       timer = new CountDownTimer(breakMillis, 50) {
         @Override
@@ -3035,7 +3038,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void startPomTimer() {
-    setTextSize(pomMillis);
+    setInitialTextSizeForRounds(pomMillis);
 
     timer = new CountDownTimer(pomMillis, 50) {
       @Override
@@ -3103,7 +3106,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
-  public void setTextSize(long millis) {
+  public void setInitialTextSizeForRounds(long millis) {
     if (millis>=59000) {
       timeLeft.setTextSize(70f);
       textSizeIncreased = true;
@@ -3113,7 +3116,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Used in count up mode to animate text size changes in our runnables.
-  public void animateTextSize(long millis) {
+  public void reduceTextSizeForInfinityRounds(long millis) {
     if (textSizeReduced) {
       if (millis >=60000) {
         changeTextSize(valueAnimatorDown, timeLeft);
@@ -3370,7 +3373,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void populateTimerUI() {
     beginTimerForNextRound = true;
     cycles_completed.setText(R.string.cycles_done);
-    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(customCyclesDone)));
+    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
 
     cycle_title_textView.setText(cycleTitle);
     dotDraws.resetDotAlpha();
@@ -3407,17 +3410,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
               setMillis = workoutTime.get(0);
               timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
-              setTextSize(setMillis);
+              setInitialTextSizeForRounds(setMillis);
               break;
             case 3:
               breakMillis = workoutTime.get(0);
               timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
-              setTextSize(breakMillis);
+              setInitialTextSizeForRounds(breakMillis);
               break;
             case 2:
             case 4:
               timeLeft.setText("0");
-              setTextSize(0);
+              setInitialTextSizeForRounds(0);
               break;
           }
         }
@@ -3429,7 +3432,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
           dotDraws.pomDraw(pomDotCounter,pomValuesTime);
           //Sets initial text size.
-          setTextSize(pomMillis);
+          setInitialTextSizeForRounds(pomMillis);
         }
         break;
       case 4:
@@ -3452,7 +3455,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ConstraintLayout.LayoutParams lapRecyclerParams = (ConstraintLayout.LayoutParams) lapRecycler.getLayoutParams();
         completedLapsParam.topMargin = 0;
         lapRecyclerParams.topMargin = 60;
-        setTextSize(0);
+        setInitialTextSizeForRounds(0);
 
         timerDisabled = false;
         timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
@@ -3549,13 +3552,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         cycles.setTotalSetTime((int) tempSetMillis / 1000);
         cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
-        cycles.setCyclesCompleted(customCyclesDone);
+        cycles.setCyclesCompleted(cyclesCompleted);
         cyclesDatabase.cyclesDao().updateCycles(cycles);
         break;
       case 3:
         pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
         pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
-        pomCycles.setCyclesCompleted(customCyclesDone);
+        pomCycles.setCyclesCompleted(cyclesCompleted);
         cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         break;
     }
