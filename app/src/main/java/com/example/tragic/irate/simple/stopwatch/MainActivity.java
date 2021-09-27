@@ -371,9 +371,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Total times buggy w/ resume option.
-  //Todo: Refactor total time vars (permMillis, etc.)
-   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
+  //Todo: Refactor Timer and Edit popups into sep files + classes.
+  //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: BUG: Resetting pom (maybe mode 1, too), can add a second to total time.
   //Todo: Color schemes.
@@ -1084,6 +1083,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      addAndRoundDownTotalCycleTimeFromPreviousRounds();
       AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
       //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
@@ -2969,14 +2969,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
+        //Todo: Counting up and down will have different sync issues w/ millis added to display.
         total_set_time.setText(stringValueOfTotalCycleTime(1));
+        timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
 
         //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
         if (textSizeIncreased) if (setMillis < 59000) {
           textSizeIncreased = false;
         }
-        //Displays Long->String conversion of time left every tick.
-        timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
         if (setMillis < 500) timerDisabled = true;
         //Refreshes Canvas so dots fade.
         dotDraws.reDraw();
@@ -2987,45 +2987,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
-  }
-
-  //Todo: Resetting cycle resets this and it should not.
-  public String stringValueOfTotalCycleTime(int roundType) {
-    long startDuration = 0;
-    long elapsedTime = 0;
-    String addedTime = "";
-    if (mode==1) {
-      switch (roundType) {
-        case 1:
-          startDuration = objectAnimator.getDuration();
-          elapsedTime = setMillis;
-
-          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime;
-          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis+ 100) / 1000);
-          break;
-        case 3:
-          startDuration = objectAnimator.getDuration();
-          elapsedTime = breakMillis;
-
-          cycleBreakTimeForSingleRoundInMillis = startDuration - elapsedTime;
-          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis+ 100) / 1000);
-          break;
-        case 2:
-          cycleSetTimeForSingleRoundInMillis = countUpMillisSets;
-          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis+ 100) / 1000);
-          break;
-        case 4:
-          cycleBreakTimeForSingleRoundInMillis = countUpMillisBreaks;
-          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis+ 100) / 1000);
-          break;
-      }
-    }
-    return addedTime;
-  }
-
-  public void addTotalCycleTimeFromPreviousRounds() {
-    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
-    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
   }
 
   public void startBreakTimer() {
@@ -3043,7 +3004,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             textSizeIncreased = false;
           }
 
-          timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
+          timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
           if (breakMillis < 500) timerDisabled = true;
 
           //Refreshes Canvas so dots fade.
@@ -3073,7 +3034,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           textSizeIncreased = false;
         }
 
-        timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
+        timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
         if (pomMillis < 500) timerDisabled = true;
         //Refreshes Canvas so dots fade.
         dotDraws.reDraw();
@@ -3084,6 +3045,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
+  }
+
+  public String stringValueOfTotalCycleTime(int roundType) {
+    long startDuration = 0;
+    long elapsedTime = 0;
+    String addedTime = "";
+    if (mode==1) {
+      switch (roundType) {
+        case 1:
+          startDuration = objectAnimator.getDuration();
+          elapsedTime = setMillis;
+
+          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          break;
+        case 3:
+          startDuration = objectAnimator.getDuration();
+          elapsedTime = breakMillis;
+
+          cycleBreakTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          break;
+        case 2:
+          cycleSetTimeForSingleRoundInMillis = countUpMillisSets;
+          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          break;
+        case 4:
+          cycleBreakTimeForSingleRoundInMillis = countUpMillisBreaks;
+          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          break;
+      }
+    }
+    return addedTime;
+  }
+
+  public void addAndRoundDownTotalCycleTimeFromPreviousRounds() {
+    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
+    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
+    long setRemainder = totalCycleSetTimeInMillis%1000;
+    long breakRemainder = totalCycleBreakTimeInMillis%1000;
+    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
+    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
   }
 
   //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
@@ -3188,7 +3191,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void nextRound(boolean endingEarly) {
-    addTotalCycleTimeFromPreviousRounds();
+    addAndRoundDownTotalCycleTimeFromPreviousRounds();
     //Fade effect to smooth out progressBar and timer text after animation.
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
@@ -3468,6 +3471,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBarPause = 10000;
     switch (mode) {
       case 1:
+        addAndRoundDownTotalCycleTimeFromPreviousRounds();
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;
