@@ -272,16 +272,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int RESETTING_CyCLE = 2;
 
   long setMillis;
-  long totalSetMillis;
-  long tempSetMillis;
-  long setMillisHolder;
-  long permSetMillis;
-
   long breakMillis;
-  long totalBreakMillis;
-  long breakMillisHolder;
-  long tempBreakMillis;
-  long permBreakMillis;
+  long cycleSetTimeForSingleRoundInMillis;
+  long totalCycleSetTimeInMillis;
+  long cycleBreakTimeForSingleRoundInMillis;
+  long totalCycleBreakTimeInMillis;
   String timeLeftValueHolder;
 
   long currentProgressBarValueForInfinityRounds;
@@ -1089,7 +1084,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      updateTotalTimeVariables();
       AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
       //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
@@ -1624,19 +1618,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         progressBarPause = (int) objectAnimator.getAnimatedValue();
-        //Animates text size change when timer gets to 60 seconds.
         reduceTextSizeForInfinityRounds(countUpMillisSets);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         countUpMillisSets = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        total_set_time.setText(stringValueOfTotalCycleTime(2));
+
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) countUpMillisSets);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-        //Temporary value for current round, using totalSetMillis which is our permanent value.
-        tempSetMillis = totalSetMillis + countUpMillisSets;
-        total_set_time.setText(convertSeconds(tempSetMillis / 1000));
         //Once progressBar value hits 0, animate bar/text, reset bar's progress value to max, and restart the objectAnimator that uses it.
         if (progressBar.getProgress()<=0) {
           progressBar.startAnimation(fadeProgressOut);
@@ -1654,6 +1646,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         reduceTextSizeForInfinityRounds(countUpMillisBreaks);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        total_break_time.setText(stringValueOfTotalCycleTime(4));
+
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - countUpMillisBreaks;
         timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
@@ -1661,8 +1655,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) countUpMillisBreaks);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
-        tempBreakMillis = totalBreakMillis + countUpMillisBreaks;
-        total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
         if (progressBar.getProgress()<=0) {
           progressBar.startAnimation(fadeProgressOut);
           timeLeft.startAnimation(fadeProgressOut);
@@ -1838,14 +1830,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         switch (mode) {
           case 1:
-            cycles.setTotalSetTime((int) tempSetMillis / 1000);
-            cycles.setTotalBreakTime((int) tempBreakMillis / 1000);
+            cycles.setTotalSetTime((int) totalCycleSetTimeInMillis / 1000);
+            cycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis/1000);
             cycles.setCyclesCompleted(cyclesCompleted);
             cyclesDatabase.cyclesDao().updateCycles(cycles);
             break;
           case 3:
-            pomCycles.setTotalWorkTime((int) tempSetMillis / 1000);
-            pomCycles.setTotalBreakTime((int) tempBreakMillis / 1000);
+            pomCycles.setTotalWorkTime((int) totalCycleSetTimeInMillis / 1000);
+            pomCycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis / 1000);
             pomCycles.setCyclesCompleted(cyclesCompleted);
             cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
             break;
@@ -1881,9 +1873,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cyclesCompleted = pomCycles.getCyclesCompleted();
           }
         }
-        //Todo: permSetMillis in timer object affected by startObjectAnimator().
-        totalSetMillis = totalSetTime*1000;
-        totalBreakMillis = totalBreakTime*1000;
+        totalCycleSetTimeInMillis = totalSetTime*1000;
+        totalCycleBreakTimeInMillis = totalBreakTime*1000;
         total_set_time.setText(convertSeconds(totalSetTime));
         total_break_time.setText(convertSeconds(totalBreakTime));
         cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
@@ -2008,14 +1999,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         runOnUiThread(()->{
           deleteCyclePopupWindow.dismiss();
-          //Resets all total times to 0.
-          totalSetMillis = 0;
-          tempSetMillis = 0;
-          totalBreakMillis = 0;
-          tempBreakMillis = 0;
-
-          permSetMillis = ((setMillis+100) / 1000) * 1000;
-          permBreakMillis = ((breakMillis+100) / 1000) * 1000;
+          totalCycleSetTimeInMillis = 0;
+          totalCycleBreakTimeInMillis = 0;
           cyclesCompleted = 0;
 
           total_set_time.setText("0");
@@ -2944,9 +2929,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerIsPaused = false;
             //Used in pause/resume. If timer HAS ended, that method calls reset. Otherwise, it pauses or resumes timer.
             timerEnded = false;
-
-            //Unchanging start point of setMillis used to count total set time over multiple rounds.
-            permSetMillis = setMillis;
           } else {
             setMillis = setMillisUntilFinished;
             if (objectAnimator != null) objectAnimator.resume();
@@ -2957,8 +2939,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerIsPaused = false;
             //Starts object animator.
             instantiateAndStartObjectAnimator(breakMillis);
-            //Unchanging start point of breakMillis used to count total set time over multiple rounds.
-            permBreakMillis = breakMillis;
           } else {
             breakMillis = breakMillisUntilFinished;
             if (objectAnimator != null) objectAnimator.resume();
@@ -2973,15 +2953,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Starts object animator.
           instantiateAndStartObjectAnimator(pomMillis);
           timerEnded = false;
-          //Unchanging start point of pomMillis used to count total set time over multiple rounds. Using SET and BREAK vars since modes are exclusive, and it saves on variable creation.
-          switch (pomDotCounter) {
-            case 0: case 2: case 4: case 6:
-              permSetMillis = pomMillis;
-              break;
-            case 1: case 3: case 5: case 7:
-              permBreakMillis = pomMillis;
-              break;
-          }
         } else {
           pomMillis = pomMillisUntilFinished;
           if (objectAnimatorPom != null) objectAnimatorPom.resume();
@@ -2998,6 +2969,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
+        total_set_time.setText(stringValueOfTotalCycleTime(1));
 
         //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
         if (textSizeIncreased) if (setMillis < 59000) {
@@ -3006,12 +2978,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Displays Long->String conversion of time left every tick.
         timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
         if (setMillis < 500) timerDisabled = true;
-
-        //Sets value to difference between starting millis and current millis (e.g. 45000 left from 50000 start is 5000/5 sec elapsed).
-        setMillisHolder = permSetMillis - setMillis;
-        //Temporary value for current round, using totalSetMillis which is our permanent value.
-        tempSetMillis = totalSetMillis + setMillisHolder;
-        total_set_time.setText(convertSeconds(tempSetMillis / 1000));
         //Refreshes Canvas so dots fade.
         dotDraws.reDraw();
       }
@@ -3023,6 +2989,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
+  //Todo: Resetting cycle resets this and it should not.
+  public String stringValueOfTotalCycleTime(int roundType) {
+    long startDuration = 0;
+    long elapsedTime = 0;
+    String addedTime = "";
+    if (mode==1) {
+      switch (roundType) {
+        case 1:
+          startDuration = objectAnimator.getDuration();
+          elapsedTime = setMillis;
+
+          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis+ 100) / 1000);
+          break;
+        case 3:
+          startDuration = objectAnimator.getDuration();
+          elapsedTime = breakMillis;
+
+          cycleBreakTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis+ 100) / 1000);
+          break;
+        case 2:
+          cycleSetTimeForSingleRoundInMillis = countUpMillisSets;
+          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis+ 100) / 1000);
+          break;
+        case 4:
+          cycleBreakTimeForSingleRoundInMillis = countUpMillisBreaks;
+          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis+ 100) / 1000);
+          break;
+      }
+    }
+    return addedTime;
+  }
+
+  public void addTotalCycleTimeFromPreviousRounds() {
+    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
+    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
+  }
+
   public void startBreakTimer() {
     if (mode == 1) {
       setInitialTextSizeForRounds(breakMillis);
@@ -3032,6 +3037,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void onTick(long millisUntilFinished) {
           progressBarPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
+          total_break_time.setText(stringValueOfTotalCycleTime(3));
 
           if (textSizeIncreased) if (breakMillis < 59000) {
             textSizeIncreased = false;
@@ -3039,11 +3045,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
           if (breakMillis < 500) timerDisabled = true;
-
-          //For "Total Break" times.
-          breakMillisHolder = permBreakMillis - breakMillis;
-          tempBreakMillis = totalBreakMillis + breakMillisHolder;
-          total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
 
           //Refreshes Canvas so dots fade.
           dotDraws.reDraw();
@@ -3057,6 +3058,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Set total times here and in String method above.
   public void startPomTimer() {
     setInitialTextSizeForRounds(pomMillis);
 
@@ -3073,26 +3075,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
         if (pomMillis < 500) timerDisabled = true;
-
-        //Switches total time count depending on which round we're on.
-        switch (pomDotCounter) {
-          case 0:
-          case 2:
-          case 4:
-          case 6:
-            setMillisHolder = permSetMillis - pomMillis;
-            tempSetMillis = totalSetMillis + setMillisHolder;
-            total_set_time.setText(convertSeconds(tempSetMillis / 1000));
-            break;
-          case 1:
-          case 3:
-          case 5:
-          case 7:
-            breakMillisHolder = permBreakMillis - pomMillis;
-            tempBreakMillis = totalBreakMillis + breakMillisHolder;
-            total_break_time.setText(convertSeconds(tempBreakMillis / 1000));
-            break;
-        }
         //Refreshes Canvas so dots fade.
         dotDraws.reDraw();
       }
@@ -3206,6 +3188,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void nextRound(boolean endingEarly) {
+    addTotalCycleTimeFromPreviousRounds();
     //Fade effect to smooth out progressBar and timer text after animation.
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
@@ -3230,8 +3213,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       currentProgressBarValueForInfinityRounds = 30000;
       //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
       mHandler.post(endFade);
-      //Saves total set/break times.
-      updateTotalTimeVariables();
       //If skipping round manually, cancel timer and objectAnimator.
       if (endingEarly) {
         if (timer != null) timer.cancel();
@@ -3244,28 +3225,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           //End of round, setting textView to 0.
           timeLeft.setText("0");
-          //tempMillis is used to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
-          //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
-          tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
-          total_set_time.setText(convertSeconds(tempSetMillis/1000));
           break;
         case 3:
           //End of round, setting textView to 0.
           timeLeft.setText("0");
-          //tempMillis is used ]to retain value in active runnables. Here, we set our static totalMillis to the value that has been iterated up to.
-          //Rounds our total millis up to the nearest 1000th and divides to whole int to ensure synchronicity w/ display (e.g. (4950 + 100) / 1000 == 5).
-          tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
-          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
         case 2:
           //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(infinityRunnableForSets);
-          total_set_time.setText(convertSeconds(tempSetMillis/1000));
           break;
         case 4:
           //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(infinityRunnableForBreaks);
-          total_break_time.setText(convertSeconds(tempBreakMillis/1000));
           break;
       }
       //Subtracts from rounds remaining.
@@ -3495,8 +3466,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (endAnimation!=null) endAnimation.cancel();
     next_round.setEnabled(true);
     progressBarPause = 10000;
-    //Stores cumulative time valuation.
-    updateTotalTimeVariables();
     switch (mode) {
       case 1:
         //Resetting millis values of count up mode to 0.
@@ -3540,28 +3509,5 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     //Base of 0 values for stopwatch means we don't want anything populated when resetting.
     if (mode!=4) populateTimerUI();
-  }
-
-  public void updateTotalTimeVariables() {
-    switch (mode) {
-      //Re-using set/break vars for work/break in Pom mode since modes are exclusive.
-      case 1: case 3:
-        //Sets our total millis to the temp value iterated up in our runnable.
-        totalSetMillis = tempSetMillis;
-        //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
-        tempSetMillis = ((totalSetMillis + 100) / 1000) * 1000;
-        total_set_time.setText(convertSeconds(tempSetMillis/1000));
-        //Sets our totalMillis to the new, revised and rounded tempMillis so when it's used again, it syncs up.
-        totalSetMillis = tempSetMillis;
-
-        //Sets our total millis to the temp value iterated up in our runnable.
-        totalBreakMillis = tempBreakMillis;
-        //Sets our temp value, which will be picked up again in our runnable next round, to the new total rounded up to nearest 1000th. These expressions seem redundant, but are necessary since our timers update continuously.
-        tempBreakMillis = ((totalBreakMillis + 100) / 1000) * 1000;
-        total_break_time.setText(convertSeconds(tempBreakMillis/1000));
-        //Sets our totalMillis to the new, revised and rounded tempMillis so when it's used again, it syncs up.
-        totalBreakMillis = tempBreakMillis;
-        break;
-    }
   }
 }
