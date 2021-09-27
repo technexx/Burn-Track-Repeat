@@ -2969,12 +2969,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
-        //Todo: Counting up and down will have different sync issues w/ millis added to display.
         total_set_time.setText(stringValueOfTotalCycleTime(1));
         timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
 
         //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
         if (textSizeIncreased) if (setMillis < 59000) {
+          changeTextSize(valueAnimatorUp, timeLeft);
           textSizeIncreased = false;
         }
         if (setMillis < 500) timerDisabled = true;
@@ -2998,13 +2998,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void onTick(long millisUntilFinished) {
           progressBarPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
+          timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
           total_break_time.setText(stringValueOfTotalCycleTime(3));
 
           if (textSizeIncreased) if (breakMillis < 59000) {
+            changeTextSize(valueAnimatorUp, timeLeft);
             textSizeIncreased = false;
           }
 
-          timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
           if (breakMillis < 500) timerDisabled = true;
 
           //Refreshes Canvas so dots fade.
@@ -3019,7 +3020,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Set total times here and in String method above.
   public void startPomTimer() {
     setInitialTextSizeForRounds(pomMillis);
 
@@ -3028,6 +3028,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         progressBarPause = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
+        switch (pomDotCounter) {
+          case 0: case 2: case 4: case 6:
+            total_set_time.setText(stringValueOfTotalCycleTime(0)); break;
+          case 1: case 3: case 5: case 7:
+            total_break_time.setText(stringValueOfTotalCycleTime(0)); break;
+        }
 
         if (textSizeIncreased) if (pomMillis < 59000) {
           changeTextSize(valueAnimatorUp, timeLeft);
@@ -3073,6 +3079,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 4:
           cycleBreakTimeForSingleRoundInMillis = countUpMillisBreaks;
+          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          break;
+      }
+    }
+
+    if (mode==3) {
+      startDuration = objectAnimatorPom.getDuration();
+      elapsedTime = pomMillis;
+
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          break;
+        case 1: case 3: case 5: case 7:
+          cycleBreakTimeForSingleRoundInMillis = startDuration - elapsedTime;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           break;
       }
