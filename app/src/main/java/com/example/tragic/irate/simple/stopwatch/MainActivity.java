@@ -2985,7 +2985,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onFinish() {
-        total_set_time.setText(stringValueOfTotalCycleTime(1));
         nextRound(false);
       }
     }.start();
@@ -3104,14 +3103,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return addedTime;
   }
 
-  public void addAndRoundDownTotalCycleTimeFromPreviousRounds() {
+  public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean endingRoundEarly) {
     totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
     totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
 
     long setRemainder = totalCycleSetTimeInMillis%1000;
     long breakRemainder = totalCycleBreakTimeInMillis%1000;
-    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
-    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+    if (endingRoundEarly) {
+      totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
+      totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
+    } else {
+      totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+      totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+    }
   }
 
   //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
@@ -3216,7 +3220,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void nextRound(boolean endingEarly) {
-    addAndRoundDownTotalCycleTimeFromPreviousRounds();
     //Fade effect to smooth out progressBar and timer text after animation.
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
@@ -3246,7 +3249,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
-      }
+        addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      } else addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
 
       switch (typeOfRound.get(currentRound)) {
         case 1:
