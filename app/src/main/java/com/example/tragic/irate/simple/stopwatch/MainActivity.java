@@ -371,6 +371,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
+  //Todo: Anytime addAndRound...() is called, total times will add. Right now, end of a cycle reset will do an extra addition.
+  //Todo: Total times only saving in exiting Timer. Should save more often.
   //Todo: Refactor Timer and Edit popups into sep files + classes.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
@@ -1083,7 +1085,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      addAndRoundDownTotalCycleTimeFromPreviousRounds();
       AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
       //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
@@ -2984,6 +2985,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onFinish() {
+        total_set_time.setText(stringValueOfTotalCycleTime(1));
         nextRound(false);
       }
     }.start();
@@ -3105,10 +3107,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds() {
     totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
     totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
+
     long setRemainder = totalCycleSetTimeInMillis%1000;
     long breakRemainder = totalCycleBreakTimeInMillis%1000;
-    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
-    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
+    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
   }
 
   //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
@@ -3244,24 +3247,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
       }
-      ///------------------------////////
 
       switch (typeOfRound.get(currentRound)) {
         case 1:
-          //End of round, setting textView to 0.
           timeLeft.setText("0");
+          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
           break;
         case 3:
-          //End of round, setting textView to 0.
           timeLeft.setText("0");
+          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
           break;
         case 2:
-          //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(infinityRunnableForSets);
+          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
           break;
         case 4:
-          //Infinite round has ended, so we cancel the runnable
           mHandler.removeCallbacks(infinityRunnableForBreaks);
+          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
           break;
       }
       //Subtracts from rounds remaining.
@@ -3493,7 +3495,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBarPause = 10000;
     switch (mode) {
       case 1:
-        addAndRoundDownTotalCycleTimeFromPreviousRounds();
         //Resetting millis values of count up mode to 0.
         countUpMillisSets = 0;
         countUpMillisBreaks = 0;
