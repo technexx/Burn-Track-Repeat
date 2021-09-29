@@ -371,8 +371,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Starting round after editing and launching IF an existing round is deleted/replaced. Also can produce index exception.
-  //Todo: Edited rounds should save on launch. Editing + launching cycle + re-launching app via Studio does not save.
+  //Todo: Need resume/reset dialogue on editing cycle + launch.
   //Todo: Refactor Timer and Edit popups into sep files + classes.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
@@ -1098,39 +1097,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Prevents timer from starting. Runnable will just populate values of next round.
       beginTimerForNextRound = false;
 
-      if (mode==1) {
-        //Only shows restart/resume options of a cycle has been started.
-        if (objectAnimator.isStarted() || startRounds-numberOfRoundsLeft>0) {
-          if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
-          savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
-        }
-        //If between rounds, post runnable for next round without starting timer or object animator.
-        if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
-
-        prefEdit.putInt("savedProgressBarValueForModeOne", progressBarPause);
-        prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
-        prefEdit.putInt("positionOfSelectedCycleForModeOne", positionOfSelectedCycle);
-        prefEdit.putBoolean("modeOneTimerPaused", timerIsPaused);
-        prefEdit.putBoolean("modeOneTimerEnded", timerEnded);
-        prefEdit.putBoolean("modeOneTimerDisabled", timerDisabled);
-      }
-
-      if (mode==3) {
-        if (objectAnimatorPom.isStarted() || pomDotCounter > 0) {
-          if (isNewCycle) positionOfSelectedCycle = 7;
-          savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
-        }
-        if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
-
-        prefEdit.putInt("savedProgressBarValueForModeThree", progressBarPause);
-        prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
-        prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
-        prefEdit.putBoolean("modeThreeTimerPaused", timerIsPaused);
-        prefEdit.putBoolean("modeThreeTimerEnded", timerEnded);
-        prefEdit.putBoolean("modeThreeTimerDisabled", timerDisabled);
-      }
-      prefEdit.apply();
-
       buttonToLaunchTimer.setEnabled(false);
       //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
       if (mode==4) mode = savedMode;
@@ -1143,6 +1109,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleAdapter.notifyDataSetChanged();
       }
+      activateResumeOrResetOptionForCycle();
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
@@ -2072,6 +2039,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     };
+  }
+
+  public void activateResumeOrResetOptionForCycle() {
+    if (mode==1) {
+      //Only shows restart/resume options of a cycle has been started.
+      if (objectAnimator.isStarted() || startRounds-numberOfRoundsLeft>0) {
+        if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
+        savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
+      }
+      //If between rounds, post runnable for next round without starting timer or object animator.
+      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
+
+      prefEdit.putInt("savedProgressBarValueForModeOne", progressBarPause);
+      prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
+      prefEdit.putInt("positionOfSelectedCycleForModeOne", positionOfSelectedCycle);
+      prefEdit.putBoolean("modeOneTimerPaused", timerIsPaused);
+      prefEdit.putBoolean("modeOneTimerEnded", timerEnded);
+      prefEdit.putBoolean("modeOneTimerDisabled", timerDisabled);
+    }
+
+    if (mode==3) {
+      if (objectAnimatorPom.isStarted() || pomDotCounter > 0) {
+        if (isNewCycle) positionOfSelectedCycle = 7;
+        savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
+      }
+      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
+
+      prefEdit.putInt("savedProgressBarValueForModeThree", progressBarPause);
+      prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
+      prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
+      prefEdit.putBoolean("modeThreeTimerPaused", timerIsPaused);
+      prefEdit.putBoolean("modeThreeTimerEnded", timerEnded);
+      prefEdit.putBoolean("modeThreeTimerDisabled", timerDisabled);
+    }
+    prefEdit.apply();
   }
 
   public int setDensityPixels(float pixels) {
