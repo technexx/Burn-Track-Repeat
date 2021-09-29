@@ -371,8 +371,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Anytime addAndRound...() is called, total times will add. Right now, end of a cycle reset will do an extra addition.
-  //Todo: Total times only saving in exiting Timer. Should save more often.
+  //Todo: sets saving as breaks for total time.
+  //Todo: Starting round after editing and launching a cycle is b0rked. Also uses old values.
+  //Todo: Edited rounds should save on launch. Editing + launching cycle + re-launching app via Studio does not save.
   //Todo: Refactor Timer and Edit popups into sep files + classes.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
@@ -1856,7 +1857,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    retrieveTotalCycleTimesFromDatabaseObjectRunnable = new Runnable() {
+  retrieveTotalCycleTimesFromDatabaseObjectRunnable = new Runnable() {
       @Override
       public void run() {
         int totalSetTime = 0;
@@ -3000,8 +3001,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void onTick(long millisUntilFinished) {
           progressBarPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
-          timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
           total_break_time.setText(stringValueOfTotalCycleTime(3));
+          timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
 
           if (textSizeIncreased) if (breakMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft);
@@ -3010,7 +3011,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           if (breakMillis < 500) timerDisabled = true;
 
-          //Refreshes Canvas so dots fade.
           dotDraws.reDraw();
         }
 
@@ -3106,14 +3106,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean roundSecondsUp) {
     if (mode==1) {
+      Log.i("testval", "type of round is " + typeOfRound.get(currentRound));
       switch (typeOfRound.get(currentRound)) {
-        case 1: case 3:
+        case 1: case 2:
           totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
           long setRemainder = totalCycleSetTimeInMillis%1000;
           if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
           else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
           break;
-        case 2: case 4:
+        case 3: case 4:
           totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
           long breakRemainder = totalCycleBreakTimeInMillis%1000;
           if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
@@ -3279,13 +3280,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timeLeft.setText("0");
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
           break;
-        case 3:
-          timeLeft.setText("0");
-          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          break;
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          break;
+        case 3:
+          timeLeft.setText("0");
+          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
@@ -3333,12 +3334,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 1:
                   setMillisUntilFinished = setMillis;
                   break;
-                case 3:
-                  breakMillisUntilFinished = breakMillis;
-                  break;
                 case 2:
                   countUpMillisHolder = countUpMillisSets;
                   mHandler.removeCallbacks(infinityRunnableForSets);
+                  break;
+                case 3:
+                  breakMillisUntilFinished = breakMillis;
                   break;
                 case 4:
                   countUpMillisHolder = countUpMillisBreaks;
@@ -3354,16 +3355,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   startObjectAnimator();
                   startSetTimer();
                   break;
-                case 3:
-                  startObjectAnimator();
-                  startBreakTimer();
-                  break;
                 case 2:
                   //Uses the current time as a base for our count-up rounds.
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
                   if (progressBar.getProgress()==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisSets = countUpMillisHolder;
                   mHandler.post(infinityRunnableForSets);
+                  break;
+                case 3:
+                  startObjectAnimator();
+                  startBreakTimer();
                   break;
                 case 4:
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
