@@ -371,11 +371,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Need resume/reset dialogue on editing cycle + launch.
+  //Todo: Not changing action bar views when going into edit mode would solve sync issue.
+  //Todo: Total time reset needs fixing.
   //Todo: Refactor Timer and Edit popups into sep files + classes.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
-  //Todo: BUG: Resetting pom (maybe mode 1, too), can add a second to total time.
   //Todo: Color schemes.
   //Todo: Lap adapter stuff.
   //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating.
@@ -2122,11 +2122,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Fades action bar buttons in/out depending on whether we are editing cycles or not.
   public void fadeEditCycleButtonsIn(int typeOfFade) {
     //Clearing all animations. If we don't, their alphas tend to get reset.
-    edit_highlighted_cycle.clearAnimation();
-    delete_highlighted_cycle.clearAnimation();
-    cancelHighlight.clearAnimation();
-    appHeader.clearAnimation();
-    sortButton.clearAnimation();
+    if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
+      edit_highlighted_cycle.clearAnimation();
+      delete_highlighted_cycle.clearAnimation();
+      cancelHighlight.clearAnimation();
+      appHeader.clearAnimation();
+      sortButton.clearAnimation();
+    }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
       //Boolean used to keep launchCycles() from calling populateRoundLists(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeIn);
@@ -2155,8 +2157,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(false);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-      sortButton.startAnimation(fadeIn);
-      delete_highlighted_cycle.startAnimation(fadeOut);
+      sortButton.setVisibility(View.VISIBLE);
+      delete_highlighted_cycle.setVisibility(View.INVISIBLE);
       delete_highlighted_cycle.setEnabled(false);
     }
   }
