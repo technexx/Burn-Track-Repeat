@@ -371,8 +371,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: sets saving as breaks for total time.
-  //Todo: Starting round after editing and launching a cycle is b0rked. Also uses old values.
+  //Todo: Starting round after editing and launching IF an existing round is deleted/replaced. Also can produce index exception.
   //Todo: Edited rounds should save on launch. Editing + launching cycle + re-launching app via Studio does not save.
   //Todo: Refactor Timer and Edit popups into sep files + classes.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
@@ -2890,7 +2889,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean saveToDB) {
-    if (isNewCycle) resetTimer();
+    if (isNewCycle || currentlyEditingACycle) resetTimer();
     populateTimerUI();
     AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
@@ -3106,7 +3105,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean roundSecondsUp) {
     if (mode==1) {
-      Log.i("testval", "type of round is " + typeOfRound.get(currentRound));
       switch (typeOfRound.get(currentRound)) {
         case 1: case 2:
           totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
