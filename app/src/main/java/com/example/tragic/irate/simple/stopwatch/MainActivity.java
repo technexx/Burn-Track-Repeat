@@ -2155,8 +2155,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(false);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-      sortButton.setVisibility(View.VISIBLE);
-      delete_highlighted_cycle.setVisibility(View.GONE);
+      sortButton.startAnimation(fadeIn);
+      delete_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.setEnabled(false);
     }
   }
