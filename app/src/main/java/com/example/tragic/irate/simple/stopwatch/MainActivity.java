@@ -371,6 +371,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
+  //Todo: Save total times on dismiss is +1 second when coming back, also some break time is saving even w/ sets only.
+  //Todo: Set nextRound() textViews for total times in Pom.
   //Todo: Anytime addAndRound...() is called, total times will add. Right now, end of a cycle reset will do an extra addition.
   //Todo: Total times only saving in exiting Timer. Should save more often.
   //Todo: Refactor Timer and Edit popups into sep files + classes.
@@ -1085,6 +1087,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
       AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
       //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
@@ -3103,13 +3106,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return addedTime;
   }
 
-  public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean endingRoundEarly) {
+  //Todo: Split by typeOfRound case for mode 1, and pomDotCounter for mode 3.
+  public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean roundSecondsUp) {
     totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
     totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
 
     long setRemainder = totalCycleSetTimeInMillis%1000;
     long breakRemainder = totalCycleBreakTimeInMillis%1000;
-    if (endingRoundEarly) {
+    if (!roundSecondsUp) {
       totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
       totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
     } else {
@@ -3249,8 +3253,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
-        addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      } else addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+        addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+      } else addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
 
       switch (typeOfRound.get(currentRound)) {
         case 1:
@@ -3497,6 +3502,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (endAnimation!=null) endAnimation.cancel();
     next_round.setEnabled(true);
     progressBarPause = 10000;
+    addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+    AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
     switch (mode) {
       case 1:
         //Resetting millis values of count up mode to 0.
