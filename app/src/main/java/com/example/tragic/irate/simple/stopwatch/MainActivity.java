@@ -371,8 +371,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Save total times on dismiss is +1 second when coming back, also some break time is saving even w/ sets only.
-  //Todo: Set nextRound() textViews for total times in Pom.
   //Todo: Anytime addAndRound...() is called, total times will add. Right now, end of a cycle reset will do an extra addition.
   //Todo: Total times only saving in exiting Timer. Should save more often.
   //Todo: Refactor Timer and Edit popups into sep files + classes.
@@ -3106,19 +3104,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return addedTime;
   }
 
-  //Todo: Split by typeOfRound case for mode 1, and pomDotCounter for mode 3.
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean roundSecondsUp) {
-    totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
-    totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
-
-    long setRemainder = totalCycleSetTimeInMillis%1000;
-    long breakRemainder = totalCycleBreakTimeInMillis%1000;
-    if (!roundSecondsUp) {
-      totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
-      totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
-    } else {
-      totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
-      totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+    if (mode==1) {
+      switch (typeOfRound.get(currentRound)) {
+        case 1: case 3:
+          totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
+          long setRemainder = totalCycleSetTimeInMillis%1000;
+          if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
+          else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+          break;
+        case 2: case 4:
+          totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
+          long breakRemainder = totalCycleBreakTimeInMillis%1000;
+          if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
+          else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+          break;
+      }
+    }
+    if (mode==3) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
+          long setRemainder = totalCycleSetTimeInMillis%1000;
+          if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
+          else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+          break;
+        case 1: case 3: case 5: case 7:
+          totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
+          long breakRemainder = totalCycleBreakTimeInMillis%1000;
+          if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
+          else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+          break;
+      }
     }
   }
 
