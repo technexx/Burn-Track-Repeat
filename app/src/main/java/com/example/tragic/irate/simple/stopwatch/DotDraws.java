@@ -54,6 +54,7 @@ public class DotDraws extends View {
     super(context, attrs);
     setFocusable(true);
     setWillNotDraw(false);
+    setupPaint();
   }
 
   public void setAlpha(int alpha) {
@@ -103,7 +104,6 @@ public class DotDraws extends View {
     mPomTime = new ArrayList<>();
     for (int i=0; i<pomTime.size(); i++) mPomTime.add(convertSeconds(pomTime.get(i)/1000));
     this.mPomDotCounter = pomDotCounter;
-    setupPaint();
     invalidate();
   }
 
@@ -137,7 +137,8 @@ public class DotDraws extends View {
 
   @Override
   public void onDraw(Canvas canvas) {
-    setupPaint();
+    //Todo: Should not be creating Paint object every canvas draw.
+//    setupPaint();
     this.mCanvas = canvas;
 
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
