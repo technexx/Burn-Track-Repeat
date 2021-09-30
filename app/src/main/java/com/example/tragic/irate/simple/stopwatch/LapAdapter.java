@@ -21,28 +21,11 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   Context mContext;
   List<String> mCurrentLap;
   List<String> mSavedLap;
-  int mFirstPos;
-  int mLastPos;
-  onPositionCallback mOnPositionCallback;
 
   public LapAdapter(Context context, List<String> currentLap, List<String> savedLap) {
     mContext = context; mCurrentLap = currentLap; mSavedLap = savedLap;
   }
 
-  public interface onPositionCallback {
-    void positionCallback(int position);
-  }
-
-  public void passPosition (onPositionCallback xOnPositionCallback) {
-    this.mOnPositionCallback = xOnPositionCallback;
-  }
-
-  //Receives visible positions in its layout.
-  public void receiveVisiblePositions(int first, int last) {
-    this.mFirstPos = first; this.mLastPos = last;
-  }
-
-  //Todo: Drawable gradient animation onScroll?
   @NonNull
   @Override
   public LapViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

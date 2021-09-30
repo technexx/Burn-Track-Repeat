@@ -41,10 +41,9 @@ public class LapListCanvas extends View {
         int alpha = 0;
         for (int i=0; i<22; i++) {
             mPaint.setAlpha(alpha);
-            mCanvas.drawRect(0, nextYCoord, 700, nextYCoord + convertDensityPixelsToScalable(5), mPaint);
+            mCanvas.drawRect(0, nextYCoord, convertDensityPixelsToScalable(240), nextYCoord + convertDensityPixelsToScalable(5), mPaint);
             nextYCoord += convertDensityPixelsToScalable(5);
             alpha+=12;
-            Log.i("testpixels", "next y coord is " + nextYCoord);
         }
     }
 

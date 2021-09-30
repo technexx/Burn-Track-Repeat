@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, LapAdapter.onPositionCallback, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle {
 
   ConstraintLayout cl;
   SharedPreferences sharedPreferences;
@@ -416,11 +416,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void sendAlphaValue(int alpha) {
     receivedAlpha = alpha;
-  }
-
-  @Override
-  public void positionCallback(int position) {
-    scrollPosition = position;
   }
 
   //For resume/reset onClicks within cycle adapter.
@@ -1554,20 +1549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
     lapRecycler.setAdapter(lapAdapter);
     lapRecycler.setLayoutManager(lapLayout);
-    lapAdapter.passPosition(MainActivity.this);
-
-    //Listener that executes method that retrieves visible positions from recyclerView and passes them into adapter for use in fading effect.
-    lapRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-      @Override
-      public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-        super.onScrollStateChanged(recyclerView, newState);
-      }
-
-      @Override
-      public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-        super.onScrolled(recyclerView, dx, dy);
-      }
-    });
 
     //Sets all progress bars to their start value.
     progressBar.setProgress(maxProgress);
