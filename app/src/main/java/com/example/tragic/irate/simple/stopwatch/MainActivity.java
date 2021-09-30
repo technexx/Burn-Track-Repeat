@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
   ConstraintLayout.LayoutParams cycle_title_layout;
+  ConstraintLayout.LayoutParams completedLapsParam;
   int FADE_IN_HIGHLIGHT_MODE = 1;
   int FADE_OUT_HIGHLIGHT_MODE = 2;
   int FADE_IN_EDIT_CYCLE = 3;
@@ -761,6 +762,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
 
     cycle_title_layout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
+    completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
 
     stopWatchView.setVisibility(View.GONE);
     savedPomCycleRecycler.setVisibility(View.GONE);
@@ -3424,6 +3426,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
     cycle_title_layout.topMargin = convertDensityPixelsToScalable(30);
+    completedLapsParam.topMargin = convertDensityPixelsToScalable(24);
 
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
@@ -3487,14 +3490,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         reset_total_times.setVisibility(View.GONE);
         new_lap.setVisibility(View.VISIBLE);
         msTime.setVisibility(View.VISIBLE);
-        ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
-        ConstraintLayout.LayoutParams lapRecyclerParams = (ConstraintLayout.LayoutParams) lapRecycler.getLayoutParams();
-        completedLapsParam.topMargin = 0;
         setInitialTextSizeForRounds(0);
+        completedLapsParam.topMargin = 0;
+        cycle_title_layout.topMargin = -25;
+
 
         timerDisabled = false;
         timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-        cycle_title_layout.topMargin = -25;
         cycle_title_textView.setVisibility(View.INVISIBLE);
         if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
         break;
