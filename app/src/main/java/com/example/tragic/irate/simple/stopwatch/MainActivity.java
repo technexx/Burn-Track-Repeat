@@ -371,9 +371,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Not changing action bar views when going into edit mode would solve sync issue.
   //Todo: Total time reset needs fixing.
-  //Todo: Refactor Timer and Edit popups into sep files + classes.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Color schemes.
@@ -1086,6 +1084,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.setOnDismissListener(() -> {
       addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
       AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
+      activateResumeOrResetOptionForCycle();
       //Pauses timer.
       pauseAndResumeTimer(PAUSING_TIMER);
       //Removes runnable that begins next round.
@@ -1109,7 +1108,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleAdapter.notifyDataSetChanged();
       }
-      activateResumeOrResetOptionForCycle();
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
