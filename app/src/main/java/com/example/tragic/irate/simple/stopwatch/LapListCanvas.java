@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 public class LapListCanvas extends View {
     Canvas mCanvas;
     Paint mPaint;
+    int mMode;
 
     public LapListCanvas(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -51,10 +52,17 @@ public class LapListCanvas extends View {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
     }
 
+    public void setMode(int mode) {
+        mMode = mode;
+        invalidate();
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
-        drawGradientBox();
-        drawOutlineBox();
+        if (mMode==4) {
+            drawGradientBox();
+            drawOutlineBox();
+        } else mPaint.setColor(Color.BLACK);
     }
 }

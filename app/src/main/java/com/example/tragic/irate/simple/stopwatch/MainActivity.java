@@ -329,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout roundRecyclerLayout;
 
   DotDraws dotDraws;
+  LapListCanvas lapListCanvas;
   ValueAnimator sizeAnimator;
   ValueAnimator valueAnimatorDown;
   ValueAnimator valueAnimatorUp;
@@ -377,7 +378,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
-  //Todo: Lap adapter stuff.
   //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating. Maybe just hide cycle adapter.
   //Todo: Text size on stopwatch doesn't change w/ more digits - may run outside of circle.
   //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
@@ -728,8 +728,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     breaksOnlyArray = new ArrayList<>();
     pomArray = new ArrayList<>();
 
-    LapListCanvas lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
-    lapListCanvas.invalidate();
+    lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
 
     reset = timerPopUpView.findViewById(R.id.reset);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
@@ -3402,6 +3401,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void populateTimerUI() {
+    lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
@@ -3467,6 +3467,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
+        lapListCanvas.invalidate();
         timeLeft.setVisibility(View.VISIBLE);
         timeLeft.setText(displayTime);
         msTime.setText(displayMs);
@@ -3485,7 +3486,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ConstraintLayout.LayoutParams completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
         ConstraintLayout.LayoutParams lapRecyclerParams = (ConstraintLayout.LayoutParams) lapRecycler.getLayoutParams();
         completedLapsParam.topMargin = 0;
-//        lapRecyclerParams.topMargin = 60;
         setInitialTextSizeForRounds(0);
 
         timerDisabled = false;
