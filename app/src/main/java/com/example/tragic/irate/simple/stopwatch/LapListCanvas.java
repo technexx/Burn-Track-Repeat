@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -20,10 +22,21 @@ public class LapListCanvas extends View {
         mPaint = new Paint();
         mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setStrokeWidth(3);
+    }
+
+    public void drawOutlineBox() {
+        mPaint.setColor(Color.WHITE);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(2);
+
+        RectF rect = new RectF(0, 0, convertDensityPixelsToScalable(240), convertDensityPixelsToScalable(240));
+        mCanvas.drawRoundRect(rect, 50, 50, mPaint);
     }
 
     public void drawGradientBox() {
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStyle(Paint.Style.FILL);
+
         int nextYCoord = convertDensityPixelsToScalable(140);
         int alpha = 0;
         for (int i=0; i<22; i++) {
@@ -43,5 +56,6 @@ public class LapListCanvas extends View {
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
         drawGradientBox();
+        drawOutlineBox();
     }
 }
