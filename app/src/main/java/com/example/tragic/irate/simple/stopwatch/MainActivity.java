@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView round_value;
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
-  ConstraintLayout.LayoutParams cycleTitleLayout;
+  ConstraintLayout.LayoutParams cycle_title_layout;
   int FADE_IN_HIGHLIGHT_MODE = 1;
   int FADE_OUT_HIGHLIGHT_MODE = 2;
   int FADE_IN_EDIT_CYCLE = 3;
@@ -760,7 +760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
     objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
 
-    cycleTitleLayout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
+    cycle_title_layout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
 
     stopWatchView.setVisibility(View.GONE);
     savedPomCycleRecycler.setVisibility(View.GONE);
@@ -2059,8 +2059,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
-  public int setDensityPixels(float pixels) {
+  public int convertScalablePixelsToDensity(float pixels) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+  }
+
+  public int convertDensityPixelsToScalable(float pixels) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
 
   public void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
@@ -2531,7 +2535,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.setText(timeLeftValueHolder);
     switch (mode) {
       case 1:
-        roundRecyclerLayoutParams.height = setDensityPixels(260);
+        roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(260);
         //All shared visibilities between modes 1 and 2.
         s2.setVisibility(View.VISIBLE);
         s3.setVisibility(View.GONE);
@@ -2553,12 +2557,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s1.setText(R.string.set_time);
         firstRowTextView.setText(convertCustomTextView(setValue));
         secondRowTextView.setText(convertCustomTextView(breakValue));
-        addParams.bottomMargin = setDensityPixels(32);
-        subParams.bottomMargin = setDensityPixels(32);
-        roundRecyclerLayoutParams.bottomMargin = setDensityPixels(18);
+        addParams.bottomMargin = convertScalablePixelsToDensity(32);
+        subParams.bottomMargin = convertScalablePixelsToDensity(32);
+        roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(18);
         break;
       case 3:
-        roundRecyclerLayoutParams.height = setDensityPixels(240);
+        roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(240);
         //Visibilities and values exclusive to mode 3.
         s1.setVisibility(View.VISIBLE);
         s3.setVisibility(View.VISIBLE);
@@ -2579,9 +2583,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRowTextView.setText(convertCustomTextView(pomValue1));
         secondRowTextView.setText(convertCustomTextView(pomValue2));
         thirdRowEditTextView.setText(convertCustomTextView(pomValue3));
-        addParams.bottomMargin = setDensityPixels(20);
-        subParams.bottomMargin = setDensityPixels(20);
-        roundRecyclerLayoutParams.bottomMargin = setDensityPixels(10);
+        addParams.bottomMargin = convertScalablePixelsToDensity(20);
+        subParams.bottomMargin = convertScalablePixelsToDensity(20);
+        roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(10);
         break;
     }
   }
@@ -3419,6 +3423,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset_total_times.setVisibility(View.VISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
+    cycle_title_layout.topMargin = convertDensityPixelsToScalable(30);
 
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
@@ -3467,7 +3472,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
-        lapListCanvas.invalidate();
         timeLeft.setVisibility(View.VISIBLE);
         timeLeft.setText(displayTime);
         msTime.setText(displayMs);
@@ -3490,7 +3494,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timerDisabled = false;
         timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-        cycleTitleLayout.topMargin = -25;
+        cycle_title_layout.topMargin = -25;
         cycle_title_textView.setVisibility(View.INVISIBLE);
         if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
         break;
