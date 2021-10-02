@@ -376,9 +376,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Need method for recyclerView being visible/invisible so we can apply it over Stopwatch and timers.
-  //Todo: Total time reset needs fixing.
-  //Todo: Resume/reset cycle doesn't blank out lap list canvas (because it is a callback from adapter and does not call populateTimerUI()).
   //Todo: Stopwatch should have some sort of progressBar animation.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
@@ -1118,6 +1115,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleAdapter.notifyDataSetChanged();
       }
+      blankCanvas.setVisibility(View.GONE);
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
