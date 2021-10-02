@@ -3061,12 +3061,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long elapsedTime = 0;
     long roundedValue = 0;
     String addedTime = "";
+
     if (mode==1) {
       switch (roundType) {
         case 1:
           if (resettingTotalTime) {
             roundedValue = 1000 - (setMillis%1000);
             cycleSetTimeForSingleRoundInMillis = roundedValue;
+            roundedValue = 0;
             resettingTotalTime = false;
           }
           cycleSetTimeForSingleRoundInMillis +=50;
@@ -3076,6 +3078,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (resettingTotalTime) {
             roundedValue = 1000 - (breakMillis%1000);
             cycleBreakTimeForSingleRoundInMillis = roundedValue;
+            roundedValue = 0;
             resettingTotalTime = false;
           }
           cycleBreakTimeForSingleRoundInMillis+=50;
@@ -3126,12 +3129,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           long setRemainder = totalCycleSetTimeInMillis%1000;
           if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
           else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+          cycleSetTimeForSingleRoundInMillis = 0;
           break;
         case 3: case 4:
           totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
           long breakRemainder = totalCycleBreakTimeInMillis%1000;
           if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
           else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+          cycleBreakTimeForSingleRoundInMillis = 0;
           break;
       }
     }
@@ -3279,6 +3284,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       currentProgressBarValueForInfinityRounds = 30000;
       //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
       mHandler.post(endFade);
+
       //If skipping round manually, cancel timer and objectAnimator.
       if (endingEarly) {
         if (timer != null) timer.cancel();
