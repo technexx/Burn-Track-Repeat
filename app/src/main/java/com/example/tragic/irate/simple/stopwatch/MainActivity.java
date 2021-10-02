@@ -376,8 +376,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Stopwatch should have some sort of progressBar animation.
-  //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
@@ -2031,6 +2029,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             });
           }
         }
+        runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
     };
   }
