@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalCycleBreakTimeInMillis;
   String timeLeftValueHolder;
   boolean resettingTotalTime;
-  long roundedValue;
+  long roundedValueForTotalTimes;
 
   long currentProgressBarValueForInfinityRounds;
   long pomMillis;
@@ -1090,6 +1090,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      roundedValueForTotalTimes = 0;
       addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
       AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
       activateResumeOrResetOptionForCycle();
@@ -1964,6 +1965,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleSetTimeInMillis = 0;
           totalCycleBreakTimeInMillis = 0;
           cyclesCompleted = 0;
+          roundedValueForTotalTimes = 0;
           resettingTotalTime = true;
 
           total_set_time.setText("0");
@@ -2921,6 +2923,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Controls each mode's object animator. Starts new or resumes current one.
   public void startObjectAnimator() {
     switch (mode) {
       case 1:
@@ -3057,18 +3060,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public String stringValueOfTotalCycleTime(int roundType) {
-    long startDuration = 0;
-    long elapsedTime = 0;
-    long roundedValue = 0;
     String addedTime = "";
 
+    //Todo: Rounded value needs reset anytime we're changing timer.
     if (mode==1) {
       switch (roundType) {
         case 1:
           if (resettingTotalTime) {
-            roundedValue = 1000 - (setMillis%1000);
-            cycleSetTimeForSingleRoundInMillis = roundedValue;
-            roundedValue = 0;
+            roundedValueForTotalTimes = 1000 - (setMillis%1000);
+            cycleSetTimeForSingleRoundInMillis = roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
           cycleSetTimeForSingleRoundInMillis +=50;
@@ -3076,9 +3076,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 3:
           if (resettingTotalTime) {
-            roundedValue = 1000 - (breakMillis%1000);
-            cycleBreakTimeForSingleRoundInMillis = roundedValue;
-            roundedValue = 0;
+            roundedValueForTotalTimes = 1000 - (breakMillis%1000);
+            cycleBreakTimeForSingleRoundInMillis = roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
           cycleBreakTimeForSingleRoundInMillis+=50;
@@ -3103,17 +3102,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
+    //Todo: Test this.
     if (mode==3) {
-      startDuration = objectAnimatorPom.getDuration();
-      elapsedTime = pomMillis;
-
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          if (resettingTotalTime) {
+            roundedValueForTotalTimes = 1000 - (setMillis%1000);
+            cycleSetTimeForSingleRoundInMillis = roundedValueForTotalTimes;
+            resettingTotalTime = false;
+          }
+          cycleSetTimeForSingleRoundInMillis+=50;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           break;
         case 1: case 3: case 5: case 7:
-          cycleBreakTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          if (resettingTotalTime) {
+            roundedValueForTotalTimes = 1000 - (breakMillis%1000);
+            cycleBreakTimeForSingleRoundInMillis = roundedValueForTotalTimes;
+            resettingTotalTime = false;
+          }
+          cycleBreakTimeForSingleRoundInMillis+=50;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           break;
       }
@@ -3329,7 +3336,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
         progressBar.setProgress(0);
-      }
+        addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+      } else addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
       mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
     }
     beginTimerForNextRound = true;
