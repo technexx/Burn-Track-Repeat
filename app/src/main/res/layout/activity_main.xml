@@ -82,5 +82,10 @@
         android:textSize="14sp">
     </TextView>
 
+    <com.example.tragic.irate.simple.stopwatch.BlankCanvas
+        android:id="@+id/blank_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </com.example.tragic.irate.simple.stopwatch.BlankCanvas>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

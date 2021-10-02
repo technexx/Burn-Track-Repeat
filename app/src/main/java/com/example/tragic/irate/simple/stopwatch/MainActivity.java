@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View tabView;
   View mainView;
   Gson gson;
+  BlankCanvas blankCanvas;
 
   ImageButton fab;
   ImageButton stopwatch;
@@ -279,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long cycleBreakTimeForSingleRoundInMillis;
   long totalCycleBreakTimeInMillis;
   String timeLeftValueHolder;
+  long singleRoundRetentionValue;
 
   long currentProgressBarValueForInfinityRounds;
   long pomMillis;
@@ -373,8 +375,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Stopwatch moves other modes display up.
+  //Todo: Need method for recyclerView being visible/invisible so we can apply it over Stopwatch and timers.
   //Todo: Total time reset needs fixing.
+  //Todo: Resume/reset cycle doesn't blank out lap list canvas (because it is a callback from adapter and does not call populateTimerUI()).
+  //Todo: Stopwatch should have some sort of progressBar animation.
   //Todo: "Nothing here" not shown right after deletion (but shown if anything refreshes).
   //Todo: Use 3 button splash menu for timer/pom/stopwatch?
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
@@ -563,6 +567,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     emptyCycleList = findViewById(R.id.empty_cycle_list);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
+    blankCanvas = findViewById(R.id.blank_canvas);
+    blankCanvas.setVisibility(View.GONE);
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
@@ -1101,6 +1107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
       if (mode==4) mode = savedMode;
       dotDraws.setMode(mode);
+      blankCanvas.setVisibility(View.INVISIBLE);
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       if (mode==1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -1951,11 +1958,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
         if (mode==3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
 
+        //Todo: We simply need to have the display of total time sync up w/ timer. Saved value can be off in millis.
         runOnUiThread(()->{
           deleteCyclePopupWindow.dismiss();
           totalCycleSetTimeInMillis = 0;
           totalCycleBreakTimeInMillis = 0;
           cyclesCompleted = 0;
+
+          long blahRemainder = setMillis%1000;
+          long booRound = (cycleSetTimeForSingleRoundInMillis/1000) * 1000;
+          long blahTotal = booRound + blahRemainder;
+          singleRoundRetentionValue = blahTotal;
 
           total_set_time.setText("0");
           total_break_time.setText("0");
@@ -3057,7 +3070,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           startDuration = objectAnimator.getDuration();
           elapsedTime = setMillis;
 
-          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime;
+
+          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime - singleRoundRetentionValue;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           break;
         case 3:
@@ -3412,6 +3426,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
 
+    blankCanvas.setVisibility(View.GONE);
     cycle_title_textView.setText(cycleTitle);
     dotDraws.resetDotAlpha();
     //Default views for Timer.
@@ -3475,6 +3490,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
+        progressBar.setProgress(maxProgress);
         timeLeft.setVisibility(View.VISIBLE);
         timeLeft.setText(displayTime);
         msTime.setText(displayMs);
@@ -3494,11 +3510,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         completedLapsParam.topMargin = 0;
         cycle_title_layout.topMargin = -25;
 
-
         timerDisabled = false;
         timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
         cycle_title_textView.setVisibility(View.INVISIBLE);
         if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
+        blankCanvas.setVisibility(View.VISIBLE);
         break;
     }
   }

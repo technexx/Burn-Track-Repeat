@@ -21,8 +21,6 @@ public class LapListCanvas extends View {
     public LapListCanvas(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mPaint = new Paint();
-        mPaint.setColor(Color.BLACK);
-        mPaint.setStyle(Paint.Style.FILL);
     }
 
     public void drawOutlineBox() {

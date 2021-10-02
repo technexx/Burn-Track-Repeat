@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -135,9 +136,12 @@ public class DotDraws extends View {
     }
   }
 
+  public int DPtoSP(float pixels) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+  }
+
   @Override
   public void onDraw(Canvas canvas) {
-    //Todo: Should not be creating Paint object every canvas draw.
 //    setupPaint();
     this.mCanvas = canvas;
 
