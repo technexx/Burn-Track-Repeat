@@ -280,7 +280,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long cycleBreakTimeForSingleRoundInMillis;
   long totalCycleBreakTimeInMillis;
   String timeLeftValueHolder;
-  long singleRoundRetentionValue;
+  boolean resettingTotalTime;
+  long roundedValue;
 
   long currentProgressBarValueForInfinityRounds;
   long pomMillis;
@@ -1958,17 +1959,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
         if (mode==3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
 
-        //Todo: We simply need to have the display of total time sync up w/ timer. Saved value can be off in millis.
         runOnUiThread(()->{
           deleteCyclePopupWindow.dismiss();
           totalCycleSetTimeInMillis = 0;
           totalCycleBreakTimeInMillis = 0;
           cyclesCompleted = 0;
-
-          long blahRemainder = setMillis%1000;
-          long booRound = (cycleSetTimeForSingleRoundInMillis/1000) * 1000;
-          long blahTotal = booRound + blahRemainder;
-          singleRoundRetentionValue = blahTotal;
+          resettingTotalTime = true;
 
           total_set_time.setText("0");
           total_break_time.setText("0");
@@ -3063,29 +3059,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public String stringValueOfTotalCycleTime(int roundType) {
     long startDuration = 0;
     long elapsedTime = 0;
+    long roundedValue = 0;
     String addedTime = "";
     if (mode==1) {
       switch (roundType) {
         case 1:
-          startDuration = objectAnimator.getDuration();
-          elapsedTime = setMillis;
-
-
-          cycleSetTimeForSingleRoundInMillis = startDuration - elapsedTime - singleRoundRetentionValue;
+          if (resettingTotalTime) {
+            roundedValue = 1000 - (setMillis%1000);
+            cycleSetTimeForSingleRoundInMillis = roundedValue;
+            resettingTotalTime = false;
+          }
+          cycleSetTimeForSingleRoundInMillis +=50;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           break;
         case 3:
-          startDuration = objectAnimator.getDuration();
-          elapsedTime = breakMillis;
-
-          cycleBreakTimeForSingleRoundInMillis = startDuration - elapsedTime;
+          if (resettingTotalTime) {
+            roundedValue = 1000 - (breakMillis%1000);
+            cycleBreakTimeForSingleRoundInMillis = roundedValue;
+            resettingTotalTime = false;
+          }
+          cycleBreakTimeForSingleRoundInMillis+=50;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           break;
         case 2:
+          if (resettingTotalTime) {
+            countUpMillisSets = 0;
+            resettingTotalTime = false;
+          }
           cycleSetTimeForSingleRoundInMillis = countUpMillisSets;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           break;
         case 4:
+          if (resettingTotalTime) {
+            countUpMillisBreaks = 0;
+            resettingTotalTime = false;
+          }
           cycleBreakTimeForSingleRoundInMillis = countUpMillisBreaks;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           break;
