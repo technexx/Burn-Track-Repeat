@@ -70,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View mainView;
   Gson gson;
   BlankCanvas blankCanvas;
+  Calendar calendar;
+  SimpleDateFormat simpleDateFormat;
+  String date;
 
   ImageButton fab;
   ImageButton stopwatch;
@@ -376,8 +379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Sort for Pom not working.
-  //Todo: Title not displaying on creating and launching cycle for first time in app - creation/launch work fine after that.
   //Todo: TextView size change for stopwatch when hitting higher numbers.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
@@ -568,6 +569,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
     blankCanvas = findViewById(R.id.blank_canvas);
     blankCanvas.setVisibility(View.GONE);
+
+    calendar = Calendar.getInstance();
+    simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+    simpleDateFormat.format(calendar.getTime());
+    date = simpleDateFormat.format(calendar.getTime());
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
@@ -1026,6 +1032,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+      if (!cycleTitle.isEmpty()) cycleTitle = cycleNameEdit.getText().toString(); else cycleTitle = date;
       buttonToLaunchTimer.setEnabled(true);
       //Default row selection.
       resetRows();
@@ -1878,13 +1885,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     saveCyclesASyncRunnable = new Runnable() {
       @Override
       public void run() {
-        //Gets current date for use in empty titles.
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-        String date = dateFormat.format(calendar.getTime());
-
         //Sets up Strings to save into database.
-        Gson gson = new Gson();
+        gson = new Gson();
         workoutString = "";
         roundTypeString = "";
         pomString = "";
