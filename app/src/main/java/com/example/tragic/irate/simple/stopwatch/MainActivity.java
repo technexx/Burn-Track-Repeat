@@ -376,7 +376,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Use 3 button splash menu for timer/pom/stopwatch?
+  //Todo: Sort for Pom not working.
+  //Todo: Title not displaying on creating and launching cycle for first time in app - creation/launch work fine after that.
+  //Todo: TextView size change for stopwatch when hitting higher numbers.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
   //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating. Maybe just hide cycle adapter.
@@ -438,6 +440,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       }
       resetTimer();
+      roundedValueForTotalTimes = 0;
     }
   }
 
@@ -933,7 +936,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
           timerEnded = sharedPreferences.getBoolean("modeOneTimerEnded", false);
           timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
-
         } else if (mode==3) {
           sortHigh.setVisibility(View.GONE);
           sortLow.setVisibility(View.GONE);
@@ -1068,14 +1070,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable);
-      savedCycleAdapter.notifyDataSetChanged();
-      moveSortCheckmark();
-      sortPopupWindow.dismiss();
       //Saves sort mode so it defaults to chosen whenever we create this activity.
       prefEdit.putInt("sortMode", sortMode);
       prefEdit.putInt("sortModePom", sortModePom);
       prefEdit.apply();
     };
+
     sortAlphaStart.setOnClickListener(sortListener);
     sortAlphaEnd.setOnClickListener(sortListener);
     sortRecent.setOnClickListener(sortListener);
@@ -1852,6 +1852,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
             case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
           }
+          runOnUiThread(()->{
+            savedCycleAdapter.notifyDataSetChanged();
+          });
         }
         if (mode==3) {
           switch (sortModePom) {
@@ -1860,7 +1863,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
             case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
           }
+          runOnUiThread(()->{
+            savedPomCycleAdapter.notifyDataSetChanged();
+          });
         }
+        runOnUiThread(()-> {
+          clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
+          moveSortCheckmark();
+          sortPopupWindow.dismiss();
+        });
       }
     };
 
@@ -3058,8 +3069,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public String stringValueOfTotalCycleTime(int roundType) {
     String addedTime = "";
-
-    //Todo: Rounded value needs reset anytime we're changing timer.
     if (mode==1) {
       switch (roundType) {
         case 1:
@@ -3099,7 +3108,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    //Todo: Test this.
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:

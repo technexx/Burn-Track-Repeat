@@ -49,18 +49,11 @@ CyclesDao {
     @Query("SELECT * from PomCycles ORDER by title ASC")
     List<PomCycles> loadPomAlphaStart();
 
-
     @Query("SELECT * from POMCYCLES ORDER by timeAdded DESC")
     List<PomCycles> loadPomCyclesMostRecent();
 
     @Query("SELECT * from POMCYCLES ORDER by timeAdded ASC")
     List<PomCycles> loadPomCyclesLeastRecent();
-
-    @Query("SELECT * from CYCLES ORDER by timeAccessed DESC")
-    List<Cycles> loadCyclesLastAccessed();
-
-    @Query("SELECT * from PomCycles ORDER by timeAccessed DESC")
-    List<PomCycles> loadPomLastAccessed();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCycle(Cycles cycles);
