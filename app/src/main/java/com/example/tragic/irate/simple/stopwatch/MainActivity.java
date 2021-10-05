@@ -1053,6 +1053,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedMode = mode;
       mode = 4;
       dotDraws.setMode(4);
+      setInitialTextSizeForRounds(0);
       populateTimerUI();
     });
 
@@ -1654,10 +1655,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //Conversion to long solves +30 ms delay for display.
         displayMs = df2.format((msDisplay / 60) * 100);
-        displayTime = convertStopwatch((long) seconds);
+        displayTime = convertSeconds( (long) seconds);
+
+        if (textSizeIncreased && mode==4) {
+          if (seconds > 4) {
+            changeTextSize(valueAnimatorDown, timeLeft);
+            textSizeIncreased = false;
+          }
+        }
 
         if (mode==4) timeLeft.setText(displayTime);
         msTime.setText(displayMs);
+
         mHandler.postDelayed(this, 10);
       }
     };
@@ -2989,10 +2998,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         total_set_time.setText(stringValueOfTotalCycleTime(1));
         timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
 
-        //If timer began @ >=60 seconds and is now less than, enlarge text size to fill progressBar.
-        if (textSizeIncreased) if (setMillis < 59000) {
-          changeTextSize(valueAnimatorUp, timeLeft);
-          textSizeIncreased = false;
+        if (textSizeIncreased && mode==1) {
+          if (setMillis < 59000) {
+            changeTextSize(valueAnimatorUp, timeLeft);
+            textSizeIncreased = false;
+          }
         }
         if (setMillis < 500) timerDisabled = true;
         //Refreshes Canvas so dots fade.
@@ -3018,9 +3028,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           total_break_time.setText(stringValueOfTotalCycleTime(3));
           timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
 
-          if (textSizeIncreased) if (breakMillis < 59000) {
-            changeTextSize(valueAnimatorUp, timeLeft);
-            textSizeIncreased = false;
+          if (textSizeIncreased && mode==1) {
+            if (breakMillis < 59000) {
+              changeTextSize(valueAnimatorUp, timeLeft);
+              textSizeIncreased = false;
+            }
           }
 
           if (breakMillis < 500) timerDisabled = true;
@@ -3051,9 +3063,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             total_break_time.setText(stringValueOfTotalCycleTime(0)); break;
         }
 
-        if (textSizeIncreased) if (pomMillis < 59000) {
-          changeTextSize(valueAnimatorUp, timeLeft);
-          textSizeIncreased = false;
+        if (textSizeIncreased && mode==3) {
+          if (pomMillis < 59000) {
+            changeTextSize(valueAnimatorUp, timeLeft);
+            textSizeIncreased = false;
+          }
         }
 
         timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
@@ -3183,6 +3197,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.startAnimation(endAnimation);
   }
 
+  //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
+  public void setInitialTextSizeForRounds(long millis) {
+    if (millis>=59000) {
+      if (mode==1 || mode==3) {
+        timeLeft.setTextSize(70f);
+        textSizeIncreased = true;
+      }
+    } else {
+      timeLeft.setTextSize(90f);
+      if (mode==4) textSizeIncreased = true;
+
+    }
+  }
   public void changeTextSize(ValueAnimator va, TextView textView) {
     sizeAnimator = va;
     sizeAnimator.addUpdateListener(animation -> {
@@ -3193,16 +3220,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sizeAnimator.start();
   }
 
-  //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
-  public void setInitialTextSizeForRounds(long millis) {
-    if (millis>=59000) {
-      timeLeft.setTextSize(70f);
-      textSizeIncreased = true;
-    } else {
-      timeLeft.setTextSize(90f);
-    }
-  }
-
   //Used in count up mode to animate text size changes in our runnables.
   public void reduceTextSizeForInfinityRounds(long millis) {
     if (textSizeReduced) {
@@ -3210,22 +3227,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         changeTextSize(valueAnimatorDown, timeLeft);
         textSizeReduced = false;
       }
-    }
-  }
-
-  public String convertStopwatch(long seconds) {
-    long minutes;
-    long roundedSeconds;
-    DecimalFormat df = new DecimalFormat("0");
-    DecimalFormat df2 = new DecimalFormat("00");
-    if (seconds >= 60) {
-      minutes = seconds / 60;
-      roundedSeconds = seconds % 60;
-      if (minutes >= 10 && timeLeft.getTextSize() != 70f) timeLeft.setTextSize(70f);
-      return (df.format(minutes) + ":" + df2.format(roundedSeconds));
-    } else {
-      if (timeLeft.getTextSize() != 90f) timeLeft.setTextSize(90f);
-      return df.format(seconds);
     }
   }
 
