@@ -379,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: TextView size change for stopwatch when hitting higher numbers.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
   //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating. Maybe just hide cycle adapter.
@@ -1463,10 +1462,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          firstRowTextView.setText(convertCustomTextView(setValue));
+          firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
           break;
         case 3:
-          firstRowTextView.setText(convertCustomTextView(pomValue1));
+          firstRowTextView.setText(convertEditPopUpRoundValues(pomValue1));
           break;
       }
       return true;
@@ -1478,10 +1477,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          firstRowTextView.setText(convertCustomTextView(setValue));
+          firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
           break;
         case 3:
-          firstRowTextView.setText(convertCustomTextView(pomValue1));
+          firstRowTextView.setText(convertEditPopUpRoundValues(pomValue1));
           break;
       }
       return true;
@@ -1493,10 +1492,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          secondRowTextView.setText(convertCustomTextView(breakValue));
+          secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
           break;
         case 3:
-          secondRowTextView.setText(convertCustomTextView(pomValue2));
+          secondRowTextView.setText(convertEditPopUpRoundValues(pomValue2));
           break;
       }
       return true;
@@ -1508,10 +1507,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          secondRowTextView.setText(convertCustomTextView(breakValue));
+          secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
           break;
         case 3:
-          secondRowTextView.setText(convertCustomTextView(pomValue2));
+          secondRowTextView.setText(convertEditPopUpRoundValues(pomValue2));
           break;
       }
       return true;
@@ -1521,7 +1520,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       incrementValues = true;
       setIncrements(event, changeThirdValue);
       convertEditTime(true);
-      thirdRowEditTextView.setText(convertCustomTextView(pomValue3));
+      thirdRowEditTextView.setText(convertEditPopUpRoundValues(pomValue3));
       return true;
     });
 
@@ -1529,7 +1528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       incrementValues = false;
       setIncrements(event, changeThirdValue);
       convertEditTime(true);
-      thirdRowEditTextView.setText(convertCustomTextView(pomValue3));
+      thirdRowEditTextView.setText(convertEditPopUpRoundValues(pomValue3));
       return true;
     });
 
@@ -2117,8 +2116,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       firstRowEditSeconds.setText(elongateEditSeconds(30));
       secondRowEditMinutes.setText(String.valueOf(0));
       secondRowEditSeconds.setText(elongateEditSeconds(30));
-      firstRowTextView.setText(convertCustomTextView(setValue));
-      secondRowTextView.setText(convertCustomTextView(breakValue));
+      firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
+      secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
     }
     else if (mode==3) {
       rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.WHITE);
@@ -2244,7 +2243,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editSetSeconds < 5 && editSetMinutes == 0) editSetSeconds = 0;
       //Sets our timer values to the values in editText.
       setValue = (int) ((editSetMinutes * 60) + editSetSeconds);
-      firstRowTextView.setText(convertCustomTextView(setValue));
+      firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
 
       editBreakMinutes = convertEditTextToLong(secondRowEditMinutes);
       editBreakSeconds = convertEditTextToLong(secondRowEditSeconds);
@@ -2258,7 +2257,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editBreakSeconds < 5 && editBreakMinutes == 0) editBreakSeconds = 0;
 
       breakValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
-      secondRowTextView.setText(convertCustomTextView(breakValue));
+      secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
       //Sets value of editBreakMinutes to either breakValue, or breakOnlyValue, depending on which mode we're on.
 
       toastBounds(5, 300, setValue);
@@ -2514,7 +2513,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
   //Conversion of Long-String for add/subtract popUp textViews. Slightly different format than our timer textViews.
-  public String convertCustomTextView(long totalSeconds) {
+  public String convertEditPopUpRoundValues(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
     long remainingSeconds;
@@ -2587,8 +2586,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRowSubtractButton.setVisibility(View.VISIBLE);
         //Strings and values exclusive to mode 1.
         s1.setText(R.string.set_time);
-        firstRowTextView.setText(convertCustomTextView(setValue));
-        secondRowTextView.setText(convertCustomTextView(breakValue));
+        firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
+        secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
         addParams.bottomMargin = convertScalablePixelsToDensity(32);
         subParams.bottomMargin = convertScalablePixelsToDensity(32);
         roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(18);
@@ -2612,9 +2611,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s1.setText(R.string.work_time);
         s2.setText(R.string.small_break);
         s3.setText(R.string.long_break);
-        firstRowTextView.setText(convertCustomTextView(pomValue1));
-        secondRowTextView.setText(convertCustomTextView(pomValue2));
-        thirdRowEditTextView.setText(convertCustomTextView(pomValue3));
+        firstRowTextView.setText(convertEditPopUpRoundValues(pomValue1));
+        secondRowTextView.setText(convertEditPopUpRoundValues(pomValue2));
+        thirdRowEditTextView.setText(convertEditPopUpRoundValues(pomValue3));
         addParams.bottomMargin = convertScalablePixelsToDensity(20);
         subParams.bottomMargin = convertScalablePixelsToDensity(20);
         roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(10);
