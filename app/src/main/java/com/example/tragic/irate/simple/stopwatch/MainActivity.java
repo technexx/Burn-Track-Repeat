@@ -379,12 +379,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
+  //Todo: Sort mode and dotDraws will need sp -> dp for check marks and scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
-  //Todo: Minimize/maximize on stopwatch flashes Main briefly due to popUp re-animating. Maybe just hide cycle adapter.
-  //Todo: Text size on stopwatch doesn't change w/ more digits - may run outside of circle.
-  //Todo: When resetting total times, partial second ticks down from timer before iterating up in time total.
-  //Todo: Double rows in Pom for aesthetics and to fill shorter space? Consider nixxing the list aspect since it's always 8 rows.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Some other indication in edit mode that a cycle is part of db and not new (just an "editing" notation would work).
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
@@ -858,7 +855,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     recyclerLayoutTwo = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
     //Using exclusively programmatic layout params for round recyclerViews. Setting defaults. Second will never change.
     recyclerLayoutOne.leftMargin = 240;
-//        recyclerLayoutTwo.leftMargin = 450;
 
     Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
     slide_left.setDuration(400);
@@ -1868,6 +1864,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
           }
           runOnUiThread(()->{
+//            Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
+//            anim.setDuration(1000);
+//            savedCycleRecycler.startAnimation(anim);
             savedCycleAdapter.notifyDataSetChanged();
           });
         }
