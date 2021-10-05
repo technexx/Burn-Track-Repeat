@@ -2054,6 +2054,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  public void moveSortCheckmark() {
+    switch (sortHolder) {
+      case 1:
+        moveSortCheckmark.setY(convertScalablePixelsToDensity(10)); break;
+      case 2:
+        moveSortCheckmark.setY(convertScalablePixelsToDensity(42)); break;
+      case 3:
+        moveSortCheckmark.setY(convertScalablePixelsToDensity(74)); break;
+      case 4:
+        moveSortCheckmark.setY(convertScalablePixelsToDensity(106)); break;
+      case 5:
+        moveSortCheckmark.setY(convertScalablePixelsToDensity(138)); break;
+      case 6:
+        moveSortCheckmark.setY(convertScalablePixelsToDensity(170)); break;
+    }
+  }
+
   public void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
       //Only shows restart/resume options of a cycle has been started.
@@ -2177,23 +2194,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortButton.setVisibility(View.VISIBLE);
       delete_highlighted_cycle.setVisibility(View.INVISIBLE);
       delete_highlighted_cycle.setEnabled(false);
-    }
-  }
-
-  public void moveSortCheckmark() {
-    switch (sortHolder) {
-      case 1:
-        moveSortCheckmark.setY(14); break;
-      case 2:
-        moveSortCheckmark.setY(110); break;
-      case 3:
-        moveSortCheckmark.setY(206); break;
-      case 4:
-        moveSortCheckmark.setY(302); break;
-      case 5:
-        moveSortCheckmark.setY(398); break;
-      case 6:
-        moveSortCheckmark.setY(494); break;
     }
   }
 
