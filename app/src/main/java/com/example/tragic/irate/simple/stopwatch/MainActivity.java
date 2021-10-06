@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ImageButton fab;
   ImageButton stopwatch;
-  ImageView moveSortCheckmark;
+  ImageView sortCheckMark;
   TextView emptyCycleList;
 
   CyclesDatabase cyclesDatabase;
@@ -244,8 +244,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean roundIsSelected;
   boolean consolidateRoundAdapterLists;
   int roundSelectedPosition;
-  float popUpDensityPixelsHeight;
-  float popUpDensityPixelWidth;
 
   PopupWindow timerPopUpWindow;
   View timerPopUpView;
@@ -379,7 +377,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  //Todo: Sort mode and dotDraws will need sp -> dp for check marks and scale sizing.
+  //Todo: The different positioning in sort resolves once the popUp is shown.
+  //Todo: Dotdraws will need sp -> dp for scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -579,9 +578,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupView = inflater.inflate(R.layout.sidebar_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
-    popUpDensityPixelsHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 475, getResources().getDisplayMetrics());
-    popUpDensityPixelWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
-
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
@@ -642,7 +638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
-    moveSortCheckmark = sortCyclePopupView.findViewById(R.id.moveSortCheckmark);
+    sortCheckMark = sortCyclePopupView.findViewById(R.id.sortCheckMark);
 
     delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
     delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
@@ -707,6 +703,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomValue3 = sharedPreferences.getInt("pomValue3", 900);
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
+
+    sortHolder = sortMode;
+    int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
+    Log.i("testSort", "pulled pos is " + checkMarkPosition);
+    sortCheckMark.setY(checkMarkPosition);
 
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
     fadeOut = new AlphaAnimation(1.0f, 0.0f);
@@ -790,8 +791,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeProgressIn.setDuration(300);
     fadeProgressOut.setDuration(300);
 
-    //Retrieves checkmark position for sort popup.
-    moveSortCheckmark();
     //Adapter and Recycler for round views within our editCycles popUp.
     LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
     LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
@@ -979,48 +978,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    s1.setOnClickListener(v->{
-      if (mode==1) {
-        //Toggles coloring and row selection.
-        if (!firstRowHighlighted) {
-          breaksSelected = false;
-          setsSelected = true;
-          firstRowHighlighted = true;
-          secondRowHighlighted = false;
-          //If first row is highlighted, second row should un-highlight.
-          toggleInfinityRoundsForBreaks.setAlpha(0.3f);
-          rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.GREEN);
-          rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.WHITE);
-        }
-      }
-    });
-
-    s2.setOnClickListener(v-> {
-      if (mode==1) {
-        //Toggles coloring and row selection.
-        if (!secondRowHighlighted) {
-          setsSelected = false;
-          breaksSelected = true;
-          secondRowHighlighted = true;
-          firstRowHighlighted = false;
-          toggleInfinityRoundsForSets.setAlpha(0.3f);
-          rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.RED);
-          rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.WHITE);
-        }
-      }
-    });
-
-    //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
-    cycleNameEdit.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction()==MotionEvent.ACTION_DOWN) {
-          convertEditTime(true);
-        }
-        return false;
-      }
-    });
-
     global_settings.setOnClickListener(v-> {
       settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
     });
@@ -1054,6 +1011,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
+      moveSortCheckmark();
       sortPopupWindow.showAtLocation(cl, Gravity.END|Gravity.TOP, 0, 0);
     });
 
@@ -1331,12 +1289,46 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return true;
     });
 
-    ////--ActionBar Item onClicks END--////
+    //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
+    cycleNameEdit.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction()==MotionEvent.ACTION_DOWN) {
+          convertEditTime(true);
+        }
+        return false;
+      }
+    });
 
-    ////--EditCycles Menu Item onClicks START--////
-    buttonToLaunchTimer.setOnClickListener(v-> {
-      //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
-      launchTimerCycle(true);
+    s1.setOnClickListener(v->{
+      if (mode==1) {
+        //Toggles coloring and row selection.
+        if (!firstRowHighlighted) {
+          breaksSelected = false;
+          setsSelected = true;
+          firstRowHighlighted = true;
+          secondRowHighlighted = false;
+          //If first row is highlighted, second row should un-highlight.
+          toggleInfinityRoundsForBreaks.setAlpha(0.3f);
+          rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.GREEN);
+          rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.WHITE);
+        }
+      }
+    });
+
+    s2.setOnClickListener(v-> {
+      if (mode==1) {
+        //Toggles coloring and row selection.
+        if (!secondRowHighlighted) {
+          setsSelected = false;
+          breaksSelected = true;
+          secondRowHighlighted = true;
+          firstRowHighlighted = false;
+          toggleInfinityRoundsForSets.setAlpha(0.3f);
+          rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.RED);
+          rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.WHITE);
+        }
+      }
     });
 
     toggleInfinityRoundsForSets.setOnClickListener(v -> {
@@ -1379,6 +1371,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         editAndTextSwitch(true, 3);
       }
       return true;
+    });
+
+    ////--EditCycles Menu Item onClicks START--////
+    buttonToLaunchTimer.setOnClickListener(v-> {
+      //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
+      launchTimerCycle(true);
     });
 
     adjustRoundDelay = new Runnable() {
@@ -2055,20 +2053,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void moveSortCheckmark() {
+    int markPosition = 0;
     switch (sortHolder) {
       case 1:
-        moveSortCheckmark.setY(convertScalablePixelsToDensity(10)); break;
+        markPosition = convertDensityPixelsToScalable(10); break;
       case 2:
-        moveSortCheckmark.setY(convertScalablePixelsToDensity(42)); break;
+        markPosition = convertDensityPixelsToScalable(42); break;
       case 3:
-        moveSortCheckmark.setY(convertScalablePixelsToDensity(74)); break;
+        markPosition = convertDensityPixelsToScalable(74); break;
       case 4:
-        moveSortCheckmark.setY(convertScalablePixelsToDensity(106)); break;
+        markPosition = convertDensityPixelsToScalable(106); break;
       case 5:
-        moveSortCheckmark.setY(convertScalablePixelsToDensity(138)); break;
+        markPosition = convertDensityPixelsToScalable(138); break;
       case 6:
-        moveSortCheckmark.setY(convertScalablePixelsToDensity(170)); break;
+        markPosition = convertDensityPixelsToScalable(170); break;
     }
+    Log.i("testSort", "saved pos is " + markPosition);
+    sortCheckMark.setY(markPosition);
+    prefEdit.putInt("checkMarkPosition", markPosition);
+    prefEdit.apply();
   }
 
   public void activateResumeOrResetOptionForCycle() {
