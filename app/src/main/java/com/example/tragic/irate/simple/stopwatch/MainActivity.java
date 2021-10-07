@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,10 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -556,6 +562,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
+    final Notification.Builder builder;
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= 26) {
+      CharSequence name = "My Channel";
+      String description = "Channel description";
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      NotificationChannel channel = new NotificationChannel("1", name, importance);
+      channel.setDescription(description);
+      // Register the channel with the system; you can't change the importance
+      // or other notification behaviors after this
+      NotificationManager notificationManager = getSystemService(NotificationManager.class);
+      notificationManager.createNotificationChannel(channel);
+      builder = new Notification.Builder(this, "1");
+    } else {
+      builder = new Notification.Builder(this);
+    }
+
+    builder.setSmallIcon(R.drawable.infinity_icon_green);
+    builder.setContentText("Testing Notification!");
+    builder.setAutoCancel(false);
+    builder.setPriority(Notification.PRIORITY_DEFAULT);
+
+    Notification notification = builder.getNotification();
+    notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+
     gson = new Gson();
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
@@ -972,14 +1004,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         positionOfSelectedCycle = 0;
         receivedHighlightPositions.clear();
       }
-
       @Override
       public void onTabReselected(TabLayout.Tab tab) {
       }
     });
 
+    //Todo: Testing Notifications.
     global_settings.setOnClickListener(v-> {
-      settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
+//      settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
+      NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+      notificationManager.notify(1, builder.build());
     });
 
       //Brings up editCycle popUp to create new Cycle.

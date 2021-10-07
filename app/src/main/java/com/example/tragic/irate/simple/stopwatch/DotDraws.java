@@ -136,13 +136,8 @@ public class DotDraws extends View {
     }
   }
 
-  public int DPtoSP(float pixels) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
-  }
-
   @Override
   public void onDraw(Canvas canvas) {
-//    setupPaint();
     this.mCanvas = canvas;
 
     mX = 58; mY = 510; mX2 = 58; mY2 = 640;
