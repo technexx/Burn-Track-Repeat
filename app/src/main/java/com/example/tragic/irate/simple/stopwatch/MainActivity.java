@@ -370,7 +370,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   long defaultProgressBarDurationForInfinityRounds;
   long countUpMillisHolder;
-  int scrollPosition;
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
@@ -383,6 +382,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
+  NotificationManagerCompat notificationManager;
+  Notification.Builder builder;
+
+  //Todo: Create method for notifications + manager.
   //Todo: The different positioning in sort resolves once the popUp is shown.
   //Todo: Dotdraws will need sp -> dp for scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
@@ -561,32 +564,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-
-    final Notification.Builder builder;
-    // Create the NotificationChannel, but only on API 26+ because
-    // the NotificationChannel class is new and not in the support library
-    if (Build.VERSION.SDK_INT >= 26) {
-      CharSequence name = "My Channel";
-      String description = "Channel description";
-      int importance = NotificationManager.IMPORTANCE_DEFAULT;
-      NotificationChannel channel = new NotificationChannel("1", name, importance);
-      channel.setDescription(description);
-      // Register the channel with the system; you can't change the importance
-      // or other notification behaviors after this
-      NotificationManager notificationManager = getSystemService(NotificationManager.class);
-      notificationManager.createNotificationChannel(channel);
-      builder = new Notification.Builder(this, "1");
-    } else {
-      builder = new Notification.Builder(this);
-    }
-
-    builder.setSmallIcon(R.drawable.infinity_icon_green);
-    builder.setContentText("Testing Notification!");
-    builder.setAutoCancel(false);
-    builder.setPriority(Notification.PRIORITY_DEFAULT);
-
-    Notification notification = builder.getNotification();
-    notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 
     gson = new Gson();
     fab = findViewById(R.id.fab);
@@ -829,6 +806,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
     LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
+//    final Notification.Builder builder;
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= 26) {
+      CharSequence name = "My Channel";
+      String description = "Channel description";
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      NotificationChannel channel = new NotificationChannel("1", name, importance);
+      channel.setDescription(description);
+      // Register the channel with the system; you can't change the importance
+      // or other notification behaviors after this
+      NotificationManager notificationManager = getSystemService(NotificationManager.class);
+      notificationManager.createNotificationChannel(channel);
+      builder = new Notification.Builder(this, "1");
+    } else {
+      builder = new Notification.Builder(this);
+    }
+
+    builder.setSmallIcon(R.drawable.start_cycle);
+    //Todo: Needs a way to stay updated.
+    builder.setContentText(timeLeft.getText().toString());
+    builder.setAutoCancel(false);
+    builder.setPriority(Notification.PRIORITY_DEFAULT);
+
+    Notification notification = builder.getNotification();
+    notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+
+
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
@@ -1012,7 +1017,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Todo: Testing Notifications.
     global_settings.setOnClickListener(v-> {
 //      settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
-      NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+      notificationManager = NotificationManagerCompat.from(this);
       notificationManager.notify(1, builder.build());
     });
 
@@ -3028,6 +3033,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
+        builder.setContentText(timeLeft.getText().toString());
+        notificationManager.notify(1, builder.build());
+
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         total_set_time.setText(stringValueOfTotalCycleTime(1));
