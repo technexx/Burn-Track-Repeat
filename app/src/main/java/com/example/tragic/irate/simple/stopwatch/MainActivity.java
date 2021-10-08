@@ -17,7 +17,10 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -382,8 +385,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
-  NotificationManagerCompat notificationManager;
+  NotificationManagerCompat notificationManagerCompat;
   Notification.Builder builder;
+  static boolean notificationDismissed;
 
   //Todo: Create method for notifications + manager.
   //Todo: The different positioning in sort resolves once the popUp is shown.
@@ -680,13 +684,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     typeHolderOne = new ArrayList<>();
     typeHolderTwo = new ArrayList<>();
 
-    //These Integer Lists hold our millis values for each round.
     pomValuesTime = new ArrayList<>();
-    //These String Lists hold String conversions (e.g. 1:05) of our Integer lists, used for display purposes in recyclerView via adapter.
     convertedPomList = new ArrayList<>();
-    //These String lists hold concatenated Strings of COMPLETE cycles (e.g. [2:00, 4:30., 3:15] etc.), used for storing the cycles in our database.
     pomArray = new ArrayList<>();
-    //These String lists hold each cycle's title.
     workoutTitleArray = new ArrayList<>();
     pomTitleArray = new ArrayList<>();
     //If highlighting cycles for deletion, contains all POSITIONS (not IDs) of cycles highlighted.
@@ -725,7 +725,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
 
-    ///////////////////////////////////////////////////////////////////////////
     mHandler = new Handler();
 
     valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
@@ -747,7 +746,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomArray = new ArrayList<>();
 
     lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
-
     reset = timerPopUpView.findViewById(R.id.reset);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
 
@@ -806,33 +804,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
     LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
-//    final Notification.Builder builder;
-    // Create the NotificationChannel, but only on API 26+ because
-    // the NotificationChannel class is new and not in the support library
-    if (Build.VERSION.SDK_INT >= 26) {
-      CharSequence name = "My Channel";
-      String description = "Channel description";
-      int importance = NotificationManager.IMPORTANCE_DEFAULT;
-      NotificationChannel channel = new NotificationChannel("1", name, importance);
-      channel.setDescription(description);
-      // Register the channel with the system; you can't change the importance
-      // or other notification behaviors after this
-      NotificationManager notificationManager = getSystemService(NotificationManager.class);
-      notificationManager.createNotificationChannel(channel);
-      builder = new Notification.Builder(this, "1");
-    } else {
-      builder = new Notification.Builder(this);
-    }
-
-    builder.setSmallIcon(R.drawable.start_cycle);
-    //Todo: Needs a way to stay updated.
-    builder.setContentText(timeLeft.getText().toString());
-    builder.setAutoCancel(false);
-    builder.setPriority(Notification.PRIORITY_DEFAULT);
-
-    Notification notification = builder.getNotification();
-    notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-
+    instantiateNotifications();
 
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -1014,30 +986,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    //Todo: Testing Notifications.
     global_settings.setOnClickListener(v-> {
-//      settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
-      notificationManager = NotificationManagerCompat.from(this);
-      notificationManager.notify(1, builder.build());
+      settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
     });
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
-      if (!cycleTitle.isEmpty()) cycleTitle = cycleNameEdit.getText().toString(); else cycleTitle = date;
-      buttonToLaunchTimer.setEnabled(true);
-      //Default row selection.
-      resetRows();
-      cycleNameEdit.getText().clear();
-      //Brings up menu to add/subtract rounds to new cycle.
-      editCyclesPopupWindow.showAsDropDown(tabLayout);
       fab.setEnabled(false);
-      //Used when deciding whether to save a new cycle or retrieve/update a current one. FAB will always create a new one.
-      isNewCycle = true;
+      buttonToLaunchTimer.setEnabled(true);
       //Default disabled state of edited cycle save, if nothing has changed.
       save_edit_cycle.setEnabled(false);
       save_edit_cycle.setAlpha(0.3f);
+      //Default row selection.
+      resetRows();
+      cycleNameEdit.getText().clear();
+      isNewCycle = true;
       //Clears round adapter arrays so they can be freshly populated.
       clearRoundAdapterArrays();
+      if (!cycleTitle.isEmpty()) cycleTitle = cycleNameEdit.getText().toString(); else cycleTitle = date;
+      editCyclesPopupWindow.showAsDropDown(tabLayout);
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -1495,10 +1462,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
+          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
           break;
         case 3:
-          firstRowTextView.setText(convertEditPopUpRoundValues(pomValue1));
+          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
           break;
       }
       return true;
@@ -1510,10 +1477,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
+          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
           break;
         case 3:
-          firstRowTextView.setText(convertEditPopUpRoundValues(pomValue1));
+          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
           break;
       }
       return true;
@@ -1525,10 +1492,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
+          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
           break;
         case 3:
-          secondRowTextView.setText(convertEditPopUpRoundValues(pomValue2));
+          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue2));
           break;
       }
       return true;
@@ -1540,10 +1507,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertEditTime(true);
       switch (mode) {
         case 1:
-          secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
+          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
           break;
         case 3:
-          secondRowTextView.setText(convertEditPopUpRoundValues(pomValue2));
+          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue2));
           break;
       }
       return true;
@@ -1553,7 +1520,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       incrementValues = true;
       setIncrements(event, changeThirdValue);
       convertEditTime(true);
-      thirdRowEditTextView.setText(convertEditPopUpRoundValues(pomValue3));
+      thirdRowEditTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue3));
       return true;
     });
 
@@ -1561,7 +1528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       incrementValues = false;
       setIncrements(event, changeThirdValue);
       convertEditTime(true);
-      thirdRowEditTextView.setText(convertEditPopUpRoundValues(pomValue3));
+      thirdRowEditTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue3));
       return true;
     });
 
@@ -2113,6 +2080,52 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
+  public static class dismissReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      int notificationId = intent.getExtras().getInt("My ID");
+      notificationDismissed = true;
+      Log.i("testnote", "true!");
+    }
+  }
+
+  private PendingIntent createOnDismissedIntent(Context context, int notificationId) {
+    Intent intent = new Intent(context, dismissReceiver.class);
+    intent.putExtra("My ID", notificationId);
+
+    PendingIntent pendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(),notificationId, intent, 0);
+
+    return pendingIntent;
+  }
+
+  public void instantiateNotifications() {
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= 26) {
+      CharSequence name = "My Channel";
+      String description = "Channel description";
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      NotificationChannel channel = new NotificationChannel("1", name, importance);
+      channel.setDescription(description);
+      // Register the channel with the system; you can't change the importance
+      // or other notification behaviors after this
+      NotificationManager notificationManager = getSystemService(NotificationManager.class);
+      notificationManager.createNotificationChannel(channel);
+      builder = new Notification.Builder(this, "1");
+    } else {
+      builder = new Notification.Builder(this);
+    }
+
+    builder.setSmallIcon(R.drawable.start_cycle);
+    builder.setAutoCancel(false);
+    builder.setPriority(Notification.PRIORITY_DEFAULT);
+    builder.setDeleteIntent(createOnDismissedIntent(this, 0));
+
+    notificationManagerCompat = NotificationManagerCompat.from(this);
+
+//    notification = builder.getNotification();
+  }
+
   public void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
       //Only shows restart/resume options of a cycle has been started.
@@ -2174,8 +2187,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       firstRowEditSeconds.setText(elongateEditSeconds(30));
       secondRowEditMinutes.setText(String.valueOf(0));
       secondRowEditSeconds.setText(elongateEditSeconds(30));
-      firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
-      secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
+      firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
+      secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
     }
     else if (mode==3) {
       rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.WHITE);
@@ -2284,7 +2297,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editSetSeconds < 5 && editSetMinutes == 0) editSetSeconds = 0;
       //Sets our timer values to the values in editText.
       setValue = (int) ((editSetMinutes * 60) + editSetSeconds);
-      firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
+      firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
 
       editBreakMinutes = convertEditTextToLong(secondRowEditMinutes);
       editBreakSeconds = convertEditTextToLong(secondRowEditSeconds);
@@ -2298,7 +2311,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editBreakSeconds < 5 && editBreakMinutes == 0) editBreakSeconds = 0;
 
       breakValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
-      secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
+      secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
       //Sets value of editBreakMinutes to either breakValue, or breakOnlyValue, depending on which mode we're on.
 
       toastBounds(5, 300, setValue);
@@ -2554,7 +2567,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
   //Conversion of Long-String for add/subtract popUp textViews. Slightly different format than our timer textViews.
-  public String convertEditPopUpRoundValues(long totalSeconds) {
+  public String convertTimeToStringWithFullMinuteAndSecondValues(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
     long remainingSeconds;
@@ -2571,6 +2584,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
       if (totalSeconds < 5) return ("0 : 05");
       else return "0 : " + totalStringSeconds;
+    }
+  }
+
+  public String convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(long totalSeconds) {
+    DecimalFormat df = new DecimalFormat("00");
+    long minutes;
+    long remainingSeconds;
+    minutes = totalSeconds / 60;
+
+    remainingSeconds = totalSeconds % 60;
+    if (totalSeconds >= 60) {
+      String formattedSeconds = df.format(remainingSeconds);
+      if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
+      if (mode==1 || totalSeconds>=600) return (minutes + ":" + formattedSeconds);
+      else return ("0" + minutes + ":" + formattedSeconds);
+    } else {
+      String totalStringSeconds = String.valueOf(totalSeconds);
+      if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
+      if (totalSeconds < 5) return ("0:05");
+      else return "0:" + totalStringSeconds;
     }
   }
 
@@ -2627,8 +2660,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRowSubtractButton.setVisibility(View.VISIBLE);
         //Strings and values exclusive to mode 1.
         s1.setText(R.string.set_time);
-        firstRowTextView.setText(convertEditPopUpRoundValues(setValue));
-        secondRowTextView.setText(convertEditPopUpRoundValues(breakValue));
+        firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
+        secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
         addParams.bottomMargin = convertScalablePixelsToDensity(32);
         subParams.bottomMargin = convertScalablePixelsToDensity(32);
         roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(18);
@@ -2652,9 +2685,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s1.setText(R.string.work_time);
         s2.setText(R.string.small_break);
         s3.setText(R.string.long_break);
-        firstRowTextView.setText(convertEditPopUpRoundValues(pomValue1));
-        secondRowTextView.setText(convertEditPopUpRoundValues(pomValue2));
-        thirdRowEditTextView.setText(convertEditPopUpRoundValues(pomValue3));
+        firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
+        secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue2));
+        thirdRowEditTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue3));
         addParams.bottomMargin = convertScalablePixelsToDensity(20);
         subParams.bottomMargin = convertScalablePixelsToDensity(20);
         roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(10);
@@ -3033,8 +3066,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        builder.setContentText(timeLeft.getText().toString());
-        notificationManager.notify(1, builder.build());
+        String currentRound = String.valueOf(startRounds-numberOfRoundsLeft + 1);
+        String totalRounds = String.valueOf(startRounds);
+        String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((setMillis + 1000) / 1000);
+        String notificationText = getString(R.string.notification_text, "Set", currentRound, totalRounds, timeRemaining);
+
+        if (!notificationDismissed) {
+          builder.setContentText(notificationText);
+          notificationManagerCompat.notify(1, builder.build());
+        }
 
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
