@@ -428,15 +428,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(true);
     notificationDismissed = true;
     notificationManagerCompat.cancel(1);
-    Log.i("testnote", "app resumed!!");
   }
 
   @Override
   public void onPause() {
     super.onPause();
     setVisible(false);
-    notificationDismissed = false;
-    Log.i("testnote", "app minimized!!");
+    if (objectAnimator.isStarted()) {
+      notificationDismissed = false;
+    }
   }
 
   @Override
@@ -1071,22 +1071,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      roundedValueForTotalTimes = 0;
-      addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
-      AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
-      activateResumeOrResetOptionForCycle();
-      //Pauses timer.
-      pauseAndResumeTimer(PAUSING_TIMER);
-      //Removes runnable that begins next round.
-      mHandler.removeCallbacksAndMessages(null);
       timerDisabled = false;
       makeCycleAdapterVisible = false;
+      beginTimerForNextRound = false;
+      buttonToLaunchTimer.setEnabled(false);
+      roundedValueForTotalTimes = 0;
+
+      if (timerIsPaused) activateResumeOrResetOptionForCycle();
+//      pauseAndResumeTimer(PAUSING_TIMER);
+
+      AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+
+      //Removes runnable that begins next round.
+      mHandler.removeCallbacksAndMessages(null);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Prevents timer from starting. Runnable will just populate values of next round.
-      beginTimerForNextRound = false;
 
-      buttonToLaunchTimer.setEnabled(false);
       //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
       if (mode==4) mode = savedMode;
       dotDraws.setMode(mode);
@@ -3077,21 +3079,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void setNotificationValues(int startRounds, int roundsLeft, long timeLeft) {
+    String currentRound = String.valueOf(startRounds-roundsLeft + 1);
+    String totalRounds = String.valueOf(startRounds);
+    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
+    String notificationText = getString(R.string.notification_text, "Set", currentRound, totalRounds, timeRemaining);
+
+    if (!notificationDismissed) {
+      builder.setContentText(notificationText);
+      notificationManagerCompat.notify(1, builder.build());
+    }
+  }
+
   public void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
 
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        String currentRound = String.valueOf(startRounds-numberOfRoundsLeft + 1);
-        String totalRounds = String.valueOf(startRounds);
-        String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((setMillis + 1000) / 1000);
-        String notificationText = getString(R.string.notification_text, "Set", currentRound, totalRounds, timeRemaining);
-
-        if (!notificationDismissed) {
-          builder.setContentText(notificationText);
-          notificationManagerCompat.notify(1, builder.build());
-        }
+        setNotificationValues(startRounds, numberOfRoundsLeft, setMillis);
 
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
