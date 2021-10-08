@@ -436,6 +436,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(false);
     if (objectAnimator.isStarted()) {
       notificationDismissed = false;
+      if (mode==1) {
+        if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==2){
+          setNotificationValues(startRounds, numberOfRoundsLeft, setMillis);
+        } else {
+          setNotificationValues(startRounds, numberOfRoundsLeft, breakMillis);
+        }
+      }
+      if (mode==3) setNotificationValues(pomDotCounter+1, 8, pomMillis);
     }
   }
 
@@ -3111,7 +3119,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         if (setMillis < 500) timerDisabled = true;
-        //Refreshes Canvas so dots fade.
         dotDraws.reDraw();
       }
 
@@ -3129,6 +3136,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timer = new CountDownTimer(breakMillis, 50) {
         @Override
         public void onTick(long millisUntilFinished) {
+          setNotificationValues(startRounds, numberOfRoundsLeft, breakMillis);
+
           progressBarPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
           total_break_time.setText(stringValueOfTotalCycleTime(3));
@@ -3160,6 +3169,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(pomMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
+        setNotificationValues(pomDotCounter+1, 8, pomMillis);
+
         progressBarPause = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
         switch (pomDotCounter) {
@@ -3178,7 +3189,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
         if (pomMillis < 500) timerDisabled = true;
-        //Refreshes Canvas so dots fade.
         dotDraws.reDraw();
       }
 
