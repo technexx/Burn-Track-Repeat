@@ -388,6 +388,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   Notification.Builder builder;
   static boolean notificationDismissed;
+  protected static boolean isVisible = false;
 
   //Todo: Create method for notifications + manager.
   //Todo: The different positioning in sort resolves once the popUp is shown.
@@ -418,6 +419,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test everything 10x.
 
    //Todo: REMINDER, Try next app w/ Kotlin.
+
+  //Todo: Dismissing Timer popUp (i.e. backPressed), auto pauses timer at moment, so notification object will not be updated.
+  //Todo: Need to make this work if we have multiple timers running.
+  @Override
+  public void onResume() {
+    super.onResume();
+    setVisible(true);
+    notificationDismissed = true;
+    notificationManagerCompat.cancel(1);
+    Log.i("testnote", "app resumed!!");
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    setVisible(false);
+    notificationDismissed = false;
+    Log.i("testnote", "app minimized!!");
+  }
 
   @Override
   public void onBackPressed() {
@@ -715,7 +735,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     sortHolder = sortMode;
     int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
-    Log.i("testSort", "pulled pos is " + checkMarkPosition);
     sortCheckMark.setY(checkMarkPosition);
 
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
@@ -2074,7 +2093,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 6:
         markPosition = convertDensityPixelsToScalable(170); break;
     }
-    Log.i("testSort", "saved pos is " + markPosition);
     sortCheckMark.setY(markPosition);
     prefEdit.putInt("checkMarkPosition", markPosition);
     prefEdit.apply();
@@ -2085,7 +2103,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public void onReceive(Context context, Intent intent) {
       int notificationId = intent.getExtras().getInt("My ID");
       notificationDismissed = true;
-      Log.i("testnote", "true!");
     }
   }
 
@@ -2122,8 +2139,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     builder.setDeleteIntent(createOnDismissedIntent(this, 0));
 
     notificationManagerCompat = NotificationManagerCompat.from(this);
-
-//    notification = builder.getNotification();
   }
 
   public void activateResumeOrResetOptionForCycle() {
@@ -3017,6 +3032,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Controls each mode's object animator. Starts new or resumes current one.
   public void startObjectAnimator() {
+    notificationDismissed = true;
+
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
