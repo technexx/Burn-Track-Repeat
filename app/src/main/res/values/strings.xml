@@ -56,5 +56,6 @@
     <string name="about">About</string>
     <string name="settings">Settings</string>
 
-    <string name="notification_text">On %1$s \n Round %2$s of %3$s \n %4$s</string>
+    <string name="workout_text">Workout - On %1$s </string>
+    <string name="notification_text">Workout - On %1$s\nRound %2$s of %3$s\n%4$s</string>
 </resources>

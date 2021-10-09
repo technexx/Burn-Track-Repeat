@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
    //Todo: REMINDER, Try next app w/ Kotlin.
 
   //Todo: Dismissing Timer popUp (i.e. backPressed), auto pauses timer at moment, so notification object will not be updated.
-  //Todo: Need to make this work if we have multiple timers running.
+  //Todo: Separate lines if both timers are active.
   @Override
   public void onResume() {
     super.onResume();
@@ -438,12 +438,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       notificationDismissed = false;
       if (mode==1) {
         if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==2){
-          setNotificationValues(startRounds, numberOfRoundsLeft, setMillis);
+          setNotificationValues("Sets", startRounds, numberOfRoundsLeft, setMillis);
         } else {
-          setNotificationValues(startRounds, numberOfRoundsLeft, breakMillis);
+          setNotificationValues("Breaks", startRounds, numberOfRoundsLeft, breakMillis);
         }
       }
-      if (mode==3) setNotificationValues(pomDotCounter+1, 8, pomMillis);
+      if (mode==3) {
+        switch (pomDotCounter) {
+          case 0: case 2: case 4: case 6:
+            setNotificationValues("Work", pomDotCounter+1, 8, pomMillis);
+            break;
+          case 1: case 3: case 5: case 7:
+            setNotificationValues("Break", pomDotCounter+1, 8, pomMillis);
+            break;
+        }
+      }
     }
   }
 
@@ -3087,14 +3096,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setNotificationValues(int startRounds, int roundsLeft, long timeLeft) {
+  public void setNotificationValues(String roundType, int startRounds, int roundsLeft, long timeLeft) {
     String currentRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
     String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
-    String notificationText = getString(R.string.notification_text, "Set", currentRound, totalRounds, timeRemaining);
+
+    String notificationHHeader = getString(R.string.workout_text, roundType);
+    String notificationBody = getString(R.string.notification_text, roundType, currentRound, totalRounds, timeRemaining);
 
     if (!notificationDismissed) {
-      builder.setContentText(notificationText);
+      builder.setContentText(notificationHHeader);
+      //Todo: bigText here. Need way to tell if both timers are active.
+      builder.setStyle(new Notification.BigTextStyle().bigText(notificationBody));
       notificationManagerCompat.notify(1, builder.build());
     }
   }
@@ -3105,7 +3118,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        setNotificationValues(startRounds, numberOfRoundsLeft, setMillis);
+        setNotificationValues("Sets", startRounds, numberOfRoundsLeft, setMillis);
 
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
@@ -3136,7 +3149,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timer = new CountDownTimer(breakMillis, 50) {
         @Override
         public void onTick(long millisUntilFinished) {
-          setNotificationValues(startRounds, numberOfRoundsLeft, breakMillis);
+          setNotificationValues("Breaks", startRounds, numberOfRoundsLeft, breakMillis);
 
           progressBarPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
@@ -3169,15 +3182,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(pomMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        setNotificationValues(pomDotCounter+1, 8, pomMillis);
-
         progressBarPause = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
+
         switch (pomDotCounter) {
           case 0: case 2: case 4: case 6:
-            total_set_time.setText(stringValueOfTotalCycleTime(0)); break;
+            total_set_time.setText(stringValueOfTotalCycleTime(0));
+            setNotificationValues("Work", pomDotCounter+1, 8, pomMillis);
+            break;
           case 1: case 3: case 5: case 7:
-            total_break_time.setText(stringValueOfTotalCycleTime(0)); break;
+            total_break_time.setText(stringValueOfTotalCycleTime(0));
+            setNotificationValues("Break", pomDotCounter+1, 8, pomMillis);
+            break;
         }
 
         if (textSizeIncreased && mode==3) {
