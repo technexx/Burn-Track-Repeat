@@ -3096,6 +3096,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Need up to 6 lines if both timers active // OR 3 lines but spaced out?
   public void setNotificationValues(String roundType, int startRounds, int roundsLeft, long timeLeft) {
     String currentRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
@@ -3106,7 +3107,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (!notificationDismissed) {
       builder.setContentText(notificationHHeader);
-      //Todo: bigText here. Need way to tell if both timers are active.
       builder.setStyle(new Notification.BigTextStyle().bigText(notificationBody));
       notificationManagerCompat.notify(1, builder.build());
     }

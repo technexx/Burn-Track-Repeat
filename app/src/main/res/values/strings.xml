@@ -58,4 +58,7 @@
 
     <string name="workout_text">Workout - On %1$s </string>
     <string name="notification_text">Workout - On %1$s\nRound %2$s of %3$s\n%4$s</string>
+
+    <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s    </string>
+    <string name="bunch_of_spaces">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>
 </resources>
