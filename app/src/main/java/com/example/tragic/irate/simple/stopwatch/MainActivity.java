@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Notification.Builder builder;
   static boolean notificationDismissed;
 
-  //Todo: Next round auto-start issue issue w/ minimizing + resuming.
+  //Todo: Timer not updating for Pom in notifications.
   //Todo: 0/0 index exception on emulator when (1) Start Workout timer, (2) Start Pom Timer, (3) Try to resume Workout timer.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
   //Todo: The different positioning in sort resolves once the popUp is shown.
@@ -2142,6 +2142,71 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
 
+  public String setNotificationHeader(String mode, String roundType) {
+    return (getString(R.string.notification_text_header, mode, roundType));
+  }
+
+  //Todo: Diff. math needed for Pom roundsLeft.
+  public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
+    String currentRound = String.valueOf(startRounds-roundsLeft + 1);
+    String totalRounds = String.valueOf(startRounds);
+    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
+
+    return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
+  }
+
+  public void setNotificationValues() {
+    String headerOne = "";
+    String headerTwo = "";
+    String bodyOne = "";
+    String bodyTwo = "";
+
+    if (typeOfRound.size() > 0) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+        headerOne = setNotificationHeader("Workout", "Set");
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+      } else {
+        headerOne = setNotificationHeader("Workout", "Break");
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+      }
+    }
+
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        headerTwo = setNotificationHeader("Pomodoro", "Work");
+        bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
+        break;
+      case 1: case 3: case 5: case 7:
+        headerTwo = setNotificationHeader("Pomodoro", "Break");
+        bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
+        break;
+    }
+
+    if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerOne)
+              .addLine(bodyOne)
+      );
+    }
+
+    if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
+      Log.i("testnote", "pomMillis is " + pomMillis + " and body is " + bodyTwo);
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerTwo)
+              .addLine(bodyTwo)
+      );
+    }
+
+    if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
+              .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
+      );
+    }
+
+    notificationManagerCompat.notify(1, builder.build());
+  }
+
   public void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
       //Only shows restart/resume options of a cycle has been started.
@@ -2618,8 +2683,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       String totalStringSeconds = String.valueOf(totalSeconds);
       if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
-      if (totalSeconds < 5) return ("0:05");
-      else return "0:" + totalStringSeconds;
+      return "0:" + totalStringSeconds;
     }
   }
 
@@ -3076,70 +3140,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
     }
-  }
-
-  public String setNotificationHeader(String mode, String roundType) {
-    return (getString(R.string.notification_text_header, mode, roundType));
-  }
-
-  //Todo: Diff. math needed for Pom roundsLeft.
-  public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
-    String currentRound = String.valueOf(startRounds-roundsLeft + 1);
-    String totalRounds = String.valueOf(startRounds);
-    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
-
-    return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
-  }
-
-  public void setNotificationValues() {
-    String headerOne = "";
-    String headerTwo = "";
-    String bodyOne = "";
-    String bodyTwo = "";
-
-    if (typeOfRound.size() > 0) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-        headerOne = setNotificationHeader("Workout", "Set");
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-      } else {
-        headerOne = setNotificationHeader("Workout", "Break");
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
-      }
-    }
-
-    switch (pomDotCounter) {
-      case 0: case 2: case 4: case 6:
-        headerTwo = setNotificationHeader("Pomodoro", "Work");
-        bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
-        break;
-      case 1: case 3: case 5: case 7:
-        headerTwo = setNotificationHeader("Pomodoro", "Break");
-        bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
-        break;
-    }
-
-    if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
-              .addLine(headerOne)
-              .addLine(bodyOne)
-      );
-    }
-
-    if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
-              .addLine(headerTwo)
-              .addLine(bodyTwo)
-      );
-    }
-
-    if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
-              .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
-              .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
-      );
-    }
-
-    notificationManagerCompat.notify(1, builder.build());
   }
 
 
