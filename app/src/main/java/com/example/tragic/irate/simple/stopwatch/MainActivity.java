@@ -388,10 +388,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   Notification.Builder builder;
   static boolean notificationDismissed;
-  protected static boolean isVisible = false;
 
-  //Todo: Create method for notifications + manager.
-  //Todo: "My Channel" title appears for user when disabling notifications - change title.
+  //Todo: Next round auto-start issue issue w/ minimizing + resuming.
   //Todo: 0/0 index exception on emulator when (1) Start Workout timer, (2) Start Pom Timer, (3) Try to resume Workout timer.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
   //Todo: The different positioning in sort resolves once the popUp is shown.
@@ -437,57 +435,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onPause();
     setVisible(false);
     notificationDismissed = false;
-
-    String headerOne = "";
-    String headerTwo = "";
-    String bodyOne = "";
-    String bodyTwo = "";
-
-
-    //Todo: typeOfRound may be 0 if not in mode 1.
-    if (typeOfRound.size() > 0) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-        headerOne = setNotificationHeader("Workout", "Set");
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-      } else {
-        headerOne = setNotificationHeader("Workout", "Break");
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
-      }
-    }
-
-    switch (pomDotCounter) {
-      case 0: case 2: case 4: case 6:
-        headerTwo = setNotificationHeader("Pomodoro", "Work");
-        bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
-        break;
-      case 1: case 3: case 5: case 7:
-        headerTwo = setNotificationHeader("Pomodoro", "Break");
-        bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
-        break;
-    }
-
-    if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
-              .addLine(headerOne)
-              .addLine(bodyOne)
-      );
-    }
-
-    if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
-              .addLine(headerTwo)
-              .addLine(bodyTwo)
-      );
-    }
-
-    if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
-              .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
-              .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
-      );
-    }
-
-    notificationManagerCompat.notify(1, builder.build());
+    setNotificationValues();
   }
 
   @Override
@@ -2172,8 +2120,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
     if (Build.VERSION.SDK_INT >= 26) {
-      CharSequence name = "My Channel";
-      String description = "Channel description";
+      CharSequence name = "Timers";
+      String description = "Timer Countdown";
       int importance = NotificationManager.IMPORTANCE_DEFAULT;
       NotificationChannel channel = new NotificationChannel("1", name, importance);
       channel.setDescription(description);
@@ -3143,17 +3091,57 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
   }
 
-  public void setNotificationValues(int mode, String roundType, int startRounds, int roundsLeft, long timeLeft) {
-    String currentRound = String.valueOf(startRounds-roundsLeft + 1);
-    String totalRounds = String.valueOf(startRounds);
-    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
+  public void setNotificationValues() {
+    String headerOne = "";
+    String headerTwo = "";
+    String bodyOne = "";
+    String bodyTwo = "";
 
-//    if (!notificationDismissed) {
-//      builder.setContentText(notificationHeader);
-//      builder.setStyle(new Notification.BigTextStyle().bigText(notificationBody));
-//      notificationManagerCompat.notify(1, builder.build());
-//    }
+    if (typeOfRound.size() > 0) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+        headerOne = setNotificationHeader("Workout", "Set");
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+      } else {
+        headerOne = setNotificationHeader("Workout", "Break");
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+      }
+    }
+
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        headerTwo = setNotificationHeader("Pomodoro", "Work");
+        bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
+        break;
+      case 1: case 3: case 5: case 7:
+        headerTwo = setNotificationHeader("Pomodoro", "Break");
+        bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
+        break;
+    }
+
+    if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerOne)
+              .addLine(bodyOne)
+      );
+    }
+
+    if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerTwo)
+              .addLine(bodyTwo)
+      );
+    }
+
+    if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
+              .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
+      );
+    }
+
+    notificationManagerCompat.notify(1, builder.build());
   }
+
 
   public void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
@@ -3161,7 +3149,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        setNotificationValues(1, "Sets", startRounds, numberOfRoundsLeft, setMillis);
+        if (!notificationDismissed) {
+          setNotificationValues();
+        }
 
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
@@ -3192,7 +3182,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timer = new CountDownTimer(breakMillis, 50) {
         @Override
         public void onTick(long millisUntilFinished) {
-          setNotificationValues(1, "Breaks", startRounds, numberOfRoundsLeft, breakMillis);
+          if (!notificationDismissed) {
+            setNotificationValues();
+          }
 
           progressBarPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
@@ -3225,19 +3217,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(pomMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
+        if (!notificationDismissed) {
+          setNotificationValues();
+        }
+
         progressBarPause = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
-
-        switch (pomDotCounter) {
-          case 0: case 2: case 4: case 6:
-            total_set_time.setText(stringValueOfTotalCycleTime(0));
-            setNotificationValues(3, "Work", pomDotCounter+1, 8, pomMillis);
-            break;
-          case 1: case 3: case 5: case 7:
-            total_break_time.setText(stringValueOfTotalCycleTime(0));
-            setNotificationValues(3, "Break", pomDotCounter+1, 8, pomMillis);
-            break;
-        }
 
         if (textSizeIncreased && mode==3) {
           if (pomMillis < 59000) {
