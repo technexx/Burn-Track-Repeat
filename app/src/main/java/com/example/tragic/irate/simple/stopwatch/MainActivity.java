@@ -391,6 +391,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   protected static boolean isVisible = false;
 
   //Todo: Create method for notifications + manager.
+  //Todo: "My Channel" title appears for user when disabling notifications - change title.
+  //Todo: 0/0 index exception on emulator when (1) Start Workout timer, (2) Start Pom Timer, (3) Try to resume Workout timer.
+  //Todo: Spinners or right-to-left time population for creating timers (like Google's).
   //Todo: The different positioning in sort resolves once the popUp is shown.
   //Todo: Dotdraws will need sp -> dp for scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
@@ -421,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
    //Todo: REMINDER, Try next app w/ Kotlin.
 
   //Todo: Dismissing Timer popUp (i.e. backPressed), auto pauses timer at moment, so notification object will not be updated.
-  //Todo: Separate lines if both timers are active.
   @Override
   public void onResume() {
     super.onResume();
@@ -434,26 +436,58 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onPause() {
     super.onPause();
     setVisible(false);
-    if (objectAnimator.isStarted()) {
-      notificationDismissed = false;
-      if (mode==1) {
-        if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==2){
-          setNotificationValues("Sets", startRounds, numberOfRoundsLeft, setMillis);
-        } else {
-          setNotificationValues("Breaks", startRounds, numberOfRoundsLeft, breakMillis);
-        }
-      }
-      if (mode==3) {
-        switch (pomDotCounter) {
-          case 0: case 2: case 4: case 6:
-            setNotificationValues("Work", pomDotCounter+1, 8, pomMillis);
-            break;
-          case 1: case 3: case 5: case 7:
-            setNotificationValues("Break", pomDotCounter+1, 8, pomMillis);
-            break;
-        }
+    notificationDismissed = false;
+
+    String headerOne = "";
+    String headerTwo = "";
+    String bodyOne = "";
+    String bodyTwo = "";
+
+
+    //Todo: typeOfRound may be 0 if not in mode 1.
+    if (typeOfRound.size() > 0) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+        headerOne = setNotificationHeader("Workout", "Set");
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+      } else {
+        headerOne = setNotificationHeader("Workout", "Break");
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
       }
     }
+
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        headerTwo = setNotificationHeader("Pomodoro", "Work");
+        bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
+        break;
+      case 1: case 3: case 5: case 7:
+        headerTwo = setNotificationHeader("Pomodoro", "Break");
+        bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
+        break;
+    }
+
+    if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerOne)
+              .addLine(bodyOne)
+      );
+    }
+
+    if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerTwo)
+              .addLine(bodyTwo)
+      );
+    }
+
+    if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
+      builder.setStyle(new Notification.InboxStyle()
+              .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
+              .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
+      );
+    }
+
+    notificationManagerCompat.notify(1, builder.build());
   }
 
   @Override
@@ -468,7 +502,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //For resume/reset onClicks within cycle adapter.
-  @Override
+@Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
     if (resumingOrResetting==RESUMING_CYCLE) {
       progressBar.setProgress(progressBarPause);
@@ -3096,20 +3130,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Need up to 6 lines if both timers active // OR 3 lines but spaced out?
-  public void setNotificationValues(String roundType, int startRounds, int roundsLeft, long timeLeft) {
+  public String setNotificationHeader(String mode, String roundType) {
+    return (getString(R.string.notification_text_header, mode, roundType));
+  }
+
+  //Todo: Diff. math needed for Pom roundsLeft.
+  public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
     String currentRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
     String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
 
-    String notificationHHeader = getString(R.string.workout_text, roundType);
-    String notificationBody = getString(R.string.notification_text, roundType, currentRound, totalRounds, timeRemaining);
+    return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
+  }
 
-    if (!notificationDismissed) {
-      builder.setContentText(notificationHHeader);
-      builder.setStyle(new Notification.BigTextStyle().bigText(notificationBody));
-      notificationManagerCompat.notify(1, builder.build());
-    }
+  public void setNotificationValues(int mode, String roundType, int startRounds, int roundsLeft, long timeLeft) {
+    String currentRound = String.valueOf(startRounds-roundsLeft + 1);
+    String totalRounds = String.valueOf(startRounds);
+    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
+
+//    if (!notificationDismissed) {
+//      builder.setContentText(notificationHeader);
+//      builder.setStyle(new Notification.BigTextStyle().bigText(notificationBody));
+//      notificationManagerCompat.notify(1, builder.build());
+//    }
   }
 
   public void startSetTimer() {
@@ -3118,7 +3161,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        setNotificationValues("Sets", startRounds, numberOfRoundsLeft, setMillis);
+        setNotificationValues(1, "Sets", startRounds, numberOfRoundsLeft, setMillis);
 
         progressBarPause = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
@@ -3149,7 +3192,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timer = new CountDownTimer(breakMillis, 50) {
         @Override
         public void onTick(long millisUntilFinished) {
-          setNotificationValues("Breaks", startRounds, numberOfRoundsLeft, breakMillis);
+          setNotificationValues(1, "Breaks", startRounds, numberOfRoundsLeft, breakMillis);
 
           progressBarPause = (int) objectAnimator.getAnimatedValue();
           breakMillis = millisUntilFinished;
@@ -3188,11 +3231,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (pomDotCounter) {
           case 0: case 2: case 4: case 6:
             total_set_time.setText(stringValueOfTotalCycleTime(0));
-            setNotificationValues("Work", pomDotCounter+1, 8, pomMillis);
+            setNotificationValues(3, "Work", pomDotCounter+1, 8, pomMillis);
             break;
           case 1: case 3: case 5: case 7:
             total_break_time.setText(stringValueOfTotalCycleTime(0));
-            setNotificationValues("Break", pomDotCounter+1, 8, pomMillis);
+            setNotificationValues(3, "Break", pomDotCounter+1, 8, pomMillis);
             break;
         }
 
