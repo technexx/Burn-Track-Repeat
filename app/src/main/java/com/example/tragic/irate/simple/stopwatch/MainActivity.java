@@ -387,16 +387,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   NotificationManagerCompat notificationManagerCompat;
   Notification.Builder builder;
-  static boolean notificationDismissed;
+  static boolean notificationDismissed = true;
 
-  //Todo: Timer not updating for Pom in notifications.
+  //Todo: When first adding + launching cycle and minimizing, skips over breaks. But not when running through cycle again.
+  //Todo: Need to resolve adding new timers when current one is active - getting oob exceptions. Should just call a cycle reset.
+  //Todo: Only Set rounds showing (Break skipping over) in notifications.
+  //Todo: Need diff. String returns/math for infinity rounds.
+  //Todo: Diff. math needed for Pom roundsLeft in notifications.
+  //Todo: Pom total times not working.
+  //Todo: Use 0:00 for <60 second total times.
+  //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
+  //Todo: Blank title for first cycle creation on app launch bug is back.
   //Todo: 0/0 index exception on emulator when (1) Start Workout timer, (2) Start Pom Timer, (3) Try to resume Workout timer.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
   //Todo: The different positioning in sort resolves once the popUp is shown.
   //Todo: Dotdraws will need sp -> dp for scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
-  //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
+  //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc./
   //Todo: Some other indication in edit mode that a cycle is part of db and not new (just an "editing" notation would work).
   //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -1751,19 +1759,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startSetTimer();
               }
               break;
+            case 2:
+              timeLeft.setText("0");
+              if (beginTimerForNextRound) {
+                instantiateAndStartObjectAnimator(30000);
+                mHandler.post(infinityRunnableForSets);
+              }
+              break;
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
               timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
               if (beginTimerForNextRound) {
                 startObjectAnimator();
                 startBreakTimer();
-              }
-              break;
-            case 2:
-              timeLeft.setText("0");
-              if (beginTimerForNextRound) {
-                instantiateAndStartObjectAnimator(30000);
-                mHandler.post(infinityRunnableForSets);
               }
               break;
             case 4:
@@ -2146,7 +2154,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (getString(R.string.notification_text_header, mode, roundType));
   }
 
-  //Todo: Diff. math needed for Pom roundsLeft.
   public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
     String currentRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
@@ -2182,6 +2189,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
     }
 
+
     if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
       builder.setStyle(new Notification.InboxStyle()
               .addLine(headerOne)
@@ -2190,7 +2198,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      Log.i("testnote", "pomMillis is " + pomMillis + " and body is " + bodyTwo);
       builder.setStyle(new Notification.InboxStyle()
               .addLine(headerTwo)
               .addLine(bodyTwo)
@@ -3097,7 +3104,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Controls each mode's object animator. Starts new or resumes current one.
   public void startObjectAnimator() {
-    notificationDismissed = true;
 
     switch (mode) {
       case 1:
@@ -3149,6 +3155,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
+        Log.i("testnote", "sets true!");
+
         if (!notificationDismissed) {
           setNotificationValues();
         }
@@ -3176,39 +3184,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void startBreakTimer() {
-    if (mode == 1) {
-      setInitialTextSizeForRounds(breakMillis);
+    setInitialTextSizeForRounds(breakMillis);
 
-      timer = new CountDownTimer(breakMillis, 50) {
-        @Override
-        public void onTick(long millisUntilFinished) {
-          if (!notificationDismissed) {
-            setNotificationValues();
-          }
+    timer = new CountDownTimer(breakMillis, 50) {
+      @Override
+      public void onTick(long millisUntilFinished) {
 
-          progressBarPause = (int) objectAnimator.getAnimatedValue();
-          breakMillis = millisUntilFinished;
-          total_break_time.setText(stringValueOfTotalCycleTime(3));
-          timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
-
-          if (textSizeIncreased && mode==1) {
-            if (breakMillis < 59000) {
-              changeTextSize(valueAnimatorUp, timeLeft);
-              textSizeIncreased = false;
-            }
-          }
-
-          if (breakMillis < 500) timerDisabled = true;
-
-          dotDraws.reDraw();
+        Log.i("testnote", "breaks true!");
+        if (!notificationDismissed) {
+          setNotificationValues();
         }
 
-        @Override
-        public void onFinish() {
-          nextRound(false);
+        progressBarPause = (int) objectAnimator.getAnimatedValue();
+        breakMillis = millisUntilFinished;
+        total_break_time.setText(stringValueOfTotalCycleTime(3));
+        timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
+
+        if (textSizeIncreased && mode==1) {
+          if (breakMillis < 59000) {
+            changeTextSize(valueAnimatorUp, timeLeft);
+            textSizeIncreased = false;
+          }
         }
-      }.start();
-    }
+
+        if (breakMillis < 500) timerDisabled = true;
+        dotDraws.reDraw();
+      }
+
+      @Override
+      public void onFinish() {
+        nextRound(false);
+      }
+    }.start();
   }
 
   public void startPomTimer() {
@@ -3512,7 +3519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void pauseAndResumeTimer(int pausing) {
-    //disabledTimer booleans are to prevent ANY action being taken.
     if (!timerDisabled) {
       if (fadeInObj != null) fadeInObj.cancel();
       if (fadeOutObj != null) fadeOutObj.cancel();
