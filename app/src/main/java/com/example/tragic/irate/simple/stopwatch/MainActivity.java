@@ -280,8 +280,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
-  int RESUMING_CYCLE = 1;
-  int RESETTING_CyCLE = 2;
+
+  int RESUMING_CYCLE_FROM_ADAPTER = 1;
+  int RESETTING_CYCLE_FROM_ADAPTER = 2;
 
   long setMillis;
   long breakMillis;
@@ -389,9 +390,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Notification.Builder builder;
   static boolean notificationDismissed = true;
 
-  //Todo: When first adding + launching cycle and minimizing, skips over breaks. But not when running through cycle again.
-  //Todo: Need to resolve adding new timers when current one is active - getting oob exceptions. Should just call a cycle reset.
-  //Todo: Only Set rounds showing (Break skipping over) in notifications.
   //Todo: Need diff. String returns/math for infinity rounds.
   //Todo: Diff. math needed for Pom roundsLeft in notifications.
   //Todo: Pom total times not working.
@@ -442,6 +440,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onPause() {
     super.onPause();
     setVisible(false);
+    //Todo: This!
     notificationDismissed = false;
     setNotificationValues();
   }
@@ -460,23 +459,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //For resume/reset onClicks within cycle adapter.
 @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
-    if (resumingOrResetting==RESUMING_CYCLE) {
-      progressBar.setProgress(progressBarPause);
-      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-      //Sets paused boolean to true, so next timer click will resume.
-      timerIsPaused = true;
+    if (resumingOrResetting==RESUMING_CYCLE_FROM_ADAPTER) {
+      resumeOrResetCycleFromAdapterList(RESUMING_CYCLE_FROM_ADAPTER);
     }
-    else if (resumingOrResetting==RESETTING_CyCLE){
-      if (mode==1) {
-        savedCycleAdapter.removeActiveCycleLayout();
-        savedCycleAdapter.notifyDataSetChanged();
-      }
-      if (mode==3) {
-        savedPomCycleAdapter.removeActiveCycleLayout();
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
-      resetTimer();
-      roundedValueForTotalTimes = 0;
+    else if (resumingOrResetting==RESETTING_CYCLE_FROM_ADAPTER){
+      resumeOrResetCycleFromAdapterList(RESETTING_CYCLE_FROM_ADAPTER);
     }
   }
 
@@ -2086,6 +2073,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
+    if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
+      progressBar.setProgress(progressBarPause);
+      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+      //Sets paused boolean to true, so next timer click will resume.
+      timerIsPaused = true;
+    } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
+      if (mode==1) {
+        savedCycleAdapter.removeActiveCycleLayout();
+        savedCycleAdapter.notifyDataSetChanged();
+      }
+      if (mode==3) {
+        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
+      resetTimer();
+      roundedValueForTotalTimes = 0;
+    }
+  }
+
   public void moveSortCheckmark() {
     int markPosition = 0;
     switch (sortHolder) {
@@ -2124,6 +2131,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return pendingIntent;
   }
 
+  //Todo: breakMillis is ZERO, that's why.
   public void instantiateNotifications() {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
@@ -2188,7 +2196,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
         break;
     }
-
 
     if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
       builder.setStyle(new Notification.InboxStyle()
@@ -3072,6 +3079,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean saveToDB) {
+    //Todo: Watch this. Meant to always reset current timer obj / obj animator if launching new cycle.
+    resetTimer();
     if (isNewCycle || currentlyEditingACycle) resetTimer();
     populateTimerUI();
     AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
@@ -3121,7 +3130,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (objectAnimator != null) objectAnimator.resume();
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
-          if (progressBar.getProgress()==maxProgress) {
+          //Todo: HERE. Progress is at 0 so breakMillis is set to breakMillisUntilFinished, which is also 0.
+          if (progressBarPause==maxProgress) {
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
             //Starts object animator.
@@ -3155,7 +3165,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        Log.i("testnote", "sets true!");
 
         if (!notificationDismissed) {
           setNotificationValues();
@@ -3190,7 +3199,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onTick(long millisUntilFinished) {
 
-        Log.i("testnote", "breaks true!");
         if (!notificationDismissed) {
           setNotificationValues();
         }
@@ -3557,9 +3565,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   startSetTimer();
                   break;
                 case 2:
+                  //Todo: Watch progressBarPause here and case 4.
                   //Uses the current time as a base for our count-up rounds.
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  if (progressBar.getProgress()==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (progressBarPause==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisSets = countUpMillisHolder;
                   mHandler.post(infinityRunnableForSets);
                   break;
@@ -3569,7 +3578,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
                 case 4:
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  if (progressBar.getProgress()==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (progressBarPause==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisBreaks = countUpMillisHolder;
                   mHandler.post(infinityRunnableForBreaks);
                   break;

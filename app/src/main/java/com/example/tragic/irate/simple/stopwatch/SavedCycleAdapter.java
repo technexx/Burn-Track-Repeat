@@ -43,8 +43,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
   onResumeOrResetCycle mOnResumeOrResetCycle;
-  int RESUMING_CYCLE = 1;
-  int RESETTING_CyCLE = 2;
+  int RESUMING_CYCLE_FROM_TIMER = 1;
+  int RESETTING_CYCLE_FROM_TIMER = 2;
   boolean mHighlightDeleted;
   boolean mHighlightMode;
   List<String> mPositionList;
@@ -124,8 +124,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resumeCycle.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
-        workoutHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE));
-        workoutHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CyCLE));
+        workoutHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER));
+        workoutHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER));
       }
     }
 

@@ -33,8 +33,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     List<String> mPositionList;
     ArrayList<Integer> mSizeToggle = new ArrayList<>();
     onResumeOrResetCycle mOnResumeOrResetCycle;
-    int RESUMING_CYCLE = 1;
-    int RESETTING_CyCLE = 2;
+    int RESUMING_CYCLE_FROM_TIMER = 1;
+    int RESETTING_CYCLE_FROM_TIMER = 2;
     boolean mActiveCycle;
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
@@ -104,8 +104,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (position==mPositionOfActiveCycle) {
                 pomHolder.resumeCycle.setVisibility(View.VISIBLE);
                 pomHolder.resetCycle.setVisibility(View.VISIBLE);
-                pomHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE));
-                pomHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CyCLE));
+                pomHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER));
+                pomHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER));
             }
         }
         pomHolder.pomName.setText(mPomTitle.get(position));
