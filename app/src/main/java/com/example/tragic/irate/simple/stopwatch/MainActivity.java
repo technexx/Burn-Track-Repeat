@@ -390,10 +390,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Notification.Builder builder;
   static boolean notificationDismissed = true;
 
-  //Todo: Have notifications display 0 once round ends.
   //Todo: Add Pause/Reset buttons to notification menu.
   //Todo: Need diff. String returns/math for infinity rounds.
   //Todo: Diff. math needed for Pom roundsLeft in notifications.
+  //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot.
   //Todo: Pom total times not working.
   //Todo: Use 0:00 for <60 second total times.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
@@ -442,7 +442,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onPause() {
     super.onPause();
     setVisible(false);
-    //Todo: This!
     notificationDismissed = false;
     setNotificationValues();
   }
@@ -2167,8 +2166,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
     String currentRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
+
     long remainder = timeLeft%1000;
-    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
+    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft - remainder) / 1000);
 
     return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
   }
@@ -2179,25 +2179,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String bodyOne = "";
     String bodyTwo = "";
 
-    if (typeOfRound.size() > 0) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-        headerOne = setNotificationHeader("Workout", "Set");
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-      } else {
-        headerOne = setNotificationHeader("Workout", "Break");
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+    if (objectAnimator.isStarted()) {
+      if (typeOfRound.size() > 0) {
+        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+          headerOne = setNotificationHeader("Workout", "Set");
+          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+        } else {
+          headerOne = setNotificationHeader("Workout", "Break");
+          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+        }
       }
     }
 
-    switch (pomDotCounter) {
-      case 0: case 2: case 4: case 6:
-        headerTwo = setNotificationHeader("Pomodoro", "Work");
-        bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
-        break;
-      case 1: case 3: case 5: case 7:
-        headerTwo = setNotificationHeader("Pomodoro", "Break");
-        bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
-        break;
+    if (objectAnimatorPom.isStarted()) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          headerTwo = setNotificationHeader("Pomodoro", "Work");
+          bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
+          break;
+        case 1: case 3: case 5: case 7:
+          headerTwo = setNotificationHeader("Pomodoro", "Break");
+          bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
+          break;
+      }
     }
 
     if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
