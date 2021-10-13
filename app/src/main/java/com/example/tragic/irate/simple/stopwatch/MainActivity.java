@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long pomMillis;
 
   int maxProgress = 10000;
-  int progressBarPause = 10000;
+  int currentProgressBarValue = 10000;
   long setMillisUntilFinished;
   long breakMillisUntilFinished;
   long pomMillisUntilFinished;
@@ -390,6 +390,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Notification.Builder builder;
   static boolean notificationDismissed = true;
 
+  //Todo: Have notifications display 0 once round ends.
+  //Todo: Add Pause/Reset buttons to notification menu.
   //Todo: Need diff. String returns/math for infinity rounds.
   //Todo: Diff. math needed for Pom roundsLeft in notifications.
   //Todo: Pom total times not working.
@@ -952,7 +954,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleRecycler.setVisibility(View.VISIBLE);
           savedPomCycleRecycler.setVisibility(View.GONE);
           total_set_header.setText(R.string.total_sets);
-          progressBarPause = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
+          currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
           timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
           positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
           timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
@@ -967,7 +969,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleRecycler.setVisibility(View.GONE);
           savedPomCycleRecycler.setVisibility(View.VISIBLE);
           total_set_header.setText(R.string.total_work);
-          progressBarPause = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
+          currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
           timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
           positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
           timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);
@@ -1598,7 +1600,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityRunnableForSets = new Runnable() {
       @Override
       public void run() {
-        progressBarPause = (int) objectAnimator.getAnimatedValue();
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         reduceTextSizeForInfinityRounds(countUpMillisSets);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         countUpMillisSets = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
@@ -1623,7 +1625,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityRunnableForBreaks = new Runnable() {
       @Override
       public void run() {
-        progressBarPause = (int) objectAnimator.getAnimatedValue();
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         reduceTextSizeForInfinityRounds(countUpMillisBreaks);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
@@ -2075,7 +2077,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
-      progressBar.setProgress(progressBarPause);
+      progressBar.setProgress(currentProgressBarValue);
       timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
       //Sets paused boolean to true, so next timer click will resume.
       timerIsPaused = true;
@@ -2165,6 +2167,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
     String currentRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
+    long remainder = timeLeft%1000;
     String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft + 1000) / 1000);
 
     return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
@@ -2231,7 +2234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //If between rounds, post runnable for next round without starting timer or object animator.
       if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
 
-      prefEdit.putInt("savedProgressBarValueForModeOne", progressBarPause);
+      prefEdit.putInt("savedProgressBarValueForModeOne", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
       prefEdit.putInt("positionOfSelectedCycleForModeOne", positionOfSelectedCycle);
       prefEdit.putBoolean("modeOneTimerPaused", timerIsPaused);
@@ -2246,7 +2249,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
 
-      prefEdit.putInt("savedProgressBarValueForModeThree", progressBarPause);
+      prefEdit.putInt("savedProgressBarValueForModeThree", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
       prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
       prefEdit.putBoolean("modeThreeTimerPaused", timerIsPaused);
@@ -3118,7 +3121,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
           //If progress bar is at max value, round has not begun.
-          if (progressBarPause==maxProgress) {
+          if (currentProgressBarValue==maxProgress) {
             //Starts object animator.
             instantiateAndStartObjectAnimator(setMillis);
             //Used for pause/resume toggle.
@@ -3131,7 +3134,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
           //Todo: HERE. Progress is at 0 so breakMillis is set to breakMillisUntilFinished, which is also 0.
-          if (progressBarPause==maxProgress) {
+          if (currentProgressBarValue==maxProgress) {
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
             //Starts object animator.
@@ -3143,7 +3146,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
-        if (progressBarPause==maxProgress){
+        if (currentProgressBarValue==maxProgress){
           //Ensures any features meant for running timer cannot be executed here.
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter);
@@ -3170,7 +3173,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setNotificationValues();
         }
 
-        progressBarPause = (int) objectAnimator.getAnimatedValue();
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         total_set_time.setText(stringValueOfTotalCycleTime(1));
         timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
@@ -3203,7 +3206,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setNotificationValues();
         }
 
-        progressBarPause = (int) objectAnimator.getAnimatedValue();
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
         total_break_time.setText(stringValueOfTotalCycleTime(3));
         timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
@@ -3236,7 +3239,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setNotificationValues();
         }
 
-        progressBarPause = (int) objectAnimatorPom.getAnimatedValue();
+        currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
 
         if (textSizeIncreased && mode==3) {
@@ -3454,7 +3457,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
     //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimator()).
-    progressBarPause = 10000;
+    currentProgressBarValue = 10000;
     //If no rounds left, remove our endFade runnable, reset timer, and return before executing anything else. The button tied to this method will be disabled until the proper rounded subtraction can occur.
     if (mode==1) {
       if (numberOfRoundsLeft==0) {
@@ -3565,10 +3568,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   startSetTimer();
                   break;
                 case 2:
-                  //Todo: Watch progressBarPause here and case 4.
+                  //Todo: Watch currentProgressBarValue here and case 4.
                   //Uses the current time as a base for our count-up rounds.
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  if (progressBarPause==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisSets = countUpMillisHolder;
                   mHandler.post(infinityRunnableForSets);
                   break;
@@ -3578,7 +3581,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
                 case 4:
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  if (progressBarPause==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
+                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
                   countUpMillisBreaks = countUpMillisHolder;
                   mHandler.post(infinityRunnableForBreaks);
                   break;
@@ -3732,7 +3735,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (timer != null) timer.cancel();
     if (endAnimation!=null) endAnimation.cancel();
     next_round.setEnabled(true);
-    progressBarPause = 10000;
+    currentProgressBarValue = 10000;
     addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
     AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
     switch (mode) {
