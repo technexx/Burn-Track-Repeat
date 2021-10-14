@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -392,7 +393,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Notification.Action notificationAction;
   String notificationPauseText = "Pause";
 
-  BroadcastReceiver broadcastReceiver;
+  public static Handler mStaticHandler;
+  public static Runnable notificationReplyStaticRunnable;
 
   //Todo: Add Pause/Reset buttons to notification menu.
   //Todo: Need diff. String returns/math for infinity rounds.
@@ -588,7 +590,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
-
+    mStaticHandler = new Handler();
+    notificationReplyStaticRunnable = new Runnable() {
+      @Override
+      public void run() {
+        if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+        Log.i("testNote", "Runnable pause set to " + timerIsPaused);
+      }
+    };
 
     gson = new Gson();
     fab = findViewById(R.id.fab);
@@ -2129,10 +2138,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Clicks extend past text - may be drawable.
   public static class ReplyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-//      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+      Log.i("testNote", "clicked!");
+      mStaticHandler.post(notificationReplyStaticRunnable);
 //      notificationManagerCompat.cancel(1);
     }
   }
@@ -3575,9 +3586,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               if (objectAnimator != null) objectAnimator.pause();
               reset.setVisibility(View.VISIBLE);
 
-              notificationManagerCompat.cancel(1);
-              notificationPauseText = "Resume";
-
               switch (typeOfRound.get(currentRound)) {
                 case 1:
                   setMillisUntilFinished = setMillis;
@@ -3597,8 +3605,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else if (pausing == RESUMING_TIMER) {
               reset.setVisibility(View.INVISIBLE);
               timerIsPaused = false;
-
-              notificationPauseText = "Pause";
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
