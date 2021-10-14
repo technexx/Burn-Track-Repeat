@@ -389,6 +389,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   Notification.Builder builder;
   static boolean notificationDismissed = true;
+  Notification.Action notificationAction;
+  String notificationPauseText = "Pause";
+
+  BroadcastReceiver broadcastReceiver;
 
   //Todo: Add Pause/Reset buttons to notification menu.
   //Todo: Need diff. String returns/math for infinity rounds.
@@ -583,6 +587,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+
+
 
     gson = new Gson();
     fab = findViewById(R.id.fab);
@@ -2115,24 +2121,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
-  public static class dismissReceiver extends BroadcastReceiver {
+  //These broadcast the Pending Intents we have created. MUST BE DECLARED IN MANIFEST.
+  public static class DismissReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      int notificationId = intent.getExtras().getInt("My ID");
       notificationDismissed = true;
     }
   }
 
-  private PendingIntent createOnDismissedIntent(Context context, int notificationId) {
-    Intent intent = new Intent(context, dismissReceiver.class);
-    intent.putExtra("My ID", notificationId);
-
-    PendingIntent pendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(),notificationId, intent, 0);
-
-    return pendingIntent;
+  public static class ReplyReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+//      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+//      notificationManagerCompat.cancel(1);
+    }
   }
 
-  //Todo: breakMillis is ZERO, that's why.
+  private PendingIntent dismissNotificationIntent(Context context, int notificationId) {
+    Intent dismissIntent = new Intent(context, DismissReceiver.class);
+    dismissIntent.putExtra("Dismiss ID", notificationId);
+
+    PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, dismissIntent, 0);
+
+    return dismissPendingIntent;
+  }
+
+  private PendingIntent pauseAndResumeIntent(Context context, int notificationId) {
+    Intent pauseAndResumeIntent = new Intent(context, ReplyReceiver.class);
+    pauseAndResumeIntent.putExtra("PauseResume ID", notificationId);
+
+    PendingIntent pauseAndResumePendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, pauseAndResumeIntent, 0);
+
+    return pauseAndResumePendingIntent;
+  }
+
   public void instantiateNotifications() {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
@@ -2142,6 +2164,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int importance = NotificationManager.IMPORTANCE_DEFAULT;
       NotificationChannel channel = new NotificationChannel("1", name, importance);
       channel.setDescription(description);
+
       // Register the channel with the system; you can't change the importance
       // or other notification behaviors after this
       NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -2154,7 +2177,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     builder.setSmallIcon(R.drawable.start_cycle);
     builder.setAutoCancel(false);
     builder.setPriority(Notification.PRIORITY_DEFAULT);
-    builder.setDeleteIntent(createOnDismissedIntent(this, 0));
+    builder.setDeleteIntent(dismissNotificationIntent(this, 0));
+
+    setNotificationAction();
 
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
@@ -2171,6 +2196,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft - remainder) / 1000);
 
     return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
+  }
+
+  public void setNotificationAction() {
+    notificationAction = new Notification.Action(0, notificationPauseText, pauseAndResumeIntent(this, 0));
+    builder.addAction(notificationAction);
   }
 
   public void setNotificationValues() {
@@ -3137,7 +3167,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (objectAnimator != null) objectAnimator.resume();
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
-          //Todo: HERE. Progress is at 0 so breakMillis is set to breakMillisUntilFinished, which is also 0.
           if (currentProgressBarValue==maxProgress) {
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
@@ -3546,6 +3575,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               if (objectAnimator != null) objectAnimator.pause();
               reset.setVisibility(View.VISIBLE);
 
+              notificationManagerCompat.cancel(1);
+              notificationPauseText = "Resume";
+
               switch (typeOfRound.get(currentRound)) {
                 case 1:
                   setMillisUntilFinished = setMillis;
@@ -3565,6 +3597,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else if (pausing == RESUMING_TIMER) {
               reset.setVisibility(View.INVISIBLE);
               timerIsPaused = false;
+
+              notificationPauseText = "Pause";
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:

@@ -22,7 +22,12 @@
             android:resource="@array/preloaded_fonts" />
 
         <receiver
-            android:name=".MainActivity$dismissReceiver"
+            android:name=".MainActivity$DismissReceiver"
+            android:exported="false" >
+        </receiver>
+
+        <receiver
+            android:name=".MainActivity$ReplyReceiver"
             android:exported="false" >
         </receiver>
 
