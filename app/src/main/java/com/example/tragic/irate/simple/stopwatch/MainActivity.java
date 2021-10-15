@@ -397,9 +397,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public static Handler mStaticHandler;
   public static Runnable notificationReplyStaticRunnable;
 
-  //Todo: Timer should persist/save even if app crashes/is closed due to lack of memory.
-  //Todo: Need diff. String returns/math for infinity rounds.
-  //Todo: Diff. math needed for Pom roundsLeft in notifications.
+  //Todo: Timer should persist/save even if app crashes/is closed due to lack of memory. However, since we keep timer going even when minimized, we can't just do this in onPause().
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot.
   //Todo: Pom total times not working.
   //Todo: Use 0:00 for <60 second total times.
@@ -444,7 +442,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat.cancel(1);
   }
 
-  //Todo:
   @Override
   public void onPause() {
     super.onPause();
@@ -2195,7 +2192,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void relaunchActivityWithTimerFromNotifications() {
-//    Intent notificationIntent = getIntent();
     Intent notificationIntent = getIntent();
     if (notificationIntent!=null) {
       boolean launchTimer = notificationIntent.getBooleanExtra("LaunchTimer", false);
@@ -2261,15 +2257,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
+//    public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
+//      String currentRound = String.valueOf(startRounds-roundsLeft + 1);
+//      String totalRounds = String.valueOf(startRounds);
+
     if (objectAnimatorPom.isStarted()) {
+      int numberOfRoundsLeft = 8-pomDotCounter;
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
           headerTwo = setNotificationHeader("Pomodoro", "Work");
-          bodyTwo = setNotificationBody( pomDotCounter + 1, 8, pomMillis);
+          bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
           break;
         case 1: case 3: case 5: case 7:
           headerTwo = setNotificationHeader("Pomodoro", "Break");
-          bodyTwo = setNotificationBody(pomDotCounter + 1, 8, pomMillis);
+          bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
           break;
       }
     }
@@ -3233,7 +3234,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
     }
   }
-
 
   public void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
