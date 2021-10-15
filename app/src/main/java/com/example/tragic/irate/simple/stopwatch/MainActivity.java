@@ -1029,11 +1029,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
-      Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-      intent.putExtra("LaunchTimer", true);
-      intent.putExtra("Hello", "Boo!!");
-      startActivity(intent);
-
       fab.setEnabled(false);
       buttonToLaunchTimer.setEnabled(true);
       //Default disabled state of edited cycle save, if nothing has changed.
