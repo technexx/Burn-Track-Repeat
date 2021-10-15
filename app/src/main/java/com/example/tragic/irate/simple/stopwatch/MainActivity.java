@@ -595,7 +595,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
-        Log.i("testNote", "Runnable pause set to " + timerIsPaused);
       }
     };
 
@@ -2188,7 +2187,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     builder.setSmallIcon(R.drawable.start_cycle);
     builder.setAutoCancel(false);
     builder.setPriority(Notification.PRIORITY_DEFAULT);
-    builder.setDeleteIntent(dismissNotificationIntent(this, 0));
+    builder.setDeleteIntent(dismissNotificationIntent(this, 1));
 
     setNotificationAction();
 
@@ -2210,7 +2209,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setNotificationAction() {
-    notificationAction = new Notification.Action(0, notificationPauseText, pauseAndResumeIntent(this, 0));
+    notificationAction = new Notification.Action(R.drawable.add_24, notificationPauseText, pauseAndResumeIntent(this, 1));
     builder.addAction(notificationAction);
   }
 
