@@ -391,20 +391,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
-  NotificationCompat.Action notificationAction;
-  String notificationPauseText = "Pause";
 
-  public static Handler mStaticHandler;
-  public static Runnable notificationReplyStaticRunnable;
-
+  //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
+  //Todo: Fix notification display for infinity rounds.
+  //Todo: Spinners or right-to-left time population for creating timers (like Google's).
   //Todo: Timer should persist/save even if app crashes/is closed due to lack of memory. However, since we keep timer going even when minimized, we can't just do this in onPause().
-  //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot.
   //Todo: Pom total times not working.
   //Todo: Use 0:00 for <60 second total times.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
   //Todo: Blank title for first cycle creation on app launch bug is back.
   //Todo: 0/0 index exception on emulator when (1) Start Workout timer, (2) Start Pom Timer, (3) Try to resume Workout timer.
-  //Todo: Spinners or right-to-left time population for creating timers (like Google's).
   //Todo: The different positioning in sort resolves once the popUp is shown.
   //Todo: Dotdraws will need sp -> dp for scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
@@ -587,22 +583,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-
-    mStaticHandler = new Handler();
-    notificationReplyStaticRunnable = new Runnable() {
-      @Override
-      public void run() {
-//        if (!timerIsPaused) {
-//          pauseAndResumeTimer(PAUSING_TIMER);
-//          notificationPauseText = "Resume";
-//        } else {
-//          pauseAndResumeTimer(RESUMING_TIMER);
-//          notificationPauseText = "Pause";
-//        }
-//        builder.mActions.clear();
-//        setNotificationAction();
-      }
-    };
 
     gson = new Gson();
     fab = findViewById(R.id.fab);
@@ -922,9 +902,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (activeEditListener) setEditValues();
       }
     };
-
-    relaunchActivityWithTimerFromNotifications();
-
 
     //Watches editText title box and passes its value into the String that gets saved/updated in database.
     TextWatcher titleTextWatcher = new TextWatcher() {
@@ -2146,14 +2123,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public static class ReplyReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      Log.i("testNote", "clicked!");
-      mStaticHandler.post(notificationReplyStaticRunnable);
-    }
-  }
-
   private PendingIntent dismissNotificationIntent(Context context, int notificationId) {
     Intent dismissIntent = new Intent(context, DismissReceiver.class);
     dismissIntent.putExtra("Dismiss ID", notificationId);
@@ -2161,15 +2130,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, dismissIntent, 0);
 
     return dismissPendingIntent;
-  }
-
-  private PendingIntent pauseAndResumeIntent(Context context, int notificationId) {
-    Intent pauseAndResumeIntent = new Intent(context, ReplyReceiver.class);
-    pauseAndResumeIntent.putExtra("PauseResume ID", notificationId);
-
-    PendingIntent pauseAndResumePendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, pauseAndResumeIntent, 0);
-
-    return pauseAndResumePendingIntent;
   }
 
   public String setNotificationHeader(String mode, String roundType) {
@@ -2184,20 +2144,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft - remainder) / 1000);
 
     return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
-  }
-
-  public void relaunchActivityWithTimerFromNotifications() {
-    Intent notificationIntent = getIntent();
-    if (notificationIntent!=null) {
-      boolean launchTimer = notificationIntent.getBooleanExtra("LaunchTimer", false);
-      notificationIntent.getExtras();
-      String hello = notificationIntent.getStringExtra("Hello");
-    }
-  }
-
-  public void setNotificationAction() {
-    notificationAction = new NotificationCompat.Action(0, notificationPauseText, pauseAndResumeIntent(this, 1));
-    builder.addAction(notificationAction);
   }
 
   public void instantiateNotifications() {
@@ -2251,10 +2197,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     }
-
-//    public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
-//      String currentRound = String.valueOf(startRounds-roundsLeft + 1);
-//      String totalRounds = String.valueOf(startRounds);
 
     if (objectAnimatorPom.isStarted()) {
       int numberOfRoundsLeft = 8-pomDotCounter;
@@ -3186,7 +3128,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Controls each mode's object animator. Starts new or resumes current one.
   public void startObjectAnimator() {
-
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
