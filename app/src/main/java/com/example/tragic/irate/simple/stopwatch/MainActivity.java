@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -388,15 +389,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
   NotificationManagerCompat notificationManagerCompat;
-  Notification.Builder builder;
+  NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
-  Notification.Action notificationAction;
+  NotificationCompat.Action notificationAction;
   String notificationPauseText = "Pause";
 
   public static Handler mStaticHandler;
   public static Runnable notificationReplyStaticRunnable;
 
-  //Todo: Add Pause/Reset buttons to notification menu.
+  //Todo: Timer should persist/save even if app crashes/is closed due to lack of memory.
   //Todo: Need diff. String returns/math for infinity rounds.
   //Todo: Diff. math needed for Pom roundsLeft in notifications.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot.
@@ -435,7 +436,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
    //Todo: REMINDER, Try next app w/ Kotlin.
 
-  //Todo: Dismissing Timer popUp (i.e. backPressed), auto pauses timer at moment, so notification object will not be updated.
   @Override
   public void onResume() {
     super.onResume();
@@ -444,6 +444,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat.cancel(1);
   }
 
+  //Todo:
   @Override
   public void onPause() {
     super.onPause();
@@ -594,7 +595,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationReplyStaticRunnable = new Runnable() {
       @Override
       public void run() {
-        if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+//        if (!timerIsPaused) {
+//          pauseAndResumeTimer(PAUSING_TIMER);
+//          notificationPauseText = "Resume";
+//        } else {
+//          pauseAndResumeTimer(RESUMING_TIMER);
+//          notificationPauseText = "Pause";
+//        }
+//        builder.mActions.clear();
+//        setNotificationAction();
       }
     };
 
@@ -917,6 +926,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
+    relaunchActivityWithTimerFromNotifications();
+
+
     //Watches editText title box and passes its value into the String that gets saved/updated in database.
     TextWatcher titleTextWatcher = new TextWatcher() {
       @Override
@@ -1020,6 +1032,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
+      Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+      intent.putExtra("LaunchTimer", true);
+      intent.putExtra("Hello", "Boo!!");
+      startActivity(intent);
+
       fab.setEnabled(false);
       buttonToLaunchTimer.setEnabled(true);
       //Default disabled state of edited cycle save, if nothing has changed.
@@ -2137,13 +2154,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Clicks extend past text - may be drawable.
   public static class ReplyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
       Log.i("testNote", "clicked!");
       mStaticHandler.post(notificationReplyStaticRunnable);
-//      notificationManagerCompat.cancel(1);
     }
   }
 
@@ -2165,35 +2180,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return pauseAndResumePendingIntent;
   }
 
-  public void instantiateNotifications() {
-    // Create the NotificationChannel, but only on API 26+ because
-    // the NotificationChannel class is new and not in the support library
-    if (Build.VERSION.SDK_INT >= 26) {
-      CharSequence name = "Timers";
-      String description = "Timer Countdown";
-      int importance = NotificationManager.IMPORTANCE_DEFAULT;
-      NotificationChannel channel = new NotificationChannel("1", name, importance);
-      channel.setDescription(description);
-
-      // Register the channel with the system; you can't change the importance
-      // or other notification behaviors after this
-      NotificationManager notificationManager = getSystemService(NotificationManager.class);
-      notificationManager.createNotificationChannel(channel);
-      builder = new Notification.Builder(this, "1");
-    } else {
-      builder = new Notification.Builder(this);
-    }
-
-    builder.setSmallIcon(R.drawable.start_cycle);
-    builder.setAutoCancel(false);
-    builder.setPriority(Notification.PRIORITY_DEFAULT);
-    builder.setDeleteIntent(dismissNotificationIntent(this, 1));
-
-    setNotificationAction();
-
-    notificationManagerCompat = NotificationManagerCompat.from(this);
-  }
-
   public String setNotificationHeader(String mode, String roundType) {
     return (getString(R.string.notification_text_header, mode, roundType));
   }
@@ -2208,9 +2194,53 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
   }
 
+  public void relaunchActivityWithTimerFromNotifications() {
+//    Intent notificationIntent = getIntent();
+    Intent notificationIntent = getIntent();
+    if (notificationIntent!=null) {
+      boolean launchTimer = notificationIntent.getBooleanExtra("LaunchTimer", false);
+      notificationIntent.getExtras();
+      String hello = notificationIntent.getStringExtra("Hello");
+    }
+  }
+
   public void setNotificationAction() {
-    notificationAction = new Notification.Action(R.drawable.add_24, notificationPauseText, pauseAndResumeIntent(this, 1));
+    notificationAction = new NotificationCompat.Action(0, notificationPauseText, pauseAndResumeIntent(this, 1));
     builder.addAction(notificationAction);
+  }
+
+  public void instantiateNotifications() {
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= 26) {
+      CharSequence name = "Timers";
+      String description = "Timer Countdown";
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      NotificationChannel channel = new NotificationChannel("1", name, importance);
+      channel.setDescription(description);
+
+      // Register the channel with the system; you can't change the importance
+      // or other notification behaviors after this
+      NotificationManager notificationManager = getSystemService(NotificationManager.class);
+      notificationManager.createNotificationChannel(channel);
+      builder = new NotificationCompat.Builder(this, "1");
+    } else {
+      builder = new NotificationCompat.Builder(this);
+    }
+
+    builder.setSmallIcon(R.drawable.start_cycle);
+    builder.setAutoCancel(false);
+    builder.setPriority(Notification.PRIORITY_DEFAULT);
+    builder.setDeleteIntent(dismissNotificationIntent(this, 1));
+
+    PackageManager pm = getApplicationContext().getPackageManager();
+    Intent pmIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
+    pmIntent.setPackage(null);
+
+    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, pmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    builder.setContentIntent(pendingIntent);
+
+    notificationManagerCompat = NotificationManagerCompat.from(this);
   }
 
   public void setNotificationValues() {
@@ -2245,21 +2275,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
+      builder.setStyle(new NotificationCompat.InboxStyle()
               .addLine(headerOne)
               .addLine(bodyOne)
       );
     }
 
     if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
+      builder.setStyle(new NotificationCompat.InboxStyle()
               .addLine(headerTwo)
               .addLine(bodyTwo)
       );
     }
 
     if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new Notification.InboxStyle()
+      builder.setStyle(new NotificationCompat.InboxStyle()
               .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
               .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
       );
