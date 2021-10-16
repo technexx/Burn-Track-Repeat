@@ -390,6 +390,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
 
+  //Todo: Override onDestroy to kill notifications on app close.
+  //Todo: Actual timer is +1 second from notification timer.
+  //Todo: Notifcations are active when activity is present.
   //Todo: Need to reset notification text if cycle is reset.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Fix notification display for infinity rounds.
@@ -2184,60 +2187,63 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setNotificationValues() {
-    String headerOne = "";
-    String headerTwo = "";
-    String bodyOne = "";
-    String bodyTwo = "";
+    if (!notificationDismissed) {
+      String headerOne = "";
+      String headerTwo = "";
+      String bodyOne = "";
+      String bodyTwo = "";
 
-    //Todo: replace setMillis w/ countUpMillisSet for infinity.
-    if (objectAnimator.isStarted()) {
-      if (typeOfRound.size() > 0) {
-        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-          headerOne = setNotificationHeader("Workout", "Set");
-          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-        } else {
-          headerOne = setNotificationHeader("Workout", "Break");
-          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+      //Todo: This probably doesn't execute in resetTimer() because our animator is not active. We should actually have it display even if timer is not active - i.e. we've just navigated to cycle.
+      if (objectAnimator.isStarted() || mode==1) {
+        if (typeOfRound.size() > 0) {
+          if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+            headerOne = setNotificationHeader("Workout", "Set");
+            bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+          } else {
+            headerOne = setNotificationHeader("Workout", "Break");
+            bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+          }
         }
       }
-    }
 
-    if (objectAnimatorPom.isStarted()) {
-      int numberOfRoundsLeft = 8-pomDotCounter;
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          headerTwo = setNotificationHeader("Pomodoro", "Work");
-          bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-          break;
-        case 1: case 3: case 5: case 7:
-          headerTwo = setNotificationHeader("Pomodoro", "Break");
-          bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-          break;
+      if (objectAnimatorPom.isStarted() || mode==3) {
+        int numberOfRoundsLeft = 8-pomDotCounter;
+        switch (pomDotCounter) {
+          case 0: case 2: case 4: case 6:
+            headerTwo = setNotificationHeader("Pomodoro", "Work");
+            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+            break;
+          case 1: case 3: case 5: case 7:
+            headerTwo = setNotificationHeader("Pomodoro", "Break");
+            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+            break;
+        }
       }
+
+      if ((objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) || mode==1) {
+        builder.setStyle(new NotificationCompat.InboxStyle()
+                .addLine(headerOne)
+                .addLine(bodyOne)
+        );
+      }
+
+      if ((!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) || mode==3) {
+        builder.setStyle(new NotificationCompat.InboxStyle()
+                .addLine(headerTwo)
+                .addLine(bodyTwo)
+        );
+      }
+
+      if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
+        builder.setStyle(new NotificationCompat.InboxStyle()
+                .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
+                .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
+        );
+      }
+
+      notificationManagerCompat.notify(1, builder.build());
     }
 
-    if (objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) {
-      builder.setStyle(new NotificationCompat.InboxStyle()
-              .addLine(headerOne)
-              .addLine(bodyOne)
-      );
-    }
-
-    if (!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new NotificationCompat.InboxStyle()
-              .addLine(headerTwo)
-              .addLine(bodyTwo)
-      );
-    }
-
-    if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-      builder.setStyle(new NotificationCompat.InboxStyle()
-              .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
-              .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
-      );
-    }
-
-    notificationManagerCompat.notify(1, builder.build());
   }
 
   public void activateResumeOrResetOptionForCycle() {
@@ -3181,10 +3187,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-
-        if (!notificationDismissed) {
-          setNotificationValues();
-        }
+        setNotificationValues();
 
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
@@ -3214,10 +3217,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(breakMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-
-        if (!notificationDismissed) {
-          setNotificationValues();
-        }
+        setNotificationValues();
 
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
@@ -3248,9 +3248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(pomMillis, 50) {
       @Override
       public void onTick(long millisUntilFinished) {
-        if (!notificationDismissed) {
-          setNotificationValues();
-        }
+        setNotificationValues();
 
         currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
@@ -3753,10 +3751,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentProgressBarValue = 10000;
     addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
     AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
+
     switch (mode) {
       case 1:
-        setMillis = 0;
-        breakMillis = 0;
+        switch (typeOfRound.get(0)) {
+          case 1: setMillis = workoutTime.get(0); break;
+          case 2: setMillis = 0; break;
+          case 3: breakMillis = workoutTime.get(0); break;
+          case 4: breakMillis = 0; break;
+      };
         countUpMillisHolder = 0;
         //Removing timer callbacks for count up mode.
         mHandler.removeCallbacks(infinityRunnableForSets);
@@ -3795,5 +3798,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     //Base of 0 values for stopwatch means we don't want anything populated when resetting.
     if (mode!=4) populateTimerUI();
+    //Todo: This won't execute w/ conditional w/ in method tho. Might be better to revert to conditional outside.
+    setNotificationValues();
   }
 }
