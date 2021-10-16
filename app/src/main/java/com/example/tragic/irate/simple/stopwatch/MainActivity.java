@@ -367,8 +367,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int receivedAlpha;
   MaterialButton pauseResumeButton;
 
-  long countUpMillisSets;
-  long countUpMillisBreaks;
   public Runnable infinityRunnableForSets;
   public Runnable infinityRunnableForBreaks;
   public Runnable postRoundRunnableForFirstMode;
@@ -392,6 +390,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
 
+  //Todo: Need to reset notification text if cycle is reset.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Fix notification display for infinity rounds.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
@@ -1600,16 +1599,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        reduceTextSizeForInfinityRounds(countUpMillisSets);
+        reduceTextSizeForInfinityRounds(setMillis);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
-        countUpMillisSets = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         total_set_time.setText(stringValueOfTotalCycleTime(2));
 
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        currentProgressBarValueForInfinityRounds = maxProgress - countUpMillisBreaks;
-        timeLeft.setText(convertSeconds((countUpMillisSets) / 1000));
+        currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
+        timeLeft.setText(convertSeconds((setMillis) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) countUpMillisSets);
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         //Once progressBar value hits 0, animate bar/text, reset bar's progress value to max, and restart the objectAnimator that uses it.
         if (progressBar.getProgress()<=0) {
@@ -1617,6 +1616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timeLeft.startAnimation(fadeProgressOut);
           objectAnimator.start();
         }
+        setNotificationValues();
         mHandler.postDelayed(this, 50);
       }
     };
@@ -1625,16 +1625,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        reduceTextSizeForInfinityRounds(countUpMillisBreaks);
+        reduceTextSizeForInfinityRounds(breakMillis);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
-        countUpMillisBreaks = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         total_break_time.setText(stringValueOfTotalCycleTime(4));
 
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        currentProgressBarValueForInfinityRounds = maxProgress - countUpMillisBreaks;
-        timeLeft.setText(convertSeconds((countUpMillisBreaks) / 1000));
+        currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
+        timeLeft.setText(convertSeconds((breakMillis) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) countUpMillisBreaks);
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         //Temporary value for current round, using totalBreakMillis which is our permanent value.
         if (progressBar.getProgress()<=0) {
@@ -1642,6 +1642,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timeLeft.startAnimation(fadeProgressOut);
           objectAnimator.start();
         }
+        setNotificationValues();
         mHandler.postDelayed(this, 50);
       }
     };
@@ -1730,8 +1731,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Resets the alpha value we use to fade dots back to 255 (fully opaque).
         dotDraws.resetDotAlpha();
         //Resetting values for count-up modes. Simpler to keep them out of switch statement.
-        countUpMillisSets = 0;
-        countUpMillisBreaks = 0;
+        setMillis = 0;
+        breakMillis = 0;
         countUpMillisHolder = 0;
         defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
         //Next round begins active by default, so we set our paused mode to false.
@@ -2137,13 +2138,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
-    String currentRound = String.valueOf(startRounds-roundsLeft + 1);
+    String currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
 
     long remainder = timeLeft%1000;
-    String timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft - remainder) / 1000);
+    String timeRemaining = "";
+    if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft - remainder) / 1000);
+    else timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(timeLeft);
 
-    return getString(R.string.notification_text, currentRound, totalRounds, timeRemaining);
+    return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
   }
 
   public void instantiateNotifications() {
@@ -2186,6 +2189,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String bodyOne = "";
     String bodyTwo = "";
 
+    //Todo: replace setMillis w/ countUpMillisSet for infinity.
     if (objectAnimator.isStarted()) {
       if (typeOfRound.size() > 0) {
         if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
@@ -3294,18 +3298,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 2:
           if (resettingTotalTime) {
-            countUpMillisSets = 0;
+            setMillis = 0;
             resettingTotalTime = false;
           }
-          cycleSetTimeForSingleRoundInMillis = countUpMillisSets;
+          cycleSetTimeForSingleRoundInMillis = setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           break;
         case 4:
           if (resettingTotalTime) {
-            countUpMillisBreaks = 0;
+            breakMillis = 0;
             resettingTotalTime = false;
           }
-          cycleBreakTimeForSingleRoundInMillis = countUpMillisBreaks;
+          cycleBreakTimeForSingleRoundInMillis = breakMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           break;
       }
@@ -3556,14 +3560,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   setMillisUntilFinished = setMillis;
                   break;
                 case 2:
-                  countUpMillisHolder = countUpMillisSets;
+                  countUpMillisHolder = setMillis;
                   mHandler.removeCallbacks(infinityRunnableForSets);
                   break;
                 case 3:
                   breakMillisUntilFinished = breakMillis;
                   break;
                 case 4:
-                  countUpMillisHolder = countUpMillisBreaks;
+                  countUpMillisHolder = breakMillis;
                   mHandler.removeCallbacks(infinityRunnableForBreaks);
                   break;
               }
@@ -3581,7 +3585,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   //Uses the current time as a base for our count-up rounds.
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
                   if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
-                  countUpMillisSets = countUpMillisHolder;
+                  setMillis = countUpMillisHolder;
                   mHandler.post(infinityRunnableForSets);
                   break;
                 case 3:
@@ -3591,7 +3595,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 4:
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
                   if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
-                  countUpMillisBreaks = countUpMillisHolder;
+                  breakMillis = countUpMillisHolder;
                   mHandler.post(infinityRunnableForBreaks);
                   break;
               }
@@ -3690,6 +3694,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 2:
             case 4:
+              setMillis = 0;
+              breakMillis = 0;
               timeLeft.setText("0");
               setInitialTextSizeForRounds(0);
               break;
@@ -3749,9 +3755,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
     switch (mode) {
       case 1:
-        //Resetting millis values of count up mode to 0.
-        countUpMillisSets = 0;
-        countUpMillisBreaks = 0;
+        setMillis = 0;
+        breakMillis = 0;
         countUpMillisHolder = 0;
         //Removing timer callbacks for count up mode.
         mHandler.removeCallbacks(infinityRunnableForSets);
