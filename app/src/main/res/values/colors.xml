@@ -31,4 +31,5 @@
     <color name="blue">#1976D2</color>
     <color name="greyed_green">#004D40</color>
     <color name="greyed_red">#B71C1C</color>
+    <color name="test_black">#212121</color>
 </resources>

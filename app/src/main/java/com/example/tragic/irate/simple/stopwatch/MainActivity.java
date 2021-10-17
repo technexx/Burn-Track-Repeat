@@ -152,24 +152,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView s1;
   TextView s2;
   TextView s3;
-  EditText firstRowEditMinutes;
-  EditText firstRowEditSeconds;
-  TextView firstRowEditColon;
   TextView firstRowTextView;
-  EditText secondRowEditMinutes;
-  EditText secondRowEditSeconds;
-  TextView secondRowEditColon;
   TextView secondRowTextView;
-  EditText thirdRowEditMinutes;
-  EditText thirdRowEditSeconds;
-  TextView thirdRowEditColon;
   TextView thirdRowEditTextView;
-  ImageView firstRowAddButton;
-  ImageView firstRowSubtractButton;
-  ImageView secondRowAddButton;
-  ImageView secondRowSubtractButton;
-  ImageButton thirdRowAddButton;
-  ImageButton thirdRowSubtractButton;
+
   Button addRoundToCycleButton;
   Button SubtractRoundFromCycleButton;
   ImageView toggleInfinityRoundsForSets;
@@ -208,17 +194,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int pomValue1;
   int pomValue2;
   int pomValue3;
-  //Edits must be longs because we divide w/ remainders on them.
-  long editSetSeconds;
-  long editSetMinutes;
-  long editBreakMinutes;
-  long editBreakSeconds;
-  long editPomMinutesOne;
-  long editPomSecondsOne;
-  long editPomMinutesTwo;
-  long editPomSecondsTwo;
-  long editPomMinutesThree;
-  long editPomSecondsThree;
   boolean incrementValues;
   int incrementTimer = 10;
   boolean minReached;
@@ -233,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable changeSecondValue;
   Runnable changeThirdValue;
   Runnable adjustRoundDelay;
-  boolean activeEditListener;
   boolean currentlyEditingACycle;
   InputMethodManager inputMethodManager;
 
@@ -643,28 +617,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     s1 = editCyclesPopupView.findViewById(R.id.s1);
     s2 = editCyclesPopupView.findViewById(R.id.s2);
     s3 = editCyclesPopupView.findViewById(R.id.s3);
-    firstRowEditMinutes = editCyclesPopupView.findViewById(R.id.firstRowEditMinutes);
-    firstRowEditSeconds = editCyclesPopupView.findViewById(R.id.firstRowEditSeconds);
-    firstRowEditColon = editCyclesPopupView.findViewById(R.id.firstRowEditColon);
     firstRowTextView = editCyclesPopupView.findViewById(R.id.firstRowTextView);
-    secondRowEditMinutes = editCyclesPopupView.findViewById(R.id.secondRowEditMinutes);
-    secondRowEditSeconds = editCyclesPopupView.findViewById(R.id.secondRowEditSeconds);
-    secondRowEditColon = editCyclesPopupView.findViewById(R.id.secondRowEditColon);
     secondRowTextView = editCyclesPopupView.findViewById(R.id.secondRowTextView);
     thirdRowEditTextView = editCyclesPopupView.findViewById(R.id.thirdRowEditTextView);
-    firstRowAddButton = editCyclesPopupView.findViewById(R.id.firstRowAddButton);
-    firstRowSubtractButton = editCyclesPopupView.findViewById(R.id.firstRowSubtractButton);
-    secondRowAddButton = editCyclesPopupView.findViewById(R.id.secondRowAddButton);
-    secondRowSubtractButton = editCyclesPopupView.findViewById(R.id.secondRowSubtractButton);
-    thirdRowAddButton = editCyclesPopupView.findViewById(R.id.thirdRowAddButton);
-    thirdRowSubtractButton = editCyclesPopupView.findViewById(R.id.thirdRowSubtractButton);
-    thirdRowEditMinutes = editCyclesPopupView.findViewById(R.id.thirdRowEditMinutes);
-    thirdRowEditSeconds = editCyclesPopupView.findViewById(R.id.thirdRowEditSeconds);
-    thirdRowEditColon = editCyclesPopupView.findViewById(R.id.thirdRowEditColon);
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
     SubtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtract_cycle);
-    toggleInfinityRoundsForSets = editCyclesPopupView.findViewById(R.id.s1_up);
-    toggleInfinityRoundsForBreaks = editCyclesPopupView.findViewById(R.id.s2_up);
+    toggleInfinityRoundsForSets = editCyclesPopupView.findViewById(R.id.set_infinity_toggle_imageButton);
+    toggleInfinityRoundsForBreaks = editCyclesPopupView.findViewById(R.id.break_infinity_toggle_imageButton);
     anchorViewForEditRows = editCyclesPopupView.findViewById(R.id.anchorViewForEditRows);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     save_edit_cycle = editCyclesPopupView.findViewById(R.id.save_edit_cycle);
@@ -898,23 +857,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
     removeEditTimerViews(false);
     defaultEditRoundViews();
-    convertEditTime(true);
-    setEditValues();
-
-    //Listens to all editTexts for changes.
-    TextWatcher editTextWatcher = new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-      }
-      @Override
-      public void afterTextChanged(Editable s) {
-        //We set activeEditListener to FALSE to prevent setEditValues() from triggering when not desired. Right now, it's when we are using the +/- runnables to move our time.
-        if (activeEditListener) setEditValues();
-      }
-    };
 
     //Watches editText title box and passes its value into the String that gets saved/updated in database.
     TextWatcher titleTextWatcher = new TextWatcher() {
@@ -936,12 +878,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
 
     cycleNameEdit.addTextChangedListener(titleTextWatcher);
-    firstRowEditMinutes.addTextChangedListener(editTextWatcher);
-    firstRowEditSeconds.addTextChangedListener(editTextWatcher);
-    secondRowEditMinutes.addTextChangedListener(editTextWatcher);
-    secondRowEditSeconds.addTextChangedListener(editTextWatcher);
-    thirdRowEditMinutes.addTextChangedListener(editTextWatcher);
-    thirdRowEditSeconds.addTextChangedListener(editTextWatcher);
 
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
@@ -1113,8 +1049,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
-      //Caps and sets editText values when clicking outside (exiting) the editText box.
-      convertEditTime(true);
       //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
       removeEditTimerViews(true);
       //Hides soft keyboard by using a token of the current editCycleView.
@@ -1128,7 +1062,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
         if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
         emptyCycleList.setVisibility(View.GONE);
-        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_grey));
+        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
       }
     });
 
@@ -1324,17 +1258,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return true;
     });
 
-    //Caps and sets editText values. Only spot that takes focus outside of the view itself (above). Needs to be onTouch to register first click, and false so event is not consumed.
-    cycleNameEdit.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction()==MotionEvent.ACTION_DOWN) {
-          convertEditTime(true);
-        }
-        return false;
-      }
-    });
-
     s1.setOnClickListener(v->{
       if (mode==1) {
         //Toggles coloring and row selection.
@@ -1345,8 +1268,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           secondRowHighlighted = false;
           //If first row is highlighted, second row should un-highlight.
           toggleInfinityRoundsForBreaks.setAlpha(0.3f);
-          rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.GREEN);
-          rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.WHITE);
+          rowSelect(s1, firstRowTextView, Color.GREEN);
+          rowSelect(s2, secondRowTextView, Color.WHITE);
         }
       }
     });
@@ -1360,8 +1283,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           secondRowHighlighted = true;
           firstRowHighlighted = false;
           toggleInfinityRoundsForSets.setAlpha(0.3f);
-          rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.RED);
-          rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.WHITE);
+          rowSelect(s2, secondRowTextView, Color.RED);
+          rowSelect(s1, firstRowTextView, Color.WHITE);
         }
       }
     });
@@ -1383,11 +1306,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       adjustCustom(false);
     });
 
+
+
+    //Todo: Probably ain't using this anymore.
     //Grabs the x-axis value of textView, and uses that determine whether we replace it with the minutes or seconds editText.
     firstRowTextView.setOnTouchListener((v, event) -> {
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
         editTextViewPosX = event.getX();
-        editAndTextSwitch(true, 1);
       }
       return true;
     });
@@ -1395,7 +1320,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     secondRowTextView.setOnTouchListener((v, event) -> {
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
         editTextViewPosX = event.getX();
-        editAndTextSwitch(true, 2);
       }
       return true;
     });
@@ -1403,7 +1327,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     thirdRowEditTextView.setOnTouchListener((v, event) -> {
       if (event.getAction()==MotionEvent.ACTION_DOWN) {
         editTextViewPosX = event.getX();
-        editAndTextSwitch(true, 3);
       }
       return true;
     });
@@ -1438,7 +1361,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.postDelayed(this, incrementTimer * 10);
         setTimerValueBounds();
         fadeCap(firstRowTextView);
-        editAndTextSwitch(false, 1);
         prefEdit.apply();
       }
     };
@@ -1459,7 +1381,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.postDelayed(this, incrementTimer * 10);
         setTimerValueBounds();
         fadeCap(secondRowTextView);
-        editAndTextSwitch(false, 2);
         prefEdit.apply();
       }
     };
@@ -1472,7 +1393,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.postDelayed(this, incrementTimer*10);
         setTimerValueBounds();
         fadeCap(thirdRowEditTextView);
-        editAndTextSwitch(false, 3);
         prefEdit.apply();
       }
     };
@@ -1484,82 +1404,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.postDelayed(this, 300);
       }
     };
-
-    firstRowAddButton.setOnTouchListener((v, event) -> {
-      incrementValues = true;
-      setIncrements(event, changeFirstValue);
-      convertEditTime(true);
-      switch (mode) {
-        case 1:
-          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
-          break;
-        case 3:
-          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
-          break;
-      }
-      return true;
-    });
-
-    firstRowSubtractButton.setOnTouchListener((v, event) -> {
-      incrementValues = false;
-      setIncrements(event, changeFirstValue);
-      convertEditTime(true);
-      switch (mode) {
-        case 1:
-          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
-          break;
-        case 3:
-          firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
-          break;
-      }
-      return true;
-    });
-
-    secondRowAddButton.setOnTouchListener((v, event) -> {
-      incrementValues = true;
-      setIncrements(event, changeSecondValue);
-      convertEditTime(true);
-      switch (mode) {
-        case 1:
-          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
-          break;
-        case 3:
-          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue2));
-          break;
-      }
-      return true;
-    });
-
-    secondRowSubtractButton.setOnTouchListener((v, event) -> {
-      incrementValues = false;
-      setIncrements(event, changeSecondValue);
-      convertEditTime(true);
-      switch (mode) {
-        case 1:
-          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
-          break;
-        case 3:
-          secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue2));
-          break;
-      }
-      return true;
-    });
-
-    thirdRowAddButton.setOnTouchListener((v, event) -> {
-      incrementValues = true;
-      setIncrements(event, changeThirdValue);
-      convertEditTime(true);
-      thirdRowEditTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue3));
-      return true;
-    });
-
-    thirdRowSubtractButton.setOnTouchListener((v, event) -> {
-      incrementValues = false;
-      setIncrements(event, changeThirdValue);
-      convertEditTime(true);
-      thirdRowEditTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue3));
-      return true;
-    });
 
     //Listens to our fadeOut animation, and runs fadeIn when it's done.
     fadeProgressOut.setAnimationListener(new Animation.AnimationListener() {
@@ -2313,32 +2157,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Default selection of Set.
       firstRowHighlighted = true;
       secondRowHighlighted = false;
-      rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.GREEN);
-      rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.WHITE);
-      //Our editText fields have listeners attached which call setEditValues(), which set our edit values AND setValue/breakValue vars to the values within the editText box itself. Here, we use 0:30 for both.
-      firstRowEditMinutes.setText(String.valueOf(0));
-      firstRowEditSeconds.setText(elongateEditSeconds(30));
-      secondRowEditMinutes.setText(String.valueOf(0));
-      secondRowEditSeconds.setText(elongateEditSeconds(30));
+      rowSelect(s1, firstRowTextView, Color.GREEN);
+      rowSelect(s2, secondRowTextView, Color.WHITE);
       firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
       secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
     }
     else if (mode==3) {
-      rowSelect(s1, firstRowTextView, firstRowEditMinutes, firstRowEditSeconds, firstRowEditColon, firstRowAddButton, firstRowSubtractButton, Color.WHITE);
-      rowSelect(s2, secondRowTextView, secondRowEditMinutes, secondRowEditSeconds, secondRowEditColon, secondRowAddButton, secondRowSubtractButton, Color.WHITE);
-      rowSelect(s3, thirdRowEditTextView, thirdRowEditMinutes, thirdRowEditSeconds, thirdRowEditColon, thirdRowAddButton, thirdRowSubtractButton, Color.WHITE);
+      rowSelect(s1, firstRowTextView, Color.WHITE);
+      rowSelect(s2, secondRowTextView, Color.WHITE);
+      rowSelect(s3, thirdRowEditTextView, Color.WHITE);
     }
   }
 
   //Colors rows.
-  public void rowSelect(TextView header, TextView textVal, EditText editOne, EditText editTwo, TextView editSep, ImageView plus, ImageView minus, int color) {
+  public void rowSelect(TextView header, TextView textVal, int color) {
     header.setTextColor(color);
     textVal.setTextColor(color);
-    editOne.setTextColor(color);
-    editTwo.setTextColor(color);
-    editSep.setTextColor(color);
-    plus.setColorFilter(color);
-    minus.setColorFilter(color);
   }
 
   //Fades action bar buttons in/out depending on whether we are editing cycles or not.
@@ -2415,55 +2249,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Passes current editText values into variables, and then sets min/max bounds on them.
-  public void setEditValues() {
-    if (mode==1) {
-      editSetMinutes = convertEditTextToLong(firstRowEditMinutes);
-      editSetSeconds = convertEditTextToLong(firstRowEditSeconds);
-      if (editSetSeconds > 59) {
-        editSetMinutes += 1;
-        editSetSeconds = editSetSeconds - 60;
-      }
-      if (editSetMinutes >= 5) editSetMinutes = 5;
-      if (editSetMinutes <= 0) editSetMinutes = 0;
-      if (editSetSeconds <= 0 || editSetMinutes == 5) editSetSeconds = 0;
-      if (editSetSeconds < 5 && editSetMinutes == 0) editSetSeconds = 0;
-      //Sets our timer values to the values in editText.
-      setValue = (int) ((editSetMinutes * 60) + editSetSeconds);
-      firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
-
-      editBreakMinutes = convertEditTextToLong(secondRowEditMinutes);
-      editBreakSeconds = convertEditTextToLong(secondRowEditSeconds);
-      if (editBreakSeconds > 59) {
-        editBreakMinutes += 1;
-        editBreakSeconds = editBreakSeconds - 60;
-      }
-      if (editBreakMinutes >= 5) editBreakMinutes = 5;
-      if (editBreakMinutes <= 0) editBreakMinutes = 0;
-      if (editBreakSeconds <=0 || editBreakMinutes == 5) editBreakSeconds = 0;
-      if (editBreakSeconds < 5 && editBreakMinutes == 0) editBreakSeconds = 0;
-
-      breakValue = (int) ((editBreakMinutes * 60) + editBreakSeconds);
-      secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
-      //Sets value of editBreakMinutes to either breakValue, or breakOnlyValue, depending on which mode we're on.
-
-      toastBounds(5, 300, setValue);
-      toastBounds(5, 300, breakValue);
-      if (setValue < 5) setValue = 5;
-      if (breakValue < 5) breakValue = 5;
-      if (setValue > 300) setValue = 300;
-      if (breakValue > 300) breakValue = 300;
-    } else if (mode==3) {
-      editPomMinutesOne = convertEditTextToLong(firstRowEditMinutes);
-      editPomSecondsOne = convertEditTextToLong(firstRowEditSeconds);
-      editPomMinutesTwo = convertEditTextToLong(secondRowEditMinutes);
-      editPomSecondsTwo = convertEditTextToLong(secondRowEditSeconds);
-      editPomMinutesThree = convertEditTextToLong(thirdRowEditMinutes);
-      editPomSecondsThree = convertEditTextToLong(thirdRowEditSeconds);
-    }
-    setTimerValueBounds();
-  }
-
+  //Todo: This should stay implemented differently.
   //Sets min/max bounds on timer values. MUST be separate from setEditValues() so it can be called w/ in our +/- increment runnable and not b0rk the values.
   public void setTimerValueBounds() {
     switch (mode) {
@@ -2489,177 +2275,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Converts and sets our minute and second edit values from raw time values.
-  public void convertEditTime(boolean setEditViews) {
-    //Used to turn off editText listener's execution of setEditValues(), which overrides setValue and breakValue when trying to change them via +/- runnables, which call this function.
-    activeEditListener = false;
-    if (mode==1) {
-      editSetSeconds = setValue % 60;
-      editSetMinutes = setValue / 60;
-      editBreakSeconds = breakValue % 60;
-      editBreakMinutes = breakValue / 60;
-      if (setEditViews) {
-        firstRowEditMinutes.setText(String.valueOf(editSetMinutes));
-        firstRowEditSeconds.setText(elongateEditSeconds(editSetSeconds));
-        secondRowEditMinutes.setText(String.valueOf(editBreakMinutes));
-        secondRowEditSeconds.setText(elongateEditSeconds(editBreakSeconds));
-      }
-
-    } else if (mode==3) {
-      editPomSecondsOne = pomValue1 % 60;
-      editPomMinutesOne = pomValue1 / 60;
-      editPomSecondsTwo = pomValue2 % 60;
-      editPomMinutesTwo = pomValue2 / 60;
-      editPomSecondsThree = pomValue3 % 60;
-      editPomMinutesThree = pomValue3 / 60;
-      if (setEditViews) {
-        firstRowEditMinutes.setText(String.valueOf(editPomMinutesOne));
-        secondRowEditMinutes.setText(String.valueOf(editPomMinutesTwo));
-        thirdRowEditMinutes.setText(String.valueOf(editPomMinutesThree));
-        firstRowEditSeconds.setText(elongateEditSeconds(editPomSecondsOne));
-        secondRowEditSeconds.setText(elongateEditSeconds(editPomSecondsTwo));
-        thirdRowEditSeconds.setText(elongateEditSeconds(editPomSecondsThree));
-      }
-    }
-    activeEditListener = true;
-  }
-
   public long convertEditTextToLong(EditText editVar) {
     if (!editVar.getText().toString().equals("")) {
       return Long.parseLong(editVar.getText().toString());
     } else return 0;
-  }
-
-  //Function for switching between textView and editText in add/sub menu.
-  public void editAndTextSwitch(boolean removeTextView, int viewRemoved) {
-    convertEditTime(false);
-    //If moving from textView -> editText.
-    if (removeTextView) {
-      if (viewRemoved == 1) {
-        firstRowTextView.setVisibility(View.INVISIBLE);
-        firstRowEditMinutes.setVisibility(View.VISIBLE);
-        firstRowEditSeconds.setVisibility(View.VISIBLE);
-        firstRowEditColon.setVisibility(View.VISIBLE);
-        if (secondRowEditMinutes.isShown() || secondRowEditSeconds.isShown()) {
-          secondRowTextView.setVisibility(View.VISIBLE);
-          secondRowEditMinutes.setVisibility(View.GONE);
-          secondRowEditSeconds.setVisibility(View.GONE);
-          secondRowEditColon.setVisibility(View.GONE);
-        }
-        if (mode==3) {
-          if (thirdRowEditMinutes.isShown()) {
-            thirdRowEditMinutes.setVisibility(View.GONE);
-            thirdRowEditSeconds.setVisibility(View.GONE);
-            thirdRowEditColon.setVisibility(View.GONE);
-            thirdRowEditTextView.setVisibility(View.VISIBLE);
-          }
-        }
-        //Used to request focus, and then show the soft keyboard. Using x-axis values to determine whether we focus on minutes or seconds.
-        if (editTextViewPosX<=75) {
-          firstRowEditMinutes.requestFocus();
-          inputMethodManager.showSoftInput(firstRowEditMinutes,  0);
-        } else {
-          firstRowEditSeconds.requestFocus();
-          inputMethodManager.showSoftInput(firstRowEditSeconds, 0);
-        }
-      } else if (viewRemoved == 2) {
-        secondRowTextView.setVisibility(View.INVISIBLE);
-        secondRowEditMinutes.setVisibility(View.VISIBLE);
-        secondRowEditSeconds.setVisibility(View.VISIBLE);
-        secondRowEditColon.setVisibility(View.VISIBLE);
-        if (firstRowEditMinutes.isShown() || firstRowEditSeconds.isShown()) {
-          firstRowTextView.setVisibility(View.VISIBLE);
-          firstRowEditMinutes.setVisibility(View.GONE);
-          firstRowEditSeconds.setVisibility(View.GONE);
-          firstRowEditColon.setVisibility(View.GONE);
-        }
-        if (mode==3) {
-          if (thirdRowEditMinutes.isShown()) {
-            thirdRowEditMinutes.setVisibility(View.GONE);
-            thirdRowEditSeconds.setVisibility(View.GONE);
-            thirdRowEditColon.setVisibility(View.GONE);
-            thirdRowEditTextView.setVisibility(View.VISIBLE);
-          }
-        }
-        if (editTextViewPosX<=75) {
-          secondRowEditMinutes.requestFocus();
-          inputMethodManager.showSoftInput(secondRowEditMinutes, 0);
-        } else {
-          secondRowEditSeconds.requestFocus();
-          inputMethodManager.showSoftInput(secondRowEditSeconds, 0);
-        }
-      } else if (viewRemoved == 3) {
-        if (firstRowEditMinutes.isShown()) {
-          firstRowEditMinutes.setVisibility(View.GONE);
-          firstRowEditSeconds.setVisibility(View.GONE);
-          firstRowEditColon.setVisibility(View.GONE);
-          firstRowTextView.setVisibility(View.VISIBLE);
-        }
-        if (secondRowEditMinutes.isShown()) {
-          secondRowEditMinutes.setVisibility(View.GONE);
-          secondRowEditSeconds.setVisibility(View.GONE);
-          secondRowEditColon.setVisibility(View.GONE);
-          secondRowTextView.setVisibility(View.VISIBLE);
-        }
-        thirdRowEditTextView.setVisibility(View.INVISIBLE);
-        thirdRowEditMinutes.setVisibility(View.VISIBLE);
-        thirdRowEditSeconds.setVisibility(View.VISIBLE);
-        thirdRowEditColon.setVisibility(View.VISIBLE);
-      }
-      if (editTextViewPosX<=75) {
-        thirdRowEditMinutes.requestFocus();
-        inputMethodManager.showSoftInput(thirdRowEditMinutes, 0);
-      } else {
-        thirdRowEditSeconds.requestFocus();
-        inputMethodManager.showSoftInput(thirdRowEditSeconds, 0);
-      }
-    } else {
-      //If moving from editText -> textView.
-      switch (mode) {
-        case 1:
-          if (viewRemoved == 1) {
-            //If first is shown, second and separator are also shown.
-            if (firstRowEditMinutes.isShown()) {
-              firstRowEditMinutes.setVisibility(View.GONE);
-              firstRowEditColon.setVisibility(View.GONE);
-              firstRowEditSeconds.setVisibility(View.GONE);
-              firstRowTextView.setVisibility(View.VISIBLE);
-            }
-          } else if (viewRemoved == 2) {
-            if (secondRowEditMinutes.isShown()) {
-              secondRowEditMinutes.setVisibility(View.GONE);
-              secondRowEditColon.setVisibility(View.GONE);
-              secondRowEditSeconds.setVisibility(View.GONE);
-              secondRowTextView.setVisibility(View.VISIBLE);
-            }
-          }
-          break;
-        case 3:
-          if (viewRemoved == 1) {
-            if (firstRowEditMinutes.isShown()) {
-              firstRowEditMinutes.setVisibility(View.GONE);
-              firstRowEditSeconds.setVisibility(View.GONE);
-              firstRowEditColon.setVisibility(View.GONE);
-              firstRowTextView.setVisibility(View.VISIBLE);
-            }
-          } else if (viewRemoved == 2) {
-            if (secondRowEditMinutes.isShown()) {
-              secondRowEditMinutes.setVisibility(View.GONE);
-              secondRowEditSeconds.setVisibility(View.GONE);
-              secondRowEditColon.setVisibility(View.GONE);
-              secondRowTextView.setVisibility(View.VISIBLE);
-            }
-          } else if (viewRemoved == 3) {
-            if (thirdRowEditMinutes.isShown()) {
-              thirdRowEditMinutes.setVisibility(View.GONE);
-              thirdRowEditSeconds.setVisibility(View.GONE);
-              thirdRowEditColon.setVisibility(View.GONE);
-              thirdRowEditTextView.setVisibility(View.VISIBLE);
-            }
-          }
-          break;
-      }
-    }
   }
 
   public void toastBounds(long min, long max, long value) {
@@ -2740,18 +2359,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Sets all of our editTexts to Invisible.
-  public void removeEditTimerViews(boolean reinstateText) {
-    firstRowEditMinutes.setVisibility(View.GONE);
-    firstRowEditColon.setVisibility(View.GONE);
-    firstRowEditMinutes.setVisibility(View.GONE);
-    firstRowEditSeconds.setVisibility(View.GONE);
-    secondRowEditMinutes.setVisibility(View.GONE);
-    secondRowEditColon.setVisibility(View.GONE);
-    secondRowEditSeconds.setVisibility(View.GONE);
-    thirdRowEditMinutes.setVisibility(View.GONE);
-    thirdRowEditColon.setVisibility(View.GONE);
-    thirdRowEditSeconds.setVisibility(View.GONE);
-
+  public void removeEditTimerViews(boolean reinstateText){
     //Replaces editTexts w/ textViews if desired.
     if (reinstateText) {
       if (mode==1 || mode==3) firstRowTextView.setVisibility(View.VISIBLE);
@@ -2762,13 +2370,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void defaultEditRoundViews() {
     //Instance of layout objects we can set programmatically based on which mode we're on.
-    ConstraintLayout.LayoutParams s2ParamsAdd = (ConstraintLayout.LayoutParams) secondRowAddButton.getLayoutParams();
-    ConstraintLayout.LayoutParams s2ParamsSub = (ConstraintLayout.LayoutParams) secondRowSubtractButton.getLayoutParams();
     ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
     ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) SubtractRoundFromCycleButton.getLayoutParams();
     ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
 
-    convertEditTime(true);
     timeLeft.setText(timeLeftValueHolder);
     switch (mode) {
       case 1:
@@ -2776,11 +2381,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //All shared visibilities between modes 1 and 2.
         s2.setVisibility(View.VISIBLE);
         s3.setVisibility(View.GONE);
-        thirdRowEditTextView.setVisibility(View.INVISIBLE);
-        thirdRowAddButton.setVisibility(View.INVISIBLE);
-        thirdRowSubtractButton.setVisibility(View.INVISIBLE);
-        secondRowAddButton.setVisibility(View.VISIBLE);
-        secondRowSubtractButton.setVisibility(View.VISIBLE);
         toggleInfinityRoundsForSets.setVisibility(View.VISIBLE);
         toggleInfinityRoundsForBreaks.setVisibility(View.VISIBLE);
         secondRowTextView.setVisibility(View.VISIBLE);
@@ -2788,8 +2388,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s2.setText(R.string.break_time);
         s1.setVisibility(View.VISIBLE);
         firstRowTextView.setVisibility(View.VISIBLE);
-        firstRowAddButton.setVisibility(View.VISIBLE);
-        firstRowSubtractButton.setVisibility(View.VISIBLE);
         //Strings and values exclusive to mode 1.
         s1.setText(R.string.set_time);
         firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
@@ -2804,14 +2402,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         s1.setVisibility(View.VISIBLE);
         s3.setVisibility(View.VISIBLE);
         firstRowTextView.setVisibility(View.VISIBLE);
-        firstRowAddButton.setVisibility(View.VISIBLE);
-        firstRowSubtractButton.setVisibility(View.VISIBLE);
         secondRowTextView.setVisibility(View.VISIBLE);
-        secondRowAddButton.setVisibility(View.VISIBLE);
-        secondRowSubtractButton.setVisibility(View.VISIBLE);
         thirdRowEditTextView.setVisibility(View.VISIBLE);
-        thirdRowAddButton.setVisibility(View.VISIBLE);
-        thirdRowSubtractButton.setVisibility(View.VISIBLE);
         toggleInfinityRoundsForSets.setVisibility(View.GONE);
         toggleInfinityRoundsForBreaks.setVisibility(View.GONE);
         s1.setText(R.string.work_time);
@@ -2835,7 +2427,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
       if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
-      setEditValues();
       if (mode==1) {
         if (workoutTime.size()<16) {
           //If Sets are highlighted green, check if its infinity mode is also highlighted. Use 1/2 for yes/no.

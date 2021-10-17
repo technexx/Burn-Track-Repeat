@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/dark_grey"
+    android:background="@color/test_black"
     android:id="@+id/edit_cycle_layout">
 
     <View
@@ -108,10 +108,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/firstRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/firstRowAddButton"
+        app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginStart="2dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginTop="10dp"
         android:textSize="23sp"
         android:textColor="@color/white"/>
 
@@ -120,10 +119,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/secondRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/secondRowSubtractButton"
+        app:layout_constraintTop_toBottomOf="@id/s1"
         android:layout_marginStart="2dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginTop="12dp"
         android:textSize="23sp"
         android:textColor="@color/white"/>
 
@@ -132,10 +130,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/thirdRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/thirdRowAddButton"
+        app:layout_constraintTop_toBottomOf="@id/s2"
         android:layout_marginStart="2dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginTop="12dp"
         android:textSize="23sp"
         android:textColor="@color/white"/>
 
@@ -143,10 +140,10 @@
         android:id="@+id/firstRowTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/firstRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/firstRowAddButton"
-        android:layout_marginEnd="124dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="150dp"
         android:textSize="23sp">
     </TextView>
 
@@ -154,10 +151,10 @@
         android:id="@+id/secondRowTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/secondRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/secondRowAddButton"
-        android:layout_marginEnd="124dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/firstRowTextView"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="150dp"
         android:gravity="center_horizontal"
         android:textSize="23sp">
     </TextView>
@@ -166,271 +163,44 @@
         android:id="@+id/thirdRowEditTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="124dp"
         android:gravity="center_horizontal"
         android:textSize="23sp"
-        app:layout_constraintBottom_toBottomOf="@id/thirdRowAddButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/thirdRowAddButton">
-    </TextView>
-
-    <ImageButton
-        android:id="@+id/firstRowAddButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/add_24"
-        app:layout_constraintEnd_toStartOf="@id/firstRowTextView"
-        app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
-        android:layout_marginEnd="14dp"
-        android:layout_marginTop="12sp"
-        android:backgroundTint="@color/dark_grey"
-        android:background="@drawable/rounded_corners">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/firstRowSubtractButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/subtract_24"
-        app:layout_constraintStart_toEndOf="@id/firstRowTextView"
-        app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
-        android:layout_marginStart="14dp"
-        android:layout_marginTop="12sp"
-        android:backgroundTint="@color/dark_grey"
-        android:background="@drawable/rounded_corners">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/secondRowAddButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/add_24"
-        app:layout_constraintEnd_toStartOf="@id/secondRowTextView"
-        app:layout_constraintTop_toBottomOf="@id/firstRowAddButton"
-        android:layout_marginEnd="14dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/dark_grey"
-        android:background="@drawable/rounded_corners">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/secondRowSubtractButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/subtract_24"
-        app:layout_constraintStart_toEndOf="@id/secondRowTextView"
-        app:layout_constraintTop_toBottomOf="@id/firstRowAddButton"
-        android:layout_marginStart="14dp"
-        android:backgroundTint="@color/dark_grey"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_corners">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/thirdRowAddButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/add_24"
-        app:layout_constraintEnd_toStartOf="@id/thirdRowEditTextView"
-        app:layout_constraintTop_toBottomOf="@id/secondRowAddButton"
-        android:layout_marginEnd="14dp"
-        android:backgroundTint="@color/dark_grey"
-        android:layout_marginTop="18dp"
-        android:background="@drawable/rounded_corners">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/thirdRowSubtractButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/subtract_24"
-        app:layout_constraintStart_toEndOf="@id/thirdRowEditTextView"
-        app:layout_constraintTop_toBottomOf="@id/secondRowSubtractButton"
-        android:layout_marginStart="14dp"
-        android:backgroundTint="@color/dark_grey"
-        android:layout_marginTop="18dp"
-        android:background="@drawable/rounded_corners">
-    </ImageButton>
-
-    <EditText
-        android:id="@+id/firstRowEditMinutes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/firstRowAddButton"
-        app:layout_constraintTop_toTopOf="@id/firstRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/firstRowAddButton"
-        android:backgroundTint="@color/dark_grey"
-        android:textCursorDrawable="@null"
-        android:layout_marginStart="3dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:gravity="center_horizontal"
-        android:inputType="number"
-        android:maxLength="2"
-        android:minWidth="35dp">
-    </EditText>
-
-    <TextView
-        android:text=":"
-        android:id="@+id/firstRowEditColon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/firstRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/firstRowAddButton"
-        android:layout_marginStart="199dp"
-        android:textSize="23sp">
+        app:layout_constraintTop_toBottomOf="@id/secondRowTextView"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="150dp">
     </TextView>
-
-    <EditText
-        android:id="@+id/firstRowEditSeconds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/firstRowSubtractButton"
-        app:layout_constraintTop_toTopOf="@id/firstRowAddButton"
-        android:backgroundTint="@color/dark_grey"
-        android:textCursorDrawable="@null"
-        app:layout_constraintBottom_toBottomOf="@id/firstRowAddButton"
-        android:layout_marginEnd="9dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:gravity="center_horizontal"
-        android:inputType="number"
-        android:maxLength="2"
-        android:minWidth="35dp">
-    </EditText>
-
-    <EditText
-        android:id="@+id/secondRowEditMinutes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/secondRowAddButton"
-        app:layout_constraintTop_toTopOf="@id/secondRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/secondRowAddButton"
-        android:backgroundTint="@color/dark_grey"
-        android:textCursorDrawable="@null"
-        android:layout_marginStart="3dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:inputType="number"
-        android:maxLength="2"
-        android:minWidth="35dp"
-        android:gravity="center_horizontal">
-    </EditText>
-
-    <TextView
-        android:text=":"
-        android:id="@+id/secondRowEditColon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/secondRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/secondRowAddButton"
-        android:textSize="23sp"
-        android:layout_marginStart="199dp">
-    </TextView>
-
-    <EditText
-        android:id="@+id/secondRowEditSeconds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/secondRowSubtractButton"
-        app:layout_constraintTop_toTopOf="@id/secondRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/secondRowAddButton"
-        android:backgroundTint="@color/dark_grey"
-        android:textCursorDrawable="@null"
-        android:layout_marginEnd="9dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"
-        android:inputType="number"
-        android:maxLength="2"
-        android:minWidth="35dp"
-        android:gravity="center_horizontal">
-    </EditText>
-
-    <EditText
-        android:id="@+id/thirdRowEditMinutes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/thirdRowAddButton"
-        app:layout_constraintTop_toTopOf="@id/thirdRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/thirdRowAddButton"
-        android:backgroundTint="@color/dark_grey"
-        android:textCursorDrawable="@null"
-        android:layout_marginStart="3dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:inputType="number"
-        android:maxLength="2"
-        android:minWidth="35dp"
-        android:gravity="center_horizontal">
-    </EditText>
-
-    <TextView
-        android:text=":"
-        android:id="@+id/thirdRowEditColon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/thirdRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/thirdRowAddButton"
-        android:textSize="23sp"
-        android:layout_marginTop="2dp"
-        android:layout_marginStart="199dp">
-    </TextView>
-
-    <EditText
-        android:id="@+id/thirdRowEditSeconds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/thirdRowSubtractButton"
-        app:layout_constraintTop_toTopOf="@id/thirdRowAddButton"
-        app:layout_constraintBottom_toBottomOf="@id/thirdRowAddButton"
-        android:backgroundTint="@color/dark_grey"
-        android:textCursorDrawable="@null"
-        android:layout_marginEnd="9dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"
-        android:inputType="number"
-        android:maxLength="2"
-        android:minWidth="35dp"
-        android:gravity="center_horizontal">
-    </EditText>
 
     <ImageView
-        android:id="@+id/s1_up"
+        android:id="@+id/set_infinity_toggle_imageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/firstRowSubtractButton"
-        app:layout_constraintBottom_toBottomOf="@id/firstRowSubtractButton"
+        app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="15dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:src="@drawable/infinity_icon_green"
-        android:backgroundTint="@color/dark_grey">
+        android:backgroundTint="@color/test_black">
     </ImageView>
 
     <ImageView
-        android:id="@+id/s2_up"
+        android:id="@+id/break_infinity_toggle_imageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/secondRowSubtractButton"
-        app:layout_constraintBottom_toBottomOf="@id/secondRowSubtractButton"
+        app:layout_constraintTop_toBottomOf="@id/set_infinity_toggle_imageButton"
+        android:layout_marginTop="3dp"
         android:layout_marginEnd="15dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:src="@drawable/infinity_icon_red"
-        android:backgroundTint="@color/dark_grey">
+        android:backgroundTint="@color/test_black">
     </ImageView>
 
     <Button
@@ -444,9 +214,9 @@
         android:layout_marginBottom="10dp"
         android:textSize="15sp"
         android:gravity="center"
-        android:backgroundTint="@color/dark_grey"
+        android:backgroundTint="@color/test_black"
         app:cornerRadius="50dp"
-        app:rippleColor="#33AAAAAA"
+        app:rippleColor="#37474F"
         app:strokeColor="@color/black"
         app:strokeWidth="1dp">
     </Button>
@@ -462,9 +232,9 @@
         android:layout_marginBottom="10dp"
         android:textSize="15sp"
         android:gravity="center"
-        android:backgroundTint="@color/dark_grey"
+        android:backgroundTint="@color/test_black"
         app:cornerRadius="50dp"
-        app:rippleColor="#33AAAAAA"
+        app:rippleColor="#37474F"
         app:strokeColor="@color/black"
         app:strokeWidth="1dp">
     </Button>
