@@ -364,6 +364,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
 
+  //Todo: Have number kb add directly to round in list?
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
@@ -372,7 +373,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Use 0:00 for <60 second total times.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
   //Todo: Blank title for first cycle creation on app launch bug is back.
-  //Todo: 0/0 index exception on emulator when (1) Start Workout timer, (2) Start Pom Timer, (3) Try to resume Workout timer.
   //Todo: The different positioning in sort resolves once the popUp is shown.
   //Todo: Dotdraws will need sp -> dp for scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
@@ -2001,11 +2001,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     long remainder = timeLeft%1000;
     String timeRemaining = "";
-    if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
-      //+250 accounts for notification reception lag.
-      timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(((timeLeft-250) +1000) / 1000);
+    if (typeOfRound.size()>0) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
+        //+250 accounts for notification reception lag.
+        timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(((timeLeft-250) +1000) / 1000);
+      }
+      else timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(timeLeft);
     }
-    else timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(timeLeft);
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
   }
