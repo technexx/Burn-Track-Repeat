@@ -7,7 +7,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +17,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
 
-  Runnable updateTotalTimesInDatabaseRunnable;
+  Runnable saveTotalTimesInDatabaseRunnable;
   Runnable queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes;
   Runnable queryAndSortAllCyclesFromDatabaseRunnable;
   Runnable deleteTotalCycleTimesASyncRunnable;
@@ -391,11 +391,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   static boolean notificationDismissed = true;
 
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
-  //Todo: Override onDestroy to kill notifications on app close.
-  //Todo: Notifcations are active when activity is present.
-  //Todo: Need to reset notification text if cycle is reset.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
-  //Todo: Fix notification display for infinity rounds.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
   //Todo: Timer should persist/save even if app crashes/is closed due to lack of memory. However, since we keep timer going even when minimized, we can't just do this in onPause().
   //Todo: Pom total times not working.
@@ -446,6 +442,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(false);
     notificationDismissed = false;
     setNotificationValues();
+    Log.i("testNote", "Pause!");
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    Log.i("testNote", "Stop!");
+  }
+
+  @Override
+  public void onDestroy() {
+    notificationDismissed = true;
+    notificationManagerCompat.cancel(1);
+    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+    super.onDestroy();
   }
 
   @Override
@@ -1077,7 +1088,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (timerIsPaused) activateResumeOrResetOptionForCycle();
 //      pauseAndResumeTimer(PAUSING_TIMER);
 
-      AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
       addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
 
       //Removes runnable that begins next round.
@@ -1819,7 +1830,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    updateTotalTimesInDatabaseRunnable = new Runnable() {
+    saveTotalTimesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
         switch (mode) {
@@ -3287,6 +3298,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleSetTimeForSingleRoundInMillis +=50;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           break;
+        case 2:
+          if (resettingTotalTime) {
+            setMillis = 0;
+            resettingTotalTime = false;
+          }
+          cycleSetTimeForSingleRoundInMillis = setMillis;
+          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          break;
         case 3:
           if (resettingTotalTime) {
             roundedValueForTotalTimes = 1000 - (breakMillis%1000);
@@ -3295,14 +3314,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           cycleBreakTimeForSingleRoundInMillis+=50;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
-          break;
-        case 2:
-          if (resettingTotalTime) {
-            setMillis = 0;
-            resettingTotalTime = false;
-          }
-          cycleSetTimeForSingleRoundInMillis = setMillis;
-          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           break;
         case 4:
           if (resettingTotalTime) {
@@ -3498,7 +3509,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar.setProgress(0);
         addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
       } else addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
       switch (typeOfRound.get(currentRound)) {
         case 1:
@@ -3752,7 +3763,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setEnabled(true);
     currentProgressBarValue = 10000;
     addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
-    AsyncTask.execute(updateTotalTimesInDatabaseRunnable);
+    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
     switch (mode) {
       case 1:
@@ -3800,7 +3811,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     //Base of 0 values for stopwatch means we don't want anything populated when resetting.
     if (mode!=4) populateTimerUI();
-    //Todo: This won't execute w/ conditional w/ in method tho. Might be better to revert to conditional outside.
     setNotificationValues();
   }
 }
