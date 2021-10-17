@@ -390,8 +390,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
 
+  //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Override onDestroy to kill notifications on app close.
-  //Todo: Actual timer is +1 second from notification timer.
   //Todo: Notifcations are active when activity is present.
   //Todo: Need to reset notification text if cycle is reset.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
@@ -2146,7 +2146,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     long remainder = timeLeft%1000;
     String timeRemaining = "";
-    if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces((timeLeft - remainder) / 1000);
+    if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
+      //+250 accounts for notification reception lag.
+      timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(((timeLeft-250) +1000) / 1000);
+    }
     else timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(timeLeft);
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
@@ -2193,7 +2196,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyOne = "";
       String bodyTwo = "";
 
-      //Todo: This probably doesn't execute in resetTimer() because our animator is not active. We should actually have it display even if timer is not active - i.e. we've just navigated to cycle.
       if (objectAnimator.isStarted() || mode==1) {
         if (typeOfRound.size() > 0) {
           if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
