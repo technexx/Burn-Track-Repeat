@@ -7,12 +7,12 @@
     <string name="reset">Reset</string>
     <string name="clear_cycles">Reset Count</string>
     <string name="skip_round">Skip Round</string>
-    <string name="set_time">Sets:</string>
-    <string name="break_time">Breaks:</string>
+    <string name="set_time">Sets</string>
+    <string name="break_time">Breaks</string>
     <string name="rounds">Rounds:</string>
-    <string name="work_time">Work:</string>
-    <string name="small_break">Break:</string>
-    <string name="long_break">Rest:</string>
+    <string name="work_time">Work</string>
+    <string name="small_break">Break</string>
+    <string name="long_break">Rest</string>
 
     <string name="cycles_done">Cycles Completed: %1$s</string>
     <string name="overtime">- %1$s</string>

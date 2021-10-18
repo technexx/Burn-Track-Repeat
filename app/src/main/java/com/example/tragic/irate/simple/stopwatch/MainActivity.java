@@ -75,6 +75,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle {
 
   ConstraintLayout cl;
+  ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
   View tabView;
@@ -195,15 +196,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int incrementTimer = 10;
   boolean minReached;
   boolean maxReached;
-  float editTextViewPosX;
   boolean firstRowHighlighted;
   boolean secondRowHighlighted;
 
   Handler mHandler;
   Runnable valueSpeed;
-  Runnable changeFirstValue;
-  Runnable changeSecondValue;
-  Runnable changeThirdValue;
   Runnable adjustRoundDelay;
   boolean currentlyEditingACycle;
   InputMethodManager inputMethodManager;
@@ -612,6 +609,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
     cl = findViewById(R.id.main_layout);
+    editPopUpLayout = findViewById(R.id.edit_cycle_layout);
     roundView = inflater.inflate(R.layout.mode_one_rounds, null);
     round_count = roundView.findViewById(R.id.round_count);
     round_value = roundView.findViewById(R.id.workout_rounds);
@@ -2266,6 +2264,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void defaultEditRoundViews() {
     //Instance of layout objects we can set programmatically based on which mode we're on.
+    ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
+    ConstraintLayout.LayoutParams secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
+    ConstraintLayout.LayoutParams thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
+
     ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
     ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) SubtractRoundFromCycleButton.getLayoutParams();
     ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
@@ -2273,36 +2275,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.setText(timeLeftValueHolder);
     switch (mode) {
       case 1:
+        firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
+        firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;
+        secondRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
+        secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
+
         roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(260);
-        //All shared visibilities between modes 1 and 2.
-        secondRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
-        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
-        toggleInfinityRounds.setVisibility(View.VISIBLE);
-        //Shared String between modes 1 and 2.
-        secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
-        firstRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
-        timerValueInEditPopUp.setVisibility(View.VISIBLE);
-        //Strings and values exclusive to mode 1.
-        firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
-        timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
+
         addParams.bottomMargin = convertScalablePixelsToDensity(32);
         subParams.bottomMargin = convertScalablePixelsToDensity(32);
         roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(18);
+
+        secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
+        firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
+        timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
+
+        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
+        toggleInfinityRounds.setVisibility(View.VISIBLE);
+        timerValueInEditPopUp.setVisibility(View.VISIBLE);
         break;
       case 3:
+        firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
+        firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;
+        secondRoundHeaderParams.endToStart = R.id.thirdRoundTypeHeaderInEditPopUp;
+        secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
+        thirdRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
+        thirdRoundHeaderParams.startToEnd = R.id.secondRoundTypeHeaderInEditPopUp;
+
         roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(240);
-        //Visibilities and values exclusive to mode 3.
-        firstRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
-        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
-        timerValueInEditPopUp.setVisibility(View.VISIBLE);
-        toggleInfinityRounds.setVisibility(View.GONE);
+
+        addParams.bottomMargin = convertScalablePixelsToDensity(20);
+        subParams.bottomMargin = convertScalablePixelsToDensity(20);
+        roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(10);
+
         firstRoundTypeHeaderInEditPopUp.setText(R.string.work_time);
         secondRoundTypeHeaderInEditPopUp.setText(R.string.small_break);
         thirdRoundTypeHeaderInEditPopUp.setText(R.string.long_break);
         timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
-        addParams.bottomMargin = convertScalablePixelsToDensity(20);
-        subParams.bottomMargin = convertScalablePixelsToDensity(20);
-        roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(10);
+
+        timerValueInEditPopUp.setVisibility(View.VISIBLE);
+        toggleInfinityRounds.setVisibility(View.GONE);
+        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
         break;
     }
   }
@@ -2596,7 +2609,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean saveToDB) {
-    //Todo: Watch this. Meant to always reset current timer obj / obj animator if launching new cycle.
     resetTimer();
     if (isNewCycle || currentlyEditingACycle) resetTimer();
     populateTimerUI();
