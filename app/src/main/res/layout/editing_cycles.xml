@@ -104,7 +104,7 @@
     </View>
 
     <TextView
-        android:id="@+id/s1"
+        android:id="@+id/firstRoundTypeHeaderInEditPopUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,70 +115,46 @@
         android:textColor="@color/white"/>
 
     <TextView
-        android:id="@+id/s2"
+        android:id="@+id/secondRoundTypeHeaderInEditPopUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/s1"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="12dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"/>
-
-    <TextView
-        android:id="@+id/s3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/s2"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="12dp"
-        android:textSize="23sp"
-        android:textColor="@color/white"/>
-
-    <TextView
-        android:id="@+id/firstRowTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
-        android:layout_marginStart="150dp"
-        android:textSize="23sp">
-    </TextView>
-
-    <TextView
-        android:id="@+id/secondRowTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/firstRowTextView"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="150dp"
-        android:gravity="center_horizontal"
-        android:textSize="23sp">
-    </TextView>
-
-    <TextView
-        android:id="@+id/thirdRowEditTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
         android:textSize="23sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/secondRowTextView"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:id="@+id/thirdRoundTypeHeaderInEditPopUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/secondRoundTypeHeaderInEditPopUp"
+        app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
-        android:layout_marginStart="150dp">
+        android:textSize="23sp"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:id="@+id/timerValueInEditPopUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        android:layout_marginTop="12dp"
+        android:textSize="23sp">
     </TextView>
 
     <ImageView
-        android:id="@+id/set_infinity_toggle_imageButton"
+        android:id="@+id/infinity_toggle_imageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
@@ -187,31 +163,14 @@
         android:backgroundTint="@color/test_black">
     </ImageView>
 
-    <ImageView
-        android:id="@+id/break_infinity_toggle_imageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/set_infinity_toggle_imageButton"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="15dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:src="@drawable/infinity_icon_red"
-        android:backgroundTint="@color/test_black">
-    </ImageView>
-
     <Button
         android:text="Add"
         android:id="@+id/addRoundToCycleButton"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/subtract_cycle"
-        app:layout_constraintBottom_toTopOf="@id/round_recycler_layout"
-        android:layout_marginBottom="10dp"
+        app:layout_constraintStart_toEndOf="@id/timerValueInEditPopUp"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        android:layout_marginStart="8dp"
         android:textSize="15sp"
         android:gravity="center"
         android:backgroundTint="@color/test_black"
@@ -222,14 +181,14 @@
     </Button>
 
     <Button
-        android:text="Remove"
+        android:text="Rem"
         android:id="@+id/subtract_cycle"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        app:layout_constraintStart_toEndOf="@id/addRoundToCycleButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/round_recycler_layout"
-        android:layout_marginBottom="10dp"
+        app:layout_constraintStart_toEndOf="@id/timerValueInEditPopUp"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:textSize="15sp"
         android:gravity="center"
         android:backgroundTint="@color/test_black"
@@ -238,30 +197,6 @@
         app:strokeColor="@color/black"
         app:strokeWidth="1dp">
     </Button>
-
-    <TextView
-        android:id="@+id/edit_total_sets"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/addRoundToCycleButton"
-        app:layout_constraintStart_toStartOf="parent">
-    </TextView>
-
-    <TextView
-        android:id="@+id/edit_total_breaks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/addRoundToCycleButton"
-        app:layout_constraintEnd_toEndOf="parent">
-    </TextView>
-
-    <TextView
-        android:id="@+id/edit_total_cycles"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/addRoundToCycleButton"
-        app:layout_constraintEnd_toEndOf="parent">
-    </TextView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/round_recycler_layout"

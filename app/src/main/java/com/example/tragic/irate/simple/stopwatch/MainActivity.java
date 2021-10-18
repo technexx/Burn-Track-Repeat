@@ -149,17 +149,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView cycleNameText;
   EditText cycleNameEdit;
-  TextView s1;
-  TextView s2;
-  TextView s3;
-  TextView firstRowTextView;
-  TextView secondRowTextView;
-  TextView thirdRowEditTextView;
+  TextView firstRoundTypeHeaderInEditPopUp;
+  TextView secondRoundTypeHeaderInEditPopUp;
+  TextView thirdRoundTypeHeaderInEditPopUp;
+  TextView timerValueInEditPopUp;
 
   Button addRoundToCycleButton;
   Button SubtractRoundFromCycleButton;
-  ImageView toggleInfinityRoundsForSets;
-  ImageView toggleInfinityRoundsForBreaks;
+  ImageView toggleInfinityRounds;
   View anchorViewForEditRows;
   ImageButton buttonToLaunchTimer;
 
@@ -363,6 +360,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
+
+  //Todo: One textView for all times, switch between set/break/etc, but retain value for each. Issue would be w/ Pom having 8 static rounds.
+
+  //Todo: Work ---- Break ---- Rest
+  //Todo: <Timer Numbers>
+  //Todo: Custom keyboard ---- X and/or Add button
+  //Todo: RecyclerView layout.
 
   //Todo: Have number kb add directly to round in list?
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
@@ -614,23 +618,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     cycleNameText = editCyclesPopupView.findViewById(R.id.cycle_name_text);
     cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
-    s1 = editCyclesPopupView.findViewById(R.id.s1);
-    s2 = editCyclesPopupView.findViewById(R.id.s2);
-    s3 = editCyclesPopupView.findViewById(R.id.s3);
-    firstRowTextView = editCyclesPopupView.findViewById(R.id.firstRowTextView);
-    secondRowTextView = editCyclesPopupView.findViewById(R.id.secondRowTextView);
-    thirdRowEditTextView = editCyclesPopupView.findViewById(R.id.thirdRowEditTextView);
+    firstRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.firstRoundTypeHeaderInEditPopUp);
+    secondRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.secondRoundTypeHeaderInEditPopUp);
+    thirdRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.thirdRoundTypeHeaderInEditPopUp);
+    timerValueInEditPopUp = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUp);
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
     SubtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtract_cycle);
-    toggleInfinityRoundsForSets = editCyclesPopupView.findViewById(R.id.set_infinity_toggle_imageButton);
-    toggleInfinityRoundsForBreaks = editCyclesPopupView.findViewById(R.id.break_infinity_toggle_imageButton);
+    toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.infinity_toggle_imageButton);
     anchorViewForEditRows = editCyclesPopupView.findViewById(R.id.anchorViewForEditRows);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     save_edit_cycle = editCyclesPopupView.findViewById(R.id.save_edit_cycle);
     delete_edit_cycle = editCyclesPopupView.findViewById(R.id.delete_edit_cycle);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
-    toggleInfinityRoundsForSets.setAlpha(0.3f);
-    toggleInfinityRoundsForBreaks.setAlpha(0.3f);
+    toggleInfinityRounds.setAlpha(0.3f);
 
     sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
     sortAlphaEnd = sortCyclePopupView.findViewById(R.id.sort_title_end);
@@ -855,7 +855,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleRecycler.startAnimation(slide_left);
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-    removeEditTimerViews(false);
     defaultEditRoundViews();
 
     //Watches editText title box and passes its value into the String that gets saved/updated in database.
@@ -925,7 +924,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerDisabled = sharedPreferences.getBoolean("modeThreeTimerDisabled", false);
         }
         //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-        removeEditTimerViews(false);
         defaultEditRoundViews();
       }
 
@@ -1049,8 +1047,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
-      //Dismisses editText views if we click within the unpopulated area of popUp. Replaces them w/ textViews.
-      removeEditTimerViews(true);
       //Hides soft keyboard by using a token of the current editCycleView.
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     });
@@ -1258,7 +1254,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return true;
     });
 
-    s1.setOnClickListener(v->{
+    firstRoundTypeHeaderInEditPopUp.setOnClickListener(v->{
       if (mode==1) {
         //Toggles coloring and row selection.
         if (!firstRowHighlighted) {
@@ -1267,14 +1263,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           firstRowHighlighted = true;
           secondRowHighlighted = false;
           //If first row is highlighted, second row should un-highlight.
-          toggleInfinityRoundsForBreaks.setAlpha(0.3f);
-          rowSelect(s1, firstRowTextView, Color.GREEN);
-          rowSelect(s2, secondRowTextView, Color.WHITE);
+          toggleInfinityRounds.setAlpha(0.3f);
+          rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.GREEN);
         }
       }
     });
 
-    s2.setOnClickListener(v-> {
+    secondRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
       if (mode==1) {
         //Toggles coloring and row selection.
         if (!secondRowHighlighted) {
@@ -1282,19 +1277,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           breaksSelected = true;
           secondRowHighlighted = true;
           firstRowHighlighted = false;
-          toggleInfinityRoundsForSets.setAlpha(0.3f);
-          rowSelect(s2, secondRowTextView, Color.RED);
-          rowSelect(s1, firstRowTextView, Color.WHITE);
+          rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.WHITE);
         }
       }
-    });
-
-    toggleInfinityRoundsForSets.setOnClickListener(v -> {
-      if (setsSelected) if (toggleInfinityRoundsForSets.getAlpha()==1.0f) toggleInfinityRoundsForSets.setAlpha(0.3f); else toggleInfinityRoundsForSets.setAlpha(1.0f);
-    });
-
-    toggleInfinityRoundsForBreaks.setOnClickListener(v -> {
-      if (breaksSelected) if (toggleInfinityRoundsForBreaks.getAlpha()==1.0f) toggleInfinityRoundsForBreaks.setAlpha(0.3f); else toggleInfinityRoundsForBreaks.setAlpha(1.0f);
     });
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
@@ -1304,31 +1289,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     SubtractRoundFromCycleButton.setOnClickListener(v -> {
       adjustCustom(false);
-    });
-
-
-
-    //Todo: Probably ain't using this anymore.
-    //Grabs the x-axis value of textView, and uses that determine whether we replace it with the minutes or seconds editText.
-    firstRowTextView.setOnTouchListener((v, event) -> {
-      if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        editTextViewPosX = event.getX();
-      }
-      return true;
-    });
-
-    secondRowTextView.setOnTouchListener((v, event) -> {
-      if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        editTextViewPosX = event.getX();
-      }
-      return true;
-    });
-
-    thirdRowEditTextView.setOnTouchListener((v, event) -> {
-      if (event.getAction()==MotionEvent.ACTION_DOWN) {
-        editTextViewPosX = event.getX();
-      }
-      return true;
     });
 
     ////--EditCycles Menu Item onClicks START--////
@@ -1342,58 +1302,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         addRoundToCycleButton.setClickable(true);
         SubtractRoundFromCycleButton.setClickable(true);
-      }
-    };
-
-    changeFirstValue = new Runnable() {
-      @Override
-      public void run() {
-        switch (mode) {
-          case 1:
-            if (incrementValues) setValue += 1; else setValue -= 1;
-            prefEdit.putInt("setValue", setValue);
-            break;
-          case 3:
-            if (incrementValues) pomValue1 += 5;
-            else pomValue1 -= 5;
-            break;
-        }
-        mHandler.postDelayed(this, incrementTimer * 10);
-        setTimerValueBounds();
-        fadeCap(firstRowTextView);
-        prefEdit.apply();
-      }
-    };
-
-    changeSecondValue = new Runnable() {
-      @Override
-      public void run() {
-        switch (mode) {
-          case 1:
-            if (incrementValues) breakValue += 1;
-            else breakValue -= 1;
-            break;
-          case 3:
-            if (incrementValues) pomValue2 += 5;
-            else pomValue2 -= 5;
-            break;
-        }
-        mHandler.postDelayed(this, incrementTimer * 10);
-        setTimerValueBounds();
-        fadeCap(secondRowTextView);
-        prefEdit.apply();
-      }
-    };
-
-    changeThirdValue = new Runnable() {
-      @Override
-      public void run() {
-        if (incrementValues) pomValue3 += 5;
-        else pomValue3 -= 5;
-        mHandler.postDelayed(this, incrementTimer*10);
-        setTimerValueBounds();
-        fadeCap(thirdRowEditTextView);
-        prefEdit.apply();
       }
     };
 
@@ -2159,15 +2067,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Default selection of Set.
       firstRowHighlighted = true;
       secondRowHighlighted = false;
-      rowSelect(s1, firstRowTextView, Color.GREEN);
-      rowSelect(s2, secondRowTextView, Color.WHITE);
-      firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
-      secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
+      rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.GREEN);
+      timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
     }
     else if (mode==3) {
-      rowSelect(s1, firstRowTextView, Color.WHITE);
-      rowSelect(s2, secondRowTextView, Color.WHITE);
-      rowSelect(s3, thirdRowEditTextView, Color.WHITE);
+      rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.WHITE);
     }
   }
 
@@ -2360,16 +2264,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Sets all of our editTexts to Invisible.
-  public void removeEditTimerViews(boolean reinstateText){
-    //Replaces editTexts w/ textViews if desired.
-    if (reinstateText) {
-      if (mode==1 || mode==3) firstRowTextView.setVisibility(View.VISIBLE);
-      if (mode==3) thirdRowEditTextView.setVisibility(View.VISIBLE);
-      secondRowTextView.setVisibility(View.VISIBLE);
-    }
-  }
-
   public void defaultEditRoundViews() {
     //Instance of layout objects we can set programmatically based on which mode we're on.
     ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
@@ -2381,19 +2275,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(260);
         //All shared visibilities between modes 1 and 2.
-        s2.setVisibility(View.VISIBLE);
-        s3.setVisibility(View.GONE);
-        toggleInfinityRoundsForSets.setVisibility(View.VISIBLE);
-        toggleInfinityRoundsForBreaks.setVisibility(View.VISIBLE);
-        secondRowTextView.setVisibility(View.VISIBLE);
+        secondRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
+        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
+        toggleInfinityRounds.setVisibility(View.VISIBLE);
         //Shared String between modes 1 and 2.
-        s2.setText(R.string.break_time);
-        s1.setVisibility(View.VISIBLE);
-        firstRowTextView.setVisibility(View.VISIBLE);
+        secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
+        firstRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
+        timerValueInEditPopUp.setVisibility(View.VISIBLE);
         //Strings and values exclusive to mode 1.
-        s1.setText(R.string.set_time);
-        firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
-        secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(breakValue));
+        firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
+        timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
         addParams.bottomMargin = convertScalablePixelsToDensity(32);
         subParams.bottomMargin = convertScalablePixelsToDensity(32);
         roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(18);
@@ -2401,19 +2292,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 3:
         roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(240);
         //Visibilities and values exclusive to mode 3.
-        s1.setVisibility(View.VISIBLE);
-        s3.setVisibility(View.VISIBLE);
-        firstRowTextView.setVisibility(View.VISIBLE);
-        secondRowTextView.setVisibility(View.VISIBLE);
-        thirdRowEditTextView.setVisibility(View.VISIBLE);
-        toggleInfinityRoundsForSets.setVisibility(View.GONE);
-        toggleInfinityRoundsForBreaks.setVisibility(View.GONE);
-        s1.setText(R.string.work_time);
-        s2.setText(R.string.small_break);
-        s3.setText(R.string.long_break);
-        firstRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
-        secondRowTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue2));
-        thirdRowEditTextView.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue3));
+        firstRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
+        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
+        timerValueInEditPopUp.setVisibility(View.VISIBLE);
+        toggleInfinityRounds.setVisibility(View.GONE);
+        firstRoundTypeHeaderInEditPopUp.setText(R.string.work_time);
+        secondRoundTypeHeaderInEditPopUp.setText(R.string.small_break);
+        thirdRoundTypeHeaderInEditPopUp.setText(R.string.long_break);
+        timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
         addParams.bottomMargin = convertScalablePixelsToDensity(20);
         subParams.bottomMargin = convertScalablePixelsToDensity(20);
         roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(10);
@@ -2432,11 +2318,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) {
         if (workoutTime.size()<16) {
           //If Sets are highlighted green, check if its infinity mode is also highlighted. Use 1/2 for yes/no.
-          if (s1.getCurrentTextColor()==Color.GREEN)
-            if (toggleInfinityRoundsForSets.getAlpha()!=1.0f) roundType = 1; else roundType = 2;
+          if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN)
+            if (toggleInfinityRounds.getAlpha()!=1.0f) roundType = 1; else roundType = 2;
           //If Breaks are highlighted red, check if its infinity mode is also highlighted. Use 3/4 for yes/no.
-          if (s2.getCurrentTextColor()==Color.RED)
-            if (toggleInfinityRoundsForBreaks.getAlpha()!=1.0f) roundType = 3; else roundType = 4;
+          if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED)
+            if (toggleInfinityRounds.getAlpha()!=1.0f) roundType = 3; else roundType = 4;
           //Adds OR replaces (depending on if a round is selected) values in both Integer (timer) Array and String (display) lists.
           switch (roundType) {
             case 1:
@@ -2946,37 +2832,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean roundSecondsUp) {
     if (mode==1) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1: case 2:
-          totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
-          long setRemainder = totalCycleSetTimeInMillis%1000;
-          if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
-          else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
-          cycleSetTimeForSingleRoundInMillis = 0;
-          break;
-        case 3: case 4:
-          totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
-          long breakRemainder = totalCycleBreakTimeInMillis%1000;
-          if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
-          else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
-          cycleBreakTimeForSingleRoundInMillis = 0;
-          break;
+      if (typeOfRound.size()>0) {
+        switch (typeOfRound.get(currentRound)) {
+          case 1: case 2:
+            totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
+            long setRemainder = totalCycleSetTimeInMillis%1000;
+            if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
+            else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+            cycleSetTimeForSingleRoundInMillis = 0;
+            break;
+          case 3: case 4:
+            totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
+            long breakRemainder = totalCycleBreakTimeInMillis%1000;
+            if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
+            else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+            cycleBreakTimeForSingleRoundInMillis = 0;
+            break;
+        }
       }
+
     }
     if (mode==3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
-          long setRemainder = totalCycleSetTimeInMillis%1000;
-          if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
-          else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
-          break;
-        case 1: case 3: case 5: case 7:
-          totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
-          long breakRemainder = totalCycleBreakTimeInMillis%1000;
-          if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
-          else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
-          break;
+      if (pomDotCounter>0) {
+        switch (pomDotCounter) {
+          case 0: case 2: case 4: case 6:
+            totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
+            long setRemainder = totalCycleSetTimeInMillis%1000;
+            if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
+            else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+            break;
+          case 1: case 3: case 5: case 7:
+            totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
+            long breakRemainder = totalCycleBreakTimeInMillis%1000;
+            if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
+            else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+            break;
+        }
       }
     }
   }
