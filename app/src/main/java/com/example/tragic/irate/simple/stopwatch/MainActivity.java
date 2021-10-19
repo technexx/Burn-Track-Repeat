@@ -367,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Custom keyboard ---- X and/or Add button
   //Todo: RecyclerView layout.
 
+  //Todo: Dismissing edit popUp should auto-save cycle, now that manual save header is gone.
   //Todo: Timer can sometimes launch w/ empty rounds in edit causing oob index exception
   //Todo: Have number kb add directly to round in list?
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
@@ -2236,12 +2237,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         secondRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
         secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
 
-        roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(260);
-
-        addParams.bottomMargin = convertScalablePixelsToDensity(32);
-        subParams.bottomMargin = convertScalablePixelsToDensity(32);
-        roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(18);
-
         secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
         firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
         timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
@@ -2257,12 +2252,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
         thirdRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
         thirdRoundHeaderParams.startToEnd = R.id.secondRoundTypeHeaderInEditPopUp;
-
-        roundRecyclerLayoutParams.height = convertScalablePixelsToDensity(240);
-
-        addParams.bottomMargin = convertScalablePixelsToDensity(20);
-        subParams.bottomMargin = convertScalablePixelsToDensity(20);
-        roundRecyclerLayoutParams.bottomMargin = convertScalablePixelsToDensity(10);
 
         firstRoundTypeHeaderInEditPopUp.setText(R.string.work_time);
         secondRoundTypeHeaderInEditPopUp.setText(R.string.small_break);
