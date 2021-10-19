@@ -159,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Button addRoundToCycleButton;
   Button SubtractRoundFromCycleButton;
   ImageView toggleInfinityRounds;
-  View anchorViewForEditRows;
   ImageButton buttonToLaunchTimer;
 
   ArrayList<Integer> workoutTime;
@@ -627,7 +626,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
     SubtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtract_cycle);
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.infinity_toggle_imageButton);
-    anchorViewForEditRows = editCyclesPopupView.findViewById(R.id.anchorViewForEditRows);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     toggleInfinityRounds.setAlpha(0.3f);
@@ -950,8 +948,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setOnClickListener(v -> {
       fab.setEnabled(false);
       buttonToLaunchTimer.setEnabled(true);
-      //Default row selection.
-      resetRows();
       cycleNameEdit.getText().clear();
       isNewCycle = true;
       //Clears round adapter arrays so they can be freshly populated.
@@ -1092,8 +1088,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //No potential index issues here, so enable timer start.
       buttonToLaunchTimer.setEnabled(true);
       currentlyEditingACycle = true;
-      //Default row selection.
-      resetRows();
       //Used when deciding whether to save a new cycle or retrieve/update a current one. Editing will always pull an existing one.
       isNewCycle = false;
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
@@ -1219,7 +1213,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           secondRowHighlighted = false;
           //If first row is highlighted, second row should un-highlight.
           toggleInfinityRounds.setAlpha(0.3f);
-          rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.GREEN);
+          timerValueInEditPopUp.setTextColor(Color.GREEN);
+          firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
+          secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
         }
       }
     });
@@ -1232,7 +1228,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           breaksSelected = true;
           secondRowHighlighted = true;
           firstRowHighlighted = false;
-          rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.WHITE);
+          secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
+          timerValueInEditPopUp.setTextColor(Color.RED);
+          firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
         }
       }
     });
@@ -2014,26 +2012,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
     if (mode==1) if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
     if (mode==3) if (pomArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
-  }
-
-  //Resets row selection and editText/textView values.
-  public void resetRows() {
-    if (mode==1) {
-      //Default selection of Set.
-      firstRowHighlighted = true;
-      secondRowHighlighted = false;
-      rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.GREEN);
-      timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
-    }
-    else if (mode==3) {
-      rowSelect(firstRoundTypeHeaderInEditPopUp, timerValueInEditPopUp, Color.WHITE);
-    }
-  }
-
-  //Colors rows.
-  public void rowSelect(TextView header, TextView textVal, int color) {
-    header.setTextColor(color);
-    textVal.setTextColor(color);
   }
 
   //Fades action bar buttons in/out depending on whether we are editing cycles or not.
