@@ -124,6 +124,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow editCyclesPopupWindow;
   PopupWindow settingsPopupWindow;
 
+  TextView number_one;
+  TextView number_two;
+  TextView number_three;
+  TextView number_four;
+  TextView number_five;
+  TextView number_six;
+  TextView number_seven;
+  TextView number_eight;
+  TextView number_nine;
+  TextView number_zero;
+
   TextView sortAlphaStart;
   TextView sortAlphaEnd;
   TextView sortRecent;
@@ -597,6 +608,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupView = inflater.inflate(R.layout.sidebar_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
+    number_one = editCyclesPopupView.findViewById(R.id.one_button);
+    number_two = editCyclesPopupView.findViewById(R.id.two_button);
+    number_three = editCyclesPopupView.findViewById(R.id.three_button);
+    number_four = editCyclesPopupView.findViewById(R.id.four_button);
+    number_five = editCyclesPopupView.findViewById(R.id.five_button);
+    number_six = editCyclesPopupView.findViewById(R.id.six_button);
+    number_seven = editCyclesPopupView.findViewById(R.id.seven_button);
+    number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
+    number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
+    number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
+
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
@@ -998,6 +1020,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortNotRecent.setOnClickListener(sortListener);
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
+
+    View.OnClickListener numberPadListener = view -> {
+
+    };
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
