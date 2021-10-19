@@ -3,10 +3,12 @@ package com.example.tragic.irate.simple.stopwatch;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +27,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -136,8 +139,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton cancelHighlight;
   TextView sortButton;
   ImageView global_settings;
-  TextView save_edit_cycle;
-  TextView delete_edit_cycle;
 
   int mode = 1;
   int savedMode = 1;
@@ -359,12 +360,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   static boolean notificationDismissed = true;
 
   //Todo: One textView for all times, switch between set/break/etc, but retain value for each. Issue would be w/ Pom having 8 static rounds.
+  //Todo: Box selection, default box on Sets.
 
   //Todo: Work ---- Break ---- Rest
   //Todo: <Timer Numbers>
   //Todo: Custom keyboard ---- X and/or Add button
   //Todo: RecyclerView layout.
 
+  //Todo: Timer can sometimes launch w/ empty rounds in edit causing oob index exception
   //Todo: Have number kb add directly to round in list?
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
@@ -625,8 +628,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.infinity_toggle_imageButton);
     anchorViewForEditRows = editCyclesPopupView.findViewById(R.id.anchorViewForEditRows);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
-    save_edit_cycle = editCyclesPopupView.findViewById(R.id.save_edit_cycle);
-    delete_edit_cycle = editCyclesPopupView.findViewById(R.id.delete_edit_cycle);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     toggleInfinityRounds.setAlpha(0.3f);
 
@@ -866,11 +867,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void afterTextChanged(Editable s) {
         cycleTitle = cycleNameEdit.getText().toString();
-        //If round list in current mode is at least 1 and title has been changed, enable save button.
-        if ((mode==1 && workoutTime.size()>0) || ((mode==3 && pomValuesTime.size()>0))) {
-          if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
-          if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
-        }
       }
     };
 
@@ -953,9 +949,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setOnClickListener(v -> {
       fab.setEnabled(false);
       buttonToLaunchTimer.setEnabled(true);
-      //Default disabled state of edited cycle save, if nothing has changed.
-      save_edit_cycle.setEnabled(false);
-      save_edit_cycle.setAlpha(0.3f);
       //Default row selection.
       resetRows();
       cycleNameEdit.getText().clear();
@@ -1160,9 +1153,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleRoundsAdapter.notifyDataSetChanged();
         cycleRoundsAdapterTwo.notifyDataSetChanged();
       });
-      //Default disabled state of edited cycle save, if nothing has changed.
-      save_edit_cycle.setEnabled(false);
-      save_edit_cycle.setAlpha(0.3f);
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -1202,40 +1192,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==3) savedPomCycleAdapter.removeHighlight(true);
       Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
 
-    });
-
-    delete_edit_cycle.setOnClickListener(v-> {
-      //If on a saved edit cycle, delete it from database. Otherwise, simply clear the adapter array lists since nothing is actually saved.
-      if (!isNewCycle) {
-        positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
-        AsyncTask.execute(deleteSingleCycleASyncRunnable);
-        editCycleArrayLists(DELETING_CYCLE);
-      } else clearRoundAdapterArrays();
-      editCyclesPopupWindow.dismiss();
-      Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-    });
-
-    delete_all_confirm.setOnClickListener(v-> {
-      //Removes confirmation window.
-      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
-      AsyncTask.execute(() -> {
-        if (delete_all_text.getText().toString().equals(getString(R.string.delete_total_times))) AsyncTask.execute(deleteTotalCycleTimesASyncRunnable);
-        else if (delete_all_text.getText().toString().equals(getString(R.string.delete_all_cycles))) AsyncTask.execute(deleteAllCyclesASyncRunnable);
-      });
-    });
-
-    delete_all_cancel.setOnClickListener(v-> {
-      //Removes confirmation window.
-      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
-    });
-
-    save_edit_cycle.setOnClickListener(v-> {
-      AsyncTask.execute(saveCyclesASyncRunnable);
-      //Disables save button. Any change in rounds or title will re-activate it.
-      save_edit_cycle.setEnabled(false);
-      save_edit_cycle.setAlpha(0.3f);
-      if (mode==1) savedCycleAdapter.notifyDataSetChanged(); if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
-      Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
     });
 
     //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
@@ -2324,9 +2280,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
-      //Enables save button now that cycle values have changed, or disables it if rounds @ 0.
-      if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
-      if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
         if (workoutTime.size()<16) {
@@ -2374,13 +2327,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     } else {
       if (mode==1) {
-        if (workoutTime.size()>1) {
-          if (!save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(true);
-          if (save_edit_cycle.getAlpha()!=1) save_edit_cycle.setAlpha(1.0f);
-        } else {
-          if (save_edit_cycle.isEnabled()) save_edit_cycle.setEnabled(false);
-          if (save_edit_cycle.getAlpha()==1) save_edit_cycle.setAlpha(0.3f);
-        }
         //removeRound is called at end of fade set below. Here, we overwrite that and remove it beforehand if user clicks before fade is done.
         if (subtractedRoundIsFading) removeRound();
 

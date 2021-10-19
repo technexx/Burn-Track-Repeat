@@ -6,63 +6,6 @@
     android:background="@color/test_black"
     android:id="@+id/edit_cycle_layout">
 
-    <View
-        android:id="@+id/edit_header"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/edit_cycles_header">
-    </View>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_header"
-        android:background="@color/test_grey">
-    </View>
-
-    <TextView
-        android:text="Save"
-        android:id="@+id/save_edit_cycle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/delete_edit_cycle"
-        android:layout_marginTop="12sp"
-        android:layout_marginEnd="24dp"
-        android:textColor="@color/white"
-        android:fontFamily="@font/roboto_medium"
-        android:textSize="18sp">
-    </TextView>
-
-    <View
-        android:layout_width="1dp"
-        android:layout_height="22dp"
-        android:layout_marginTop="2dp"
-        app:layout_constraintTop_toTopOf="@id/save_edit_cycle"
-        app:layout_constraintBottom_toBottomOf="@id/save_edit_cycle"
-        app:layout_constraintStart_toEndOf="@id/save_edit_cycle"
-        app:layout_constraintEnd_toStartOf="@id/delete_edit_cycle"
-        android:background="@color/white"
-        android:backgroundTint="@color/white">
-    </View>
-
-    <TextView
-        android:text="Delete"
-        android:id="@+id/delete_edit_cycle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12sp"
-        android:layout_marginEnd="16dp"
-        android:textColor="@color/white"
-        android:fontFamily="@font/roboto_medium"
-        android:textSize="18sp">
-    </TextView>
-
     <TextView
         android:id="@+id/cycle_name_text"
         android:layout_width="wrap_content"
@@ -70,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="2dp"
         android:textColor="@color/black"
         android:textSize="22sp">
     </TextView>
@@ -83,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="2dp"
         android:textColorHint="@color/circular_progress_default_subtitle"
         android:textColor="@color/white"
         android:textSize="22sp"
