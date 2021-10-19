@@ -28,6 +28,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -608,16 +609,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupView = inflater.inflate(R.layout.sidebar_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
-    number_one = editCyclesPopupView.findViewById(R.id.one_button);
-    number_two = editCyclesPopupView.findViewById(R.id.two_button);
-    number_three = editCyclesPopupView.findViewById(R.id.three_button);
-    number_four = editCyclesPopupView.findViewById(R.id.four_button);
-    number_five = editCyclesPopupView.findViewById(R.id.five_button);
-    number_six = editCyclesPopupView.findViewById(R.id.six_button);
-    number_seven = editCyclesPopupView.findViewById(R.id.seven_button);
-    number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
-    number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
-    number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
+//    number_one = editCyclesPopupView.findViewById(R.id.one_button);
+//    number_two = editCyclesPopupView.findViewById(R.id.two_button);
+//    number_three = editCyclesPopupView.findViewById(R.id.three_button);
+//    number_four = editCyclesPopupView.findViewById(R.id.four_button);
+//    number_five = editCyclesPopupView.findViewById(R.id.five_button);
+//    number_six = editCyclesPopupView.findViewById(R.id.six_button);
+//    number_seven = editCyclesPopupView.findViewById(R.id.seven_button);
+//    number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
+//    number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
+//    number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
+
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
