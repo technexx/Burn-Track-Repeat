@@ -97,7 +97,7 @@
         android:layout_marginStart="6dp"
         android:layout_marginTop="16sp"
         android:src="@drawable/cancel_x"
-        android:background="@color/test_black">
+        android:background="@drawable/ripple_effect_2">
     </ImageButton>
 
     <ImageView
