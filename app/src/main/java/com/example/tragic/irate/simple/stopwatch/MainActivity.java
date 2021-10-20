@@ -1029,7 +1029,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View.OnClickListener numberPadListener = view -> {
       TextView textButton = (TextView) view;
 
-      if (editPopUpTimerArray.size()<=4) {
+      if (editPopUpTimerArray.size()<=3) {
         for (int i=0; i<10; i++)  {
           if (textButton.getText().equals(String.valueOf(i))) {
             editPopUpTimerArray.add(String.valueOf(i));
@@ -1037,7 +1037,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
       setEditPopUpTimerValues();
-
     };
 
     number_one.setOnClickListener(numberPadListener);
@@ -1846,7 +1845,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     for (int i=0; i<editPopUpTimerArray.size(); i++) {
       //Third index of timeLeft list is colon, so we never want to replace it.
-      if (i!=2) {
+      if (i<2) {
         timeLeft.set(i, editPopUpTimerArray.get(i));
       } else {
         timeLeft.set(i+1, editPopUpTimerArray.get(i));
