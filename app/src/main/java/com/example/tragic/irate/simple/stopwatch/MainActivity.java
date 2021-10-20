@@ -207,11 +207,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int pomValue1;
   int pomValue2;
   int pomValue3;
-  int incrementTimer = 10;
-  boolean minReached;
-  boolean maxReached;
-  boolean firstRowHighlighted;
-  boolean secondRowHighlighted;
+  int editHeaderSelected = 1;
 
   Handler mHandler;
   boolean currentlyEditingACycle;
@@ -1264,11 +1260,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     firstRoundTypeHeaderInEditPopUp.setOnClickListener(v->{
       if (mode==1) {
         //Toggles coloring and row selection.
-        if (!firstRowHighlighted) {
+        if (editHeaderSelected == 2) {
           breaksSelected = false;
           setsSelected = true;
-          firstRowHighlighted = true;
-          secondRowHighlighted = false;
+          editHeaderSelected = 1;
           //If first row is highlighted, second row should un-highlight.
           toggleInfinityRounds.setAlpha(0.3f);
           timerValueInEditPopUp.setTextColor(Color.GREEN);
@@ -1281,11 +1276,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     secondRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
       if (mode==1) {
         //Toggles coloring and row selection.
-        if (!secondRowHighlighted) {
+        if (editHeaderSelected == 1) {
           setsSelected = false;
           breaksSelected = true;
-          secondRowHighlighted = true;
-          firstRowHighlighted = false;
+          editHeaderSelected = 2;
           secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
           timerValueInEditPopUp.setTextColor(Color.RED);
           firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
@@ -1833,9 +1827,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Takes an extra click to iterate over colon.
   public void setEditPopUpTimerValues() {
-    String timeBase = "00:00";
+    String timeBase;
     List<String> timeLeft = new ArrayList<>();
     timeLeft.add("0");
     timeLeft.add("0");
@@ -1852,8 +1845,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     timeBase = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0);
-
     timerValueInEditPopUp.setText(timeBase);
+
+    int totalMinutes = Integer.parseInt(timeLeft.get(4) + timeLeft.get(3));
+    int totalSeconds = Integer.parseInt(timeLeft.get(1) + timeLeft.get(0));
+    if (totalSeconds>60) {
+      totalSeconds = totalSeconds%60;
+      totalMinutes +=1;
+    }
+    int totalTime = (totalMinutes*60) + totalSeconds;
+
+    setTimerValueBoundsFormula(totalTime);
+    Log.i("testTime", "setValue is " + setValue);
+    Log.i("testTime", "breakValue is " + breakValue);
+  }
+
+  public void capAndStoreEditPopUpTimerValues() {
+
   }
 
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
@@ -2131,58 +2139,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertedPomList.clear();
   }
 
-  //Todo: This should stay implemented differently.
-  //Sets min/max bounds on timer values. MUST be separate from setEditValues() so it can be called w/ in our +/- increment runnable and not b0rk the values.
-  public void setTimerValueBounds() {
+  public void setTimerValueBoundsFormula(int value) {
     switch (mode) {
       case 1:
-        toastBounds(5, 300, setValue);
-        toastBounds(5, 300, breakValue);
-        if (setValue < 5) setValue = 5;
-        if (breakValue < 5) breakValue = 5;
-        if (setValue > 300) setValue = 300;
-        if (breakValue > 300) breakValue = 300;
+        if (editHeaderSelected==1) setValue = timerValueBoundsFormula(5, 1200, value);
+        if (editHeaderSelected==2) breakValue = timerValueBoundsFormula(5, 1200, value);
         break;
       case 3:
-        toastBounds(900, 5400, pomValue1);
-        toastBounds(180, 600, pomValue2);
-        toastBounds(600, 1800, pomValue3);
-        if (pomValue1 > 5400) pomValue1 = 5400;
-        if (pomValue1 < 900) pomValue1 = 900;
-        if (pomValue2 > 600) pomValue2 = 600;
-        if (pomValue2 < 180) pomValue2 = 180;
-        if (pomValue3 < 600) pomValue3 = 600;
-        if (pomValue3 > 1800) pomValue3 = 1800;
+        if (editHeaderSelected==1) pomValue1 = timerValueBoundsFormula(900, 5400, value);
+        if (editHeaderSelected==2) pomValue2 = timerValueBoundsFormula(180, 600, value);
+        if (editHeaderSelected==3) pomValue3 = timerValueBoundsFormula(600, 1800, value);
         break;
     }
   }
 
-  public long convertEditTextToLong(EditText editVar) {
-    if (!editVar.getText().toString().equals("")) {
-      return Long.parseLong(editVar.getText().toString());
-    } else return 0;
-  }
-
-  public void toastBounds(long min, long max, long value) {
-    if (value < min) minReached = true;
-    if (value > max) maxReached = true;
-  }
-
-  //Creates fade effect if reaching min/max of timer values.
-  public void fadeCap(TextView textView) {
-    if (minReached || maxReached) {
-      minReached = false;
-      maxReached = false;
-      Animation fadeCap = new AlphaAnimation(1.0f, 0.3f);
-      fadeCap.setDuration(350);
-      textView.setAnimation(fadeCap);
-    }
-  }
-
-  public String elongateEditSeconds(long seconds) {
-    String temp = String.valueOf(seconds);
-    if (temp.length()<2) temp = "0" + temp;
-    return temp;
+  public int timerValueBoundsFormula(int min, int max, int value) {
+    if (value < min) return min;
+    else if (value > max) return max;
+    else return value;
   }
 
   //Conversion of Long->String for CIRCLE TIMER textViews.
