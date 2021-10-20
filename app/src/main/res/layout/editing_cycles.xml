@@ -88,6 +88,18 @@
         android:textSize="36sp">
     </TextView>
 
+    <ImageButton
+        android:id="@+id/delete_edit_popUp_timer_numbers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/timerValueInEditPopUp"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="16sp"
+        android:src="@drawable/cancel_x"
+        android:background="@color/test_black">
+    </ImageButton>
+
     <ImageView
         android:id="@+id/infinity_toggle_imageButton"
         android:layout_width="wrap_content"
@@ -107,7 +119,7 @@
     <Button
         android:text="A"
         android:id="@+id/addRoundToCycleButton"
-        android:layout_width="20dp"
+        android:layout_width="40dp"
         android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
@@ -124,7 +136,7 @@
     <Button
         android:text="S"
         android:id="@+id/subtract_cycle"
-        android:layout_width="20dp"
+        android:layout_width="40dp"
         android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"

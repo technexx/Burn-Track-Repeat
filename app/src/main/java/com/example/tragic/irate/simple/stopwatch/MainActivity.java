@@ -72,6 +72,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow editCyclesPopupWindow;
   PopupWindow settingsPopupWindow;
 
+  ImageButton delete_edit_popUp_timer_numbers;
   TextView number_one;
   TextView number_two;
   TextView number_three;
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView number_eight;
   TextView number_nine;
   TextView number_zero;
+  ArrayList<String> editPopUpTimerArray;
 
   TextView sortAlphaStart;
   TextView sortAlphaEnd;
@@ -204,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int pomValue1;
   int pomValue2;
   int pomValue3;
-  boolean incrementValues;
   int incrementTimer = 10;
   boolean minReached;
   boolean maxReached;
@@ -212,8 +214,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean secondRowHighlighted;
 
   Handler mHandler;
-  Runnable valueSpeed;
-  Runnable adjustRoundDelay;
   boolean currentlyEditingACycle;
   InputMethodManager inputMethodManager;
 
@@ -609,17 +609,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupView = inflater.inflate(R.layout.sidebar_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
-//    number_one = editCyclesPopupView.findViewById(R.id.one_button);
-//    number_two = editCyclesPopupView.findViewById(R.id.two_button);
-//    number_three = editCyclesPopupView.findViewById(R.id.three_button);
-//    number_four = editCyclesPopupView.findViewById(R.id.four_button);
-//    number_five = editCyclesPopupView.findViewById(R.id.five_button);
-//    number_six = editCyclesPopupView.findViewById(R.id.six_button);
-//    number_seven = editCyclesPopupView.findViewById(R.id.seven_button);
-//    number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
-//    number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
-//    number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
-
+    delete_edit_popUp_timer_numbers = editCyclesPopupView.findViewById(R.id.delete_edit_popUp_timer_numbers);
+    number_one = editCyclesPopupView.findViewById(R.id.one_button);
+    number_two = editCyclesPopupView.findViewById(R.id.two_button);
+    number_three = editCyclesPopupView.findViewById(R.id.three_button);
+    number_four = editCyclesPopupView.findViewById(R.id.four_button);
+    number_five = editCyclesPopupView.findViewById(R.id.five_button);
+    number_six = editCyclesPopupView.findViewById(R.id.six_button);
+    number_seven = editCyclesPopupView.findViewById(R.id.seven_button);
+    number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
+    number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
+    number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
+    editPopUpTimerArray = new ArrayList<>();
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -712,6 +713,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     inputMethodManager =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
+
+    timerValueInEditPopUp.setText("00:00");
 
     //Default values in WHOLE seconds. Multiplied * 1000 for our millis values.
     setValue = sharedPreferences.getInt("setValue", 30);
@@ -1024,8 +1027,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setOnClickListener(sortListener);
 
     View.OnClickListener numberPadListener = view -> {
+      TextView textButton = (TextView) view;
 
+      //Todo: This should go in method, not onClick.
+      if (editPopUpTimerArray.size()<=4) {
+        for (int i=0; i<10; i++)  {
+          if (textButton.getText().equals(String.valueOf(i))) {
+            editPopUpTimerArray.add(String.valueOf(i));
+          }
+        }
+        setEditPopUpTimerValues();
+      }
     };
+
+    number_one.setOnClickListener(numberPadListener);
+    number_two.setOnClickListener(numberPadListener);
+    number_three.setOnClickListener(numberPadListener);
+    number_four.setOnClickListener(numberPadListener);
+    number_five.setOnClickListener(numberPadListener);
+    number_six.setOnClickListener(numberPadListener);
+    number_seven.setOnClickListener(numberPadListener);
+    number_eight.setOnClickListener(numberPadListener);
+    number_nine.setOnClickListener(numberPadListener);
+    number_zero.setOnClickListener(numberPadListener);
+
+    delete_edit_popUp_timer_numbers.setOnClickListener(v-> {
+      if (editPopUpTimerArray.size()>0) {
+        editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
+      }
+    });
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
@@ -1277,22 +1307,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
       launchTimerCycle(true);
     });
-
-    adjustRoundDelay = new Runnable() {
-      @Override
-      public void run() {
-        addRoundToCycleButton.setClickable(true);
-        SubtractRoundFromCycleButton.setClickable(true);
-      }
-    };
-
-    valueSpeed = new Runnable() {
-      @Override
-      public void run() {
-        if (incrementTimer > 1) incrementTimer -= 1;
-        mHandler.postDelayed(this, 300);
-      }
-    };
 
     //Listens to our fadeOut animation, and runs fadeIn when it's done.
     fadeProgressOut.setAnimationListener(new Animation.AnimationListener() {
@@ -1632,9 +1646,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
           }
           runOnUiThread(()->{
-//            Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
-//            anim.setDuration(1000);
-//            savedCycleRecycler.startAnimation(anim);
             savedCycleAdapter.notifyDataSetChanged();
           });
         }
@@ -1820,6 +1831,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
     };
+  }
+
+  public void setEditPopUpTimerValues() {
+    String timeBase = "00:00";
+    List<String> timeLeft = new ArrayList<>();
+    timeLeft.add("0");
+    timeLeft.add("0");
+    timeLeft.add(":");
+    timeLeft.add("0");
+    timeLeft.add("0");
+
+    for (int i=0; i<editPopUpTimerArray.size(); i++) {
+      //Third index of timeLeft list is colon, so we never want to replace it.
+      if (i!=2) {
+        timeLeft.set(i, editPopUpTimerArray.get(i));
+      }
+    }
+    timeBase = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0);
+
+    timerValueInEditPopUp.setText(timeBase);
   }
 
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
@@ -2029,10 +2060,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
-  public int convertScalablePixelsToDensity(float pixels) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
-  }
-
   public int convertDensityPixelsToScalable(float pixels) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
@@ -2099,21 +2126,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomValuesTime.clear();
 
     convertedPomList.clear();
-  }
-
-  //Calls runnables to change set, break and pom values. Sets a handler to increase change rate based on click length. Sets min/max values.
-  public void setIncrements(MotionEvent event, Runnable runnable) {
-    switch (event.getAction()) {
-      case MotionEvent.ACTION_DOWN:
-        //Handler must not be instantiated before this, otherwise the runnable will execute it on every touch (i.e. even on "action_up" removal.
-        mHandler.postDelayed(runnable, 25);
-        mHandler.postDelayed(valueSpeed, 25);
-
-        break;
-      case MotionEvent.ACTION_UP:
-        mHandler.removeCallbacksAndMessages(null);
-        incrementTimer = 10;
-    }
   }
 
   //Todo: This should stay implemented differently.
@@ -2245,7 +2257,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
         firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
-        timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(setValue));
 
         thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
         toggleInfinityRounds.setVisibility(View.VISIBLE);
@@ -2262,7 +2273,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRoundTypeHeaderInEditPopUp.setText(R.string.work_time);
         secondRoundTypeHeaderInEditPopUp.setText(R.string.small_break);
         thirdRoundTypeHeaderInEditPopUp.setText(R.string.long_break);
-        timerValueInEditPopUp.setText(convertTimeToStringWithFullMinuteAndSecondValues(pomValue1));
 
         timerValueInEditPopUp.setVisibility(View.VISIBLE);
         toggleInfinityRounds.setVisibility(View.GONE);
