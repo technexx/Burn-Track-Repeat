@@ -811,6 +811,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
     LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
+    setEditPopUpTimerHeaders(1);
     instantiateNotifications();
 
     AsyncTask.execute(() -> {
@@ -1259,32 +1260,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     firstRoundTypeHeaderInEditPopUp.setOnClickListener(v->{
       if (mode==1) {
-        //Toggles coloring and row selection.
-        if (editHeaderSelected == 2) {
-          breaksSelected = false;
-          setsSelected = true;
-          editHeaderSelected = 1;
-          //If first row is highlighted, second row should un-highlight.
-          toggleInfinityRounds.setAlpha(0.3f);
-          timerValueInEditPopUp.setTextColor(Color.GREEN);
-          firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
-          secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-        }
+        setEditPopUpTimerHeaders(1);
       }
     });
 
     secondRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
-      if (mode==1) {
-        //Toggles coloring and row selection.
-        if (editHeaderSelected == 1) {
-          setsSelected = false;
-          breaksSelected = true;
-          editHeaderSelected = 2;
-          secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
-          timerValueInEditPopUp.setTextColor(Color.RED);
-          firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-        }
-      }
+      setEditPopUpTimerHeaders(2);
     });
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
@@ -1825,6 +1806,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
     };
+  }
+
+  public void setEditPopUpTimerHeaders(int headerToSelect) {
+    if (mode==1) {
+      //Toggles coloring and row selection.
+      if (headerToSelect == 1) {
+        breaksSelected = false;
+        setsSelected = true;
+        editHeaderSelected = 1;
+        //If first row is highlighted, second row should un-highlight.
+        toggleInfinityRounds.setAlpha(0.3f);
+        timerValueInEditPopUp.setTextColor(Color.GREEN);
+        firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
+        secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      }
+      if (headerToSelect == 2) {
+        setsSelected = false;
+        breaksSelected = true;
+        editHeaderSelected = 2;
+        secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
+        timerValueInEditPopUp.setTextColor(Color.RED);
+        firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+        }
+    }
   }
 
   public void setEditPopUpTimerValues() {
