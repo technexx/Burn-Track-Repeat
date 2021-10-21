@@ -1850,6 +1850,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     timeBase = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0);
+    //Todo: This should update to reflect capped value (in adjustCustom).
     timerValueInEditPopUp.setText(timeBase);
 
     int totalMinutes = Integer.parseInt(timeLeft.get(4) + timeLeft.get(3));
@@ -1861,8 +1862,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int totalTime = (totalMinutes*60) + totalSeconds;
 
     setTimerValueBoundsFormula(totalTime);
-    Log.i("testTime", "setValue is " + setValue);
-    Log.i("testTime", "breakValue is " + breakValue);
   }
 
   public void capAndStoreEditPopUpTimerValues() {
@@ -1940,9 +1939,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (typeOfRound.size()>0) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         //+250 accounts for notification reception lag.
-        timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(((timeLeft-250) +1000) / 1000);
+        timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000, false);
       }
-      else timeRemaining = convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(timeLeft);
+      else timeRemaining = convertTimerValuesToString(timeLeft, false);
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
@@ -2179,8 +2178,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else return "5";
     }
   }
-  //Conversion of Long-String for add/subtract popUp textViews. Slightly different format than our timer textViews.
-  public String convertTimeToStringWithFullMinuteAndSecondValues(long totalSeconds) {
+
+  public String convertTimerValuesToString(long totalSeconds, boolean extraZero) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
     long remainingSeconds;
@@ -2190,32 +2189,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (totalSeconds >= 60) {
       String formattedSeconds = df.format(remainingSeconds);
       if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
-      if (mode==1 || totalSeconds>=600) return (minutes + " : " + formattedSeconds);
-      else return ("0" + minutes + " : " + formattedSeconds);
+      if (totalSeconds>=600) {
+        return (minutes + ":" + formattedSeconds);
+      } else {
+        return ("0" + minutes + ":" + formattedSeconds);
+      }
     } else {
       String totalStringSeconds = String.valueOf(totalSeconds);
-      if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
-      if (totalSeconds < 5) return ("0 : 05");
-      else return "0 : " + totalStringSeconds;
-    }
-  }
 
-  public String convertTimeToStringWithFullMinuteAndSecondValuesWithoutSpaces(long totalSeconds) {
-    DecimalFormat df = new DecimalFormat("00");
-    long minutes;
-    long remainingSeconds;
-    minutes = totalSeconds / 60;
-
-    remainingSeconds = totalSeconds % 60;
-    if (totalSeconds >= 60) {
-      String formattedSeconds = df.format(remainingSeconds);
-      if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
-      if (mode==1 || totalSeconds>=600) return (minutes + ":" + formattedSeconds);
-      else return ("0" + minutes + ":" + formattedSeconds);
-    } else {
-      String totalStringSeconds = String.valueOf(totalSeconds);
       if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
-      return "0:" + totalStringSeconds;
+      return "00:" + totalStringSeconds;
     }
   }
 
@@ -2348,6 +2331,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
+    timerValueInEditPopUp.setText(convertTimerValuesToString(integerValue, true));
     if (mode==1) {
       //If adding a round.
       if (!replacingValue) {
