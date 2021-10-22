@@ -71,10 +71,13 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle {
@@ -126,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow editCyclesPopupWindow;
   PopupWindow settingsPopupWindow;
 
-  ImageButton delete_edit_popUp_timer_numbers;
   TextView number_one;
   TextView number_two;
   TextView number_three;
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView number_eight;
   TextView number_nine;
   TextView number_zero;
+  ImageButton deleteEditPopUpTimerNumbers;
   ArrayList<String> editPopUpTimerArray;
 
   TextView sortAlphaStart;
@@ -169,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView firstRoundTypeHeaderInEditPopUp;
   TextView secondRoundTypeHeaderInEditPopUp;
   TextView thirdRoundTypeHeaderInEditPopUp;
-  TextView timerValueInEditPopUp;
+  TextView timerValueInEditPopUpTextView;
 
   Button addRoundToCycleButton;
   Button SubtractRoundFromCycleButton;
@@ -605,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupView = inflater.inflate(R.layout.sidebar_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
-    delete_edit_popUp_timer_numbers = editCyclesPopupView.findViewById(R.id.delete_edit_popUp_timer_numbers);
+    deleteEditPopUpTimerNumbers = editCyclesPopupView.findViewById(R.id.deleteEditPopUpTimerNumbers);
     number_one = editCyclesPopupView.findViewById(R.id.one_button);
     number_two = editCyclesPopupView.findViewById(R.id.two_button);
     number_three = editCyclesPopupView.findViewById(R.id.three_button);
@@ -643,7 +646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     firstRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.firstRoundTypeHeaderInEditPopUp);
     secondRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.secondRoundTypeHeaderInEditPopUp);
     thirdRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.thirdRoundTypeHeaderInEditPopUp);
-    timerValueInEditPopUp = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUp);
+    timerValueInEditPopUpTextView = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUpTextView);
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
     SubtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtract_cycle);
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.infinity_toggle_imageButton);
@@ -710,7 +713,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
-    timerValueInEditPopUp.setText("00:00");
+    timerValueInEditPopUpTextView.setText("00:00");
 
     //Default values in WHOLE seconds. Multiplied * 1000 for our millis values.
     setValue = sharedPreferences.getInt("setValue", 30);
@@ -1047,10 +1050,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_nine.setOnClickListener(numberPadListener);
     number_zero.setOnClickListener(numberPadListener);
 
-    delete_edit_popUp_timer_numbers.setOnClickListener(v-> {
+    deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
       if (editPopUpTimerArray.size()>0) {
         editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
         setEditPopUpTimerValues();
+        Log.i("testTime", "edit array is " + editPopUpTimerArray);
       }
     });
 
@@ -1817,7 +1821,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         editHeaderSelected = 1;
         //If first row is highlighted, second row should un-highlight.
         toggleInfinityRounds.setAlpha(0.3f);
-        timerValueInEditPopUp.setTextColor(Color.GREEN);
+        timerValueInEditPopUpTextView.setTextColor(Color.GREEN);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       }
@@ -1826,15 +1830,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breaksSelected = true;
         editHeaderSelected = 2;
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
-        timerValueInEditPopUp.setTextColor(Color.RED);
+        timerValueInEditPopUpTextView.setTextColor(Color.RED);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
         }
     }
   }
 
   public void setEditPopUpTimerValues() {
-    String timeBase;
-    List<String> timeLeft = new ArrayList<>();
+    ArrayList<String> timeLeft = new ArrayList<>();
     timeLeft.add("0");
     timeLeft.add("0");
     timeLeft.add(":");
@@ -1849,22 +1852,52 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.set(i+1, editPopUpTimerArray.get(i));
       }
     }
-    timeBase = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0);
-    //Todo: This should update to reflect capped value (in adjustCustom).
-    timerValueInEditPopUp.setText(timeBase);
 
-    int totalMinutes = Integer.parseInt(timeLeft.get(4) + timeLeft.get(3));
-    int totalSeconds = Integer.parseInt(timeLeft.get(1) + timeLeft.get(0));
+    String editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0);
+    timerValueInEditPopUpTextView.setText(editPopUpTimerString);
+
+    int totalTime = convertStringArrayToSecondsValue(timeLeft);
+    setTimerValueBoundsFormula(totalTime);
+  }
+
+  public int convertStringArrayToSecondsValue(ArrayList<String> stringArray) {
+    int totalMinutes = Integer.parseInt(stringArray.get(4) + stringArray.get(3));
+    int totalSeconds = Integer.parseInt(stringArray.get(1) + stringArray.get(0));
     if (totalSeconds>60) {
       totalSeconds = totalSeconds%60;
       totalMinutes +=1;
     }
     int totalTime = (totalMinutes*60) + totalSeconds;
-
-    setTimerValueBoundsFormula(totalTime);
+    return totalTime;
   }
 
-  public void capAndStoreEditPopUpTimerValues() {
+  //Todo: Convert total time in seconds to DISPLAY time (e.g. 200 seconds should display as 3:20).
+  //Todo: SetValue is in seconds.
+  public String convertSecondsValueToStringArray(int totalSeconds) {
+    int totalMinutes = totalSeconds/60;
+    if (totalSeconds>60) {
+      totalSeconds = totalSeconds%60;
+    }
+
+    String secondString = "";
+    String minuteString = "";
+
+    if (totalSeconds<=10) secondString = 0 + String.valueOf(totalSeconds); else secondString = String.valueOf(totalSeconds);
+    if (totalMinutes>=10) minuteString = String.valueOf(totalMinutes); else minuteString = "0" + totalMinutes;
+    String totalString = minuteString + ":" + secondString;
+
+    ArrayList<String> newList = new ArrayList<>();
+    for (int i=0; i<4; i++) {
+      if (i<2) {
+        newList.add(totalString.substring(i,i+1));
+      } else {
+        newList.add(totalString.substring(i+1, i+2));
+      }
+    }
+
+    editPopUpTimerArray = newList;
+
+    return totalString;
 
   }
 
@@ -1939,9 +1972,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (typeOfRound.size()>0) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         //+250 accounts for notification reception lag.
-        timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000, false);
+        timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000);
       }
-      else timeRemaining = convertTimerValuesToString(timeLeft, false);
+      else timeRemaining = convertTimerValuesToString(timeLeft);
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
@@ -2179,7 +2212,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public String convertTimerValuesToString(long totalSeconds, boolean extraZero) {
+  public String convertTimerValuesToString(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
     long remainingSeconds;
@@ -2225,7 +2258,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
         toggleInfinityRounds.setVisibility(View.VISIBLE);
-        timerValueInEditPopUp.setVisibility(View.VISIBLE);
+        timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
         break;
       case 3:
         firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
@@ -2239,7 +2272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         secondRoundTypeHeaderInEditPopUp.setText(R.string.small_break);
         thirdRoundTypeHeaderInEditPopUp.setText(R.string.long_break);
 
-        timerValueInEditPopUp.setVisibility(View.VISIBLE);
+        timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
         toggleInfinityRounds.setVisibility(View.GONE);
         thirdRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
         break;
@@ -2331,7 +2364,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
-    timerValueInEditPopUp.setText(convertTimerValuesToString(integerValue, true));
+    timerValueInEditPopUpTextView.setText(convertSecondsValueToStringArray(integerValue));
+
     if (mode==1) {
       //If adding a round.
       if (!replacingValue) {
