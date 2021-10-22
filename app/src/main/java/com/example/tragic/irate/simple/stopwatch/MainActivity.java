@@ -1050,12 +1050,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_nine.setOnClickListener(numberPadListener);
     number_zero.setOnClickListener(numberPadListener);
 
-    //Todo: convertSecondsValueToStringArray always creates a 4 item array, whereas we want one that only contains as many items as there are digits.
+    //Todo: Zero array doesn't execute method, so textView doesn't display.
     deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
       if (editPopUpTimerArray.size()>0) {
         editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
-//        setEditPopUpTimerValues();
       }
+      setEditPopUpTimerValues();
     });
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
@@ -1836,7 +1836,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Need to move numbers over (e.g. 2 + 0 + 0 + 0 = 20:00).
   public void setEditPopUpTimerValues() {
     ArrayList<String> timeLeft = new ArrayList<>();
     timeLeft.add("0");
@@ -1860,7 +1859,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     String editPopUpTimerString = "";
     switch (editPopUpTimerArray.size()) {
-      case 1:
+      case 0: case 1:
         editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0); break;
       case 2:
         editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(0) + timeLeft.get(1); break;
