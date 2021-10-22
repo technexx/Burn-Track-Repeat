@@ -1050,11 +1050,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_nine.setOnClickListener(numberPadListener);
     number_zero.setOnClickListener(numberPadListener);
 
+    //Todo: convertSecondsValueToStringArray always creates a 4 item array, whereas we want one that only contains as many items as there are digits.
     deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
       if (editPopUpTimerArray.size()>0) {
         editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
-        setEditPopUpTimerValues();
-        Log.i("testTime", "edit array is " + editPopUpTimerArray);
+//        setEditPopUpTimerValues();
       }
     });
 
@@ -1836,6 +1836,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Need to move numbers over (e.g. 2 + 0 + 0 + 0 = 20:00).
   public void setEditPopUpTimerValues() {
     ArrayList<String> timeLeft = new ArrayList<>();
     timeLeft.add("0");
@@ -1852,8 +1853,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.set(i+1, editPopUpTimerArray.get(i));
       }
     }
+    ///[8 0 : 0 0] [8 6 : 0 0] [8 6 : 4 0] [8 6 : 4 2]
 
-    String editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0);
+    Log.i("testTime", "time left array is " + timeLeft);
+    Log.i("testTime", "edit array is " + editPopUpTimerArray);
+
+    String editPopUpTimerString = "";
+    switch (editPopUpTimerArray.size()) {
+      case 1:
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0); break;
+      case 2:
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(0) + timeLeft.get(1); break;
+      case 3:
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(0) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(3); break;
+      case 4:
+        editPopUpTimerString = timeLeft.get(0) + timeLeft.get(1) + timeLeft.get(2) + timeLeft.get(3) + timeLeft.get(4); break;
+    }
     timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
     int totalTime = convertStringArrayToSecondsValue(timeLeft);
@@ -1871,8 +1886,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return totalTime;
   }
 
-  //Todo: Convert total time in seconds to DISPLAY time (e.g. 200 seconds should display as 3:20).
-  //Todo: SetValue is in seconds.
   public String convertSecondsValueToStringArray(int totalSeconds) {
     int totalMinutes = totalSeconds/60;
     if (totalSeconds>60) {
@@ -1896,6 +1909,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     editPopUpTimerArray = newList;
+    Collections.reverse(editPopUpTimerArray);
+
+//    Log.i("testTime", "edit array in conversion is " + editPopUpTimerArray);
 
     return totalString;
 
