@@ -1067,7 +1067,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundedValueForTotalTimes = 0;
 
       if (timerIsPaused) activateResumeOrResetOptionForCycle();
-//      pauseAndResumeTimer(PAUSING_TIMER);
 
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
       addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
@@ -1854,9 +1853,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     ///[8 0 : 0 0] [8 6 : 0 0] [8 6 : 4 0] [8 6 : 4 2]
 
-    Log.i("testTime", "time left array is " + timeLeft);
-    Log.i("testTime", "edit array is " + editPopUpTimerArray);
-
     String editPopUpTimerString = "";
     switch (editPopUpTimerArray.size()) {
       case 0: case 1:
@@ -1870,13 +1866,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
-    int totalTime = convertStringArrayToSecondsValue(timeLeft);
+    int totalTime = convertStringToSecondsValue(editPopUpTimerString);
+    Log.i("testTime", "timerString value is " + editPopUpTimerString);
+    Log.i("testTime", "converted time value is " + totalTime);
+
+    //Todo: This is returning wrong value. We need to use editPopUpTimerString, since its order changes depending on timer digits.
     setTimerValueBoundsFormula(totalTime);
   }
 
-  public int convertStringArrayToSecondsValue(ArrayList<String> stringArray) {
-    int totalMinutes = Integer.parseInt(stringArray.get(4) + stringArray.get(3));
-    int totalSeconds = Integer.parseInt(stringArray.get(1) + stringArray.get(0));
+  public int convertStringToSecondsValue(String timerString) {
+    int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+    int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+    Log.i("testTime", "totalMinutes is " + totalMinutes);
+    Log.i("testTime", "totalSeconds is " + totalSeconds);
     if (totalSeconds>60) {
       totalSeconds = totalSeconds%60;
       totalMinutes +=1;
@@ -1907,10 +1909,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
+    //Todo: Reverse not working AND bad conversion happening (e.g. SHOULD BE 1800 - > 0081 - > 01:21.
     editPopUpTimerArray = newList;
+    Log.i("testTime", "original array is " + editPopUpTimerArray);
     Collections.reverse(editPopUpTimerArray);
-
-//    Log.i("testTime", "edit array in conversion is " + editPopUpTimerArray);
+    Log.i("testTime", "reversed array is " + editPopUpTimerArray);
 
     return totalString;
 
@@ -2311,9 +2314,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
+              timerValueInEditPopUpTextView.setText(convertSecondsValueToStringArray(setValue));
               break;
             case 3:
               addOrReplaceRounds(breakValue, roundIsSelected);
+              timerValueInEditPopUpTextView.setText(convertSecondsValueToStringArray(breakValue));
               break;
             case 2: case 4:
               addOrReplaceRounds(0, roundIsSelected);
@@ -2379,8 +2384,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
-    timerValueInEditPopUpTextView.setText(convertSecondsValueToStringArray(integerValue));
-
     if (mode==1) {
       //If adding a round.
       if (!replacingValue) {
