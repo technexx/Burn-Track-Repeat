@@ -1867,18 +1867,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
     int totalTime = convertStringToSecondsValue(editPopUpTimerString);
-    Log.i("testTime", "timerString value is " + editPopUpTimerString);
-    Log.i("testTime", "converted time value is " + totalTime);
-
-    //Todo: This is returning wrong value. We need to use editPopUpTimerString, since its order changes depending on timer digits.
     setTimerValueBoundsFormula(totalTime);
   }
 
   public int convertStringToSecondsValue(String timerString) {
     int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
     int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-    Log.i("testTime", "totalMinutes is " + totalMinutes);
-    Log.i("testTime", "totalSeconds is " + totalSeconds);
     if (totalSeconds>60) {
       totalSeconds = totalSeconds%60;
       totalMinutes +=1;
