@@ -1836,6 +1836,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEditPopUpTimerValues() {
+    String editPopUpTimerString = convertedTimerArrayToString();
+
+    timerValueInEditPopUpTextView.setText(editPopUpTimerString);
+    int totalTime = convertStringToSecondsValue(editPopUpTimerString);
+
+    setTimerValueBoundsFormula(totalTime);
+  }
+
+  public String convertedTimerArrayToString() {
+    ArrayList<String> timeLeft = populateEditTimerArray();
+
+    String editPopUpTimerString;
+    switch (editPopUpTimerArray.size()) {
+      default: case 0: case 1:
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0); break;
+      case 2:
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(0) + timeLeft.get(1); break;
+      case 3:
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(0) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(3); break;
+      case 4:
+        editPopUpTimerString = timeLeft.get(0) + timeLeft.get(1) + timeLeft.get(2) + timeLeft.get(3) + timeLeft.get(4); break;
+    }
+    return editPopUpTimerString;
+  }
+
+  //Todo: This conversion works. Just need a straight conversion below, BUT it needs to correspond to editPopUpTimerArray switch statement above.
+  public int convertStringToSecondsValue(String timerString) {
+    int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+    int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+    if (totalSeconds>60) {
+      totalSeconds = totalSeconds%60;
+      totalMinutes +=1;
+    }
+    int totalTime = (totalMinutes*60) + totalSeconds;
+    return totalTime;
+  }
+
+
+  public ArrayList<String> populateEditTimerArray() {
     ArrayList<String> timeLeft = new ArrayList<>();
     timeLeft.add("0");
     timeLeft.add("0");
@@ -1851,34 +1890,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.set(i+1, editPopUpTimerArray.get(i));
       }
     }
-    ///[8 0 : 0 0] [8 6 : 0 0] [8 6 : 4 0] [8 6 : 4 2]
-
-    String editPopUpTimerString = "";
-    switch (editPopUpTimerArray.size()) {
-      case 0: case 1:
-        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0); break;
-      case 2:
-        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(0) + timeLeft.get(1); break;
-      case 3:
-        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(0) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(3); break;
-      case 4:
-        editPopUpTimerString = timeLeft.get(0) + timeLeft.get(1) + timeLeft.get(2) + timeLeft.get(3) + timeLeft.get(4); break;
-    }
-    timerValueInEditPopUpTextView.setText(editPopUpTimerString);
-
-    int totalTime = convertStringToSecondsValue(editPopUpTimerString);
-    setTimerValueBoundsFormula(totalTime);
-  }
-
-  public int convertStringToSecondsValue(String timerString) {
-    int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-    int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-    if (totalSeconds>60) {
-      totalSeconds = totalSeconds%60;
-      totalMinutes +=1;
-    }
-    int totalTime = (totalMinutes*60) + totalSeconds;
-    return totalTime;
+    return timeLeft;
   }
 
   public String convertSecondsValueToStringArray(int totalSeconds) {
@@ -1903,14 +1915,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    //Todo: Reverse not working AND bad conversion happening (e.g. SHOULD BE 1800 - > 0081 - > 01:21.
+    //Todo: Reverse not working AND bad conversion happening (e.g. SHOULD BE 1800 - > 0081 - > 01:21).
     editPopUpTimerArray = newList;
     Log.i("testTime", "original array is " + editPopUpTimerArray);
     Collections.reverse(editPopUpTimerArray);
     Log.i("testTime", "reversed array is " + editPopUpTimerArray);
 
     return totalString;
-
   }
 
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
