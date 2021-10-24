@@ -1050,7 +1050,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_nine.setOnClickListener(numberPadListener);
     number_zero.setOnClickListener(numberPadListener);
 
-    //Todo: Zero array doesn't execute method, so textView doesn't display.
     deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
       if (editPopUpTimerArray.size()>0) {
         editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
@@ -1841,7 +1840,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerValueInEditPopUpTextView.setText(editPopUpTimerString);
     int totalTime = convertStringToSecondsValue(editPopUpTimerString);
 
-    setTimerValueBoundsFormula(totalTime);
+    setAndCapTimerValues(totalTime);
+
+//    String test = convertSecondsValueToStringArray(setValue);
+//    Log.i("testTime", "val is " + test);
   }
 
   public String convertedTimerArrayToString() {
@@ -1860,19 +1862,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     return editPopUpTimerString;
   }
-
-  //Todo: This conversion works. Just need a straight conversion below, BUT it needs to correspond to editPopUpTimerArray switch statement above.
-  public int convertStringToSecondsValue(String timerString) {
-    int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-    int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-    if (totalSeconds>60) {
-      totalSeconds = totalSeconds%60;
-      totalMinutes +=1;
-    }
-    int totalTime = (totalMinutes*60) + totalSeconds;
-    return totalTime;
-  }
-
 
   public ArrayList<String> populateEditTimerArray() {
     ArrayList<String> timeLeft = new ArrayList<>();
@@ -1893,6 +1882,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return timeLeft;
   }
 
+  public int convertStringToSecondsValue(String timerString) {
+    int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+    int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+    if (totalSeconds>60) {
+      totalSeconds = totalSeconds%60;
+      totalMinutes +=1;
+    }
+    int totalTime = (totalMinutes*60) + totalSeconds;
+    return totalTime;
+  }
+
+  //Todo: Just need to update editPopUpTimerArray if values are capped (e.g. 55:55 becomes 20:00).
+  //Todo: Best way is to go from setValue/breakValue integer -> ArrayList (specifically editPopUpTimerArray) - > Pass that into convertedTimerArrayToString since that is called to in setEditPopUpTimerValues to fill our XX:XX timer.
+
+
+
   public String convertSecondsValueToStringArray(int totalSeconds) {
     int totalMinutes = totalSeconds/60;
     if (totalSeconds>60) {
@@ -1905,21 +1910,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (totalSeconds<=10) secondString = 0 + String.valueOf(totalSeconds); else secondString = String.valueOf(totalSeconds);
     if (totalMinutes>=10) minuteString = String.valueOf(totalMinutes); else minuteString = "0" + totalMinutes;
     String totalString = minuteString + ":" + secondString;
-
-    ArrayList<String> newList = new ArrayList<>();
-    for (int i=0; i<4; i++) {
-      if (i<2) {
-        newList.add(totalString.substring(i,i+1));
-      } else {
-        newList.add(totalString.substring(i+1, i+2));
-      }
-    }
-
-    //Todo: Reverse not working AND bad conversion happening (e.g. SHOULD BE 1800 - > 0081 - > 01:21).
-    editPopUpTimerArray = newList;
-    Log.i("testTime", "original array is " + editPopUpTimerArray);
-    Collections.reverse(editPopUpTimerArray);
-    Log.i("testTime", "reversed array is " + editPopUpTimerArray);
 
     return totalString;
   }
@@ -2199,7 +2189,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertedPomList.clear();
   }
 
-  public void setTimerValueBoundsFormula(int value) {
+  public void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
         if (editHeaderSelected==1) setValue = timerValueBoundsFormula(5, 1200, value);
