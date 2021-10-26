@@ -1025,8 +1025,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Todo: Not executing after round addition because array is always size 4 (since we set it to capped array value).
       //Todo: We should keep this conditional, adjust the array, and use the capped array->string to set the textView.
-
-      //Todo: Should we keep original array @ 4 (00:00) and just set indices?
       if (editPopUpTimerArray.size()<=3) {
         for (int i=0; i<10; i++)  {
           if (textButton.getText().equals(String.valueOf(i))) {
@@ -1052,6 +1050,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editPopUpTimerArray.size()>0) {
         editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
       }
+
       setEditPopUpTimerValues();
     });
 
@@ -1888,29 +1887,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return totalTime;
   }
 
-  public String convertSecondsValueToStringArray(int totalSeconds) {
-    int totalMinutes = totalSeconds/60;
-    if (totalSeconds>60) {
-      totalSeconds = totalSeconds%60;
-    }
-
-    String secondString = "";
-    String minuteString = "";
-
-    if (totalSeconds<=10) secondString = 0 + String.valueOf(totalSeconds); else secondString = String.valueOf(totalSeconds);
-    if (totalMinutes>=10) minuteString = String.valueOf(totalMinutes); else minuteString = "0" + totalMinutes;
-    String totalString = minuteString + ":" + secondString;
-
-    return totalString;
-  }
-
-  public ArrayList<String> convertIntegerToStringArray(int timerInteger) {
+  public void convertIntegerToStringArray(int timerInteger) {
     String minutes = String.valueOf(timerInteger/60);
     String seconds = String.valueOf(timerInteger%60);
     String indexOne = "0";
     String indexTwo = "0";
     String indexThree = "0";
     String indexFour = "0";
+
+    int indexPlaces = 0;
 
     if (minutes.length()<=1) {
       indexTwo = minutes;
@@ -1926,13 +1911,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       indexFour = seconds.substring(1, 2);
     }
 
-    editPopUpTimerArray.clear();
+    editPopUpTimerArrayCapped.clear();
     editPopUpTimerArrayCapped.add(indexOne);
     editPopUpTimerArrayCapped.add(indexTwo);
     editPopUpTimerArrayCapped.add(indexThree);
     editPopUpTimerArrayCapped.add(indexFour);
 
-    return editPopUpTimerArrayCapped;
+    if (timerInteger>0) indexPlaces++;
+    if (timerInteger>9) indexPlaces++;
+    if (timerInteger>59) indexPlaces++;
+    if (timerInteger>599) indexPlaces++;
+
+    editPopUpTimerArray.clear();
+    for (int i=0; i<indexPlaces; i++) {
+      editPopUpTimerArray.add(editPopUpTimerArrayCapped.get(i+(4-indexPlaces)));
+    }
   }
 
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
@@ -2330,12 +2323,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
-              editPopUpTimerArray = convertIntegerToStringArray(setValue);
+              convertIntegerToStringArray(setValue);
               setEditPopUpTimerValues();
-              Log.i("testTime", "new array is " + editPopUpTimerArray);
               break;
             case 3:
               addOrReplaceRounds(breakValue, roundIsSelected);
+              convertIntegerToStringArray(breakValue);
+              setEditPopUpTimerValues();
               break;
             case 2: case 4:
               addOrReplaceRounds(0, roundIsSelected);
