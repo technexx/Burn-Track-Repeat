@@ -274,7 +274,7 @@ public class DotDraws extends View {
             }
             break;
         }
-      } else {
+      } else if (list.get(i).length()<=4){
         //If 3 or more chars in time string, fonts are as follows.
         mPaintText.setTypeface(narrow);
         switch (mMode) {
@@ -282,9 +282,28 @@ public class DotDraws extends View {
             mPaintText.setTextSize(58f);
             mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
             break;
-          case 2:
-            mPaintText.setTextSize(65f);
-            mCanvas.drawText(list.get(i), x-51, y+17, mPaintText);
+          case 3:
+            switch (i) {
+              case 0: case 2: case 4: case 6:
+                mPaintText.setTextSize(57f);
+                mCanvas.drawText(list.get(i), x-58, y+87, mPaintText);
+                break;
+              case 1: case 3: case 5:
+                mPaintText.setTextSize(50f);
+                mCanvas.drawText(list.get(i), x-42, y+82, mPaintText);
+                break;
+              case 7:
+                mPaintText.setTextSize(53f);
+                mCanvas.drawText(list.get(i), x-39, y+87, mPaintText);
+                break;
+            }
+        }
+      } else {
+        mPaintText.setTypeface(narrow);
+        switch (mMode) {
+          case 1:
+            mPaintText.setTextSize(48f);
+            mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
             break;
           case 3:
             switch (i) {
