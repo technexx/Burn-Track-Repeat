@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView number_zero;
   ImageButton deleteEditPopUpTimerNumbers;
   ArrayList<String> editPopUpTimerArray;
+  ArrayList<String> editPopUpTimerArrayCapped;
 
   TextView sortAlphaStart;
   TextView sortAlphaEnd;
@@ -368,14 +369,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
-
-  //Todo: One textView for all times, switch between set/break/etc, but retain value for each. Issue would be w/ Pom having 8 static rounds.
-  //Todo: Box selection, default box on Sets.
-
-  //Todo: Work ---- Break ---- Rest
-  //Todo: <Timer Numbers>
-  //Todo: Custom keyboard ---- X and/or Add button
-  //Todo: RecyclerView layout.
 
   //Todo: Dismissing edit popUp should auto-save cycle, now that manual save header is gone.
   //Todo: Timer can sometimes launch w/ empty rounds in edit causing oob index exception
@@ -620,6 +613,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
     number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
     editPopUpTimerArray = new ArrayList<>();
+    editPopUpTimerArrayCapped = new ArrayList<>();
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -1013,7 +1007,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable);
-      //Saves sort mode so it defaults to chosen whenever we create this activity.
+
       prefEdit.putInt("sortMode", sortMode);
       prefEdit.putInt("sortModePom", sortModePom);
       prefEdit.apply();
@@ -1029,6 +1023,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View.OnClickListener numberPadListener = view -> {
       TextView textButton = (TextView) view;
 
+      //Todo: Not executing after round addition because array is always size 4 (since we set it to capped array value).
+      //Todo: We should keep this conditional, adjust the array, and use the capped array->string to set the textView.
+
+      //Todo: Should we keep original array @ 4 (00:00) and just set indices?
       if (editPopUpTimerArray.size()<=3) {
         for (int i=0; i<10; i++)  {
           if (textButton.getText().equals(String.valueOf(i))) {
@@ -1841,9 +1839,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int totalTime = convertStringToSecondsValue(editPopUpTimerString);
 
     setAndCapTimerValues(totalTime);
-
-//    String test = convertSecondsValueToStringArray(setValue);
-//    Log.i("testTime", "val is " + test);
   }
 
   public String convertedTimerArrayToString() {
@@ -1893,11 +1888,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return totalTime;
   }
 
-  //Todo: Just need to update editPopUpTimerArray if values are capped (e.g. 55:55 becomes 20:00).
-  //Todo: Best way is to go from setValue/breakValue integer -> ArrayList (specifically editPopUpTimerArray) - > Pass that into convertedTimerArrayToString since that is called to in setEditPopUpTimerValues to fill our XX:XX timer.
-
-
-
   public String convertSecondsValueToStringArray(int totalSeconds) {
     int totalMinutes = totalSeconds/60;
     if (totalSeconds>60) {
@@ -1912,6 +1902,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String totalString = minuteString + ":" + secondString;
 
     return totalString;
+  }
+
+  public ArrayList<String> convertIntegerToStringArray(int timerInteger) {
+    String minutes = String.valueOf(timerInteger/60);
+    String seconds = String.valueOf(timerInteger%60);
+    String indexOne = "0";
+    String indexTwo = "0";
+    String indexThree = "0";
+    String indexFour = "0";
+
+    if (minutes.length()<=1) {
+      indexTwo = minutes;
+    } else {
+      indexOne = minutes.substring(0, 1);
+      indexTwo = minutes.substring(1, 2);
+    }
+
+    if (seconds.length()<=1) {
+      indexFour = seconds;
+    } else {
+      indexThree = seconds.substring(0 ,1);
+      indexFour = seconds.substring(1, 2);
+    }
+
+    editPopUpTimerArray.clear();
+    editPopUpTimerArrayCapped.add(indexOne);
+    editPopUpTimerArrayCapped.add(indexTwo);
+    editPopUpTimerArrayCapped.add(indexThree);
+    editPopUpTimerArrayCapped.add(indexFour);
+
+    return editPopUpTimerArrayCapped;
   }
 
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
@@ -2309,11 +2330,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
-              timerValueInEditPopUpTextView.setText(convertSecondsValueToStringArray(setValue));
+              editPopUpTimerArray = convertIntegerToStringArray(setValue);
+              setEditPopUpTimerValues();
+              Log.i("testTime", "new array is " + editPopUpTimerArray);
               break;
             case 3:
               addOrReplaceRounds(breakValue, roundIsSelected);
-              timerValueInEditPopUpTextView.setText(convertSecondsValueToStringArray(breakValue));
               break;
             case 2: case 4:
               addOrReplaceRounds(0, roundIsSelected);
