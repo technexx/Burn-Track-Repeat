@@ -370,6 +370,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationCompat.Builder builder;
   static boolean notificationDismissed = true;
 
+  String oldCycleTitleString;
+  ArrayList<String> oldCycleRoundListOne;
+  ArrayList<String> oldCycleRoundListTwo;
+  ArrayList<String> oldPomRoundList;
+
+  //Todo: Current recycler box cuts off last pom round.
   //Todo: Dismissing edit popUp should auto-save cycle, now that manual save header is gone.
   //Todo: Timer can sometimes launch w/ empty rounds in edit causing oob index exception
   //Todo: Have number kb add directly to round in list?
@@ -1101,12 +1107,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
         emptyCycleList.setVisibility(View.GONE);
         cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
+
+        oldCycleTitleString = cycleTitle;
+        if (mode==1) {
+          oldCycleRoundListOne = new ArrayList<>(roundHolderOne);
+          oldCycleRoundListTwo = new ArrayList<>(roundHolderTwo);
+        }
+        if (mode==3) {
+          oldPomRoundList = new ArrayList<>(pomArray);
+        }
       }
     });
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
+      saveCycleOnPopUpDismissIfEdited();
+
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+
       //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
       if (!makeCycleAdapterVisible) {
         if (mode==1) {
@@ -1651,14 +1669,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundTypeString = "";
         pomString = "";
 
-        int cycleID = 0;
+        int cycleID;
         if (mode==1) {
           //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
           if (isNewCycle) cycles = new Cycles(); else if (cyclesList.size()>0) {
             cycleID = cyclesList.get(positionOfSelectedCycle).getId();
             cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           }
-          ///*----All of this occurs whether we are saving a new cycle, or launching a cycle currently in the database.----*///
           //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
           workoutString = gson.toJson(workoutTime);
           workoutString = friendlyString(workoutString);
@@ -1669,28 +1686,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Adding and inserting into database.
             cycles.setWorkoutRounds(workoutString);
             cycles.setRoundType(roundTypeString);
-            //Setting most recent time accessed for sort mode.
             cycles.setTimeAccessed(System.currentTimeMillis());
             cycles.setItemCount(workoutTime.size());
             //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
             if (isNewCycle) {
-              //Only setting timeAdded for NEW cycle. We want our (sort by date) to use the initial time/date.
               cycles.setTimeAdded(System.currentTimeMillis());
               cycles.setTotalSetTime(0);
               cycles.setTotalBreakTime(0);
               cycles.setCyclesCompleted(0);
-              //If cycle is new, set title to given, or to current date/time if none given. If cycle is NOT new, only set to what has been entered (or keep old one if unchanged).
+
               if (cycleTitle.isEmpty()) cycleTitle = date;
               cycles.setTitle(cycleTitle);
-              //If cycle is new, insert a new row.
               cyclesDatabase.cyclesDao().insertCycle(cycles);
-              //Adding to adapter list.
               editCycleArrayLists(ADDING_CYCLE);
             } else {
               cycles.setTitle(cycleTitle);
-              //If cycle is old, update current row.
               cyclesDatabase.cyclesDao().updateCycles(cycles);
-              //Editing adapter list.
               editCycleArrayLists(EDITING_CYCLE);
             }
           }
@@ -1805,6 +1816,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
     };
+  }
+
+  public void saveCycleOnPopUpDismissIfEdited() {
+    boolean roundIsEdited = false;
+    if (!cycleTitle.equals(oldCycleTitleString)) roundIsEdited = true;
+
+    if (mode==1) {
+      if (!roundHolderOne.equals(oldCycleRoundListOne) || !roundHolderTwo.equals(oldCycleRoundListTwo)) roundIsEdited = true;
+    }
+    if (mode==3) {
+      if (!pomArray.equals(oldPomRoundList)) roundIsEdited = true;
+    }
+
+    if (roundIsEdited) {
+      AsyncTask.execute(saveCyclesASyncRunnable);
+      Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+    }
   }
 
   public void setEditPopUpTimerHeaders(int headerToSelect) {
