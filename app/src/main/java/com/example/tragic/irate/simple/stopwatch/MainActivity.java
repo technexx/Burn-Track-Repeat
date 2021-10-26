@@ -375,6 +375,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
+  //Todo: Adding @ 00:00 adds 0:04 for some reason.
   //Todo: Current recycler box cuts off last pom round.
   //Todo: Dismissing edit popUp should auto-save cycle, now that manual save header is gone.
   //Todo: Timer can sometimes launch w/ empty rounds in edit causing oob index exception
@@ -981,6 +982,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAdapterArrays();
       if (!cycleTitle.isEmpty()) cycleTitle = cycleNameEdit.getText().toString(); else cycleTitle = date;
       editCyclesPopupWindow.showAsDropDown(tabLayout);
+
+      assignOldCycleValuesToCheckForChanges();
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -1108,14 +1111,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         emptyCycleList.setVisibility(View.GONE);
         cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
 
-        oldCycleTitleString = cycleTitle;
-        if (mode==1) {
-          oldCycleRoundListOne = new ArrayList<>(roundHolderOne);
-          oldCycleRoundListTwo = new ArrayList<>(roundHolderTwo);
-        }
-        if (mode==3) {
-          oldPomRoundList = new ArrayList<>(pomArray);
-        }
+        assignOldCycleValuesToCheckForChanges();
       }
     });
 
@@ -1820,18 +1816,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void saveCycleOnPopUpDismissIfEdited() {
     boolean roundIsEdited = false;
-    if (!cycleTitle.equals(oldCycleTitleString)) roundIsEdited = true;
 
     if (mode==1) {
-      if (!roundHolderOne.equals(oldCycleRoundListOne) || !roundHolderTwo.equals(oldCycleRoundListTwo)) roundIsEdited = true;
+      if (!roundHolderOne.isEmpty()){
+        if (!roundHolderOne.equals(oldCycleRoundListOne) || !roundHolderTwo.equals(oldCycleRoundListTwo) || !cycleTitle.equals(oldCycleTitleString)) {
+          roundIsEdited = true;
+        }
+      }
     }
     if (mode==3) {
-      if (!pomArray.equals(oldPomRoundList)) roundIsEdited = true;
+      if (!pomArray.isEmpty()) {
+        if (!pomArray.equals(oldPomRoundList) || !cycleTitle.equals(oldCycleTitleString)) {
+          roundIsEdited = true;
+        }
+      }
     }
 
     if (roundIsEdited) {
       AsyncTask.execute(saveCyclesASyncRunnable);
       Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  public void assignOldCycleValuesToCheckForChanges() {
+    oldCycleTitleString = cycleTitle;
+    if (mode==1) {
+      oldCycleRoundListOne = new ArrayList<>(roundHolderOne);
+      oldCycleRoundListTwo = new ArrayList<>(roundHolderTwo);
+    }
+    if (mode==3) {
+      oldPomRoundList = new ArrayList<>(pomArray);
     }
   }
 
