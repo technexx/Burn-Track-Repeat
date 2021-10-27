@@ -375,7 +375,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Adding @ 00:00 adds 0:04 for some reason.
   //Todo: Current recycler box cuts off last pom round.
   //Todo: Have number kb add directly to round in list?
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
@@ -712,16 +711,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
-    timerValueInEditPopUpTextView.setText("00:00");
-
-    //Default values in WHOLE seconds. Multiplied * 1000 for our millis values.
-    setValue = sharedPreferences.getInt("setValue", 30);
-    breakValue = sharedPreferences.getInt("breakValue", 30);
-    pomValue1 = sharedPreferences.getInt("pomValue1", 1500);
-    pomValue2 = sharedPreferences.getInt("pomValue2", 300);
-    pomValue3 = sharedPreferences.getInt("pomValue3", 900);
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
+
+    timerValueInEditPopUpTextView.setText("00:00");
 
     sortHolder = sortMode;
     int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
@@ -1030,8 +1023,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View.OnClickListener numberPadListener = view -> {
       TextView textButton = (TextView) view;
 
-      //Todo: Not executing after round addition because array is always size 4 (since we set it to capped array value).
-      //Todo: We should keep this conditional, adjust the array, and use the capped array->string to set the textView.
       if (editPopUpTimerArray.size()<=3) {
         for (int i=0; i<10; i++)  {
           if (textButton.getText().equals(String.valueOf(i))) {
@@ -1057,7 +1048,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editPopUpTimerArray.size()>0) {
         editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
       }
-
       setEditPopUpTimerValues();
     });
 
@@ -1110,6 +1100,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
 
         assignOldCycleValuesToCheckForChanges();
+        setAndCapTimerValues();
       }
     });
 
@@ -1877,7 +1868,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerValueInEditPopUpTextView.setText(editPopUpTimerString);
     int totalTime = convertStringToSecondsValue(editPopUpTimerString);
 
-    setAndCapTimerValues(totalTime);
+    //Todo: This isn't capped if we don't press any numbers. Should we only cap when adding rounds instead of here?
+    setAndCapTimerValues();
   }
 
   public String convertedTimerArrayToString() {
@@ -1930,6 +1922,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void convertIntegerToStringArray(int timerInteger) {
     String minutes = String.valueOf(timerInteger/60);
     String seconds = String.valueOf(timerInteger%60);
+
     String indexOne = "0";
     String indexTwo = "0";
     String indexThree = "0";
@@ -2243,16 +2236,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertedPomList.clear();
   }
 
-  public void setAndCapTimerValues(int value) {
+  public void setAndCapTimerValues() {
     switch (mode) {
       case 1:
-        if (editHeaderSelected==1) setValue = timerValueBoundsFormula(5, 1200, value);
-        if (editHeaderSelected==2) breakValue = timerValueBoundsFormula(5, 1200, value);
+        if (editHeaderSelected==1) setValue = timerValueBoundsFormula(5, 1200, setValue);
+        if (editHeaderSelected==2) breakValue = timerValueBoundsFormula(5, 1200, breakValue);
         break;
       case 3:
-        if (editHeaderSelected==1) pomValue1 = timerValueBoundsFormula(900, 5400, value);
-        if (editHeaderSelected==2) pomValue2 = timerValueBoundsFormula(180, 600, value);
-        if (editHeaderSelected==3) pomValue3 = timerValueBoundsFormula(600, 1800, value);
+        if (editHeaderSelected==1) pomValue1 = timerValueBoundsFormula(900, 5400, pomValue1);
+        if (editHeaderSelected==2) pomValue2 = timerValueBoundsFormula(180, 600, pomValue2);
+        if (editHeaderSelected==3) pomValue3 = timerValueBoundsFormula(600, 1800, pomValue3);
         break;
     }
   }
@@ -2347,6 +2340,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void adjustCustom(boolean adding) {
+    Log.i("testTime", "set val " + setValue);
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
@@ -2363,6 +2357,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
+              Log.i("testTime", "set val " + setValue);
               convertIntegerToStringArray(setValue);
               setEditPopUpTimerValues();
               break;
