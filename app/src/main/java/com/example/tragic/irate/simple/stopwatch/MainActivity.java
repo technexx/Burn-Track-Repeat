@@ -377,8 +377,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Adding @ 00:00 adds 0:04 for some reason.
   //Todo: Current recycler box cuts off last pom round.
-  //Todo: Dismissing edit popUp should auto-save cycle, now that manual save header is gone.
-  //Todo: Timer can sometimes launch w/ empty rounds in edit causing oob index exception
   //Todo: Have number kb add directly to round in list?
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
@@ -2631,17 +2629,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void launchTimerCycle(boolean saveToDB) {
-    resetTimer();
-    if (isNewCycle || currentlyEditingACycle) resetTimer();
-    populateTimerUI();
-    AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
-    //Used to toggle views/updates on Main for visually smooth transitions between popUps.
-    makeCycleAdapterVisible = true;
-    //If trying to add new cycle and rounds are at 0, pop a toast and exit method. Otherwise, set a title and proceed to intents.
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
       return;
     }
+
+    //    if (isNewCycle || currentlyEditingACycle) resetTimer();
+    resetTimer();
+    populateTimerUI();
+    AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
+    //Used to toggle views/updates on Main for visually smooth transitions between popUps.
+    makeCycleAdapterVisible = true;
     if (isNewCycle || saveToDB) AsyncTask.execute(saveCyclesASyncRunnable);
     editCyclesPopupWindow.dismiss();
     timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
