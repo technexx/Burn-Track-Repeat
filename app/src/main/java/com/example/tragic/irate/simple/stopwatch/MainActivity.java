@@ -375,8 +375,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Current recycler box cuts off last pom round.
-  //Todo: Have number kb add directly to round in list?
+  //Todo: Move infinity + add/sub views, verify infinity onClick.
+  //Todo: Retain editPopUpArray values for all 2/3 cateogires of rounds.
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
