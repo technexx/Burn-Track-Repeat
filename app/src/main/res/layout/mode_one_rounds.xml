@@ -52,7 +52,7 @@
         app:layout_constraintStart_toEndOf="@id/round_count"
         android:layout_marginTop="5dp"
         android:layout_marginStart="7.5dp"
-        android:src="@drawable/infinity_icon_green">
+        android:src="@drawable/infinity_medium_green">
     </ImageView>
 
     <ImageView

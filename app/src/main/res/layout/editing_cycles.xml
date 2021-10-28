@@ -108,7 +108,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="-8dp"
-        android:src="@drawable/infinity_icon_green"
+        android:src="@drawable/infinity_large_green"
         android:backgroundTint="@color/test_black">
     </ImageButton>
 

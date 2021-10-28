@@ -1849,13 +1849,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (headerToSelect == 1) {
         //If first row is highlighted, second row should un-highlight.
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
-        toggleInfinityRounds.setImageResource(R.drawable.infinity_icon_green);
+        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       }
       if (headerToSelect == 2) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-        toggleInfinityRounds.setImageResource(R.drawable.infinity_icon_red);
+        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
       }
     }
   }
@@ -2353,7 +2353,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) {
         if (workoutTime.size()<16) {
           toggleInfinityModeAndSetRoundType();
-          Log.i("testTime", "round type is " + roundType);
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
