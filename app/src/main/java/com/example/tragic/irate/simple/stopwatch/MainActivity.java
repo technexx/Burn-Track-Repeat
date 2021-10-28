@@ -375,8 +375,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Adding 0:05 to rounds no matter what value is entered.
-  //Todo: "Saved" toast comes up when dismissing edit popUp and launching timer - commented out for now.
   //Todo: Current recycler box cuts off last pom round.
   //Todo: Have number kb add directly to round in list?
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
@@ -1808,24 +1806,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void saveCycleOnPopUpDismissIfEdited() {
     boolean roundIsEdited = false;
 
-    if (mode==1) {
-      if (!roundHolderOne.isEmpty()){
-        if (!roundHolderOne.equals(oldCycleRoundListOne) || !roundHolderTwo.equals(oldCycleRoundListTwo) || !cycleTitle.equals(oldCycleTitleString)) {
-          roundIsEdited = true;
+    if (!timerPopUpWindow.isShowing()) {
+      if (mode==1) {
+        if (!roundHolderOne.isEmpty()){
+          if (!roundHolderOne.equals(oldCycleRoundListOne) || !roundHolderTwo.equals(oldCycleRoundListTwo) || !cycleTitle.equals(oldCycleTitleString)) {
+            roundIsEdited = true;
+          }
         }
       }
-    }
-    if (mode==3) {
-      if (!pomArray.isEmpty()) {
-        if (!pomArray.equals(oldPomRoundList) || !cycleTitle.equals(oldCycleTitleString)) {
-          roundIsEdited = true;
+      if (mode==3) {
+        if (!pomArray.isEmpty()) {
+          if (!pomArray.equals(oldPomRoundList) || !cycleTitle.equals(oldCycleTitleString)) {
+            roundIsEdited = true;
+          }
         }
       }
     }
 
     if (roundIsEdited) {
       AsyncTask.execute(saveCyclesASyncRunnable);
-//      Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
+      Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
     }
   }
 
@@ -2635,8 +2635,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
     if (isNewCycle || saveToDB) AsyncTask.execute(saveCyclesASyncRunnable);
-    editCyclesPopupWindow.dismiss();
+
     timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+
+    editCyclesPopupWindow.dismiss();
   }
 
   public void instantiateAndStartObjectAnimator(long duration) {
