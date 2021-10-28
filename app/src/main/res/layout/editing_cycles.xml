@@ -106,12 +106,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="16dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="-8dp"
         android:src="@drawable/infinity_icon_green"
         android:backgroundTint="@color/test_black">
     </ImageButton>

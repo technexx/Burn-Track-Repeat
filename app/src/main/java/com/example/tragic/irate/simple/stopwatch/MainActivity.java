@@ -375,8 +375,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Move infinity + add/sub views, verify infinity onClick.
+  //Todo: Move infinity and re-implement it.
   //Todo: Retain editPopUpArray values for all 2/3 categories of rounds.
+  //Todo: Reset/Resume not always working. We're also getting some errant active object animators that crash app.
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
@@ -1847,8 +1848,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         editHeaderSelected = 1;
         //If first row is highlighted, second row should un-highlight.
         toggleInfinityRounds.setAlpha(0.3f);
-        timerValueInEditPopUpTextView.setTextColor(Color.GREEN);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
+        toggleInfinityRounds.setImageResource(R.drawable.infinity_icon_green);
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       }
       if (headerToSelect == 2) {
@@ -1856,9 +1857,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breaksSelected = true;
         editHeaderSelected = 2;
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
-        timerValueInEditPopUpTextView.setTextColor(Color.RED);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-        }
+        toggleInfinityRounds.setImageResource(R.drawable.infinity_icon_red);
+      }
     }
   }
 
