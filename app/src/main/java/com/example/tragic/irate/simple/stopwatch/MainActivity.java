@@ -384,7 +384,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Pom total times not working.
   //Todo: Use 0:00 for <60 second total times.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
-  //Todo: Blank title for first cycle creation on app launch bug is back.
   //Todo: The different positioning in sort resolves once the popUp is shown.
   //Todo: Dotdraws will need sp -> dp for scale sizing.
   //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
@@ -1198,10 +1197,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         cycleNameText.setVisibility(View.INVISIBLE);
         cycleNameEdit.setVisibility(View.VISIBLE);
-        cycleNameText.setText(cycleTitle);
-        //Setting editText title.
         cycleNameEdit.setText(cycleTitle);
-        //Updating adapter views.
+
         cycleRoundsAdapter.notifyDataSetChanged();
         cycleRoundsAdapterTwo.notifyDataSetChanged();
       });
@@ -2628,9 +2625,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    //    if (isNewCycle || currentlyEditingACycle) resetTimer();
+    cycleNameText.setText(cycleTitle);
+
     resetTimer();
     populateTimerUI();
+
     AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
