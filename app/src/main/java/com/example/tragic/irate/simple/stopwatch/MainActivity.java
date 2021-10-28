@@ -175,9 +175,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView thirdRoundTypeHeaderInEditPopUp;
   TextView timerValueInEditPopUpTextView;
 
-  Button addRoundToCycleButton;
-  Button SubtractRoundFromCycleButton;
-  ImageView toggleInfinityRounds;
+  ImageButton addRoundToCycleButton;
+  ImageButton SubtractRoundFromCycleButton;
+  ImageButton toggleInfinityRounds;
   ImageButton buttonToLaunchTimer;
 
   ArrayList<Integer> workoutTime;
@@ -376,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
 
   //Todo: Move infinity + add/sub views, verify infinity onClick.
-  //Todo: Retain editPopUpArray values for all 2/3 cateogires of rounds.
+  //Todo: Retain editPopUpArray values for all 2/3 categories of rounds.
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
@@ -645,7 +645,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     thirdRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.thirdRoundTypeHeaderInEditPopUp);
     timerValueInEditPopUpTextView = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUpTextView);
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
-    SubtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtract_cycle);
+    SubtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
+    //Todo: We were using color of imageButton to set roundType to 2 or 4 (if infinity).
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.infinity_toggle_imageButton);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
