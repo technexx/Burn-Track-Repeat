@@ -1278,6 +1278,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       adjustCustom(false);
     });
 
+    toggleInfinityRounds.setOnClickListener(v-> {
+      if (toggleInfinityRounds.getAlpha()==1.0f) toggleInfinityRounds.setAlpha(0.3f); else toggleInfinityRounds.setAlpha(1.0f);
+    });
+
     ////--EditCycles Menu Item onClicks START--////
     buttonToLaunchTimer.setOnClickListener(v-> {
       //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
@@ -1843,23 +1847,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       //Toggles coloring and row selection.
       if (headerToSelect == 1) {
-        breaksSelected = false;
-        setsSelected = true;
-        editHeaderSelected = 1;
         //If first row is highlighted, second row should un-highlight.
-        toggleInfinityRounds.setAlpha(0.3f);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
         toggleInfinityRounds.setImageResource(R.drawable.infinity_icon_green);
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       }
       if (headerToSelect == 2) {
-        setsSelected = false;
-        breaksSelected = true;
-        editHeaderSelected = 2;
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
         toggleInfinityRounds.setImageResource(R.drawable.infinity_icon_red);
       }
+    }
+  }
+
+  public void toggleInfinityModeAndSetRoundType() {
+    if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
+      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
+    }
+    if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
+      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
     }
   }
 
@@ -2346,13 +2352,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
         if (workoutTime.size()<16) {
-          //If Sets are highlighted green, check if its infinity mode is also highlighted. Use 1/2 for yes/no.
-          if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN)
-            if (toggleInfinityRounds.getAlpha()!=1.0f) roundType = 1; else roundType = 2;
-          //If Breaks are highlighted red, check if its infinity mode is also highlighted. Use 3/4 for yes/no.
-          if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED)
-            if (toggleInfinityRounds.getAlpha()!=1.0f) roundType = 3; else roundType = 4;
-          //Adds OR replaces (depending on if a round is selected) values in both Integer (timer) Array and String (display) lists.
+          toggleInfinityModeAndSetRoundType();
+          Log.i("testTime", "round type is " + roundType);
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
