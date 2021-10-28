@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Move infinity and re-implement it.
+  //Todo: No cap of first 0:00 when switching to breaks, because cap value method is only called for sets at start.
   //Todo: Retain editPopUpArray values for all 2/3 categories of rounds.
   //Todo: Reset/Resume not always working. We're also getting some errant active object animators that crash app.
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
@@ -1851,11 +1851,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
         toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+        editHeaderSelected = 1;
       }
       if (headerToSelect == 2) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
         toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
+        editHeaderSelected = 2;
       }
     }
   }
