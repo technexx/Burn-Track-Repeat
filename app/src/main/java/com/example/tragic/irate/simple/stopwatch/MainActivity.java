@@ -1865,9 +1865,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void toggleInfinityModeAndSetRoundType() {
     if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
       if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
+      setAndCapTimerValues(setValue);
     }
     if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
       if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
+      setAndCapTimerValues(breakValue);
     }
   }
 
