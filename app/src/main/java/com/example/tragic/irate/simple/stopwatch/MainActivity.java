@@ -379,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Pom total times not working.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
-  //Todo: The different positioning in sort resolves once the popUp is shown.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -413,13 +412,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(false);
     notificationDismissed = false;
     setNotificationValues();
-    Log.i("testNote", "Pause!");
   }
 
   @Override
   public void onStop() {
     super.onStop();
-    Log.i("testNote", "Stop!");
   }
 
   @Override
@@ -427,8 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationDismissed = true;
     notificationManagerCompat.cancel(1);
     AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
-    Log.i("testNote", "Destroyed!");
-
     super.onDestroy();
   }
 

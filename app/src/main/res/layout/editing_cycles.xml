@@ -114,7 +114,6 @@
 
     <ImageButton
         android:id="@+id/addRoundToCycleButton"
-        android:background="@color/black"
         android:src="@drawable/white_plus_circle"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -128,13 +127,15 @@
         app:cornerRadius="50dp"
         app:rippleColor="#37474F"
         app:strokeColor="@color/black"
-        app:strokeWidth="1dp">
+        app:strokeWidth="1dp"
+        android:background="@drawable/ripple_effect_3"
+        android:clickable="true"
+        android:focusable="true">
     </ImageButton>
 
     <ImageButton
         android:id="@+id/subtractRoundFromCycleButton"
         android:src="@drawable/white_sub_circle"
-        android:background="@color/black"
         android:layout_width="40dp"
         android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -147,7 +148,10 @@
         app:cornerRadius="50dp"
         app:rippleColor="#37474F"
         app:strokeColor="@color/black"
-        app:strokeWidth="1dp">
+        app:strokeWidth="1dp"
+        android:background="@drawable/ripple_effect_3"
+        android:clickable="true"
+        android:focusable="true">
     </ImageButton>
 
     <androidx.constraintlayout.widget.ConstraintLayout
