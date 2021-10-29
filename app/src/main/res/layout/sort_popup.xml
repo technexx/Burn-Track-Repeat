@@ -87,7 +87,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/sort_most_recent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="5dp"
         android:layout_marginStart="14dp"
         android:src="@drawable/check_16">
     </ImageView>

@@ -388,7 +388,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Infinity mode for Pom?
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
-  //Todo: Could long svg files be a lag contributor?
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Add vibrations.
   //Todo: Add color scheme options.
