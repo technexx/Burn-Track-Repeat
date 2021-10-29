@@ -26,10 +26,5 @@
             android:exported="false" >
         </receiver>
 
-        <receiver
-            android:name=".MainActivity$ReplyReceiver"
-            android:exported="false" >
-        </receiver>
-
     </application>
 </manifest>

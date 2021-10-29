@@ -376,37 +376,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
-  //Todo: Spinners or right-to-left time population for creating timers (like Google's).
-  //Todo: Timer should persist/save even if app crashes/is closed due to lack of memory. However, since we keep timer going even when minimized, we can't just do this in onPause().
   //Todo: Pom total times not working.
-  //Todo: Use 0:00 for <60 second total times.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
   //Todo: The different positioning in sort resolves once the popUp is shown.
-  //Todo: Dotdraws will need sp -> dp for scale sizing.
-  //Todo: Drop-down functionality for cycles when app is minimized (like Google's).
   //Todo: Color schemes.
-  //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc./
-  //Todo: Some other indication in edit mode that a cycle is part of db and not new (just an "editing" notation would work).
-  //Todo: Use empty view space in edit mode for cycle stats (e.g. rounds completed, total times, etc.).
+  //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Infinity mode for Pom?
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
-  //Todo: editText round box diff. sizes in emulator. Need to work on layout in general.
   //Todo: Could long svg files be a lag contributor?
   //Todo: TDEE in sep popup w/ tabs.
-  //Todo: Make sure sort checkmark positions work on different size screens.
-  //Todo: Add taskbar notification for timers. Add vibrations.
+  //Todo: Add vibrations.
   //Todo: Add color scheme options.
   //Todo: Rename app, of course.
   //Todo: Add onOptionsSelected dots for About, etc.
-  //Todo: Repository for db. Look at Executor/other alternate thread methods. Would be MUCH more streamlined on all db calls, but might also bork order of operations when we need to call other stuff under UI thread right after.
-  //Todo: Make sure number pad is dismissed when switching to stopwatch mode.
-  //Todo: IMPORTANT: Resolve landscape mode vs. portrait. Set to portrait-only in manifest at present. Likely need a second layout for landscape mode. Also check that lifecycle is stable when re-orienting.
+  //Todo: Repository for db. Look at Executor/other alternate thread methods.
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
 
@@ -440,6 +428,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationDismissed = true;
     notificationManagerCompat.cancel(1);
     AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+    Log.i("testNote", "Destroyed!");
+
     super.onDestroy();
   }
 
@@ -3045,7 +3035,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
         addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
-      } else addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      } else {
+        addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      }
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
       switch (typeOfRound.get(currentRound)) {
