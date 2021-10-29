@@ -376,8 +376,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
+  //Todo: Total time errors: +1 on end of sets and -1 at end of both work and break.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
-  //Todo: Pom total times not working.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -1329,7 +1329,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         reduceTextSizeForInfinityRounds(setMillis);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-        total_set_time.setText(stringValueOfTotalCycleTime(2));
+        setTextViewToStringValueOfTotalCycleTimer();
 
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
@@ -1355,7 +1355,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         reduceTextSizeForInfinityRounds(breakMillis);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-        total_break_time.setText(stringValueOfTotalCycleTime(4));
+        setTextViewToStringValueOfTotalCycleTimer();
 
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
@@ -2720,8 +2720,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
-        total_set_time.setText(stringValueOfTotalCycleTime(1));
         timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
+        setTextViewToStringValueOfTotalCycleTimer();
 
         if (textSizeIncreased && mode==1) {
           if (setMillis < 59000) {
@@ -2750,8 +2750,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
-        total_break_time.setText(stringValueOfTotalCycleTime(3));
         timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
+        setTextViewToStringValueOfTotalCycleTimer();
 
         if (textSizeIncreased && mode==1) {
           if (breakMillis < 59000) {
@@ -2781,6 +2781,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
+        timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
+        setTextViewToStringValueOfTotalCycleTimer();
 
         if (textSizeIncreased && mode==3) {
           if (pomMillis < 59000) {
@@ -2789,7 +2791,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
 
-        timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
         if (pomMillis < 500) timerDisabled = true;
         dotDraws.reDraw();
       }
@@ -2801,10 +2802,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  public String stringValueOfTotalCycleTime(int roundType) {
+  public void setTextViewToStringValueOfTotalCycleTimer() {
     String addedTime = "";
     if (mode==1) {
-      switch (roundType) {
+      switch (typeOfRound.get(currentRound)) {
         case 1:
           if (resettingTotalTime) {
             roundedValueForTotalTimes = 1000 - (setMillis%1000);
@@ -2813,6 +2814,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           cycleSetTimeForSingleRoundInMillis +=50;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          total_set_time.setText(addedTime);
+          Log.i("testTime", "time is " + addedTime);
           break;
         case 2:
           if (resettingTotalTime) {
@@ -2821,6 +2824,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           cycleSetTimeForSingleRoundInMillis = setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          total_set_time.setText(addedTime);
           break;
         case 3:
           if (resettingTotalTime) {
@@ -2830,6 +2834,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           cycleBreakTimeForSingleRoundInMillis+=50;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          total_break_time.setText(addedTime);
           break;
         case 4:
           if (resettingTotalTime) {
@@ -2838,6 +2843,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           cycleBreakTimeForSingleRoundInMillis = breakMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          total_break_time.setText(addedTime);
           break;
       }
     }
@@ -2852,6 +2858,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           cycleSetTimeForSingleRoundInMillis+=50;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          total_set_time.setText(addedTime);
           break;
         case 1: case 3: case 5: case 7:
           if (resettingTotalTime) {
@@ -2861,10 +2868,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           cycleBreakTimeForSingleRoundInMillis+=50;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          total_break_time.setText(addedTime);
           break;
       }
     }
-    return addedTime;
   }
 
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean roundSecondsUp) {
