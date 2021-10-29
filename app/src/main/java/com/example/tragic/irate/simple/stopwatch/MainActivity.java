@@ -376,8 +376,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Retain editPopUpArray values for all 2/3 categories of rounds.
-  //Todo: Reset/Resume not always working. We're also getting some errant active object animators that crash app.
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Spinners or right-to-left time population for creating timers (like Google's).
@@ -1063,7 +1061,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       buttonToLaunchTimer.setEnabled(false);
       roundedValueForTotalTimes = 0;
 
-      if (timerIsPaused) activateResumeOrResetOptionForCycle();
+      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+      activateResumeOrResetOptionForCycle();
 
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
       addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
@@ -2162,7 +2161,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       notificationManagerCompat.notify(1, builder.build());
     }
-
   }
 
   public void activateResumeOrResetOptionForCycle() {
