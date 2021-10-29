@@ -142,6 +142,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton deleteEditPopUpTimerNumbers;
   ArrayList<String> editPopUpTimerArray;
   ArrayList<String> editPopUpTimerArrayCapped;
+  ArrayList<String> savedEditPopUpArrayForFirstHeader;
+  ArrayList<String> savedEditPopUpArrayForSecondHeader;
+  ArrayList<String> savedEditPopUpArrayForThirdHeader;
 
   TextView sortAlphaStart;
   TextView sortAlphaEnd;
@@ -198,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ArrayList<Integer> typeOfRound;
   ArrayList<String> typeOfRoundArray;
-  boolean setsSelected = true;
-  boolean breaksSelected;
   int roundType;
   ArrayList<String> roundHolderOne;
   ArrayList<String> roundHolderTwo;
@@ -375,7 +376,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: No cap of first 0:00 when switching to breaks, because cap value method is only called for sets at start.
   //Todo: Retain editPopUpArray values for all 2/3 categories of rounds.
   //Todo: Reset/Resume not always working. We're also getting some errant active object animators that crash app.
   //Todo: Reset/resume option may not always show up if backtracking after notifications. May also occur on last round.
@@ -618,6 +618,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
     editPopUpTimerArray = new ArrayList<>();
     editPopUpTimerArrayCapped = new ArrayList<>();
+    savedEditPopUpArrayForFirstHeader = new ArrayList<>();
+    savedEditPopUpArrayForSecondHeader = new ArrayList<>();
+    savedEditPopUpArrayForThirdHeader = new ArrayList<>();
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -1852,13 +1855,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
         editHeaderSelected = 1;
+
+        editPopUpTimerArray = savedEditPopUpArrayForFirstHeader;
+
       }
       if (headerToSelect == 2) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
         firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
         toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
         editHeaderSelected = 2;
+
+        editPopUpTimerArray = savedEditPopUpArrayForSecondHeader;
       }
+
+      String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+      timerValueInEditPopUpTextView.setText(savedTimerString);
+
+      int totalTime = convertStringToSecondsValue(savedTimerString);
+      setAndCapTimerValues(totalTime);
+
     }
   }
 
@@ -1873,8 +1888,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void saveEditHeaderTimerStringValues() {
+    if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeader = new ArrayList<>(editPopUpTimerArray);
+    if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeader = new ArrayList<>(editPopUpTimerArray);
+    if (editHeaderSelected == 3) savedEditPopUpArrayForThirdHeader = new ArrayList<>(editPopUpTimerArray);
+  }
+
   public void setEditPopUpTimerValues() {
-    String editPopUpTimerString = convertedTimerArrayToString();
+    String editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+    saveEditHeaderTimerStringValues();
 
     timerValueInEditPopUpTextView.setText(editPopUpTimerString);
     int totalTime = convertStringToSecondsValue(editPopUpTimerString);
@@ -1882,11 +1904,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setAndCapTimerValues(totalTime);
   }
 
-  public String convertedTimerArrayToString() {
+  public String convertedTimerArrayToString(ArrayList<String> arrayToConvert) {
     ArrayList<String> timeLeft = populateEditTimerArray();
 
     String editPopUpTimerString;
-    switch (editPopUpTimerArray.size()) {
+    switch (arrayToConvert.size()) {
       default: case 0: case 1:
         editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0); break;
       case 2:
@@ -3109,7 +3131,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   startSetTimer();
                   break;
                 case 2:
-                  //Todo: Watch currentProgressBarValue here and case 4.
                   //Uses the current time as a base for our count-up rounds.
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
                   if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
