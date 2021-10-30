@@ -376,6 +376,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
+  //Todo: Reset tot
   //Todo: Total time errors: +1 on end of sets and -1 at end of both work and break.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
@@ -1440,14 +1441,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
-    delete_all_cancel.setOnClickListener(v -> {
-      //Removes our delete confirm popUp if we cancel.
-      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
-    });
-
     reset_total_times.setOnClickListener(v -> {
       delete_all_text.setText(R.string.delete_total_times);
       deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER_HORIZONTAL, 0, -100);
+    });
+
+    //Todo: Brought up by both delete-all-cycles and delete-total-times.
+    delete_all_confirm.setOnClickListener(v-> {
+      if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
+        AsyncTask.execute(deleteAllCyclesASyncRunnable);
+      } else if (delete_all_text.getText().equals(getString(R.string.delete_total_times))) {
+        AsyncTask.execute(deleteTotalCycleTimesASyncRunnable);
+      }
+      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
+    });
+
+    delete_all_cancel.setOnClickListener(v -> {
+      //Removes our delete confirm popUp if we cancel.
+      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
 
     postRoundRunnableForFirstMode = new Runnable() {
@@ -2815,7 +2826,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleSetTimeForSingleRoundInMillis +=50;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
-          Log.i("testTime", "time is " + addedTime);
+          Log.i("testTime", "total set time is " + totalCycleSetTimeInMillis);
+          Log.i("testTime", "single set time is " + cycleSetTimeForSingleRoundInMillis);
           break;
         case 2:
           if (resettingTotalTime) {
