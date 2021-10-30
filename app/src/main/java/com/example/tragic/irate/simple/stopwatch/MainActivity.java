@@ -276,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timeLeftValueHolder;
   boolean resettingTotalTime;
   long roundedValueForTotalTimes;
+  long timerDurationPlaceHolder;
 
   long currentProgressBarValueForInfinityRounds;
   long pomMillis;
@@ -376,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Total times a bit buggy when resetting them concurrently w/ timer reset.
+  //Todo: Test infinity modes w/ total time change.
   //Todo: Cycle title bug back again on adding cycle for first time!
   //Todo: Total time errors: +1 on end of sets and -1 at end of both work and break.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
@@ -2682,6 +2683,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
+          timerDurationPlaceHolder = setMillis;
           //If progress bar is at max value, round has not begun.
           if (currentProgressBarValue==maxProgress) {
             //Starts object animator.
@@ -2695,6 +2697,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (objectAnimator != null) objectAnimator.resume();
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
+          timerDurationPlaceHolder = breakMillis;
           if (currentProgressBarValue==maxProgress) {
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
@@ -2824,11 +2827,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleSetTimeForSingleRoundInMillis = roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
-          cycleSetTimeForSingleRoundInMillis +=50;
+          cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
-//          Log.i("testTime", "total set time in TIMER " + totalCycleSetTimeInMillis);
-//          Log.i("testTime", "single set time is " + cycleSetTimeForSingleRoundInMillis);
           break;
         case 2:
           if (resettingTotalTime) {
@@ -2892,15 +2893,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (typeOfRound.size()>0) {
         switch (typeOfRound.get(currentRound)) {
           case 1: case 2:
-            totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
-            long setRemainder = totalCycleSetTimeInMillis%1000;
-            totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
+            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
+            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
             cycleSetTimeForSingleRoundInMillis = 0;
             break;
           case 3: case 4:
-            totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
-            long breakRemainder = totalCycleBreakTimeInMillis%1000;
-            totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) + 1000;
             cycleBreakTimeForSingleRoundInMillis = 0;
             break;
         }
@@ -2910,16 +2909,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (pomDotCounter>0) {
         switch (pomDotCounter) {
           case 0: case 2: case 4: case 6:
-            totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis;
-            long setRemainder = totalCycleSetTimeInMillis%1000;
-            if (!roundSecondsUp) totalCycleSetTimeInMillis = totalCycleSetTimeInMillis - setRemainder;
-            else totalCycleSetTimeInMillis = totalCycleSetTimeInMillis + (1000 - setRemainder);
+            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 1000;
+            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) + 1000;
             break;
           case 1: case 3: case 5: case 7:
-            totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis;
-            long breakRemainder = totalCycleBreakTimeInMillis%1000;
-            if (!roundSecondsUp) totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis - breakRemainder;
-            else totalCycleBreakTimeInMillis = totalCycleBreakTimeInMillis + (1000 - breakRemainder);
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 1000;
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) + 1000;
             break;
         }
       }
