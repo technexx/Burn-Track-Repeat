@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView timerValueInEditPopUpTextView;
 
   ImageButton addRoundToCycleButton;
-  ImageButton SubtractRoundFromCycleButton;
+  ImageButton subtractRoundFromCycleButton;
   ImageButton toggleInfinityRounds;
   ImageButton buttonToLaunchTimer;
 
@@ -377,9 +377,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Test infinity modes w/ total time change.
-  //Todo: Cycle title bug back again on adding cycle for first time!
-  //Todo: Total time errors: +1 on end of sets and -1 at end of both work and break.
   //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
   //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
   //Todo: Color schemes.
@@ -521,7 +518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       convertedPomList.clear();
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapter.disablePomFade();
-      SubtractRoundFromCycleButton.setClickable(true);
+      subtractRoundFromCycleButton.setClickable(true);
     }
   }
 
@@ -580,7 +577,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     calendar = Calendar.getInstance();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
     simpleDateFormat.format(calendar.getTime());
-    date = simpleDateFormat.format(calendar.getTime());
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
@@ -634,8 +630,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     thirdRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.thirdRoundTypeHeaderInEditPopUp);
     timerValueInEditPopUpTextView = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUpTextView);
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
-    SubtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
-    //Todo: We were using color of imageButton to set roundType to 2 or 4 (if infinity).
+    subtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.infinity_toggle_imageButton);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
@@ -960,7 +955,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       isNewCycle = true;
       //Clears round adapter arrays so they can be freshly populated.
       clearRoundAdapterArrays();
-      if (!cycleTitle.isEmpty()) cycleTitle = cycleNameEdit.getText().toString(); else cycleTitle = date;
       editCyclesPopupWindow.showAsDropDown(tabLayout);
 
       assignOldCycleValuesToCheckForChanges();
@@ -1052,7 +1046,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       activateResumeOrResetOptionForCycle();
 
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
-      addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+      addAndRoundDownTotalCycleTimeFromPreviousRounds();
 
       //Removes runnable that begins next round.
       mHandler.removeCallbacksAndMessages(null);
@@ -1263,7 +1257,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       adjustCustom(true);
     });
 
-    SubtractRoundFromCycleButton.setOnClickListener(v -> {
+    subtractRoundFromCycleButton.setOnClickListener(v -> {
       adjustCustom(false);
     });
 
@@ -1655,6 +1649,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutString = "";
         roundTypeString = "";
         pomString = "";
+        date = simpleDateFormat.format(calendar.getTime());
 
         int cycleID;
         if (mode==1) {
@@ -1682,7 +1677,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               cycles.setTotalBreakTime(0);
               cycles.setCyclesCompleted(0);
 
-              if (cycleTitle.isEmpty()) cycleTitle = date;
               cycles.setTitle(cycleTitle);
               cyclesDatabase.cyclesDao().insertCycle(cycles);
               editCycleArrayLists(ADDING_CYCLE);
@@ -2329,7 +2323,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ConstraintLayout.LayoutParams thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
 
     ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
-    ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) SubtractRoundFromCycleButton.getLayoutParams();
+    ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) subtractRoundFromCycleButton.getLayoutParams();
     ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
 
     timeLeft.setText(timeLeftValueHolder);
@@ -2439,7 +2433,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomValuesTime.size() != 0) {
           cycleRoundsAdapter.setPomFade(false);
           cycleRoundsAdapter.notifyDataSetChanged();
-          SubtractRoundFromCycleButton.setClickable(false);
+          subtractRoundFromCycleButton.setClickable(false);
         } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
       }
     }
@@ -2648,18 +2642,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    cycleNameText.setText(cycleTitle);
-
     resetTimer();
     populateTimerUI();
 
+    if (isNewCycle || saveToDB) AsyncTask.execute(saveCyclesASyncRunnable);
     AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
+
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
-    if (isNewCycle || saveToDB) AsyncTask.execute(saveCyclesASyncRunnable);
 
     timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
-
     editCyclesPopupWindow.dismiss();
   }
 
@@ -2888,7 +2880,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean roundSecondsUp) {
+  public void addAndRoundDownTotalCycleTimeFromPreviousRounds() {
     if (mode==1) {
       if (typeOfRound.size()>0) {
         switch (typeOfRound.get(currentRound)) {
@@ -3040,9 +3032,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
-        addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+        addAndRoundDownTotalCycleTimeFromPreviousRounds();
       } else {
-        addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+        addAndRoundDownTotalCycleTimeFromPreviousRounds();
       }
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
@@ -3081,8 +3073,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
         progressBar.setProgress(0);
-        addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
-      } else addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+        addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      } else addAndRoundDownTotalCycleTimeFromPreviousRounds();
       mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
     }
     beginTimerForNextRound = true;
@@ -3191,11 +3183,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     beginTimerForNextRound = true;
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-
-    blankCanvas.setVisibility(View.GONE);
+    date = simpleDateFormat.format(calendar.getTime());
+    if (cycleTitle.isEmpty()) cycleTitle = date;
     cycle_title_textView.setText(cycleTitle);
+
     dotDraws.resetDotAlpha();
-    //Default views for Timer.
     cycle_title_textView.setVisibility(View.VISIBLE);
     total_set_header.setVisibility(View.VISIBLE);
     total_set_time.setVisibility(View.VISIBLE);
@@ -3206,6 +3198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset_total_times.setVisibility(View.VISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
+    blankCanvas.setVisibility(View.GONE);
     cycle_title_layout.topMargin = convertDensityPixelsToScalable(30);
     completedLapsParam.topMargin = convertDensityPixelsToScalable(24);
 
@@ -3296,7 +3289,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (endAnimation!=null) endAnimation.cancel();
     next_round.setEnabled(true);
     currentProgressBarValue = 10000;
-    addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+    addAndRoundDownTotalCycleTimeFromPreviousRounds();
     AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
     switch (mode) {
