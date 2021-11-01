@@ -370,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
-  static boolean notificationDismissed = true;
+  static boolean dismissNotification = true;
 
   String oldCycleTitleString;
   ArrayList<String> oldCycleRoundListOne;
@@ -400,26 +400,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onResume() {
     super.onResume();
     setVisible(true);
-    notificationDismissed = true;
+    dismissNotification = true;
     notificationManagerCompat.cancel(1);
-  }
-
-  @Override
-  public void onPause() {
-    super.onPause();
-    setVisible(false);
-    notificationDismissed = false;
-    setNotificationValues();
+    Log.i("testtime", "Resumed!!");
   }
 
   @Override
   public void onStop() {
     super.onStop();
+    setVisible(false);
+    if (timerPopUpWindow.isShowing()) {
+      dismissNotification = false;
+      setNotificationValues();
+    }
+    Log.i("testtime", "Stopped!!");
   }
 
   @Override
   public void onDestroy() {
-    notificationDismissed = true;
+    dismissNotification = true;
     notificationManagerCompat.cancel(1);
     AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
     super.onDestroy();
@@ -2025,7 +2024,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public static class DismissReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-      notificationDismissed = true;
+      dismissNotification = true;
     }
   }
 
@@ -2093,7 +2092,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setNotificationValues() {
-    if (!notificationDismissed) {
+    if (!dismissNotification) {
       String headerOne = "";
       String headerTwo = "";
       String bodyOne = "";
