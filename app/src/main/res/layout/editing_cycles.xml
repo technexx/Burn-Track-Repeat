@@ -92,10 +92,10 @@
         android:id="@+id/deleteEditPopUpTimerNumbers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/timerValueInEditPopUpTextView"
+        app:layout_constraintEnd_toStartOf="@id/infinity_toggle_imageButton"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginStart="6dp"
         android:layout_marginTop="16sp"
+        android:layout_marginEnd="4dp"
         android:src="@drawable/cancel_x"
         android:background="@drawable/ripple_effect_2">
     </ImageButton>

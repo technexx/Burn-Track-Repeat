@@ -1858,6 +1858,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       int totalTime = convertStringToSecondsValue(savedTimerString);
       setAndCapTimerValues(totalTime);
+      changeEditTimerTextViewColorIfNotEmpty();
 
     }
   }
@@ -1870,6 +1871,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
       if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
       setAndCapTimerValues(breakValue);
+    }
+  }
+
+  public void changeEditTimerTextViewColorIfNotEmpty() {
+    if (editPopUpTimerArray.size()>0) {
+      timerValueInEditPopUpTextView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
+    } else {
+      timerValueInEditPopUpTextView.setTextColor(Color.WHITE);
     }
   }
 
@@ -1887,6 +1896,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int totalTime = convertStringToSecondsValue(editPopUpTimerString);
 
     setAndCapTimerValues(totalTime);
+    changeEditTimerTextViewColorIfNotEmpty();
   }
 
   public String convertedTimerArrayToString(ArrayList<String> arrayToConvert) {
