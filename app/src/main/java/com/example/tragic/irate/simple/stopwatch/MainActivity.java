@@ -377,8 +377,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Restarting cycle after one has ended from minimization starts w/ faded first dot. ALSO adds an extra second to "total time" once first round is completed.
-  //Todo: Selecting and de-selecting a specific round to replace still tries to replace old selection.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -1318,7 +1316,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    //These two runnables act as our timers for "count up" rounds.
     infinityRunnableForSets = new Runnable() {
       @Override
       public void run() {
@@ -2049,7 +2046,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
 
-    long remainder = timeLeft%1000;
     String timeRemaining = "";
     if (typeOfRound.size()>0) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
@@ -2490,7 +2486,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void removeRound () {
+  public void removeRound() {
     //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
     if (mode==1) {
       if (workoutTime.size()>0) {
@@ -3280,7 +3276,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Called via onPauseResume @ end of round, and also triggers the faded first dot.
   public void resetTimer() {
+    dotDraws.resetDotAlpha();
     timerIsPaused = true;
     timerEnded = false;
     reset.setVisibility(View.INVISIBLE);

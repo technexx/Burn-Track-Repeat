@@ -114,6 +114,7 @@ public class DotDraws extends View {
 
   public void resetDotAlpha() {
     mAlpha = 255; cycle = 0;
+    invalidate();
   }
 
   public void encloseDots(float topY, float botY) {
