@@ -26,13 +26,10 @@
         <item name="android:windowExitAnimation">@anim/slide_out_from_top</item>
     </style>
 
-    <style name="FadeInOnlyAnimation" parent="android:Theme">
-        <item name="android:windowEnterAnimation">@anim/fade_in_short</item>
-        <item name="android:windowExitAnimation">@null</item>
+
+
+    <style name="EditButtonTextColor">
+        <item name="android:textColor">@color/off_white</item>
     </style>
 
-    <style name="noAnimation" parent="android:Theme">
-        <item name="android:windowEnterAnimation">@null</item>
-        <item name="android:windowExitAnimation">@null</item>
-    </style>
 </resources>

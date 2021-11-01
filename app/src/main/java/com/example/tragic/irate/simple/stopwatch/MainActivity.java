@@ -377,6 +377,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
+  //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -402,7 +403,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(true);
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-    Log.i("testtime", "Resumed!!");
   }
 
   @Override
@@ -413,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dismissNotification = false;
       setNotificationValues();
     }
-    Log.i("testtime", "Stopped!!");
   }
 
   @Override
