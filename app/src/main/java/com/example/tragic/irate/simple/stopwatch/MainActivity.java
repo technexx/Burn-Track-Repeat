@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Subtracting selected rounds in edit cycle removes wrong round.
+  //Todo: Subtracting selected rounds in edit cycle removes wrong round if choosing first.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
@@ -1816,6 +1816,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (roundIsEdited) {
+      if (currentlyEditingACycle) {
+        ResumeOrResetCycle(RESETTING_CYCLE_FROM_ADAPTER);
+      }
       AsyncTask.execute(saveCyclesASyncRunnable);
       Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
     }
