@@ -377,7 +377,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: Subtracting selected rounds in edit cycle removes wrong round if choosing first.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
@@ -526,6 +525,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void roundSelected(int position) {
     roundIsSelected = true;
     roundSelectedPosition = position;
+    Log.i("testTime", "selected position in callback is " + roundSelectedPosition);
   }
 
   @Override
@@ -2438,8 +2438,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (subtractedRoundIsFading) removeRound();
 
         if (workoutTime.size()>0) {
-          //If round is not selected, default subtraction to latest round entry. Otherwise, keep the selected position.
-          if (!roundIsSelected) roundSelectedPosition = workoutTime.size()-1;
           if (roundSelectedPosition<=7) {
             //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
             cycleRoundsAdapter.setFadePositions(roundSelectedPosition, -1);
@@ -2462,9 +2460,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
       }
     }
-    //Resets round selection boolean.
-    if (roundIsSelected) consolidateRoundAdapterLists = true;
-    roundIsSelected = false;
   }
 
   public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
@@ -2519,14 +2514,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
     if (mode==1) {
       if (workoutTime.size()>0) {
-        //If round is not selected, default subtraction to latest round entry. Otherwise, keep the selected position. Needs to be declared here and in adjustCustom() to avoid occasional index errors w/ fase clicking.
-        if (!roundIsSelected) roundSelectedPosition = workoutTime.size()-1;
+        if (!roundIsSelected) {
+          roundSelectedPosition = workoutTime.size()-1;
+          Log.i("testTime", "boolean true!");
+        }
+
         if (workoutTime.size()-1>=roundSelectedPosition) {
           //If workoutTime list has 8 or less items, or a round is selected and its position is in that first 8 items, remove item from first adapter.
           if (workoutTime.size()<=8 || (roundIsSelected && roundSelectedPosition<=7)) {
             if (roundHolderOne.size()-1>=roundSelectedPosition) {
               roundHolderOne.remove(roundSelectedPosition);
               typeHolderOne.remove(roundSelectedPosition);
+              Log.i("testTime", "selected position in remove method is " + roundSelectedPosition);
               //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
               cycleRoundsAdapter.setFadePositions(-1, -1);
               cycleRoundsAdapter.notifyDataSetChanged();
@@ -2552,6 +2551,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
           subtractedRoundIsFading = false;
+        }
+        //Resets round selection boolean.
+        if (roundIsSelected) {
+          consolidateRoundAdapterLists = true;
+          roundIsSelected = false;
         }
       } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
     }
