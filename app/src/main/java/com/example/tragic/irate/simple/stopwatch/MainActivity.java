@@ -378,9 +378,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
 
   //Todo: BUG: Editing a cycle w/ reset/resume option up will b0rk the positioning when selecting a cycle to launch.
+  //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total time sync issue when resetting.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
-  //Todo: There's a likely index exception crash somewhere when launching a cycle.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -2829,14 +2829,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
-          //Todo: Placeholder is changing when starting object animator from pause/resume, so it matches setMillis and thus resets singlecycleTotal to 0.
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
-          Log.i("testTime", "single set time is " + cycleSetTimeForSingleRoundInMillis);
-          Log.i("testTime", "total set time is " + totalCycleSetTimeInMillis);
-          Log.i("testTime", "time duration holder is " + timerDurationPlaceHolder);
-          Log.i("testTime", "setMillis is " + setMillis);
           break;
         case 2:
           if (resettingTotalTime) {
@@ -2858,6 +2853,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTime);
+          Log.i("testTime", "single break time is " + cycleBreakTimeForSingleRoundInMillis);
+          Log.i("testTime", "single break time is " + cycleBreakTimeForSingleRoundInMillis);
+
           break;
         case 4:
           if (resettingTotalTime) {
@@ -2909,7 +2907,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
           case 3: case 4:
             totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
-            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) + 1000;
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
             cycleBreakTimeForSingleRoundInMillis = 0;
             break;
         }
