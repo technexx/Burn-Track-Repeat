@@ -377,9 +377,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: BUG: Editing a cycle w/ reset/resume option up will b0rk the positioning when selecting a cycle to launch.
+  //Todo: 59 seconds starts w/ small font instead of larger.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
-  //Todo: Total time sync issue when resetting.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -1076,6 +1075,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
+        setZeroedOutEditTimer();
         //Prevents tearing when soft keyboard pushes up in editCycle popUp.
         if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
         if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
@@ -1125,7 +1125,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
-      //No potential index issues here, so enable timer start.
       buttonToLaunchTimer.setEnabled(true);
       currentlyEditingACycle = true;
       //Used when deciding whether to save a new cycle or retrieve/update a current one. Editing will always pull an existing one.
@@ -1140,6 +1139,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAdapterArrays();
       //Uses this single position to retrieve cycle and populate timer arrays.
       populateRoundList();
+//      setEditPopUpTimerValueForEditedCycle();
       switch (mode) {
         case 1:
           //Populating String ArrayLists used to display rounds in editCycle popUp.
@@ -1861,9 +1861,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int totalTime = convertStringToSecondsValue(savedTimerString);
       setAndCapTimerValues(totalTime);
       changeEditTimerTextViewColorIfNotEmpty();
-
     }
   }
+
+  public void setZeroedOutEditTimer() {
+    editPopUpTimerArray.clear();
+    setEditPopUpTimerValues();
+    timerValueInEditPopUpTextView.setText("00:00");
+  }
+
+//  public void setEditPopUpTimerValueForEditedCycle() {
+//    int timeOfLastAddedRound = workoutTime.get(workoutTime.size()-1)/1000;
+//    convertIntegerToStringArray(timeOfLastAddedRound);
+//
+//    String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+//    timerValueInEditPopUpTextView.setText(savedTimerString);
+//
+//    int totalTime = convertStringToSecondsValue(savedTimerString);
+//    setAndCapTimerValues(totalTime);
+//  }
 
   public void toggleInfinityModeAndSetRoundType() {
     if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
@@ -2853,9 +2869,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTime);
-          Log.i("testTime", "single break time is " + cycleBreakTimeForSingleRoundInMillis);
-          Log.i("testTime", "single break time is " + cycleBreakTimeForSingleRoundInMillis);
-
           break;
         case 4:
           if (resettingTotalTime) {
