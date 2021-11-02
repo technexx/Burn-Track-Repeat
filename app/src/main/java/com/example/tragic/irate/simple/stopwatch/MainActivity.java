@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
-  //Todo: 59 seconds starts w/ small font instead of larger.
+  //Todo: Subtracting selected rounds in edit cycle removes wrong round.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
@@ -2955,7 +2955,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
   public void setInitialTextSizeForRounds(long millis) {
-    if (millis>=59000) {
+    if (millis>59000) {
       if (mode==1 || mode==3) {
         timeLeft.setTextSize(70f);
         textSizeIncreased = true;
