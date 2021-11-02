@@ -377,7 +377,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
 
+  //Todo: BUG: Editing a cycle w/ reset/resume option up will b0rk the positioning when selecting a cycle to launch.
+  //Todo: Total time sync issue when resetting.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
+  //Todo: There's a likely index exception crash somewhere when launching a cycle.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -1321,7 +1324,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         reduceTextSizeForInfinityRounds(setMillis);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-        setTextViewToStringValueOfTotalCycleTimer();
+        updateTotalTimeValuesEachTick();
 
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
@@ -1347,7 +1350,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         reduceTextSizeForInfinityRounds(breakMillis);
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-        setTextViewToStringValueOfTotalCycleTimer();
+        updateTotalTimeValuesEachTick();
 
         //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
         currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
@@ -1437,7 +1440,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER_HORIZONTAL, 0, -100);
     });
 
-    //Todo: Brought up by both delete-all-cycles and delete-total-times.
     delete_all_confirm.setOnClickListener(v-> {
       if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
         AsyncTask.execute(deleteAllCyclesASyncRunnable);
@@ -1721,7 +1723,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleSetTimeInMillis = 0;
           totalCycleBreakTimeInMillis = 0;
           cyclesCompleted = 0;
-          roundedValueForTotalTimes = 0;
           resettingTotalTime = true;
 
           total_set_time.setText("0");
@@ -1832,6 +1833,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEditPopUpTimerHeaders(int headerToSelect) {
+    //Todo: For Pom.
     if (mode==1) {
       //Toggles coloring and row selection.
       if (headerToSelect == 1) {
@@ -2732,7 +2734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
-        setTextViewToStringValueOfTotalCycleTimer();
+        updateTotalTimeValuesEachTick();
 
         if (textSizeIncreased && mode==1) {
           if (setMillis < 59000) {
@@ -2762,7 +2764,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
-        setTextViewToStringValueOfTotalCycleTimer();
+        updateTotalTimeValuesEachTick();
 
         if (textSizeIncreased && mode==1) {
           if (breakMillis < 59000) {
@@ -2793,7 +2795,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
-        setTextViewToStringValueOfTotalCycleTimer();
+        updateTotalTimeValuesEachTick();
 
         if (textSizeIncreased && mode==3) {
           if (pomMillis < 59000) {
@@ -2813,16 +2815,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  public void setTextViewToStringValueOfTotalCycleTimer() {
+  //Todo: Breaks a bit buggy - total time resetting to 1 after round and also doesn't add last second of round.
+  //Todo: Will need a sep. var for Pom mode since we can run timers concurrently.
+  public void updateTotalTimeValuesEachTick() {
     String addedTime = "";
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1:
           if (resettingTotalTime) {
+            //e.g. setMillis = 3200; roundedValueForTotalTimes = 1000-200 = 800; cycleSetTimeForSingleRound = 800.
             roundedValueForTotalTimes = 1000 - (setMillis%1000);
-            cycleSetTimeForSingleRoundInMillis = roundedValueForTotalTimes;
+            timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
+
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
@@ -2839,10 +2845,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 3:
           if (resettingTotalTime) {
             roundedValueForTotalTimes = 1000 - (breakMillis%1000);
-            cycleBreakTimeForSingleRoundInMillis = roundedValueForTotalTimes;
+            timerDurationPlaceHolder = breakMillis + roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
-          cycleBreakTimeForSingleRoundInMillis+=50;
+
+          cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTime);
           break;
@@ -3019,7 +3026,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         return;
       }
-      ///---Executes for all Modes---///
       //Always starting new rounds active, so reset button will not be available.
       reset.setVisibility(View.INVISIBLE);
       //Disables button that calls this method so it doesn't execute twice.
