@@ -2681,9 +2681,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
-          timerDurationPlaceHolder = setMillis;
           //If progress bar is at max value, round has not begun.
           if (currentProgressBarValue==maxProgress) {
+            timerDurationPlaceHolder = setMillis;
             //Starts object animator.
             instantiateAndStartObjectAnimator(setMillis);
             //Used for pause/resume toggle.
@@ -2695,8 +2695,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (objectAnimator != null) objectAnimator.resume();
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
-          timerDurationPlaceHolder = breakMillis;
           if (currentProgressBarValue==maxProgress) {
+            timerDurationPlaceHolder = breakMillis;
             //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
             //Starts object animator.
@@ -2829,15 +2829,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
+          //Todo: Placeholder is changing when starting object animator from pause/resume, so it matches setMillis and thus resets singlecycleTotal to 0.
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
+          Log.i("testTime", "single set time is " + cycleSetTimeForSingleRoundInMillis);
+          Log.i("testTime", "total set time is " + totalCycleSetTimeInMillis);
+          Log.i("testTime", "time duration holder is " + timerDurationPlaceHolder);
+          Log.i("testTime", "setMillis is " + setMillis);
           break;
         case 2:
           if (resettingTotalTime) {
             setMillis = 0;
             resettingTotalTime = false;
           }
+
           cycleSetTimeForSingleRoundInMillis = setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
@@ -2858,6 +2864,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             breakMillis = 0;
             resettingTotalTime = false;
           }
+
           cycleBreakTimeForSingleRoundInMillis = breakMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTime);
