@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -376,7 +377,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldCycleRoundListOne;
   ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
+  Vibrator vibrator;
 
+  //Todo: Pom mode needs love. Check for all methods or just nix it.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
@@ -571,6 +574,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
     blankCanvas = findViewById(R.id.blank_canvas);
     blankCanvas.setVisibility(View.GONE);
+
+    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
     calendar = Calendar.getInstance();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
@@ -3043,20 +3048,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.startAnimation(fadeProgressOut);
     //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimator()).
     currentProgressBarValue = 10000;
-    //If no rounds left, remove our endFade runnable, reset timer, and return before executing anything else. The button tied to this method will be disabled until the proper rounded subtraction can occur.
+    reset.setVisibility(View.INVISIBLE);
+    next_round.setEnabled(false);
+    timerDisabled = true;
+
     if (mode==1) {
       if (numberOfRoundsLeft==0) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
         mHandler.removeCallbacks(endFade);
         resetTimer();
+//        long[] pattern = {0, 500, 300};
+//        vibrator.vibrate(pattern, 0);
         return;
       }
-      //Always starting new rounds active, so reset button will not be available.
-      reset.setVisibility(View.INVISIBLE);
-      //Disables button that calls this method so it doesn't execute twice.
-      next_round.setEnabled(false);
-      //Disables pause/resume button.
-      timerDisabled = true;
       //Resets default base (30 sec) for count-up rounds.
       currentProgressBarValueForInfinityRounds = 30000;
       //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
@@ -3073,22 +3077,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
+      long[] pattern = {0, 300, 300, 300, 300};
       switch (typeOfRound.get(currentRound)) {
         case 1:
           timeLeft.setText("0");
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          vibrator.vibrate(300);
           break;
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          vibrator.vibrate(pattern, -1);
           break;
         case 3:
           timeLeft.setText("0");
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          vibrator.vibrate(300);
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          vibrator.vibrate(pattern, -1);
           break;
       }
       //Subtracts from rounds remaining.
@@ -3100,6 +3109,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       beginTimerForNextRound = true;
     }
     if (mode==3) {
+      if (pomDotCounter==8) {
+        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
+        mHandler.removeCallbacks(endFade);
+        resetTimer();
+        return;
+      }
+
       timeLeft.setText("0");
       mHandler.post(endFade);
       pomDotCounter++;
