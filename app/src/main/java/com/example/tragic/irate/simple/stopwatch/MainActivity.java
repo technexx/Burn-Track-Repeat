@@ -381,6 +381,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Pom mode needs love. Check for all methods or just nix it.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
+  //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -3053,12 +3054,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerDisabled = true;
 
     if (mode==1) {
+      if (numberOfRoundsLeft==1) {
+        long[] pattern = {0, 500, 300};
+        vibrator.vibrate(pattern, 0);
+      }
       if (numberOfRoundsLeft==0) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
         mHandler.removeCallbacks(endFade);
         resetTimer();
-//        long[] pattern = {0, 500, 300};
-//        vibrator.vibrate(pattern, 0);
         return;
       }
       //Resets default base (30 sec) for count-up rounds.
@@ -3087,12 +3090,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-          vibrator.vibrate(pattern, -1);
+          vibrator.vibrate(300);
           break;
         case 3:
           timeLeft.setText("0");
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          vibrator.vibrate(300);
+          vibrator.vibrate(pattern, -1);
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
@@ -3109,6 +3112,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       beginTimerForNextRound = true;
     }
     if (mode==3) {
+      if (pomDotCounter==7) {
+        long[] pattern = {0, 500, 300};
+        vibrator.vibrate(pattern, 0);
+      }
       if (pomDotCounter==8) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
         mHandler.removeCallbacks(endFade);
@@ -3333,6 +3340,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Called via onPauseResume @ end of round, and also triggers the faded first dot.
   public void resetTimer() {
+    vibrator.cancel();
     dotDraws.resetDotAlpha();
     timerIsPaused = true;
     timerEnded = false;
