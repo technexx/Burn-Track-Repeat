@@ -143,8 +143,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton deleteEditPopUpTimerNumbers;
   ArrayList<String> editPopUpTimerArray;
   ArrayList<String> editPopUpTimerArrayCapped;
-  ArrayList<String> savedEditPopUpArrayForFirstHeader;
-  ArrayList<String> savedEditPopUpArrayForSecondHeader;
+  ArrayList<String> savedEditPopUpArrayForFirstHeaderModeOne;
+  ArrayList<String> savedEditPopUpArrayForSecondHeaderModeOne;
+
+  ArrayList<String> savedEditPopUpArrayForFirstHeaderModeThree;
+  ArrayList<String> savedEditPopUpArrayForSecondHeaderModeThree;
   ArrayList<String> savedEditPopUpArrayForThirdHeader;
 
   TextView sortAlphaStart;
@@ -603,8 +606,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
     editPopUpTimerArray = new ArrayList<>();
     editPopUpTimerArrayCapped = new ArrayList<>();
-    savedEditPopUpArrayForFirstHeader = new ArrayList<>();
-    savedEditPopUpArrayForSecondHeader = new ArrayList<>();
+    savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>();
+    savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>();
+    savedEditPopUpArrayForFirstHeaderModeThree = new ArrayList<>();
+    savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>();
     savedEditPopUpArrayForThirdHeader = new ArrayList<>();
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
@@ -1248,13 +1253,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     firstRoundTypeHeaderInEditPopUp.setOnClickListener(v->{
-      if (mode==1) {
-        setEditPopUpTimerHeaders(1);
-      }
+      setEditPopUpTimerHeaders(1);
     });
 
     secondRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
       setEditPopUpTimerHeaders(2);
+    });
+
+    thirdRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
+      setEditPopUpTimerHeaders(3);
     });
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
@@ -1842,35 +1849,51 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEditPopUpTimerHeaders(int headerToSelect) {
-    //Todo: For Pom.
-    if (mode==1) {
-      //Toggles coloring and row selection.
-      if (headerToSelect == 1) {
-        //If first row is highlighted, second row should un-highlight.
-        firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
+    if (headerToSelect == 1) {
+      //If first row is highlighted, second row should un-highlight.
+      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
+      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      editHeaderSelected = 1;
+
+      if (mode==1) {
         toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
-        secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-        editHeaderSelected = 1;
-
-        editPopUpTimerArray = savedEditPopUpArrayForFirstHeader;
-
+        editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
       }
-      if (headerToSelect == 2) {
-        secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
-        firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
-        editHeaderSelected = 2;
-
-        editPopUpTimerArray = savedEditPopUpArrayForSecondHeader;
+      if (mode==3) {
+        editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeThree;
       }
-
-      String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
-      timerValueInEditPopUpTextView.setText(savedTimerString);
-
-      int totalTime = convertStringToSecondsValue(savedTimerString);
-      setAndCapTimerValues(totalTime);
-      changeEditTimerTextViewColorIfNotEmpty();
     }
+    if (headerToSelect == 2) {
+      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      editHeaderSelected = 2;
+
+      if (mode==1) {
+        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
+        editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
+      }
+      if (mode==3) {
+        editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeThree;
+      }
+
+    }
+    if (headerToSelect == 3) {
+      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple));
+      editHeaderSelected = 3;
+
+      editPopUpTimerArray = savedEditPopUpArrayForThirdHeader;
+    }
+
+    String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+    timerValueInEditPopUpTextView.setText(savedTimerString);
+
+    int totalTime = convertStringToSecondsValue(savedTimerString);
+    setAndCapTimerValues(totalTime);
+    changeEditTimerTextViewColorIfNotEmpty();
   }
 
   public void setZeroedOutEditTimer() {
@@ -1879,25 +1902,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerValueInEditPopUpTextView.setText("00:00");
   }
 
-//  public void setEditPopUpTimerValueForEditedCycle() {
-//    int timeOfLastAddedRound = workoutTime.get(workoutTime.size()-1)/1000;
-//    convertIntegerToStringArray(timeOfLastAddedRound);
-//
-//    String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
-//    timerValueInEditPopUpTextView.setText(savedTimerString);
-//
-//    int totalTime = convertStringToSecondsValue(savedTimerString);
-//    setAndCapTimerValues(totalTime);
-//  }
-
   public void toggleInfinityModeAndSetRoundType() {
-    if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
-      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
-      setAndCapTimerValues(setValue);
+    if (mode==1) {
+      if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
+        if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
+        setAndCapTimerValues(setValue);
+      }
+      if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
+        if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
+        setAndCapTimerValues(breakValue);
+      }
     }
-    if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
-      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
-      setAndCapTimerValues(breakValue);
+
+    if (mode==3) {
+      if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
+        setAndCapTimerValues(pomValue1);
+      }
+      if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
+        setAndCapTimerValues(pomValue2);
+      }
+      if (thirdRoundTypeHeaderInEditPopUp.getCurrentTextColor()==ContextCompat.getColor(getApplicationContext(), R.color.purple)) {
+        setAndCapTimerValues(pomValue3);
+      }
     }
   }
 
@@ -1910,9 +1936,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void saveEditHeaderTimerStringValues() {
-    if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeader = new ArrayList<>(editPopUpTimerArray);
-    if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeader = new ArrayList<>(editPopUpTimerArray);
-    if (editHeaderSelected == 3) savedEditPopUpArrayForThirdHeader = new ArrayList<>(editPopUpTimerArray);
+    if (mode==1) {
+      if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
+      if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
+    }
+    if (mode==3) {
+      if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeaderModeThree = new ArrayList<>(editPopUpTimerArray);
+      if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>(editPopUpTimerArray);
+      if (editHeaderSelected == 3) savedEditPopUpArrayForThirdHeader = new ArrayList<>(editPopUpTimerArray);
+    }
   }
 
   public void setEditPopUpTimerValues() {
