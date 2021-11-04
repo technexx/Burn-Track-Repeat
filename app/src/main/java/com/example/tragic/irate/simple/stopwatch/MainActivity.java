@@ -383,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Vibrator vibrator;
 
   //Todo: Pom mode needs love. Check for all methods or just nix it.
+  //Todo: Have option to remove cap on Pom mode.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
@@ -1849,6 +1850,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEditPopUpTimerHeaders(int headerToSelect) {
+//    if (mode==3) callConversionMethodForIntegerToStringArrayOnModeThree();
+
     if (headerToSelect == 1) {
       //If first row is highlighted, second row should un-highlight.
       firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
@@ -2044,6 +2047,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editPopUpTimerArray.clear();
     for (int i=0; i<indexPlaces; i++) {
       editPopUpTimerArray.add(editPopUpTimerArrayCapped.get(i+(4-indexPlaces)));
+    }
+
+    //Todo: savedEditPopUpArrays now contain the 3 String arrays we need based on each pomValue.
+    //Todo: Set timer textView to capped values for all headers (we'll be adding textView for this).
+    if (mode==3) {
+      if (timerInteger==pomValue1) {
+        savedEditPopUpArrayForFirstHeaderModeThree = editPopUpTimerArray;
+      }
+      if (timerInteger==pomValue2) {
+        savedEditPopUpArrayForSecondHeaderModeThree = editPopUpTimerArray;
+      }
+      if (timerInteger==pomValue3) {
+        savedEditPopUpArrayForThirdHeader = editPopUpTimerArray;
+      }
     }
   }
 
@@ -2320,6 +2337,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertedPomList.clear();
   }
 
+  //Todo: These are all getting capped at min, so it is working.
   public void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
@@ -2327,9 +2345,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editHeaderSelected==2) breakValue = timerValueBoundsFormula(5, 1200, value);
         break;
       case 3:
-        if (editHeaderSelected==1) pomValue1 = timerValueBoundsFormula(900, 5400, value);
-        if (editHeaderSelected==2) pomValue2 = timerValueBoundsFormula(180, 600, value);
-        if (editHeaderSelected==3) pomValue3 = timerValueBoundsFormula(600, 1800, value);
+        pomValue1 = timerValueBoundsFormula(600, 5400, value);
+        pomValue2 = timerValueBoundsFormula(180, 600, value);
+        pomValue3 = timerValueBoundsFormula(900, 1800, value);
         break;
     }
   }
@@ -2454,7 +2472,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
         }
       }
+      //Todo: List all 3 at once, with times under each.
       if (mode==3) {
+        convertIntegerToStringArray(pomValue1);
+        convertIntegerToStringArray(pomValue2);
+        convertIntegerToStringArray(pomValue3);
+        Log.i("testTime", "pomValue 1 is " + pomValue1);
+        Log.i("testTime", "pomValue 2 is " + pomValue2);
+        Log.i("testTime", "pomValue 3 is " + pomValue3);
+
         if (pomValuesTime.size()==0) {
           for (int i = 0; i < 3; i++) {
             pomValuesTime.add(pomValue1 * 1000);
