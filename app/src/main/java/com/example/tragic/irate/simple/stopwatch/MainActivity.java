@@ -130,6 +130,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow editCyclesPopupWindow;
   PopupWindow settingsPopupWindow;
 
+  TextView cycleNameText;
+  EditText cycleNameEdit;
+  TextView firstRoundTypeHeaderInEditPopUp;
+  TextView secondRoundTypeHeaderInEditPopUp;
+  TextView thirdRoundTypeHeaderInEditPopUp;
+  TextView timerValueInEditPopUpTextView;
+  TextView pomTimerValueInEditPopUpTextViewOne;
+  TextView pomTimerValueInEditPopUpTextViewTwo;
+  TextView pomTimerValueInEditPopUpTextViewThree;
+
   TextView number_one;
   TextView number_two;
   TextView number_three;
@@ -174,13 +184,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int positionOfSelectedCycle;
   String cycleTitle = "";
   List<String> receivedHighlightPositions;
-
-  TextView cycleNameText;
-  EditText cycleNameEdit;
-  TextView firstRoundTypeHeaderInEditPopUp;
-  TextView secondRoundTypeHeaderInEditPopUp;
-  TextView thirdRoundTypeHeaderInEditPopUp;
-  TextView timerValueInEditPopUpTextView;
 
   ImageButton addRoundToCycleButton;
   ImageButton subtractRoundFromCycleButton;
@@ -639,9 +642,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     secondRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.secondRoundTypeHeaderInEditPopUp);
     thirdRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.thirdRoundTypeHeaderInEditPopUp);
     timerValueInEditPopUpTextView = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUpTextView);
+    pomTimerValueInEditPopUpTextViewOne = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewOne);
+    pomTimerValueInEditPopUpTextViewTwo = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewTwo);
+    pomTimerValueInEditPopUpTextViewThree = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewThree);
+
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
     subtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
-    toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.infinity_toggle_imageButton);
+    toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     toggleInfinityRounds.setAlpha(0.3f);
@@ -901,35 +908,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-        if (mode==1) {
-          sortHigh.setVisibility(View.VISIBLE);
-          sortLow.setVisibility(View.VISIBLE);
-          savedCycleRecycler.setVisibility(View.VISIBLE);
-          savedPomCycleRecycler.setVisibility(View.GONE);
-          total_set_header.setText(R.string.total_sets);
-          currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
-          timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
-          positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
-          timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
-          timerEnded = sharedPreferences.getBoolean("modeOneTimerEnded", false);
-          timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
-        } else if (mode==3) {
-          sortHigh.setVisibility(View.GONE);
-          sortLow.setVisibility(View.GONE);
-          roundRecyclerTwo.setVisibility(View.GONE);
-          recyclerLayoutOne.leftMargin = 240;
-          roundListDivider.setVisibility(View.GONE);
-          savedCycleRecycler.setVisibility(View.GONE);
-          savedPomCycleRecycler.setVisibility(View.VISIBLE);
-          total_set_header.setText(R.string.total_work);
-          currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
-          timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
-          positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
-          timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);
-          timerEnded = sharedPreferences.getBoolean("modeThreeTimerEnded", false);
-          timerDisabled = sharedPreferences.getBoolean("modeThreeTimerDisabled", false);
-        }
-        //Sets all editTexts to GONE, and then populates them + textViews based on mode.
         defaultEditRoundViews();
       }
 
@@ -1012,37 +990,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortNotRecent.setOnClickListener(sortListener);
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
-
-    View.OnClickListener numberPadListener = view -> {
-      TextView textButton = (TextView) view;
-
-      if (editPopUpTimerArray.size()<=3) {
-        for (int i=0; i<10; i++)  {
-          if (textButton.getText().equals(String.valueOf(i))) {
-            editPopUpTimerArray.add(String.valueOf(i));
-          }
-        }
-      }
-      setEditPopUpTimerValues();
-    };
-
-    number_one.setOnClickListener(numberPadListener);
-    number_two.setOnClickListener(numberPadListener);
-    number_three.setOnClickListener(numberPadListener);
-    number_four.setOnClickListener(numberPadListener);
-    number_five.setOnClickListener(numberPadListener);
-    number_six.setOnClickListener(numberPadListener);
-    number_seven.setOnClickListener(numberPadListener);
-    number_eight.setOnClickListener(numberPadListener);
-    number_nine.setOnClickListener(numberPadListener);
-    number_zero.setOnClickListener(numberPadListener);
-
-    deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
-      if (editPopUpTimerArray.size()>0) {
-        editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
-      }
-      setEditPopUpTimerValues();
-    });
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
@@ -1263,6 +1210,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     thirdRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
       setEditPopUpTimerHeaders(3);
+    });
+
+    View.OnClickListener numberPadListener = view -> {
+      TextView textButton = (TextView) view;
+
+      if (editPopUpTimerArray.size()<=3) {
+        for (int i=0; i<10; i++)  {
+          if (textButton.getText().equals(String.valueOf(i))) {
+            editPopUpTimerArray.add(String.valueOf(i));
+          }
+        }
+      }
+      setEditPopUpTimerValues();
+    };
+
+    number_one.setOnClickListener(numberPadListener);
+    number_two.setOnClickListener(numberPadListener);
+    number_three.setOnClickListener(numberPadListener);
+    number_four.setOnClickListener(numberPadListener);
+    number_five.setOnClickListener(numberPadListener);
+    number_six.setOnClickListener(numberPadListener);
+    number_seven.setOnClickListener(numberPadListener);
+    number_eight.setOnClickListener(numberPadListener);
+    number_nine.setOnClickListener(numberPadListener);
+    number_zero.setOnClickListener(numberPadListener);
+
+    deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
+      if (editPopUpTimerArray.size()>0) {
+        editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
+      }
+      setEditPopUpTimerValues();
     });
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
@@ -2397,50 +2375,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void defaultEditRoundViews() {
-    //Instance of layout objects we can set programmatically based on which mode we're on.
-    ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
-    ConstraintLayout.LayoutParams secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
-    ConstraintLayout.LayoutParams thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
-
-    ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
-    ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) subtractRoundFromCycleButton.getLayoutParams();
-    ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
-
-    timeLeft.setText(timeLeftValueHolder);
-    switch (mode) {
-      case 1:
-        firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
-        firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;
-        secondRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
-        secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
-
-        secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
-        firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
-
-        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
-        toggleInfinityRounds.setVisibility(View.VISIBLE);
-        timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
-        break;
-      case 3:
-        firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
-        firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;
-        secondRoundHeaderParams.endToStart = R.id.thirdRoundTypeHeaderInEditPopUp;
-        secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
-        thirdRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
-        thirdRoundHeaderParams.startToEnd = R.id.secondRoundTypeHeaderInEditPopUp;
-
-        firstRoundTypeHeaderInEditPopUp.setText(R.string.work_time);
-        secondRoundTypeHeaderInEditPopUp.setText(R.string.small_break);
-        thirdRoundTypeHeaderInEditPopUp.setText(R.string.long_break);
-
-        timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
-        toggleInfinityRounds.setVisibility(View.GONE);
-        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
-        break;
-    }
-  }
-
   public void adjustCustom(boolean adding) {
     //Hides soft keyboard by using a token of the current editCycleView.
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
@@ -2902,8 +2836,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  //Todo: Breaks a bit buggy - total time resetting to 1 after round and also doesn't add last second of round.
-  //Todo: Will need a sep. var for Pom mode since we can run timers concurrently.
   public void updateTotalTimeValuesEachTick() {
     String addedTime = "";
     if (mode==1) {
@@ -3294,6 +3226,98 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void defaultEditRoundViews() {
+    //Instance of layout objects we can set programmatically based on which mode we're on.
+    ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
+    ConstraintLayout.LayoutParams secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
+    ConstraintLayout.LayoutParams thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
+
+    ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
+    ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) subtractRoundFromCycleButton.getLayoutParams();
+    ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
+
+    ConstraintLayout.LayoutParams secondEditHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
+    ConstraintLayout.LayoutParams deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
+
+    timeLeft.setText(timeLeftValueHolder);
+    switch (mode) {
+      case 1:
+        firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
+        firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;
+        secondRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
+        secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
+
+        secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
+        firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
+
+        secondEditHeaderParams.rightMargin = 20;
+        deleteEditTimerNumbersParams.rightMargin = convertDensityPixelsToScalable(76);
+        deleteEditTimerNumbersParams.topMargin = convertDensityPixelsToScalable(12);
+
+        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
+        toggleInfinityRounds.setVisibility(View.VISIBLE);
+        timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
+        sortHigh.setVisibility(View.VISIBLE);
+        sortLow.setVisibility(View.VISIBLE);
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        savedPomCycleRecycler.setVisibility(View.GONE);
+
+        timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
+        pomTimerValueInEditPopUpTextViewOne.setVisibility(View.GONE);
+        pomTimerValueInEditPopUpTextViewTwo.setVisibility(View.GONE);
+        pomTimerValueInEditPopUpTextViewThree.setVisibility(View.GONE);
+
+        total_set_header.setText(R.string.total_sets);
+        currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
+        timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
+        positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
+        timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
+        timerEnded = sharedPreferences.getBoolean("modeOneTimerEnded", false);
+        timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
+        break;
+      case 3:
+        secondEditHeaderParams.rightMargin = 0;
+        deleteEditTimerNumbersParams.rightMargin = convertDensityPixelsToScalable(8);
+        deleteEditTimerNumbersParams.topMargin = convertDensityPixelsToScalable(8);
+
+        firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
+        firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;
+        secondRoundHeaderParams.endToStart = R.id.thirdRoundTypeHeaderInEditPopUp;
+        secondRoundHeaderParams.startToEnd = R.id.firstRoundTypeHeaderInEditPopUp;
+        thirdRoundHeaderParams.endToEnd = R.id.edit_cycle_layout;
+        thirdRoundHeaderParams.startToEnd = R.id.secondRoundTypeHeaderInEditPopUp;
+
+        firstRoundTypeHeaderInEditPopUp.setText(R.string.work_time);
+        secondRoundTypeHeaderInEditPopUp.setText(R.string.small_break);
+        thirdRoundTypeHeaderInEditPopUp.setText(R.string.long_break);
+
+        timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
+        toggleInfinityRounds.setVisibility(View.GONE);
+        thirdRoundTypeHeaderInEditPopUp.setVisibility(View.VISIBLE);
+
+        timerValueInEditPopUpTextView.setVisibility(View.INVISIBLE);
+        pomTimerValueInEditPopUpTextViewOne.setVisibility(View.VISIBLE);
+        pomTimerValueInEditPopUpTextViewTwo.setVisibility(View.VISIBLE);
+        pomTimerValueInEditPopUpTextViewThree.setVisibility(View.VISIBLE);
+
+        sortHigh.setVisibility(View.GONE);
+        sortLow.setVisibility(View.GONE);
+        roundRecyclerTwo.setVisibility(View.GONE);
+        recyclerLayoutOne.leftMargin = 240;
+        roundListDivider.setVisibility(View.GONE);
+        savedCycleRecycler.setVisibility(View.GONE);
+        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+        total_set_header.setText(R.string.total_work);
+        currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
+        timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
+        positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
+        timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);
+        timerEnded = sharedPreferences.getBoolean("modeThreeTimerEnded", false);
+        timerDisabled = sharedPreferences.getBoolean("modeThreeTimerDisabled", false);
+        break;
+    }
+  }
+
   public void populateTimerUI() {
     lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
@@ -3396,7 +3420,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Called via onPauseResume @ end of round, and also triggers the faded first dot.
   public void resetTimer() {
     vibrator.cancel();
     dotDraws.resetDotAlpha();

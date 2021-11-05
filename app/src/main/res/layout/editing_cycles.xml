@@ -52,7 +52,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
-        android:layout_marginStart="2dp"
         android:layout_marginTop="8dp"
         android:textSize="23sp"
         android:textColor="@color/white"/>
@@ -74,6 +73,7 @@
         app:layout_constraintStart_toEndOf="@id/secondRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="26dp"
         android:textSize="23sp"
         android:textColor="@color/white"/>
 
@@ -85,26 +85,65 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         android:layout_marginTop="6dp"
+        android:layout_marginEnd="24dp"
         android:textSize="36sp">
+    </TextView>
+
+    <TextView
+        android:text="00:05"
+        android:id="@+id/pomTimerValueInEditPopUpTextViewOne"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewTwo"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="6dp"
+        android:textSize="28sp">
+    </TextView>
+
+    <TextView
+        android:text="00:05"
+        android:id="@+id/pomTimerValueInEditPopUpTextViewTwo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewOne"
+        app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewThree"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="2sp"
+        android:textSize="28sp">
+    </TextView>
+
+    <TextView
+        android:text="00:05"
+        android:id="@+id/pomTimerValueInEditPopUpTextViewThree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewTwo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="28dp"
+        android:textSize="28sp">
     </TextView>
 
     <ImageButton
         android:id="@+id/deleteEditPopUpTimerNumbers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/infinity_toggle_imageButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="16sp"
-        android:layout_marginEnd="4dp"
         android:src="@drawable/cancel_x"
         android:background="@drawable/ripple_effect_2">
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/infinity_toggle_imageButton"
+        android:id="@+id/toggle_infinity_rounds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewTwo"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="-8dp"
@@ -161,6 +200,7 @@
         app:layout_constraintTop_toBottomOf="@id/timerValueInEditPopUpTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
         android:layout_marginTop="6dp">
 
         <TextView
@@ -323,6 +363,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:paddingTop="4dp"
         android:layout_marginBottom="12dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/recycler_border">
 
         <androidx.recyclerview.widget.RecyclerView
