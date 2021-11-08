@@ -385,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
+  //Todo: Pom recyclerView coloring is now off.
   //Todo: Pom mode needs love. Check for all methods or just nix it.
   //Todo: Have option to remove cap on Pom mode.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
@@ -1215,6 +1216,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       TextView textButton = (TextView) view;
 
       if (mode==1) addToEditPopUpTimerArrays(editPopUpTimerArray, textButton);
+
       if (mode==3) {
         if (editHeaderSelected==1) addToEditPopUpTimerArrays(savedEditPopUpArrayForFirstHeaderModeThree, textButton);
         if (editHeaderSelected==2) addToEditPopUpTimerArrays(savedEditPopUpArrayForSecondHeaderModeThree, textButton);
@@ -1236,9 +1238,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_zero.setOnClickListener(numberPadListener);
 
     deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
-      if (editPopUpTimerArray.size()>0) {
-        editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
+      if (mode==1) {
+        if (editPopUpTimerArray.size()>0) {
+          editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
+        }
       }
+
+      if (mode==3) {
+        if (editHeaderSelected==1) savedEditPopUpArrayForFirstHeaderModeThree.remove(savedEditPopUpArrayForFirstHeaderModeThree.size()-1);
+        if (editHeaderSelected==2) savedEditPopUpArrayForSecondHeaderModeThree.remove(savedEditPopUpArrayForSecondHeaderModeThree.size()-1);
+        if (editHeaderSelected==3) savedEditPopUpArrayForThirdHeader.remove(savedEditPopUpArrayForThirdHeader.size()-1);
+      }
+
       setEditPopUpTimerValues();
     });
 
