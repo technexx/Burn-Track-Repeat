@@ -536,7 +536,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void roundSelected(int position) {
     roundIsSelected = true;
     roundSelectedPosition = position;
-    Log.i("testTime", "selected position in callback is " + roundSelectedPosition);
   }
 
   @Override
@@ -1215,12 +1214,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View.OnClickListener numberPadListener = view -> {
       TextView textButton = (TextView) view;
 
-      if (editPopUpTimerArray.size()<=3) {
-        for (int i=0; i<10; i++)  {
-          if (textButton.getText().equals(String.valueOf(i))) {
-            editPopUpTimerArray.add(String.valueOf(i));
-          }
-        }
+      if (mode==1) addToEditPopUpTimerArrays(editPopUpTimerArray, textButton);
+      if (mode==3) {
+        if (editHeaderSelected==1) addToEditPopUpTimerArrays(savedEditPopUpArrayForFirstHeaderModeThree, textButton);
+        if (editHeaderSelected==2) addToEditPopUpTimerArrays(savedEditPopUpArrayForSecondHeaderModeThree, textButton);
+        if (editHeaderSelected==3) addToEditPopUpTimerArrays(savedEditPopUpArrayForThirdHeader, textButton);
+
       }
       setEditPopUpTimerValues();
     };
@@ -1686,7 +1685,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           if (!pomString.equals("")) {
             pomCycles.setFullCycle(pomString);
-            pomCycles.setTimeAccessed(System.currentTimeMillis());;
+            pomCycles.setTimeAccessed(System.currentTimeMillis());
             if (isNewCycle) {
               pomCycles.setTimeAdded(System.currentTimeMillis());
               if (cycleTitle.isEmpty()) cycleTitle = date;
@@ -1828,8 +1827,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEditPopUpTimerHeaders(int headerToSelect) {
-//    if (mode==3) callConversionMethodForIntegerToStringArrayOnModeThree();
-
     if (headerToSelect == 1) {
       //If first row is highlighted, second row should un-highlight.
       firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
@@ -1841,10 +1838,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
         editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
       }
-      if (mode==3) {
-        editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeThree;
-      }
     }
+
     if (headerToSelect == 2) {
       firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
@@ -1855,18 +1850,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
         editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
       }
-      if (mode==3) {
-        editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeThree;
-      }
-
     }
+
     if (headerToSelect == 3) {
       firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       thirdRoundTypeHeaderInEditPopUp.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple));
       editHeaderSelected = 3;
-
-      editPopUpTimerArray = savedEditPopUpArrayForThirdHeader;
     }
 
     String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
@@ -1896,14 +1886,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode==3) {
+      setAndCapTimerValues(pomValue1);
+      setAndCapTimerValues(pomValue2);
+      setAndCapTimerValues(pomValue3);
+
       if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
-        setAndCapTimerValues(pomValue1);
       }
       if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
-        setAndCapTimerValues(pomValue2);
       }
       if (thirdRoundTypeHeaderInEditPopUp.getCurrentTextColor()==ContextCompat.getColor(getApplicationContext(), R.color.purple)) {
-        setAndCapTimerValues(pomValue3);
       }
     }
   }
@@ -1921,26 +1912,61 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
       if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
     }
-    if (mode==3) {
-      if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeaderModeThree = new ArrayList<>(editPopUpTimerArray);
-      if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>(editPopUpTimerArray);
-      if (editHeaderSelected == 3) savedEditPopUpArrayForThirdHeader = new ArrayList<>(editPopUpTimerArray);
+  }
+
+  public void addToEditPopUpTimerArrays(ArrayList<String> arrayList, TextView textView) {
+    if (arrayList.size()<=3) {
+      for (int i=0; i<10; i++)  {
+        if (textView.getText().equals(String.valueOf(i))) {
+          arrayList.add(String.valueOf(i));
+        }
+      }
     }
   }
 
   public void setEditPopUpTimerValues() {
-    String editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
-    saveEditHeaderTimerStringValues();
+    String editPopUpTimerString = "";
+    if (mode==1) {
+      editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+      saveEditHeaderTimerStringValues();
+      timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
-    timerValueInEditPopUpTextView.setText(editPopUpTimerString);
-    int totalTime = convertStringToSecondsValue(editPopUpTimerString);
+      int totalTime = convertStringToSecondsValue(editPopUpTimerString);
+      setAndCapTimerValues(totalTime);
+    }
 
-    setAndCapTimerValues(totalTime);
+    if (mode==3) {
+      int totalTimeOne = 0;
+      int totalTimeTwo = 0;
+      int totalTimeThree = 0;
+      String editPopUpTimerStringOne = "";
+      String editPopUpTimerStringTwo = "";
+      String editPopUpTimerStringThree = "";
+
+      editPopUpTimerStringOne =  convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
+      totalTimeOne = convertStringToSecondsValue(editPopUpTimerStringOne);
+      pomTimerValueInEditPopUpTextViewOne.setText(editPopUpTimerStringOne);
+
+      editPopUpTimerStringTwo = convertedTimerArrayToString(savedEditPopUpArrayForSecondHeaderModeThree);
+      totalTimeTwo = convertStringToSecondsValue(editPopUpTimerStringTwo);
+      pomTimerValueInEditPopUpTextViewTwo.setText(editPopUpTimerStringTwo);
+
+      editPopUpTimerStringThree = convertedTimerArrayToString(savedEditPopUpArrayForThirdHeader);
+      totalTimeThree = convertStringToSecondsValue(editPopUpTimerStringThree);
+      pomTimerValueInEditPopUpTextViewThree.setText(editPopUpTimerStringThree);
+
+      setAndCapPomValuesForEditTimer(totalTimeOne, 1);
+      setAndCapPomValuesForEditTimer(totalTimeTwo, 2);
+      setAndCapPomValuesForEditTimer(totalTimeThree, 3);
+    }
+
     changeEditTimerTextViewColorIfNotEmpty();
+
   }
 
   public String convertedTimerArrayToString(ArrayList<String> arrayToConvert) {
-    ArrayList<String> timeLeft = populateEditTimerArray();
+    ArrayList<String> timeLeft = new ArrayList<>();
+    timeLeft = populateEditTimerArray(arrayToConvert);
 
     String editPopUpTimerString;
     switch (arrayToConvert.size()) {
@@ -1956,7 +1982,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return editPopUpTimerString;
   }
 
-  public ArrayList<String> populateEditTimerArray() {
+  public ArrayList<String> populateEditTimerArray(ArrayList<String> arrayToPopulate) {
     ArrayList<String> timeLeft = new ArrayList<>();
     timeLeft.add("0");
     timeLeft.add("0");
@@ -1964,12 +1990,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.add("0");
     timeLeft.add("0");
 
-    for (int i=0; i<editPopUpTimerArray.size(); i++) {
+    for (int i=0; i<arrayToPopulate.size(); i++) {
       //Third index of timeLeft list is colon, so we never want to replace it.
       if (i<2) {
-        timeLeft.set(i, editPopUpTimerArray.get(i));
+        timeLeft.set(i, arrayToPopulate.get(i));
       } else {
-        timeLeft.set(i+1, editPopUpTimerArray.get(i));
+        timeLeft.set(i+1, arrayToPopulate.get(i));
       }
     }
     return timeLeft;
@@ -1986,7 +2012,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return totalTime;
   }
 
-  public void convertIntegerToStringArray(int timerInteger) {
+  public ArrayList<String> convertIntegerToStringArray(int timerInteger) {
     String minutes = String.valueOf(timerInteger/60);
     String seconds = String.valueOf(timerInteger%60);
 
@@ -2022,23 +2048,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (timerInteger>59) indexPlaces++;
     if (timerInteger>599) indexPlaces++;
 
-    editPopUpTimerArray.clear();
+    ArrayList<String> newList = new ArrayList<>();
     for (int i=0; i<indexPlaces; i++) {
-      editPopUpTimerArray.add(editPopUpTimerArrayCapped.get(i+(4-indexPlaces)));
+      newList.add(editPopUpTimerArrayCapped.get(i+(4-indexPlaces)));
     }
 
-    //Todo: savedEditPopUpArrays now contain the 3 String arrays we need based on each pomValue.
-    //Todo: Set timer textView to capped values for all headers (we'll be adding textView for this).
-    if (mode==3) {
-      if (timerInteger==pomValue1) {
-        savedEditPopUpArrayForFirstHeaderModeThree = editPopUpTimerArray;
-      }
-      if (timerInteger==pomValue2) {
-        savedEditPopUpArrayForSecondHeaderModeThree = editPopUpTimerArray;
-      }
-      if (timerInteger==pomValue3) {
-        savedEditPopUpArrayForThirdHeader = editPopUpTimerArray;
-      }
+    return newList;
+
+
+  }
+
+  public void setEditPopUpArrayWithCappedValues(ArrayList<String> arrayToSet, int numberOfIndices) {
+    arrayToSet.clear();
+    for (int i=0; i<numberOfIndices; i++) {
+      arrayToSet.add(editPopUpTimerArrayCapped.get(i+(4-numberOfIndices)));
     }
   }
 
@@ -2315,7 +2338,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     convertedPomList.clear();
   }
 
-  //Todo: These are all getting capped at min, so it is working.
   public void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
@@ -2328,6 +2350,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValue3 = timerValueBoundsFormula(900, 1800, value);
         break;
     }
+  }
+
+  public void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
+    if (variableToCap==1) pomValue1 = timerValueBoundsFormula(5, 6000, value);
+    if (variableToCap==2) pomValue2 = timerValueBoundsFormula(5, 6000, value);
+    if (variableToCap==3) pomValue3 = timerValueBoundsFormula(5, 6000, value);
   }
 
   public int timerValueBoundsFormula(int min, int max, int value) {
@@ -2386,12 +2414,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
-              convertIntegerToStringArray(setValue);
+              editPopUpTimerArray = convertIntegerToStringArray(setValue);
               setEditPopUpTimerValues();
               break;
             case 3:
               addOrReplaceRounds(breakValue, roundIsSelected);
-              convertIntegerToStringArray(breakValue);
+              editPopUpTimerArray = convertIntegerToStringArray(breakValue);
               setEditPopUpTimerValues();
               break;
             case 2: case 4:
@@ -2406,14 +2434,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
         }
       }
-      //Todo: List all 3 at once, with times under each.
       if (mode==3) {
-        convertIntegerToStringArray(pomValue1);
-        convertIntegerToStringArray(pomValue2);
-        convertIntegerToStringArray(pomValue3);
-        Log.i("testTime", "pomValue 1 is " + pomValue1);
-        Log.i("testTime", "pomValue 2 is " + pomValue2);
-        Log.i("testTime", "pomValue 3 is " + pomValue3);
+        savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
+        savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
+        savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
+
+        Log.i("testTime", "first is " + savedEditPopUpArrayForFirstHeaderModeThree);
+        Log.i("testTime", "second is " + savedEditPopUpArrayForSecondHeaderModeThree);
+        Log.i("testTime", "third is " + savedEditPopUpArrayForThirdHeader);
+
+        setEditPopUpTimerValues();
 
         if (pomValuesTime.size()==0) {
           for (int i = 0; i < 3; i++) {
@@ -2514,7 +2544,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (workoutTime.size()>0) {
         if (!roundIsSelected) {
           roundSelectedPosition = workoutTime.size()-1;
-          Log.i("testTime", "boolean true!");
         }
 
         if (workoutTime.size()-1>=roundSelectedPosition) {
@@ -2523,7 +2552,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (roundHolderOne.size()-1>=roundSelectedPosition) {
               roundHolderOne.remove(roundSelectedPosition);
               typeHolderOne.remove(roundSelectedPosition);
-              Log.i("testTime", "selected position in remove method is " + roundSelectedPosition);
               //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
               cycleRoundsAdapter.setFadePositions(-1, -1);
               cycleRoundsAdapter.notifyDataSetChanged();
@@ -2836,6 +2864,101 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
+  public void nextRound(boolean endingEarly) {
+    //Fade effect to smooth out progressBar and timer text after animation.
+    progressBar.startAnimation(fadeProgressOut);
+    timeLeft.startAnimation(fadeProgressOut);
+    //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimator()).
+    currentProgressBarValue = 10000;
+    reset.setVisibility(View.INVISIBLE);
+    next_round.setEnabled(false);
+    timerDisabled = true;
+
+    if (mode==1) {
+      if (numberOfRoundsLeft==1) {
+        long[] pattern = {0, 500, 300};
+        vibrator.vibrate(pattern, 0);
+      }
+      if (numberOfRoundsLeft==0) {
+        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
+        mHandler.removeCallbacks(endFade);
+        resetTimer();
+        return;
+      }
+      //Resets default base (30 sec) for count-up rounds.
+      currentProgressBarValueForInfinityRounds = 30000;
+      //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
+      mHandler.post(endFade);
+
+      //If skipping round manually, cancel timer and objectAnimator.
+      if (endingEarly) {
+        if (timer != null) timer.cancel();
+        if (objectAnimator != null) objectAnimator.cancel();
+        progressBar.setProgress(0);
+        addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      } else {
+        addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      }
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+
+      long[] pattern = {0, 300, 300, 300, 300};
+      switch (typeOfRound.get(currentRound)) {
+        case 1:
+          timeLeft.setText("0");
+          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          vibrator.vibrate(300);
+          break;
+        case 2:
+          mHandler.removeCallbacks(infinityRunnableForSets);
+          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          vibrator.vibrate(300);
+          break;
+        case 3:
+          timeLeft.setText("0");
+          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          vibrator.vibrate(pattern, -1);
+          break;
+        case 4:
+          mHandler.removeCallbacks(infinityRunnableForBreaks);
+          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          vibrator.vibrate(pattern, -1);
+          break;
+      }
+      //Subtracts from rounds remaining.
+      numberOfRoundsLeft--;
+      //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
+      currentRound++;
+      mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
+      //Ensures subsequent rounds will start automatically.
+      beginTimerForNextRound = true;
+    }
+    if (mode==3) {
+      if (pomDotCounter==7) {
+        long[] pattern = {0, 500, 300};
+        vibrator.vibrate(pattern, 0);
+      }
+      if (pomDotCounter==8) {
+        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
+        mHandler.removeCallbacks(endFade);
+        resetTimer();
+        return;
+      }
+
+      timeLeft.setText("0");
+      mHandler.post(endFade);
+      pomDotCounter++;
+      //If skipping round manually, cancel timer and objectAnimator.
+      if (endingEarly) {
+        if (timer != null) timer.cancel();
+        if (objectAnimatorPom != null) objectAnimatorPom.cancel();
+        progressBar.setProgress(0);
+        addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      } else addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
+    }
+    beginTimerForNextRound = true;
+  }
+
   public void updateTotalTimeValuesEachTick() {
     String addedTime = "";
     if (mode==1) {
@@ -3031,101 +3154,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       msReset = 0;
       msConvert2 = 0;
     }
-  }
-
-  public void nextRound(boolean endingEarly) {
-    //Fade effect to smooth out progressBar and timer text after animation.
-    progressBar.startAnimation(fadeProgressOut);
-    timeLeft.startAnimation(fadeProgressOut);
-    //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimator()).
-    currentProgressBarValue = 10000;
-    reset.setVisibility(View.INVISIBLE);
-    next_round.setEnabled(false);
-    timerDisabled = true;
-
-    if (mode==1) {
-      if (numberOfRoundsLeft==1) {
-        long[] pattern = {0, 500, 300};
-        vibrator.vibrate(pattern, 0);
-      }
-      if (numberOfRoundsLeft==0) {
-        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
-        mHandler.removeCallbacks(endFade);
-        resetTimer();
-        return;
-      }
-      //Resets default base (30 sec) for count-up rounds.
-      currentProgressBarValueForInfinityRounds = 30000;
-      //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
-      mHandler.post(endFade);
-
-      //If skipping round manually, cancel timer and objectAnimator.
-      if (endingEarly) {
-        if (timer != null) timer.cancel();
-        if (objectAnimator != null) objectAnimator.cancel();
-        progressBar.setProgress(0);
-        addAndRoundDownTotalCycleTimeFromPreviousRounds();
-      } else {
-        addAndRoundDownTotalCycleTimeFromPreviousRounds();
-      }
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
-
-      long[] pattern = {0, 300, 300, 300, 300};
-      switch (typeOfRound.get(currentRound)) {
-        case 1:
-          timeLeft.setText("0");
-          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-          vibrator.vibrate(300);
-          break;
-        case 2:
-          mHandler.removeCallbacks(infinityRunnableForSets);
-          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-          vibrator.vibrate(300);
-          break;
-        case 3:
-          timeLeft.setText("0");
-          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          vibrator.vibrate(pattern, -1);
-          break;
-        case 4:
-          mHandler.removeCallbacks(infinityRunnableForBreaks);
-          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          vibrator.vibrate(pattern, -1);
-          break;
-      }
-      //Subtracts from rounds remaining.
-      numberOfRoundsLeft--;
-      //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
-      currentRound++;
-      mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
-      //Ensures subsequent rounds will start automatically.
-      beginTimerForNextRound = true;
-    }
-    if (mode==3) {
-      if (pomDotCounter==7) {
-        long[] pattern = {0, 500, 300};
-        vibrator.vibrate(pattern, 0);
-      }
-      if (pomDotCounter==8) {
-        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
-        mHandler.removeCallbacks(endFade);
-        resetTimer();
-        return;
-      }
-
-      timeLeft.setText("0");
-      mHandler.post(endFade);
-      pomDotCounter++;
-      //If skipping round manually, cancel timer and objectAnimator.
-      if (endingEarly) {
-        if (timer != null) timer.cancel();
-        if (objectAnimatorPom != null) objectAnimatorPom.cancel();
-        progressBar.setProgress(0);
-        addAndRoundDownTotalCycleTimeFromPreviousRounds();
-      } else addAndRoundDownTotalCycleTimeFromPreviousRounds();
-      mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
-    }
-    beginTimerForNextRound = true;
   }
 
   public void pauseAndResumeTimer(int pausing) {
