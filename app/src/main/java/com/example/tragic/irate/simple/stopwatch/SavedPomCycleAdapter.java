@@ -39,6 +39,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
     int positionOfRound;
+    ArrayList<Integer> testList = new ArrayList<>();
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
@@ -111,21 +112,25 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         pomHolder.pomName.setText(mPomTitle.get(position));
         String tempPom = (convertTime(mPomList).get(position));
 
-        Log.i("testList", "mPomList is " + mPomList);
         tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
+        tempPom = tempPom + "     ";
         pomSpan = new SpannableString(tempPom);
+
+        testList = retrievedRoundSizeFromConcatenatedString(tempPom, " " + mContext.getString(R.string.bullet) + " ");
+        mSizeToggle = testList;
+        Log.i("testList", "test list is " + testList);
 
         int moving = 0;
         int rangeStart = 0;
         int rangeEnd = 4;
 
-        Log.i("testList", "size toggle total list is " + mSizeToggle);
+        //Todo: Easier solution is just to use XX:XX for everything!
         for (int i=0; i<8; i++) {
-            if (mSizeToggle.get(i)==1) rangeEnd = 5;
-            Log.i("testList", "size toggle for single position is " + mSizeToggle.get(i) + " for " + i);
-            //Todo: This uses last cycle's mSizeToggle list for all cycles.
-            if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            if (mSizeToggle.get(i)==5) rangeEnd = 5;
+            if (moving+rangeEnd<=pomSpan.length()) {
+                if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            }
             if (mActiveCycle) {
                 if (position==mPositionOfActiveCycle) {
                     if (i<=mNumberOfRoundsCompleted-1) {
@@ -134,9 +139,12 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                     }
                 }
             }
-            if (mSizeToggle.get(i)==1) moving+=8; else moving+=7;
+            if (i!=7) if (mSizeToggle.get(i)==4) moving+=7; else moving+=8;
         }
         pomHolder.pomView.setText(pomSpan);
+
+        Log.i("testList", "span length is " + pomSpan.length());
+        Log.i("testList", "setting length is " + (moving+rangeEnd));
 
         if (mHighlightDeleted) {
             //Clears highlight list.
@@ -232,9 +240,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 //Converting each Long value into a String we can display.
                 newString.add(convertSeconds(newLong.get(k)));
                 //If in Pom mode, set "0" for a time entry that is <10 minutes/4 length (e.g. X:XX), and "1" for >=10 minutes/5 length (e.g. XX:XX). This is so we can properly alternate green/red coloring in onBindView's Spannable.
-                Log.i("testconvert", "new string is " + newString);
-                if ((newString.get(k)).length()==4) mSizeToggle.set(k, 0); else mSizeToggle.set(k, 1);
-                Log.i("testconvert", "size toggle list is " + mSizeToggle);
             }
             finalSplit = String.valueOf(newString);
             finalSplit = finalSplit.replace("[", "");
@@ -246,6 +251,17 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             newString = new ArrayList<>();
         }
         return finalList;
+    }
+
+    public ArrayList<Integer> retrievedRoundSizeFromConcatenatedString(String stringToSeparate, String charToSplit) {
+        ArrayList<Integer> arrayToPopulate = new ArrayList<>();
+
+        String[] pulledValue = stringToSeparate.split(charToSplit);
+        for (int i=0; i<pulledValue.length; i++) {
+            arrayToPopulate.add(pulledValue[i].length());
+        }
+
+        return arrayToPopulate;
     }
 
     public String convertSeconds(long totalSeconds) {

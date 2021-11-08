@@ -385,8 +385,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Pom recyclerView coloring is now off.
-  //Todo: Pom mode needs love. Check for all methods or just nix it.
+  //Todo: Pom recyclerView coloring is off.
+  //Todo: Spannable is delicate w/ any instances of going beyond setSpan length.
   //Todo: Have option to remove cap on Pom mode.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
