@@ -385,8 +385,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Cap issues w/ pom edit. Sometimes super high (e.g. 99:99) will cap low instead of high.
-  //Todo: Index exception crashes w/ Pom edit. Occurs when subtracting digits past empty (00:00) timer.
   //Todo: Short Pom round times in Edit show without colon (e.g. 5, 30).
   //Todo: Some pom cycle color issues again.
   //Todo: Have option to remove cap on Pom mode.
@@ -2075,8 +2073,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return newList;
-
-
   }
 
   public void setEditPopUpArrayWithCappedValues(ArrayList<String> arrayToSet, int numberOfIndices) {
@@ -2366,17 +2362,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editHeaderSelected==2) breakValue = timerValueBoundsFormula(5, 1200, value);
         break;
       case 3:
-        pomValue1 = timerValueBoundsFormula(600, 5400, value);
+        pomValue1 = timerValueBoundsFormula(600, 3600, value);
         pomValue2 = timerValueBoundsFormula(180, 600, value);
-        pomValue3 = timerValueBoundsFormula(900, 1800, value);
+        pomValue3 = timerValueBoundsFormula(900, 3600, value);
         break;
     }
   }
 
   public void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
-    if (variableToCap==1) pomValue1 = timerValueBoundsFormula(600, 6000, value);
+    if (variableToCap==1) pomValue1 = timerValueBoundsFormula(600, 3600, value);
     if (variableToCap==2) pomValue2 = timerValueBoundsFormula(180, 600, value);
-    if (variableToCap==3) pomValue3 = timerValueBoundsFormula(900, 6000, value);
+    if (variableToCap==3) pomValue3 = timerValueBoundsFormula(900, 3600, value);
   }
 
   public int timerValueBoundsFormula(int min, int max, int value) {

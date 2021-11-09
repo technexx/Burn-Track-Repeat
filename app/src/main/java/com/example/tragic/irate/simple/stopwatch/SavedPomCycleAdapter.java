@@ -39,7 +39,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
     int positionOfRound;
-    ArrayList<Integer> testList = new ArrayList<>();
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
@@ -117,7 +116,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         pomSpan = new SpannableString(tempPom);
 
         mSizeToggle = retrievedRoundSizeFromConcatenatedString(tempPom, " " + mContext.getString(R.string.bullet) + " ");
-        Log.i("testList", "size toggle is " + mSizeToggle);
+//        Log.i("testList", "size toggle is " + mSizeToggle);
 
         int moving = 0;
         int rangeStart = 0;
