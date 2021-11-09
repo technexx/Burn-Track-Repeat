@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Short Pom round times in Edit show without colon (e.g. 5, 30).
+  //Todo: Set default values in Pom edit Textview to start app (and make sure pomValues correspond).
   //Todo: Some pom cycle color issues again.
   //Todo: Have option to remove cap on Pom mode.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
@@ -809,6 +809,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
     LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
+    setDefaultTimerValuesAndTheirEditTextViews();
     setEditPopUpTimerHeaders(1);
     instantiateNotifications();
 
@@ -875,7 +876,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleRecycler.startAnimation(slide_left);
 
     //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-    defaultEditRoundViews();
+    setDefaultEditRoundViews();
 
     //Watches editText title box and passes its value into the String that gets saved/updated in database.
     TextWatcher titleTextWatcher = new TextWatcher() {
@@ -910,7 +911,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-        defaultEditRoundViews();
+        setDefaultEditRoundViews();
       }
 
       @Override
@@ -1044,7 +1045,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
 
         assignOldCycleValuesToCheckForChanges();
-        setAndCapTimerValues(setValue);
       }
     });
 
@@ -1878,11 +1878,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editHeaderSelected = 3;
     }
 
-    String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
-    timerValueInEditPopUpTextView.setText(savedTimerString);
+    if (mode==1) {
+      String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+      timerValueInEditPopUpTextView.setText(savedTimerString);
 
-    int totalTime = convertStringToSecondsValue(savedTimerString);
-    setAndCapTimerValues(totalTime);
+      int totalTime = convertStringToSecondsValue(savedTimerString);
+      setAndCapTimerValues(totalTime);
+    }
+
     changeEditTimerTextViewColorIfNotEmpty();
   }
 
@@ -2455,10 +2458,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
         savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
         savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
-
-        Log.i("testTime", "first is " + savedEditPopUpArrayForFirstHeaderModeThree);
-        Log.i("testTime", "second is " + savedEditPopUpArrayForSecondHeaderModeThree);
-        Log.i("testTime", "third is " + savedEditPopUpArrayForThirdHeader);
 
         setEditPopUpTimerValues();
 
@@ -3271,7 +3270,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void defaultEditRoundViews() {
+  public void setDefaultTimerValuesAndTheirEditTextViews() {
+    setValue = 30;
+    breakValue = 30;
+    pomValue1 = 1500;
+    pomValue2 = 300;
+    pomValue3 = 1200;
+    savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
+    savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
+    savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
+
+    setEditPopUpTimerValues();
+  }
+
+  public void setDefaultEditRoundViews() {
     //Instance of layout objects we can set programmatically based on which mode we're on.
     ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
     ConstraintLayout.LayoutParams secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
