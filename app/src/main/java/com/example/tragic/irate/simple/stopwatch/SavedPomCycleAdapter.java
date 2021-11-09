@@ -116,9 +116,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         tempPom = tempPom + "     ";
         pomSpan = new SpannableString(tempPom);
 
-        testList = retrievedRoundSizeFromConcatenatedString(tempPom, " " + mContext.getString(R.string.bullet) + " ");
-        mSizeToggle = testList;
-        Log.i("testList", "test list is " + testList);
+        mSizeToggle = retrievedRoundSizeFromConcatenatedString(tempPom, " " + mContext.getString(R.string.bullet) + " ");
+        Log.i("testList", "size toggle is " + mSizeToggle);
 
         int moving = 0;
         int rangeStart = 0;
@@ -143,8 +142,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
         pomHolder.pomView.setText(pomSpan);
 
-        Log.i("testList", "span length is " + pomSpan.length());
-        Log.i("testList", "setting length is " + (moving+rangeEnd));
+//        Log.i("testList", "span length is " + pomSpan.length());
+//        Log.i("testList", "setting length is " + (moving+rangeEnd));
 
         if (mHighlightDeleted) {
             //Clears highlight list.

@@ -165,7 +165,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           span = new SpannableString("  " + bullet);
           tempSpace = 1;
         }
-
         //If roundType is 2 (sets), use green infinity drawable for ImageSpan. If roundType is 4 (breaks), use red.
         if (tempTypeArray[j].contains("2"))
           imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);

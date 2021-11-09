@@ -385,11 +385,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Pom recyclerView coloring is off.
-  //Todo: Spannable is delicate w/ any instances of going beyond setSpan length.
+  //Todo: Cap issues w/ pom edit. Sometimes super high (e.g. 99:99) will cap low instead of high.
+  //Todo: Index exception crashes w/ Pom edit. Occurs when subtracting digits past empty (00:00) timer.
+  //Todo: Short Pom round times in Edit show without colon (e.g. 5, 30).
+  //Todo: Some pom cycle color issues again.
   //Todo: Have option to remove cap on Pom mode.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
+  //Todo: Some timer textSize issues (also running small->big animation on first round start).
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -397,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Infinity mode for Pom?
+  //Todo: Spannable is delicate w/ any instances of going beyond setSpan length.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
   //Todo: TDEE in sep popup w/ tabs.
@@ -1245,9 +1249,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (mode==3) {
-        if (editHeaderSelected==1) savedEditPopUpArrayForFirstHeaderModeThree.remove(savedEditPopUpArrayForFirstHeaderModeThree.size()-1);
-        if (editHeaderSelected==2) savedEditPopUpArrayForSecondHeaderModeThree.remove(savedEditPopUpArrayForSecondHeaderModeThree.size()-1);
-        if (editHeaderSelected==3) savedEditPopUpArrayForThirdHeader.remove(savedEditPopUpArrayForThirdHeader.size()-1);
+        if (editHeaderSelected==1 && savedEditPopUpArrayForFirstHeaderModeThree.size()>0) {
+          savedEditPopUpArrayForFirstHeaderModeThree.remove(savedEditPopUpArrayForFirstHeaderModeThree.size()-1);
+        }
+        if (editHeaderSelected==2 && savedEditPopUpArrayForSecondHeaderModeThree.size()>0) {
+          savedEditPopUpArrayForSecondHeaderModeThree.remove(savedEditPopUpArrayForSecondHeaderModeThree.size()-1);
+        }
+        if (editHeaderSelected==3 && savedEditPopUpArrayForThirdHeader.size()>0){
+          savedEditPopUpArrayForThirdHeader.remove(savedEditPopUpArrayForThirdHeader.size()-1);
+        }
       }
 
       setEditPopUpTimerValues();
@@ -2364,9 +2374,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
-    if (variableToCap==1) pomValue1 = timerValueBoundsFormula(5, 6000, value);
-    if (variableToCap==2) pomValue2 = timerValueBoundsFormula(5, 6000, value);
-    if (variableToCap==3) pomValue3 = timerValueBoundsFormula(5, 6000, value);
+    if (variableToCap==1) pomValue1 = timerValueBoundsFormula(600, 6000, value);
+    if (variableToCap==2) pomValue2 = timerValueBoundsFormula(180, 600, value);
+    if (variableToCap==3) pomValue3 = timerValueBoundsFormula(900, 6000, value);
   }
 
   public int timerValueBoundsFormula(int min, int max, int value) {
