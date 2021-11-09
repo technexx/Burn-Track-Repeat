@@ -385,9 +385,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Set default values in Pom edit Textview to start app (and make sure pomValues correspond).
-  //Todo: Some pom cycle color issues again.
-  //Todo: Have option to remove cap on Pom mode.
+  //Todo: Fade issue when editing rounds.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Some timer textSize issues (also running small->big animation on first round start).
@@ -400,7 +398,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Infinity mode for Pom?
   //Todo: Spannable is delicate w/ any instances of going beyond setSpan length.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
+  //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit).
 
+  //Todo: Optional "get back to work" touch warning for Pom.
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Add vibrations.
   //Todo: Add color scheme options.
@@ -1331,7 +1331,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        reduceTextSizeForInfinityRounds(setMillis);
+        if (setMillis>=60000 && !textSizeIncreased) {
+          changeTextSize(valueAnimatorDown, timeLeft);
+          textSizeIncreased = true;
+        }
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
@@ -1357,7 +1360,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        reduceTextSizeForInfinityRounds(breakMillis);
+        if (breakMillis>=60000 && !textSizeIncreased) {
+          changeTextSize(valueAnimatorDown, timeLeft);
+          textSizeIncreased = true;
+        }
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
@@ -1408,7 +1414,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (textSizeIncreased && mode==4) {
           if (seconds > 4) {
             changeTextSize(valueAnimatorDown, timeLeft);
-            textSizeIncreased = false;
+            textSizeIncreased = true;
           }
         }
 
@@ -2801,10 +2807,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
         updateTotalTimeValuesEachTick();
 
-        if (textSizeIncreased && mode==1) {
+        if (!textSizeIncreased && mode==1) {
           if (setMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft);
-            textSizeIncreased = false;
+            textSizeIncreased = true;
           }
         }
         if (setMillis < 500) timerDisabled = true;
@@ -2831,10 +2837,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
         updateTotalTimeValuesEachTick();
 
-        if (textSizeIncreased && mode==1) {
+        if (!textSizeIncreased && mode==1) {
           if (breakMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft);
-            textSizeIncreased = false;
+            textSizeIncreased = true;
           }
         }
 
@@ -2862,10 +2868,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
         updateTotalTimeValuesEachTick();
 
-        if (textSizeIncreased && mode==3) {
+        if (!textSizeIncreased && mode==3) {
           if (pomMillis < 59000) {
             changeTextSize(valueAnimatorUp, timeLeft);
-            textSizeIncreased = false;
+            textSizeIncreased = true;
           }
         }
 
@@ -3098,14 +3104,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
   public void setInitialTextSizeForRounds(long millis) {
     if (millis>59000) {
-      if (mode==1 || mode==3) {
-        timeLeft.setTextSize(70f);
-        textSizeIncreased = true;
-      }
+      timeLeft.setTextSize(70f);
+      textSizeIncreased = false;
     } else {
       timeLeft.setTextSize(90f);
-      if (mode==4) textSizeIncreased = true;
-
+      if (mode==4) textSizeIncreased = false;
     }
   }
   public void changeTextSize(ValueAnimator va, TextView textView) {
@@ -3116,16 +3119,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
     sizeAnimator.setRepeatCount(0);
     sizeAnimator.start();
-  }
-
-  //Used in count up mode to animate text size changes in our runnables.
-  public void reduceTextSizeForInfinityRounds(long millis) {
-    if (textSizeReduced) {
-      if (millis >=60000) {
-        changeTextSize(valueAnimatorDown, timeLeft);
-        textSizeReduced = false;
-      }
-    }
   }
 
   public void newLap() {
