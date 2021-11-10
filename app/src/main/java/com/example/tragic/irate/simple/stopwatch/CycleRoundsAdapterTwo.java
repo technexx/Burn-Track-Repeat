@@ -80,8 +80,13 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         });
     }
 
-    public void setFadePositions(int sub, int add) {
-        mPosSubHolder = sub; mPosAddHolder = add; mRunRoundAnimation = true;
+    //Receives position from Main to fade (or not), and also sets our fade animation boolean to true.
+    public void setFadeInPosition(int add) {
+        mPosAddHolder = add; mPosSubHolder = -1; mRunRoundAnimation = true;
+    }
+
+    public void setFadeOutPosition(int subtract){
+        mPosSubHolder = subtract; mPosAddHolder = -1; mRunRoundAnimation = true;
     }
 
     @NonNull
@@ -145,11 +150,13 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
 
         //Only runs fade animation if adding/subtracting rounds.
         if (mRunRoundAnimation) {
-            //Sets animation of round number.
-            setAnimation(modeOneRounds.round_count, position);
-            //Animates round value (either infinity or timer value).
-            if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
-            else setAnimationTwo(modeOneRounds.infinity_rounds, position);
+            if (mPosAddHolder>=0 || mPosSubHolder >=0) {
+                //Sets animation of round number.
+                setAnimation(modeOneRounds.round_count, position);
+                //Animates round value (either infinity or timer value).
+                if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) setAnimation(modeOneRounds.workout_rounds, position);
+                else setAnimationTwo(modeOneRounds.infinity_rounds, position);
+            }
         }
         if (position==mWorkOutList.size()-1) mRunRoundAnimation = false;
 

@@ -385,7 +385,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Fade issue when editing rounds.
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Some timer textSize issues (also running small->big animation on first round start).
@@ -1100,7 +1099,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAdapterArrays();
       //Uses this single position to retrieve cycle and populate timer arrays.
       populateRoundList();
-//      setEditPopUpTimerValueForEditedCycle();
       switch (mode) {
         case 1:
           //Populating String ArrayLists used to display rounds in editCycle popUp.
@@ -1118,6 +1116,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               typeHolderTwo.add(typeOfRound.get(i));
             }
           }
+
+          roundSelectedPosition = workoutTime.size()-1;
           break;
         case 3:
           //Since our fade animation listener clears our timer and adapter lists, we disable it here when we need to pull up saved cycles.
@@ -2485,16 +2485,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       if (mode==1) {
         //removeRound is called at end of fade set below. Here, we overwrite that and remove it beforehand if user clicks before fade is done.
-        if (subtractedRoundIsFading) removeRound();
+        if (subtractedRoundIsFading) {
+          removeRound();
+        }
 
         if (workoutTime.size()>0) {
           if (roundSelectedPosition<=7) {
             //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-            cycleRoundsAdapter.setFadePositions(roundSelectedPosition, -1);
+            cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
             //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
-            cycleRoundsAdapterTwo.setFadePositions(roundSelectedPosition-8, -1);
+            cycleRoundsAdapterTwo.setFadeOutPosition(roundSelectedPosition-8);
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
           subtractedRoundIsFading = true;
@@ -2519,16 +2521,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.add(integerValue * 1000);
         convertedWorkoutTime.add(convertSeconds(integerValue));
         typeOfRound.add(roundType);
+
+        roundSelectedPosition = workoutTime.size()-1;
         //Adds and sends to adapter the newest addition round position to fade.
         if (workoutTime.size()<=8) {
           roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
           typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
-          cycleRoundsAdapter.setFadePositions(-1, workoutTime.size()-1);
+          cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
           roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
           typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
-          cycleRoundsAdapterTwo.setFadePositions(-1, workoutTime.size()-9);
+          cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
           cycleRoundsAdapterTwo.notifyDataSetChanged();
         }
         //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
@@ -2546,14 +2550,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (roundSelectedPosition<=7) {
           roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
           typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
-          cycleRoundsAdapter.setFadePositions(-1, roundSelectedPosition);
+          cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
 
           //Since our workOutTime lists are independent of adapter and run from (up to) 0-15, we change the value of roundSelectedPosition back to original.
           roundHolderTwo.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
           typeHolderTwo.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
-          cycleRoundsAdapterTwo.setFadePositions(-1, roundSelectedPosition-8);
+          cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
           cycleRoundsAdapterTwo.notifyDataSetChanged();
         }
       }
@@ -2564,10 +2568,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
     if (mode==1) {
       if (workoutTime.size()>0) {
-        if (!roundIsSelected) {
-          roundSelectedPosition = workoutTime.size()-1;
-        }
-
         if (workoutTime.size()-1>=roundSelectedPosition) {
           //If workoutTime list has 8 or less items, or a round is selected and its position is in that first 8 items, remove item from first adapter.
           if (workoutTime.size()<=8 || (roundIsSelected && roundSelectedPosition<=7)) {
@@ -2575,7 +2575,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               roundHolderOne.remove(roundSelectedPosition);
               typeHolderOne.remove(roundSelectedPosition);
               //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
-              cycleRoundsAdapter.setFadePositions(-1, -1);
+              cycleRoundsAdapter.setFadeOutPosition(-1);
               cycleRoundsAdapter.notifyDataSetChanged();
             }
           } else {
@@ -2583,7 +2583,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               roundHolderTwo.remove(roundSelectedPosition-8);
               typeHolderTwo.remove(roundSelectedPosition-8);
               //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
-              cycleRoundsAdapterTwo.setFadePositions(-1,  -1);
+              cycleRoundsAdapterTwo.setFadeInPosition(-1);
               cycleRoundsAdapterTwo.notifyDataSetChanged();
             }
           }
@@ -2601,7 +2601,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           subtractedRoundIsFading = false;
         }
         //Resets round selection boolean.
-        if (roundIsSelected) {
+        if (!roundIsSelected) {
+          roundSelectedPosition = workoutTime.size()-1;
+        } else {
           consolidateRoundAdapterLists = true;
           roundIsSelected = false;
         }
