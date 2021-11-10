@@ -184,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int positionOfSelectedCycle;
   String cycleTitle = "";
   List<String> receivedHighlightPositions;
+  List<Integer> receivedHighlightPositionHolder;
 
   ImageButton addRoundToCycleButton;
   ImageButton subtractRoundFromCycleButton;
@@ -385,9 +386,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
+  //Todo: Index crash when trying to delete multiple selected cycles.
+  //Todo: Reset/resume menu remains when adding new cycle, but clicking that resume will launch the new cycle.
+  //Todo: Switching tabs keeps cycles highlighted but resets top bar (should remove highlights).
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
-  //Todo: Some timer textSize issues (also running small->big animation on first round start).
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
   //Todo: Color schemes.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -395,7 +398,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: Save total sets/breaks and completed by day option?
   //Todo: Infinity mode for Pom?
-  //Todo: Spannable is delicate w/ any instances of going beyond setSpan length.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
   //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit).
 
@@ -700,6 +702,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomTitleArray = new ArrayList<>();
     //If highlighting cycles for deletion, contains all POSITIONS (not IDs) of cycles highlighted.
     receivedHighlightPositions = new ArrayList<>();
+    receivedHighlightPositionHolder = new ArrayList<>();
     //Database entity lists.
     cyclesList = new ArrayList<>();
     cyclesBOList = new ArrayList<>();
@@ -1167,14 +1170,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(false);
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
 
-      //First query to get current list of rows.
+      //[0, 1, 2, 3, 4]  [0, 2, 3, 4]  [0, 1, 3, 4]
       for (int i=0; i<receivedHighlightPositions.size(); i++) {
         positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
-        //Using each received position, deletes the cycle from the database.
-        AsyncTask.execute(deleteSingleCycleASyncRunnable);
-        //Using each received position, deletes the cycle's values from its adapter arrays.
-        editCycleArrayLists(DELETING_CYCLE);
+        receivedHighlightPositionHolder.add(positionOfSelectedCycle);
       }
+      AsyncTask.execute(deleteSingleCycleASyncRunnable);
+      editCycleArrayLists(DELETING_CYCLE);
+
       //Since we have deleted every position in selected list, clear the list.
       receivedHighlightPositions.clear();
       cancelHighlight.setVisibility(View.INVISIBLE);
@@ -1749,6 +1752,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
+    //Todo: If we add an option to use this within an active cycle, we will need to modify this method because it is based on a highlighted position list.
     deleteSingleCycleASyncRunnable = new Runnable() {
       @Override
       public void run() {
@@ -1756,24 +1760,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
           return;
         }
-        int cycleID;
+
+        int cycleID = 0;
+        List<Integer> tempIdList = new ArrayList<>();
+        tempIdList.addAll(receivedHighlightPositionHolder);
+
         if (mode==1) {
           cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-          cycleID = cyclesList.get(positionOfSelectedCycle).getId();
-          cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-          cyclesDatabase.cyclesDao().deleteCycle(cycles);
-          runOnUiThread(()-> {
-            savedCycleAdapter.notifyDataSetChanged();
-          });
+
+          for (int i=0; i<tempIdList.size(); i++) {
+            cycleID = cyclesList.get(i).getId();
+            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+            cyclesDatabase.cyclesDao().deleteCycle(cycles);
+          }
         }
         if (mode==3) {
           pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-          cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
-          pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
-          cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
-          runOnUiThread(()-> {
-            savedPomCycleAdapter.notifyDataSetChanged();
-          });
+
+          for (int i=0; i<tempIdList.size(); i++) {
+            cycleID = pomCyclesList.get(i).getId();
+            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+            cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
+          }
         }
         runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
@@ -2670,13 +2678,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     } else if (action == DELETING_CYCLE) {
       if (mode==1) {
-        workoutTitleArray.remove(positionOfSelectedCycle);
-        typeOfRoundArray.remove(positionOfSelectedCycle);
-        workoutCyclesArray.remove(positionOfSelectedCycle);
+        for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+          int posToRemove = receivedHighlightPositionHolder.get(i);
+          workoutTitleArray.remove(posToRemove);
+          typeOfRoundArray.remove(posToRemove);
+          workoutCyclesArray.remove(posToRemove);
+          posToRemove --;
+        }
+
+        savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode==3) {
-        pomTitleArray.remove(positionOfSelectedCycle);
-        pomArray.remove(positionOfSelectedCycle);
+        for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+          int posToRemove = receivedHighlightPositionHolder.get(i);
+          pomTitleArray.remove(positionOfSelectedCycle);
+          pomArray.remove(positionOfSelectedCycle);
+          posToRemove--;
+        }
+        savedPomCycleAdapter.notifyDataSetChanged();
       }
     }
   }
