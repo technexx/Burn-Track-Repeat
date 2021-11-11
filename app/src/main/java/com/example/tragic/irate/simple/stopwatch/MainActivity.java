@@ -371,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes;
   Runnable queryAndSortAllCyclesFromDatabaseRunnable;
   Runnable deleteTotalCycleTimesASyncRunnable;
-  Runnable deleteSingleCycleASyncRunnable;
+  Runnable deleteHighlightedCyclesASyncRunnable;
   Runnable deleteAllCyclesASyncRunnable;
   Runnable saveCyclesASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
@@ -386,7 +386,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Index crash when trying to delete multiple selected cycles.
   //Todo: Reset/resume menu remains when adding new cycle, but clicking that resume will launch the new cycle.
   //Todo: Switching tabs keeps cycles highlighted but resets top bar (should remove highlights).
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
@@ -1175,7 +1174,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
         receivedHighlightPositionHolder.add(positionOfSelectedCycle);
       }
-      AsyncTask.execute(deleteSingleCycleASyncRunnable);
+      AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
       editCycleArrayLists(DELETING_CYCLE);
 
       //Since we have deleted every position in selected list, clear the list.
@@ -1752,8 +1751,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    //Todo: If we add an option to use this within an active cycle, we will need to modify this method because it is based on a highlighted position list.
-    deleteSingleCycleASyncRunnable = new Runnable() {
+    deleteHighlightedCyclesASyncRunnable = new Runnable() {
       @Override
       public void run() {
         if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
@@ -2683,16 +2681,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTitleArray.remove(posToRemove);
           typeOfRoundArray.remove(posToRemove);
           workoutCyclesArray.remove(posToRemove);
-          posToRemove --;
+          posToRemove--;
         }
-
         savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode==3) {
         for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
           int posToRemove = receivedHighlightPositionHolder.get(i);
-          pomTitleArray.remove(positionOfSelectedCycle);
-          pomArray.remove(positionOfSelectedCycle);
+          pomTitleArray.remove(posToRemove);
+          pomArray.remove(posToRemove);
           posToRemove--;
         }
         savedPomCycleAdapter.notifyDataSetChanged();
