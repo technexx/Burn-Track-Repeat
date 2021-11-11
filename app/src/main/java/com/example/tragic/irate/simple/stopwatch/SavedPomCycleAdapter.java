@@ -43,6 +43,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         return mActiveCycle;
     }
 
+    public boolean isCycleHighlighted() {
+        return mHighlightMode;
+    }
+
     public interface onCycleClickListener {
         void onCycleClick (int position);
     }

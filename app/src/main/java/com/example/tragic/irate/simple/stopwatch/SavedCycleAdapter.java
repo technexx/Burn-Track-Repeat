@@ -59,6 +59,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     return mActiveCycle;
   }
 
+  public boolean isCycleHighlighted() {
+    return mHighlightMode;
+  }
+
   public interface onCycleClickListener {
     void onCycleClick (int position);
   }

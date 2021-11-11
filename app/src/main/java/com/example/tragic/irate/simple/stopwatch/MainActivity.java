@@ -386,7 +386,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Switching tabs keeps cycles highlighted but resets top bar (should remove highlights).
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, etc.
@@ -922,13 +921,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!sortButton.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
         //Dismisses editCycle popup when switching tabs.
         if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
-        //Turning highlight mode off since we are moving to a new tab.
-        savedCycleAdapter.removeHighlight(true);
-        savedPomCycleAdapter.removeHighlight(true);
         //Resets callback vars for clicked positions and highlighted positions when switching tabs.
         positionOfSelectedCycle = 0;
         receivedHighlightPositions.clear();
         receivedHighlightPositionHolder.clear();
+
+        if (tab.getPosition()==0) {
+          if (savedCycleAdapter.isCycleHighlighted()==true) {
+            removeCycleHighlights();
+            savedCycleAdapter.notifyDataSetChanged();
+          }
+        }
+
+        if (tab.getPosition()==1) {
+          if (savedPomCycleAdapter.isCycleHighlighted()==true) {
+            removeCycleHighlights();
+            savedPomCycleAdapter.notifyDataSetChanged();
+          }
+        }
       }
       @Override
       public void onTabReselected(TabLayout.Tab tab) {
@@ -1153,14 +1163,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Turns off our cycle highlight mode from adapter.
     cancelHighlight.setOnClickListener(v-> {
-      if (mode==1) {
-        savedCycleAdapter.removeHighlight(true);
-        savedCycleAdapter.notifyDataSetChanged();
-      }
-      if (mode==3) {
-        savedPomCycleAdapter.removeHighlight(true);
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
+      removeCycleHighlights();
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
     });
 
@@ -2308,6 +2311,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
     if (mode==1) if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
     if (mode==3) if (pomArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
+  }
+
+  public void removeCycleHighlights() {
+    if (mode==1) {
+      savedCycleAdapter.removeHighlight(true);
+      savedCycleAdapter.notifyDataSetChanged();
+    }
+    if (mode==3) {
+      savedPomCycleAdapter.removeHighlight(true);
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
   }
 
   //Fades action bar buttons in/out depending on whether we are editing cycles or not.
