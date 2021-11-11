@@ -929,6 +929,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Resets callback vars for clicked positions and highlighted positions when switching tabs.
         positionOfSelectedCycle = 0;
         receivedHighlightPositions.clear();
+        receivedHighlightPositionHolder.clear();
       }
       @Override
       public void onTabReselected(TabLayout.Tab tab) {
@@ -1169,16 +1170,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(false);
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
 
-      //[0, 1, 2, 3, 4]  [0, 2, 3, 4]  [0, 1, 3, 4]
+      //[0, 1, 2, 3]  [1, 2]       [0, 2, 3]
       for (int i=0; i<receivedHighlightPositions.size(); i++) {
         positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
         receivedHighlightPositionHolder.add(positionOfSelectedCycle);
       }
+
       AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
       editCycleArrayLists(DELETING_CYCLE);
 
-      //Since we have deleted every position in selected list, clear the list.
-      receivedHighlightPositions.clear();
       cancelHighlight.setVisibility(View.INVISIBLE);
       edit_highlighted_cycle.setVisibility(View.INVISIBLE);
       delete_highlighted_cycle.setVisibility(View.INVISIBLE);
@@ -2675,25 +2675,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomArray.set(positionOfSelectedCycle, pomString);
       }
     } else if (action == DELETING_CYCLE) {
+      int posToRemove = receivedHighlightPositionHolder.get(0);
+
       if (mode==1) {
         for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
-          int posToRemove = receivedHighlightPositionHolder.get(i);
           workoutTitleArray.remove(posToRemove);
           typeOfRoundArray.remove(posToRemove);
           workoutCyclesArray.remove(posToRemove);
+          posToRemove = receivedHighlightPositionHolder.get(i);
           posToRemove--;
         }
         savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode==3) {
         for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
-          int posToRemove = receivedHighlightPositionHolder.get(i);
           pomTitleArray.remove(posToRemove);
           pomArray.remove(posToRemove);
+          posToRemove = receivedHighlightPositionHolder.get(i);
           posToRemove--;
         }
         savedPomCycleAdapter.notifyDataSetChanged();
       }
+
+      receivedHighlightPositions.clear();
+      receivedHighlightPositionHolder.clear();
     }
   }
 
