@@ -386,7 +386,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  //Todo: Reset/resume menu remains when adding new cycle, but clicking that resume will launch the new cycle.
   //Todo: Switching tabs keeps cycles highlighted but resets top bar (should remove highlights).
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
@@ -2740,6 +2739,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
       return;
+    }
+
+    if (savedCycleAdapter.isCycleActive()==true) {
+      savedCycleAdapter.removeActiveCycleLayout();
+      savedCycleAdapter.notifyDataSetChanged();
+    }
+
+    if (savedPomCycleAdapter.isCycleActive()==true) {
+      savedPomCycleAdapter.removeActiveCycleLayout();
+      savedPomCycleAdapter.notifyDataSetChanged();
     }
 
     resetTimer();

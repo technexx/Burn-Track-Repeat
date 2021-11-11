@@ -55,6 +55,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int mPositionOfActiveCycle;
   int mNumberOfRoundsCompleted;
 
+  public boolean isCycleActive() {
+    return mActiveCycle;
+  }
+
   public interface onCycleClickListener {
     void onCycleClick (int position);
   }

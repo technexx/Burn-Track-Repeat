@@ -38,7 +38,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     boolean mActiveCycle;
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
-    int positionOfRound;
+
+    public boolean isCycleActive() {
+        return mActiveCycle;
+    }
 
     public interface onCycleClickListener {
         void onCycleClick (int position);
