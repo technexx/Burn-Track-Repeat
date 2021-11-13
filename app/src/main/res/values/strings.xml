@@ -54,7 +54,8 @@
     <string name="empty_laps_list">No laps yet!</string>
 
     <string name="about">About</string>
-    <string name="settings">Settings</string>
+    <string name="sounds_and_vibrations">Sounds and Vibrations</string>
+    <string name="colors_schemes">Colors</string>
 
     <string name="notification_text_header">%1$s - On %2$s </string>
     <string name="notification_text">Round %1$s of %2$s - %3$s</string>

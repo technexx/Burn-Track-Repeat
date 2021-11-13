@@ -1,14 +1,11 @@
 package com.example.tragic.irate.simple.stopwatch;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,16 +16,12 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,14 +30,12 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -72,23 +63,19 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle {
 
-  ConstraintLayout cl;
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
   View tabView;
   View mainView;
+  View actionBarView;
   Gson gson;
   BlankCanvas blankCanvas;
   Calendar calendar;
@@ -394,9 +381,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: Save total sets/breaks and completed by day option?
-  //Todo: Infinity mode for Pom?
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
   //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit).
+
+  //Todo: Settings: Vibrations (Both modes, all diff round types), Colors,
 
   //Todo: Optional "get back to work" touch warning for Pom.
   //Todo: TDEE in sep popup w/ tabs.
@@ -555,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
             } else {
               delete_all_text.setText(R.string.delete_all_cycles);
-              deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER, 0, 0);
+              deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
             }
             break;
         }
@@ -569,6 +557,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setContentView(R.layout.activity_main);
     mainView = findViewById(R.id.main_layout);
     tabView = findViewById(R.id.tabLayout);
+    actionBarView = findViewById(R.id.custom_action_bar);
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
@@ -594,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
-    settingsPopupView = inflater.inflate(R.layout.sidebar_popup, null);
+    settingsPopupView = inflater.inflate(R.layout.settings_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
     deleteEditPopUpTimerNumbers = editCyclesPopupView.findViewById(R.id.deleteEditPopUpTimerNumbers);
@@ -620,17 +609,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, 600, 1540, true);
+//    settingsPopupWindow = new PopupWindow(settingsPopupView, 800, 1200, true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1530, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimation);
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    settingsPopupWindow.setAnimationStyle(R.style.SlideLeftAnimation);
+    settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
-    cl = findViewById(R.id.main_layout);
     editPopUpLayout = findViewById(R.id.edit_cycle_layout);
     roundView = inflater.inflate(R.layout.mode_one_rounds, null);
     round_count = roundView.findViewById(R.id.round_count);
@@ -669,6 +658,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setCustomView(R.layout.custom_bar);
+
     appHeader = findViewById(R.id.app_header);
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
@@ -946,7 +936,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     global_settings.setOnClickListener(v-> {
-      settingsPopupWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 240);
+      settingsPopupWindow.showAtLocation(mainView, Gravity.TOP, 0, 240);
+//      settingsPopupWindow.showAsDropDown(mainView, 0, 200, Gravity.TOP);
     });
 
       //Brings up editCycle popUp to create new Cycle.
@@ -973,7 +964,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
       moveSortCheckmark();
-      sortPopupWindow.showAtLocation(cl, Gravity.END|Gravity.TOP, 0, 0);
+      sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
     //Uses single view for all sort buttons. Queries the appropriate cycle sort via the DAO and sets checkmark.
@@ -1022,7 +1013,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Removes runnable that begins next round.
       mHandler.removeCallbacksAndMessages(null);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Prevents timer from starting. Runnable will just populate values of next round.
 
       //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
@@ -1053,7 +1044,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
         if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
         emptyCycleList.setVisibility(View.GONE);
-        cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
+        mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
 
         assignOldCycleValuesToCheckForChanges();
       }
@@ -1077,7 +1068,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
       //Color reset to black, also for smooth transition to timer. Grey only necessary to prevent soft kb tearing.
-      cl.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -1457,7 +1448,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     reset_total_times.setOnClickListener(v -> {
       delete_all_text.setText(R.string.delete_total_times);
-      deleteCyclePopupWindow.showAtLocation(cl, Gravity.CENTER_HORIZONTAL, 0, -100);
+      deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER_HORIZONTAL, 0, -100);
     });
 
     delete_all_confirm.setOnClickListener(v-> {
@@ -2102,7 +2093,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
       progressBar.setProgress(currentProgressBarValue);
-      timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+      timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
       //Sets paused boolean to true, so next timer click will resume.
       timerIsPaused = true;
     } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
@@ -2774,7 +2765,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
 
-    timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
     editCyclesPopupWindow.dismiss();
   }
 
@@ -3508,7 +3499,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_title_layout.topMargin = -25;
 
         timerDisabled = false;
-        timerPopUpWindow.showAtLocation(cl, Gravity.NO_GRAVITY, 0, 0);
+        timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
         cycle_title_textView.setVisibility(View.INVISIBLE);
         if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
         blankCanvas.setVisibility(View.VISIBLE);
