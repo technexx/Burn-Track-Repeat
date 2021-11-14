@@ -416,15 +416,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onResume() {
     super.onResume();
+    Toast.makeText(getApplicationContext(), "Main resuming!", Toast.LENGTH_SHORT).show();
     setVisible(true);
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
   }
 
   @Override
+  public void onPause() {
+    super.onPause();
+    Toast.makeText(getApplicationContext(), "Main paused!", Toast.LENGTH_SHORT).show();  }
+
+  @Override
   public void onStop() {
     super.onStop();
     setVisible(false);
+    Toast.makeText(getApplicationContext(), "Main stopped!", Toast.LENGTH_SHORT).show();
     if (timerPopUpWindow.isShowing()) {
       dismissNotification = false;
       setNotificationValues();
@@ -443,8 +450,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onBackPressed() {
     if (settingsFragment!=null) {
       settingsFragmentFrameLayout.setVisibility(View.GONE);
+      settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
+
       getSupportFragmentManager().beginTransaction()
-              .remove(settingsFragment)
+//              .setCustomAnimations(
+//                      R.anim.fade_in_anim,
+//                      R.anim.fade_out_anim
+//              )
+              .detach(settingsFragment)
               .commit();
     }
     //Used to minimize activity. Will only be called if no popUps have focus.
@@ -584,6 +597,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsFragment = new SettingsFragment();
     settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     settingsFragmentFrameLayout.setVisibility(View.GONE);
+
+    getSupportFragmentManager().beginTransaction().
+            add((R.id.settings_fragment_frameLayout), settingsFragment)
+            .commit();
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
@@ -833,6 +850,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setEditPopUpTimerHeaders(1);
     instantiateNotifications();
 
+    //Todo: Fragment callback reception here. Or, simply refresh Main activity on settings save/dismiss, OR check life cycle i.e. onResume, etc.
+
+
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
@@ -967,20 +987,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     global_settings.setOnClickListener(v-> {
-      getSupportFragmentManager().beginTransaction().
-              replace((R.id.settings_fragment_frameLayout), settingsFragment)
-              .commit();
+      settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
       settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
-    });
 
-    soundSettings.setOnClickListener(v->{
-    });
-
-    colorSettings.setOnClickListener(v-> {
-
-    });
-
-    aboutSettings.setOnClickListener(v-> {
+      if (settingsFragment!=null) {
+        getSupportFragmentManager().beginTransaction()
+                .attach(settingsFragment)
+                .commit();
+      }
 
     });
 
