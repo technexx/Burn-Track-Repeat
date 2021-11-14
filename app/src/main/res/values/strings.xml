@@ -57,6 +57,12 @@
     <string name="sounds_and_vibrations">Sounds and Vibrations</string>
     <string name="colors_schemes">Colors</string>
 
+    <string name="set_sounds">Sets:</string>
+    <string name="break_sounds">Breaks:</string>
+    <string name="work_sounds">Work:</string>
+    <string name="mini_break_sounds">Short Break:</string>
+    <string name="long_break_sounds">Long Break:</string>
+
     <string name="notification_text_header">%1$s - On %2$s </string>
     <string name="notification_text">Round %1$s of %2$s - %3$s</string>
 

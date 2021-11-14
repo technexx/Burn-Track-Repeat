@@ -6,6 +6,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +47,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -110,6 +113,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View savedCyclePopupView;
   View editCyclesPopupView;
   View settingsPopupView;
+  View soundsViewInSettings;
+  View colorsViewInSettings;
+  View aboutViewInSettings;
 
   PopupWindow sortPopupWindow;
   PopupWindow savedCyclePopupWindow;
@@ -373,10 +379,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
+  SettingsFragment settingsFragment;
+  FrameLayout settingsFragmentFrameLayout;
+  FragmentTransaction ft;
+  TextView soundSettings;
+  TextView colorSettings;
+  TextView aboutSettings;
+
+  //Todo: Main activity's recyclerView and/or layout may have to be set as a fragment, if we're going to be using a preference fragment for serttings.
+  //Todo: Create fragments for settings? Also fragment for Timer?
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
-  //Todo: Should have adjustable settings for interface, vibration duration, etc.
-  //Todo: Color schemes.
+  //Todo: Should have adjustable settings for interface, vibration duration, color, etc.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
@@ -426,8 +440,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
+    if (settingsFragment!=null) {
+      settingsFragmentFrameLayout.setVisibility(View.GONE);
+      getSupportFragmentManager().beginTransaction()
+              .remove(settingsFragment)
+              .commit();
+    }
     //Used to minimize activity. Will only be called if no popUps have focus.
-    moveTaskToBack(false);
+//    moveTaskToBack(false);
   }
 
   @Override
@@ -558,12 +578,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mainView = findViewById(R.id.main_layout);
     tabView = findViewById(R.id.tabLayout);
     actionBarView = findViewById(R.id.custom_action_bar);
+    gson = new Gson();
+
+    settingsFragment = new SettingsFragment();
+    settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
+    settingsFragmentFrameLayout.setVisibility(View.GONE);
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
-    gson = new Gson();
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
@@ -583,8 +607,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
-    settingsPopupView = inflater.inflate(R.layout.settings_popup, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
+
+    settingsPopupView = inflater.inflate(R.layout.settings_popup, null);
+    soundsViewInSettings = inflater.inflate(R.layout.sound_settings_layout, null);
+
+    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
+    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
+    sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1530, true);
+    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+
+    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimation);
+    editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
     deleteEditPopUpTimerNumbers = editCyclesPopupView.findViewById(R.id.deleteEditPopUpTimerNumbers);
     number_one = editCyclesPopupView.findViewById(R.id.one_button);
@@ -605,20 +645,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>();
     savedEditPopUpArrayForThirdHeader = new ArrayList<>();
 
-    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
-    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
-    sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-//    settingsPopupWindow = new PopupWindow(settingsPopupView, 800, 1200, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1530, true);
-    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-
-    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimation);
-    editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    soundSettings = settingsPopupView.findViewById(R.id.sound_settings);
+    colorSettings = settingsPopupView.findViewById(R.id.color_settings);
+    aboutSettings = settingsPopupView.findViewById(R.id.about_settings);
 
     editPopUpLayout = findViewById(R.id.edit_cycle_layout);
     roundView = inflater.inflate(R.layout.mode_one_rounds, null);
@@ -767,6 +796,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset_total_times = timerPopUpView.findViewById(R.id.reset_total_times);
     empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
     if (mode!=4) empty_laps.setVisibility(View.INVISIBLE);
+
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
     objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
 
@@ -936,8 +966,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     global_settings.setOnClickListener(v-> {
-      settingsPopupWindow.showAtLocation(mainView, Gravity.TOP, 0, 240);
-//      settingsPopupWindow.showAsDropDown(mainView, 0, 200, Gravity.TOP);
+      getSupportFragmentManager().beginTransaction().
+              replace((R.id.settings_fragment_frameLayout), settingsFragment)
+              .commit();
+      settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
+    });
+
+    soundSettings.setOnClickListener(v->{
+    });
+
+    colorSettings.setOnClickListener(v-> {
+
+    });
+
+    aboutSettings.setOnClickListener(v-> {
+
     });
 
       //Brings up editCycle popUp to create new Cycle.
