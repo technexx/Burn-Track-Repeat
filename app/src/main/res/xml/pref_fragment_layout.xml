@@ -4,27 +4,22 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <CheckBoxPreference
+    <SwitchPreferenceCompat
         android:defaultValue="true"
-        android:key="show_base"
-        android:summaryOff="Bass will not be shown currently."
-        android:summaryOn="Bass will be shown currently."
+        android:key="test_one"
         android:title="This is a test!"
         />
 
-    <CheckBoxPreference
+    <SwitchPreferenceCompat
         android:defaultValue="true"
-        android:key="show_base"
-        android:summaryOff="Bass will not be shown currently."
-        android:summaryOn="Bass will be shown currently."
+        android:key="test_two"
         android:title="This is a test!"
         />
 
-    <CheckBoxPreference
+    <SwitchPreferenceCompat
         android:defaultValue="true"
-        android:key="show_base"
-        android:summaryOff="Bass will not be shown currently."
-        android:summaryOn="Bass will be shown currently."
+        android:key="test_three"
         android:title="This is a test!"
         />
+
 </PreferenceScreen>
