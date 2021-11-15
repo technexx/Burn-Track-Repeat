@@ -33,6 +33,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -72,7 +73,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, SettingsFragment.onChangedSettings {
 
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
@@ -453,15 +454,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
 
       getSupportFragmentManager().beginTransaction()
-//              .setCustomAnimations(
-//                      R.anim.fade_in_anim,
-//                      R.anim.fade_out_anim
-//              )
               .detach(settingsFragment)
               .commit();
     }
     //Used to minimize activity. Will only be called if no popUps have focus.
 //    moveTaskToBack(false);
+  }
+
+  @Override
+  public void settingsData(int settingNumber, boolean turnedOn) {
+    Log.i("testPref", "Setting number is " + settingNumber + " and boolean is "  + turnedOn);
   }
 
   @Override
@@ -597,6 +599,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsFragment = new SettingsFragment();
     settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     settingsFragmentFrameLayout.setVisibility(View.GONE);
+    settingsFragment.sendSettingsData((MainActivity.this));
 
     getSupportFragmentManager().beginTransaction().
             add((R.id.settings_fragment_frameLayout), settingsFragment)
@@ -849,9 +852,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setDefaultTimerValuesAndTheirEditTextViews();
     setEditPopUpTimerHeaders(1);
     instantiateNotifications();
-
-    //Todo: Fragment callback reception here. Or, simply refresh Main activity on settings save/dismiss, OR check life cycle i.e. onResume, etc.
-
 
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());

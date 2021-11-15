@@ -6,19 +6,19 @@
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
-        android:key="test_one"
+        android:key="soundPref"
         android:title="This is a test!"
         />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
-        android:key="test_two"
+        android:key="colorPref"
         android:title="This is a test!"
         />
 
     <SwitchPreferenceCompat
         android:defaultValue="true"
-        android:key="test_three"
+        android:key="aboutPref"
         android:title="This is a test!"
         />
 

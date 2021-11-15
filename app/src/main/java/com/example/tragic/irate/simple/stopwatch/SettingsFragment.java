@@ -17,27 +17,59 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
+    int SOUND_SETTINGS = 1;
+    int COLOR_SETTINGS = 2;
+    int ABOUT_SETTINGS = 3;
+
+    onChangedSettings mOnChangedSettings;
+
+    public interface onChangedSettings {
+        void settingsData(int settingNumber, boolean turnedOn);
+    }
+
+    public void sendSettingsData(onChangedSettings xOnChangedSettings) {
+        this.mOnChangedSettings = xOnChangedSettings;
+    }
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.pref_fragment_layout, rootKey);
         sharedPreferences = getContext().getSharedPreferences("settingsPref", 0);
         prefEdit = sharedPreferences.edit();
-        Preference prefOne = findPreference("test_one");
 
-        //Todo: Callback to Main and pass boolean in.
-        prefOne.setOnPreferenceChangeListener((preference, newValue) -> {
+        Preference soundPref = findPreference("soundPref");
+        Preference colorPref = findPreference("colorPref");
+        Preference aboutPref = findPreference("aboutPref");
+
+        soundPref.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean clickedValue = (boolean) newValue;
-            prefEdit.putBoolean("firstSettingBoolean", clickedValue);
+            prefEdit.putBoolean("soundPrefBoolean", clickedValue);
             prefEdit.apply();
-//            Toast.makeText(getContext(), String.valueOf(clickedValue), Toast.LENGTH_SHORT ).show();
 
-            Bundle bundle = new Bundle();
-            bundle.putBoolean("firstSettingBool", clickedValue);
+            mOnChangedSettings.settingsData(SOUND_SETTINGS, clickedValue);
+
             return true;
         });
 
-        prefOne.setOnPreferenceClickListener(v-> {
+        colorPref.setOnPreferenceChangeListener((preference, newValue) -> {
+            boolean clickedValue = (boolean) newValue;
+            prefEdit.putBoolean("colorPrefBoolean", clickedValue);
+            prefEdit.apply();
+
+            mOnChangedSettings.settingsData(COLOR_SETTINGS, clickedValue);
+
             return true;
         });
+
+        aboutPref.setOnPreferenceChangeListener((preference, newValue) -> {
+            boolean clickedValue = (boolean) newValue;
+            prefEdit.putBoolean("aboutPrefBoolean", clickedValue);
+            prefEdit.apply();
+
+            mOnChangedSettings.settingsData(ABOUT_SETTINGS, clickedValue);
+
+            return true;
+        });
+
     }
 }
