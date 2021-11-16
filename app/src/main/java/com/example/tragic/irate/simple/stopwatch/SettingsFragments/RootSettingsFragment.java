@@ -1,18 +1,15 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import android.transition.TransitionInflater;
-import android.widget.Toast;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.SwitchPreferenceCompat;
+
+import com.example.tragic.irate.simple.stopwatch.R;
 
 
-public class SettingsFragment extends PreferenceFragmentCompat {
+public class RootSettingsFragment extends PreferenceFragmentCompat {
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
@@ -24,7 +21,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     onChangedSettings mOnChangedSettings;
 
     public interface onChangedSettings {
-        void settingsData(int settingNumber, boolean turnedOn);
+        void settingsData(int settingNumber);
     }
 
     public void sendSettingsData(onChangedSettings xOnChangedSettings) {
@@ -33,21 +30,32 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.pref_fragment_layout, rootKey);
+        setPreferencesFromResource(R.xml.root_settings_layout, rootKey);
         sharedPreferences = getContext().getSharedPreferences("settingsPref", 0);
         prefEdit = sharedPreferences.edit();
 
+        Preference soundOptionPref = findPreference("soundOptions");
         Preference soundPref = findPreference("soundPref");
         Preference colorPref = findPreference("colorPref");
         Preference aboutPref = findPreference("aboutPref");
 
-        soundPref.setOnPreferenceChangeListener((preference, newValue) -> {
-            boolean clickedValue = (boolean) newValue;
-            prefEdit.putBoolean("soundPrefBoolean", clickedValue);
-            prefEdit.apply();
+//        soundOptionPref.setOnPreferenceClickListener(v->{
+//            mOnChangedSettings.settingsData(1);
+//            return true;
+//        });
 
-            mOnChangedSettings.settingsData(SOUND_SETTINGS, clickedValue);
+//        soundPref.setOnPreferenceChangeListener((preference, newValue) -> {
+//            boolean clickedValue = (boolean) newValue;
+//            prefEdit.putBoolean("soundPrefBoolean", clickedValue);
+//            prefEdit.apply();
+//
+//            mOnChangedSettings.settingsData(SOUND_SETTINGS);
+//
+//            return true;
+//        });
 
+        soundOptionPref.setOnPreferenceClickListener(v-> {
+            mOnChangedSettings.settingsData(SOUND_SETTINGS);
             return true;
         });
 
@@ -56,7 +64,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             prefEdit.putBoolean("colorPrefBoolean", clickedValue);
             prefEdit.apply();
 
-            mOnChangedSettings.settingsData(COLOR_SETTINGS, clickedValue);
+            mOnChangedSettings.settingsData(COLOR_SETTINGS);
 
             return true;
         });
@@ -66,7 +74,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             prefEdit.putBoolean("aboutPrefBoolean", clickedValue);
             prefEdit.apply();
 
-            mOnChangedSettings.settingsData(ABOUT_SETTINGS, clickedValue);
+            mOnChangedSettings.settingsData(ABOUT_SETTINGS);
 
             return true;
         });

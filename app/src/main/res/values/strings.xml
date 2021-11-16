@@ -69,4 +69,23 @@
     <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s </string>
     <string name="bunch_of_spaces">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>
     <string name="bunch_of_spaces_2">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>
+
+    <string name="empty_string"/>
+    <string-array name="empty_array"/>
+
+    <string-array name="sound_setting_options">
+        <item>Silent</item>
+        <item>Vibrate Once</item>
+        <item>Vibrate Twice</item>
+        <item>Vibrate Thrice</item>
+        <item>Ringtone</item>
+    </string-array>
+
+    <string-array name="sound_setting_option_values">
+        <item>silent</item>
+        <item>vibrate_once</item>
+        <item>vibrate_twice</item>
+        <item>vibrate_thrice</item>
+        <item>use_ringtone</item>
+    </string-array>
 </resources>

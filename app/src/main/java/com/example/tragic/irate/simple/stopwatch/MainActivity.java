@@ -6,9 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,6 +59,8 @@ import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesBO;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
@@ -73,7 +73,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, SettingsFragment.onChangedSettings {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSound {
 
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
@@ -381,12 +381,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  SettingsFragment settingsFragment;
+  ChangeSettingsValues changeSettingsValues;
+  int SOUND_SETTINGS;
+  int COLOR_SETTINGS;
+  int ABOUT_SETTINGS;
+  long[] vibrationPattern;
+
+  RootSettingsFragment rootSettingsFragment;
+  SoundSettingsFragment soundSettingsFragment;
+
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
   TextView soundSettings;
   TextView colorSettings;
   TextView aboutSettings;
+
 
   //Todo: Main activity's recyclerView and/or layout may have to be set as a fragment, if we're going to be using a preference fragment for serttings.
   //Todo: Create fragments for settings? Also fragment for Timer?
@@ -447,23 +456,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onDestroy();
   }
 
+  //Todo: Make sure to re-implement behavior for non-fragments.
   @Override
   public void onBackPressed() {
-    if (settingsFragment!=null) {
+    if (rootSettingsFragment.isVisible()) {
       settingsFragmentFrameLayout.setVisibility(View.GONE);
       settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
-
-      getSupportFragmentManager().beginTransaction()
-              .detach(settingsFragment)
-              .commit();
     }
+
+    if (soundSettingsFragment.isVisible()) {
+      getSupportFragmentManager().beginTransaction()
+              .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
+              .commit();
+
+    }
+
     //Used to minimize activity. Will only be called if no popUps have focus.
 //    moveTaskToBack(false);
   }
 
+
+  //Todo: Replace root settings fragment w/ whichever options is passed in.
   @Override
-  public void settingsData(int settingNumber, boolean turnedOn) {
-    Log.i("testPref", "Setting number is " + settingNumber + " and boolean is "  + turnedOn);
+  public void settingsData(int settingNumber) {
+    if (soundSettingsFragment !=null) {
+      getSupportFragmentManager().beginTransaction()
+              .replace(R.id.settings_fragment_frameLayout, soundSettingsFragment)
+              .commit();
+    }
+    Log.i("testPref", "Setting number is " + settingNumber);
+  }
+
+  @Override
+  public void changeSound(int typeOfSetting) {
+    Log.i("testPref", "We have clicked " + typeOfSetting);
   }
 
   @Override
@@ -596,13 +622,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     actionBarView = findViewById(R.id.custom_action_bar);
     gson = new Gson();
 
-    settingsFragment = new SettingsFragment();
+    rootSettingsFragment = new RootSettingsFragment();
+    soundSettingsFragment = new SoundSettingsFragment();
     settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     settingsFragmentFrameLayout.setVisibility(View.GONE);
-    settingsFragment.sendSettingsData((MainActivity.this));
+
+    rootSettingsFragment.sendSettingsData(MainActivity.this);
+    soundSettingsFragment.setSoundSetting(MainActivity.this);
 
     getSupportFragmentManager().beginTransaction().
-            add((R.id.settings_fragment_frameLayout), settingsFragment)
+            add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
             .commit();
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
@@ -990,9 +1019,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
       settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
 
-      if (settingsFragment!=null) {
+      if (rootSettingsFragment !=null) {
         getSupportFragmentManager().beginTransaction()
-                .attach(settingsFragment)
+                .attach(rootSettingsFragment)
                 .commit();
       }
 
@@ -2993,7 +3022,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       if (numberOfRoundsLeft==1) {
-        long[] pattern = {0, 500, 300};
+        long[] pattern = {0, 750, 300};
         vibrator.vibrate(pattern, 0);
       }
       if (numberOfRoundsLeft==0) {
