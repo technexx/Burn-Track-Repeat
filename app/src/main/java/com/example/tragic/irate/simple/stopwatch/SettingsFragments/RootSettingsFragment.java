@@ -34,25 +34,9 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
         sharedPreferences = getContext().getSharedPreferences("settingsPref", 0);
         prefEdit = sharedPreferences.edit();
 
-        Preference soundOptionPref = findPreference("soundOptions");
-        Preference soundPref = findPreference("soundPref");
+        Preference soundOptionPref = findPreference("soundPref");
         Preference colorPref = findPreference("colorPref");
         Preference aboutPref = findPreference("aboutPref");
-
-//        soundOptionPref.setOnPreferenceClickListener(v->{
-//            mOnChangedSettings.settingsData(1);
-//            return true;
-//        });
-
-//        soundPref.setOnPreferenceChangeListener((preference, newValue) -> {
-//            boolean clickedValue = (boolean) newValue;
-//            prefEdit.putBoolean("soundPrefBoolean", clickedValue);
-//            prefEdit.apply();
-//
-//            mOnChangedSettings.settingsData(SOUND_SETTINGS);
-//
-//            return true;
-//        });
 
         soundOptionPref.setOnPreferenceClickListener(v-> {
             mOnChangedSettings.settingsData(SOUND_SETTINGS);
@@ -60,8 +44,6 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
         });
 
         colorPref.setOnPreferenceChangeListener((preference, newValue) -> {
-            boolean clickedValue = (boolean) newValue;
-            prefEdit.putBoolean("colorPrefBoolean", clickedValue);
             prefEdit.apply();
 
             mOnChangedSettings.settingsData(COLOR_SETTINGS);
@@ -70,8 +52,6 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
         });
 
         aboutPref.setOnPreferenceChangeListener((preference, newValue) -> {
-            boolean clickedValue = (boolean) newValue;
-            prefEdit.putBoolean("aboutPrefBoolean", clickedValue);
             prefEdit.apply();
 
             mOnChangedSettings.settingsData(ABOUT_SETTINGS);

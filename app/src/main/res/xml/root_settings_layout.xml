@@ -6,7 +6,7 @@
     android:layout_width="match_parent">
 
     <PreferenceScreen
-        android:key="soundOptions"
+        android:key="soundPref"
         android:title="Sounds"
         />
 

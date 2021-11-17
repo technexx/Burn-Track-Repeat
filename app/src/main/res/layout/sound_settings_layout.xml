@@ -6,7 +6,7 @@
     android:background="@drawable/settings_border">
 
     <TextView
-        android:id="@+id/set_sound_opti0n"
+        android:id="@+id/set_sound_option"
         android:text="@string/set_sounds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

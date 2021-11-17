@@ -68,12 +68,13 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSound {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSound{
 
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
@@ -386,18 +387,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int COLOR_SETTINGS;
   int ABOUT_SETTINGS;
   long[] vibrationPattern;
+  int vibrationSetting;
 
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
 
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
-  TextView soundSettings;
-  TextView colorSettings;
-  TextView aboutSettings;
 
-
-  //Todo: Main activity's recyclerView and/or layout may have to be set as a fragment, if we're going to be using a preference fragment for serttings.
+  //Todo: Add simple count-up timer?
   //Todo: Create fragments for settings? Also fragment for Timer?
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
@@ -426,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onResume() {
     super.onResume();
-    Toast.makeText(getApplicationContext(), "Main resuming!", Toast.LENGTH_SHORT).show();
     setVisible(true);
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
@@ -435,13 +432,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onPause() {
     super.onPause();
-    Toast.makeText(getApplicationContext(), "Main paused!", Toast.LENGTH_SHORT).show();  }
+ }
 
   @Override
   public void onStop() {
     super.onStop();
     setVisible(false);
-    Toast.makeText(getApplicationContext(), "Main stopped!", Toast.LENGTH_SHORT).show();
     if (timerPopUpWindow.isShowing()) {
       dismissNotification = false;
       setNotificationValues();
@@ -475,21 +471,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //    moveTaskToBack(false);
   }
 
-
-  //Todo: Replace root settings fragment w/ whichever options is passed in.
   @Override
   public void settingsData(int settingNumber) {
-    if (soundSettingsFragment !=null) {
-      getSupportFragmentManager().beginTransaction()
-              .replace(R.id.settings_fragment_frameLayout, soundSettingsFragment)
-              .commit();
-    }
-    Log.i("testPref", "Setting number is " + settingNumber);
+    getSupportFragmentManager().beginTransaction()
+            .replace(R.id.settings_fragment_frameLayout, soundSettingsFragment)
+            .commit();
   }
 
+  //Todo: This is a setting behind, since it only updates on the menu click.
   @Override
   public void changeSound(int typeOfSetting) {
-    Log.i("testPref", "We have clicked " + typeOfSetting);
+    vibrationSetting = typeOfSetting;
+    changeSettingsValues.setSoundSetting(typeOfSetting);
+    vibrationPattern = changeSettingsValues.getVibrationSetting();
+    Log.i("testPref", "type of setting is " + typeOfSetting);
+    Log.i("testPref", "vibration pattern is " + Arrays.toString(vibrationPattern));
   }
 
   @Override
@@ -630,6 +626,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     rootSettingsFragment.sendSettingsData(MainActivity.this);
     soundSettingsFragment.setSoundSetting(MainActivity.this);
 
+    changeSettingsValues = new ChangeSettingsValues();
+
     getSupportFragmentManager().beginTransaction().
             add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
             .commit();
@@ -659,8 +657,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 
-    settingsPopupView = inflater.inflate(R.layout.settings_popup, null);
-    soundsViewInSettings = inflater.inflate(R.layout.sound_settings_layout, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -694,10 +690,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedEditPopUpArrayForFirstHeaderModeThree = new ArrayList<>();
     savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>();
     savedEditPopUpArrayForThirdHeader = new ArrayList<>();
-
-    soundSettings = settingsPopupView.findViewById(R.id.sound_settings);
-    colorSettings = settingsPopupView.findViewById(R.id.color_settings);
-    aboutSettings = settingsPopupView.findViewById(R.id.about_settings);
 
     editPopUpLayout = findViewById(R.id.edit_cycle_layout);
     roundView = inflater.inflate(R.layout.mode_one_rounds, null);
@@ -1021,6 +1013,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (rootSettingsFragment !=null) {
         getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
                 .attach(rootSettingsFragment)
                 .commit();
       }
@@ -3022,8 +3015,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       if (numberOfRoundsLeft==1) {
-        long[] pattern = {0, 750, 300};
-        vibrator.vibrate(pattern, 0);
+        setEndOfRoundSounds(true);
+      } else {
+        setEndOfRoundSounds(false);
       }
       if (numberOfRoundsLeft==0) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
@@ -3047,29 +3041,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
-      long[] pattern = {0, 300, 300, 300, 300};
       switch (typeOfRound.get(currentRound)) {
         case 1:
           timeLeft.setText("0");
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-          vibrator.vibrate(300);
           break;
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-          vibrator.vibrate(300);
           break;
         case 3:
           timeLeft.setText("0");
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          vibrator.vibrate(pattern, -1);
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          vibrator.vibrate(pattern, -1);
           break;
       }
+
       //Subtracts from rounds remaining.
       numberOfRoundsLeft--;
       //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
@@ -3243,6 +3233,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
     sizeAnimator.setRepeatCount(0);
     sizeAnimator.start();
+  }
+
+  public void setEndOfRoundSounds(boolean repeat) {
+    switch (vibrationSetting) {
+      case 2: case 3: case 4:
+        if (repeat) {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(), 0);
+        } else {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(), -1);
+        }
+        break;
+      case 5:
+        //Todo: Ringtone here.
+        break;
+    }
   }
 
   public void newLap() {

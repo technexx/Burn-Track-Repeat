@@ -2,12 +2,17 @@ package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.fragment.app.Fragment;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.tragic.irate.simple.stopwatch.R;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
@@ -24,28 +29,35 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         this.mOnChangedSound = xOnChangedSound;
     }
 
-    int SILENT = 1;
-    int VIBRATE_ONCE = 21;
-    int VIBRATE_TWICE = 22;
-    int VIBRATE_THRICE = 23;
-    int PLAY_RINGTONE = 3;
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_layout, rootKey);
-        sharedPreferences = getContext().getSharedPreferences("settingsPref", 0);
-        prefEdit = sharedPreferences.edit();
 
-        Preference silent = findPreference("silent");
-        Preference vibrate_once = findPreference("vibrate_once");
-        Preference vibrate_twice = findPreference("vibrate_twice");
-        Preference vibrate_thrice = findPreference("vibrate_thrice");
-        Preference use_ringtone = findPreference("use_ringtone");
+        ListPreference soundPreference = (ListPreference) findPreference("soundSettings");
 
-//        silent.setOnPreferenceChangeListener((preference, newValue) -> {
-//            mOnChangedSound.changeSound(1);
-//            return true;
-//        });
+        soundPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                // Casting this to ListPreference would allow us to call getValues() on it, and assign the same conditional as below.
+                ListPreference pref = (ListPreference) preference;
 
+                if (newValue.equals("silent")) {
+                    mOnChangedSound.changeSound(1);
+                }
+                if (newValue.equals("vibrate_once")) {
+                    mOnChangedSound.changeSound(2);
+                }
+                if (newValue.equals("vibrate_twice")) {
+                    mOnChangedSound.changeSound(3);
+                }
+                if (newValue.equals("vibrate_thrice")) {
+                    mOnChangedSound.changeSound(4);
+                }
+                if (newValue.equals("use_ringtone")) {
+                    mOnChangedSound.changeSound(5);
+                }
+                return true;
+            }
+        });
     }
 }
