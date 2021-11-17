@@ -41,23 +41,30 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
                 // Casting this to ListPreference would allow us to call getValues() on it, and assign the same conditional as below.
                 ListPreference pref = (ListPreference) preference;
 
-                if (newValue.equals("silent")) {
-                    mOnChangedSound.changeSound(1);
-                }
-                if (newValue.equals("vibrate_once")) {
-                    mOnChangedSound.changeSound(2);
-                }
-                if (newValue.equals("vibrate_twice")) {
-                    mOnChangedSound.changeSound(3);
-                }
-                if (newValue.equals("vibrate_thrice")) {
-                    mOnChangedSound.changeSound(4);
-                }
-                if (newValue.equals("use_ringtone")) {
-                    mOnChangedSound.changeSound(5);
-                }
+                int settingsValue = assignSoundSettingNumericValue((String) newValue);
+                mOnChangedSound.changeSound(settingsValue);
                 return true;
             }
         });
+    }
+
+    public int assignSoundSettingNumericValue(String setting) {
+        int assignedValue = 0;
+        if (setting.equals("silent")) {
+            assignedValue = 1;
+        }
+        if (setting.equals("vibrate_once")) {
+            assignedValue = 2;
+        }
+        if (setting.equals("vibrate_twice")) {
+            assignedValue = 3;
+        }
+        if (setting.equals("vibrate_thrice")) {
+            assignedValue = 4;
+        }
+        if (setting.equals("use_ringtone")) {
+            assignedValue = 5;
+        }
+        return assignedValue;
     }
 }

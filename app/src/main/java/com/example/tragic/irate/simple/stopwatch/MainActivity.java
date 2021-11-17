@@ -7,6 +7,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -478,13 +479,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .commit();
   }
 
-  //Todo: This is a setting behind, since it only updates on the menu click.
+  //Todo: No callback @ start of app means vibrationSetting will always start at 0.
   @Override
   public void changeSound(int typeOfSetting) {
     vibrationSetting = typeOfSetting;
     changeSettingsValues.setSoundSetting(typeOfSetting);
     vibrationPattern = changeSettingsValues.getVibrationSetting();
-    Log.i("testPref", "type of setting is " + typeOfSetting);
+    Log.i("testPref", "type of setting in callback is " + typeOfSetting);
     Log.i("testPref", "vibration pattern is " + Arrays.toString(vibrationPattern));
   }
 
@@ -776,6 +777,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
+
+    SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
+    String testPref = prefShared.getString("soundSettings", "");
+    vibrationSetting  = soundSettingsFragment.assignSoundSettingNumericValue(testPref);
+    Log.i("testPref", "retrieved value is " + testPref);
+    Log.i("testPref", "converted value is " + vibrationSetting);
 
     timerValueInEditPopUpTextView.setText("00:00");
 
@@ -3236,6 +3243,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEndOfRoundSounds(boolean repeat) {
+    Log.i("testPref", "type of setting in Main's method is " + vibrationSetting);
+
     switch (vibrationSetting) {
       case 2: case 3: case 4:
         if (repeat) {
