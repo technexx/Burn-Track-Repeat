@@ -479,7 +479,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .commit();
   }
 
-  //Todo: No callback @ start of app means vibrationSetting will always start at 0.
   @Override
   public void changeSound(int typeOfSetting) {
     vibrationSetting = typeOfSetting;
@@ -779,10 +778,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
-    String testPref = prefShared.getString("soundSettings", "");
+    String testPref = prefShared.getString("soundSettingForSets", "");
     vibrationSetting  = soundSettingsFragment.assignSoundSettingNumericValue(testPref);
-    Log.i("testPref", "retrieved value is " + testPref);
-    Log.i("testPref", "converted value is " + vibrationSetting);
 
     timerValueInEditPopUpTextView.setText("00:00");
 

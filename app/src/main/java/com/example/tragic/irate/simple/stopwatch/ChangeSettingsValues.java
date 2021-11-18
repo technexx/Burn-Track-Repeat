@@ -40,8 +40,6 @@ public class ChangeSettingsValues {
             chosenVibration = new long[]{0, 300, 300, 0, 300, 300, 0, 300, 300};
         }
 
-        Log.i("testPref", "type of setting in values class is " + mValueOfSetting);
-
         return chosenVibration;
     }
 

@@ -5,11 +5,19 @@
     android:layout_width="match_parent">
 
         <ListPreference
-            android:key="soundSettings"
-            android:title="Sound Options"
+            android:key="soundSettingForSets"
+            android:title="Sets"
             android:entries="@array/sound_setting_options"
             android:entryValues="@array/sound_setting_option_values"
-            android:defaultValue="boo">
+            android:defaultValue="">
+        </ListPreference>
+
+        <ListPreference
+            android:key="soundSettingForBreaks"
+            android:title="Breaks"
+            android:entries="@array/sound_setting_options"
+            android:entryValues="@array/sound_setting_option_values"
+            android:defaultValue="">
         </ListPreference>
 
 </PreferenceScreen>

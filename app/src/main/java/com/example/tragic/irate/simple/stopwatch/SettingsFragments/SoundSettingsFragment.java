@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import com.example.tragic.irate.simple.stopwatch.R;
 
@@ -33,7 +34,8 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_layout, rootKey);
 
-        ListPreference soundPreference = (ListPreference) findPreference("soundSettings");
+        ListPreference soundPreference = (ListPreference) findPreference("soundSettingForSets");
+        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         soundPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -43,6 +45,11 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
                 int settingsValue = assignSoundSettingNumericValue((String) newValue);
                 mOnChangedSound.changeSound(settingsValue);
+
+                CharSequence[] soundEntryList = soundPreference.getEntries();
+                String entryString = (String) soundEntryList[settingsValue-1];
+
+                soundPreference.setSummary(entryString);
                 return true;
             }
         });
