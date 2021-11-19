@@ -398,10 +398,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
+  //Todo: Isolated index exception crash - ToDo @ 3218 @ beginning of addAndRoundDownTotalCycleTimeFromPreviousRounds().
+  //Todo: Sound setting summary only appears after selecting something (not on app start).
   //Todo: Some small->large text size change on second round of multiple 5 second rounds.
   //Todo: Add simple count-up timer?
   //Todo: Create fragments for settings? Also fragment for Timer?
-  //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, color, etc.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -785,8 +786,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
-    String testPref = prefShared.getString("soundSettingForSets", "");
-    vibrationSettingForSets  = soundSettingsFragment.assignSoundSettingNumericValue(testPref);
+    String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
+    vibrationSettingForSets  = soundSettingsFragment.assignSoundSettingNumericValue(defaultSoundSettingForSets);
+    String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+    vibrationSettingForBreaks = soundSettingsFragment.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
 
     timerValueInEditPopUpTextView.setText("00:00");
 
@@ -3204,6 +3207,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds() {
     if (mode==1) {
       if (typeOfRound.size()>0) {
+        //Todo: Index exception crash here when exiting a cycle and then trying to launch another under certain circumstances. resetTimer() is called when launching a new cycle, which calls this method.
         switch (typeOfRound.get(currentRound)) {
           case 1: case 2:
             totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
