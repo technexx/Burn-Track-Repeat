@@ -39,22 +39,35 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         this.mOnChangeSoundForBreaks = xOnChangedSoundForBreaks;
     }
 
-    //Todo: Sep for breaks. Make sure that Main calls correct vibration pattern (we'll need another global var).
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_layout, rootKey);
 
-//        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
+        String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+
         ListPreference soundPreference = (ListPreference) findPreference("soundSettingForSets");
         ListPreference breakPreference = (ListPreference) findPreference("soundSettingForBreaks");
+
+        CharSequence[] soundEntryListForSets = soundPreference.getEntries();
+        CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();
+
+        int defaultSetNumericValue = assignSoundSettingNumericValue(defaultSoundSettingForSets);
+        int defaultBreakNumericValue = assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
+
+        String defaultSetString = (String) soundEntryListForSets[defaultSetNumericValue-1];
+        String defaultBreakString = (String) soundEntryListForBreaks[defaultBreakNumericValue-1];
+
+        soundPreference.setSummary(defaultSetString);
+        breakPreference.setSummary(defaultBreakString);
 
         soundPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             int settingsValue = assignSoundSettingNumericValue((String) newValue);
             mOnChangedSoundForSets.changeSetSound(settingsValue);
 
-            CharSequence[] soundEntryList = soundPreference.getEntries();
-            String entryString = (String) soundEntryList[settingsValue-1];
-
+            String entryString = (String) soundEntryListForSets[settingsValue-1];
             soundPreference.setSummary(entryString);
             return true;
         });
@@ -63,10 +76,8 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             int breaksValue = assignSoundSettingNumericValue((String) newValue);
             mOnChangeSoundForBreaks.changeBreakSounds(breaksValue);
 
-            CharSequence[] soundEntryList = breakPreference.getEntries();
-            String entryString = (String) soundEntryList[breaksValue-1];
-
-            breakPreference.setSummary(entryString);
+            String entryString = (String) soundEntryListForBreaks[breaksValue-1];
+            soundPreference.setSummary(entryString);
             return true;
         });
     }
