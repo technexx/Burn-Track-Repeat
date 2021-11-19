@@ -20,38 +20,54 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
-    onChangedSound mOnChangedSound;
+    onChangedSoundForSets mOnChangedSoundForSets;
+    onChangedSoundForBreaks mOnChangeSoundForBreaks;
 
-    public interface onChangedSound {
-        void changeSound(int typeOfSetting);
+    public interface onChangedSoundForSets {
+        void changeSetSound(int typeOfSetting);
     }
 
-    public void setSoundSetting(onChangedSound xOnChangedSound) {
-        this.mOnChangedSound = xOnChangedSound;
+    public interface onChangedSoundForBreaks {
+        void changeBreakSounds(int typeOfSetting);
     }
 
+    public void soundSettingForSets(onChangedSoundForSets xonChangedSoundForSets) {
+        this.mOnChangedSoundForSets = xonChangedSoundForSets;
+    }
+
+    public void soundSettingForBreaks(onChangedSoundForBreaks xOnChangedSoundForBreaks) {
+        this.mOnChangeSoundForBreaks = xOnChangedSoundForBreaks;
+    }
+
+    //Todo: Sep for breaks. Make sure that Main calls correct vibration pattern (we'll need another global var).
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_layout, rootKey);
 
+//        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
         ListPreference soundPreference = (ListPreference) findPreference("soundSettingForSets");
-        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
+        ListPreference breakPreference = (ListPreference) findPreference("soundSettingForBreaks");
 
-        soundPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                // Casting this to ListPreference would allow us to call getValues() on it, and assign the same conditional as below.
-                ListPreference pref = (ListPreference) preference;
+        soundPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            int settingsValue = assignSoundSettingNumericValue((String) newValue);
+            mOnChangedSoundForSets.changeSetSound(settingsValue);
 
-                int settingsValue = assignSoundSettingNumericValue((String) newValue);
-                mOnChangedSound.changeSound(settingsValue);
+            CharSequence[] soundEntryList = soundPreference.getEntries();
+            String entryString = (String) soundEntryList[settingsValue-1];
 
-                CharSequence[] soundEntryList = soundPreference.getEntries();
-                String entryString = (String) soundEntryList[settingsValue-1];
+            soundPreference.setSummary(entryString);
+            return true;
+        });
 
-                soundPreference.setSummary(entryString);
-                return true;
-            }
+        breakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            int breaksValue = assignSoundSettingNumericValue((String) newValue);
+            mOnChangeSoundForBreaks.changeBreakSounds(breaksValue);
+
+            CharSequence[] soundEntryList = breakPreference.getEntries();
+            String entryString = (String) soundEntryList[breaksValue-1];
+
+            breakPreference.setSummary(entryString);
+            return true;
         });
     }
 

@@ -22,22 +22,22 @@ public class ChangeSettingsValues {
     public ChangeSettingsValues() {
     }
 
-    public void setSoundSetting(int setting) {
+    public void soundSettingForSets(int setting) {
         this.mValueOfSetting = setting;
     }
 
-    public long[] getVibrationSetting() {
+    public long[] getVibrationSetting(int settingNumber) {
         long[] chosenVibration = new long[0];
 
-        if (mValueOfSetting==2) {
+        if (settingNumber==2) {
             chosenVibration = new long[]{0, 300, 300};
 
         }
-        if (mValueOfSetting==3) {
-            chosenVibration = new long[]{0, 300, 300, 0, 500, 300};
+        if (settingNumber==3) {
+            chosenVibration = new long[]{0, 300, 150, 300, 150};
         }
-        if (mValueOfSetting==4) {
-            chosenVibration = new long[]{0, 300, 300, 0, 300, 300, 0, 300, 300};
+        if (settingNumber==4) {
+            chosenVibration = new long[]{0, 300, 300, 300, 300, 300, 300};
         }
 
         return chosenVibration;

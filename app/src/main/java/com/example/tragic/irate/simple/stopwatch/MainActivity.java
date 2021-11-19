@@ -75,7 +75,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSound{
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundForSets, SoundSettingsFragment.onChangedSoundForBreaks{
 
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
@@ -387,8 +387,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SOUND_SETTINGS;
   int COLOR_SETTINGS;
   int ABOUT_SETTINGS;
-  long[] vibrationPattern;
-  int vibrationSetting;
+  long[] vibrationPatternForSets;
+  long[] vibrationPatternForBreaks;
+  int vibrationSettingForSets;
+  int vibrationSettingForBreaks;
 
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
@@ -396,6 +398,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
+  //Todo: Some small->large text size change on second round of multiple 5 second rounds.
   //Todo: Add simple count-up timer?
   //Todo: Create fragments for settings? Also fragment for Timer?
   //Todo: Index exception crash somewhere when exiting and launching a new cycle after doing it a few times.
@@ -467,7 +470,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .commit();
 
     }
-
     //Used to minimize activity. Will only be called if no popUps have focus.
 //    moveTaskToBack(false);
   }
@@ -480,12 +482,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
-  public void changeSound(int typeOfSetting) {
-    vibrationSetting = typeOfSetting;
-    changeSettingsValues.setSoundSetting(typeOfSetting);
-    vibrationPattern = changeSettingsValues.getVibrationSetting();
-    Log.i("testPref", "type of setting in callback is " + typeOfSetting);
-    Log.i("testPref", "vibration pattern is " + Arrays.toString(vibrationPattern));
+  public void changeSetSound(int typeOfSetting) {
+    vibrationSettingForSets = typeOfSetting;
+//    changeSettingsValues.soundSettingForSets(typeOfSetting);
+    vibrationPatternForSets = changeSettingsValues.getVibrationSetting(typeOfSetting);
+  }
+
+  @Override
+  public void changeBreakSounds(int typeOfSetting) {
+    vibrationSettingForBreaks = typeOfSetting;
+    vibrationPatternForBreaks = changeSettingsValues.getVibrationSetting(typeOfSetting);
   }
 
   @Override
@@ -624,7 +630,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsFragmentFrameLayout.setVisibility(View.GONE);
 
     rootSettingsFragment.sendSettingsData(MainActivity.this);
-    soundSettingsFragment.setSoundSetting(MainActivity.this);
+    soundSettingsFragment.soundSettingForSets(MainActivity.this);
+    soundSettingsFragment.soundSettingForBreaks(MainActivity.this);
 
     changeSettingsValues = new ChangeSettingsValues();
 
@@ -779,7 +786,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
     String testPref = prefShared.getString("soundSettingForSets", "");
-    vibrationSetting  = soundSettingsFragment.assignSoundSettingNumericValue(testPref);
+    vibrationSettingForSets  = soundSettingsFragment.assignSoundSettingNumericValue(testPref);
 
     timerValueInEditPopUpTextView.setText("00:00");
 
@@ -3018,11 +3025,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerDisabled = true;
 
     if (mode==1) {
-      if (numberOfRoundsLeft==1) {
-        setEndOfRoundSounds(true);
-      } else {
-        setEndOfRoundSounds(false);
-      }
       if (numberOfRoundsLeft==0) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
         mHandler.removeCallbacks(endFade);
@@ -3049,18 +3051,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           timeLeft.setText("0");
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          if (numberOfRoundsLeft!=1) {
+            setEndOfRoundSounds(vibrationSettingForSets, false);
+          } else{
+            setEndOfRoundSounds(vibrationSettingForSets, true);
+          }
+          Log.i("testPref", "executed in SETS with a vibration setting of " + vibrationSettingForSets);
           break;
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          if (numberOfRoundsLeft!=1) {
+            setEndOfRoundSounds(vibrationSettingForSets, false);
+          } else {
+            setEndOfRoundSounds(vibrationSettingForSets, true);
+          }
+          Log.i("testPref", "executed in SETS with a vibration setting of " + vibrationSettingForSets);
           break;
         case 3:
           timeLeft.setText("0");
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          if (numberOfRoundsLeft!=1) {
+            setEndOfRoundSounds(vibrationSettingForBreaks, false);
+          } else {
+            setEndOfRoundSounds(vibrationSettingForBreaks, true);
+          }
+          Log.i("testPref", "executed in BREAKS with a vibration setting of " + vibrationSettingForBreaks);
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          if (numberOfRoundsLeft!=1) {
+            setEndOfRoundSounds(vibrationSettingForBreaks, false);
+          } else {
+            setEndOfRoundSounds(vibrationSettingForBreaks, true);
+          }
+          Log.i("testPref", "executed in BREAKS with a vibration setting of " + vibrationSettingForBreaks);
           break;
       }
 
@@ -3239,15 +3265,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sizeAnimator.start();
   }
 
-  public void setEndOfRoundSounds(boolean repeat) {
-    Log.i("testPref", "type of setting in Main's method is " + vibrationSetting);
+  public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
 
     switch (vibrationSetting) {
       case 2: case 3: case 4:
         if (repeat) {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(), 0);
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
         } else {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(), -1);
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
         }
         break;
       case 5:
