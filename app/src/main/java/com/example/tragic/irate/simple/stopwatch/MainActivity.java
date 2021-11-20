@@ -644,7 +644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     soundSettingsFragment.soundSettingForBreaks(MainActivity.this);
 
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//    audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+    mediaPlayer = MediaPlayer.create(this, ringToneUri);
 
     changeSettingsValues = new ChangeSettingsValues();
 
@@ -3070,7 +3070,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           } else{
             setEndOfRoundSounds(vibrationSettingForSets, true);
           }
-          Log.i("testPref", "executed in SETS with a vibration setting of " + vibrationSettingForSets);
           break;
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
@@ -3080,7 +3079,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           } else {
             setEndOfRoundSounds(vibrationSettingForSets, true);
           }
-          Log.i("testPref", "executed in SETS with a vibration setting of " + vibrationSettingForSets);
           break;
         case 3:
           timeLeft.setText("0");
@@ -3090,7 +3088,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           } else {
             setEndOfRoundSounds(vibrationSettingForBreaks, true);
           }
-          Log.i("testPref", "executed in BREAKS with a vibration setting of " + vibrationSettingForBreaks);
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
@@ -3100,13 +3097,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           } else {
             setEndOfRoundSounds(vibrationSettingForBreaks, true);
           }
-          Log.i("testPref", "executed in BREAKS with a vibration setting of " + vibrationSettingForBreaks);
           break;
       }
 
-      //Subtracts from rounds remaining.
       numberOfRoundsLeft--;
-      //Iterates up in our current round count. This is used to determine which type of round will execute next (below).
       currentRound++;
       mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
       //Ensures subsequent rounds will start automatically.
@@ -3290,14 +3284,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 5:
-        mediaPlayer = MediaPlayer.create(this, ringToneUri);
-        mediaPlayer.setLooping(false);
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-          @Override
-          public void onCompletion(MediaPlayer mp) {
-            mediaPlayer.stop();
-          }
-        });
         if (!repeat) {
           mediaPlayer.setLooping(false);
         } else {
@@ -3660,16 +3646,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void resetTimer() {
     vibrator.cancel();
     dotDraws.resetDotAlpha();
-    timerIsPaused = true;
-    timerEnded = false;
-    reset.setVisibility(View.INVISIBLE);
-    progressBar.setProgress(10000);
     if (timer != null) timer.cancel();
     if (endAnimation!=null) endAnimation.cancel();
+    if (mediaPlayer.isPlaying()) {
+      mediaPlayer.stop();
+      mediaPlayer.reset();
+    }
+
+    timerIsPaused = true;
+    timerEnded = false;
     next_round.setEnabled(true);
+
+    progressBar.setProgress(10000);
     currentProgressBarValue = 10000;
+
     addAndRoundDownTotalCycleTimeFromPreviousRounds();
     AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+
+    reset.setVisibility(View.INVISIBLE);
 
     switch (mode) {
       case 1:
