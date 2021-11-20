@@ -2938,6 +2938,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
 
     timer = new CountDownTimer(setMillis, 50) {
       @Override
@@ -2950,9 +2951,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateTotalTimeValuesEachTick();
 
         if (!textSizeIncreased && mode==1) {
-          if (setMillis < 59000) {
-            changeTextSize(valueAnimatorUp, timeLeft);
-            textSizeIncreased = true;
+          if (willWeChangeTextSize) {
+            if (setMillis < 59000) {
+              changeTextSize(valueAnimatorUp, timeLeft);
+              textSizeIncreased = true;
+            }
           }
         }
         if (setMillis < 500) timerDisabled = true;
@@ -2968,6 +2971,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void startBreakTimer() {
     setInitialTextSizeForRounds(breakMillis);
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
 
     timer = new CountDownTimer(breakMillis, 50) {
       @Override
@@ -2980,9 +2984,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateTotalTimeValuesEachTick();
 
         if (!textSizeIncreased && mode==1) {
-          if (breakMillis < 59000) {
-            changeTextSize(valueAnimatorUp, timeLeft);
-            textSizeIncreased = true;
+          if (willWeChangeTextSize) {
+            if (breakMillis < 59000) {
+              changeTextSize(valueAnimatorUp, timeLeft);
+              textSizeIncreased = true;
+            }
           }
         }
 
@@ -2999,6 +3005,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void startPomTimer() {
     setInitialTextSizeForRounds(pomMillis);
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
 
     timer = new CountDownTimer(pomMillis, 50) {
       @Override
@@ -3011,9 +3018,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateTotalTimeValuesEachTick();
 
         if (!textSizeIncreased && mode==3) {
-          if (pomMillis < 59000) {
-            changeTextSize(valueAnimatorUp, timeLeft);
-            textSizeIncreased = true;
+          if (willWeChangeTextSize) {
+            if (pomMillis < 59000) {
+              changeTextSize(valueAnimatorUp, timeLeft);
+              textSizeIncreased = true;
+            }
           }
         }
 
@@ -3264,6 +3273,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==4) textSizeIncreased = false;
     }
   }
+
+  public boolean checkIfRunningTextSizeChange(long startingMillis) {
+    if (mode==1) {
+      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
+        if (startingMillis>=60000) return true; else return false;
+      } else {
+        if (startingMillis<=59000) return true; else return false;
+      }
+    } else if (mode==3) {
+      if (startingMillis>=60000) return true; else return false;
+    } else {
+      return false;
+    }
+  }
+
   public void changeTextSize(ValueAnimator va, TextView textView) {
     sizeAnimator = va;
     sizeAnimator.addUpdateListener(animation -> {
