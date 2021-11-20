@@ -407,9 +407,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
-  //Todo: Replacing a round via edit gets stuck on that round - does not automatically add next round to list.
-  //Todo: Sound setting summary only appears after selecting something (not on app start).
-  //Todo: Some small->large text size change on second round of multiple 5 second rounds.
   //Todo: Add simple count-up timer?
   //Todo: Create fragments for settings? Also fragment for Timer?
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
@@ -2668,13 +2665,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-
           //Since our workOutTime lists are independent of adapter and run from (up to) 0-15, we change the value of roundSelectedPosition back to original.
           roundHolderTwo.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
           typeHolderTwo.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
           cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
           cycleRoundsAdapterTwo.notifyDataSetChanged();
         }
+        roundIsSelected = false;
       }
     }
   }
