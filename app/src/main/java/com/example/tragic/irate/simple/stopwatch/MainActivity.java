@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
-  //Todo: Isolated index exception crash - ToDo @ 3218 @ beginning of addAndRoundDownTotalCycleTimeFromPreviousRounds().
+  //Todo: Replacing a round via edit gets stuck on that round - does not automatically add next round to list.
   //Todo: Sound setting summary only appears after selecting something (not on app start).
   //Todo: Some small->large text size change on second round of multiple 5 second rounds.
   //Todo: Add simple count-up timer?
@@ -3064,10 +3064,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
-        addAndRoundDownTotalCycleTimeFromPreviousRounds();
-      } else {
-        addAndRoundDownTotalCycleTimeFromPreviousRounds();
       }
+      addAndRoundDownTotalCycleTimeFromPreviousRounds();
+
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
       switch (typeOfRound.get(currentRound)) {
@@ -3135,8 +3134,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
         progressBar.setProgress(0);
-        addAndRoundDownTotalCycleTimeFromPreviousRounds();
-      } else addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      }
+      addAndRoundDownTotalCycleTimeFromPreviousRounds();
       mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
     }
     beginTimerForNextRound = true;
@@ -3220,21 +3219,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds() {
     if (mode==1) {
-      if (typeOfRound.size()>0) {
-        //Todo: Index exception crash here when exiting a cycle and then trying to launch another under certain circumstances. resetTimer() is called when launching a new cycle, which calls this method.
-        switch (typeOfRound.get(currentRound)) {
-          case 1: case 2:
-            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
-            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
-            cycleSetTimeForSingleRoundInMillis = 0;
-            break;
-          case 3: case 4:
-            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
-            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
-            cycleBreakTimeForSingleRoundInMillis = 0;
-            break;
-        }
-      }
+      totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
+      totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
+      cycleSetTimeForSingleRoundInMillis = 0;
+
+      totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
+      totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
+      cycleBreakTimeForSingleRoundInMillis = 0;
     }
     if (mode==3) {
       if (pomDotCounter>0) {
