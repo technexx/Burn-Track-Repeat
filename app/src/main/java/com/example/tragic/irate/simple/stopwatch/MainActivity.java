@@ -407,6 +407,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
+  //Todo: Ending round early should change "0" textSize to large.
   //Todo: Add simple count-up timer?
   //Todo: Create fragments for settings? Also fragment for Timer?
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
@@ -3061,6 +3062,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
+        timeLeft.setTextSize(90f);
       }
       addAndRoundDownTotalCycleTimeFromPreviousRounds();
 
