@@ -24,6 +24,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -387,10 +391,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SOUND_SETTINGS;
   int COLOR_SETTINGS;
   int ABOUT_SETTINGS;
+
   long[] vibrationPatternForSets;
   long[] vibrationPatternForBreaks;
   int vibrationSettingForSets;
   int vibrationSettingForBreaks;
+
+  Uri ringToneUri;
+  MediaPlayer mediaPlayer;
+  AudioManager audioManager;
 
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
@@ -634,6 +643,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     soundSettingsFragment.soundSettingForSets(MainActivity.this);
     soundSettingsFragment.soundSettingForBreaks(MainActivity.this);
 
+    ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//    audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
     changeSettingsValues = new ChangeSettingsValues();
 
     getSupportFragmentManager().beginTransaction().
@@ -664,7 +676,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
-
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
@@ -3270,7 +3281,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-
     switch (vibrationSetting) {
       case 2: case 3: case 4:
         if (repeat) {
@@ -3280,7 +3290,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 5:
-        //Todo: Ringtone here.
+        mediaPlayer = MediaPlayer.create(this, ringToneUri);
+        mediaPlayer.setLooping(false);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+          @Override
+          public void onCompletion(MediaPlayer mp) {
+            mediaPlayer.stop();
+          }
+        });
+        if (!repeat) {
+          mediaPlayer.setLooping(false);
+        } else {
+          mediaPlayer.setLooping(true);
+        }
+        mediaPlayer.start();
         break;
     }
   }

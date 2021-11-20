@@ -77,7 +77,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             mOnChangeSoundForBreaks.changeBreakSounds(breaksValue);
 
             String entryString = (String) soundEntryListForBreaks[breaksValue-1];
-            soundPreference.setSummary(entryString);
+            breakPreference.setSummary(entryString);
             return true;
         });
     }
