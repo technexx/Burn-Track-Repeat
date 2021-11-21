@@ -22,10 +22,6 @@ public class ChangeSettingsValues {
     public ChangeSettingsValues() {
     }
 
-    public void soundSettingForSets(int setting) {
-        this.mValueOfSetting = setting;
-    }
-
     public long[] getVibrationSetting(int settingNumber) {
         long[] chosenVibration = new long[0];
 

@@ -4,20 +4,57 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-        <ListPreference
-            android:key="soundSettingForSets"
-            android:title="Sets"
-            android:entries="@array/sound_setting_options"
-            android:entryValues="@array/sound_setting_option_values"
-            android:defaultValue="">
-        </ListPreference>
+        <PreferenceCategory
+            android:title="Workout Mode">
 
-        <ListPreference
-            android:key="soundSettingForBreaks"
-            android:title="Breaks"
-            android:entries="@array/sound_setting_options"
-            android:entryValues="@array/sound_setting_option_values"
-            android:defaultValue="">
-        </ListPreference>
+                <ListPreference
+                    android:key="soundSettingForSets"
+                    android:title="Sets"
+                    android:entries="@array/sound_setting_options"
+                    android:entryValues="@array/sound_setting_option_values"
+                    android:defaultValue="">
+                </ListPreference>
+
+                <ListPreference
+                    android:key="soundSettingForBreaks"
+                    android:title="Breaks"
+                    android:entries="@array/sound_setting_options"
+                    android:entryValues="@array/sound_setting_option_values"
+                    android:defaultValue="">
+                </ListPreference>
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="Pomodoro Mode">
+
+                <ListPreference
+                    android:key="soundSettingForWork"
+                    android:title="Work"
+                    android:entries="@array/sound_setting_options"
+                    android:entryValues="@array/sound_setting_option_values"
+                    android:defaultValue="">
+                </ListPreference>
+
+                <ListPreference
+                    android:key="soundSettingForMiniBreaks"
+                    android:title="Mini Break"
+                    android:entries="@array/sound_setting_options"
+                    android:entryValues="@array/sound_setting_option_values"
+                    android:defaultValue="">
+                </ListPreference>
+
+                <ListPreference
+                    android:key="soundSettingForFullBreak"
+                    android:title="Full Break"
+                    android:entries="@array/sound_setting_options"
+                    android:entryValues="@array/sound_setting_option_values"
+                    android:defaultValue="">
+                </ListPreference>
+
+        </PreferenceCategory>
+
+
+
+
 
 </PreferenceScreen>

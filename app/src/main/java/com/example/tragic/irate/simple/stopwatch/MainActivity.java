@@ -407,9 +407,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
-  //Todo: Ending round early should change "0" textSize to large.
-  //Todo: Add simple count-up timer?
-  //Todo: Create fragments for settings? Also fragment for Timer?
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, color, etc.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.

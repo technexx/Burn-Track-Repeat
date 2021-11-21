@@ -17,9 +17,6 @@ import java.util.List;
 
 public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor prefEdit;
-
     onChangedSoundForSets mOnChangedSoundForSets;
     onChangedSoundForBreaks mOnChangeSoundForBreaks;
 
@@ -43,32 +40,51 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_layout, rootKey);
 
+        //Todo: Create looping method for Strings + ints outside of clickListeners, since we only need them to populate summary?
         SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        ListPreference setPreference = (ListPreference) findPreference("soundSettingForSets");
+        ListPreference breakPreference = (ListPreference) findPreference("soundSettingForBreaks");
+        ListPreference workPreference = (ListPreference) findPreference("soundSettingForWork");
+        ListPreference miniBreakPreference = (ListPreference) findPreference("soundSettingForMiniBreaks");
+        ListPreference fullBreakPreference = (ListPreference) findPreference("soundSettingForFullBreak");
 
         String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
         String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+        String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "");
+        String defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "");
+        String defaultSoundSettingForFullBreak = prefShared.getString("soundSettingForFullBreak", "");
 
-        ListPreference soundPreference = (ListPreference) findPreference("soundSettingForSets");
-        ListPreference breakPreference = (ListPreference) findPreference("soundSettingForBreaks");
-
-        CharSequence[] soundEntryListForSets = soundPreference.getEntries();
+        CharSequence[] soundEntryListForSets = setPreference.getEntries();
         CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();
+        CharSequence[] soundEntryListForWork = workPreference.getEntries();
+        CharSequence[] soundEntryListForMiniBreaks = miniBreakPreference.getEntries();
+        CharSequence[] soundEntryListForFullBreak = fullBreakPreference.getEntries();
 
         int defaultSetNumericValue = assignSoundSettingNumericValue(defaultSoundSettingForSets);
         int defaultBreakNumericValue = assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
+        int defaultWorkNumericValue = assignSoundSettingNumericValue(defaultSoundSettingForWork);
+        int defaultMiniBreaksNumericValue = assignSoundSettingNumericValue(defaultSoundSettingForMiniBreaks);
+        int defaultFullBreakNumericValue = assignSoundSettingNumericValue(defaultSoundSettingForFullBreak);
 
         String defaultSetString = (String) soundEntryListForSets[defaultSetNumericValue-1];
         String defaultBreakString = (String) soundEntryListForBreaks[defaultBreakNumericValue-1];
+        String defaultWorkString = (String) soundEntryListForWork[defaultWorkNumericValue-1];
+        String defaultMiniBreaksString = (String) soundEntryListForMiniBreaks[defaultMiniBreaksNumericValue-1];
+        String defaultFullBreakString = (String) soundEntryListForFullBreak[defaultFullBreakNumericValue-1];
 
-        soundPreference.setSummary(defaultSetString);
+        setPreference.setSummary(defaultSetString);
         breakPreference.setSummary(defaultBreakString);
+        workPreference.setSummary(defaultWorkString);
+        miniBreakPreference.setSummary(defaultMiniBreaksString);
+        fullBreakPreference.setSummary(defaultFullBreakString);
 
-        soundPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+        setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             int settingsValue = assignSoundSettingNumericValue((String) newValue);
             mOnChangedSoundForSets.changeSetSound(settingsValue);
 
             String entryString = (String) soundEntryListForSets[settingsValue-1];
-            soundPreference.setSummary(entryString);
+            setPreference.setSummary(entryString);
             return true;
         });
 
