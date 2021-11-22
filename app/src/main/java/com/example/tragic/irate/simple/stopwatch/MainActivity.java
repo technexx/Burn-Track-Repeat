@@ -79,7 +79,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundForSets, SoundSettingsFragment.onChangedSoundForBreaks{
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting{
 
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
@@ -387,15 +387,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  ChangeSettingsValues changeSettingsValues;
   int SOUND_SETTINGS;
   int COLOR_SETTINGS;
   int ABOUT_SETTINGS;
 
   long[] vibrationPatternForSets;
   long[] vibrationPatternForBreaks;
+
   int vibrationSettingForSets;
   int vibrationSettingForBreaks;
+  int vibrationSettingForWork;
+  int vibrationSettingForMiniBreaks;
+  int vibrationSettingForFullBreak;
 
   Uri ringToneUri;
   MediaPlayer mediaPlayer;
@@ -403,6 +406,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
+  ChangeSettingsValues changeSettingsValues;
 
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
@@ -487,16 +491,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
-  public void changeSetSound(int typeOfSetting) {
-    vibrationSettingForSets = typeOfSetting;
-//    changeSettingsValues.soundSettingForSets(typeOfSetting);
-    vibrationPatternForSets = changeSettingsValues.getVibrationSetting(typeOfSetting);
-  }
+  public void changeSoundSetting(int typeOfRound, int settingNumber) {
+    assignSoundSettingVariableNumbers(typeOfRound, settingNumber);
+    Log.i("testSetting", "type of round is " + typeOfRound + " and setting number is " + settingNumber);
 
-  @Override
-  public void changeBreakSounds(int typeOfSetting) {
-    vibrationSettingForBreaks = typeOfSetting;
-    vibrationPatternForBreaks = changeSettingsValues.getVibrationSetting(typeOfSetting);
+    Log.i("testSetting", "SETS are " + vibrationSettingForSets);
+    Log.i("testSetting", "BREAKS are " + vibrationSettingForBreaks);
+    Log.i("testSetting", "WORK are " + vibrationSettingForWork);
+    Log.i("testSetting", "MINI are " + vibrationSettingForMiniBreaks);
+    Log.i("testSetting", "FULL are " + vibrationSettingForFullBreak);
   }
 
   @Override
@@ -635,8 +638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsFragmentFrameLayout.setVisibility(View.GONE);
 
     rootSettingsFragment.sendSettingsData(MainActivity.this);
-    soundSettingsFragment.soundSettingForSets(MainActivity.this);
-    soundSettingsFragment.soundSettingForBreaks(MainActivity.this);
+    soundSettingsFragment.soundSetting(MainActivity.this);
 
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
@@ -793,9 +795,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
-    vibrationSettingForSets  = soundSettingsFragment.assignSoundSettingNumericValue(defaultSoundSettingForSets);
+    vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
-    vibrationSettingForBreaks = soundSettingsFragment.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
+    vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
 
     timerValueInEditPopUpTextView.setText("00:00");
 
@@ -3111,9 +3113,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       beginTimerForNextRound = true;
     }
     if (mode==3) {
-      if (pomDotCounter==7) {
-        long[] pattern = {0, 500, 300};
-        vibrator.vibrate(pattern, 0);
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          setEndOfRoundSounds(vibrationSettingForWork, false);
+          break;
+        case 1: case 3: case 5:
+          setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
+          break;
+        case 7:
+          setEndOfRoundSounds(vibrationSettingForFullBreak, true);
       }
       if (pomDotCounter==8) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
@@ -3302,6 +3310,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         mediaPlayer.start();
         break;
+    }
+  }
+
+  public void assignSoundSettingVariableNumbers(int typeOfRound, int settingNumber) {
+    switch (typeOfRound) {
+      case 1:
+        vibrationSettingForSets = settingNumber; break;
+      case 2:
+        vibrationSettingForBreaks = settingNumber; break;
+      case 3:
+        vibrationSettingForWork = settingNumber; break;
+      case 4:
+        vibrationSettingForMiniBreaks = settingNumber; break;
+      case 5:
+        vibrationSettingForFullBreak = settingNumber; break;
     }
   }
 
