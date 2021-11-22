@@ -81,7 +81,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
 
         setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int settingsValue = changeSettingsValues.assignSoundSettingNumericValue((String) newValue);
+            int settingsValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(SET_SETTING, settingsValue);
 
             String entryString = summaryText(soundEntryListForSets, settingsValue);
@@ -90,7 +90,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         breakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int breaksValue = changeSettingsValues.assignSoundSettingNumericValue((String) newValue);
+            int breaksValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(BREAK_SETTING, breaksValue);
 
             String entryString = summaryText(soundEntryListForSets, breaksValue);
@@ -99,7 +99,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         workPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int workValue = changeSettingsValues.assignSoundSettingNumericValue((String) newValue);
+            int workValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(WORK_SETTING, workValue);
 
             String entryString = summaryText(soundEntryListForBreaks, workValue);
@@ -108,7 +108,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         miniBreakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int miniBreakValue = changeSettingsValues.assignSoundSettingNumericValue((String) newValue);
+            int miniBreakValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(MINI_BREAK_SETTING, miniBreakValue);
 
             String entryString = summaryText(soundEntryListForSets, miniBreakValue);
@@ -117,13 +117,17 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         fullBreakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int fullBreakValue = changeSettingsValues.assignSoundSettingNumericValue((String) newValue);
+            int fullBreakValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(FULL_BREAK_SETTING, fullBreakValue);
 
             String entryString = summaryText(soundEntryListForSets, fullBreakValue);
             fullBreakPreference.setSummary(entryString);
             return true;
         });
+    }
+
+    public int soundSettingVariable(Object newVar) {
+        return changeSettingsValues.assignSoundSettingNumericValue((String) newVar);
     }
 
     public String summaryText(CharSequence[] settingsList, int entry) {
