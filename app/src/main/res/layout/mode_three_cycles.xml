@@ -11,7 +11,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textColor="@color/silver">
     </TextView>
 
@@ -22,8 +22,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginEnd="5dp"
+        android:layout_marginTop="24dp"
         android:textStyle="bold"
-        android:layout_marginTop="24dp">
+        android:textSize="15sp">
     </TextView>
 
     <TextView

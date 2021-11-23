@@ -254,10 +254,6 @@ public class DotDraws extends View {
             mPaintText.setTextSize(70f);
             mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
             break;
-          case 2:
-            mPaintText.setTextSize(90f);
-            mCanvas.drawText(list.get(i), x-52, y+28, mPaintText);
-            break;
           case 3:
             switch (i) {
               case 0: case 2: case 4: case 6:
@@ -270,7 +266,7 @@ public class DotDraws extends View {
                 break;
               case 7:
                 mPaintText.setTextSize(70f);
-                mCanvas.drawText(list.get(i), x-30, y+88, mPaintText);
+                mCanvas.drawText(list.get(i), x-27, y+88, mPaintText);
                 break;
             }
             break;

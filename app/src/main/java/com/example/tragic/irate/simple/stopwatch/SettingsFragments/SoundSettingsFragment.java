@@ -40,7 +40,6 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.sounds_settings_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues();
 
-        //Todo: Create looping method for Strings + ints outside of clickListeners, since we only need them to populate summary?
         SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         ListPreference setPreference = (ListPreference) findPreference("soundSettingForSets");
@@ -126,11 +125,11 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
     }
 
-    public int soundSettingVariable(Object newVar) {
+    private int soundSettingVariable(Object newVar) {
         return changeSettingsValues.assignSoundSettingNumericValue((String) newVar);
     }
 
-    public String summaryText(CharSequence[] settingsList, int entry) {
+    private String summaryText(CharSequence[] settingsList, int entry) {
         if (entry>=1) {
             return (String) settingsList[entry-1];
         } else {

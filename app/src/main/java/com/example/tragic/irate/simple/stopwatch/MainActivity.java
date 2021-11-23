@@ -2835,7 +2835,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           buttonToLaunchTimer.setEnabled(true);
 
           /////---------Testing pom round iterations---------------/////////
-          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(8000); else pomValuesTime.add(10000);
+          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
 //          for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
         }
         break;
