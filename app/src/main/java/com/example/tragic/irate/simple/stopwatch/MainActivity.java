@@ -387,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
+  boolean aSettingsMenuIsVisible;
   int SOUND_SETTINGS;
   int COLOR_SETTINGS;
   int ABOUT_SETTINGS;
@@ -411,7 +412,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
-  //Todo: Disable settings menu button when settings are displayed so fragment does not keep reloading.
+  //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
+  //Todo: Fix fragment replacement screen blips.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, color, etc.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -421,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
   //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit).
 
-  //Todo: Settings: Vibrations (Both modes, all diff round types), Colors,
+  //Todo: Settings: Vibrations (Both modes, all diff round types), Color change setting for dots.
 
   //Todo: Optional "get back to work" touch warning for Pom.
   //Todo: TDEE in sep popup w/ tabs.
@@ -472,13 +474,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (rootSettingsFragment.isVisible()) {
       settingsFragmentFrameLayout.setVisibility(View.GONE);
       settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
+
+      aSettingsMenuIsVisible = false;
     }
 
     if (soundSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
-
     }
     //Used to minimize activity. Will only be called if no popUps have focus.
 //    moveTaskToBack(false);
@@ -494,13 +497,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void changeSoundSetting(int typeOfRound, int settingNumber) {
     assignSoundSettingVariableNumbers(typeOfRound, settingNumber);
-    Log.i("testSetting", "type of round is " + typeOfRound + " and setting number is " + settingNumber);
-
-    Log.i("testSetting", "SETS are " + vibrationSettingForSets);
-    Log.i("testSetting", "BREAKS are " + vibrationSettingForBreaks);
-    Log.i("testSetting", "WORK are " + vibrationSettingForWork);
-    Log.i("testSetting", "MINI are " + vibrationSettingForMiniBreaks);
-    Log.i("testSetting", "FULL are " + vibrationSettingForFullBreak);
   }
 
   @Override
@@ -1031,16 +1027,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     global_settings.setOnClickListener(v-> {
-      settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-      settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
+      if (!aSettingsMenuIsVisible) {
+        settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+        settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
 
-      if (rootSettingsFragment !=null) {
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
-                .attach(rootSettingsFragment)
-                .commit();
+        if (rootSettingsFragment !=null) {
+          getSupportFragmentManager().beginTransaction()
+                  .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
+                  .attach(rootSettingsFragment)
+                  .commit();
+        }
+        aSettingsMenuIsVisible = true;
       }
-
     });
 
       //Brings up editCycle popUp to create new Cycle.
