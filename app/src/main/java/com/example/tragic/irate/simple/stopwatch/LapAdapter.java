@@ -40,8 +40,11 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   //This gets called when scrolling w/ out any listener attached.
   @Override
   public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
-    holder.currentLap.setText(mCurrentLap.get(position));
-    holder.savedLapTime.setText(mSavedLap.get(position));
+    int oldestPosition = mSavedLap.size() - position - 1;
+    holder.currentLap.setText(mCurrentLap.get(oldestPosition));
+    holder.savedLapTime.setText(mSavedLap.get(oldestPosition));
+//    holder.currentLap.setText(mCurrentLap.get(position));
+//    holder.savedLapTime.setText(mSavedLap.get(position));
     holder.lapNumber.setText("# " + (position+1));
   }
 
