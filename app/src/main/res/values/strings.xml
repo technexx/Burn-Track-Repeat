@@ -66,6 +66,9 @@
     <string name="notification_text_header">%1$s - On %2$s </string>
     <string name="notification_text">Round %1$s of %2$s - %3$s</string>
 
+    <string name="workout_mode"><u>Workout Mode</u></string>
+    <string name="pomodoro_mode"><u>Pomodoro Mode</u></string>
+
     <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s </string>
     <string name="bunch_of_spaces">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>
     <string name="bunch_of_spaces_2">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>

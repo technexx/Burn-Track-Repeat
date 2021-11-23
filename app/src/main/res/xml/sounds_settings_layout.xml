@@ -5,7 +5,8 @@
     android:layout_width="match_parent">
 
         <PreferenceCategory
-            android:title="Workout Mode">
+            android:layout="@layout/preference_category_layout"
+            android:title="@string/workout_mode">
 
                 <ListPreference
                     android:key="soundSettingForSets"
@@ -25,7 +26,8 @@
         </PreferenceCategory>
 
         <PreferenceCategory
-            android:title="Pomodoro Mode">
+            android:title="@string/pomodoro_mode"
+            android:layout="@layout/preference_category_layout">
 
                 <ListPreference
                     android:key="soundSettingForWork"

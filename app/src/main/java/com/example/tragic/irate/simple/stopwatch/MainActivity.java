@@ -411,6 +411,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
+  //Todo: Disable settings menu button when settings are displayed so fragment does not keep reloading.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, color, etc.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
