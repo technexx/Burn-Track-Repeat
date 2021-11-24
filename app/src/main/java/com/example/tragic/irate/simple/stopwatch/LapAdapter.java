@@ -43,11 +43,12 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     holder.savedLapTime.setText(mSavedLap.get(position));
     holder.lapNumber.setText("# " + (position+1));
 
-    if (position==mCurrentLap.size()-1) {
-      if (!lapHasBeenAnimated)
-      holder.fullView.startAnimation(anim);
-      lapHasBeenAnimated = true;
-    }
+    holder.fullView.startAnimation(anim);
+
+//    if (position==mCurrentLap.size()-1) {
+//      if (!lapHasBeenAnimated)
+//      lapHasBeenAnimated = true;
+//    }
   }
 
   @Override
