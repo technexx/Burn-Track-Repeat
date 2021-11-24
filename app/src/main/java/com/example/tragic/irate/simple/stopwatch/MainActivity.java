@@ -298,12 +298,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable endFade;
   int pomDotCounter;
 
-  double ms;
+  double stopWatchMs;
   double msConvert;
   double msConvert2;
   double msDisplay;
-  double seconds;
-  double minutes;
+  double stopWatchSeconds;
+  double stopWatchMinutes;
   double msReset;
   String newMs;
   String savedMs;
@@ -412,9 +412,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
+  //Todo: Stopwatch lags behind when minimizing + restoring. Should use java time to sync back up OR just in general.
   //Todo: Add stopwatch time to notifications.
-  //Todo: Use #XX for stopwatch lap count below 10, and cap laps @ 99 for even spacing.
-  //Todo: Add slight startOffset to lap animation.
+  //Todo: Stopwatch should remain active when exiting. Right now, it is paused and we have a sync error w/ pause/resume.
+  //Todo: Use alpha fade in/out for infinity mode. Careful w/ notifications as their conditional requires an active object animator at moment.
+  //Todo: Add slight startOffset to lap animation? Would prolly require a delay on notifyDataSet(), since omitted textViews would still populate row.
   //Todo: Stopwatch textView needs to reduce size @ 1 min.
   //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
   //Todo: Replace root fragment menu w/ complete list of settings?
@@ -1492,9 +1494,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchRunnable = new Runnable() {
       @Override
       public void run() {
+        setNotificationValues();
+
         DecimalFormat df2 = new DecimalFormat("00");
-        //ms can never be more than 60/sec due to refresh rate.
-        ms += 1;
+        //stopWatchMs can never be more than 60/sec due to refresh rate.
+        stopWatchMs += 1;
         msReset += 1;
         msConvert += 1;
         msConvert2 += 1;
@@ -1503,8 +1507,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (msConvert2 > 59) msConvert2 = 0;
         if (msDisplay > 59) msDisplay = 0;
 
-        seconds = ms / 60;
-        minutes = seconds / 60;
+        stopWatchSeconds = stopWatchMs / 60;
+        stopWatchMinutes = stopWatchSeconds / 60;
 
         newMs = df2.format((msConvert2 / 60) * 100);
         savedMs = df2.format((msConvert / 60) * 100);
@@ -1513,10 +1517,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //Conversion to long solves +30 ms delay for display.
         displayMs = df2.format((msDisplay / 60) * 100);
-        displayTime = convertSeconds( (long) seconds);
+        displayTime = convertSeconds( (long) stopWatchSeconds);
 
         if (textSizeIncreased && mode==4) {
-          if (seconds > 4) {
+          if (stopWatchSeconds > 4) {
             changeTextSize(valueAnimatorDown, timeLeft);
             textSizeIncreased = true;
           }
@@ -2257,7 +2261,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return dismissPendingIntent;
   }
 
-  public String setNotificationHeader(String mode, String roundType) {
+  public String setNotificationHeader(String selectedMode, String roundType) {
     return (getString(R.string.notification_text_header, mode, roundType));
   }
 
@@ -2344,7 +2348,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
-      if ((objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) || mode==1) {
+      //Todo: This will override the above headers, but it would be better to set a different conditional.
+      if (mode==4) {
+        headerOne = getString(R.string.notification_stopwatch_header);
+        bodyOne = convertTimerValuesToString((long) stopWatchSeconds);
+//        bodyOne = String.valueOf(displayTime) + ":"  + String.valueOf(displayMs);
+      }
+
+      if ((objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) || mode==1 || mode==4) {
         builder.setStyle(new NotificationCompat.InboxStyle()
                 .addLine(headerOne)
                 .addLine(bodyOne)
@@ -3366,15 +3377,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
       } else
-        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) minutes, (int) seconds, savedMsConvert);
+        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, savedMsConvert);
 
       newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
 
       currentLapList.add(newEntries);
       savedLapList.add(savedEntries);
       lapLayout.scrollToPosition(savedLapList.size() - 1);
-      lapAdapter.notifyDataSetChanged();
 
+      lapAdapter.notifyDataSetChanged();
 
       lapsNumber++;
       cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
@@ -3737,13 +3748,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
         break;
       case 4:
-        ms = 0;
+        stopWatchMs = 0;
         msConvert = 0;
         msConvert2 = 0;
         msDisplay = 0;
         msReset = 0;
-        seconds = 0;
-        minutes = 0;
+        stopWatchSeconds = 0;
+        stopWatchMinutes = 0;
         timeLeft.setAlpha(1);
         timeLeft.setText("0");
         msTime.setText("00");

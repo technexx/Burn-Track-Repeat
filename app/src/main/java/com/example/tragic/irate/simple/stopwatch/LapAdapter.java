@@ -41,6 +41,7 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
     holder.currentLap.setText(mCurrentLap.get(position));
     holder.savedLapTime.setText(mSavedLap.get(position));
+
     if (position<9) {
       holder.lapNumber.setText("# 0" + (position+1));
     } else {
