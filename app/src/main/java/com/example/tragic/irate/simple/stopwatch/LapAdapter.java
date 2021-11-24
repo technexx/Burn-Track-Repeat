@@ -1,10 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Paint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +17,13 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   Context mContext;
   List<String> mCurrentLap;
   List<String> mSavedLap;
+  Animation anim;
+  boolean lapHasBeenAnimated;
 
   public LapAdapter(Context context, List<String> currentLap, List<String> savedLap) {
     mContext = context; mCurrentLap = currentLap; mSavedLap = savedLap;
+    anim = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_top_for_laps);
+    anim.setDuration(500);
   }
 
   @NonNull
@@ -37,17 +37,17 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     return lapViewHolder;
   }
 
-  //Todo: Reverse order of layout?
   @Override
   public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
-    int oldestPosition = mSavedLap.size() - position - 1;
-
-//    holder.currentLap.setText(mCurrentLap.get(oldestPosition));
-//    holder.savedLapTime.setText(mSavedLap.get(oldestPosition));
-
     holder.currentLap.setText(mCurrentLap.get(position));
     holder.savedLapTime.setText(mSavedLap.get(position));
     holder.lapNumber.setText("# " + (position+1));
+
+    if (position==mCurrentLap.size()-1) {
+      if (!lapHasBeenAnimated)
+      holder.fullView.startAnimation(anim);
+      lapHasBeenAnimated = true;
+    }
   }
 
   @Override
@@ -68,5 +68,9 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
       savedLapTime = itemView.findViewById(R.id.saved_laps);
       fullView = itemView;
     }
+  }
+
+  public void resetLapAnimation() {
+    lapHasBeenAnimated = false;
   }
 }

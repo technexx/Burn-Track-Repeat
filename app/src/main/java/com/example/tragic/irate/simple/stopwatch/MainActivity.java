@@ -412,8 +412,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
+  //Todo: Optional lap animation triggers when scrolling up to last added entry.
+  //Todo: Align lap times when lap #s reach 10, 100, etc.
+  //Todo: Stopwatch textView needs to reduce size @ 1 min.
   //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
-  //Todo: Stopwatch lap order should be reversed in view - we don't want the most recent to be faded grey.
   //Todo: Replace root fragment menu w/ complete list of settings?
   //Todo: Fix fragment replacement screen blips.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
@@ -3373,6 +3375,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       msReset = 0;
       msConvert2 = 0;
+
+      lapAdapter.resetLapAnimation();
     }
   }
 
