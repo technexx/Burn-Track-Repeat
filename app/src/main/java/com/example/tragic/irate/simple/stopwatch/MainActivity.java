@@ -3336,7 +3336,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void newLap() {
-    //Todo: Get position from adapter. If >100, return here.
+    if (lapAdapter.getItemCount()>98) {
+      return;
+    }
+
     if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
     double newSeconds = msReset / 60;
     double newMinutes = newSeconds / 60;
