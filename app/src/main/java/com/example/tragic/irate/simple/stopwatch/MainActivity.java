@@ -412,8 +412,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
-  //Todo: Optional lap animation triggers when scrolling up to last added entry.
-  //Todo: Align lap times when lap #s reach 10, 100, etc.
+  //Todo: Add stopwatch time to notifications.
+  //Todo: Use #XX for stopwatch lap count below 10, and cap laps @ 99 for even spacing.
+  //Todo: Add slight startOffset to lap animation.
   //Todo: Stopwatch textView needs to reduce size @ 1 min.
   //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
   //Todo: Replace root fragment menu w/ complete list of settings?
@@ -3335,6 +3336,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void newLap() {
+    //Todo: Get position from adapter. If >100, return here.
     if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
     double newSeconds = msReset / 60;
     double newMinutes = newSeconds / 60;
@@ -3369,6 +3371,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedLapList.add(savedEntries);
       lapLayout.scrollToPosition(savedLapList.size() - 1);
       lapAdapter.notifyDataSetChanged();
+
 
       lapsNumber++;
       cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));

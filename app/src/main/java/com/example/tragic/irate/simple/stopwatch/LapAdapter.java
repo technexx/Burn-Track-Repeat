@@ -41,9 +41,16 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
     holder.currentLap.setText(mCurrentLap.get(position));
     holder.savedLapTime.setText(mSavedLap.get(position));
-    holder.lapNumber.setText("# " + (position+1));
+    if (position<9) {
+      holder.lapNumber.setText("# 0" + (position+1));
+    } else {
+      holder.lapNumber.setText("# " + (position+1));
+    }
 
-    holder.fullView.startAnimation(anim);
+    if (!lapHasBeenAnimated) {
+      holder.fullView.startAnimation(anim);
+      lapHasBeenAnimated = true;
+    }
 
 //    if (position==mCurrentLap.size()-1) {
 //      if (!lapHasBeenAnimated)
