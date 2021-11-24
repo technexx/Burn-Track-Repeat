@@ -31,20 +31,22 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   public LapViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     Context context = parent.getContext();
     LayoutInflater inflater = LayoutInflater.from(context);
-    View view = inflater.inflate(R.layout.saved_laps, parent, false);
+    View view = inflater.inflate(R.layout.lap_recycler_layout, parent, false);
 
     LapViewHolder lapViewHolder = new LapViewHolder(view);
     return lapViewHolder;
   }
 
-  //This gets called when scrolling w/ out any listener attached.
+  //Todo: Reverse order of layout?
   @Override
   public void onBindViewHolder(@NonNull LapViewHolder holder, int position) {
     int oldestPosition = mSavedLap.size() - position - 1;
-    holder.currentLap.setText(mCurrentLap.get(oldestPosition));
-    holder.savedLapTime.setText(mSavedLap.get(oldestPosition));
-//    holder.currentLap.setText(mCurrentLap.get(position));
-//    holder.savedLapTime.setText(mSavedLap.get(position));
+
+//    holder.currentLap.setText(mCurrentLap.get(oldestPosition));
+//    holder.savedLapTime.setText(mSavedLap.get(oldestPosition));
+
+    holder.currentLap.setText(mCurrentLap.get(position));
+    holder.savedLapTime.setText(mSavedLap.get(position));
     holder.lapNumber.setText("# " + (position+1));
   }
 

@@ -1405,6 +1405,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Recycler view for our stopwatch laps.
     lapLayout = new LinearLayoutManager(getApplicationContext());
+    lapLayout.setStackFromEnd(true);
+    lapLayout.setReverseLayout(true);
+
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
     lapRecycler.setAdapter(lapAdapter);
     lapRecycler.setLayoutManager(lapLayout);
