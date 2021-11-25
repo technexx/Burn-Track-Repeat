@@ -415,6 +415,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchstartTime;
   long stopWatchTotalTime;
   long stopWatchTotalTimeHolder;
+  long stopWatchNewLapTime;
 
   //Todo: Stopwatch lags behind when minimizing + restoring. Should use java time to sync back up OR just in general. Should also verify for other timers.
   //Todo: Add stopwatch time to notifications.
@@ -1525,11 +1526,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
         stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
 
-        stopWatchMs = (stopWatchTotalTime%1000);
-        Log.i("testTime", "ms is " + stopWatchMs);
+        stopWatchMs = (stopWatchTotalTime%1000) / 10;
 
         displayTime = convertSeconds( (long)stopWatchSeconds);
-        displayMs = df2.format(stopWatchMs / 10);
+        displayMs = df2.format(stopWatchMs);
 
         if (textSizeIncreased && mode==4) {
           if (stopWatchSeconds > 4) {
@@ -3387,9 +3387,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedSeconds = savedSeconds - 100;
           savedMinutes += 1;
         }
-        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) savedMinutes, (int) savedSeconds, (int) savedMs);
+        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
       } else
-        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, savedMsConvert);
+        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
 
       newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
 
