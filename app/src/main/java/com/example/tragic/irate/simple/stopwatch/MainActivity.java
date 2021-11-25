@@ -412,7 +412,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FrameLayout settingsFragmentFrameLayout;
   FragmentTransaction ft;
 
-  //Todo: Stopwatch lags behind when minimizing + restoring. Should use java time to sync back up OR just in general.
+  long stopWatchstartTime;
+  long stopWatchTotalTime;
+  long stopWatchTotalTimeHolder;
+
+  //Todo: Stopwatch lags behind when minimizing + restoring. Should use java time to sync back up OR just in general. Should also verify for other timers.
   //Todo: Add stopwatch time to notifications.
   //Todo: Stopwatch should remain active when exiting. Right now, it is paused and we have a sync error w/ pause/resume.
   //Todo: Use alpha fade in/out for infinity mode. Careful w/ notifications as their conditional requires an active object animator at moment.
@@ -1507,17 +1511,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (msConvert2 > 59) msConvert2 = 0;
         if (msDisplay > 59) msDisplay = 0;
 
-        stopWatchSeconds = stopWatchMs / 60;
-        stopWatchMinutes = stopWatchSeconds / 60;
-
-        newMs = df2.format((msConvert2 / 60) * 100);
-        savedMs = df2.format((msConvert / 60) * 100);
-        newMsConvert = Integer.parseInt(newMs);
-        savedMsConvert = Integer.parseInt(savedMs);
+//        stopWatchSeconds = stopWatchMs / 60;
+//        stopWatchMinutes = stopWatchSeconds / 60;
+//
+//        newMs = df2.format((msConvert2 / 60) * 100);
+//        savedMs = df2.format((msConvert / 60) * 100);
+//        newMsConvert = Integer.parseInt(newMs);
+//        savedMsConvert = Integer.parseInt(savedMs);
 
         //Conversion to long solves +30 ms delay for display.
-        displayMs = df2.format((msDisplay / 60) * 100);
-        displayTime = convertSeconds( (long) stopWatchSeconds);
+//        displayMs = df2.format((msDisplay / 60) * 100);
+
+        stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
+        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
+
+        stopWatchMs = (stopWatchTotalTime%1000);
+        Log.i("testTime", "ms is " + stopWatchMs);
+
+        displayTime = convertSeconds( (long)stopWatchSeconds);
+        displayMs = df2.format(stopWatchMs / 10);
 
         if (textSizeIncreased && mode==4) {
           if (stopWatchSeconds > 4) {
@@ -3476,7 +3488,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 4:
           if (fadeInObj != null) fadeInObj.cancel();
+
           if (pausing == RESUMING_TIMER) {
+            stopWatchstartTime = System.currentTimeMillis();
+
             reset.setVisibility(View.INVISIBLE);
             stopWatchIsPaused = false;
             new_lap.setAlpha(1.0f);
@@ -3484,6 +3499,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             //Main runnable for Stopwatch.
             mHandler.post(stopWatchRunnable);
           } else if (pausing == PAUSING_TIMER) {
+            stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
+            stopWatchTotalTimeHolder = stopWatchTotalTime;
+
             reset.setVisibility(View.VISIBLE);
             mHandler.removeCallbacksAndMessages(null);
             stopWatchIsPaused = true;
@@ -3673,6 +3691,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
+        //Todo: startTime, totalTime, totalTime holder to 0 and rename these vars.
         progressBar.setProgress(maxProgress);
         timeLeft.setVisibility(View.VISIBLE);
         timeLeft.setText(displayTime);
@@ -3748,6 +3767,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
         break;
       case 4:
+        stopWatchstartTime = 0;
+        stopWatchTotalTime = 0;
+        stopWatchTotalTimeHolder = 0;
+
         stopWatchMs = 0;
         msConvert = 0;
         msConvert2 = 0;
