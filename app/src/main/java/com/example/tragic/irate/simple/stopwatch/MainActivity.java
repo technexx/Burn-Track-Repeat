@@ -299,12 +299,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int pomDotCounter;
 
   double stopWatchMs;
-  double msConvert;
-  double msConvert2;
-  double msDisplay;
   double stopWatchSeconds;
   double stopWatchMinutes;
-  double msReset;
   String displayMs = "00";
   String displayTime = "0";
   String newEntries;
@@ -1500,26 +1496,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setNotificationValues();
 
         DecimalFormat df2 = new DecimalFormat("00");
-        //stopWatchMs can never be more than 60/sec due to refresh rate.
-        stopWatchMs += 1;
-        msReset += 1;
-        msConvert += 1;
-        msConvert2 += 1;
-        msDisplay += 1;
-        if (msConvert > 59) msConvert = 0;
-        if (msConvert2 > 59) msConvert2 = 0;
-        if (msDisplay > 59) msDisplay = 0;
-
-//        stopWatchSeconds = stopWatchMs / 60;
-//        stopWatchMinutes = stopWatchSeconds / 60;
-//
-//        newMs = df2.format((msConvert2 / 60) * 100);
-//        savedMs = df2.format((msConvert / 60) * 100);
-//        newMsConvert = Integer.parseInt(newMs);
-//        savedMsConvert = Integer.parseInt(savedMs);
-
-        //Conversion to long solves +30 ms delay for display.
-//        displayMs = df2.format((msDisplay / 60) * 100);
 
         stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
         stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
@@ -1529,15 +1505,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         displayTime = convertSeconds( (long)stopWatchSeconds);
         displayMs = df2.format(stopWatchMs);
 
+        if (mode==4) timeLeft.setText(displayTime);
+        msTime.setText(displayMs);
+
         if (textSizeIncreased && mode==4) {
-          if (stopWatchSeconds > 4) {
+          if (stopWatchSeconds > 59) {
             changeTextSize(valueAnimatorDown, timeLeft);
             textSizeIncreased = true;
           }
         }
-
-        if (mode==4) timeLeft.setText(displayTime);
-        msTime.setText(displayMs);
 
         mHandler.postDelayed(this, 10);
       }
@@ -3392,10 +3368,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapsNumber++;
     cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
 
-    msReset = 0;
-    msConvert2 = 0;
-
     //Todo: Holder doesn't work w/ pausing stopwatch., since the diifference will keep accumulating.
+    //Todo: ms is a BIT off in totality.
     stopWatchNewLapHolder = System.currentTimeMillis();
 
     lapAdapter.resetLapAnimation();
@@ -3683,7 +3657,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 4:
-        //Todo: startTime, totalTime, totalTime holder to 0 and rename these vars.
         progressBar.setProgress(maxProgress);
         timeLeft.setVisibility(View.VISIBLE);
         timeLeft.setText(displayTime);
@@ -3764,12 +3737,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchTotalTimeHolder = 0;
 
         stopWatchMs = 0;
-        msConvert = 0;
-        msConvert2 = 0;
-        msDisplay = 0;
-        msReset = 0;
         stopWatchSeconds = 0;
         stopWatchMinutes = 0;
+
         timeLeft.setAlpha(1);
         timeLeft.setText("0");
         msTime.setText("00");
