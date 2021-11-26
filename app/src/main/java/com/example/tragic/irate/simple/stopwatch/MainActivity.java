@@ -305,14 +305,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double stopWatchSeconds;
   double stopWatchMinutes;
   double msReset;
-  String newMs;
-  String savedMs;
   String displayMs = "00";
   String displayTime = "0";
   String newEntries;
   String savedEntries;
-  int newMsConvert;
-  int savedMsConvert;
   ArrayList<String> currentLapList;
   ArrayList<String> savedLapList;
   Runnable stopWatchRunnable;
@@ -415,7 +411,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchstartTime;
   long stopWatchTotalTime;
   long stopWatchTotalTimeHolder;
+
   long stopWatchNewLapTime;
+  long stopWatchNewLapHolder;
 
   //Todo: Stopwatch lags behind when minimizing + restoring. Should use java time to sync back up OR just in general. Should also verify for other timers.
   //Todo: Add stopwatch time to notifications.
@@ -3362,51 +3360,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (lapAdapter.getItemCount()>98) {
       return;
     }
-
     if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
-    double newSeconds = msReset / 60;
-    double newMinutes = newSeconds / 60;
 
-    double savedMinutes = 0;
-    double savedSeconds = 0;
-    double savedMs = 0;
 
-    String[] holder = null;
-    if (!stopWatchIsPaused) {
-      if (savedLapList.size() > 0) {
-        holder = (savedLapList.get(savedLapList.size() - 1).split(":", 3));
-        savedMinutes = newMinutes + Integer.parseInt(holder[0]);
-        savedSeconds = newSeconds + Integer.parseInt(holder[1]);
-        savedMs = newMsConvert + Integer.parseInt(holder[2]);
+    stopWatchNewLapTime = System.currentTimeMillis();
 
-        if (savedMs > 99) {
-          savedMs = savedMs - 100;
-          savedSeconds += 1;
-        }
-        if (savedSeconds > 99) {
-          savedSeconds = savedSeconds - 100;
-          savedMinutes += 1;
-        }
-        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
-      } else
-        savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
+    double stopWatchAddedTime = stopWatchNewLapTime - stopWatchNewLapHolder;
+    Log.i("testTime", "time to be added is " + stopWatchAddedTime);
+    double newTime = stopWatchAddedTime/1000;
+    double newMinutes = newTime/60;
+    double newSeconds = newTime%60;
+    double newMS = (stopWatchAddedTime%1000) / 10;
+    Log.i("testTime", "minutes are " + newMinutes);
+    Log.i("testTime", "seconds are " + newSeconds);
+    Log.i("testTime", "milliseconds are " + newMS);
 
-      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, newMsConvert);
+    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
 
-      currentLapList.add(newEntries);
-      savedLapList.add(savedEntries);
-      lapLayout.scrollToPosition(savedLapList.size() - 1);
-
-      lapAdapter.notifyDataSetChanged();
-
-      lapsNumber++;
-      cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
-
-      msReset = 0;
-      msConvert2 = 0;
-
-      lapAdapter.resetLapAnimation();
+    if (savedLapList.size()==0) {
+      newEntries = savedEntries;
+    } else {
+      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
     }
+
+    currentLapList.add(newEntries);
+    savedLapList.add(savedEntries);
+    lapLayout.scrollToPosition(savedLapList.size() - 1);
+
+    lapAdapter.notifyDataSetChanged();
+
+    lapsNumber++;
+    cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
+
+    msReset = 0;
+    msConvert2 = 0;
+
+    //Todo: Holder doesn't work w/ pausing stopwatch., since the diifference will keep accumulating.
+    stopWatchNewLapHolder = System.currentTimeMillis();
+
+    lapAdapter.resetLapAnimation();
   }
 
   public void pauseAndResumeTimer(int pausing) {
