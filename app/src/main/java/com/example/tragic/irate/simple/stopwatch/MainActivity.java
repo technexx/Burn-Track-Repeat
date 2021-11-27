@@ -1498,15 +1498,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         DecimalFormat df2 = new DecimalFormat("00");
 
         stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
-        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
 
+        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
+        stopWatchMinutes = (int) stopWatchSeconds/60;
         stopWatchMs = (stopWatchTotalTime%1000) / 10;
 
         displayTime = convertSeconds( (long)stopWatchSeconds);
         displayMs = df2.format(stopWatchMs);
 
-        if (mode==4) timeLeft.setText(displayTime);
-        msTime.setText(displayMs);
+        if (mode==4) {
+          timeLeft.setText(displayTime);
+          msTime.setText(displayMs);
+        }
 
         if (textSizeIncreased && mode==4) {
           if (stopWatchSeconds > 59) {
@@ -3456,15 +3459,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (fadeInObj != null) fadeInObj.cancel();
 
           if (pausing == RESUMING_TIMER) {
+
             stopWatchstartTime = System.currentTimeMillis();
+
 
             reset.setVisibility(View.INVISIBLE);
             stopWatchIsPaused = false;
             new_lap.setAlpha(1.0f);
             new_lap.setEnabled(true);
-            //Main runnable for Stopwatch.
             mHandler.post(stopWatchRunnable);
           } else if (pausing == PAUSING_TIMER) {
+
             stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
             stopWatchTotalTimeHolder = stopWatchTotalTime;
 
