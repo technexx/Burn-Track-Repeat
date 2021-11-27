@@ -3341,25 +3341,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
 
-
-    stopWatchNewLapTime = System.currentTimeMillis();
-
-    double stopWatchAddedTime = stopWatchNewLapTime - stopWatchNewLapHolder;
-    Log.i("testTime", "time to be added is " + stopWatchAddedTime);
-    double newTime = stopWatchAddedTime/1000;
-    double newMinutes = newTime/60;
-    double newSeconds = newTime%60;
-    double newMS = (stopWatchAddedTime%1000) / 10;
-    Log.i("testTime", "minutes are " + newMinutes);
-    Log.i("testTime", "seconds are " + newSeconds);
-    Log.i("testTime", "milliseconds are " + newMS);
-
     savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
 
-    if (savedLapList.size()==0) {
-      newEntries = savedEntries;
-    } else {
+    if (savedLapList.size()>0) {
+      String retrievedLap = savedLapList.get(savedLapList.size()-1);
+      String[] splitLap = retrievedLap.split(":");
+      int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
+      int convertedMinute = pulledMinute * 60 * 1000;
+      int convertedSecond = Integer.parseInt(splitLap[1]) * 1000;
+      int convertedMs = Integer.parseInt(splitLap[2]) * 10;
+
+      int totalMs = convertedMinute + convertedSecond + convertedMs;
+
+      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
+
+      int newMinutes = (totalNewTime/1000) / 60;
+      int newSeconds = (totalNewTime/1000) % 60;
+      double newMS = ((double) totalNewTime%1000) / 10;
+
       newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
+    } else {
+      newEntries = savedEntries;
     }
 
     currentLapList.add(newEntries);
@@ -3370,10 +3372,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     lapsNumber++;
     cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
-
-    //Todo: Holder doesn't work w/ pausing stopwatch., since the diifference will keep accumulating.
-    //Todo: ms is a BIT off in totality.
-    stopWatchNewLapHolder = System.currentTimeMillis();
 
     lapAdapter.resetLapAnimation();
   }
@@ -3459,9 +3457,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (fadeInObj != null) fadeInObj.cancel();
 
           if (pausing == RESUMING_TIMER) {
-
             stopWatchstartTime = System.currentTimeMillis();
-
 
             reset.setVisibility(View.INVISIBLE);
             stopWatchIsPaused = false;
@@ -3469,7 +3465,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             new_lap.setEnabled(true);
             mHandler.post(stopWatchRunnable);
           } else if (pausing == PAUSING_TIMER) {
-
             stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
             stopWatchTotalTimeHolder = stopWatchTotalTime;
 
