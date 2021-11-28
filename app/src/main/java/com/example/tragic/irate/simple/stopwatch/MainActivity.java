@@ -411,9 +411,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Stopwatch lags behind when minimizing + restoring. Should use java time to sync back up OR just in general. Should also verify for other timers.
-  //Todo: Add stopwatch time to notifications.
-  //Todo: Stopwatch should remain active when exiting. Right now, it is paused and we have a sync error w/ pause/resume.
+  //Todo: We should have single notifications for whichever timer is visible in popUp, and none if none are.
+  //Todo: Figure how how we want Stopwatch to interact w/ both modes. -->
+  // Todo: Stopwatch should remain active when exiting timer popup. Right now, it is paused and we have a sync error w/ pause/resume.
+  //Todo: (A) Alignment issues w/ mode 1 + mode 3 simultaneous notifications. Conditionals need work, since if both are active but paused, notifications will not display.
   //Todo: Use alpha fade in/out for infinity mode. Careful w/ notifications as their conditional requires an active object animator at moment.
   //Todo: Add slight startOffset to lap animation? Would prolly require a delay on notifyDataSet(), since omitted textViews would still populate row.
   //Todo: Stopwatch textView needs to reduce size @ 1 min.
@@ -429,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
   //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit).
 
-  //Todo: Settings: Vibrations (Both modes, all diff round types), Color change setting for dots.
+  //Todo: Settings: Color change setting for dots.
 
   //Todo: Optional "get back to work" touch warning for Pom.
   //Todo: TDEE in sep popup w/ tabs.
@@ -2260,11 +2261,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     String timeRemaining = "";
     if (typeOfRound.size()>0) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
-        //+250 accounts for notification reception lag.
-        timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000);
-      }
-      else timeRemaining = convertTimerValuesToString(timeLeft);
+      timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000);
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
