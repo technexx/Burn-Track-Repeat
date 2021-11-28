@@ -2254,7 +2254,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public String setNotificationHeader(String selectedMode, String roundType) {
-    return (getString(R.string.notification_text_header, mode, roundType));
+    return (getString(R.string.notification_text_header, selectedMode, roundType));
   }
 
   public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
