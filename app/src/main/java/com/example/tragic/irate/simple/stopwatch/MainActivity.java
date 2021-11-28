@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -411,7 +412,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Add slight startOffset to lap animation? Would prolly require a delay on notifyDataSet(), since omitted textViews would still populate row.
-  //Todo: Stopwatch textView needs to reduce size @ 1 min.
   //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
   //Todo: Replace root fragment menu w/ complete list of settings?
   //Todo: Fix fragment replacement screen blips.
@@ -1511,8 +1511,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           msTime.setText(displayMs);
         }
 
-        if (textSizeIncreased && mode==4) {
+        if (!textSizeIncreased && mode==4) {
+          Log.i("testTime", "seconds are " + stopWatchSeconds);
           if (stopWatchSeconds > 59) {
+            Log.i("testTime", "changing!");
             changeTextSize(valueAnimatorDown, timeLeft);
             textSizeIncreased = true;
           }
@@ -3728,6 +3730,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchIsPaused = true;
         lapAdapter.notifyDataSetChanged();
         empty_laps.setVisibility(View.VISIBLE);
+        setInitialTextSizeForRounds(0);
         break;
     }
     //Base of 0 values for stopwatch means we don't want anything populated when resetting.
