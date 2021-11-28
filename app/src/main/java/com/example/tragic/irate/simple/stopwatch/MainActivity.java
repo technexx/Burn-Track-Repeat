@@ -414,7 +414,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add slight startOffset to lap animation? Would prolly require a delay on notifyDataSet(), since omitted textViews would still populate row.
   //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
   //Todo: Replace root fragment menu w/ complete list of settings?
-  //Todo: Fix fragment replacement screen blips.
   //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
   //Todo: Should have adjustable settings for interface, vibration duration, color, etc.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
@@ -481,6 +480,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (soundSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
+              //This removes screen flashing, and commented out transition will give us a fade instead.
+              .addToBackStack(null)
+//              .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
     }
@@ -491,6 +493,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void settingsData(int settingNumber) {
     getSupportFragmentManager().beginTransaction()
+            .addToBackStack(null)
+//            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
             .replace(R.id.settings_fragment_frameLayout, soundSettingsFragment)
             .commit();
   }
@@ -1512,9 +1516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (!textSizeIncreased && mode==4) {
-          Log.i("testTime", "seconds are " + stopWatchSeconds);
           if (stopWatchSeconds > 59) {
-            Log.i("testTime", "changing!");
             changeTextSize(valueAnimatorDown, timeLeft);
             textSizeIncreased = true;
           }
