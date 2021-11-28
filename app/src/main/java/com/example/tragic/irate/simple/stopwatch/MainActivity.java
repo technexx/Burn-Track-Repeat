@@ -359,6 +359,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisHolder;
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
+  boolean timerPopUpIsVisible;
 
   Runnable saveTotalTimesInDatabaseRunnable;
   Runnable queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes;
@@ -1109,6 +1110,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerDisabled = false;
       makeCycleAdapterVisible = false;
       beginTimerForNextRound = false;
+      timerPopUpIsVisible = false;
       buttonToLaunchTimer.setEnabled(false);
       roundedValueForTotalTimes = 0;
 
@@ -2260,9 +2262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String totalRounds = String.valueOf(startRounds);
 
     String timeRemaining = "";
-    if (typeOfRound.size()>0) {
-      timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000);
-    }
+    timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000);
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
   }
@@ -2308,8 +2308,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyOne = "";
       String bodyTwo = "";
 
-      if (objectAnimator.isStarted() || mode==1) {
-        if (typeOfRound.size() > 0) {
+      //Todo: Mode 1 header is a bit off. Mode 3 doesn't show pomMillis in body because it is empty.
+      if (timerPopUpIsVisible) {
+        if (mode==1) {
           if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
             headerOne = setNotificationHeader("Workout", "Set");
             bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
@@ -2318,51 +2319,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
           }
         }
-      }
 
-      if (objectAnimatorPom.isStarted() || mode==3) {
-        int numberOfRoundsLeft = 8-pomDotCounter;
-        switch (pomDotCounter) {
-          case 0: case 2: case 4: case 6:
-            headerTwo = setNotificationHeader("Pomodoro", "Work");
-            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-            break;
-          case 1: case 3: case 5: case 7:
-            headerTwo = setNotificationHeader("Pomodoro", "Break");
-            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-            break;
+        if (mode==3) {
+          int numberOfRoundsLeft = 8-pomDotCounter;
+          if (pomDotCounter==0)
+          switch (pomDotCounter) {
+            case 0: case 2: case 4: case 6:
+              headerOne = setNotificationHeader("Pomodoro", "Work");
+              bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+              break;
+            case 1: case 3: case 5: case 7:
+              headerOne = setNotificationHeader("Pomodoro", "Break");
+              bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+              break;
+          }
         }
-      }
 
-      //Todo: This will override the above headers, but it would be better to set a different conditional.
-      if (mode==4) {
-        headerOne = getString(R.string.notification_stopwatch_header);
-        bodyOne = convertTimerValuesToString((long) stopWatchSeconds);
-//        bodyOne = String.valueOf(displayTime) + ":"  + String.valueOf(displayMs);
-      }
+        if (mode==4) {
+          headerOne = getString(R.string.notification_stopwatch_header);
+          bodyOne = convertTimerValuesToString((long) stopWatchSeconds);
+        }
 
-      if ((objectAnimator.isStarted() && !objectAnimatorPom.isStarted()) || mode==1 || mode==4) {
         builder.setStyle(new NotificationCompat.InboxStyle()
                 .addLine(headerOne)
                 .addLine(bodyOne)
         );
-      }
 
-      if ((!objectAnimator.isStarted() && objectAnimatorPom.isStarted()) || mode==3) {
-        builder.setStyle(new NotificationCompat.InboxStyle()
-                .addLine(headerTwo)
-                .addLine(bodyTwo)
-        );
+        notificationManagerCompat.notify(1, builder.build());
       }
-
-      if (objectAnimator.isStarted() && objectAnimatorPom.isStarted()) {
-        builder.setStyle(new NotificationCompat.InboxStyle()
-                .addLine(headerOne + getString(R.string.bunch_of_spaces_2) + headerTwo)
-                .addLine(bodyOne + getString(R.string.bunch_of_spaces) + bodyTwo)
-        );
-      }
-
-      notificationManagerCompat.notify(1, builder.build());
     }
   }
 
@@ -2870,6 +2854,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
+    timerPopUpIsVisible = true;
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
     editCyclesPopupWindow.dismiss();
