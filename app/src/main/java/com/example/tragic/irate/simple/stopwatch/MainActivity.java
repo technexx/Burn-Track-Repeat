@@ -1,16 +1,5 @@
 package com.example.tragic.irate.simple.stopwatch;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -36,7 +25,6 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -60,6 +48,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesBO;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
@@ -73,7 +72,6 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -412,11 +410,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: We should have single notifications for whichever timer is visible in popUp, and none if none are.
-  //Todo: Figure how how we want Stopwatch to interact w/ both modes. -->
-  // Todo: Stopwatch should remain active when exiting timer popup. Right now, it is paused and we have a sync error w/ pause/resume.
-  //Todo: (A) Alignment issues w/ mode 1 + mode 3 simultaneous notifications. Conditionals need work, since if both are active but paused, notifications will not display.
-  //Todo: Use alpha fade in/out for infinity mode. Careful w/ notifications as their conditional requires an active object animator at moment.
   //Todo: Add slight startOffset to lap animation? Would prolly require a delay on notifyDataSet(), since omitted textViews would still populate row.
   //Todo: Stopwatch textView needs to reduce size @ 1 min.
   //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
@@ -1109,36 +1102,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.setOnDismissListener(() -> {
       timerDisabled = false;
       makeCycleAdapterVisible = false;
-      beginTimerForNextRound = false;
       timerPopUpIsVisible = false;
+      beginTimerForNextRound = false;
       buttonToLaunchTimer.setEnabled(false);
       roundedValueForTotalTimes = 0;
+      //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
+      blankCanvas.setVisibility(View.GONE);
 
-      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
       activateResumeOrResetOptionForCycle();
-
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
       addAndRoundDownTotalCycleTimeFromPreviousRounds();
 
-      //Removes runnable that begins next round.
-      mHandler.removeCallbacksAndMessages(null);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
       //Prevents timer from starting. Runnable will just populate values of next round.
 
-      //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
-      if (mode==4) mode = savedMode;
-      dotDraws.setMode(mode);
-      blankCanvas.setVisibility(View.INVISIBLE);
-      //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
-      if (mode==1) {
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        savedCycleAdapter.notifyDataSetChanged();
-      } else if (mode==3){
-        savedPomCycleRecycler.setVisibility(View.VISIBLE);
-        savedPomCycleAdapter.notifyDataSetChanged();
+      if (mode!=4) {
+        if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+        //Removes runnable that begins next round.
+        mHandler.removeCallbacksAndMessages(null);
+
+        if (mode==1) {
+          savedCycleRecycler.setVisibility(View.VISIBLE);
+          savedCycleAdapter.notifyDataSetChanged();
+        } else if (mode==3){
+          savedPomCycleRecycler.setVisibility(View.VISIBLE);
+          savedPomCycleAdapter.notifyDataSetChanged();
+        }
+      } else {
+        if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+        //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
+        mode = savedMode;
       }
-      blankCanvas.setVisibility(View.GONE);
+
+      dotDraws.setMode(mode);
     });
 
      editCyclesPopupView.setOnClickListener(v-> {
@@ -2308,7 +2305,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyOne = "";
       String bodyTwo = "";
 
-      //Todo: Mode 1 header is a bit off. Mode 3 doesn't show pomMillis in body because it is empty.
       if (timerPopUpIsVisible) {
         if (mode==1) {
           if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
@@ -3436,11 +3432,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           } else resetTimer();
           break;
         case 4:
-          if (fadeInObj != null) fadeInObj.cancel();
-
           if (pausing == RESUMING_TIMER) {
             stopWatchstartTime = System.currentTimeMillis();
 
+            if (fadeInObj != null) fadeInObj.cancel();
             reset.setVisibility(View.INVISIBLE);
             stopWatchIsPaused = false;
             new_lap.setAlpha(1.0f);
