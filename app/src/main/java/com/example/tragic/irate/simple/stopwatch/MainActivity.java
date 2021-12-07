@@ -412,23 +412,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Soft keyboard pops up sometimes when minimizing app via onBackPressed after accessing settings fragment.
-  //Todo: Add slight startOffset to lap animation? Would prolly require a delay on notifyDataSet(), since omitted textViews would still populate row.
-  //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
-  //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
-  //Todo: Save total sets/breaks and completed by day option?
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
-  //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit).
+  //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit). Change to XX:XX should be set on both modes.
 
   //Todo: Settings: Color change setting for dots.
-
   //Todo: TDEE in sep popup w/ tabs.
-  //Todo: Add vibrations.
   //Todo: Add color scheme options.
   //Todo: Rename app, of course.
-  //Todo: Add onOptionsSelected dots for About, etc.
-  //Todo: Repository for db. Look at Executor/other alternate thread methods.
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
 
@@ -3227,10 +3219,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          Log.i("testTime", "single time is " + cycleSetTimeForSingleRoundInMillis);
-          Log.i("testTime", "total time is " + totalCycleSetTimeInMillis);
           totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
-          Log.i("testTime", "NEW total time is " + totalCycleSetTimeInMillis);
           totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
           cycleSetTimeForSingleRoundInMillis = 0;
           break;
