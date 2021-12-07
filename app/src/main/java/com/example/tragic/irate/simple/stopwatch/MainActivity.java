@@ -411,11 +411,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
+  //Todo: Soft keyboard pops up sometimes when minimizing app via onBackPressed after accessing settings fragment.
   //Todo: Add slight startOffset to lap animation? Would prolly require a delay on notifyDataSet(), since omitted textViews would still populate row.
   //Todo: Highlight mode retained w/ out status bar buttons when exiting out of editing cycle. Happened once and not replicating.
-  //Todo: Replace root fragment menu w/ complete list of settings?
-  //Todo: Total break times might leave off a second on some end rounds, esp. for Pom.
-  //Todo: Should have adjustable settings for interface, vibration duration, color, etc.
   //Todo: More stats? E.g. total sets/breaks, total partial sets/breaks, etc.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
@@ -425,7 +423,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Settings: Color change setting for dots.
 
-  //Todo: Optional "get back to work" touch warning for Pom.
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Add vibrations.
   //Todo: Add color scheme options.
@@ -468,14 +465,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onDestroy();
   }
 
-  //Todo: Make sure to re-implement behavior for non-fragments.
   @Override
   public void onBackPressed() {
+    if (!timerPopUpIsVisible && settingsFragmentFrameLayout.getVisibility()==View.GONE) {
+      moveTaskToBack(false);
+//      Log.i("testTime", "Backstack and return!");
+      return;
+
+    }
     if (rootSettingsFragment.isVisible()) {
       settingsFragmentFrameLayout.setVisibility(View.GONE);
       settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
 
       aSettingsMenuIsVisible = false;
+//      Log.i("testTime", "root conditional!");
     }
 
     if (soundSettingsFragment.isVisible()) {
@@ -485,9 +488,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //              .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
+//      Log.i("testTime", "sound conditional!");
     }
-    //Used to minimize activity. Will only be called if no popUps have focus.
-//    moveTaskToBack(false);
   }
 
   @Override
@@ -1274,7 +1276,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(false);
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
 
-      //[0, 1, 2, 3]  [1, 2]       [0, 2, 3]
       for (int i=0; i<receivedHighlightPositions.size(); i++) {
         positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
         receivedHighlightPositionHolder.add(positionOfSelectedCycle);
@@ -1559,8 +1560,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_all_confirm.setOnClickListener(v-> {
       if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
+        Log.i("testDelete", "Deleting full CYCLES");
         AsyncTask.execute(deleteAllCyclesASyncRunnable);
       } else if (delete_all_text.getText().equals(getString(R.string.delete_total_times))) {
+        Log.i("testDelete", "Deleting TIMES only");
         AsyncTask.execute(deleteTotalCycleTimesASyncRunnable);
       }
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
@@ -1701,6 +1704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!isNewCycle) {
           if (mode==1) {
             cycles = cyclesList.get(positionOfSelectedCycle);
+
             totalSetTime = cycles.getTotalSetTime();
             totalBreakTime = cycles.getTotalBreakTime();
             cyclesCompleted = cycles.getCyclesCompleted();
@@ -1845,7 +1849,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           total_set_time.setText("0");
           total_break_time.setText("0");
           cycles_completed.setText(getString(R.string.cycles_done, "0"));
-          replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         });
       }
     };
@@ -2322,7 +2325,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (mode==3) {
           int numberOfRoundsLeft = 8-pomDotCounter;
-          if (pomDotCounter==0)
           switch (pomDotCounter) {
             case 0: case 2: case 4: case 6:
               headerOne = setNotificationHeader("Pomodoro", "Work");
@@ -2880,15 +2882,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
-          //If progress bar is at max value, round has not begun.
           if (currentProgressBarValue==maxProgress) {
             timerDurationPlaceHolder = setMillis;
-            //Starts object animator.
-            instantiateAndStartObjectAnimator(setMillis);
-            //Used for pause/resume toggle.
             timerIsPaused = false;
-            //Used in pause/resume. If timer HAS ended, that method calls reset. Otherwise, it pauses or resumes timer.
-            timerEnded = false;
+            instantiateAndStartObjectAnimator(setMillis);
           } else {
             setMillis = setMillisUntilFinished;
             if (objectAnimator != null) objectAnimator.resume();
@@ -2896,9 +2893,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (typeOfRound.get(currentRound).equals(3)) {
           if (currentProgressBarValue==maxProgress) {
             timerDurationPlaceHolder = breakMillis;
-            //Used for pause/resume and fading text in (i.e. timeLeft or timePaused).
             timerIsPaused = false;
-            //Starts object animator.
             instantiateAndStartObjectAnimator(breakMillis);
           } else {
             breakMillis = breakMillisUntilFinished;
@@ -2911,9 +2906,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Ensures any features meant for running timer cannot be executed here.
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter);
-          //Starts object animator.
+
+          timerDurationPlaceHolder = pomMillis;
           instantiateAndStartObjectAnimator(pomMillis);
-          timerEnded = false;
         } else {
           pomMillis = pomMillisUntilFinished;
           if (objectAnimatorPom != null) objectAnimatorPom.resume();
@@ -3102,15 +3097,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       beginTimerForNextRound = true;
     }
     if (mode==3) {
+      addAndRoundDownTotalCycleTimeFromPreviousRounds();
+
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
           setEndOfRoundSounds(vibrationSettingForWork, false);
+          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
           break;
         case 1: case 3: case 5:
           setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
+          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
           break;
         case 7:
           setEndOfRoundSounds(vibrationSettingForFullBreak, true);
+          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
       }
       if (pomDotCounter==8) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
@@ -3122,14 +3122,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeft.setText("0");
       mHandler.post(endFade);
       pomDotCounter++;
+
+      mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
+
       //If skipping round manually, cancel timer and objectAnimator.
       if (endingEarly) {
         if (timer != null) timer.cancel();
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
         progressBar.setProgress(0);
       }
-      addAndRoundDownTotalCycleTimeFromPreviousRounds();
-      mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
+
     }
     beginTimerForNextRound = true;
   }
@@ -3188,21 +3190,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
           if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (setMillis%1000);
-            cycleSetTimeForSingleRoundInMillis = roundedValueForTotalTimes;
+            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
-          cycleSetTimeForSingleRoundInMillis+=50;
+
+          //Todo: Issue w/ timerDurationPlaceHolder.
+          cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
           break;
         case 1: case 3: case 5: case 7:
           if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (breakMillis%1000);
-            cycleBreakTimeForSingleRoundInMillis = roundedValueForTotalTimes;
+            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
-          cycleBreakTimeForSingleRoundInMillis+=50;
+          cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTime);
           break;
@@ -3221,17 +3225,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycleBreakTimeForSingleRoundInMillis = 0;
     }
     if (mode==3) {
-      if (pomDotCounter>0) {
-        switch (pomDotCounter) {
-          case 0: case 2: case 4: case 6:
-            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 1000;
-            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) + 1000;
-            break;
-          case 1: case 3: case 5: case 7:
-            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 1000;
-            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) + 1000;
-            break;
-        }
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          Log.i("testTime", "single time is " + cycleSetTimeForSingleRoundInMillis);
+          Log.i("testTime", "total time is " + totalCycleSetTimeInMillis);
+          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
+          Log.i("testTime", "NEW total time is " + totalCycleSetTimeInMillis);
+          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
+          cycleSetTimeForSingleRoundInMillis = 0;
+          break;
+        case 1: case 3: case 5: case 7:
+          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
+          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
+          cycleBreakTimeForSingleRoundInMillis = 0;
+          break;
       }
     }
   }

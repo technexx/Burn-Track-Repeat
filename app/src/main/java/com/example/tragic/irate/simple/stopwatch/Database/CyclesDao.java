@@ -58,7 +58,6 @@ CyclesDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCycle(Cycles cycles);
 
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertPomCycle(PomCycles pomCycles);
 
@@ -68,10 +67,7 @@ CyclesDao {
     @Query("DELETE from CYCLES where totalSetTime AND totalBreakTime AND cyclesCompleted")
     void deleteTotalTimesCycle();
 
-    @Query("DELETE from CYCLESBO WHERE totalBOTime AND cyclesCompleted")
-    void deleteTotalTimesCycleBO();
-
-    @Query("DELETE from POMCYCLES WHERE cyclesCompleted")
+    @Query("DELETE from POMCYCLES WHERE cyclesCompleted AND totalWorkTime AND totalBreakTime")
     void deleteTotalTimesPom();
 
     @Update
