@@ -57,11 +57,9 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
         String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
         String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
-        boolean defaultSoundSettingForLastRound = prefShared.getBoolean("soundSettingForLastRound", true);
 
         String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
         String defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_once");
-        boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForFullBreak", true);
 
         CharSequence[] soundEntryListForSets = setPreference.getEntries();
         CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();
@@ -73,10 +71,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         int defaultWorkNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
         int defaultMiniBreaksNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreaks);
 
-        String defaultSetString = summaryText(soundEntryListForSets, defaultSetNumericValue);
-        String defaultBreakString = summaryText(soundEntryListForBreaks, defaultBreakNumericValue);
-        String defaultWorkString = summaryText(soundEntryListForWork, defaultWorkNumericValue);
-        String defaultMiniBreaksString = summaryText(soundEntryListForMiniBreaks, defaultMiniBreaksNumericValue);
+        String defaultSetString = summaryTextToStart(soundEntryListForSets, defaultSetNumericValue);
+        String defaultBreakString = summaryTextToStart(soundEntryListForBreaks, defaultBreakNumericValue);
+        String defaultWorkString = summaryTextToStart(soundEntryListForWork, defaultWorkNumericValue);
+        String defaultMiniBreaksString = summaryTextToStart(soundEntryListForMiniBreaks, defaultMiniBreaksNumericValue);
 
         setPreference.setSummary(defaultSetString);
         breakPreference.setSummary(defaultBreakString);
@@ -88,7 +86,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             int settingsValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(SET_SETTING, settingsValue);
 
-            String entryString = summaryText(soundEntryListForSets, settingsValue);
+            String entryString = summaryTextChange(soundEntryListForSets, settingsValue);
             setPreference.setSummary(entryString);
             return true;
         });
@@ -97,7 +95,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             int breaksValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(BREAK_SETTING, breaksValue);
 
-            String entryString = summaryText(soundEntryListForSets, breaksValue);
+            String entryString = summaryTextChange(soundEntryListForSets, breaksValue);
             breakPreference.setSummary(entryString);
             return true;
         });
@@ -114,7 +112,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             int workValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(WORK_SETTING, workValue);
 
-            String entryString = summaryText(soundEntryListForBreaks, workValue);
+            String entryString = summaryTextChange(soundEntryListForBreaks, workValue);
             workPreference.setSummary(entryString);
             return true;
         });
@@ -123,7 +121,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             int miniBreakValue = soundSettingVariable(newValue);
             mOnChangedSoundSetting.changeSoundSetting(MINI_BREAK_SETTING, miniBreakValue);
 
-            String entryString = summaryText(soundEntryListForSets, miniBreakValue);
+            String entryString = summaryTextChange(soundEntryListForSets, miniBreakValue);
             miniBreakPreference.setSummary(entryString);
             return true;
         });
@@ -141,11 +139,15 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         return changeSettingsValues.assignSoundSettingNumericValue((String) newVar);
     }
 
-    private String summaryText(CharSequence[] settingsList, int entry) {
+    private String summaryTextChange(CharSequence[] settingsList, int entry) {
         if (entry>=1) {
             return (String) settingsList[entry-1];
         } else {
             return "";
         }
+    }
+
+    private String summaryTextToStart(CharSequence[] settingsList, int entry) {
+        return (String) settingsList[entry];
     }
 }
