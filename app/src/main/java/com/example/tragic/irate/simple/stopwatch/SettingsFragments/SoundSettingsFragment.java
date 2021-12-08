@@ -12,6 +12,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
 
 import com.example.tragic.irate.simple.stopwatch.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.R;
@@ -23,9 +24,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
     int SET_SETTING = 1;
     int BREAK_SETTING = 2;
-    int WORK_SETTING = 3;
-    int MINI_BREAK_SETTING = 4;
-    int FULL_BREAK_SETTING = 5;
+    int LAST_ROUND_SETTING = 3;
+    int WORK_SETTING = 4;
+    int MINI_BREAK_SETTING = 5;
+    int FULL_BREAK_SETTING = 6;
 
     ChangeSettingsValues changeSettingsValues;
     onChangedSoundSetting mOnChangedSoundSetting;
@@ -47,39 +49,39 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
         ListPreference setPreference = (ListPreference) findPreference("soundSettingForSets");
         ListPreference breakPreference = (ListPreference) findPreference("soundSettingForBreaks");
+        SwitchPreference lastRoundPreference = (SwitchPreference) findPreference("soundSettingForLastRound");
+
         ListPreference workPreference = (ListPreference) findPreference("soundSettingForWork");
         ListPreference miniBreakPreference = (ListPreference) findPreference("soundSettingForMiniBreaks");
-        ListPreference fullBreakPreference = (ListPreference) findPreference("soundSettingForFullBreak");
+        SwitchPreference fullBreakPreference = (SwitchPreference) findPreference("soundSettingForFullBreak");
 
         String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
         String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
+        boolean defaultSoundSettingForLastRound = prefShared.getBoolean("soundSettingForLastRound", true);
+
         String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
         String defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_once");
-        String defaultSoundSettingForFullBreak = prefShared.getString("soundSettingForFullBreak", "vibrate_once");
+        boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForFullBreak", true);
 
         CharSequence[] soundEntryListForSets = setPreference.getEntries();
         CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();
         CharSequence[] soundEntryListForWork = workPreference.getEntries();
         CharSequence[] soundEntryListForMiniBreaks = miniBreakPreference.getEntries();
-        CharSequence[] soundEntryListForFullBreak = fullBreakPreference.getEntries();
 
         int defaultSetNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
         int defaultBreakNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
         int defaultWorkNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
         int defaultMiniBreaksNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreaks);
-        int defaultFullBreakNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForFullBreak);
 
         String defaultSetString = summaryText(soundEntryListForSets, defaultSetNumericValue);
         String defaultBreakString = summaryText(soundEntryListForBreaks, defaultBreakNumericValue);
         String defaultWorkString = summaryText(soundEntryListForWork, defaultWorkNumericValue);
         String defaultMiniBreaksString = summaryText(soundEntryListForMiniBreaks, defaultMiniBreaksNumericValue);
-        String defaultFullBreakString = summaryText(soundEntryListForFullBreak, defaultFullBreakNumericValue);
 
         setPreference.setSummary(defaultSetString);
         breakPreference.setSummary(defaultBreakString);
         workPreference.setSummary(defaultWorkString);
         miniBreakPreference.setSummary(defaultMiniBreaksString);
-        fullBreakPreference.setSummary(defaultFullBreakString);
 
 
         setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -97,6 +99,14 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryText(soundEntryListForSets, breaksValue);
             breakPreference.setSummary(entryString);
+            return true;
+        });
+
+        lastRoundPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            boolean isInfinityEnabled = (boolean) newValue;
+            int infinityInteger = 0;
+            if (isInfinityEnabled) infinityInteger = 1;
+            mOnChangedSoundSetting.changeSoundSetting(LAST_ROUND_SETTING, infinityInteger);
             return true;
         });
 
@@ -119,11 +129,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         fullBreakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int fullBreakValue = soundSettingVariable(newValue);
-            mOnChangedSoundSetting.changeSoundSetting(FULL_BREAK_SETTING, fullBreakValue);
-
-            String entryString = summaryText(soundEntryListForSets, fullBreakValue);
-            fullBreakPreference.setSummary(entryString);
+            boolean isInfinityEnabled = (boolean) newValue;
+            int infinityInteger = 0;
+            if (isInfinityEnabled) infinityInteger = 1;
+            mOnChangedSoundSetting.changeSoundSetting(LAST_ROUND_SETTING, infinityInteger);
             return true;
         });
     }

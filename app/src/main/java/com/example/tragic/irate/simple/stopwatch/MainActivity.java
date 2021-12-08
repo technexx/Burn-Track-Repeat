@@ -389,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int vibrationSettingForSets;
   int vibrationSettingForBreaks;
+  int vibrationSettingForLastRound;
   int vibrationSettingForWork;
   int vibrationSettingForMiniBreaks;
   int vibrationSettingForFullBreak;
@@ -411,7 +412,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Soft keyboard pops up sometimes when minimizing app via onBackPressed after accessing settings fragment.
+  //Todo: Need default sound settings for Pom, not just assigned on first click. Should be set while inflating the fragment.
+  //Todo: No default pop for either mode on new app install.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
@@ -461,7 +463,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onBackPressed() {
     if (!timerPopUpIsVisible && settingsFragmentFrameLayout.getVisibility()==View.GONE) {
       moveTaskToBack(false);
-//      Log.i("testTime", "Backstack and return!");
       return;
 
     }
@@ -470,7 +471,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
 
       aSettingsMenuIsVisible = false;
-//      Log.i("testTime", "root conditional!");
     }
 
     if (soundSettingsFragment.isVisible()) {
@@ -480,7 +480,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //              .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
-//      Log.i("testTime", "sound conditional!");
     }
   }
 
@@ -488,7 +487,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void settingsData(int settingNumber) {
     getSupportFragmentManager().beginTransaction()
             .addToBackStack(null)
-//            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
             .replace(R.id.settings_fragment_frameLayout, soundSettingsFragment)
             .commit();
   }
@@ -496,6 +494,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void changeSoundSetting(int typeOfRound, int settingNumber) {
     assignSoundSettingVariableNumbers(typeOfRound, settingNumber);
+    Log.i("testSetting", "type of round is " + typeOfRound);
+    Log.i("testSetting", "setting number is " + settingNumber);
   }
 
   @Override
@@ -3043,42 +3043,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
+      boolean isAlertRepeating = false;
       switch (typeOfRound.get(currentRound)) {
         case 1:
           timeLeft.setText("0");
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-          if (numberOfRoundsLeft!=1) {
-            setEndOfRoundSounds(vibrationSettingForSets, false);
-          } else{
-            setEndOfRoundSounds(vibrationSettingForSets, true);
-          }
+
+          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          setEndOfRoundSounds(vibrationSettingForSets, false);
           break;
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-          if (numberOfRoundsLeft!=1) {
-            setEndOfRoundSounds(vibrationSettingForSets, false);
-          } else {
-            setEndOfRoundSounds(vibrationSettingForSets, true);
-          }
+
+          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          setEndOfRoundSounds(vibrationSettingForSets, false);
           break;
         case 3:
           timeLeft.setText("0");
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          if (numberOfRoundsLeft!=1) {
-            setEndOfRoundSounds(vibrationSettingForBreaks, false);
-          } else {
-            setEndOfRoundSounds(vibrationSettingForBreaks, true);
-          }
+
+          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          setEndOfRoundSounds(vibrationSettingForBreaks, false);
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-          if (numberOfRoundsLeft!=1) {
-            setEndOfRoundSounds(vibrationSettingForBreaks, false);
-          } else {
-            setEndOfRoundSounds(vibrationSettingForBreaks, true);
-          }
+
+          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          setEndOfRoundSounds(vibrationSettingForBreaks, false);
           break;
       }
 
@@ -3093,16 +3086,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          setEndOfRoundSounds(vibrationSettingForWork, false);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          setEndOfRoundSounds(vibrationSettingForWork, false);
           break;
         case 1: case 3: case 5:
-          setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
           break;
         case 7:
-          setEndOfRoundSounds(vibrationSettingForFullBreak, true);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+
+          boolean isAlertRepeating = false;
+          if (vibrationSettingForFullBreak == 1) isAlertRepeating = true;
+          setEndOfRoundSounds(vibrationSettingForFullBreak, isAlertRepeating);
       }
       if (pomDotCounter==8) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
@@ -3305,10 +3301,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 2:
         vibrationSettingForBreaks = settingNumber; break;
       case 3:
-        vibrationSettingForWork = settingNumber; break;
+        vibrationSettingForLastRound = settingNumber; break;
       case 4:
-        vibrationSettingForMiniBreaks = settingNumber; break;
+        vibrationSettingForWork = settingNumber; break;
       case 5:
+        vibrationSettingForMiniBreaks = settingNumber; break;
+      case 6:
         vibrationSettingForFullBreak = settingNumber; break;
     }
   }

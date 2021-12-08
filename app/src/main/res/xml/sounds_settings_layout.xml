@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
@@ -23,6 +24,14 @@
                     android:entryValues="@array/sound_setting_option_values"
                     android:defaultValue="">
                 </ListPreference>
+
+                <SwitchPreference
+                    android:key="soundSettingForLastRound"
+                    android:title="Last Round"
+                    android:summary="Continuous"
+                    android:defaultValue="true">
+                </SwitchPreference>
+
         </PreferenceCategory>
 
         <PreferenceCategory
@@ -39,19 +48,18 @@
 
                 <ListPreference
                     android:key="soundSettingForMiniBreaks"
-                    android:title="Mini Break"
+                    android:title="Break"
                     android:entries="@array/sound_setting_options"
                     android:entryValues="@array/sound_setting_option_values"
                     android:defaultValue="">
                 </ListPreference>
 
-                <ListPreference
+                <SwitchPreference
                     android:key="soundSettingForFullBreak"
-                    android:title="Full Break"
-                    android:entries="@array/sound_setting_options"
-                    android:entryValues="@array/sound_setting_option_values"
-                    android:defaultValue="">
-                </ListPreference>
+                    android:title="Last Round"
+                    android:summary="Continuous"
+                    android:defaultValue="true">
+                </SwitchPreference>
 
         </PreferenceCategory>
 
