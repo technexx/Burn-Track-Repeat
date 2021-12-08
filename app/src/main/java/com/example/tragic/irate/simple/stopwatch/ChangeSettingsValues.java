@@ -42,6 +42,26 @@ public class ChangeSettingsValues {
         return assignedValue;
     }
 
+    public int assignColorSettingNumericValue(String setting) {
+        int assignedValue = 0;
+        if (setting.equals("green_setting")) {
+            assignedValue = 1;
+        }
+        if (setting.equals("red_setting")) {
+            assignedValue = 2;
+        }
+        if (setting.equals("blue_setting")) {
+            assignedValue = 3;
+        }
+        if (setting.equals("yellow_setting")) {
+            assignedValue = 4;
+        }
+        if (setting.equals("magenta_setting")) {
+            assignedValue = 5;
+        }
+        return assignedValue;
+    }
+
     public long[] getVibrationSetting(int settingNumber) {
         long[] chosenVibration = new long[0];
 

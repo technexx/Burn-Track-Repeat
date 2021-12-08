@@ -99,8 +99,6 @@
         <item>Blue</item>
         <item>Yellow</item>
         <item>Magenta</item>
-        <item>White</item>
-        <item>Black</item>
     </string-array>
 
     <string-array name="color_setting_option_values">
@@ -109,8 +107,6 @@
         <item>blue_setting</item>
         <item>yellow_setting</item>
         <item>magenta_setting</item>
-        <item>white_setting</item>
-        <item>black_setting</item>
     </string-array>
 
 </resources>

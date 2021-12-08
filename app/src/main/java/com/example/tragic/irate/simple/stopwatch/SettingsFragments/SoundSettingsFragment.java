@@ -74,7 +74,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
 
         setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int settingsValue = soundSettingVariable(newValue);
+            int settingsValue = convertSoundSettingObjectToInteger(newValue);
             mOnChangedSoundSetting.changeSoundSetting(SET_SETTING, settingsValue);
 
             String entryString = summaryTextChange(soundEntryListForSets, settingsValue);
@@ -83,7 +83,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         breakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int breaksValue = soundSettingVariable(newValue);
+            int breaksValue = convertSoundSettingObjectToInteger(newValue);
             mOnChangedSoundSetting.changeSoundSetting(BREAK_SETTING, breaksValue);
 
             String entryString = summaryTextChange(soundEntryListForSets, breaksValue);
@@ -100,7 +100,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         workPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int workValue = soundSettingVariable(newValue);
+            int workValue = convertSoundSettingObjectToInteger(newValue);
             mOnChangedSoundSetting.changeSoundSetting(WORK_SETTING, workValue);
 
             String entryString = summaryTextChange(soundEntryListForBreaks, workValue);
@@ -109,7 +109,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
 
         miniBreakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            int miniBreakValue = soundSettingVariable(newValue);
+            int miniBreakValue = convertSoundSettingObjectToInteger(newValue);
             mOnChangedSoundSetting.changeSoundSetting(MINI_BREAK_SETTING, miniBreakValue);
 
             String entryString = summaryTextChange(soundEntryListForSets, miniBreakValue);
@@ -126,7 +126,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         });
     }
 
-    private int soundSettingVariable(Object newVar) {
+    private int convertSoundSettingObjectToInteger(Object newVar) {
         return changeSettingsValues.assignSoundSettingNumericValue((String) newVar);
     }
 
