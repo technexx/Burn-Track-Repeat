@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <PreferenceCategory
+        android:layout="@layout/preference_category_layout"
+        android:title="@string/workout_mode">
+
+        <ListPreference
+            android:key="colorSettingForSets"
+            android:title="Sets"
+            android:entries="@array/color_setting_options"
+            android:entryValues="@array/color_setting_option_values"
+            android:defaultValue="">
+        </ListPreference>
+
+        <ListPreference
+            android:key="colorSettingForBreaks"
+            android:title="Breaks"
+            android:entries="@array/color_setting_options"
+            android:entryValues="@array/color_setting_option_values"
+            android:defaultValue="">
+        </ListPreference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pomodoro_mode"
+        android:layout="@layout/preference_category_layout">
+
+        <ListPreference
+            android:key="colorSettingForWork"
+            android:title="Work"
+            android:entries="@array/color_setting_options"
+            android:entryValues="@array/color_setting_option_values"
+            android:defaultValue="">
+        </ListPreference>
+
+        <ListPreference
+            android:key="colorSettingForMiniBreaks"
+            android:title="Break"
+            android:entries="@array/color_setting_options"
+            android:entryValues="@array/color_setting_option_values"
+            android:defaultValue="">
+        </ListPreference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

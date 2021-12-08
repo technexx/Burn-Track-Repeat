@@ -43,6 +43,9 @@ public class DotDraws extends View {
   boolean mAddSubFade;
   boolean mFadeUp;
 
+  int SET_COLOR;
+  int BREAK_COLOR;
+
   public interface sendAlpha {
     void sendAlphaValue(int alpha);
   }
@@ -148,7 +151,7 @@ public class DotDraws extends View {
 
         for (int i=0; i<mRoundTimes.size(); i++) {
           //If type 1 or 2 (sets), color is green. Otherwise, color is red.
-          if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) mPaint.setColor(Color.GREEN); else mPaint.setColor(Color.RED);
+          if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) mPaint.setColor(SET_COLOR); else mPaint.setColor(BREAK_COLOR);
           //if type 1 or 3 (counting down), dots are filled. Otherwise, they are hollow.
           if (mRoundType.get(i)==1 || mRoundType.get(i)==3) setDotStyle(false); else setDotStyle(true);
           //If the rounds remaining subtracted from our total rounds equals the position in its list we are drawing, fade that position (i.e. our current round).
@@ -210,7 +213,7 @@ public class DotDraws extends View {
   public void pomFill(int i, boolean fade, int alpha) {
     switch (i) {
       case 0: case 2: case 4: case 6:
-        mPaint.setColor(Color.GREEN);
+        mPaint.setColor(SET_COLOR);
         //Must be called AFTER color is changed, otherwise alpha will reset to 255.
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
@@ -219,7 +222,7 @@ public class DotDraws extends View {
         mX+=260;
         break;
       case 1: case 3: case 5:
-        mPaint.setColor(Color.RED);
+        mPaint.setColor(BREAK_COLOR);
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         mCanvas.drawCircle(mX2, 740, 50 , mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
@@ -227,7 +230,7 @@ public class DotDraws extends View {
         mX2=mX+130;
         break;
       case 7:
-        mPaint.setColor(Color.RED);
+        mPaint.setColor(BREAK_COLOR);
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         mCanvas.drawRect(mX-170, 685, mX-60, 795, mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);

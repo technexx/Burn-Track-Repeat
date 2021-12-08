@@ -30,7 +30,7 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.root_settings_layout, rootKey);
+        setPreferencesFromResource(R.xml.root_preference_fragment_layout, rootKey);
         sharedPreferences = getContext().getSharedPreferences("settingsPref", 0);
         prefEdit = sharedPreferences.edit();
 

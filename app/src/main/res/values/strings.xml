@@ -93,4 +93,24 @@
         <item>use_ringtone</item>
     </string-array>
 
+    <string-array name="color_setting_options">
+        <item>Green</item>
+        <item>Red</item>
+        <item>Blue</item>
+        <item>Yellow</item>
+        <item>Magenta</item>
+        <item>White</item>
+        <item>Black</item>
+    </string-array>
+
+    <string-array name="color_setting_option_values">
+        <item>green_setting</item>
+        <item>red_setting</item>
+        <item>blue_setting</item>
+        <item>yellow_setting</item>
+        <item>magenta_setting</item>
+        <item>white_setting</item>
+        <item>black_setting</item>
+    </string-array>
+
 </resources>

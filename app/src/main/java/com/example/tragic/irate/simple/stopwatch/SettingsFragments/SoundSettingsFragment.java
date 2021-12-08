@@ -1,24 +1,15 @@
 package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.AttributeSet;
-import android.util.Log;
 
-import androidx.fragment.app.Fragment;
 import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 
 import com.example.tragic.irate.simple.stopwatch.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.R;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
@@ -42,7 +33,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.sounds_settings_layout, rootKey);
+        setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues();
 
         SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
