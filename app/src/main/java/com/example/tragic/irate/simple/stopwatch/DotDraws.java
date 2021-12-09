@@ -12,6 +12,8 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.logging.Handler;
@@ -50,7 +52,7 @@ public class DotDraws extends View {
     void sendAlphaValue(int alpha);
   }
 
-  public void onAlphaSend(sendAlpha xSendAlpha) {
+  public void onAlphaSend(sendAlpha xSendAlpha)  {
     this.mSendAlpha = xSendAlpha;
   }
 
@@ -58,6 +60,7 @@ public class DotDraws extends View {
     super(context, attrs);
     setFocusable(true);
     setWillNotDraw(false);
+
     setupPaint();
   }
 
@@ -84,6 +87,24 @@ public class DotDraws extends View {
     mPaintBox.setStyle(Paint.Style.STROKE);
     mPaintBox.setStrokeWidth(6);
   }
+
+  public void changeColorSetting(int typeOFRound, int settingNumber) {
+    if (typeOFRound==1) SET_COLOR = assignColor(settingNumber);
+    if (typeOFRound==2) BREAK_COLOR = assignColor(settingNumber);
+  }
+
+  public int assignColor(int setting) {
+    int color = 1;
+
+    if (setting==1) color = Color.GREEN;
+    if (setting==2) color = Color.RED;
+    if (setting==3) color = Color.BLUE;
+    if (setting==4) color = Color.YELLOW;
+    if (setting==5) color = Color.MAGENTA;
+
+    return color;
+  }
+
 
   public void setMode(int mode) {
     mMode = mode;

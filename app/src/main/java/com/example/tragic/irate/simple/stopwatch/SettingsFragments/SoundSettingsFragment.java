@@ -62,10 +62,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         int defaultWorkNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
         int defaultMiniBreaksNumericValue = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreaks);
 
-        String defaultSetString = summaryTextToStart(soundEntryListForSets, defaultSetNumericValue);
-        String defaultBreakString = summaryTextToStart(soundEntryListForBreaks, defaultBreakNumericValue);
-        String defaultWorkString = summaryTextToStart(soundEntryListForWork, defaultWorkNumericValue);
-        String defaultMiniBreaksString = summaryTextToStart(soundEntryListForMiniBreaks, defaultMiniBreaksNumericValue);
+        String defaultSetString = summaryTextChange(soundEntryListForSets, defaultSetNumericValue);
+        String defaultBreakString = summaryTextChange(soundEntryListForBreaks, defaultBreakNumericValue);
+        String defaultWorkString = summaryTextChange(soundEntryListForWork, defaultWorkNumericValue);
+        String defaultMiniBreaksString = summaryTextChange(soundEntryListForMiniBreaks, defaultMiniBreaksNumericValue);
 
         setPreference.setSummary(defaultSetString);
         breakPreference.setSummary(defaultBreakString);
@@ -136,9 +136,5 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         } else {
             return "";
         }
-    }
-
-    private String summaryTextToStart(CharSequence[] settingsList, int entry) {
-        return (String) settingsList[entry];
     }
 }

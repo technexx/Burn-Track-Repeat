@@ -416,6 +416,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
+  //Todo: Colors work except for on app launch when they're black.
+  //Todo: Still need to resolve empty summary @ app start. We're out of index bounds using a method that doesn't subtract 1.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
@@ -476,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       aSettingsMenuIsVisible = false;
     }
 
-    if (soundSettingsFragment.isVisible()) {
+    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               //This removes screen flashing, and commented out transition will give us a fade instead.
               .addToBackStack(null)
@@ -505,8 +507,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void changeColorSetting(int typeOFRound, int settingNumber) {
-
+    dotDraws.changeColorSetting(typeOFRound, settingNumber);
   }
+
 
   @Override
   public void sendAlphaValue(int alpha) {
@@ -654,8 +657,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     changeSettingsValues = new ChangeSettingsValues();
 
-    getSupportFragmentManager().beginTransaction().
-            add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
+    getSupportFragmentManager().beginTransaction()
+            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
             .commit();
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
@@ -802,10 +805,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
+    //Todo: Fetch default for colors at app launch and sent to dotDraws. These fetch the entryValues, so that's good.
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
-    vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+
+    vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
 
     timerValueInEditPopUpTextView.setText("00:00");
@@ -3052,8 +3057,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar.setProgress(0);
         timeLeft.setTextSize(90f);
       }
-      addAndRoundDownTotalCycleTimeFromPreviousRounds();
 
+      addAndRoundDownTotalCycleTimeFromPreviousRounds();
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
       boolean isAlertRepeating = false;
