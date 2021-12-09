@@ -105,7 +105,6 @@ public class DotDraws extends View {
     return color;
   }
 
-
   public void setMode(int mode) {
     mMode = mode;
   }

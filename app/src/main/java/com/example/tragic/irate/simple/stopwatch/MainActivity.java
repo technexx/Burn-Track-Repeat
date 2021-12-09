@@ -805,35 +805,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
-    //Todo: Fetch default for colors at app launch and sent to dotDraws. These fetch the entryValues, so that's good.
-    //Todo: Also need to set these for Pom.
-    //Todo: Should probably put all this in a separate method.
-    SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
-
-    String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
-    String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
-    String defaultSoundSettingForLastRound = prefShared.getString("soundSettingForLastRound", "");
-
-    String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "");
-    String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "");
-    String defaultSoundSettingForFullBreak = prefShared.getString("soundSettingForFullBreak", "");
-
-    String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "");
-    String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks;", "");
-
-    vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
-    vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
-    vibrationSettingForLastRound = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForLastRound);
-
-    vibrationSettingForWork  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
-    vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
-    vibrationSettingForFullBreak = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForFullBreak);
-
-    int defaultSetColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
-    int defaultBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
-    dotDraws.changeColorSetting(1, defaultSetColor);
-    dotDraws.changeColorSetting(2, defaultBreakColor);
-
     timerValueInEditPopUpTextView.setText("00:00");
 
     sortHolder = sortMode;
@@ -885,9 +856,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
     stopWatchView = timerPopUpView.findViewById(R.id.stopWatchView);
+    dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
     msTime = timerPopUpView.findViewById(R.id.msTime);
-    dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     lapRecycler = timerPopUpView.findViewById(R.id.lap_recycler);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
     pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
@@ -930,6 +901,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setDefaultTimerValuesAndTheirEditTextViews();
     setEditPopUpTimerHeaders(1);
     instantiateNotifications();
+    setDefaultSettings();
 
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -1948,6 +1920,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
     };
+  }
+
+  public void setDefaultSettings() {
+    //Todo: Retrieve boolean for Continuous for last round on modes 1/3. Can simply assign true/false here based on return.
+    SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
+
+    String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
+    String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+    String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "");
+    String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "");
+
+    String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "");
+    String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "");
+
+    vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
+    vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
+    vibrationSettingForWork  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
+    vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
+
+    int defaultSetColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
+    int defaultBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
+
+    dotDraws.changeColorSetting(1, defaultSetColor);
+    dotDraws.changeColorSetting(2, defaultBreakColor);
   }
 
   public void saveCycleOnPopUpDismissIfEdited() {
