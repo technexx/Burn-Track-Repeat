@@ -43,17 +43,13 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
             return true;
         });
 
-        colorPref.setOnPreferenceChangeListener((preference, newValue) -> {
-            prefEdit.apply();
-
+        colorPref.setOnPreferenceClickListener(v-> {
             mOnChangedSettings.settingsData(COLOR_SETTINGS);
 
             return true;
         });
 
-        aboutPref.setOnPreferenceChangeListener((preference, newValue) -> {
-            prefEdit.apply();
-
+        aboutPref.setOnPreferenceClickListener(v-> {
             mOnChangedSettings.settingsData(ABOUT_SETTINGS);
 
             return true;

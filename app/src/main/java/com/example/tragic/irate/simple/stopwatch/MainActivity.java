@@ -55,6 +55,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -64,6 +66,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesBO;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 import com.google.android.material.button.MaterialButton;
@@ -78,7 +81,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting{
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
@@ -400,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
+  ColorSettingsFragment colorSettingsFragment;
   ChangeSettingsValues changeSettingsValues;
 
   FrameLayout settingsFragmentFrameLayout;
@@ -484,17 +488,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void settingsData(int settingNumber) {
+    Fragment fragmentToReplace = new Fragment();
+    if (settingNumber==1) fragmentToReplace = soundSettingsFragment;
+    if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
+
     getSupportFragmentManager().beginTransaction()
             .addToBackStack(null)
-            .replace(R.id.settings_fragment_frameLayout, soundSettingsFragment)
+            .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
             .commit();
   }
 
   @Override
   public void changeSoundSetting(int typeOfRound, int settingNumber) {
     assignSoundSettingVariableNumbers(typeOfRound, settingNumber);
-    Log.i("testSetting", "type of round is " + typeOfRound);
-    Log.i("testSetting", "setting number is " + settingNumber);
+  }
+
+  @Override
+  public void changeColorSetting(int typeOFRound, int settingNumber) {
+
   }
 
   @Override
@@ -629,11 +640,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
+    colorSettingsFragment = new ColorSettingsFragment();
+
     settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
-    settingsFragmentFrameLayout.setVisibility(View.GONE);
+    settingsFragmentFrameLayout.setVisibility(View.GONE);;
 
     rootSettingsFragment.sendSettingsData(MainActivity.this);
     soundSettingsFragment.soundSetting(MainActivity.this);
+    colorSettingsFragment.colorSetting(MainActivity.this);
 
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
