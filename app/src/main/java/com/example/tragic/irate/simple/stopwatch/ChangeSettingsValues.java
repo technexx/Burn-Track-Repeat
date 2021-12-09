@@ -42,7 +42,7 @@ public class ChangeSettingsValues {
         return assignedValue;
     }
 
-    public int assignColorettingNumericValue(String setting) {
+    public int assignColorSettingNumericValue(String setting) {
         int assignedValue = 0;
         if (setting.equals("green_setting")) {
             assignedValue = 1;

@@ -495,7 +495,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
 
     getSupportFragmentManager().beginTransaction()
-            .addToBackStack(null)
+            .addToBackStack (null)
             .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
             .commit();
   }
@@ -806,12 +806,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
     //Todo: Fetch default for colors at app launch and sent to dotDraws. These fetch the entryValues, so that's good.
+    //Todo: Also need to set these for Pom.
+    //Todo: Should probably put all this in a separate method.
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
+
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
     String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+    String defaultSoundSettingForLastRound = prefShared.getString("soundSettingForLastRound", "");
+
+    String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "");
+    String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "");
+    String defaultSoundSettingForFullBreak = prefShared.getString("soundSettingForFullBreak", "");
+
+    String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "");
+    String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks;", "");
 
     vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
+    vibrationSettingForLastRound = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForLastRound);
+
+    vibrationSettingForWork  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
+    vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
+    vibrationSettingForFullBreak = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForFullBreak);
+
+    int defaultSetColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
+    int defaultBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
+    dotDraws.changeColorSetting(1, defaultSetColor);
+    dotDraws.changeColorSetting(2, defaultBreakColor);
 
     timerValueInEditPopUpTextView.setText("00:00");
 
