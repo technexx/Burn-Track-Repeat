@@ -508,6 +508,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     dotDraws.changeColorSetting(typeOFRound, settingNumber);
+    savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
   }
 
 
@@ -838,6 +839,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     breaksOnlyArray = new ArrayList<>();
     pomArray = new ArrayList<>();
 
+    dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
     reset = timerPopUpView.findViewById(R.id.reset);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
@@ -901,7 +903,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setDefaultTimerValuesAndTheirEditTextViews();
     setEditPopUpTimerHeaders(1);
     instantiateNotifications();
-    setDefaultSettings();dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
 
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -931,6 +932,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
         savedCycleAdapter.notifyDataSetChanged();
+
+        setDefaultSettings();
       });
     });
 
@@ -1944,6 +1947,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotDraws.changeColorSetting(1, defaultSetColor);
     dotDraws.changeColorSetting(2, defaultBreakColor);
+    savedCycleAdapter.changeColorSetting(1, defaultSetColor);
+    savedCycleAdapter.changeColorSetting(2, defaultBreakColor);
   }
 
   public void saveCycleOnPopUpDismissIfEdited() {

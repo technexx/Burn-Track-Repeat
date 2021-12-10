@@ -45,6 +45,7 @@ public class DotDraws extends View {
   boolean mAddSubFade;
   boolean mFadeUp;
 
+  ChangeSettingsValues changeSettingsValues;
   int SET_COLOR;
   int BREAK_COLOR;
 
@@ -62,6 +63,7 @@ public class DotDraws extends View {
     setWillNotDraw(false);
 
     setupPaint();
+    changeSettingsValues = new ChangeSettingsValues();
   }
 
   public void setAlpha(int alpha) {
@@ -89,20 +91,8 @@ public class DotDraws extends View {
   }
 
   public void changeColorSetting(int typeOFRound, int settingNumber) {
-    if (typeOFRound==1) SET_COLOR = assignColor(settingNumber);
-    if (typeOFRound==2) BREAK_COLOR = assignColor(settingNumber);
-  }
-
-  public int assignColor(int setting) {
-    int color = 0;
-
-    if (setting==0) color = Color.GREEN;
-    if (setting==1) color = Color.RED;
-    if (setting==2) color = Color.BLUE;
-    if (setting==3) color = Color.YELLOW;
-    if (setting==4) color = Color.MAGENTA;
-
-    return color;
+    if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
+    if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
   }
 
   public void setMode(int mode) {

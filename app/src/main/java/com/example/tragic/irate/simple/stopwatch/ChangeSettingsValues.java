@@ -1,5 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.util.Log;
@@ -11,13 +12,6 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 
 public class ChangeSettingsValues {
-
-    int SOUND_SETTINGS = 1;
-    int COLOR_SETTINGS = 2;
-    int ABOUT_SETTINGS = 3;
-
-    int mSettingToChange;
-    int mValueOfSetting;
 
     public ChangeSettingsValues() {
     }
@@ -61,6 +55,9 @@ public class ChangeSettingsValues {
         if (setting.equals("magenta_setting")) {
             assignedValue = 4;
         }
+        if (setting.equals("cyan_setting")) {
+            assignedValue = 5;
+        }
         return assignedValue;
     }
 
@@ -79,6 +76,19 @@ public class ChangeSettingsValues {
         }
 
         return chosenVibration;
+    }
+
+    public int assignColor(int setting) {
+        int color = 0;
+
+        if (setting==0) color = Color.GREEN;
+        if (setting==1) color = Color.RED;
+        if (setting==2) color = Color.BLUE;
+        if (setting==3) color = Color.YELLOW;
+        if (setting==4) color = Color.MAGENTA;
+        if (setting==5) color = Color.CYAN;
+
+        return color;
     }
 
 }

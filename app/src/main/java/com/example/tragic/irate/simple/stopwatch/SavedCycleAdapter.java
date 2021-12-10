@@ -37,23 +37,38 @@ import java.util.List;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
   Context mContext;
+
   ArrayList<String> mWorkoutList;
   ArrayList<String> mRoundType;
   ArrayList<String> mWorkoutTitle;
+
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
   onResumeOrResetCycle mOnResumeOrResetCycle;
+
   int RESUMING_CYCLE_FROM_TIMER = 1;
   int RESETTING_CYCLE_FROM_TIMER = 2;
+
   boolean mHighlightDeleted;
   boolean mHighlightMode;
+
   List<String> mPositionList;
   CharSequence permSpan;
   Spannable span;
   ImageSpan imageSpan;
+
   boolean mActiveCycle;
   int mPositionOfActiveCycle;
   int mNumberOfRoundsCompleted;
+
+  ChangeSettingsValues changeSettingsValues;
+  int SET_COLOR;
+  int BREAK_COLOR;
+
+  public void changeColorSetting(int typeOFRound, int settingNumber) {
+    if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
+    if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+  }
 
   public boolean isCycleActive() {
     return mActiveCycle;
@@ -94,6 +109,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
     mHighlightDeleted = false;
+
+    changeSettingsValues = new ChangeSettingsValues();
   }
 
   public void removeHighlight(boolean cancelMode) {
@@ -181,9 +198,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
       if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
-        span.setSpan(new ForegroundColorSpan(Color.GREEN), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        span.setSpan(new ForegroundColorSpan(SET_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       } else
-        span.setSpan(new ForegroundColorSpan(Color.RED), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        span.setSpan(new ForegroundColorSpan(BREAK_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
       if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
         //If using infinity drawable, increase its size.
