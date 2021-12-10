@@ -134,11 +134,4 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         return (String) settingsList[entry];
     }
 
-//    private String summaryTextChange(CharSequence[] settingsList, int entry) {
-//        if (entry>=1) {
-//            return (String) settingsList[entry-1];
-//        } else {
-//            return "";
-//        }
-//    }
 }

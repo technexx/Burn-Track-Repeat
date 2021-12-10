@@ -94,13 +94,13 @@ public class DotDraws extends View {
   }
 
   public int assignColor(int setting) {
-    int color = 1;
+    int color = 0;
 
-    if (setting==1) color = Color.GREEN;
-    if (setting==2) color = Color.RED;
-    if (setting==3) color = Color.BLUE;
-    if (setting==4) color = Color.YELLOW;
-    if (setting==5) color = Color.MAGENTA;
+    if (setting==0) color = Color.GREEN;
+    if (setting==1) color = Color.RED;
+    if (setting==2) color = Color.BLUE;
+    if (setting==3) color = Color.YELLOW;
+    if (setting==4) color = Color.MAGENTA;
 
     return color;
   }

@@ -24,40 +24,42 @@ public class ChangeSettingsValues {
 
     public int assignSoundSettingNumericValue(String setting) {
         int assignedValue = 0;
+
         if (setting.equals("silent")) {
-            assignedValue = 1;
+            assignedValue = 0;
         }
         if (setting.equals("vibrate_once")) {
-            assignedValue = 2;
+            assignedValue = 1;
         }
         if (setting.equals("vibrate_twice")) {
-            assignedValue = 3;
+            assignedValue = 2;
         }
         if (setting.equals("vibrate_thrice")) {
-            assignedValue = 4;
+            assignedValue = 3;
         }
         if (setting.equals("use_ringtone")) {
-            assignedValue = 5;
+            assignedValue = 4;
         }
         return assignedValue;
     }
 
     public int assignColorSettingNumericValue(String setting) {
         int assignedValue = 0;
+
         if (setting.equals("green_setting")) {
-            assignedValue = 1;
+            assignedValue = 0;
         }
         if (setting.equals("red_setting")) {
-            assignedValue = 2;
+            assignedValue = 1;
         }
         if (setting.equals("blue_setting")) {
-            assignedValue = 3;
+            assignedValue = 2;
         }
         if (setting.equals("yellow_setting")) {
-            assignedValue = 4;
+            assignedValue = 3;
         }
         if (setting.equals("magenta_setting")) {
-            assignedValue = 5;
+            assignedValue = 4;
         }
         return assignedValue;
     }

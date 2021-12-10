@@ -901,7 +901,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setDefaultTimerValuesAndTheirEditTextViews();
     setEditPopUpTimerHeaders(1);
     instantiateNotifications();
-    setDefaultSettings();
+    setDefaultSettings();dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
 
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -3331,17 +3331,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void assignSoundSettingVariableNumbers(int typeOfRound, int settingNumber) {
     switch (typeOfRound) {
-      case 1:
+      case 0:
         vibrationSettingForSets = settingNumber; break;
-      case 2:
+      case 1:
         vibrationSettingForBreaks = settingNumber; break;
-      case 3:
+      case 2:
         vibrationSettingForLastRound = settingNumber; break;
-      case 4:
+      case 3:
         vibrationSettingForWork = settingNumber; break;
-      case 5:
+      case 4:
         vibrationSettingForMiniBreaks = settingNumber; break;
-      case 6:
+      case 5:
         vibrationSettingForFullBreak = settingNumber; break;
     }
   }
