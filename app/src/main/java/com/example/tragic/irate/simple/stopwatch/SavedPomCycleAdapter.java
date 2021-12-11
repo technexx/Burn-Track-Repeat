@@ -24,20 +24,34 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     Context mContext;
     ArrayList<String> mPomList;
     ArrayList<String> mPomTitle;
+
     onCycleClickListener mOnCycleClickListener;
     onHighlightListener mOnHighlightListener;
+    onResumeOrResetCycle mOnResumeOrResetCycle;
 
     Spannable pomSpan;
     boolean mHighlightDeleted;
     boolean mHighlightMode;
+
     List<String> mPositionList;
     ArrayList<Integer> mSizeToggle = new ArrayList<>();
-    onResumeOrResetCycle mOnResumeOrResetCycle;
     int RESUMING_CYCLE_FROM_TIMER = 1;
     int RESETTING_CYCLE_FROM_TIMER = 2;
+
     boolean mActiveCycle;
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
+
+    ChangeSettingsValues changeSettingsValues;
+    int WORK_COLOR;
+    int BREAK_COLOR;
+    int REST_COLOR;
+
+    public void changeColorSetting(int typeOFRound, int settingNumber) {
+        if (typeOFRound==1) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==3) REST_COLOR = changeSettingsValues.assignColor(settingNumber);
+    }
 
     public boolean isCycleActive() {
         return mActiveCycle;

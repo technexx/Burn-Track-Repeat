@@ -506,9 +506,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
-  public void changeColorSetting(int typeOFRound, int settingNumber) {
+  public void changeColorSetting(int mode, int typeOFRound, int settingNumber) {
     dotDraws.changeColorSetting(typeOFRound, settingNumber);
-    savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
+    //Todo: May need separate callback. Mode won't help as a conditional since the same callback is used in all prefFrag onClicks.
+    if (mode==1) savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
+    if (mode==3) savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
   }
 
 

@@ -59,7 +59,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   CharSequence permSpan;
   Spannable span;
   ImageSpan imageSpan;
-  ImageSpan imageSpanTwo;
 
   boolean mActiveCycle;
   int mPositionOfActiveCycle;
@@ -195,7 +194,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           tempSpace = 1;
         }
 
-        //Todo: This works. Take it out of this loop and set it properly based on settings callback.
         //If roundType is 2 (sets), use green infinity drawable for ImageSpan. If roundType is 4 (breaks), use red.
         if (tempTypeArray[j].contains("2")) {
           imageSpan = setColorOnInfinityImageSpan(SET_COLOR, R.drawable.infinity_small_green);

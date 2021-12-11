@@ -45,6 +45,14 @@
             android:entryValues="@array/color_setting_option_values"
             android:defaultValue="">
         </ListPreference>
+
+        <ListPreference
+            android:key="colorSettingForFullBreak"
+            android:title="Rest"
+            android:entries="@array/color_setting_options"
+            android:entryValues="@array/color_setting_option_values"
+            android:defaultValue="">
+        </ListPreference>
     </PreferenceCategory>
 
 </PreferenceScreen>
