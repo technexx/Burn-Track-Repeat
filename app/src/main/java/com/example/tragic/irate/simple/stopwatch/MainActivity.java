@@ -416,8 +416,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Colors work except for on app launch when they're black.
-  //Todo: Still need to resolve empty summary @ app start. We're out of index bounds using a method that doesn't subtract 1.
+  //Todo: Also, remember that edit cycles uses green/red as well. May be easier to just stick w/ changing dot colors.
+  //Todo: Infinity signs will need their backgrounds changed to match colors. Also, use alpha values for "finished" rounds instead of diff. colors.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.

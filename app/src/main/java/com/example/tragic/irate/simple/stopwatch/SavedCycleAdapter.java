@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -24,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,6 +59,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   CharSequence permSpan;
   Spannable span;
   ImageSpan imageSpan;
+  ImageSpan imageSpanTwo;
 
   boolean mActiveCycle;
   int mPositionOfActiveCycle;
@@ -190,10 +194,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           span = new SpannableString("  " + bullet);
           tempSpace = 1;
         }
+
+        //Todo: This works. Take it out of this loop and set it properly based on settings callback.
         //If roundType is 2 (sets), use green infinity drawable for ImageSpan. If roundType is 4 (breaks), use red.
-        if (tempTypeArray[j].contains("2"))
-          imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_green);
-        else imageSpan = new ImageSpan(mContext, R.drawable.infinity_small_red);
+        if (tempTypeArray[j].contains("2")) {
+          imageSpan = setColorOnInfinityImageSpan(SET_COLOR, R.drawable.infinity_small_green);
+        } else {
+          imageSpan = setColorOnInfinityImageSpan(BREAK_COLOR, R.drawable.infinity_small_red);
+        }
       }
 
       //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
@@ -207,8 +215,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         span.setSpan(new AbsoluteSizeSpan(18, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         //Setting our Spannable, which can be concatenated w/ permSpan object in TextUtils below, to our imageSpan. We run from index 1-2 inclusive because 0 is used as an empty separator space (see: original Spannable span creation above).
         //Using different placement of image in spannable for first round, since we do not want it spaced out (i.e. indented).
-        if (j != 0) span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        else span.setSpan(imageSpan, 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        if (j != 0) {
+          span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        }
+        else {
+          span.setSpan(imageSpan, 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        }
       }
 
       //If a cycle is active, change color of completed rounds to "greyed out" version of original color.
@@ -369,4 +381,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else if (totalSeconds >=10) return "0:" + totalSeconds;
     else return "0:0" + totalSeconds;
   }
+
+  public ImageSpan setColorOnInfinityImageSpan(int color, int drawable) {
+    ImageSpan imageSpan = new ImageSpan(mContext, drawable);
+    Drawable tempDrawable = imageSpan.getDrawable();
+
+    tempDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+    imageSpan = new ImageSpan(tempDrawable);
+
+    return imageSpan;
+  }
+
 }
