@@ -137,13 +137,11 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         pomSpan = new SpannableString(tempPom);
 
         mSizeToggle = retrievedRoundSizeFromConcatenatedString(tempPom, " " + mContext.getString(R.string.bullet) + " ");
-//        Log.i("testList", "size toggle is " + mSizeToggle);
 
         int moving = 0;
         int rangeStart = 0;
         int rangeEnd = 4;
 
-        //Todo: Easier solution is just to use XX:XX for everything!
         for (int i=0; i<8; i++) {
             if (mSizeToggle.get(i)==5) rangeEnd = 5;
             if (moving+rangeEnd<=pomSpan.length()) {
@@ -162,8 +160,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
         pomHolder.pomView.setText(pomSpan);
 
-//        Log.i("testList", "span length is " + pomSpan.length());
-//        Log.i("testList", "setting length is " + (moving+rangeEnd));
 
         if (mHighlightDeleted) {
             //Clears highlight list.

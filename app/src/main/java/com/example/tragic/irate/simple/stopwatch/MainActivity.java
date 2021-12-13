@@ -416,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Also, remember that edit cycles uses green/red as well. May be easier to just stick w/ changing dot colors.
+  //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Infinity signs will need their backgrounds changed to match colors. Also, use alpha values for "finished" rounds instead of diff. colors.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -508,7 +508,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void changeColorSetting(int mode, int typeOFRound, int settingNumber) {
     dotDraws.changeColorSetting(typeOFRound, settingNumber);
-    //Todo: May need separate callback. Mode won't help as a conditional since the same callback is used in all prefFrag onClicks.
     if (mode==1) savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
     if (mode==3) savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
   }
