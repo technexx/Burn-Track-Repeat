@@ -45,7 +45,7 @@ public class DotDraws extends View {
   boolean mAddSubFade;
   boolean mFadeUp;
 
-  ChangeSettingsValues changeSettingsValues;
+  ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
   int SET_COLOR;
   int BREAK_COLOR;
 
@@ -63,7 +63,6 @@ public class DotDraws extends View {
     setWillNotDraw(false);
 
     setupPaint();
-    changeSettingsValues = new ChangeSettingsValues();
   }
 
   public void setAlpha(int alpha) {
