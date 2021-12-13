@@ -1961,6 +1961,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotDraws.changeColorSetting(1, defaultSetColor);
     dotDraws.changeColorSetting(2, defaultBreakColor);
+    dotDraws.changeColorSetting(3, defaultWorkColor);
+    dotDraws.changeColorSetting(4, defaultMiniBreakColor);
+    dotDraws.changeColorSetting(5, defaultFullBreakColor);
 
     savedCycleAdapter.changeColorSetting(1, defaultSetColor);
     savedCycleAdapter.changeColorSetting(2, defaultBreakColor);
