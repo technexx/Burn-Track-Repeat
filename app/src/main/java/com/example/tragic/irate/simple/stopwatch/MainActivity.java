@@ -1966,7 +1966,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     savedPomCycleAdapter.changeColorSetting(1, defaultWorkColor);
     savedPomCycleAdapter.changeColorSetting(2, defaultMiniBreakColor);
-    savedPomCycleAdapter.changeColorSetting(1, defaultFullBreakColor);
+    savedPomCycleAdapter.changeColorSetting(3, defaultFullBreakColor);
   }
 
   public void saveCycleOnPopUpDismissIfEdited() {
