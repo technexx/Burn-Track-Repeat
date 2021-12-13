@@ -42,7 +42,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
 
-    ChangeSettingsValues changeSettingsValues;
+    ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
     int WORK_COLOR;
     int BREAK_COLOR;
     int REST_COLOR;
@@ -145,8 +145,16 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         for (int i=0; i<8; i++) {
             if (mSizeToggle.get(i)==5) rangeEnd = 5;
             if (moving+rangeEnd<=pomSpan.length()) {
-                if (i%2==0) pomSpan.setSpan(new ForegroundColorSpan(Color.GREEN), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                else pomSpan.setSpan(new ForegroundColorSpan(Color.RED), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                if (i!=7) {
+                    if (i%2==0) {
+                        pomSpan.setSpan(new ForegroundColorSpan(WORK_COLOR), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    }
+                    else {
+                        pomSpan.setSpan(new ForegroundColorSpan(BREAK_COLOR), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    }
+                } else {
+                    pomSpan.setSpan(new ForegroundColorSpan(REST_COLOR), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                }
             }
             if (mActiveCycle) {
                 if (position==mPositionOfActiveCycle) {

@@ -392,10 +392,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int vibrationSettingForSets;
   int vibrationSettingForBreaks;
-  int vibrationSettingForLastRound;
+  boolean isLastRoundSoundContinuous;
   int vibrationSettingForWork;
   int vibrationSettingForMiniBreaks;
-  int vibrationSettingForFullBreak;
+  boolean isFullBreakSoundContinuous;
 
   Uri ringToneUri;
   MediaPlayer mediaPlayer;
@@ -931,7 +931,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.setHighlight(MainActivity.this);
         savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
 
-        //Calling this by default, so any launch of Main will update our cycle list, since populateCycleList(), called after adapter is instantiated, is what populates our arrays.
         savedCycleAdapter.notifyDataSetChanged();
 
         setDefaultSettings();
@@ -1927,29 +1926,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setDefaultSettings() {
-    //Todo: Retrieve boolean for Continuous for last round on modes 1/3. Can simply assign true/false here based on return.
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
 
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
     String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+    boolean defaultSoundSettingForLastRound = prefShared.getBoolean("soundSettingForLastRound", true);
+
     String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "");
     String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "");
+    boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForFullBreak", true);
 
     String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "");
     String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "");
 
+    String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "");
+    String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "");
+    String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "");
+
     vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
+    isLastRoundSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForLastRound);
+
     vibrationSettingForWork  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
     vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
+    isFullBreakSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForFullBreak);
 
     int defaultSetColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
     int defaultBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
 
+    int defaultWorkColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForWork);
+    int defaultMiniBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForMiniBreak);
+    int defaultFullBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForFullBreak);
+
     dotDraws.changeColorSetting(1, defaultSetColor);
     dotDraws.changeColorSetting(2, defaultBreakColor);
+
     savedCycleAdapter.changeColorSetting(1, defaultSetColor);
     savedCycleAdapter.changeColorSetting(2, defaultBreakColor);
+
+    savedPomCycleAdapter.changeColorSetting(1, defaultWorkColor);
+    savedPomCycleAdapter.changeColorSetting(2, defaultMiniBreakColor);
+    savedPomCycleAdapter.changeColorSetting(1, defaultFullBreakColor);
   }
 
   public void saveCycleOnPopUpDismissIfEdited() {
@@ -3090,28 +3107,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timeLeft.setText("0");
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
 
-          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForSets, false);
           break;
         case 2:
           mHandler.removeCallbacks(infinityRunnableForSets);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
 
-          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForSets, false);
           break;
         case 3:
           timeLeft.setText("0");
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
 
-          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForBreaks, false);
           break;
         case 4:
           mHandler.removeCallbacks(infinityRunnableForBreaks);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
 
-          if (numberOfRoundsLeft==1 && vibrationSettingForLastRound == 1) isAlertRepeating = true;
+          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForBreaks, false);
           break;
       }
@@ -3138,8 +3155,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
 
           boolean isAlertRepeating = false;
-          if (vibrationSettingForFullBreak == 1) isAlertRepeating = true;
-          setEndOfRoundSounds(vibrationSettingForFullBreak, isAlertRepeating);
+          if (isFullBreakSoundContinuous) isAlertRepeating = true;
+          setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
       }
       if (pomDotCounter==8) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
@@ -3341,14 +3358,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         vibrationSettingForSets = settingNumber; break;
       case 1:
         vibrationSettingForBreaks = settingNumber; break;
-      case 2:
-        vibrationSettingForLastRound = settingNumber; break;
       case 3:
         vibrationSettingForWork = settingNumber; break;
       case 4:
         vibrationSettingForMiniBreaks = settingNumber; break;
-      case 5:
-        vibrationSettingForFullBreak = settingNumber; break;
     }
   }
 

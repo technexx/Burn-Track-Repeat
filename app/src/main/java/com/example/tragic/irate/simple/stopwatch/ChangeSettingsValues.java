@@ -37,6 +37,10 @@ public class ChangeSettingsValues {
         return assignedValue;
     }
 
+    public boolean assignFinalRoundSwitchValue(boolean setting) {
+        return setting;
+    }
+
     public int assignColorSettingNumericValue(String setting) {
         int assignedValue = 0;
 

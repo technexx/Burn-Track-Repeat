@@ -64,7 +64,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int mPositionOfActiveCycle;
   int mNumberOfRoundsCompleted;
 
-  ChangeSettingsValues changeSettingsValues;
+  ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
   int SET_COLOR;
   int BREAK_COLOR;
 
@@ -112,8 +112,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
     mHighlightDeleted = false;
-
-    changeSettingsValues = new ChangeSettingsValues();
   }
 
   public void removeHighlight(boolean cancelMode) {
