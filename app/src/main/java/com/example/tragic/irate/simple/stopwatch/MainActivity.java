@@ -2137,13 +2137,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Todo: This b0rks adding rounds because of new colors.
-  public void toggleInfinityModeAndSetRoundType() {
+  public void toggleInfinityModeAndSetRoundType(int headerSelected) {
     if (mode==1) {
-      if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
+      if (headerSelected==1) {
         if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
         setAndCapTimerValues(setValue);
       }
-      if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
+      if (headerSelected==2) {
         if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
         setAndCapTimerValues(breakValue);
       }
@@ -2666,20 +2666,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
         if (workoutTime.size()<16) {
-          toggleInfinityModeAndSetRoundType();
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
               editPopUpTimerArray = convertIntegerToStringArray(setValue);
               setEditPopUpTimerValues();
+              toggleInfinityModeAndSetRoundType(1);
               break;
+            case 2:
+              addOrReplaceRounds(0, roundIsSelected);
+              toggleInfinityModeAndSetRoundType(1);
             case 3:
               addOrReplaceRounds(breakValue, roundIsSelected);
               editPopUpTimerArray = convertIntegerToStringArray(breakValue);
               setEditPopUpTimerValues();
+              toggleInfinityModeAndSetRoundType(2);
               break;
-            case 2: case 4:
+            case 4:
               addOrReplaceRounds(0, roundIsSelected);
+              toggleInfinityModeAndSetRoundType(2);
               break;
             default:
               //Returns from method so we don't add a roundType entry to our list, and the list stays in sync w/ the rounds we are actually adding.
