@@ -385,5 +385,4 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     return imageSpan;
   }
-
 }

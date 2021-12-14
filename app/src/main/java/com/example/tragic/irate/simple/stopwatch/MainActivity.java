@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Change edit colors to match color settings.
+  //Todo: Edit colors work except for first launching edit popUp
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -1937,20 +1937,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void setDefaultSettings() {
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
 
-    String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "");
-    String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "");
+    String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
+    String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
     boolean defaultSoundSettingForLastRound = prefShared.getBoolean("soundSettingForLastRound", true);
 
-    String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "");
-    String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "");
+    String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
+    String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "vibrate_once");
     boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForFullBreak", true);
 
-    String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "");
-    String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "");
+    String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "green_setting");
+    String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "red_setting");
 
-    String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "");
-    String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "");
-    String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "");
+    String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
+    String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
+    String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "magenta_setting");
 
     vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
@@ -1960,12 +1960,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
     isFullBreakSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForFullBreak);
 
-    setColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
-    breakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
-
-    workColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForWork);
-    miniBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForMiniBreak);
-    fullBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForFullBreak);
+    int setColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
+    int breakColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
+    int workColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForWork);
+    int miniBreakColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForMiniBreak);
+    int fullBreakColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForFullBreak);
+    setColor = changeSettingsValues.assignColor(setColorNumericValue);
+    breakColor = changeSettingsValues.assignColor(breakColorNumericValue);
+    workColor = changeSettingsValues.assignColor(workColorNumericValue);
+    miniBreakColor = changeSettingsValues.assignColor(miniBreakColorNumericValue);
+    fullBreakColor = changeSettingsValues.assignColor(fullBreakColorNumericValue);
 
     dotDraws.changeColorSetting(1, setColor);
     dotDraws.changeColorSetting(2, breakColor);
@@ -1973,12 +1977,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws.changeColorSetting(4, miniBreakColor);
     dotDraws.changeColorSetting(5, fullBreakColor);
 
-    savedCycleAdapter.changeColorSetting(1, setColor);
-    savedCycleAdapter.changeColorSetting(2, breakColor);
+    savedCycleAdapter.changeColorSetting(1, setColorNumericValue);
+    savedCycleAdapter.changeColorSetting(2, breakColorNumericValue);
 
-    savedPomCycleAdapter.changeColorSetting(1, workColor);
-    savedPomCycleAdapter.changeColorSetting(2, miniBreakColor);
-    savedPomCycleAdapter.changeColorSetting(3, fullBreakColor);
+    savedPomCycleAdapter.changeColorSetting(1, workColorNumericValue);
+    savedPomCycleAdapter.changeColorSetting(2, miniBreakColorNumericValue);
+    savedPomCycleAdapter.changeColorSetting(3, fullBreakColorNumericValue);
   }
 
   public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
@@ -2002,17 +2006,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void assignColorSettingValues(int typeOfRound, int settingsNumber) {
+    int color = changeSettingsValues.assignColor(settingsNumber);
     switch (typeOfRound) {
       case 1:
-        setColor = settingsNumber; break;
+        setColor = color; break;
       case 2:
-        breakColor = settingsNumber; break;
+        breakColor = color; break;
       case 3:
-        workColor = settingsNumber; break;
+        workColor = color; break;
       case 4:
-        miniBreakColor = settingsNumber; break;
+        miniBreakColor = color; break;
       case 5:
-        fullBreakColor = settingsNumber; break;
+        fullBreakColor = color; break;
     }
   }
 
@@ -2069,46 +2074,56 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Need to use different modes here now.
   public void setEditPopUpTimerHeaders(int headerToSelect) {
-    if (headerToSelect == 1) {
-      //If first row is highlighted, second row should un-highlight.
-      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GREEN);
-      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      editHeaderSelected = 1;
-
-      if (mode==1) {
-        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
-        editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
-      }
-    }
-
-    if (headerToSelect == 2) {
-      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.RED);
-      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      editHeaderSelected = 2;
-
-      if (mode==1) {
-        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
-        editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
-      }
-    }
-
-    if (headerToSelect == 3) {
-      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      thirdRoundTypeHeaderInEditPopUp.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple));
-      editHeaderSelected = 3;
-    }
-
+    //For any header clicked within first mode.
     if (mode==1) {
       String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       timerValueInEditPopUpTextView.setText(savedTimerString);
 
       int totalTime = convertStringToSecondsValue(savedTimerString);
       setAndCapTimerValues(totalTime);
+    }
+
+    if (headerToSelect == 1) {
+      if (mode==1) {
+        firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
+
+        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
+        editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
+      }
+
+      if (mode==3) {
+        firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
+      }
+
+      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      editHeaderSelected = 1;
+    }
+
+    if (headerToSelect == 2) {
+      if (mode==1) {
+        secondRoundTypeHeaderInEditPopUp.setTextColor(breakColor);
+
+        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
+        editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
+      }
+
+      if (mode==3) {
+        secondRoundTypeHeaderInEditPopUp.setTextColor(miniBreakColor);
+      }
+
+      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      editHeaderSelected = 2;
+
+    }
+
+    if (headerToSelect == 3) {
+      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(fullBreakColor);
+      editHeaderSelected = 3;
     }
 
     changeEditTimerTextViewColorIfNotEmpty();
