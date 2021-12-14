@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Edit colors work except for first launching edit popUp
+  //Todo: Set round adapter array colors as well.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -911,7 +911,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
     setDefaultTimerValuesAndTheirEditTextViews();
-    setEditPopUpTimerHeaders(1);
     instantiateNotifications();
 
     AsyncTask.execute(() -> {
@@ -1159,11 +1158,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dotDraws.setMode(mode);
     });
 
-     editCyclesPopupView.setOnClickListener(v-> {
-      //Hides soft keyboard by using a token of the current editCycleView.
-      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-    });
-
     editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
@@ -1175,6 +1169,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
 
         assignOldCycleValuesToCheckForChanges();
+        setEditPopUpTimerHeaders(1);
       }
     });
 
@@ -2074,6 +2069,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: this is probably called before default values.
   public void setEditPopUpTimerHeaders(int headerToSelect) {
     //For any header clicked within first mode.
     if (mode==1) {
