@@ -397,6 +397,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int vibrationSettingForMiniBreaks;
   boolean isFullBreakSoundContinuous;
 
+  int setColor;
+  int breakColor;
+  int workColor;
+  int miniBreakColor;
+  int fullBreakColor;
+
   Uri ringToneUri;
   MediaPlayer mediaPlayer;
   AudioManager audioManager;
@@ -416,7 +422,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Change dotDraws for Pom to match color settings.
   //Todo: Change edit colors to match color settings.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
@@ -503,14 +508,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void changeSoundSetting(int typeOfRound, int settingNumber) {
-    assignSoundSettingVariableNumbers(typeOfRound, settingNumber);
+    assignSoundSettingValues(typeOfRound, settingNumber);
   }
 
   @Override
   public void changeColorSetting(int mode, int typeOFRound, int settingNumber) {
     dotDraws.changeColorSetting(typeOFRound, settingNumber);
+
     if (mode==1) savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
     if (mode==3) savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
+
+    assignColorSettingValues(typeOFRound, settingNumber);
   }
 
 
@@ -1952,25 +1960,73 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
     isFullBreakSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForFullBreak);
 
-    int defaultSetColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
-    int defaultBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
+    setColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
+    breakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
 
-    int defaultWorkColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForWork);
-    int defaultMiniBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForMiniBreak);
-    int defaultFullBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForFullBreak);
+    workColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForWork);
+    miniBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForMiniBreak);
+    fullBreakColor = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForFullBreak);
 
-    dotDraws.changeColorSetting(1, defaultSetColor);
-    dotDraws.changeColorSetting(2, defaultBreakColor);
-    dotDraws.changeColorSetting(3, defaultWorkColor);
-    dotDraws.changeColorSetting(4, defaultMiniBreakColor);
-    dotDraws.changeColorSetting(5, defaultFullBreakColor);
+    dotDraws.changeColorSetting(1, setColor);
+    dotDraws.changeColorSetting(2, breakColor);
+    dotDraws.changeColorSetting(3, workColor);
+    dotDraws.changeColorSetting(4, miniBreakColor);
+    dotDraws.changeColorSetting(5, fullBreakColor);
 
-    savedCycleAdapter.changeColorSetting(1, defaultSetColor);
-    savedCycleAdapter.changeColorSetting(2, defaultBreakColor);
+    savedCycleAdapter.changeColorSetting(1, setColor);
+    savedCycleAdapter.changeColorSetting(2, breakColor);
 
-    savedPomCycleAdapter.changeColorSetting(1, defaultWorkColor);
-    savedPomCycleAdapter.changeColorSetting(2, defaultMiniBreakColor);
-    savedPomCycleAdapter.changeColorSetting(3, defaultFullBreakColor);
+    savedPomCycleAdapter.changeColorSetting(1, workColor);
+    savedPomCycleAdapter.changeColorSetting(2, miniBreakColor);
+    savedPomCycleAdapter.changeColorSetting(3, fullBreakColor);
+  }
+
+  public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
+    switch (vibrationSetting) {
+      case 2: case 3: case 4:
+        if (repeat) {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+        } else {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+        }
+        break;
+      case 5:
+        if (!repeat) {
+          mediaPlayer.setLooping(false);
+        } else {
+          mediaPlayer.setLooping(true);
+        }
+        mediaPlayer.start();
+        break;
+    }
+  }
+
+  public void assignColorSettingValues(int typeOfRound, int settingsNumber) {
+    switch (typeOfRound) {
+      case 1:
+        setColor = settingsNumber; break;
+      case 2:
+        breakColor = settingsNumber; break;
+      case 3:
+        workColor = settingsNumber; break;
+      case 4:
+        miniBreakColor = settingsNumber; break;
+      case 5:
+        fullBreakColor = settingsNumber; break;
+    }
+  }
+
+  public void assignSoundSettingValues(int typeOfRound, int settingNumber) {
+    switch (typeOfRound) {
+      case 0:
+        vibrationSettingForSets = settingNumber; break;
+      case 1:
+        vibrationSettingForBreaks = settingNumber; break;
+      case 3:
+        vibrationSettingForWork = settingNumber; break;
+      case 4:
+        vibrationSettingForMiniBreaks = settingNumber; break;
+    }
   }
 
   public void saveCycleOnPopUpDismissIfEdited() {
@@ -2013,6 +2069,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Need to use different modes here now.
   public void setEditPopUpTimerHeaders(int headerToSelect) {
     if (headerToSelect == 1) {
       //If first row is highlighted, second row should un-highlight.
@@ -3334,39 +3391,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
     sizeAnimator.setRepeatCount(0);
     sizeAnimator.start();
-  }
-
-  public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-    switch (vibrationSetting) {
-      case 2: case 3: case 4:
-        if (repeat) {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-        } else {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-        }
-        break;
-      case 5:
-        if (!repeat) {
-          mediaPlayer.setLooping(false);
-        } else {
-          mediaPlayer.setLooping(true);
-        }
-        mediaPlayer.start();
-        break;
-    }
-  }
-
-  public void assignSoundSettingVariableNumbers(int typeOfRound, int settingNumber) {
-    switch (typeOfRound) {
-      case 0:
-        vibrationSettingForSets = settingNumber; break;
-      case 1:
-        vibrationSettingForBreaks = settingNumber; break;
-      case 3:
-        vibrationSettingForWork = settingNumber; break;
-      case 4:
-        vibrationSettingForMiniBreaks = settingNumber; break;
-    }
   }
 
   public void newLap() {

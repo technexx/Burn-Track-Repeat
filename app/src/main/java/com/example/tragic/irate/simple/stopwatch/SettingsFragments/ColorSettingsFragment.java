@@ -97,7 +97,7 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
             int workValue = convertColorSettingObjectToInteger(newValue);
             mOnChangedColorSetting.changeColorSetting(3, WORK_SETTING, workValue);
 
-            String entryString = summaryTextChange(colorEntryListForBreaks, workValue);
+            String entryString = summaryTextChange(colorEntryListForWork, workValue);
             workPreference.setSummary(entryString);
             return true;
         });
