@@ -424,15 +424,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Pom dots are drawn as infinity circles.
+  //Todo: Round adapters alignment.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
-  //Todo: Pom cycle color spannable works w/ current min/max caps, but won't if we drop another type of round beneath 10 minutes (i.e. one less digit). Change to XX:XX should be set on both modes.
 
-  //Todo: Settings: Color change setting for dots.
   //Todo: TDEE in sep popup w/ tabs.
   //Todo: Add color scheme options.
   //Todo: Rename app, of course.
@@ -488,9 +486,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
-              //This removes screen flashing, and commented out transition will give us a fade instead.
               .addToBackStack(null)
-//              .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
     }
@@ -514,12 +510,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
-  public void changeColorSetting(int mode, int typeOFRound, int settingNumber) {
+  public void changeColorSetting(int receivedMode, int typeOFRound, int settingNumber) {
+
+    cycleRoundsAdapter.changeColorSetting(typeOFRound, settingNumber);
+    if (receivedMode==1) {
+      savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
+      cycleRoundsAdapterTwo.changeColorSetting(typeOFRound, settingNumber);
+      savedCycleAdapter.notifyDataSetChanged();
+    }
+
+    if (receivedMode==3) {
+      savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+
     dotDraws.changeColorSetting(typeOFRound, settingNumber);
-
-    if (mode==1) savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
-    if (mode==3) savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
-
     assignColorSettingValues(typeOFRound, settingNumber);
   }
 
@@ -1979,14 +1984,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.changeColorSetting(3, workColorNumericValue);
     cycleRoundsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
     cycleRoundsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
-
+    cycleRoundsAdapterTwo.changeColorSetting(1, setColorNumericValue);
+    cycleRoundsAdapterTwo.changeColorSetting(2, setColorNumericValue);
 
     savedCycleAdapter.changeColorSetting(1, setColorNumericValue);
     savedCycleAdapter.changeColorSetting(2, breakColorNumericValue);
 
-    savedPomCycleAdapter.changeColorSetting(1, workColorNumericValue);
-    savedPomCycleAdapter.changeColorSetting(2, miniBreakColorNumericValue);
-    savedPomCycleAdapter.changeColorSetting(3, fullBreakColorNumericValue);
+    savedPomCycleAdapter.changeColorSetting(3, workColorNumericValue);
+    savedPomCycleAdapter.changeColorSetting(4, miniBreakColorNumericValue);
+    savedPomCycleAdapter.changeColorSetting(5, fullBreakColorNumericValue);
   }
 
   public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {

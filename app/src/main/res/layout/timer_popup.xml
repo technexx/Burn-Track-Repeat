@@ -82,10 +82,10 @@
         android:id="@+id/reset_total_times"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cycles_completed"
         app:layout_constraintStart_toEndOf="@id/total_set_header"
         app:layout_constraintEnd_toStartOf="@id/total_break_header"
-        android:layout_marginTop="20sp"
+        app:layout_constraintTop_toTopOf="@id/total_set_header"
+        app:layout_constraintBottom_toBottomOf="@id/total_set_header"
         android:background="@color/black"
         android:src="@drawable/reset_24">
     </ImageButton>
