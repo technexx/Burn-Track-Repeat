@@ -42,6 +42,10 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     boolean mRoundSelected;
     int mPositionOfSelectedRound;
 
+    ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
+    int SET_COLOR;
+    int BREAK_COLOR;
+
     public interface onFadeFinished {
         void subtractionFadeHasFinished();
     }
@@ -57,6 +61,14 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     public void selectedRound(onRoundSelected xOnRoundSelected) {
         this.mOnRoundSelected = xOnRoundSelected;
     }
+
+    public void changeColorSetting(int typeOFRound, int settingNumber) {
+        int color = changeSettingsValues.assignColor(settingNumber);
+
+        if (typeOFRound==1) SET_COLOR = color;
+        if (typeOFRound==2) BREAK_COLOR = color;
+    }
+
 
     public CycleRoundsAdapterTwo(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound) {
         this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound;
@@ -129,22 +141,22 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             case 1:
                 modeOneRounds.infinity_rounds.setVisibility(View.INVISIBLE);
                 modeOneRounds.workout_rounds.setVisibility(View.VISIBLE);
-                modeOneRounds.workout_rounds.setTextColor(Color.GREEN);
+                modeOneRounds.workout_rounds.setTextColor(SET_COLOR);
                 break;
             case 2:
                 modeOneRounds.infinity_rounds.setVisibility(View.VISIBLE);
                 modeOneRounds.workout_rounds.setVisibility(View.INVISIBLE);
-                modeOneRounds.infinity_rounds.setColorFilter(Color.GREEN);
+                modeOneRounds.infinity_rounds.setColorFilter(SET_COLOR);
                 break;
             case 3:
                 modeOneRounds.infinity_rounds.setVisibility(View.INVISIBLE);
                 modeOneRounds.workout_rounds.setVisibility(View.VISIBLE);
-                modeOneRounds.workout_rounds.setTextColor(Color.RED);
+                modeOneRounds.workout_rounds.setTextColor(SET_COLOR);
                 break;
             case 4:
                 modeOneRounds.workout_rounds.setVisibility(View.INVISIBLE);
                 modeOneRounds.infinity_rounds.setVisibility(View.VISIBLE);
-                modeOneRounds.infinity_rounds.setColorFilter(Color.RED);
+                modeOneRounds.infinity_rounds.setColorFilter(SET_COLOR);
                 break;
         }
 

@@ -424,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Set round adapter array colors and infinity as well.
+  //Todo: Set round adapter array colors.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -1204,6 +1204,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentlyEditingACycle = false;
       }
 
+      //Todo: Do we still need this?
       //Updates round adapters so lists show as cleared.
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -1968,11 +1969,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     miniBreakColor = changeSettingsValues.assignColor(miniBreakColorNumericValue);
     fullBreakColor = changeSettingsValues.assignColor(fullBreakColorNumericValue);
 
-    dotDraws.changeColorSetting(1, setColor);
-    dotDraws.changeColorSetting(2, breakColor);
-    dotDraws.changeColorSetting(3, workColor);
-    dotDraws.changeColorSetting(4, miniBreakColor);
-    dotDraws.changeColorSetting(5, fullBreakColor);
+    dotDraws.changeColorSetting(1, setColorNumericValue);
+    dotDraws.changeColorSetting(2, breakColorNumericValue);
+    dotDraws.changeColorSetting(3, workColorNumericValue);
+    dotDraws.changeColorSetting(4, miniBreakColorNumericValue);
+    dotDraws.changeColorSetting(5, fullBreakColorNumericValue);
+    cycleRoundsAdapter.changeColorSetting(1, setColorNumericValue);
+    cycleRoundsAdapter.changeColorSetting(2, breakColorNumericValue);
+    cycleRoundsAdapter.changeColorSetting(3, workColorNumericValue);
+    cycleRoundsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
+    cycleRoundsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
+
 
     savedCycleAdapter.changeColorSetting(1, setColorNumericValue);
     savedCycleAdapter.changeColorSetting(2, breakColorNumericValue);
@@ -2072,7 +2079,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEditPopUpTimerHeaders(int headerToSelect) {
-    //For any header clicked within first mode.
     if (mode==1) {
       String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       timerValueInEditPopUpTextView.setText(savedTimerString);
@@ -2136,30 +2142,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerValueInEditPopUpTextView.setText("00:00");
   }
 
-  //Todo: This b0rks adding rounds because of new colors.
-  public void toggleInfinityModeAndSetRoundType(int headerSelected) {
-    if (mode==1) {
-      if (headerSelected==1) {
-        if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
-        setAndCapTimerValues(setValue);
-      }
-      if (headerSelected==2) {
-        if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
-        setAndCapTimerValues(breakValue);
-      }
+  public void toggleInfinityModeAndSetRoundType() {
+    if (editHeaderSelected==1) {
+      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
+      setAndCapTimerValues(setValue);
     }
-
-    if (mode==3) {
-      setAndCapTimerValues(pomValue1);
-      setAndCapTimerValues(pomValue2);
-      setAndCapTimerValues(pomValue3);
-
-      if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
-      }
-      if (secondRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.RED) {
-      }
-      if (thirdRoundTypeHeaderInEditPopUp.getCurrentTextColor()==ContextCompat.getColor(getApplicationContext(), R.color.purple)) {
-      }
+    if (editHeaderSelected==2) {
+      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
+      setAndCapTimerValues(breakValue);
     }
   }
 
@@ -2666,25 +2656,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
         if (workoutTime.size()<16) {
+          toggleInfinityModeAndSetRoundType();
           switch (roundType) {
             case 1:
               addOrReplaceRounds(setValue, roundIsSelected);
               editPopUpTimerArray = convertIntegerToStringArray(setValue);
               setEditPopUpTimerValues();
-              toggleInfinityModeAndSetRoundType(1);
               break;
             case 2:
               addOrReplaceRounds(0, roundIsSelected);
-              toggleInfinityModeAndSetRoundType(1);
             case 3:
               addOrReplaceRounds(breakValue, roundIsSelected);
               editPopUpTimerArray = convertIntegerToStringArray(breakValue);
               setEditPopUpTimerValues();
-              toggleInfinityModeAndSetRoundType(2);
               break;
             case 4:
               addOrReplaceRounds(0, roundIsSelected);
-              toggleInfinityModeAndSetRoundType(2);
               break;
             default:
               //Returns from method so we don't add a roundType entry to our list, and the list stays in sync w/ the rounds we are actually adding.

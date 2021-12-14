@@ -49,6 +49,13 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   boolean mRoundSelected;
   int mPositionOfSelectedRound;
 
+  ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
+  int SET_COLOR;
+  int BREAK_COLOR;
+  int WORK_COLOR;
+  int MINI_BREAK_COLOR;
+  int FULL_BREAK_COLOR;
+
   public interface onFadeFinished {
     void subtractionFadeHasFinished();
   }
@@ -63,6 +70,16 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public void selectedRound(onRoundSelected xOnRoundSelected) {
     this.mOnRoundSelected = xOnRoundSelected;
+  }
+
+  public void changeColorSetting(int typeOFRound, int settingNumber) {
+    int color = changeSettingsValues.assignColor(settingNumber);
+
+    if (typeOFRound==1) SET_COLOR = color;
+    if (typeOFRound==2) BREAK_COLOR = color;
+    if (typeOFRound==3) WORK_COLOR = color;
+    if (typeOFRound==4) MINI_BREAK_COLOR = color;
+    if (typeOFRound==5) FULL_BREAK_COLOR = color;
   }
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
@@ -158,22 +175,22 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         case 1:
           modeOneRounds.infinity_rounds.setVisibility(View.INVISIBLE);
           modeOneRounds.workout_rounds.setVisibility(View.VISIBLE);
-          modeOneRounds.workout_rounds.setTextColor(Color.GREEN);
+          modeOneRounds.workout_rounds.setTextColor(SET_COLOR);
           break;
         case 2:
           modeOneRounds.infinity_rounds.setVisibility(View.VISIBLE);
           modeOneRounds.workout_rounds.setVisibility(View.INVISIBLE);
-          modeOneRounds.infinity_rounds.setColorFilter(Color.GREEN);
+          modeOneRounds.infinity_rounds.setColorFilter(SET_COLOR);
           break;
         case 3:
           modeOneRounds.infinity_rounds.setVisibility(View.INVISIBLE);
           modeOneRounds.workout_rounds.setVisibility(View.VISIBLE);
-          modeOneRounds.workout_rounds.setTextColor(Color.RED);
+          modeOneRounds.workout_rounds.setTextColor(BREAK_COLOR);
           break;
         case 4:
           modeOneRounds.workout_rounds.setVisibility(View.INVISIBLE);
           modeOneRounds.infinity_rounds.setVisibility(View.VISIBLE);
-          modeOneRounds.infinity_rounds.setColorFilter(Color.RED);
+          modeOneRounds.infinity_rounds.setColorFilter(BREAK_COLOR);
           break;
       }
 
@@ -201,7 +218,16 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       setAnimationThree(modeThreeRounds.round_pomodoro, position);
       //Sets work texts to green and break to red.
-      if (position%2==0) modeThreeRounds.round_pomodoro.setTextColor(Color.GREEN); else modeThreeRounds.round_pomodoro.setTextColor(Color.RED);
+      if (position != 7) {
+        if (position % 2 == 0){
+          modeThreeRounds.round_pomodoro.setTextColor(WORK_COLOR);
+        }
+        else {
+          modeThreeRounds.round_pomodoro.setTextColor(MINI_BREAK_COLOR);
+        }
+      } else {
+        modeThreeRounds.round_pomodoro.setTextColor(FULL_BREAK_COLOR);
+      }
     }
   }
 
