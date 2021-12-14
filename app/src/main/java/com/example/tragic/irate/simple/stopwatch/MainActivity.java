@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -422,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Set round adapter array colors as well.
+  //Todo: Set round adapter array colors and infinity as well.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -2069,7 +2071,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: this is probably called before default values.
   public void setEditPopUpTimerHeaders(int headerToSelect) {
     //For any header clicked within first mode.
     if (mode==1) {
@@ -2084,10 +2085,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
 
-        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_green);
+        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
+        newDraw.setColorFilter(setColor, PorterDuff.Mode.SRC_IN);
+        toggleInfinityRounds.setImageDrawable(newDraw);
+
         editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
       }
-
       if (mode==3) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
       }
@@ -2101,10 +2104,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(breakColor);
 
-        toggleInfinityRounds.setImageResource(R.drawable.infinity_large_red);
+        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
+        newDraw.setColorFilter(breakColor, PorterDuff.Mode.SRC_IN);
+        toggleInfinityRounds.setImageDrawable(newDraw);
+
         editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
       }
-
       if (mode==3) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(miniBreakColor);
       }
@@ -2131,6 +2136,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerValueInEditPopUpTextView.setText("00:00");
   }
 
+  //Todo: This b0rks adding rounds because of new colors.
   public void toggleInfinityModeAndSetRoundType() {
     if (mode==1) {
       if (firstRoundTypeHeaderInEditPopUp.getCurrentTextColor()==Color.GREEN) {
