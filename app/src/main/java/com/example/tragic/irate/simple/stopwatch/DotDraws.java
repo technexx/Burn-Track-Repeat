@@ -213,6 +213,7 @@ public class DotDraws extends View {
         }
         break;
       case 3:
+        setDotStyle(false);
         mX = 82; mX2=mX+125;
         encloseDots(mY+130 , mY+335);
         //Fading last object drawn. Setting previous ones to "greyed out"
