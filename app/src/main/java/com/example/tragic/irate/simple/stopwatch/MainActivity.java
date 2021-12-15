@@ -233,9 +233,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
-  View roundView;
-  TextView round_count;
-  TextView round_value;
   ConstraintLayout.LayoutParams recyclerLayoutOne;
   ConstraintLayout.LayoutParams recyclerLayoutTwo;
   ConstraintLayout.LayoutParams cycle_title_layout;
@@ -741,9 +738,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedEditPopUpArrayForThirdHeader = new ArrayList<>();
 
     editPopUpLayout = findViewById(R.id.edit_cycle_layout);
-    roundView = inflater.inflate(R.layout.mode_one_rounds, null);
-    round_count = roundView.findViewById(R.id.round_count);
-    round_value = roundView.findViewById(R.id.workout_rounds);
 
     cycleNameText = editCyclesPopupView.findViewById(R.id.cycle_name_text);
     cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);

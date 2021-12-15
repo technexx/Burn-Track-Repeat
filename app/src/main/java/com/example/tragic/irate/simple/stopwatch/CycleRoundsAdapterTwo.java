@@ -105,7 +105,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds_second_adapter, parent, false);
         return new ModeOneRounds(view);
     }
 
