@@ -151,12 +151,12 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
             case 3:
                 modeOneRounds.infinity_rounds.setVisibility(View.INVISIBLE);
                 modeOneRounds.workout_rounds.setVisibility(View.VISIBLE);
-                modeOneRounds.workout_rounds.setTextColor(SET_COLOR);
+                modeOneRounds.workout_rounds.setTextColor(BREAK_COLOR);
                 break;
             case 4:
                 modeOneRounds.workout_rounds.setVisibility(View.INVISIBLE);
                 modeOneRounds.infinity_rounds.setVisibility(View.VISIBLE);
-                modeOneRounds.infinity_rounds.setColorFilter(SET_COLOR);
+                modeOneRounds.infinity_rounds.setColorFilter(BREAK_COLOR);
                 break;
         }
 

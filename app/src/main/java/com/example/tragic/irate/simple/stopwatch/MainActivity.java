@@ -425,6 +425,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Round adapters alignment.
+  //Todo: May want to remove auto save of cycles if exiting edit when only adding (not editing a current cycle).
+  //Todo: Some default 00:00 -> 00:05 bugginess in edit timer. Sometimes not moving to 00:05 or reverting back when switching headers.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -437,7 +439,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
 
-   //Todo: REMINDER, Try next app w/ Kotlin.
+  //Todo: REMINDER, Try next app w/ Kotlin.
 
   @Override
   public void onResume() {
@@ -450,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onPause() {
     super.onPause();
- }
+  }
 
   @Override
   public void onStop() {
@@ -535,7 +537,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //For resume/reset onClicks within cycle adapter.
-@Override
+  @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
     if (resumingOrResetting==RESUMING_CYCLE_FROM_ADAPTER) {
       resumeOrResetCycleFromAdapterList(RESUMING_CYCLE_FROM_ADAPTER);
@@ -633,21 +635,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return true;
   }
 
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-          case R.id.delete_all_cycles:
-            if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
-              Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
-            } else {
-              delete_all_text.setText(R.string.delete_all_cycles);
-              deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
-            }
-            break;
+  @SuppressLint("NonConstantResourceId")
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.delete_all_cycles:
+        if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
+          Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
+        } else {
+          delete_all_text.setText(R.string.delete_all_cycles);
+          deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         }
-        return super.onOptionsItemSelected(item);
+        break;
     }
+    return super.onOptionsItemSelected(item);
+  }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
@@ -971,13 +973,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setLayoutManager(lm2);
     roundRecyclerTwo.setLayoutManager(lm3);
 
-    //Rounds begin unpopulated, so remove second recycler view.
-    roundRecyclerTwo.setVisibility(View.GONE);
     //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
     recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
     recyclerLayoutTwo = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
-    //Using exclusively programmatic layout params for round recyclerViews. Setting defaults. Second will never change.
-    recyclerLayoutOne.leftMargin = 240;
+    setRoundRecyclerViewsWhenChangingAdapterCount(1);
 
     Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
     slide_left.setDuration(400);
@@ -1069,7 +1068,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-      //Brings up editCycle popUp to create new Cycle.
+    //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
       fab.setEnabled(false);
       buttonToLaunchTimer.setEnabled(true);
@@ -1263,14 +1262,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Changes view layout depending on +/- 8 round count.
         if (mode==1) {
           if (workoutTime.size()<=8) {
-            roundRecyclerTwo.setVisibility(View.GONE);
-            recyclerLayoutOne.leftMargin = 240;
-            roundListDivider.setVisibility(View.GONE);
+            setRoundRecyclerViewsWhenChangingAdapterCount(1);
             savedCycleAdapter.removeHighlight(true);
           } else {
-            roundRecyclerTwo.setVisibility(View.VISIBLE);
-            recyclerLayoutOne.leftMargin = 5;
-            roundListDivider.setVisibility(View.VISIBLE);
+            setRoundRecyclerViewsWhenChangingAdapterCount(2);
             savedPomCycleAdapter.removeHighlight(true);
           }
         }
@@ -1714,7 +1709,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-  retrieveTotalCycleTimesFromDatabaseObjectRunnable = new Runnable() {
+    retrieveTotalCycleTimesFromDatabaseObjectRunnable = new Runnable() {
       @Override
       public void run() {
         int totalSetTime = 0;
@@ -2765,9 +2760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
         if (workoutTime.size()==9) {
-          roundRecyclerTwo.setVisibility(View.VISIBLE);
-          recyclerLayoutOne.leftMargin = 5;
-          roundListDivider.setVisibility(View.VISIBLE);
+          setRoundRecyclerViewsWhenChangingAdapterCount(2);
         }
         //if replacing a round. Done via add button. Subtract will always subtract.
       } else {
@@ -2821,9 +2814,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           convertedWorkoutTime.remove(roundSelectedPosition);
           //If moving from two lists to one, set its visibility and change layout params.
           if (workoutTime.size()==8) {
-            roundRecyclerTwo.setVisibility(View.GONE);
-            recyclerLayoutOne.leftMargin = 240;
-            roundListDivider.setVisibility(View.GONE);
+            setRoundRecyclerViewsWhenChangingAdapterCount(1);
           }
           //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
           subtractedRoundIsFading = false;
@@ -2836,6 +2827,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           roundIsSelected = false;
         }
       } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  public void setRoundRecyclerViewsWhenChangingAdapterCount(int numberOfAdapters) {
+    if (numberOfAdapters == 1) {
+      roundRecyclerTwo.setVisibility(View.GONE);
+      roundListDivider.setVisibility(View.GONE);
+      recyclerLayoutOne.leftMargin = 240;
+    } else if (numberOfAdapters==2){
+      recyclerLayoutOne.leftMargin = 5;
+      roundRecyclerTwo.setVisibility(View.VISIBLE);
+      roundListDivider.setVisibility(View.VISIBLE);
     }
   }
 
@@ -3638,10 +3641,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTimerValueInEditPopUpTextViewTwo.setVisibility(View.VISIBLE);
         pomTimerValueInEditPopUpTextViewThree.setVisibility(View.VISIBLE);
 
+        setRoundRecyclerViewsWhenChangingAdapterCount(1);
         sortHigh.setVisibility(View.GONE);
         sortLow.setVisibility(View.GONE);
         roundRecyclerTwo.setVisibility(View.GONE);
-        recyclerLayoutOne.leftMargin = 240;
         roundListDivider.setVisibility(View.GONE);
         savedCycleRecycler.setVisibility(View.GONE);
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
@@ -3787,7 +3790,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 2: setMillis = 0; break;
           case 3: breakMillis = workoutTime.get(0); break;
           case 4: breakMillis = 0; break;
-      };
+        };
         countUpMillisHolder = 0;
         //Removing timer callbacks for count up mode.
         mHandler.removeCallbacks(infinityRunnableForSets);
