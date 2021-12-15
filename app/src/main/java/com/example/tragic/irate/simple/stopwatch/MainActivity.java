@@ -425,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Round adapters alignment.
+  //Todo: BUG: We can select two rounds to edit, one in each adapter. We should also make sure replacement/deletion works with both adapters up.
   //Todo: May want to remove auto save of cycles if exiting edit when only adding (not editing a current cycle).
   //Todo: Some default 00:00 -> 00:05 bugginess in edit timer. Sometimes not moving to 00:05 or reverting back when switching headers.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
@@ -2836,7 +2837,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundListDivider.setVisibility(View.GONE);
       recyclerLayoutOne.leftMargin = 240;
     } else if (numberOfAdapters==2){
-      recyclerLayoutOne.leftMargin = 5;
+      recyclerLayoutOne.leftMargin = 15;
       roundRecyclerTwo.setVisibility(View.VISIBLE);
       roundListDivider.setVisibility(View.VISIBLE);
     }

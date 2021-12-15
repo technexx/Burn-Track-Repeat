@@ -7,22 +7,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/workout_recycler_layout">
 
-    <View
-        android:id="@+id/workout_views_start_anchor"
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </View>
-
-    <View
-        android:id="@+id/workout_views_end_anchor"
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </View>
-
     <TextView
         android:id="@+id/round_count"
         android:layout_width="wrap_content"
@@ -63,7 +47,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginTop="2dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="6dp"
         android:src="@drawable/target_dot">
     </ImageView>
 
