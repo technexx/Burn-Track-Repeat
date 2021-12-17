@@ -6,7 +6,7 @@
     android:layout_marginBottom="-3dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/workout_recycler_layout"
-    android:layout_marginStart="10dp">
+    android:layout_marginStart="2dp">
 
     <TextView
         android:id="@+id/round_count"

@@ -424,6 +424,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Dot overlaps border @ XX:XX in second adapter. prolly shpuld just expand border width.
+  //Todo: Removing selected dot retains selected position after deletion and causes index exception.
+  //Todo: Change to round highlight (multiple) to change times?
   //Todo: Allow replacement of round 16 if selected (right now we get "full" Toast).
   //Todo: BUG: We can select two rounds to edit, one in each adapter. We should also make sure replacement/deletion works with both adapters up.
   //Todo: May want to remove auto save of cycles if exiting edit when only adding (not editing a current cycle).
@@ -2680,31 +2682,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
-        if (workoutTime.size()<16) {
-          toggleInfinityModeAndSetRoundType();
-          switch (roundType) {
-            case 1:
-              addOrReplaceRounds(setValue, roundIsSelected);
-              editPopUpTimerArray = convertIntegerToStringArray(setValue);
-              setEditPopUpTimerValues();
-              break;
-            case 2:
-              addOrReplaceRounds(0, roundIsSelected);
-            case 3:
-              addOrReplaceRounds(breakValue, roundIsSelected);
-              editPopUpTimerArray = convertIntegerToStringArray(breakValue);
-              setEditPopUpTimerValues();
-              break;
-            case 4:
-              addOrReplaceRounds(0, roundIsSelected);
-              break;
-            default:
-              //Returns from method so we don't add a roundType entry to our list, and the list stays in sync w/ the rounds we are actually adding.
-              Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
-              return;
-          }
-        } else{
-          Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
+        toggleInfinityModeAndSetRoundType();
+        switch (roundType) {
+          case 1:
+            addOrReplaceRounds(setValue, roundIsSelected);
+            editPopUpTimerArray = convertIntegerToStringArray(setValue);
+            setEditPopUpTimerValues();
+            break;
+          case 2:
+            addOrReplaceRounds(0, roundIsSelected);
+          case 3:
+            addOrReplaceRounds(breakValue, roundIsSelected);
+            editPopUpTimerArray = convertIntegerToStringArray(breakValue);
+            setEditPopUpTimerValues();
+            break;
+          case 4:
+            addOrReplaceRounds(0, roundIsSelected);
+            break;
+          default:
+            //Returns from method so we don't add a roundType entry to our list, and the list stays in sync w/ the rounds we are actually adding.
+            Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
+            return;
         }
       }
       if (mode==3) {
@@ -2765,23 +2763,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       //If adding a round.
       if (!replacingValue) {
-        workoutTime.add(integerValue * 1000);
-        convertedWorkoutTime.add(convertSeconds(integerValue));
-        typeOfRound.add(roundType);
-        roundSelectedPosition = workoutTime.size()-1;
+        if (workoutTime.size()<16) {
+          workoutTime.add(integerValue * 1000);
+          convertedWorkoutTime.add(convertSeconds(integerValue));
+          typeOfRound.add(roundType);
+          roundSelectedPosition = workoutTime.size()-1;
 
-        //Adds and sends to adapter the newest addition round position to fade.
-        if (workoutTime.size()<=8) {
-          roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-          typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
-          cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
-          cycleRoundsAdapter.notifyDataSetChanged();
+          //Adds and sends to adapter the newest addition round position to fade.
+          if (workoutTime.size()<=8) {
+            roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+            typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
+            cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
+            cycleRoundsAdapter.notifyDataSetChanged();
+          } else {
+            roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+            typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
+            cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
+            cycleRoundsAdapterTwo.notifyDataSetChanged();
+          }
         } else {
-          roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-          typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
-          cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
-          cycleRoundsAdapterTwo.notifyDataSetChanged();
+          Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
         }
+
         //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
         if (workoutTime.size()==9) {
           setRoundRecyclerViewsWhenChangingAdapterCount(2);
@@ -2848,12 +2851,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           subtractedRoundIsFading = false;
         }
         //Resets round selection boolean.
-        if (!roundIsSelected) {
-          roundSelectedPosition = workoutTime.size()-1;
-        } else {
+        if (roundIsSelected) {
+          if (roundSelectedPosition<=7) {
+            cycleRoundsAdapter.isRoundCurrentlySelected(false);
+            cycleRoundsAdapter.notifyDataSetChanged();
+          } else {
+            cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
+            cycleRoundsAdapterTwo.notifyDataSetChanged();
+          }
           consolidateRoundAdapterLists = true;
           roundIsSelected = false;
+          Log.i("testRound", "selected position is " + roundSelectedPosition);
         }
+        roundSelectedPosition = workoutTime.size()-1;
       } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
     }
   }
