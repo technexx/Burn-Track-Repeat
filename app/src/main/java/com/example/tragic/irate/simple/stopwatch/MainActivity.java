@@ -423,12 +423,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Dot overlaps border @ XX:XX in second adapter. prolly shpuld just expand border width.
-  //Todo: Removing selected dot retains selected position after deletion and causes index exception.
-  //Todo: Change to round highlight (multiple) to change times?
-  //Todo: Allow replacement of round 16 if selected (right now we get "full" Toast).
-  //Todo: BUG: We can select two rounds to edit, one in each adapter. We should also make sure replacement/deletion works with both adapters up.
-  //Todo: May want to remove auto save of cycles if exiting edit when only adding (not editing a current cycle).
   //Todo: Some default 00:00 -> 00:05 bugginess in edit timer. Sometimes not moving to 00:05 or reverting back when switching headers.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
@@ -654,7 +648,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
-
 
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
@@ -1208,8 +1201,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-      saveCycleOnPopUpDismissIfEdited();
-
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
 
       //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
@@ -1229,6 +1220,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
       if (currentlyEditingACycle) {
+        saveCycleOnPopUpDismissIfEdited();
         savedCycleAdapter.removeHighlight(true);
         //Calls method that sets views for our edit cycles mode.
         fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
