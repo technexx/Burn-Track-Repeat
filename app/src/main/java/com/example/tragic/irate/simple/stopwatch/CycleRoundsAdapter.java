@@ -61,7 +61,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   }
 
   public interface onRoundSelected {
-    void roundSelected(int position);
+    void roundSelected(boolean selected, int position);
   }
 
   public void fadeFinished(onFadeFinished xOnFadeFinished) {
@@ -128,6 +128,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     mFadePom = true;
   }
 
+  public void isRoundCurrentlySelected(boolean selected) {
+    mRoundSelected = selected;
+  }
+
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -152,22 +156,25 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       //If a round has been selected (and boolean set to true), set only that position's bullet to visible.
       if (mRoundSelected) if (position==mPositionOfSelectedRound) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
       //On last iteration of this method (i.e. the adapter's last position), reset selectedRound boolean to false.
-      if (position==mWorkOutList.size()-1) mRoundSelected = false;
+//      if (position==mWorkOutList.size()-1) {
+//        mOnRoundSelected.roundSelected(false, 0);
+//      }
 
       modeOneRounds.fullView.setOnClickListener(v -> {
         //Toggles bullet appearance next to each round, and de-selects a round if another is selected.
-        if (modeOneRounds.selection_bullet.getVisibility()==View.INVISIBLE) {
+        if (!mRoundSelected || position!=mPositionOfSelectedRound) {
           modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
           //This var is used to make visible the correct bullet position when we re-draw this adapter's list.
           mPositionOfSelectedRound = position;
-          //Used to indicate a round has been selected.
-          mRoundSelected = true;
           //Passes position to Main activity.
-          mOnRoundSelected.roundSelected(position);
+          mOnRoundSelected.roundSelected(true, position);
           //Since we need to remove the previous bullet when selecting a new round, we need to re-draw the list.
           notifyDataSetChanged();
           //If position we are clicking on shows a bullet, remove it.
-        } else modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+        } else {
+          mOnRoundSelected.roundSelected(false, 0);
+          modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+        }
       });
 
       //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.

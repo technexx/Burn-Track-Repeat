@@ -36,7 +36,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     Animation animateIn;
     Animation animateOut;
     onFadeFinished mOnFadeFinished;
-    onRoundSelected mOnRoundSelected;
+    onRoundSelectedSecondAdapter mOnRoundSelectedSecondAdapter;
 
     boolean mRunRoundAnimation;
     boolean mRoundSelected;
@@ -50,16 +50,16 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         void subtractionFadeHasFinished();
     }
 
-    public interface onRoundSelected {
-        void roundSelected(int position);
+    public interface onRoundSelectedSecondAdapter {
+        void roundSelectedSecondAdapter(boolean selected, int position);
     }
 
     public void fadeFinished(onFadeFinished xOnFadeFinished) {
         this.mOnFadeFinished = xOnFadeFinished;
     }
 
-    public void selectedRound(onRoundSelected xOnRoundSelected) {
-        this.mOnRoundSelected = xOnRoundSelected;
+    public void selectedRoundSecondAdapter(onRoundSelectedSecondAdapter xOnRoundSelectedSecondAdapter) {
+        this.mOnRoundSelectedSecondAdapter = xOnRoundSelectedSecondAdapter;
     }
 
     public void changeColorSetting(int typeOFRound, int settingNumber) {
@@ -101,6 +101,10 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         mPosSubHolder = subtract; mPosAddHolder = -1; mRunRoundAnimation = true;
     }
 
+    public void isRoundCurrentlySelected(boolean selected) {
+        mRoundSelected = selected;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -118,22 +122,25 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         //If a round has been selected (and boolean set to true), set only that position's bullet to visible.
         if (mRoundSelected) if (position==mPositionOfSelectedRound) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
         //On last iteration of this method (i.e. the adapter's last position), reset selectedRound boolean to false.
-        if (position==mWorkOutList.size()-1) mRoundSelected = false;
+//        if (position==mWorkOutList.size()-1) {
+//            mOnRoundSelected.roundSelected(false, 0);
+//        }
 
         modeOneRounds.fullView.setOnClickListener(v -> {
             //Toggles bullet appearance next to each round, and de-selects a round if another is selected.
-            if (modeOneRounds.selection_bullet.getVisibility()==View.INVISIBLE) {
+            if (!mRoundSelected) {
                 modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
                 //This var is used to make visible the correct bullet position when we re-draw this adapter's list.
                 mPositionOfSelectedRound = position;
-                //Used to indicate a round has been selected.
-                mRoundSelected = true;
                 //Passes position to Main activity. +8 since we use the total workout list (up to 16 rounds/positions) as a conditional in Main.
-                mOnRoundSelected.roundSelected(position+8);
+                mOnRoundSelectedSecondAdapter.roundSelectedSecondAdapter(true, position+8);
                 //Since we need to remove the previous bullet when selecting a new round, we need to re-draw the list.
                 notifyDataSetChanged();
                 //If position we are clicking on shows a bullet, remove it.
-            } else modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+            } else {
+                mOnRoundSelectedSecondAdapter.roundSelectedSecondAdapter(false, 0);
+                modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
+            }
         });
 
         //Sets color, visibility, and textViews for sets, breaks, and their infinity modes.

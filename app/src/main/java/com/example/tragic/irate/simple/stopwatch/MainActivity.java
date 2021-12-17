@@ -48,6 +48,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +62,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -83,7 +85,7 @@ import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings({"depreciation"})
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelected, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
   ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
@@ -618,13 +620,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //This callback method works for both round adapters.
-  //Receives position of selected round from adapter.
+  //Todo: Need sep. callback if we're toggling visible + invisible w/ same boolean on different adapters.
   @Override
-  public void roundSelected(int position) {
-    roundIsSelected = true;
-    roundSelectedPosition = position;
+  public void roundSelected(boolean selected, int position) {
+    if (selected) {
+      cycleRoundsAdapter.isRoundCurrentlySelected(true);
+      cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
+      roundIsSelected = true;
+      roundSelectedPosition = position;
+    } else {
+      cycleRoundsAdapter.isRoundCurrentlySelected(false);
+      roundIsSelected = false;
+    }
+
+    cycleRoundsAdapter.notifyDataSetChanged();
+    cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
+
+  @Override
+  public void roundSelectedSecondAdapter(boolean selected, int position) {
+    if (selected) {
+      cycleRoundsAdapter.isRoundCurrentlySelected(false);
+      cycleRoundsAdapterTwo.isRoundCurrentlySelected(true);
+      roundIsSelected = true;
+      roundSelectedPosition = position;
+    } else {
+      cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
+      roundIsSelected = false;
+    }
+
+    cycleRoundsAdapter.notifyDataSetChanged();
+    cycleRoundsAdapterTwo.notifyDataSetChanged();
+  }
+
 
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
@@ -955,17 +983,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.fadeFinished(MainActivity.this);
     cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
     cycleRoundsAdapter.selectedRound(MainActivity.this);
-    cycleRoundsAdapterTwo.selectedRound(MainActivity.this);
+    cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
     //Only first adapter is used for Pom mode, so only needs to be set here.
     cycleRoundsAdapter.setMode(mode);
 
     roundListDivider = editCyclesPopupView.findViewById(R.id.round_list_divider);
     roundListDivider.setVisibility(View.GONE);
     roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
+    roundRecycler.setLayoutManager(lm2);
+//    GridLayoutManager gm = new GridLayoutManager(this, 2);
+
     roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
-    roundRecycler.setLayoutManager(lm2);
     roundRecyclerTwo.setLayoutManager(lm3);
 
     //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
@@ -1203,7 +1233,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentlyEditingACycle = false;
       }
 
-      //Todo: Do we still need this?
       //Updates round adapters so lists show as cleared.
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -3315,7 +3344,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
-          //Todo: Issue w/ timerDurationPlaceHolder.
+          //If issue w/ seconds comes up, it's likely in timeDurationPlaceHolder.
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
