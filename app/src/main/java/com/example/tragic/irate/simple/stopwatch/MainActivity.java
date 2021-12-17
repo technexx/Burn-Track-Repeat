@@ -423,7 +423,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Round adapters alignment.
+  //Todo: Dot overlaps border @ XX:XX in second adapter. prolly shpuld just expand border width.
+  //Todo: Allow replacement of round 16 if selected (right now we get "full" Toast).
   //Todo: BUG: We can select two rounds to edit, one in each adapter. We should also make sure replacement/deletion works with both adapters up.
   //Todo: May want to remove auto save of cycles if exiting edit when only adding (not editing a current cycle).
   //Todo: Some default 00:00 -> 00:05 bugginess in edit timer. Sometimes not moving to 00:05 or reverting back when switching headers.
@@ -620,7 +621,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Need sep. callback if we're toggling visible + invisible w/ same boolean on different adapters.
   @Override
   public void roundSelected(boolean selected, int position) {
     if (selected) {
@@ -2768,8 +2768,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.add(integerValue * 1000);
         convertedWorkoutTime.add(convertSeconds(integerValue));
         typeOfRound.add(roundType);
-
         roundSelectedPosition = workoutTime.size()-1;
+
         //Adds and sends to adapter the newest addition round position to fade.
         if (workoutTime.size()<=8) {
           roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
@@ -2795,12 +2795,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (roundSelectedPosition<=7) {
           roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
           typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
+
+          cycleRoundsAdapter.isRoundCurrentlySelected(false);
           cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
           //Since our workOutTime lists are independent of adapter and run from (up to) 0-15, we change the value of roundSelectedPosition back to original.
           roundHolderTwo.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
           typeHolderTwo.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
+
+          cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
           cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
           cycleRoundsAdapterTwo.notifyDataSetChanged();
         }

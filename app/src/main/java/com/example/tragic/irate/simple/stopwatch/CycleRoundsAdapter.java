@@ -155,10 +155,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       //If a round has been selected (and boolean set to true), set only that position's bullet to visible.
       if (mRoundSelected) if (position==mPositionOfSelectedRound) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
-      //On last iteration of this method (i.e. the adapter's last position), reset selectedRound boolean to false.
-//      if (position==mWorkOutList.size()-1) {
-//        mOnRoundSelected.roundSelected(false, 0);
-//      }
 
       modeOneRounds.fullView.setOnClickListener(v -> {
         //Toggles bullet appearance next to each round, and de-selects a round if another is selected.
