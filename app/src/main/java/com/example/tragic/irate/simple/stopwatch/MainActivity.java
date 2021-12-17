@@ -423,10 +423,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
+  //Todo: Total times keep counting when exiting timer, even tho we put it into a paused state.
+  //Todo: Resetting timer when exiting gives us resume/reset option, which we do not want.
+  //Todo: In edit, setting infinity rounds sets timer textView to a 00:30 default.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Test all spannable iterations.
   //Todo: Should do theme changes just so we get familiar with themes + style.
-  //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
@@ -1486,12 +1488,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+
         //Once progressBar value hits 0, animate bar/text, reset bar's progress value to max, and restart the objectAnimator that uses it.
-        if (progressBar.getProgress()<=0) {
-          progressBar.startAnimation(fadeProgressOut);
-          timeLeft.startAnimation(fadeProgressOut);
-          objectAnimator.start();
-        }
+//        if (progressBar.getProgress()<=0) {
+//          progressBar.startAnimation(fadeProgressOut);
+//          timeLeft.startAnimation(fadeProgressOut);
+//          objectAnimator.start();
+//        }
+
         setNotificationValues();
         mHandler.postDelayed(this, 50);
       }
@@ -1515,12 +1519,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-        //Temporary value for current round, using totalBreakMillis which is our permanent value.
-        if (progressBar.getProgress()<=0) {
-          progressBar.startAnimation(fadeProgressOut);
-          timeLeft.startAnimation(fadeProgressOut);
-          objectAnimator.start();
-        }
+
+//        if (progressBar.getProgress()<=0) {
+//          progressBar.startAnimation(fadeProgressOut);
+//          timeLeft.startAnimation(fadeProgressOut);
+//          objectAnimator.start();
+//        }
+
         setNotificationValues();
         mHandler.postDelayed(this, 50);
       }
@@ -3523,7 +3528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2:
                   //Uses the current time as a base for our count-up rounds.
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
+//                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
                   setMillis = countUpMillisHolder;
                   mHandler.post(infinityRunnableForSets);
                   break;
@@ -3533,7 +3538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
                 case 4:
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
+//                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
                   breakMillis = countUpMillisHolder;
                   mHandler.post(infinityRunnableForBreaks);
                   break;
