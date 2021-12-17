@@ -424,6 +424,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
+  //Todo: Test all spannable iterations.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
   //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
@@ -1159,7 +1160,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       addAndRoundDownTotalCycleTimeFromPreviousRounds();
 
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+      mainView.setBackgroundColor(Color.BLACK);
       //Prevents timer from starting. Runnable will just populate values of next round.
 
       if (mode!=4) {
@@ -1191,7 +1192,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
         if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
         emptyCycleList.setVisibility(View.GONE);
-        mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
+        mainView.setBackgroundColor(Color.BLACK);
 
         assignOldCycleValuesToCheckForChanges();
         setEditPopUpTimerHeaders(1);
@@ -1214,7 +1215,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
       //Color reset to black, also for smooth transition to timer. Grey only necessary to prevent soft kb tearing.
-      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+      mainView.setBackgroundColor(Color.BLACK);
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -2144,10 +2145,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode==1) {
-      Log.i("testheader", "saved one is " + savedEditPopUpArrayForFirstHeaderModeOne);
-      Log.i("testheader", "saved two is " + savedEditPopUpArrayForSecondHeaderModeOne);
-      Log.i("testheader", "edit array is " + editPopUpTimerArray);
-
       String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       timerValueInEditPopUpTextView.setText(savedTimerString);
 

@@ -178,7 +178,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         //For moment, using "09" on first round of this adapter, and setting "0" to same color as background. Trouble aligning otherwise.
         if (position==0) {
             Spannable spannable = new SpannableString("09 -");
-            spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#37474F")), 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#212121")), 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             modeOneRounds.round_count.setText(spannable);
         } else modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 9)));
         modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
