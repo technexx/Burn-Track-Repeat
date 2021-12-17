@@ -290,7 +290,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long roundedValueForTotalTimes;
   long timerDurationPlaceHolder;
 
-  long currentProgressBarValueForInfinityRounds;
   long pomMillis;
 
   int maxProgress = 10000;
@@ -429,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Test all spannable iterations.
   //Todo: Should do theme changes just so we get familiar with themes + style.
-  //Todo: Option to set "base" progressBar for count-up (options section in menu?). Simply change currentProgressBarValueForInfinityRounds.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
   //Todo: TDEE in sep popup w/ tabs.
@@ -1482,19 +1480,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
 
-        //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
         timeLeft.setText(convertSeconds((setMillis) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-
-        //Once progressBar value hits 0, animate bar/text, reset bar's progress value to max, and restart the objectAnimator that uses it.
-//        if (progressBar.getProgress()<=0) {
-//          progressBar.startAnimation(fadeProgressOut);
-//          timeLeft.startAnimation(fadeProgressOut);
-//          objectAnimator.start();
-//        }
 
         setNotificationValues();
         mHandler.postDelayed(this, 50);
@@ -1513,18 +1502,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
 
-        //Subtracts the elapsed millis value from base 30000 used for count-up rounds.
-        currentProgressBarValueForInfinityRounds = maxProgress - breakMillis;
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
         //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-
-//        if (progressBar.getProgress()<=0) {
-//          progressBar.startAnimation(fadeProgressOut);
-//          timeLeft.startAnimation(fadeProgressOut);
-//          objectAnimator.start();
-//        }
 
         setNotificationValues();
         mHandler.postDelayed(this, 50);
@@ -3199,8 +3180,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         return;
       }
-      //Resets default base (30 sec) for count-up rounds.
-      currentProgressBarValueForInfinityRounds = 30000;
       //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
       mHandler.post(endFade);
 
@@ -3528,7 +3507,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 case 2:
                   //Uses the current time as a base for our count-up rounds.
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-//                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(currentProgressBarValueForInfinityRounds); else if (objectAnimator!=null) objectAnimator.resume();
                   setMillis = countUpMillisHolder;
                   mHandler.post(infinityRunnableForSets);
                   break;
@@ -3538,7 +3516,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
                 case 4:
                   defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-//                  if (currentProgressBarValue==maxProgress) instantiateAndStartObjectAnimator(5000); else if (objectAnimator!=null) objectAnimator.resume();
                   breakMillis = countUpMillisHolder;
                   mHandler.post(infinityRunnableForBreaks);
                   break;
@@ -3721,8 +3698,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
-        //Resets base progressBar duration for count-up rounds.
-        currentProgressBarValueForInfinityRounds = 30000;
         //Sets the long value in our "count up" rounds back to 0.
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
