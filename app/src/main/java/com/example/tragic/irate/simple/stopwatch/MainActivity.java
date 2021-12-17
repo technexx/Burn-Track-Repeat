@@ -423,7 +423,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Some default 00:00 -> 00:05 bugginess in edit timer. Sometimes not moving to 00:05 or reverting back when switching headers.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: Add fade/ripple effects to buttons and other stuff that would like it.
@@ -2098,14 +2097,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setEditPopUpTimerHeaders(int headerToSelect) {
-    if (mode==1) {
-      String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
-      timerValueInEditPopUpTextView.setText(savedTimerString);
-
-      int totalTime = convertStringToSecondsValue(savedTimerString);
-      setAndCapTimerValues(totalTime);
-    }
-
     if (headerToSelect == 1) {
       if (mode==1) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
@@ -2150,6 +2141,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       thirdRoundTypeHeaderInEditPopUp.setTextColor(fullBreakColor);
       editHeaderSelected = 3;
+    }
+
+    if (mode==1) {
+      Log.i("testheader", "saved one is " + savedEditPopUpArrayForFirstHeaderModeOne);
+      Log.i("testheader", "saved two is " + savedEditPopUpArrayForSecondHeaderModeOne);
+      Log.i("testheader", "edit array is " + editPopUpTimerArray);
+
+      String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+      timerValueInEditPopUpTextView.setText(savedTimerString);
+
+      int totalTime = convertStringToSecondsValue(savedTimerString);
+      setAndCapTimerValues(totalTime);
     }
 
     changeEditTimerTextViewColorIfNotEmpty();
