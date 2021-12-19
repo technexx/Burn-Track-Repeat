@@ -273,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView total_break_time;
   TextView empty_laps;
 
+  boolean activeCycle;
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
 
@@ -422,8 +423,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Total times keep counting when exiting timer, even tho we put it into a paused state.
+  //Todo: Infinity round total times not sync'ing + same former addition issue as non-infinity.
   //Todo: Resetting timer when exiting gives us resume/reset option, which we do not want.
+  //Todo: Test Pom total times.
   //Todo: In edit, setting infinity rounds sets timer textView to a 00:30 default.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Test all spannable iterations.
@@ -1154,14 +1156,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundedValueForTotalTimes = 0;
       //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
       blankCanvas.setVisibility(View.GONE);
+      mainView.setBackgroundColor(Color.BLACK);
 
+      //Prevents timer from starting. Runnable will just populate values of next round.
       activateResumeOrResetOptionForCycle();
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
-      addAndRoundDownTotalCycleTimeFromPreviousRounds();
-
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-      mainView.setBackgroundColor(Color.BLACK);
-      //Prevents timer from starting. Runnable will just populate values of next round.
 
       if (mode!=4) {
         if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
@@ -1471,7 +1472,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityRunnableForSets = new Runnable() {
       @Override
       public void run() {
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+//        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         if (setMillis>=60000 && !textSizeIncreased) {
           changeTextSize(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
@@ -1493,7 +1494,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityRunnableForBreaks = new Runnable() {
       @Override
       public void run() {
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+//        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         if (breakMillis>=60000 && !textSizeIncreased) {
           changeTextSize(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
@@ -1577,10 +1578,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_all_confirm.setOnClickListener(v-> {
       if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
-        Log.i("testDelete", "Deleting full CYCLES");
         AsyncTask.execute(deleteAllCyclesASyncRunnable);
       } else if (delete_all_text.getText().equals(getString(R.string.delete_total_times))) {
-        Log.i("testDelete", "Deleting TIMES only");
         AsyncTask.execute(deleteTotalCycleTimesASyncRunnable);
       }
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
@@ -2478,7 +2477,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
       //Only shows restart/resume options of a cycle has been started.
-      if (objectAnimator.isStarted() || startRounds-numberOfRoundsLeft>0) {
+      if (activeCycle) {
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
         savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
       }
@@ -2494,7 +2493,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode==3) {
-      if (objectAnimatorPom.isStarted() || pomDotCounter > 0) {
+      if (activeCycle) {
         if (isNewCycle) positionOfSelectedCycle = 7;
         savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
       }
@@ -2839,7 +2838,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           consolidateRoundAdapterLists = true;
           roundIsSelected = false;
-          Log.i("testRound", "selected position is " + roundSelectedPosition);
         }
         roundSelectedPosition = workoutTime.size()-1;
       } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
@@ -3191,7 +3189,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setTextSize(90f);
       }
 
-      addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
       AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
       boolean isAlertRepeating = false;
@@ -3233,7 +3231,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       beginTimerForNextRound = true;
     }
     if (mode==3) {
-      addAndRoundDownTotalCycleTimeFromPreviousRounds();
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
 
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
@@ -3353,27 +3351,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void addAndRoundDownTotalCycleTimeFromPreviousRounds() {
+  public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean newRound) {
     if (mode==1) {
+      if (newRound) {
       totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
       totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
-      cycleSetTimeForSingleRoundInMillis = 0;
 
       totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
       totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
-      cycleBreakTimeForSingleRoundInMillis = 0;
+      } else {
+        totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
+        totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
+
+        if (typeOfRound.get(currentRound) == 1) {
+          timerDurationPlaceHolder = setMillis;
+        }
+        if (typeOfRound.get(currentRound) == 3) {
+          timerDurationPlaceHolder = breakMillis;
+        }
+      }
     }
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
-          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
-          cycleSetTimeForSingleRoundInMillis = 0;
+          if (newRound) {
+            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
+            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
+          } else {
+            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
+            timerDurationPlaceHolder = setMillis;
+          }
           break;
         case 1: case 3: case 5: case 7:
-          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
-          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
-          cycleBreakTimeForSingleRoundInMillis = 0;
+          if (newRound) {
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
+          } else {
+            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
+            timerDurationPlaceHolder = breakMillis;
+          }
           break;
       }
     }
@@ -3497,6 +3513,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
             } else if (pausing == RESUMING_TIMER) {
               reset.setVisibility(View.INVISIBLE);
+              if (!activeCycle) activeCycle = true;
               timerIsPaused = false;
 
               switch (typeOfRound.get(currentRound)) {
@@ -3772,6 +3789,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void resetTimer() {
+    activeCycle = false;
     vibrator.cancel();
     dotDraws.resetDotAlpha();
     if (timer != null) timer.cancel();
@@ -3788,7 +3806,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBar.setProgress(10000);
     currentProgressBarValue = 10000;
 
-    addAndRoundDownTotalCycleTimeFromPreviousRounds();
+    addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
     AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
     reset.setVisibility(View.INVISIBLE);
