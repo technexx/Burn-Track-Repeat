@@ -424,8 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Test total times again.
-  //Todo: Move total time stuff in startObjectAnimator() to different method.
-  //Todo: Resetting timer when exiting gives us resume/reset option, which we do not want.
   //Todo: Test Pom total times.
   //Todo: In edit, setting infinity rounds sets timer textView to a 00:30 default.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
@@ -1613,7 +1611,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
               timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
               if (beginTimerForNextRound) {
-                startObjectAnimator();
+                startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
               break;
@@ -1628,7 +1626,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
               timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
               if (beginTimerForNextRound) {
-                startObjectAnimator();
+                startObjectAnimatorAndTotalCycleTimeCounters();
                 startBreakTimer();
               }
               break;
@@ -1670,7 +1668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomMillis = pomValuesTime.get(pomDotCounter);
           timeLeft.setText(convertSeconds((pomMillis) / 1000));
           if (beginTimerForNextRound) {
-            startObjectAnimator();
+            startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
           }
         } else {
@@ -3023,7 +3021,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Controls each mode's object animator. Starts new or resumes current one.
-  public void startObjectAnimator() {
+  public void startObjectAnimatorAndTotalCycleTimeCounters() {
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
@@ -3173,7 +3171,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Fade effect to smooth out progressBar and timer text after animation.
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
-    //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimator()).
+    //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimatorAndTotalCycleTimeCounters()).
     currentProgressBarValue = 10000;
     reset.setVisibility(View.INVISIBLE);
     next_round.setEnabled(false);
@@ -3530,7 +3528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
-                  startObjectAnimator();
+                  startObjectAnimatorAndTotalCycleTimeCounters();
                   startSetTimer();
                   break;
                 case 2:
@@ -3540,7 +3538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   mHandler.post(infinityRunnableForSets);
                   break;
                 case 3:
-                  startObjectAnimator();
+                  startObjectAnimatorAndTotalCycleTimeCounters();
                   startBreakTimer();
                   break;
                 case 4:
@@ -3565,7 +3563,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             } else if (pausing == RESUMING_TIMER) {
               reset.setVisibility(View.INVISIBLE);
               timerIsPaused = false;
-              startObjectAnimator();
+              startObjectAnimatorAndTotalCycleTimeCounters();
               startPomTimer();
             }
           } else resetTimer();
@@ -3841,10 +3839,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Resets current round counter.
         currentRound = 0;
         if (objectAnimator != null) objectAnimator.cancel();
+
+        if (savedCycleAdapter.isCycleActive()==true) {
+          savedCycleAdapter.removeActiveCycleLayout();
+          savedCycleAdapter.notifyDataSetChanged();
+        }
         break;
       case 3:
         pomDotCounter = 0;
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
+
+        if (savedPomCycleAdapter.isCycleActive()==true) {
+          savedPomCycleAdapter.removeActiveCycleLayout();
+          savedPomCycleAdapter.notifyDataSetChanged();
+        }
         break;
       case 4:
         stopWatchstartTime = 0;
