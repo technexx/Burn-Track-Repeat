@@ -425,7 +425,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Test total times again.
   //Todo: Test Pom total times.
-  //Todo: In edit, setting infinity rounds sets timer textView to a 00:30 default.
   //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Test all spannable iterations.
   //Todo: Should do theme changes just so we get familiar with themes + style.
@@ -1153,9 +1152,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       beginTimerForNextRound = false;
       buttonToLaunchTimer.setEnabled(false);
       roundedValueForTotalTimes = 0;
-      //Since we don't update saved cycle list when launching timer (for aesthetic purposes), we do it here on exiting timer.
-      blankCanvas.setVisibility(View.GONE);
-      mainView.setBackgroundColor(Color.BLACK);
 
       //Prevents timer from starting. Runnable will just populate values of next round.
       activateResumeOrResetOptionForCycle();
@@ -1188,15 +1184,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
       @Override
       public void onSystemUiVisibilityChange(int visibility) {
-        setZeroedOutEditTimer();
-        //Prevents tearing when soft keyboard pushes up in editCycle popUp.
-        if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
-        if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
-        emptyCycleList.setVisibility(View.GONE);
-        mainView.setBackgroundColor(Color.BLACK);
-
         assignOldCycleValuesToCheckForChanges();
-        setEditPopUpTimerHeaders(1);
       }
     });
 
@@ -1215,8 +1203,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleRecycler.setVisibility(View.VISIBLE);
         }
       }
-      //Color reset to black, also for smooth transition to timer. Grey only necessary to prevent soft kb tearing.
-      mainView.setBackgroundColor(Color.BLACK);
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -2140,12 +2126,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     changeEditTimerTextViewColorIfNotEmpty();
   }
 
-  public void setZeroedOutEditTimer() {
-    editPopUpTimerArray.clear();
-    setEditPopUpTimerValues();
-    timerValueInEditPopUpTextView.setText("00:00");
-  }
-
   public void toggleInfinityModeAndSetRoundType() {
     if (editHeaderSelected==1) {
       if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
@@ -2187,6 +2167,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       saveEditHeaderTimerStringValues();
+      //Todo: This is where it lies. We don't want it to change w/ infinity rounds, but this also controls the textView change on each press of numberpad.
       timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
       int totalTime = convertStringToSecondsValue(editPopUpTimerString);
@@ -2654,8 +2635,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void adjustCustom(boolean adding) {
-    //Hides soft keyboard by using a token of the current editCycleView.
-    inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
@@ -2668,6 +2647,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
           case 2:
             addOrReplaceRounds(0, roundIsSelected);
+            break;
           case 3:
             addOrReplaceRounds(breakValue, roundIsSelected);
             editPopUpTimerArray = convertIntegerToStringArray(breakValue);
