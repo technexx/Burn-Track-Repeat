@@ -424,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   //Todo: Action bar button fading for highlught mode still a bit wonky.
-  //Todo: Default editText round values for Pom starts @ 00:05 - should default to minimum.
   //Todo: Test total times again.
   //Todo: Test Pom total times.
   //Todo: Test all spannable iterations.
@@ -1351,7 +1350,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editHeaderSelected==3) addToEditPopUpTimerArrays(savedEditPopUpArrayForThirdHeader, textButton);
 
       }
-      setEditPopUpTimerValues();
+      setEditPopUpTimerStringValues();
     };
 
     number_one.setOnClickListener(numberPadListener);
@@ -1384,7 +1383,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
-      setEditPopUpTimerValues();
+      setEditPopUpTimerStringValues();
     });
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
@@ -2163,12 +2162,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setEditPopUpTimerValues() {
+  public void setEditPopUpTimerStringValues() {
     String editPopUpTimerString = "";
     if (mode==1) {
       editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       saveEditHeaderTimerStringValues();
-      //Todo: This is where it lies. We don't want it to change w/ infinity rounds, but this also controls the textView change on each press of numberpad.
       timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
       int totalTime = convertStringToSecondsValue(editPopUpTimerString);
@@ -2201,7 +2199,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     changeEditTimerTextViewColorIfNotEmpty();
+  }
 
+  public void convertEditPopUpTimerArrayToStringValues(int chosenMode) {
+    if (chosenMode==1) {
+
+    }
   }
 
   public String convertedTimerArrayToString(ArrayList<String> arrayToConvert) {
@@ -2644,7 +2647,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 1:
             addOrReplaceRounds(setValue, roundIsSelected);
             editPopUpTimerArray = convertIntegerToStringArray(setValue);
-            setEditPopUpTimerValues();
+            setEditPopUpTimerStringValues();
             break;
           case 2:
             addOrReplaceRounds(0, roundIsSelected);
@@ -2652,7 +2655,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 3:
             addOrReplaceRounds(breakValue, roundIsSelected);
             editPopUpTimerArray = convertIntegerToStringArray(breakValue);
-            setEditPopUpTimerValues();
+            setEditPopUpTimerStringValues();
             break;
           case 4:
             addOrReplaceRounds(0, roundIsSelected);
@@ -2668,7 +2671,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
         savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
 
-        setEditPopUpTimerValues();
+        setEditPopUpTimerStringValues();
 
         if (pomValuesTime.size()==0) {
           for (int i = 0; i < 3; i++) {
@@ -3589,11 +3592,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomValue1 = 1500;
     pomValue2 = 300;
     pomValue3 = 1200;
+
+    String editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
+    timerValueInEditPopUpTextView.setText(editPopUpTimerString);
+
     savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
     savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
     savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
 
-    setEditPopUpTimerValues();
+    String convertedStringOne = convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
+    String convertedStringTwo = convertedTimerArrayToString(savedEditPopUpArrayForSecondHeaderModeThree);
+    String convertedStringThree = convertedTimerArrayToString(savedEditPopUpArrayForThirdHeader);
+
+    pomTimerValueInEditPopUpTextViewOne.setText(convertedStringOne);
+    pomTimerValueInEditPopUpTextViewTwo.setText(convertedStringTwo);
+    pomTimerValueInEditPopUpTextViewThree.setText(convertedStringThree);
   }
 
   public void setDefaultEditRoundViews() {
