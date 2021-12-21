@@ -423,9 +423,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
+  //Todo: Action bar button fading for highlught mode still a bit wonky.
+  //Todo: Default editText round values for Pom starts @ 00:05 - should default to minimum.
   //Todo: Test total times again.
   //Todo: Test Pom total times.
-  //Todo: Easier solution is just to use XX:XX for everything for Pom spannables.
   //Todo: Test all spannable iterations.
   //Todo: Should do theme changes just so we get familiar with themes + style.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
@@ -2825,14 +2826,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setRoundRecyclerViewsWhenChangingAdapterCount(int numberOfAdapters) {
+    ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
+    ConstraintLayout.LayoutParams roundRecyclerParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
+
     if (numberOfAdapters == 1) {
       roundRecyclerTwo.setVisibility(View.GONE);
       roundListDivider.setVisibility(View.GONE);
-      recyclerLayoutOne.leftMargin = 240;
+
+      roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(180);
+      roundRecyclerParams.leftMargin = 60;
+      roundRecyclerParams.rightMargin = 0;
     } else if (numberOfAdapters==2){
-      recyclerLayoutOne.leftMargin = 15;
       roundRecyclerTwo.setVisibility(View.VISIBLE);
       roundListDivider.setVisibility(View.VISIBLE);
+
+      roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(240);
+      roundRecyclerParams.leftMargin = 0;
+      roundRecyclerParams.rightMargin = 300;
     }
   }
 
@@ -3587,14 +3597,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setDefaultEditRoundViews() {
-    //Instance of layout objects we can set programmatically based on which mode we're on.
     ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
     ConstraintLayout.LayoutParams secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
     ConstraintLayout.LayoutParams thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
-
-    ConstraintLayout.LayoutParams addParams = (ConstraintLayout.LayoutParams) addRoundToCycleButton.getLayoutParams();
-    ConstraintLayout.LayoutParams subParams = (ConstraintLayout.LayoutParams) subtractRoundFromCycleButton.getLayoutParams();
-    ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
 
     ConstraintLayout.LayoutParams secondEditHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
     ConstraintLayout.LayoutParams deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
