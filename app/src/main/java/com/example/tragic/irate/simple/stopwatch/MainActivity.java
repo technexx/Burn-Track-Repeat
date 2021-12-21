@@ -937,6 +937,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
     LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
+    //Todo: Colors not set until below, so setting a default w/ in this won't work.
     setDefaultTimerValuesAndTheirEditTextViews();
     instantiateNotifications();
 
@@ -969,6 +970,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.notifyDataSetChanged();
 
         setDefaultSettings();
+        setDefaultEditRoundViews();
+        instantiateNotifications();
       });
     });
 
@@ -1001,9 +1004,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
     slide_left.setDuration(400);
     savedCycleRecycler.startAnimation(slide_left);
-
-    //Sets all editTexts to GONE, and then populates them + textViews based on mode.
-    setDefaultEditRoundViews();
 
     //Watches editText title box and passes its value into the String that gets saved/updated in database.
     TextWatcher titleTextWatcher = new TextWatcher() {
@@ -3610,6 +3610,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setDefaultEditRoundViews() {
+    setDefaultTimerValuesAndTheirEditTextViews();
+
     ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
     ConstraintLayout.LayoutParams secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
     ConstraintLayout.LayoutParams thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
@@ -3618,6 +3620,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ConstraintLayout.LayoutParams deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
 
     timeLeft.setText(timeLeftValueHolder);
+    setEditPopUpTimerHeaders(1);
+
     switch (mode) {
       case 1:
         firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
@@ -3654,6 +3658,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
         break;
       case 3:
+        firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
+
         secondEditHeaderParams.rightMargin = 0;
         deleteEditTimerNumbersParams.rightMargin = convertDensityPixelsToScalable(8);
         deleteEditTimerNumbersParams.topMargin = convertDensityPixelsToScalable(8);
