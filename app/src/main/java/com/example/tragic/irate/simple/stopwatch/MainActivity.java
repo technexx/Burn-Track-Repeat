@@ -423,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
+  //Todo: Reset/Resume does not appear after nextRound() (needs pause/resume to set boolean).
   //Todo: Action bar button fading for highlught mode still a bit wonky.
   //Todo: Test total times again.
   //Todo: Test Pom total times.
@@ -2907,6 +2908,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomArray.set(positionOfSelectedCycle, pomString);
       }
     } else if (action == DELETING_CYCLE) {
+
       int posToRemove = receivedHighlightPositionHolder.get(0);
 
       if (mode==1) {
@@ -2915,8 +2917,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRoundArray.remove(posToRemove);
           workoutCyclesArray.remove(posToRemove);
           posToRemove = receivedHighlightPositionHolder.get(i);
-          posToRemove--;
+          if (posToRemove>=1) {
+            posToRemove--;
+          }
         }
+
         savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode==3) {
@@ -2924,7 +2929,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomTitleArray.remove(posToRemove);
           pomArray.remove(posToRemove);
           posToRemove = receivedHighlightPositionHolder.get(i);
-          posToRemove--;
+          if (posToRemove>=1) {
+            posToRemove--;
+          }
         }
         savedPomCycleAdapter.notifyDataSetChanged();
       }
