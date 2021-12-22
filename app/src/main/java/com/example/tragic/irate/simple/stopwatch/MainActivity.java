@@ -423,7 +423,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Pressing "next round" after resetting a cycle in the middle of a round will add seconds to totalTime.
+  //Todo: Pressing "next round" after resetting a cycle in the middle of a round will add seconds to totalTime. (Adds whatever duration had elapsed in that round).
+  //Todo: Starting new iteration of cycle will also add full value of last round to totalTime.
+  //Todo: Sometimes when clicking flashing timer @ end of cycle to reset, total time will add a second. Likely due to +100 rounding.
+  //Todo: Round beginning w/ first dot faded after full cycle finishes.
   //Todo: Action bar button fading for highlught mode still a bit wonky.
   //Todo: Test total times again.
   //Todo: Test Pom total times.
@@ -1547,6 +1550,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           resetTimer();
         }
       }
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
     });
 
     new_lap.setOnClickListener(v -> {
@@ -2324,6 +2329,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       resetTimer();
       roundedValueForTotalTimes = 0;
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
     }
   }
 
@@ -3184,7 +3191,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         return;
       }
-      //Fade out effect for dots so they always end their fade @ 105 alpha (same alpha they retain once completed).
+
+      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+
       mHandler.post(endFade);
 
       //If skipping round manually, cancel timer and objectAnimator.
@@ -3195,9 +3205,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setTextSize(90f);
         if (!activeCycle) activeCycle = true;
       }
-
-      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
       boolean isAlertRepeating = false;
       switch (typeOfRound.get(currentRound)) {
@@ -3295,6 +3302,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
+
+//          Log.i("testTime", "setMillis is " + setMillis);
+//          Log.i("testTime", "placeHolder is " + timerDurationPlaceHolder);
+
+          //Todo: totalTime is getting added to twice at end of cycle because addAndRoundDownTotalCycleTimeFromPreviousRounds() is called in resetTimer() in addition to final round in nextRound, because count is still 1 because our delay runnable hasn't subtracted it yet.
+          Log.i("testTime", "single round is " + cycleSetTimeForSingleRoundInMillis);
+          Log.i("testTime", "total is " + totalCycleSetTimeInMillis);
           break;
         case 2:
           if (resettingTotalTime) {
@@ -3302,13 +3316,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
-          cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
+          cycleSetTimeForSingleRoundInMillis = setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
 
-          Log.i("testTime", "setMillis is " + setMillis);
-          Log.i("testTime", "single round is " + cycleSetTimeForSingleRoundInMillis);
-          Log.i("testTime", "total is " + totalCycleSetTimeInMillis);
+//          Log.i("testTime", "setMillis is " + setMillis);
+//          Log.i("testTime", "placeHolder is " + timerDurationPlaceHolder);
+//          Log.i("testTime", "single round is " + cycleSetTimeForSingleRoundInMillis);
+//          Log.i("testTime", "total is " + totalCycleSetTimeInMillis);
           break;
         case 3:
           if (resettingTotalTime) {
@@ -3317,7 +3332,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
-          cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolder;
+          cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
           addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTime);
           break;
@@ -3362,6 +3377,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Resume from pauseAndResuem() calls startObjectAnimatorAndTotalCycleTimeCounters();
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean newRound) {
     if (mode==1) {
       if (newRound) {
@@ -3828,8 +3844,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBar.setProgress(10000);
     currentProgressBarValue = 10000;
 
-    addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+//    addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+//    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
     reset.setVisibility(View.INVISIBLE);
 
