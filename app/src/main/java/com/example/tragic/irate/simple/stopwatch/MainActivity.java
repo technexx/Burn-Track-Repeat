@@ -423,16 +423,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Round beginning w/ first dot faded after full cycle finishes.
   //Todo: Action bar button fading for highlught mode still a bit wonky.
   //Todo: Test total times again, including alternating infinity/non-infinity rounds.
   //Todo: Test Pom total times.
   //Todo: Test all spannable iterations.
-  //Todo: Should do theme changes just so we get familiar with themes + style.
+  //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
   //Todo: TDEE in sep popup w/ tabs.
-  //Todo: Add color scheme options.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
@@ -3833,6 +3831,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     timerIsPaused = true;
     timerEnded = false;
+    timerDisabled = false;
     next_round.setEnabled(true);
 
     progressBar.setProgress(10000);
