@@ -423,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Reset/Resume does not appear after nextRound() (needs pause/resume to set boolean).
+  //Todo: Pressing "next round" after resetting a cycle in the middle of a round will add seconds to totalTime.
   //Todo: Action bar button fading for highlught mode still a bit wonky.
   //Todo: Test total times again.
   //Todo: Test Pom total times.
@@ -3193,6 +3193,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
         timeLeft.setTextSize(90f);
+        if (!activeCycle) activeCycle = true;
       }
 
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
