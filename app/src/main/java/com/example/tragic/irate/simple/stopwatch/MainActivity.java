@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Settings fragment bug: Was found not bringing up fragment after highlight round deletion. Might be app bar "cancelHighlight" button overriding.
+  //Todo: Had an instance of total time resetting to 0 (or not saving) when resetting a cycle.
   //Todo: Test total times again, including alternating infinity/non-infinity rounds.
   //Todo: Test Pom total times.
   //Todo: Test all spannable iterations.
@@ -1156,6 +1156,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
         addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
+        Log.i("testTime", "single is " + cycleSetTimeForSingleRoundInMillis);
+        Log.i("testTime", "total is " + totalCycleSetTimeInMillis);
       } else {
         if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
         //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
@@ -3373,9 +3375,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
           timerDurationPlaceHolder = setMillis;
+          cycleSetTimeForSingleRoundInMillis = 0;
         }
         if (typeOfRound.get(currentRound) == 3 || typeOfRound.get(currentRound) == 4) {
           timerDurationPlaceHolder = breakMillis;
+          cycleBreakTimeForSingleRoundInMillis = 0;
         }
       }
     }
