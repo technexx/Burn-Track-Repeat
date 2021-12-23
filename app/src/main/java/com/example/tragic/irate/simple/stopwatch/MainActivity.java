@@ -181,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton delete_highlighted_cycle;
   ImageButton cancelHighlight;
   TextView sortButton;
-  ImageView global_settings;
 
   int mode = 1;
   int savedMode = 1;
@@ -423,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Action bar button fading for highlught mode still a bit wonky.
+  //Todo: Settings fragment bug: Was found not bringing up fragment after highlight round deletion. Might be app bar "cancelHighlight" button overriding.
   //Todo: Test total times again, including alternating infinity/non-infinity rounds.
   //Todo: Test Pom total times.
   //Todo: Test all spannable iterations.
@@ -659,6 +658,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case R.id.global_settings:
+        launchGlobalSettings();
+        break;
       case R.id.delete_all_cycles:
         if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
           Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
@@ -800,7 +802,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
     sortButton = findViewById(R.id.sortButton);
-    global_settings = findViewById(R.id.global_settings);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -1071,21 +1072,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    global_settings.setOnClickListener(v-> {
-      if (!aSettingsMenuIsVisible) {
-        settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-        settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
-
-        if (rootSettingsFragment !=null) {
-          getSupportFragmentManager().beginTransaction()
-                  .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
-                  .attach(rootSettingsFragment)
-                  .commit();
-        }
-        aSettingsMenuIsVisible = true;
-      }
-    });
-
     //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
       fab.setEnabled(false);
@@ -1287,6 +1273,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
     });
 
+
     delete_highlighted_cycle.setOnClickListener(v-> {
       //Disables button until next highlight enables it (to prevent index errors).
       delete_highlighted_cycle.setEnabled(false);
@@ -1299,11 +1286,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
       editCycleArrayLists(DELETING_CYCLE);
-
-      cancelHighlight.setVisibility(View.INVISIBLE);
-      edit_highlighted_cycle.setVisibility(View.INVISIBLE);
-      delete_highlighted_cycle.setVisibility(View.INVISIBLE);
-      appHeader.setVisibility(View.VISIBLE);
 
       if (mode==1) savedCycleAdapter.removeHighlight(true);
       if (mode==3) savedPomCycleAdapter.removeHighlight(true);
@@ -1456,7 +1438,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityRunnableForSets = new Runnable() {
       @Override
       public void run() {
-//        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         if (setMillis>=60000 && !textSizeIncreased) {
           changeTextSize(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
@@ -1478,7 +1459,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityRunnableForBreaks = new Runnable() {
       @Override
       public void run() {
-//        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         if (breakMillis>=60000 && !textSizeIncreased) {
           changeTextSize(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
@@ -1977,6 +1957,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter.changeColorSetting(3, workColorNumericValue);
     savedPomCycleAdapter.changeColorSetting(4, miniBreakColorNumericValue);
     savedPomCycleAdapter.changeColorSetting(5, fullBreakColorNumericValue);
+  }
+
+  public void launchGlobalSettings() {
+    settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+    settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+    if (rootSettingsFragment !=null) {
+      getSupportFragmentManager().beginTransaction()
+              .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
+              .attach(rootSettingsFragment)
+              .commit();
+    }
+    aSettingsMenuIsVisible = true;
   }
 
   public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
@@ -2544,14 +2537,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Boolean used to keep launchCycles() from calling populateRoundLists(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
-      cancelHighlight.startAnimation(fadeOut);
       appHeader.startAnimation(fadeIn);
       sortButton.startAnimation(fadeIn);
-      //Re-enabling sort button now that edit mode has exited.
+
+      //Todo: This b0rk global settings button.
+      cancelHighlight.startAnimation(fadeOut);
+      cancelHighlight.setVisibility(View.GONE);
+
       sortButton.setEnabled(true);
-      //Disabling edit/delete buttons.
       edit_highlighted_cycle.setEnabled(false);
       delete_highlighted_cycle.setEnabled(false);
+      cancelHighlight.setEnabled(false);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
       sortButton.setVisibility(View.VISIBLE);
@@ -3307,10 +3303,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
-
-//          Log.i("testTime", "setMillis is " + setMillis);
-//          Log.i("testTime", "single round is " + cycleSetTimeForSingleRoundInMillis);
-//          Log.i("testTime", "total is " + totalCycleSetTimeInMillis);
           break;
         case 3:
           if (resettingTotalTime) {
@@ -3386,9 +3378,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerDurationPlaceHolder = breakMillis;
         }
       }
-      Log.i("testTime", "setMillis on SAVE is " + setMillis);
-      Log.i("testTime", "single round on SAVE is " + cycleSetTimeForSingleRoundInMillis);
-      Log.i("testTime", "total on SAVE is " + totalCycleSetTimeInMillis);
     }
     if (mode==3) {
       switch (pomDotCounter) {
