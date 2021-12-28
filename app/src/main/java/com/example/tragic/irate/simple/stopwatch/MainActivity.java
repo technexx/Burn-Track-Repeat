@@ -158,6 +158,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView number_nine;
   TextView number_zero;
   ImageButton deleteEditPopUpTimerNumbers;
+
+  boolean isSavedInfinityOptionActiveForSets;
+  boolean isSavedInfinityOptionActiveForBreaks;
   ArrayList<String> editPopUpTimerArray;
   ArrayList<String> editPopUpTimerArrayCapped;
   ArrayList<String> savedEditPopUpArrayForFirstHeaderModeOne;
@@ -422,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Clicking inside edit popUp should regain focus (and dismiss soft kb) after clicking in title editText
+  //Todo: Infinity mode on/off does not save for individual headers.
   //Todo: Had an instance of total time resetting to 0 (or not saving) when resetting a cycle.
   //Todo: Test total times again, including alternating infinity/non-infinity rounds.
   //Todo: Test Pom total times.
@@ -1166,13 +1169,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dotDraws.setMode(mode);
     });
 
-    editCyclesPopupView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-      @Override
-      public void onSystemUiVisibilityChange(int visibility) {
-        assignOldCycleValuesToCheckForChanges();
-      }
-    });
-
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       setViewsAndColorsToPreventTearingInEditPopUp(false);
@@ -1367,7 +1363,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     toggleInfinityRounds.setOnClickListener(v-> {
-      if (toggleInfinityRounds.getAlpha()==1.0f) toggleInfinityRounds.setAlpha(0.3f); else toggleInfinityRounds.setAlpha(1.0f);
+      if (toggleInfinityRounds.getAlpha()==1.0f) {
+        toggleInfinityRounds.setAlpha(0.3f);
+        if (mode==1) isSavedInfinityOptionActiveForSets = false;
+        if (mode==3) isSavedInfinityOptionActiveForBreaks = false;
+      } else {
+        toggleInfinityRounds.setAlpha(1.0f);
+        if (mode==1) isSavedInfinityOptionActiveForSets = true;
+        if (mode==3) isSavedInfinityOptionActiveForBreaks = true;
+      }
     });
 
     ////--EditCycles Menu Item onClicks START--////
@@ -2061,6 +2065,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         newDraw.setColorFilter(setColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
 
+        if (isSavedInfinityOptionActiveForSets) {
+          toggleInfinityRounds.setAlpha(1.0f);
+        } else {
+          toggleInfinityRounds.setAlpha(0.3f);
+        }
+        toggleInfinityModeAndSetRoundType();
+
         editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
       }
       if (mode==3) {
@@ -2079,6 +2090,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
         newDraw.setColorFilter(breakColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
+
+        if (isSavedInfinityOptionActiveForBreaks) {
+          toggleInfinityRounds.setAlpha(1.0f);
+        } else {
+          toggleInfinityRounds.setAlpha(0.3f);
+        }
+        toggleInfinityModeAndSetRoundType();
 
         editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
       }
