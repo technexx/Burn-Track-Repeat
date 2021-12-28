@@ -422,6 +422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
+  //Todo: Clicking inside edit popUp should regain focus (and dismiss soft kb) after clicking in title editText
   //Todo: Had an instance of total time resetting to 0 (or not saving) when resetting a cycle.
   //Todo: Test total times again, including alternating infinity/non-infinity rounds.
   //Todo: Test Pom total times.
@@ -895,7 +896,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
     stopWatchView = timerPopUpView.findViewById(R.id.stopWatchView);
-    dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
     msTime = timerPopUpView.findViewById(R.id.msTime);
     lapRecycler = timerPopUpView.findViewById(R.id.lap_recycler);
@@ -1081,6 +1081,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Clears round adapter arrays so they can be freshly populated.
       clearRoundAdapterArrays();
       editCyclesPopupWindow.showAsDropDown(tabLayout);
+      setViewsAndColorsToPreventTearingInEditPopUp(true);
 
       assignOldCycleValuesToCheckForChanges();
     });
@@ -1156,8 +1157,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
         addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
-        Log.i("testTime", "single is " + cycleSetTimeForSingleRoundInMillis);
-        Log.i("testTime", "total is " + totalCycleSetTimeInMillis);
       } else {
         if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
         //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
@@ -1176,19 +1175,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
+      setViewsAndColorsToPreventTearingInEditPopUp(false);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-
-      //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
-      if (!makeCycleAdapterVisible) {
-        if (mode==1) {
-          savedCycleAdapter.notifyDataSetChanged();
-          savedCycleRecycler.setVisibility(View.VISIBLE);
-        }
-        if (mode==3) {
-          savedPomCycleAdapter.notifyDataSetChanged();
-          savedPomCycleRecycler.setVisibility(View.VISIBLE);
-        }
-      }
       //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
       fab.setEnabled(true);
       //If closing edit cycle popUp after editing a cycle, do the following.
@@ -1216,6 +1204,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
       //Displays edit cycles popUp.
       editCyclesPopupWindow.showAsDropDown(tabLayout);
+      setViewsAndColorsToPreventTearingInEditPopUp(true);
 
       //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
       positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
@@ -2301,6 +2290,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void setViewsAndColorsToPreventTearingInEditPopUp(boolean popUpIsActive) {
+    if (popUpIsActive) {
+      //Prevents tearing when soft keyboard pushes up in editCycle popUp.
+      if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
+      if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
+      emptyCycleList.setVisibility(View.GONE);
+      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
+    } else {
+      //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
+      if (!makeCycleAdapterVisible) {
+        if (mode==1) {
+          savedCycleAdapter.notifyDataSetChanged();
+          savedCycleRecycler.setVisibility(View.VISIBLE);
+        }
+        if (mode==3) {
+          savedPomCycleAdapter.notifyDataSetChanged();
+          savedPomCycleRecycler.setVisibility(View.VISIBLE);
+        }
+      }
+      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+    }
+
+  }
+
   public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
       progressBar.setProgress(currentProgressBarValue);
@@ -2639,6 +2652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void adjustCustom(boolean adding) {
+    inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
       //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
