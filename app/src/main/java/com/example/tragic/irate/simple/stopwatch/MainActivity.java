@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -2862,22 +2863,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void setRoundRecyclerViewsWhenChangingAdapterCount(int numberOfAdapters) {
     ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
+
     ConstraintLayout.LayoutParams roundRecyclerParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
+    ConstraintLayout.LayoutParams roundRecyclerTwoParams = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
+
+    DisplayMetrics metrics = getApplicationContext().getResources().getDisplayMetrics();
+    float ratio = ((float)metrics.heightPixels / (float)metrics.widthPixels);
+    Log.i("testRatio", "height is " + (float)metrics.heightPixels);
+    Log.i("testRatio", "width is " + (float)metrics.widthPixels);
+    Log.i("testRatio", "ratio is " + ratio);
 
     if (numberOfAdapters == 1) {
       roundRecyclerTwo.setVisibility(View.GONE);
       roundListDivider.setVisibility(View.GONE);
 
-      roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(180);
-      roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(60);
+      //16:9 is ~1.7.
+      if (ratio<1.8f) {
+        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(180);
+        roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(60);
+      } else {
+        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(200);
+        roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(20);
+      }
+
       roundRecyclerParams.rightMargin = 0;
     } else if (numberOfAdapters==2){
       roundRecyclerTwo.setVisibility(View.VISIBLE);
       roundListDivider.setVisibility(View.VISIBLE);
 
-      roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(240);
-      roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(10);
-      roundRecyclerParams.rightMargin = convertDensityPixelsToScalable(300);
+      if (ratio<1.8f) {
+        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(240);
+        roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(10);
+
+      } else {
+        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(260);
+        roundRecyclerParams.rightMargin = convertDensityPixelsToScalable(150);
+        roundRecyclerTwoParams.rightMargin = convertDensityPixelsToScalable(10);
+      }
     }
   }
 
