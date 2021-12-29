@@ -2869,15 +2869,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundListDivider.setVisibility(View.GONE);
 
       roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(180);
-      roundRecyclerParams.leftMargin = 60;
+      roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(60);
       roundRecyclerParams.rightMargin = 0;
     } else if (numberOfAdapters==2){
       roundRecyclerTwo.setVisibility(View.VISIBLE);
       roundListDivider.setVisibility(View.VISIBLE);
 
       roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(240);
-      roundRecyclerParams.leftMargin = 0;
-      roundRecyclerParams.rightMargin = 300;
+      roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(10);
+      roundRecyclerParams.rightMargin = convertDensityPixelsToScalable(300);
     }
   }
 

@@ -52,8 +52,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
-        android:layout_marginTop="8dp"
-        android:textSize="23sp"
+        android:layout_marginTop="10dp"
+        android:textSize="30sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -62,8 +62,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
-        android:layout_marginTop="8dp"
-        android:textSize="23sp"
+        android:layout_marginTop="10dp"
+        android:textSize="30sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -72,9 +72,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/secondRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="26dp"
-        android:textSize="23sp"
+        android:textSize="30sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -84,46 +84,43 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"
-        android:textSize="36sp">
+        android:textSize="48sp">
     </TextView>
 
     <TextView
-        android:text="00:05"
         android:id="@+id/pomTimerValueInEditPopUpTextViewOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewTwo"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="20dp"
         android:layout_marginStart="6dp"
         android:textSize="28sp">
     </TextView>
 
     <TextView
-        android:text="00:05"
         android:id="@+id/pomTimerValueInEditPopUpTextViewTwo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewOne"
         app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewThree"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="20dp"
         android:layout_marginStart="2sp"
         android:textSize="28sp">
     </TextView>
 
     <TextView
-        android:text="00:05"
         android:id="@+id/pomTimerValueInEditPopUpTextViewThree"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewTwo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="28dp"
         android:textSize="28sp">
     </TextView>
@@ -133,8 +130,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
+        app:layout_constraintBottom_toTopOf="@id/number_pad_layout"
         android:src="@drawable/cancel_x"
+        android:layout_marginBottom="26dp"
         android:background="@drawable/ripple_effect_2">
     </ImageButton>
 
@@ -145,7 +143,7 @@
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewTwo"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="-8dp"
         android:src="@drawable/infinity_large_green"
         android:backgroundTint="@color/test_black">
@@ -158,7 +156,7 @@
         android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/number_pad_layout"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="4dp"
         android:textSize="15sp"
         android:gravity="center"
@@ -179,7 +177,7 @@
         android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/number_pad_layout"
-        android:layout_marginBottom="106dp"
+        android:layout_marginBottom="72dp"
         android:layout_marginEnd="4dp"
         android:textSize="15sp"
         android:gravity="center"
@@ -201,12 +199,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="20dp"
-        android:layout_marginTop="6dp">
+        android:layout_marginTop="12dp">
 
         <TextView
             android:id="@+id/one_button"
             android:text="1"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -221,7 +219,7 @@
         <TextView
             android:id="@+id/two_button"
             android:text="2"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -236,7 +234,7 @@
         <TextView
             android:id="@+id/three_button"
             android:text="3"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -251,7 +249,7 @@
         <TextView
             android:id="@+id/four_button"
             android:text="4"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -266,7 +264,7 @@
         <TextView
             android:id="@+id/five_button"
             android:text="5"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -281,7 +279,7 @@
         <TextView
             android:id="@+id/six_button"
             android:text="6"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -296,7 +294,7 @@
         <TextView
             android:id="@+id/seven_button"
             android:text="7"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -311,7 +309,7 @@
         <TextView
             android:id="@+id/eight_button"
             android:text="8"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -326,7 +324,7 @@
         <TextView
             android:id="@+id/nine_button"
             android:text="9"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -341,7 +339,7 @@
         <TextView
             android:id="@+id/zero_button"
             android:text="0"
-            android:textSize="32sp"
+            android:textSize="40sp"
             style="@style/EditButtonTextColor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -360,9 +358,8 @@
         android:layout_height="240dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/number_pad_layout"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:paddingTop="4dp"
-        android:layout_marginBottom="6dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/recycler_border">
 
@@ -371,6 +368,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginStart="4dp">
         </androidx.recyclerview.widget.RecyclerView>
@@ -393,7 +391,7 @@
             app:layout_constraintStart_toEndOf="@id/round_list_divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginEnd="4dp">
+            android:layout_marginStart="10dp">
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
