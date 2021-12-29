@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: Infinity mode on/off does not save for individual headers.
+  //Todo: Long aspect size for dot draws.
   //Todo: Had an instance of total time resetting to 0 (or not saving) when resetting a cycle.
   //Todo: Test total times again, including alternating infinity/non-infinity rounds.
   //Todo: Test Pom total times.
