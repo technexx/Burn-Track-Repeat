@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="30dp"
         android:textColor="@color/teal_200"
-        android:textSize="22sp">
+        android:textSize="25sp">
     </TextView>
 
     <TextView
@@ -29,7 +29,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"
         android:textColor="@color/white"
-        android:textSize="20sp">
+        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -38,10 +38,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycles_completed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/total_break_header"
+        app:layout_constraintEnd_toStartOf="@id/reset_total_times"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="30dp"
-        android:textSize="18sp">
+        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -50,10 +49,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycles_completed"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/total_set_header"
+        app:layout_constraintStart_toEndOf="@id/reset_total_times"
         android:layout_marginTop="25dp"
-        android:layout_marginStart="30dp"
-        android:textSize="18sp">
+        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -64,7 +62,7 @@
         app:layout_constraintStart_toStartOf="@id/total_set_header"
         app:layout_constraintEnd_toEndOf="@id/total_set_header"
         android:layout_marginTop="2dp"
-        android:textSize="18sp">
+        android:textSize="22sp">
     </TextView>
 
     <TextView
@@ -75,7 +73,7 @@
         app:layout_constraintStart_toStartOf="@id/total_break_header"
         app:layout_constraintEnd_toEndOf="@id/total_break_header"
         android:layout_marginTop="2dp"
-        android:textSize="18sp">
+        android:textSize="22sp">
     </TextView>
 
     <ImageButton
@@ -93,9 +91,10 @@
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
+        app:layout_constraintTop_toBottomOf="@id/reset_total_times"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="40dp">
     </com.example.tragic.irate.simple.stopwatch.DotDraws>
 
     <TextView
@@ -106,7 +105,8 @@
         app:layout_constraintTop_toTopOf="@id/progressBar"
         app:layout_constraintBottom_toBottomOf="@id/progressBar"
         app:layout_constraintStart_toStartOf="@id/progressBar"
-        app:layout_constraintEnd_toEndOf="@id/progressBar">
+        app:layout_constraintEnd_toEndOf="@id/progressBar"
+        android:textSize="80sp">
     </TextView>
 
     <TextView
@@ -119,17 +119,17 @@
         android:backgroundTint="@color/black"
         android:textColor="@color/white"
         android:layout_marginBottom="33dp"
-        android:textSize="16sp">
+        android:textSize="18sp">
     </TextView>
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="54dp"
         style="?android:attr/progressBarStyleHorizontal"
         android:max="10000"
         android:progressDrawable="@drawable/circle_progress"
@@ -138,8 +138,9 @@
 
     <ImageView
         android:id="@+id/stopWatchView"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginBottom="54dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -148,12 +149,12 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pauseResumeButton"
-        android:layout_width="190dp"
-        android:layout_height="190dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="54dp"
         app:cornerRadius="90dp">
     </com.google.android.material.button.MaterialButton>
 
@@ -205,10 +206,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/white"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="30dp"
         android:paddingBottom="4dp"
         android:paddingTop="4dp"
-        android:textSize="18sp">
+        android:textSize="20sp">
     </TextView>
 
     <ImageButton
