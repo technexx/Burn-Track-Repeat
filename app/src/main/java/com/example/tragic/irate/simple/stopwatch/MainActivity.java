@@ -423,8 +423,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
+  //Todo: "Unable to add window" crash when using edit popUp.
   //Todo: Total time issues w/ infinity rounds - may be related to other cycles using non-infinity rounds.
-  //Todo: edit popUp dismiss on edit shwos save toast but either a) not saving or b) not updating adapter.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.
   //Todo: Had an instance of tota`l time resetting to 0 (or not saving) when resetting a cycle.
