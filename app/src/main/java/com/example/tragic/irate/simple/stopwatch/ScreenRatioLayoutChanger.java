@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
+package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.util.DisplayMetrics;

@@ -5,20 +5,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
-import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
-import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ScreenRatioLayoutChanger;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.logging.Handler;
 
 public class DotDraws extends View {
   Context mContext;

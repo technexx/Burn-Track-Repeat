@@ -27,8 +27,6 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -49,7 +47,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,10 +57,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -73,7 +68,6 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
-import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
@@ -429,8 +423,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
+  //Todo: Total time issues w/ infinity rounds - may be related to other cycles using non-infinity rounds.
   //Todo: edit popUp dismiss on edit shwos save toast but either a) not saving or b) not updating adapter.
-  //Todo: Check text size changes w/ new aspect ratio conditional.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.
   //Todo: Had an instance of tota`l time resetting to 0 (or not saving) when resetting a cycle.
@@ -3512,6 +3506,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void changeTextSize(ValueAnimator va, TextView textView) {
+    changeValueAnimatorNumbers();
     sizeAnimator = va;
     sizeAnimator.addUpdateListener(animation -> {
       float sizeChange = (float) va.getAnimatedValue();
@@ -3519,6 +3514,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
     sizeAnimator.setRepeatCount(0);
     sizeAnimator.start();
+  }
+
+  public void changeValueAnimatorNumbers() {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      valueAnimatorDown.setFloatValues(90f, 70f);
+      valueAnimatorUp.setFloatValues(70f, 90f);
+    } else {
+      valueAnimatorDown.setFloatValues(120f, 90f);
+      valueAnimatorUp.setFloatValues(90f, 120f);
+    }
   }
 
   public void newLap() {
