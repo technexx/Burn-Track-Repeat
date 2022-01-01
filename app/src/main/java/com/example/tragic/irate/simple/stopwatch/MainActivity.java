@@ -1105,6 +1105,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dotDraws.setMode(4);
       setInitialTextSizeForRounds(0);
       populateTimerUI();
+
+      timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
     });
 
     //Showing sort popup window.
@@ -3869,10 +3871,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycle_title_layout.topMargin = -25;
 
         timerDisabled = false;
-        timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
         cycle_title_textView.setVisibility(View.INVISIBLE);
         if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
-        blankCanvas.setVisibility(View.VISIBLE);
         break;
     }
   }
