@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
-  //Todo: Limit chars in saved cycle titles so they display properly when launching timer.
+  //Todo: edit popUp dismiss on edit shwos save toast but either a) not saving or b) not updating adapter.
   //Todo: Check text size changes w/ new aspect ratio conditional.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.

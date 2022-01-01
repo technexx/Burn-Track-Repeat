@@ -12,7 +12,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="15sp"
-        android:textColor="@color/silver">
+        android:textColor="@color/silver"
+        android:maxLines="1"
+        android:gravity="center">
     </TextView>
 
     <TextView

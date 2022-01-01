@@ -34,7 +34,9 @@
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:singleLine="true"
-        android:inputType="textAutoCorrect|textAutoComplete|textMultiLine">
+        android:inputType="textAutoCorrect|textAutoComplete"
+        android:maxLines="1"
+        android:maxLength="50">
     </EditText>
 
     <View
