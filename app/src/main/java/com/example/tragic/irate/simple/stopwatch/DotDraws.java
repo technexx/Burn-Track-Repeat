@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ScreenRatioLayoutChanger;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ public class DotDraws extends View {
   int MINI_BREAK_COLOR;
   int FULL_BREAK_COLOR;
 
+  ScreenRatioLayoutChanger screenRatioLayoutChanger;
+
   public interface sendAlpha {
     void sendAlphaValue(int alpha);
   }
@@ -68,6 +71,7 @@ public class DotDraws extends View {
     setWillNotDraw(false);
 
     setupPaint();
+    screenRatioLayoutChanger = new ScreenRatioLayoutChanger(mContext);
   }
 
   public void setAlpha(int alpha) {
@@ -167,7 +171,7 @@ public class DotDraws extends View {
     float encloseYStart = 0;
     float encloseYEnd = 0;
 
-    if (setScreenRatioBasedLayoutChanges()>=1.8f) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       encloseYEnd = 60;
       mY = mY+30;
     }
@@ -378,11 +382,5 @@ public class DotDraws extends View {
       return (minutes + ":" + df.format(remainingSeconds));
     } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
     else return "5";
-  }
-
-  public float setScreenRatioBasedLayoutChanges() {
-    DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-    float ratio = ((float)metrics.heightPixels / (float)metrics.widthPixels);
-    return ratio;
   }
 }

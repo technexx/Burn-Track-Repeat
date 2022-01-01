@@ -13,14 +13,23 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ScreenRatioLayoutChanger;
+
 public class LapListCanvas extends View {
     Canvas mCanvas;
     Paint mPaint;
     int mMode;
 
+    ScreenRatioLayoutChanger screenRatioLayoutChanger;
+    int gradientWidthAndHeight;
+    int gradientShadeMovement;
+    int gradientYAxisMovement;
+
     public LapListCanvas(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mPaint = new Paint();
+        screenRatioLayoutChanger = new ScreenRatioLayoutChanger(context);
+        setGradientWidth();
     }
 
     public void drawOutlineBox() {
@@ -28,7 +37,8 @@ public class LapListCanvas extends View {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(2);
 
-        RectF rect = new RectF(0, 0, convertDensityPixelsToScalable(240), convertDensityPixelsToScalable(240));
+        RectF rect = new RectF(0, convertDensityPixelsToScalable(10), convertDensityPixelsToScalable(gradientWidthAndHeight), convertDensityPixelsToScalable(gradientWidthAndHeight));
+
         mCanvas.drawRoundRect(rect, 50, 50, mPaint);
     }
 
@@ -40,9 +50,22 @@ public class LapListCanvas extends View {
         int alpha = 0;
         for (int i=0; i<22; i++) {
             mPaint.setAlpha(alpha);
-            mCanvas.drawRect(0, nextYCoord, convertDensityPixelsToScalable(240), nextYCoord + convertDensityPixelsToScalable(5), mPaint);
-            nextYCoord += convertDensityPixelsToScalable(5);
-            alpha+=12;
+            mCanvas.drawRect(0, nextYCoord, convertDensityPixelsToScalable(gradientWidthAndHeight), nextYCoord + convertDensityPixelsToScalable(gradientYAxisMovement), mPaint);
+
+            nextYCoord += convertDensityPixelsToScalable(gradientYAxisMovement);
+            alpha+=gradientShadeMovement;
+        }
+    }
+
+    public void setGradientWidth() {
+        if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+            gradientWidthAndHeight = 240;
+            gradientShadeMovement = 12;
+            gradientYAxisMovement = 5;
+        } else {
+            gradientWidthAndHeight = 280;
+            gradientShadeMovement = 10;
+            gradientYAxisMovement = 7;
         }
     }
 

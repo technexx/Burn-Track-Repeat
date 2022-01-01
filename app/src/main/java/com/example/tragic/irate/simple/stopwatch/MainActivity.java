@@ -73,6 +73,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
@@ -426,11 +427,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  //Todo: timeLeft textView size is set propgramatically depending on time left, so xml overrides ain't gonna work.
-  //Todo: Long aspect size for dot draws.
+  ScreenRatioLayoutChanger screenRatioLayoutChanger;
+
   //Todo: Limit chars in saved cycle titles so they display properly when launching timer.
+  //Todo: Check text size changes w/ new aspect ratio conditional.
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Had an instance of total time resetting to 0 (or not saving) when resetting a cycle.
+  //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.
+  //Todo: Had an instance of tota`l time resetting to 0 (or not saving) when resetting a cycle.
   //Todo: Test total times again, including alternating infinity/non-infinity rounds.
   //Todo: Test Pom total times.
   //Todo: Test all spannable iterations.
@@ -691,6 +694,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     actionBarView = findViewById(R.id.custom_action_bar);
     gson = new Gson();
 
+    screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
+
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
@@ -887,6 +892,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
     reset = timerPopUpView.findViewById(R.id.reset);
+    reset.setVisibility(View.INVISIBLE);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
 
     cycles_completed = timerPopUpView.findViewById(R.id.cycles_completed);
@@ -1170,6 +1176,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mode = savedMode;
       }
 
+      reset.setVisibility(View.INVISIBLE);
       dotDraws.setMode(mode);
     });
 
@@ -2875,7 +2882,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundListDivider.setVisibility(View.GONE);
 
       //16:9 is ~1.7.
-      if (setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(180);
         roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(60);
       } else {
@@ -2888,7 +2895,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundRecyclerTwo.setVisibility(View.VISIBLE);
       roundListDivider.setVisibility(View.VISIBLE);
 
-      if (setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(240);
         roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(10);
 
@@ -2898,12 +2905,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerTwoParams.rightMargin = convertDensityPixelsToScalable(10);
       }
     }
-  }
-
-  public float setScreenRatioBasedLayoutChanges() {
-    DisplayMetrics metrics = getApplicationContext().getResources().getDisplayMetrics();
-    float ratio = ((float)metrics.heightPixels / (float)metrics.widthPixels);
-    return ratio;
   }
 
   public String friendlyString(String altString) {
@@ -3478,14 +3479,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
   public void setInitialTextSizeForRounds(long millis) {
     if (millis>59000) {
-      if (setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         timeLeft.setTextSize(70f);
       } else {
         timeLeft.setTextSize(90f);
       }
       textSizeIncreased = false;
     } else {
-      if (setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         timeLeft.setTextSize(90f);
       } else {
         timeLeft.setTextSize(120f);

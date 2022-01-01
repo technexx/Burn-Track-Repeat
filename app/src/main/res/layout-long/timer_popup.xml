@@ -113,12 +113,11 @@
         android:id="@+id/msTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timeLeft"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="@color/black"
         android:textColor="@color/white"
-        android:layout_marginBottom="33dp"
         android:textSize="18sp">
     </TextView>
 
@@ -160,8 +159,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lap_recycler"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         app:layout_constraintTop_toBottomOf="@id/cycles_completed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -174,8 +173,8 @@
 
     <com.example.tragic.irate.simple.stopwatch.LapListCanvas
         android:id="@+id/lapCanvas"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         app:layout_constraintTop_toBottomOf="@id/cycles_completed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
