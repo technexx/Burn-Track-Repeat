@@ -424,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
-  //Todo: Resetting total time in infinity b0rks.
   //Todo: "Unable to add window" crash when using edit popUp. May be our popUp retaining focus away from Main activity.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.
@@ -1452,7 +1451,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateTotalTimeValuesEachTick();
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
-        //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
+
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
 
@@ -1473,7 +1472,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateTotalTimeValuesEachTick();
 
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
-        //Updates workoutTime list w/ millis values for round counting up, and passes those into dotDraws so the dot text also iterates up.
+
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
 
@@ -3341,6 +3340,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public void updateTotalTimeValuesEachTick() {
     String addedTime = "";
+    long remainder = 0;
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1:
@@ -3356,15 +3356,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 2:
           if (resettingTotalTime) {
-            setMillis = 0;
+            remainder = setMillis%1000;
+            timerDurationPlaceHolder = setMillis - remainder;
             resettingTotalTime = false;
           }
 
           cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
-
-          Log.i("testTime", "single round is " + cycleSetTimeForSingleRoundInMillis);
-          Log.i("testTime", "total rounds are " + totalCycleSetTimeInMillis);
 
           total_set_time.setText(addedTime);
           break;
@@ -3381,7 +3379,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 4:
           if (resettingTotalTime) {
-            breakMillis = 0;
+            remainder = setMillis%1000;
+            timerDurationPlaceHolder = setMillis - remainder;
             resettingTotalTime = false;
           }
 
