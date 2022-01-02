@@ -423,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
-  //Todo: "Unable to add window" crash when using edit popUp.
+  //Todo: "Unable to add window" crash when using edit popUp. May be our popUp retaining focus away from Main activity.
   //Todo: Total time issues w/ infinity rounds - may be related to other cycles using non-infinity rounds.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.
@@ -1241,6 +1241,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
           break;
       }
+      assignOldCycleValuesToCheckForChanges();
+
       runOnUiThread(()-> {
         //Changes view layout depending on +/- 8 round count.
         if (mode==1) {
@@ -2048,6 +2050,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ResumeOrResetCycle(RESETTING_CYCLE_FROM_ADAPTER);
       }
       AsyncTask.execute(saveCyclesASyncRunnable);
+
       Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
     }
   }
@@ -2974,8 +2977,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             posToRemove--;
           }
         }
-
-        savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode==3) {
         for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
@@ -2986,12 +2987,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             posToRemove--;
           }
         }
-        savedPomCycleAdapter.notifyDataSetChanged();
       }
 
       receivedHighlightPositions.clear();
       receivedHighlightPositionHolder.clear();
     }
+
+    if (mode==1) savedCycleAdapter.notifyDataSetChanged();
+    if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
   }
 
   //Populates round list from single cycle.
