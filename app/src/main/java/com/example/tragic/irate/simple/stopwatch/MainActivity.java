@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -423,8 +424,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
+  //Todo: Resetting total time in infinity b0rks.
   //Todo: "Unable to add window" crash when using edit popUp. May be our popUp retaining focus away from Main activity.
-  //Todo: Total time issues w/ infinity rounds - may be related to other cycles using non-infinity rounds.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.
   //Todo: Had an instance of tota`l time resetting to 0 (or not saving) when resetting a cycle.
@@ -1829,6 +1830,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           deleteCyclePopupWindow.dismiss();
           totalCycleSetTimeInMillis = 0;
           totalCycleBreakTimeInMillis = 0;
+
+
           cyclesCompleted = 0;
           resettingTotalTime = true;
 
@@ -3342,7 +3345,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       switch (typeOfRound.get(currentRound)) {
         case 1:
           if (resettingTotalTime) {
-            //e.g. setMillis = 3200; roundedValueForTotalTimes = 1000-200 = 800; cycleSetTimeForSingleRound = 800.
             roundedValueForTotalTimes = 1000 - (setMillis%1000);
             timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
             resettingTotalTime = false;
@@ -3358,9 +3360,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
-          //Todo: Works for resume from Adapter, but not for end of each round within timer.
           cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+
+          Log.i("testTime", "single round is " + cycleSetTimeForSingleRoundInMillis);
+          Log.i("testTime", "total rounds are " + totalCycleSetTimeInMillis);
+
           total_set_time.setText(addedTime);
           break;
         case 3:
@@ -3439,6 +3444,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleBreakTimeForSingleRoundInMillis = 0;
         }
       }
+
+      Log.i("testTime", "setMillis on DISMISS is " + setMillis);
+      Log.i("testTime", "placeHolder on DISMISS is " + timerDurationPlaceHolder);
+
+      Log.i("testTime", "single round on DISMISS is " + cycleSetTimeForSingleRoundInMillis);
+      Log.i("testTime", "total rounds on DISMISS are " + totalCycleSetTimeInMillis);
     }
     if (mode==3) {
       switch (pomDotCounter) {
@@ -3811,6 +3822,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_layout.topMargin = convertDensityPixelsToScalable(30);
     completedLapsParam.topMargin = convertDensityPixelsToScalable(24);
 
+    timerDurationPlaceHolder = 0;
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
