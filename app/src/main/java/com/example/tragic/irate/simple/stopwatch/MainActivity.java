@@ -426,10 +426,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: "Unable to add window" crash when using edit popUp. May be our popUp retaining focus away from Main activity.
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Check white border on active progressBar in long aspect view. May be slightly off white due to view overlaps.
-  //Todo: Had an instance of tota`l time resetting to 0 (or not saving) when resetting a cycle.
-  //Todo: Test total times again, including alternating infinity/non-infinity rounds.
-  //Todo: Test Pom total times.
+  //Todo: Definite overlapping shadows on progressBar.
   //Todo: Test all spannable iterations.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
@@ -439,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
 
-  //Todo: REMINDER, Try next app w/ Kotlin.
+  //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
   @Override
   public void onResume() {
@@ -1150,6 +1147,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Prevents timer from starting. Runnable will just populate values of next round.
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+      setViewsAndColorsToPreventTearingInEditPopUp(false);
 
       if (mode!=4) {
         if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
@@ -3038,6 +3036,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
       return;
     }
+    editCyclesPopupWindow.dismiss();
+    //This is called as false in editCycle's dismissListener, but we call it as true here to black out main view for transitional purposes.
+    setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     if (savedCycleAdapter.isCycleActive()==true) {
       savedCycleAdapter.removeActiveCycleLayout();
@@ -3060,7 +3061,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = true;
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-    editCyclesPopupWindow.dismiss();
   }
 
   public void instantiateAndStartObjectAnimator(long duration) {
@@ -3443,12 +3443,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleBreakTimeForSingleRoundInMillis = 0;
         }
       }
-
-      Log.i("testTime", "setMillis on DISMISS is " + setMillis);
-      Log.i("testTime", "placeHolder on DISMISS is " + timerDurationPlaceHolder);
-
-      Log.i("testTime", "single round on DISMISS is " + cycleSetTimeForSingleRoundInMillis);
-      Log.i("testTime", "total rounds on DISMISS are " + totalCycleSetTimeInMillis);
     }
     if (mode==3) {
       switch (pomDotCounter) {
