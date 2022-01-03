@@ -424,7 +424,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
-  //Todo: Extra second (e.g. 1:01 becomes 1:02) can briefly flash on reset/resume within timer popup.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all spannable iterations.
   //Todo: Test all notifications.
@@ -1440,7 +1439,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         if (setMillis>=60000 && !textSizeIncreased) {
-          changeTextSize(valueAnimatorDown, timeLeft);
+          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
         }
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
@@ -1461,7 +1460,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         if (breakMillis>=60000 && !textSizeIncreased) {
-          changeTextSize(valueAnimatorDown, timeLeft);
+          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
         }
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
@@ -1501,7 +1500,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (!textSizeIncreased && mode==4) {
           if (stopWatchSeconds > 59) {
-            changeTextSize(valueAnimatorDown, timeLeft);
+            changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
             textSizeIncreased = true;
           }
         }
@@ -2992,8 +2991,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       receivedHighlightPositionHolder.clear();
     }
 
-    if (mode==1) savedCycleAdapter.notifyDataSetChanged();
-    if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
+    runOnUiThread(()-> {
+      if (mode==1) savedCycleAdapter.notifyDataSetChanged();
+      if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
+    });
   }
 
   //Populates round list from single cycle.
@@ -3134,13 +3135,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds((setMillis + 1000) / 1000));
+        timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
         updateTotalTimeValuesEachTick();
 
         if (!textSizeIncreased && mode==1) {
           if (willWeChangeTextSize) {
             if (setMillis < 59000) {
-              changeTextSize(valueAnimatorUp, timeLeft);
+              changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
               textSizeIncreased = true;
             }
           }
@@ -3167,13 +3168,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds((millisUntilFinished + 1000) / 1000));
+        timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
         updateTotalTimeValuesEachTick();
 
         if (!textSizeIncreased && mode==1) {
           if (willWeChangeTextSize) {
             if (breakMillis < 59000) {
-              changeTextSize(valueAnimatorUp, timeLeft);
+              changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
               textSizeIncreased = true;
             }
           }
@@ -3201,13 +3202,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds((pomMillis + 1000) / 1000));
+        timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
         updateTotalTimeValuesEachTick();
 
         if (!textSizeIncreased && mode==3) {
           if (willWeChangeTextSize) {
             if (pomMillis < 59000) {
-              changeTextSize(valueAnimatorUp, timeLeft);
+              changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
               textSizeIncreased = true;
             }
           }
@@ -3252,7 +3253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
-        timeLeft.setTextSize(90f);
+//        timeLeft.setTextSize(90f);
         if (!activeCycle) activeCycle = true;
       }
 
@@ -3260,6 +3261,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       switch (typeOfRound.get(currentRound)) {
         case 1:
           timeLeft.setText("0");
+          changeTextSizeWithoutAnimator(true);
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
 
           if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
@@ -3274,6 +3276,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 3:
           timeLeft.setText("0");
+          changeTextSizeWithoutAnimator(true);
           total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
 
           if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
@@ -3511,7 +3514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void changeTextSize(ValueAnimator va, TextView textView) {
+  public void changeTextSizeWithAnimator(ValueAnimator va, TextView textView) {
     changeValueAnimatorNumbers();
     sizeAnimator = va;
     sizeAnimator.addUpdateListener(animation -> {
@@ -3529,6 +3532,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       valueAnimatorDown.setFloatValues(120f, 90f);
       valueAnimatorUp.setFloatValues(90f, 120f);
+    }
+  }
+
+  public void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (sizeIncrease) {
+        timeLeft.setTextSize(90f);
+      } else {
+        timeLeft.setTextSize(70f);
+      }
+    } else {
+      if (sizeIncrease) {
+        timeLeft.setTextSize(120f);
+      } else {
+        timeLeft.setTextSize(90f);
+      }
     }
   }
 
@@ -3603,6 +3622,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             } else if (pausing == RESUMING_TIMER) {
+              Log.i("testTime", "setmillis in resume click is " + setMillis);
               reset.setVisibility(View.INVISIBLE);
               if (!activeCycle) activeCycle = true;
               timerIsPaused = false;
@@ -3933,6 +3953,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
         }
+        Log.i("testTime", "setmillis in reset is " + setMillis);
         break;
       case 3:
         pomDotCounter = 0;
