@@ -424,9 +424,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
-  //Todo: "Unable to add window" crash when using edit popUp. May be our popUp retaining focus away from Main activity.
+  //Todo: Extra second (e.g. 1:01 becomes 1:02) can briefly flash on reset/resume within timer popup.
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Definite overlapping shadows on progressBar.
   //Todo: Test all spannable iterations.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
