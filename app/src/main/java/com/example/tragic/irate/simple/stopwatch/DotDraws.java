@@ -159,8 +159,7 @@ public class DotDraws extends View {
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
 
-    mX = dpConv(20); mY= dpConv(200);
-//    mX2 = dpConv(28);
+    mX = dpConv(28); mY= dpConv(40);
     int circleRadius = dpConv(16);
 
     float encloseYStartOneRow = dpConv(40);
@@ -174,8 +173,8 @@ public class DotDraws extends View {
       encloseYStartTwoRows = dpConv(10);
       encloseYEndTwoRows = dpConv(170);
 
-      mY = dpConv(220);
-      circleRadius = dpConv(19);
+      mY = dpConv(85);
+      circleRadius = dpConv(22);
     }
 
     switch (mMode) {
@@ -214,16 +213,14 @@ public class DotDraws extends View {
             mCanvas.drawCircle(mX, mY, circleRadius, mPaint);
             drawText(mRoundTimes, mX, mY, i);
             mCanvas.drawText(String.valueOf(i+1), mX, mY, mPaintNumbers);
-//            mX += 110;
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
               mCanvas.drawCircle(mX, mY, circleRadius, mPaint);
               drawText(mRoundTimes, mX, mY, i);
               mCanvas.drawText(String.valueOf(i+1), mX, mY, mPaintNumbers);
-//              mX += 132;
               //Resetting mX after 8th round so the second row begins on top of first.
-              if (i==7) mX = dpConv(20);
+              if (i==7) mX = dpConv(22);
             } else {
               mCanvas.drawCircle(mX, mY, circleRadius, mPaint);
               drawText(mRoundTimes, mX, mY, i);
@@ -233,10 +230,9 @@ public class DotDraws extends View {
               } else {
                 mCanvas.drawText(String.valueOf(i+1), mX, mY, mPaintNumbers);
               }
-//              mX += 132;
             }
           }
-          mX += dpConv(40);
+          mX += dpConv(48);
         }
         break;
       case 3:
