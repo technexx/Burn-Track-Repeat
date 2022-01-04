@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -158,20 +159,24 @@ public class DotDraws extends View {
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
 
-    //Todo: These values are also passed in through encloseDots, so shifting them shifts the enclosure as well.
-    mX = 58; mY = 0; mX2 = 58;
-    int circleRadius = 58;
+    mX = dpConv(28); mY= dpConv(200); mX2 = dpConv(28);
+    int circleRadius = dpConv(16);
     float encloseYStart = 0;
     float encloseYEnd = 0;
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-      encloseYEnd = 60;
-      mY = mY+30;
+      encloseYEnd = dpConv(60);
+      mY = dpConv(220);
+      circleRadius = dpConv(19);
     }
 
     switch (mMode) {
       case 1:
-        if (mRoundTimes.size()<=8) encloseDots(encloseYStart+130 , encloseYEnd+335); else encloseDots(encloseYStart, encloseYEnd+430);
+        if (mRoundTimes.size()<=8) {
+          encloseDots(encloseYStart+130 , encloseYEnd+335);
+        } else {
+          encloseDots(encloseYStart+30, encloseYEnd+330);
+        }
 
         for (int i=0; i<mRoundTimes.size(); i++) {
           //If type 1 or 2 (sets), color is green. Otherwise, color is red.
@@ -198,10 +203,10 @@ public class DotDraws extends View {
 
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
-            mCanvas.drawCircle(mX+20, mY+210, circleRadius, mPaint);
+            mCanvas.drawCircle(mX+4, mY+210, circleRadius, mPaint);
             drawText(mRoundTimes, mX+16, mY+212, i);
             mCanvas.drawText(String.valueOf(i+1), mX+5, mY+315, mPaintNumbers);
-            mX += 132;
+            mX += 110;
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
@@ -375,5 +380,9 @@ public class DotDraws extends View {
       return (minutes + ":" + df.format(remainingSeconds));
     } else if (totalSeconds != 5) return String.valueOf(totalSeconds);
     else return "5";
+  }
+
+  public int dpConv(float pixels) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
 }

@@ -424,6 +424,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
 
+  //Todo: All values in dotDraws needs to use dp -> sp conversion.
+  //Todo: Resize dotDraws border for long aspect.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all spannable iterations.
   //Todo: Test all notifications.
@@ -3622,7 +3624,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             } else if (pausing == RESUMING_TIMER) {
-              Log.i("testTime", "setmillis in resume click is " + setMillis);
               reset.setVisibility(View.INVISIBLE);
               if (!activeCycle) activeCycle = true;
               timerIsPaused = false;
@@ -3953,7 +3954,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
         }
-        Log.i("testTime", "setmillis in reset is " + setMillis);
         break;
       case 3:
         pomDotCounter = 0;
