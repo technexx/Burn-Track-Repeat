@@ -159,13 +159,21 @@ public class DotDraws extends View {
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
 
-    mX = dpConv(28); mY= dpConv(200); mX2 = dpConv(28);
+    mX = dpConv(20); mY= dpConv(200);
+//    mX2 = dpConv(28);
     int circleRadius = dpConv(16);
-    float encloseYStart = 0;
-    float encloseYEnd = 0;
+
+    float encloseYStartOneRow = dpConv(40);
+    float encloseYEndOneRow = dpConv(110);
+    float encloseYStartTwoRows = dpConv(40);
+    float encloseYEndTwoRows = dpConv(110);
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-      encloseYEnd = dpConv(60);
+      encloseYStartOneRow = dpConv(40);
+      encloseYEndOneRow = dpConv(140);
+      encloseYStartTwoRows = dpConv(10);
+      encloseYEndTwoRows = dpConv(170);
+
       mY = dpConv(220);
       circleRadius = dpConv(19);
     }
@@ -173,9 +181,9 @@ public class DotDraws extends View {
     switch (mMode) {
       case 1:
         if (mRoundTimes.size()<=8) {
-          encloseDots(encloseYStart+130 , encloseYEnd+335);
+          encloseDots(encloseYStartOneRow, encloseYEndOneRow);
         } else {
-          encloseDots(encloseYStart+30, encloseYEnd+330);
+          encloseDots(encloseYStartTwoRows, encloseYEndTwoRows);
         }
 
         for (int i=0; i<mRoundTimes.size(); i++) {
@@ -203,33 +211,38 @@ public class DotDraws extends View {
 
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
-            mCanvas.drawCircle(mX+4, mY+210, circleRadius, mPaint);
-            drawText(mRoundTimes, mX+16, mY+212, i);
-            mCanvas.drawText(String.valueOf(i+1), mX+5, mY+315, mPaintNumbers);
-            mX += 110;
+            mCanvas.drawCircle(mX, mY, circleRadius, mPaint);
+            drawText(mRoundTimes, mX, mY, i);
+            mCanvas.drawText(String.valueOf(i+1), mX, mY, mPaintNumbers);
+//            mX += 110;
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
-              mCanvas.drawCircle(mX+20, mY+140, circleRadius, mPaint);
-              drawText(mRoundTimes, mX+16, mY+144, i);
-              mCanvas.drawText(String.valueOf(i+1), mX+9, mY+235, mPaintNumbers);
-              mX += 132;
+              mCanvas.drawCircle(mX, mY, circleRadius, mPaint);
+              drawText(mRoundTimes, mX, mY, i);
+              mCanvas.drawText(String.valueOf(i+1), mX, mY, mPaintNumbers);
+//              mX += 132;
               //Resetting mX after 8th round so the second row begins on top of first.
-              if (i==7) mX = 58;
+              if (i==7) mX = dpConv(20);
             } else {
-              mCanvas.drawCircle(mX+20, mY+320, circleRadius, mPaint);
-              drawText(mRoundTimes, mX+16, mY+325, i);
+              mCanvas.drawCircle(mX, mY, circleRadius, mPaint);
+              drawText(mRoundTimes, mX, mY, i);
               //Position 8 (first pos, second row), has to be indented slightly.
-              if (i==8) mCanvas.drawText(String.valueOf(i+1), mX+9, mY+415, mPaintNumbers); else mCanvas.drawText(String.valueOf(i+1), mX-2, mY+415, mPaintNumbers);
-              mX += 132;
+              if (i==8) {
+                mCanvas.drawText(String.valueOf(i+1), mX, mY, mPaintNumbers);
+              } else {
+                mCanvas.drawText(String.valueOf(i+1), mX, mY, mPaintNumbers);
+              }
+//              mX += 132;
             }
           }
+          mX += dpConv(40);
         }
         break;
       case 3:
         setDotStyle(false);
-        mX = 82; mX2=mX+125;
-        encloseDots(encloseYStart+130 , encloseYEnd+335);
+//        mX = 82; mX2=mX+125;
+        encloseDots(encloseYStartOneRow , encloseYEndOneRow);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
           if (mPomDotCounter == i) pomFill(i, true, 255);
@@ -241,32 +254,33 @@ public class DotDraws extends View {
 
   //Used to draw shape, text, and alpha values (including fades) on Pom objects. Called in canvas draw above.
   public void pomFill(int i, boolean fade, int alpha) {
+    int pomRadiusLarge = dpConv(23);
+    int pomRadiusSmall = dpConv(17);
     switch (i) {
       case 0: case 2: case 4: case 6:
         mPaint.setColor(WORK_COLOR);
         //Must be called AFTER color is changed, otherwise alpha will reset to 255.
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        mCanvas.drawCircle(mX, 740, 62, mPaint);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY+165, i);
-        mX+=260;
+        mCanvas.drawCircle(mX, mY, pomRadiusLarge, mPaint);
+        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
         break;
       case 1: case 3: case 5:
         mPaint.setColor(MINI_BREAK_COLOR);
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
-        mCanvas.drawCircle(mX2, 740, 50 , mPaint);
+        mCanvas.drawCircle(mX, mY, pomRadiusSmall , mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY+165, i);
-        mX2=mX+130;
+        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
         break;
       case 7:
         mPaint.setColor(FULL_BREAK_COLOR);
         if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
-        mCanvas.drawRect(mX-170, 685, mX-60, 795, mPaint);
+        mCanvas.drawRect(mX, dpConv(250), mX, dpConv(290), mPaint);
         if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX2, mY+165, i);
+        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
         break;
     }
+    mX += (dpConv(85));
   }
 
   private void drawText(ArrayList<String> list, float x, float y, int i) {
@@ -285,21 +299,21 @@ public class DotDraws extends View {
         switch (mMode) {
           case 1:
             mPaintText.setTextSize(70f);
-            mCanvas.drawText(list.get(i), x-37, y+22, mPaintText);
+            mCanvas.drawText(list.get(i), x, y, mPaintText);
             break;
           case 3:
             switch (i) {
               case 0: case 2: case 4: case 6:
                 mPaintText.setTextSize(70f);
-                mCanvas.drawText(list.get(i), x-41, y+87, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
               case 1: case 3: case 5:
                 mPaintText.setTextSize(60f);
-                mCanvas.drawText(list.get(i), x-35, y+85, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
               case 7:
                 mPaintText.setTextSize(70f);
-                mCanvas.drawText(list.get(i), x-27, y+88, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
             }
             break;
@@ -310,21 +324,21 @@ public class DotDraws extends View {
         switch (mMode) {
           case 1:
             mPaintText.setTextSize(58f);
-            mCanvas.drawText(list.get(i), x-43, y+17, mPaintText);
+            mCanvas.drawText(list.get(i), x, y, mPaintText);
             break;
           case 3:
             switch (i) {
               case 0: case 2: case 4: case 6:
                 mPaintText.setTextSize(57f);
-                mCanvas.drawText(list.get(i), x-58, y+87, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
               case 1: case 3: case 5:
                 mPaintText.setTextSize(50f);
-                mCanvas.drawText(list.get(i), x-42, y+82, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
               case 7:
                 mPaintText.setTextSize(53f);
-                mCanvas.drawText(list.get(i), x-39, y+87, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
             }
         }
@@ -333,21 +347,21 @@ public class DotDraws extends View {
         switch (mMode) {
           case 1:
             mPaintText.setTextSize(48f);
-            mCanvas.drawText(list.get(i), x-45, y+17, mPaintText);
+            mCanvas.drawText(list.get(i), x, y, mPaintText);
             break;
           case 3:
             switch (i) {
               case 0: case 2: case 4: case 6:
                 mPaintText.setTextSize(57f);
-                mCanvas.drawText(list.get(i), x-58, y+87, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
               case 1: case 3: case 5:
                 mPaintText.setTextSize(50f);
-                mCanvas.drawText(list.get(i), x-42, y+82, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
               case 7:
                 mPaintText.setTextSize(53f);
-                mCanvas.drawText(list.get(i), x-39, y+87, mPaintText);
+                mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
             }
         }
