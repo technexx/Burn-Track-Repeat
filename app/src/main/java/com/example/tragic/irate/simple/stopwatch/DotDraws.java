@@ -160,18 +160,25 @@ public class DotDraws extends View {
     this.mCanvas = canvas;
 
     int circleRadius = dpConv(16);
+
     int xCircleOneRow = dpConv(28);
     int yCircleOneRow = dpConv(40);
+    int yCircleFirstOfTwoRows = dpConv(42);
+    int yCircleSecondOfTwoRows = dpConv(60);
 
     int xCircleTextOneRow = dpConv(16);
     int yCircleTextOneRow = dpConv(48);
+    int yCircleTextOneOfTwoRows= dpConv(44);
+    int yCircleTextSecondOfTwoRows = dpConv(52);
     int xRoundNumberTextOneRow = dpConv(43);
     int yRoundNumberTextOneRow = dpConv(50);
+    int yRoundNumberTextOneOfTwoRows = dpConv(46);
+    int yRoundNumberTextTwoOfTwoRows = dpConv(54);
 
-    float encloseYStartOneRow = dpConv(40);
-    float encloseYEndOneRow = dpConv(110);
-    float encloseYStartTwoRows = dpConv(40);
-    float encloseYEndTwoRows = dpConv(110);
+    int encloseYStartOneRow = dpConv(40);
+    int encloseYEndOneRow = dpConv(110);
+    int encloseYStartTwoRows = dpConv(40);
+    int encloseYEndTwoRows = dpConv(110);
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       encloseYStartOneRow = dpConv(40);
@@ -182,11 +189,18 @@ public class DotDraws extends View {
       circleRadius = dpConv(22);
       xCircleOneRow = dpConv(28);
       yCircleOneRow = dpConv(82);
+      yCircleFirstOfTwoRows = dpConv(48);
+      yCircleSecondOfTwoRows = dpConv(120);
 
       xCircleTextOneRow = dpConv(14);
       yCircleTextOneRow = dpConv(90);
+      yCircleTextOneOfTwoRows= dpConv(56);
+      yCircleTextSecondOfTwoRows = dpConv(128);
+
       xRoundNumberTextOneRow = dpConv(25);
       yRoundNumberTextOneRow = dpConv(125);
+      yRoundNumberTextOneOfTwoRows = dpConv(88);
+      yRoundNumberTextTwoOfTwoRows = dpConv(160);
     }
 
     switch (mMode) {
@@ -228,19 +242,23 @@ public class DotDraws extends View {
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
-              mCanvas.drawCircle(xCircleOneRow, yCircleOneRow, circleRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextOneRow, yCircleTextOneRow, i);
-              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneRow, mPaintNumbers);
+              mCanvas.drawCircle(xCircleOneRow, yCircleFirstOfTwoRows, circleRadius, mPaint);
+              drawText(mRoundTimes, xCircleTextOneRow, yCircleTextOneOfTwoRows, i);
+              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneOfTwoRows, mPaintNumbers);
               //Resetting mX after 8th round so the second row begins on top of first.
-              if (i==7) xCircleOneRow = dpConv(22);
             } else {
-              mCanvas.drawCircle(xCircleOneRow, yCircleOneRow, circleRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextOneRow, yCircleTextOneRow, i);
+              if (i==8) {
+                xCircleOneRow = dpConv(28);
+                xCircleTextOneRow = dpConv(14);
+                xRoundNumberTextOneRow = dpConv(25);
+              }
+              mCanvas.drawCircle(xCircleOneRow, yCircleSecondOfTwoRows, circleRadius, mPaint);
+              drawText(mRoundTimes, xCircleTextOneRow, yCircleTextSecondOfTwoRows, i);
               //Position 8 (first pos, second row), has to be indented slightly.
               if (i==8) {
-                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneRow, mPaintNumbers);
+                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextTwoOfTwoRows, mPaintNumbers);
               } else {
-                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneRow, mPaintNumbers);
+                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextTwoOfTwoRows, mPaintNumbers);
               }
             }
           }
@@ -251,7 +269,6 @@ public class DotDraws extends View {
         break;
       case 3:
         setDotStyle(false);
-//        mX = 82; mX2=mX+125;
         encloseDots(encloseYStartOneRow , encloseYEndOneRow);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
