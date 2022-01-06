@@ -283,22 +283,28 @@ public class DotDraws extends View {
         int xRectangleText = dpConv(19);
         int yRectangleText = dpConv(103);
 
+        int xRoundNumberText = dpConv(25);
+        int yRoundNumberText = dpConv(125);
+
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
           pomRadiusSmall = dpConv(18);
           pomRadiusLarge = dpConv(24);
 
           xCircle = dpConv(30);
-          yCircle = dpConv(90);
+          yCircle = dpConv(82);
 
           xRectangleStart = dpConv(335);
           xRectangleEnd = dpConv(385);
-          yRectangleTop = dpConv(65);
-          yRectangleBottom = dpConv(115);
+          yRectangleTop = dpConv(57);
+          yRectangleBottom = dpConv(107);
 
           xCircleText = dpConv(16);
-          yCircleText = dpConv(100);
+          yCircleText = dpConv(92);
           xRectangleText = dpConv(342);
-          yRectangleText = dpConv(100);
+          yRectangleText = dpConv(92);
+
+          xRoundNumberText = dpConv(26);
+          yRoundNumberText = dpConv(125);
         }
 
         setDotStyle(false);
@@ -343,8 +349,15 @@ public class DotDraws extends View {
               drawText(mPomTime, xRectangleText, yRectangleText, i);
               break;
           }
+          if (i==7) {
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberText + dpConv(8), yRoundNumberText, mPaintNumbers);
+          } else {
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberText, yRoundNumberText, mPaintNumbers);
+          }
+
           xCircle += (dpConv(46));
           xCircleText += dpConv(46);
+          xRoundNumberText += dpConv(46);
         }
         break;
     }
