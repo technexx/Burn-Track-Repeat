@@ -268,46 +268,86 @@ public class DotDraws extends View {
         }
         break;
       case 3:
+        int pomRadiusSmall = dpConv(17);
+        int pomRadiusLarge = dpConv(223);
+
+        int xCircle = dpConv(28);
+        int yCircle = dpConv(90);
+        int xRectangleStart = dpConv(200);
+        int xRectangleEnd = dpConv(230);
+        int yRectangleTop = dpConv(100);
+        int yRectangleBottom = dpConv(130);
+
+        int xCircleText = dpConv(16);
+        int yCircleText = dpConv(105);
+        int xRectangleText = dpConv(19);
+        int yRectangleText = dpConv(103);
+
+        if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
+          pomRadiusSmall = dpConv(18);
+          pomRadiusLarge = dpConv(24);
+
+          xCircle = dpConv(30);
+          yCircle = dpConv(90);
+
+          xRectangleStart = dpConv(335);
+          xRectangleEnd = dpConv(385);
+          yRectangleTop = dpConv(65);
+          yRectangleBottom = dpConv(115);
+
+          xCircleText = dpConv(16);
+          yCircleText = dpConv(100);
+          xRectangleText = dpConv(342);
+          yRectangleText = dpConv(100);
+        }
+
         setDotStyle(false);
         encloseDots(encloseYStartOneRow , encloseYEndOneRow);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
-          if (mPomDotCounter == i) pomFill(i, true, 255);
-          else if (i - mPomDotCounter <=0) pomFill(i, false, 105); else pomFill(i, false, 255);
+          int alphaValue = 255;
+          boolean fadeDot = false;
+
+          if (mPomDotCounter == i) {
+            alphaValue = 255;
+            fadeDot = true;
+          } else if (i - mPomDotCounter <=0) {
+            alphaValue = 105;
+            fadeDot = false;
+          } else {
+            alphaValue = 255;
+            fadeDot = false;
+          }
+
+          switch (i) {
+            case 0: case 2: case 4: case 6:
+              mPaint.setColor(WORK_COLOR);
+              //Must be called AFTER color is changed, otherwise alpha will reset to 255.
+              if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
+              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
+              mCanvas.drawCircle(xCircle, yCircle, pomRadiusLarge, mPaint);
+              drawText(mPomTime, xCircleText, yCircleText, i);
+              break;
+            case 1: case 3: case 5:
+              mPaint.setColor(MINI_BREAK_COLOR);
+              if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
+              mCanvas.drawCircle(xCircle, yCircle, pomRadiusSmall , mPaint);
+              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
+              drawText(mPomTime, xCircleText, yCircleText, i);
+              break;
+            case 7:
+              mPaint.setColor(FULL_BREAK_COLOR);
+              if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
+              mCanvas.drawRect(xRectangleStart, yRectangleTop, xRectangleEnd, yRectangleBottom, mPaint);
+              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
+              drawText(mPomTime, xRectangleText, yRectangleText, i);
+              break;
+          }
+          xCircle += (dpConv(46));
+          xCircleText += dpConv(46);
         }
         break;
     }
-  }
-
-  //Used to draw shape, text, and alpha values (including fades) on Pom objects. Called in canvas draw above.
-  public void pomFill(int i, boolean fade, int alpha) {
-    int pomRadiusLarge = dpConv(23);
-    int pomRadiusSmall = dpConv(17);
-    switch (i) {
-      case 0: case 2: case 4: case 6:
-        mPaint.setColor(WORK_COLOR);
-        //Must be called AFTER color is changed, otherwise alpha will reset to 255.
-        if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
-        if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        mCanvas.drawCircle(mX, mY, pomRadiusLarge, mPaint);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
-        break;
-      case 1: case 3: case 5:
-        mPaint.setColor(MINI_BREAK_COLOR);
-        if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
-        mCanvas.drawCircle(mX, mY, pomRadiusSmall , mPaint);
-        if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
-        break;
-      case 7:
-        mPaint.setColor(FULL_BREAK_COLOR);
-        if (fade) fadeDot(false); else mPaint.setAlpha(alpha);
-        mCanvas.drawRect(mX, dpConv(250), mX, dpConv(290), mPaint);
-        if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-        if (mPomTime.size()!=0) drawText(mPomTime, mX, mY, i);
-        break;
-    }
-    mX += (dpConv(85));
   }
 
   private void drawText(ArrayList<String> list, float x, float y, int i) {
@@ -339,7 +379,7 @@ public class DotDraws extends View {
                 mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
               case 7:
-                mPaintText.setTextSize(70f);
+                mPaintText.setTextSize(80f);
                 mCanvas.drawText(list.get(i), x, y, mPaintText);
                 break;
             }
