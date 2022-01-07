@@ -161,12 +161,12 @@ public class DotDraws extends View {
 
     int circleRadius = dpConv(16);
 
-    int xCircleOneRow = dpConv(28);
+    int xCircleAllRows = dpConv(28);
     int yCircleOneRow = dpConv(40);
     int yCircleFirstOfTwoRows = dpConv(42);
     int yCircleSecondOfTwoRows = dpConv(60);
 
-    int xCircleTextOneRow = dpConv(16);
+    int xCircleTextAllRows = dpConv(16);
     int yCircleTextOneRow = dpConv(48);
     int yCircleTextOneOfTwoRows= dpConv(44);
     int yCircleTextSecondOfTwoRows = dpConv(52);
@@ -187,12 +187,12 @@ public class DotDraws extends View {
       encloseYEndTwoRows = dpConv(170);
 
       circleRadius = dpConv(22);
-      xCircleOneRow = dpConv(28);
+      xCircleAllRows = dpConv(28);
       yCircleOneRow = dpConv(82);
       yCircleFirstOfTwoRows = dpConv(48);
       yCircleSecondOfTwoRows = dpConv(120);
 
-      xCircleTextOneRow = dpConv(14);
+      xCircleTextAllRows = dpConv(14);
       yCircleTextOneRow = dpConv(90);
       yCircleTextOneOfTwoRows= dpConv(56);
       yCircleTextSecondOfTwoRows = dpConv(128);
@@ -236,24 +236,24 @@ public class DotDraws extends View {
 
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
-            mCanvas.drawCircle(xCircleOneRow, yCircleOneRow, circleRadius, mPaint);
-            drawText(mRoundTimes, xCircleTextOneRow, yCircleTextOneRow, i);
+            mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, circleRadius, mPaint);
+            drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneRow, i);
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneRow, mPaintNumbers);
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
-              mCanvas.drawCircle(xCircleOneRow, yCircleFirstOfTwoRows, circleRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextOneRow, yCircleTextOneOfTwoRows, i);
+              mCanvas.drawCircle(xCircleAllRows, yCircleFirstOfTwoRows, circleRadius, mPaint);
+              drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneOfTwoRows, i);
               mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneOfTwoRows, mPaintNumbers);
               //Resetting mX after 8th round so the second row begins on top of first.
             } else {
               if (i==8) {
-                xCircleOneRow = dpConv(28);
-                xCircleTextOneRow = dpConv(14);
+                xCircleAllRows = dpConv(28);
+                xCircleTextAllRows = dpConv(14);
                 xRoundNumberTextOneRow = dpConv(25);
               }
-              mCanvas.drawCircle(xCircleOneRow, yCircleSecondOfTwoRows, circleRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextOneRow, yCircleTextSecondOfTwoRows, i);
+              mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, circleRadius, mPaint);
+              drawText(mRoundTimes, xCircleTextAllRows, yCircleTextSecondOfTwoRows, i);
               //Position 8 (first pos, second row), has to be indented slightly.
               if (i==8) {
                 mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextTwoOfTwoRows, mPaintNumbers);
@@ -262,8 +262,8 @@ public class DotDraws extends View {
               }
             }
           }
-          xCircleOneRow += dpConv(48);
-          xCircleTextOneRow += dpConv(48);
+          xCircleAllRows += dpConv(48);
+          xCircleTextAllRows += dpConv(48);
           xRoundNumberTextOneRow += dpConv(48);
         }
         break;
@@ -365,6 +365,10 @@ public class DotDraws extends View {
 
   private void drawText(ArrayList<String> list, float x, float y, int i) {
     Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+    int xMediumMod = dpConv(3);
+    int yMediumMod = dpConv(1);
+    int xSmallMod = dpConv(6);
+    int ySmallMod = dpConv(1);
 
     if (list.size() >0) {
       //If 2 or less chars in time string, fonts are as follows.
@@ -399,12 +403,11 @@ public class DotDraws extends View {
             break;
         }
       } else if (list.get(i).length()<=4){
-        //If 3 or more chars in time string, fonts are as follows.
         mPaintText.setTypeface(narrow);
         switch (mMode) {
           case 1:
             mPaintText.setTextSize(58f);
-            mCanvas.drawText(list.get(i), x, y, mPaintText);
+            mCanvas.drawText(list.get(i), x-xMediumMod, y-yMediumMod, mPaintText);
             break;
           case 3:
             switch (i) {
@@ -426,8 +429,8 @@ public class DotDraws extends View {
         mPaintText.setTypeface(narrow);
         switch (mMode) {
           case 1:
-            mPaintText.setTextSize(48f);
-            mCanvas.drawText(list.get(i), x, y, mPaintText);
+            mPaintText.setTextSize(52f);
+            mCanvas.drawText(list.get(i), x-xSmallMod, y-ySmallMod, mPaintText);
             break;
           case 3:
             switch (i) {
