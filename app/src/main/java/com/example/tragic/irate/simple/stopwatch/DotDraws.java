@@ -273,10 +273,10 @@ public class DotDraws extends View {
 
         int xCircle = dpConv(28);
         int yCircle = dpConv(90);
-        int xRectangleStart = dpConv(200);
-        int xRectangleEnd = dpConv(230);
-        int yRectangleTop = dpConv(100);
-        int yRectangleBottom = dpConv(130);
+        int xRectangleStart = dpConv(203);
+        int xRectangleEnd = dpConv(227);
+        int yRectangleTop = dpConv(103);
+        int yRectangleBottom = dpConv(127);
 
         int xCircleText = dpConv(16);
         int yCircleText = dpConv(105);
@@ -370,6 +370,12 @@ public class DotDraws extends View {
     int xSmallMod = dpConv(6);
     int ySmallMod = dpConv(1);
 
+    int xBigCircleMod = dpConv(7);
+    int yBigCircleMod = dpConv(2);
+    int ySmallCircleMod = dpConv(3);
+    int xSquareMod = dpConv(7);
+    int ySquareMod = dpConv(3);
+
     if (list.size() >0) {
       //If 2 or less chars in time string, fonts are as follows.
       if (list.get(i).length() <= 2) {
@@ -380,28 +386,8 @@ public class DotDraws extends View {
           list.set(i, temp);
         }
         mPaintText.setTypeface(Typeface.DEFAULT);
-        switch (mMode) {
-          case 1:
-            mPaintText.setTextSize(70f);
-            mCanvas.drawText(list.get(i), x, y, mPaintText);
-            break;
-          case 3:
-            switch (i) {
-              case 0: case 2: case 4: case 6:
-                mPaintText.setTextSize(70f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
-                break;
-              case 1: case 3: case 5:
-                mPaintText.setTextSize(60f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
-                break;
-              case 7:
-                mPaintText.setTextSize(80f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
-                break;
-            }
-            break;
-        }
+        mPaintText.setTextSize(70f);
+        mCanvas.drawText(list.get(i), x, y, mPaintText);
       } else if (list.get(i).length()<=4){
         mPaintText.setTypeface(narrow);
         switch (mMode) {
@@ -411,17 +397,10 @@ public class DotDraws extends View {
             break;
           case 3:
             switch (i) {
-              case 0: case 2: case 4: case 6:
-                mPaintText.setTextSize(57f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
-                break;
+              //4 length (X:XX) only used for mini breaks.
               case 1: case 3: case 5:
                 mPaintText.setTextSize(50f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
-                break;
-              case 7:
-                mPaintText.setTextSize(53f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
+                mCanvas.drawText(list.get(i), x, y-ySmallCircleMod, mPaintText);
                 break;
             }
         }
@@ -436,15 +415,11 @@ public class DotDraws extends View {
             switch (i) {
               case 0: case 2: case 4: case 6:
                 mPaintText.setTextSize(57f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
-                break;
-              case 1: case 3: case 5:
-                mPaintText.setTextSize(50f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
+                mCanvas.drawText(list.get(i), x-xBigCircleMod, y-yBigCircleMod, mPaintText);
                 break;
               case 7:
-                mPaintText.setTextSize(53f);
-                mCanvas.drawText(list.get(i), x, y, mPaintText);
+                mPaintText.setTextSize(65f);
+                mCanvas.drawText(list.get(i), x-xSquareMod, y-ySquareMod, mPaintText);
                 break;
             }
         }
