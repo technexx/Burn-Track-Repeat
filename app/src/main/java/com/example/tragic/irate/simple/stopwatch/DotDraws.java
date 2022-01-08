@@ -21,7 +21,7 @@ public class DotDraws extends View {
   Paint mPaint;
   Paint mPaintBox;
   Paint mPaintText;
-  Paint mPaintNumbers;
+  Paint mPaintRoundNumbers;
 
   int mRoundCount;
   int mRoundsLeft;
@@ -81,10 +81,10 @@ public class DotDraws extends View {
     mPaintText = new Paint();
     mPaintText.setAntiAlias(true);
 
-    mPaintNumbers = new Paint();
-    mPaintNumbers.setAntiAlias(true);
-    mPaintNumbers.setColor(Color.WHITE);
-    mPaintNumbers.setTextSize(40f);
+    mPaintRoundNumbers = new Paint();
+    mPaintRoundNumbers.setAntiAlias(true);
+    mPaintRoundNumbers.setColor(Color.WHITE);
+    mPaintRoundNumbers.setTextSize(40f);
 
     mPaintBox = new Paint();
     mPaintBox.setColor(Color.WHITE);
@@ -155,6 +155,7 @@ public class DotDraws extends View {
     mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 20, mPaintBox);
   }
 
+  //Todo: Should we just use a division formula (e.g. /8) based on phone conversion?
   public void receivePhoneDimensions(int height, int width) {
     this.mPhoneHeight = height; this.mPhoneWidth = width;
 
@@ -165,6 +166,7 @@ public class DotDraws extends View {
     Log.i("testSize", "converted height value is " + mPhoneWidth);
   }
 
+  //Todo: Fix row 2 round numbers (all aspects).
   @Override
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
@@ -172,26 +174,35 @@ public class DotDraws extends View {
     int encloseXStart = dpConv(2);
     int encloseXEnd = dpConv(mPhoneWidth-2);
 
-    int encloseYStartOneRow = dpConv(20);
+    int encloseYStartOneRow = dpConv(0);
     int encloseYEndOneRow = dpConv(90);
-    int encloseYStartTwoRows = dpConv(40);
-    int encloseYEndTwoRows = dpConv(110);
+    int encloseYStartTwoRows = dpConv(0);
+    int encloseYEndTwoRows = dpConv(130);
 
-    int circleRadius = dpConv(21);
+    int circleRadius = dpConv(22);
+    int xCircleStart = dpConv(28);
+    int xTextStart = dpConv(7);
+    int xRoundNumberStart = dpConv(25);
 
     int xCircleAllRows = dpConv(28);
-    int yCircleOneRow = dpConv(40);
-    int yCircleFirstOfTwoRows = dpConv(42);
-    int yCircleSecondOfTwoRows = dpConv(60);
+    int yCircleOneRow = dpConv(36);
+    int yCircleFirstOfTwoRows = dpConv(26);
+    int yCircleSecondOfTwoRows = dpConv(90);
 
-    int xCircleTextAllRows = dpConv(16);
+    int xCircleTextAllRows = dpConv(7);
     int yCircleTextOneRow = dpConv(48);
-    int yCircleTextOneOfTwoRows= dpConv(44);
-    int yCircleTextSecondOfTwoRows = dpConv(52);
-    int xRoundNumberTextOneRow = dpConv(43);
-    int yRoundNumberTextOneRow = dpConv(50);
-    int yRoundNumberTextOneOfTwoRows = dpConv(46);
-    int yRoundNumberTextTwoOfTwoRows = dpConv(54);
+    int yCircleTextOneOfTwoRows= dpConv(38);
+    int yCircleTextSecondOfTwoRows = dpConv(102);
+
+    int xRoundNumberTextOneRow = dpConv(25);
+    int yRoundNumberTextOneRow = dpConv(80);
+    int yRoundNumberTextOneOfTwoRows = dpConv(63);
+    int yRoundNumberTextTwoOfTwoRows = dpConv(126);
+
+    int xCircleMovement = dpConv(47);
+    int xTextMovement = dpConv(47);
+    int xRoundNumberMovement = dpConv(47);
+//    int xValueOnSecondRowTransition =
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       encloseYStartOneRow = dpConv(40);
@@ -200,6 +211,9 @@ public class DotDraws extends View {
       encloseYEndTwoRows = dpConv(170);
 
       circleRadius = dpConv(22);
+      xCircleStart = dpConv(28);
+      xTextStart = dpConv(14);
+      xRoundNumberStart = dpConv(25);
 
       xCircleAllRows = dpConv(28);
       yCircleOneRow = dpConv(82);
@@ -215,6 +229,10 @@ public class DotDraws extends View {
       yRoundNumberTextOneRow = dpConv(125);
       yRoundNumberTextOneOfTwoRows = dpConv(88);
       yRoundNumberTextTwoOfTwoRows = dpConv(160);
+
+      xCircleMovement = dpConv(48);
+      xTextMovement = dpConv(48);
+      xRoundNumberMovement = dpConv(48);
     }
 
     switch (mMode) {
@@ -252,33 +270,33 @@ public class DotDraws extends View {
             //Draws dot, timer value, and round count.
             mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, circleRadius, mPaint);
             drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneRow, i);
-            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneRow, mPaintNumbers);
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneRow, mPaintRoundNumbers);
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
               mCanvas.drawCircle(xCircleAllRows, yCircleFirstOfTwoRows, circleRadius, mPaint);
               drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneOfTwoRows, i);
-              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneOfTwoRows, mPaintNumbers);
+              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextOneOfTwoRows, mPaintRoundNumbers);
               //Resetting mX after 8th round so the second row begins on top of first.
             } else {
               if (i==8) {
-                xCircleAllRows = dpConv(28);
-                xCircleTextAllRows = dpConv(14);
-                xRoundNumberTextOneRow = dpConv(25);
+                xCircleAllRows = xCircleStart;
+                xCircleTextAllRows = xTextStart;
+                xRoundNumberTextOneRow = xRoundNumberStart;
               }
               mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, circleRadius, mPaint);
               drawText(mRoundTimes, xCircleTextAllRows, yCircleTextSecondOfTwoRows, i);
               //Position 8 (first pos, second row), has to be indented slightly.
               if (i==8) {
-                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextTwoOfTwoRows, mPaintNumbers);
+                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
               } else {
-                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextTwoOfTwoRows, mPaintNumbers);
+                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextOneRow, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
               }
             }
           }
-          xCircleAllRows += dpConv(48);
-          xCircleTextAllRows += dpConv(48);
-          xRoundNumberTextOneRow += dpConv(48);
+          xCircleAllRows += xCircleMovement;
+          xCircleTextAllRows += xTextMovement;
+          xRoundNumberTextOneRow += xRoundNumberMovement;
         }
         break;
       case 3:
@@ -364,9 +382,9 @@ public class DotDraws extends View {
               break;
           }
           if (i==7) {
-            mCanvas.drawText(String.valueOf(i+1), xRoundNumberText + dpConv(8), yRoundNumberText, mPaintNumbers);
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberText + dpConv(8), yRoundNumberText, mPaintRoundNumbers);
           } else {
-            mCanvas.drawText(String.valueOf(i+1), xRoundNumberText, yRoundNumberText, mPaintNumbers);
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberText, yRoundNumberText, mPaintRoundNumbers);
           }
 
           xCircle += (dpConv(46));
@@ -379,6 +397,15 @@ public class DotDraws extends View {
 
   private void drawText(ArrayList<String> list, float x, float y, int i) {
     Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+
+    float modeOneTextSizeForLowDigits = 70f;
+    float modeOneTextSizeForMediumDigits = 58f;
+    float modeOneTextSizeForLargeDigits = 52f;
+
+    float modeThreeTextSizeForMediumDigits = 50f;
+    float modeThreeTextSizeForLargeDigits = 57f;
+    float modeThreeTextSizeForRectangle = 65f;
+
     int xMediumMod = dpConv(3);
     int yMediumMod = dpConv(1);
     int xSmallMod = dpConv(6);
@@ -390,6 +417,21 @@ public class DotDraws extends View {
     int xSquareMod = dpConv(7);
     int ySquareMod = dpConv(3);
 
+    mPaintRoundNumbers.setTextSize(32f);
+
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
+
+      modeOneTextSizeForLowDigits = 70f;
+      modeOneTextSizeForMediumDigits = 58f;
+      modeOneTextSizeForLargeDigits = 52f;
+
+      modeThreeTextSizeForMediumDigits = 50f;
+      modeThreeTextSizeForLargeDigits = 57f;
+      modeThreeTextSizeForRectangle = 65f;
+
+      mPaintRoundNumbers.setTextSize(40f);
+    }
+
     if (list.size() >0) {
       //If 2 or less chars in time string, fonts are as follows.
       if (list.get(i).length() <= 2) {
@@ -400,20 +442,20 @@ public class DotDraws extends View {
           list.set(i, temp);
         }
         mPaintText.setTypeface(Typeface.DEFAULT);
-        mPaintText.setTextSize(70f);
+        mPaintText.setTextSize(modeOneTextSizeForLowDigits);
         mCanvas.drawText(list.get(i), x, y, mPaintText);
       } else if (list.get(i).length()<=4){
         mPaintText.setTypeface(narrow);
         switch (mMode) {
           case 1:
-            mPaintText.setTextSize(58f);
+            mPaintText.setTextSize(modeOneTextSizeForMediumDigits);
             mCanvas.drawText(list.get(i), x-xMediumMod, y-yMediumMod, mPaintText);
             break;
           case 3:
             switch (i) {
               //4 length (X:XX) only used for mini breaks.
               case 1: case 3: case 5:
-                mPaintText.setTextSize(50f);
+                mPaintText.setTextSize(modeThreeTextSizeForMediumDigits);
                 mCanvas.drawText(list.get(i), x, y-ySmallCircleMod, mPaintText);
                 break;
             }
@@ -422,17 +464,17 @@ public class DotDraws extends View {
         mPaintText.setTypeface(narrow);
         switch (mMode) {
           case 1:
-            mPaintText.setTextSize(52f);
+            mPaintText.setTextSize(modeOneTextSizeForLargeDigits);
             mCanvas.drawText(list.get(i), x-xSmallMod, y-ySmallMod, mPaintText);
             break;
           case 3:
             switch (i) {
               case 0: case 2: case 4: case 6:
-                mPaintText.setTextSize(57f);
+                mPaintText.setTextSize(modeThreeTextSizeForLargeDigits);
                 mCanvas.drawText(list.get(i), x-xBigCircleMod, y-yBigCircleMod, mPaintText);
                 break;
               case 7:
-                mPaintText.setTextSize(65f);
+                mPaintText.setTextSize(modeThreeTextSizeForRectangle);
                 mCanvas.drawText(list.get(i), x-xSquareMod, y-ySquareMod, mPaintText);
                 break;
             }
