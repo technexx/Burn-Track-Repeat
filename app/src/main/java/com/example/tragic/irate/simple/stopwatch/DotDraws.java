@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -21,9 +22,6 @@ public class DotDraws extends View {
   Paint mPaintBox;
   Paint mPaintText;
   Paint mPaintNumbers;
-  float mX;
-  float mX2;
-  float mY;
 
   int mRoundCount;
   int mRoundsLeft;
@@ -49,6 +47,8 @@ public class DotDraws extends View {
   int FULL_BREAK_COLOR;
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
+  float mPhoneHeight;
+  float mPhoneWidth;
 
   public interface sendAlpha {
     void sendAlphaValue(int alpha);
@@ -135,15 +135,6 @@ public class DotDraws extends View {
     invalidate();
   }
 
-  public void encloseDots(float topY, float botY) {
-    mPaintBox.setStyle(Paint.Style.STROKE);
-    mPaintBox.setAlpha(175);
-    mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
-    mPaintBox.setStyle(Paint.Style.FILL);
-    mPaintBox.setAlpha(35);
-    mCanvas.drawRoundRect(3, topY, 1078, botY, 20, 20, mPaintBox);
-  }
-
   //Used to clear or filled dot for counting up/counting down.
   public void setDotStyle(boolean countingUp) {
     if (countingUp) {
@@ -155,11 +146,38 @@ public class DotDraws extends View {
     }
   }
 
+  public void encloseDots(float xStart, float xEnd, float topY, float botY) {
+    mPaintBox.setStyle(Paint.Style.STROKE);
+    mPaintBox.setAlpha(175);
+    mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 20, mPaintBox);
+    mPaintBox.setStyle(Paint.Style.FILL);
+    mPaintBox.setAlpha(35);
+    mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 20, mPaintBox);
+  }
+
+  public void receivePhoneDimensions(int height, int width) {
+    this.mPhoneHeight = height; this.mPhoneWidth = width;
+
+    mPhoneHeight = height / getResources().getDisplayMetrics().scaledDensity;
+    mPhoneWidth = width / getResources().getDisplayMetrics().scaledDensity;
+
+    Log.i("testSize", "converted width value is " + mPhoneHeight);
+    Log.i("testSize", "converted height value is " + mPhoneWidth);
+  }
+
   @Override
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
 
-    int circleRadius = dpConv(16);
+    int encloseXStart = dpConv(2);
+    int encloseXEnd = dpConv(mPhoneWidth-2);
+
+    int encloseYStartOneRow = dpConv(20);
+    int encloseYEndOneRow = dpConv(90);
+    int encloseYStartTwoRows = dpConv(40);
+    int encloseYEndTwoRows = dpConv(110);
+
+    int circleRadius = dpConv(21);
 
     int xCircleAllRows = dpConv(28);
     int yCircleOneRow = dpConv(40);
@@ -175,11 +193,6 @@ public class DotDraws extends View {
     int yRoundNumberTextOneOfTwoRows = dpConv(46);
     int yRoundNumberTextTwoOfTwoRows = dpConv(54);
 
-    int encloseYStartOneRow = dpConv(40);
-    int encloseYEndOneRow = dpConv(110);
-    int encloseYStartTwoRows = dpConv(40);
-    int encloseYEndTwoRows = dpConv(110);
-
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       encloseYStartOneRow = dpConv(40);
       encloseYEndOneRow = dpConv(140);
@@ -187,6 +200,7 @@ public class DotDraws extends View {
       encloseYEndTwoRows = dpConv(170);
 
       circleRadius = dpConv(22);
+
       xCircleAllRows = dpConv(28);
       yCircleOneRow = dpConv(82);
       yCircleFirstOfTwoRows = dpConv(48);
@@ -206,9 +220,9 @@ public class DotDraws extends View {
     switch (mMode) {
       case 1:
         if (mRoundTimes.size()<=8) {
-          encloseDots(encloseYStartOneRow, encloseYEndOneRow);
+          encloseDots(encloseXStart, encloseXEnd, encloseYStartOneRow, encloseYEndOneRow);
         } else {
-          encloseDots(encloseYStartTwoRows, encloseYEndTwoRows);
+          encloseDots(encloseXStart, encloseXEnd, encloseYStartTwoRows, encloseYEndTwoRows);
         }
 
         for (int i=0; i<mRoundTimes.size(); i++) {
@@ -308,7 +322,7 @@ public class DotDraws extends View {
         }
 
         setDotStyle(false);
-        encloseDots(encloseYStartOneRow , encloseYEndOneRow);
+        encloseDots(encloseXStart, encloseXEnd, encloseYStartOneRow , encloseYEndOneRow);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
           int alphaValue = 255;

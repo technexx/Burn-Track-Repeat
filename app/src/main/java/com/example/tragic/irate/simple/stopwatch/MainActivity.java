@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -27,8 +28,10 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -423,9 +426,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapHolder;
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
+  View.MeasureSpec measureSpec;
 
-  //Todo: All values in dotDraws needs to use dp -> sp conversion.
-  //Todo: Resize dotDraws border for long aspect.
+  //Todo: Got some funky -XXX total set time.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all spannable iterations.
   //Todo: Test all notifications.
@@ -687,6 +690,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
 
+//    View testView = mainView.getRootView();
+//    int widthPixels = measureSpec.getSize(testView.getWidth());
+//    int widthMode = View.MeasureSpec.getMode(testView.getWidth());
+
+//    Log.i("testSize", "base value is " + widthPixels);
+//    Log.i("testSize", "exact value is " + widthMode);
+
+
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
@@ -943,6 +954,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setDefaultTimerValuesAndTheirEditTextViews();
     instantiateNotifications();
+    sendPhoneResolutionToDotDrawsClass();
 
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -3989,5 +4001,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Base of 0 values for stopwatch means we don't want anything populated when resetting.
     if (mode!=4) populateTimerUI();
     setNotificationValues();
+  }
+
+  private void sendPhoneResolutionToDotDrawsClass() {
+    DisplayMetrics metrics = new DisplayMetrics();
+    getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+    int height = metrics.heightPixels;
+    int width = metrics.widthPixels;
+
+    dotDraws.receivePhoneDimensions(height, width);
   }
 }
