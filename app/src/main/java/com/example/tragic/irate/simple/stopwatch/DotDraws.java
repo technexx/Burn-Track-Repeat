@@ -398,6 +398,7 @@ public class DotDraws extends View {
   private void drawText(ArrayList<String> list, float x, float y, int i) {
     Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
 
+    //Todo: All text draws need to use our dpConvFloat method. Also do mPaintRoundNumbers.
     float modeOneTextSizeForLowDigits = 70f;
     float modeOneTextSizeForMediumDigits = 58f;
     float modeOneTextSizeForLargeDigits = 52f;
@@ -419,9 +420,12 @@ public class DotDraws extends View {
 
     mPaintRoundNumbers.setTextSize(32f);
 
+
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
 
       modeOneTextSizeForLowDigits = 70f;
+      modeOneTextSizeForLowDigits = dpConvFloat(30f);
+
       modeOneTextSizeForMediumDigits = 58f;
       modeOneTextSizeForLargeDigits = 52f;
 
@@ -512,5 +516,9 @@ public class DotDraws extends View {
 
   public int dpConv(float pixels) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+  }
+
+  public float dpConvFloat(float pixels) {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
 }
