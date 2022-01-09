@@ -171,6 +171,10 @@ public class DotDraws extends View {
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
 
+    float definedCircumference = dpConv(mPhoneWidth/8);
+    float definedRadius = definedCircumference/2;
+    float definedXMovement = definedCircumference + dpConv(2);
+
     int encloseXStart = dpConv(2);
     int encloseXEnd = dpConv(mPhoneWidth-2);
 
@@ -189,20 +193,19 @@ public class DotDraws extends View {
     int yCircleFirstOfTwoRows = dpConv(26);
     int yCircleSecondOfTwoRows = dpConv(90);
 
-    int xCircleTextAllRows = dpConv(7);
+    int xCircleTextAllRows = dpConv(10);
     int yCircleTextOneRow = dpConv(48);
     int yCircleTextOneOfTwoRows= dpConv(38);
     int yCircleTextSecondOfTwoRows = dpConv(102);
 
     int xRoundNumberTextOneRow = dpConv(25);
-    int yRoundNumberTextOneRow = dpConv(80);
+    int yRoundNumberTextOneRow = dpConv(79);
     int yRoundNumberTextOneOfTwoRows = dpConv(63);
     int yRoundNumberTextTwoOfTwoRows = dpConv(126);
 
     int xCircleMovement = dpConv(47);
     int xTextMovement = dpConv(47);
     int xRoundNumberMovement = dpConv(47);
-//    int xValueOnSecondRowTransition =
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       encloseYStartOneRow = dpConv(40);
@@ -220,8 +223,8 @@ public class DotDraws extends View {
       yCircleFirstOfTwoRows = dpConv(48);
       yCircleSecondOfTwoRows = dpConv(120);
 
-      xCircleTextAllRows = dpConv(14);
-      yCircleTextOneRow = dpConv(90);
+      xCircleTextAllRows = dpConv(11);
+      yCircleTextOneRow = dpConv(93);
       yCircleTextOneOfTwoRows= dpConv(56);
       yCircleTextSecondOfTwoRows = dpConv(128);
 
@@ -399,18 +402,18 @@ public class DotDraws extends View {
     Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
 
     //Todo: All text draws need to use our dpConvFloat method. Also do mPaintRoundNumbers.
-    float modeOneTextSizeForLowDigits = 70f;
-    float modeOneTextSizeForMediumDigits = 58f;
-    float modeOneTextSizeForLargeDigits = 52f;
+    float modeOneTextSizeForLowDigits = dpConvFloat(30f);
+    float modeOneTextSizeForMediumDigits = dpConvFloat(23f);
+    float modeOneTextSizeForLargeDigits = dpConvFloat(19f);
 
     float modeThreeTextSizeForMediumDigits = 50f;
     float modeThreeTextSizeForLargeDigits = 57f;
     float modeThreeTextSizeForRectangle = 65f;
 
-    int xMediumMod = dpConv(3);
-    int yMediumMod = dpConv(1);
-    int xSmallMod = dpConv(6);
-    int ySmallMod = dpConv(1);
+    int xMediumMod = dpConv(1);
+    int yMediumMod = dpConv(3);
+    int xSmallMod = dpConv(2);
+    int ySmallMod = dpConv(5);
 
     int xBigCircleMod = dpConv(7);
     int yBigCircleMod = dpConv(2);
@@ -420,18 +423,26 @@ public class DotDraws extends View {
 
     mPaintRoundNumbers.setTextSize(32f);
 
-
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-
-      modeOneTextSizeForLowDigits = 70f;
       modeOneTextSizeForLowDigits = dpConvFloat(30f);
 
-      modeOneTextSizeForMediumDigits = 58f;
-      modeOneTextSizeForLargeDigits = 52f;
+      modeOneTextSizeForMediumDigits = dpConvFloat(23f);
+      modeOneTextSizeForLargeDigits = dpConvFloat(20f);
 
       modeThreeTextSizeForMediumDigits = 50f;
       modeThreeTextSizeForLargeDigits = 57f;
       modeThreeTextSizeForRectangle = 65f;
+
+      xMediumMod = dpConv(2);
+      yMediumMod = dpConv(3);
+      xSmallMod = dpConv(4);
+      ySmallMod = dpConv(4);
+
+      xBigCircleMod = dpConv(7);
+      yBigCircleMod = dpConv(2);
+      ySmallCircleMod = dpConv(3);
+      xSquareMod = dpConv(7);
+      ySquareMod = dpConv(3);
 
       mPaintRoundNumbers.setTextSize(40f);
     }
