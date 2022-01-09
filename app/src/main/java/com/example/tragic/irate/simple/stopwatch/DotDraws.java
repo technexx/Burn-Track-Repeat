@@ -155,7 +155,6 @@ public class DotDraws extends View {
     mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 20, mPaintBox);
   }
 
-  //Todo: Should we just use a division formula (e.g. /8) based on phone conversion?
   public void receivePhoneDimensions(int height, int width) {
     this.mPhoneHeight = height; this.mPhoneWidth = width;
 
@@ -166,14 +165,18 @@ public class DotDraws extends View {
     Log.i("testSize", "converted height value is " + mPhoneWidth);
   }
 
-  //Todo: Fix row 2 round numbers (all aspects).
   @Override
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
 
-    float definedCircumference = dpConv(mPhoneWidth/8);
-    float definedRadius = definedCircumference/2;
-    float definedXMovement = definedCircumference + dpConv(2);
+    int paddedWidth = (int) mPhoneWidth-30;
+    double definedCircumference = (double) paddedWidth/8;
+    int definedRadius = (int) dpConv((float) definedCircumference/2);
+    int definedXMovement = (int) dpConv((float) definedCircumference) + dpConv(3);
+
+    Log.i("testDim", "padded width is " + paddedWidth);
+    Log.i("testdim", "radius is " + definedRadius);
+    Log.i("testdim", "movement is " + definedXMovement);
 
     int encloseXStart = dpConv(2);
     int encloseXEnd = dpConv(mPhoneWidth-2);
@@ -183,7 +186,7 @@ public class DotDraws extends View {
     int encloseYStartTwoRows = dpConv(0);
     int encloseYEndTwoRows = dpConv(130);
 
-    int circleRadius = dpConv(22);
+    int circleRadius = definedRadius;
     int xCircleStart = dpConv(28);
     int xTextStart = dpConv(7);
     int xRoundNumberStart = dpConv(25);
@@ -203,7 +206,7 @@ public class DotDraws extends View {
     int yRoundNumberTextOneOfTwoRows = dpConv(63);
     int yRoundNumberTextTwoOfTwoRows = dpConv(126);
 
-    int xCircleMovement = dpConv(47);
+    int xCircleMovement = definedXMovement;
     int xTextMovement = dpConv(47);
     int xRoundNumberMovement = dpConv(47);
 
@@ -213,7 +216,7 @@ public class DotDraws extends View {
       encloseYStartTwoRows = dpConv(10);
       encloseYEndTwoRows = dpConv(170);
 
-      circleRadius = dpConv(22);
+      circleRadius = definedRadius;
       xCircleStart = dpConv(28);
       xTextStart = dpConv(14);
       xRoundNumberStart = dpConv(25);
@@ -233,7 +236,7 @@ public class DotDraws extends View {
       yRoundNumberTextOneOfTwoRows = dpConv(88);
       yRoundNumberTextTwoOfTwoRows = dpConv(160);
 
-      xCircleMovement = dpConv(48);
+      xCircleMovement = definedXMovement;
       xTextMovement = dpConv(48);
       xRoundNumberMovement = dpConv(48);
     }
@@ -528,6 +531,10 @@ public class DotDraws extends View {
   public int dpConv(float pixels) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
+
+//  public double dpConvDouble(double pixels) {
+//    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+//  }
 
   public float dpConvFloat(float pixels) {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
