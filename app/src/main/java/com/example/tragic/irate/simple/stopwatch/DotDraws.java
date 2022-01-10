@@ -183,7 +183,6 @@ public class DotDraws extends View {
     int encloseYStartTwoRows = dpConv(0);
     int encloseYEndTwoRows = dpConv(130);
 
-    int circleRadius = definedRadius;
     int xCircleStart = dpConv(28);
     int xTextStart = dpConv(11);
     int xRoundNumberStart = dpConv(25);
@@ -258,13 +257,13 @@ public class DotDraws extends View {
 
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
-            mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, circleRadius, mPaint);
+            mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, definedRadius, mPaint);
             drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneRow, i);
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextOneRow, mPaintRoundNumbers);
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
-              mCanvas.drawCircle(xCircleAllRows, yCircleFirstOfTwoRows, circleRadius, mPaint);
+              mCanvas.drawCircle(xCircleAllRows, yCircleFirstOfTwoRows, definedRadius, mPaint);
               drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneOfTwoRows, i);
               mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextOneOfTwoRows, mPaintRoundNumbers);
               //Resetting mX after 8th round so the second row begins on top of first.
@@ -274,7 +273,7 @@ public class DotDraws extends View {
                 xCircleTextAllRows = xTextStart;
                 xRoundNumberTextAllRows = xRoundNumberStart;
               }
-              mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, circleRadius, mPaint);
+              mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, definedRadius, mPaint);
               drawText(mRoundTimes, xCircleTextAllRows, yCircleTextSecondOfTwoRows, i);
               //Position 8 (first pos, second row), has to be indented slightly.
               if (i==8) {
@@ -289,14 +288,20 @@ public class DotDraws extends View {
           xRoundNumberTextAllRows += definedXRoundNumberMovement;
         }
         break;
+        //Todo: Precise spacing for mode 3.
       case 3:
-        int pomRadiusSmall = dpConv(17);
-        int pomRadiusLarge = dpConv(223);
+//        int definedRadius = (int) dpConv((float) definedCircumference/2);
+//        int definedXCircleMovement = (int) dpConv((float) definedCircumference) + dpConv(3);
+
+        int pomRadiusLarge = (int) dpConv((float) definedCircumference/2);
+        int pomRadiusSmall = pomRadiusLarge/2;
 
         int xCircle = dpConv(28);
         int yCircle = dpConv(90);
-        int xRectangleStart = dpConv(203);
-        int xRectangleEnd = dpConv(227);
+
+        int xRectangleStart = xCircle;
+
+        int xRectangleEnd = xRectangleStart + (pomRadiusSmall*3);
         int yRectangleTop = dpConv(103);
         int yRectangleBottom = dpConv(127);
 
@@ -309,16 +314,8 @@ public class DotDraws extends View {
         int yRoundNumberText = dpConv(125);
 
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-          pomRadiusSmall = dpConv(18);
-          pomRadiusLarge = dpConv(24);
-
           xCircle = dpConv(30);
           yCircle = dpConv(82);
-
-          xRectangleStart = dpConv(335);
-          xRectangleEnd = dpConv(385);
-          yRectangleTop = dpConv(57);
-          yRectangleBottom = dpConv(107);
 
           xCircleText = dpConv(16);
           yCircleText = dpConv(92);
@@ -352,14 +349,16 @@ public class DotDraws extends View {
               mPaint.setColor(WORK_COLOR);
               //Must be called AFTER color is changed, otherwise alpha will reset to 255.
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
-              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               mCanvas.drawCircle(xCircle, yCircle, pomRadiusLarge, mPaint);
+
+              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               drawText(mPomTime, xCircleText, yCircleText, i);
               break;
             case 1: case 3: case 5:
               mPaint.setColor(MINI_BREAK_COLOR);
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
               mCanvas.drawCircle(xCircle, yCircle, pomRadiusSmall , mPaint);
+
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               drawText(mPomTime, xCircleText, yCircleText, i);
               break;
@@ -367,6 +366,7 @@ public class DotDraws extends View {
               mPaint.setColor(FULL_BREAK_COLOR);
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
               mCanvas.drawRect(xRectangleStart, yRectangleTop, xRectangleEnd, yRectangleBottom, mPaint);
+
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               drawText(mPomTime, xRectangleText, yRectangleText, i);
               break;
@@ -377,9 +377,11 @@ public class DotDraws extends View {
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberText, yRoundNumberText, mPaintRoundNumbers);
           }
 
-          xCircle += (dpConv(46));
-          xCircleText += dpConv(46);
-          xRoundNumberText += dpConv(46);
+          xCircle += definedXCircleMovement;
+          xRectangleStart += definedXCircleMovement;
+          xRectangleEnd += definedXCircleMovement;
+          xCircleText += definedXTextMovement;
+          xRoundNumberText += definedXRoundNumberMovement;
         }
         break;
     }
