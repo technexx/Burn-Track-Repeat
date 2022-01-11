@@ -271,17 +271,15 @@ public class DotDraws extends View {
               if (i==8) {
                 xCircleAllRows = xCircleStart;
                 xCircleTextAllRows = xTextStart;
-                xRoundNumberTextAllRows = xRoundNumberStart;
+                xRoundNumberTextAllRows = xRoundNumberStart - dpConv(5);
               }
               mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, definedRadius, mPaint);
               drawText(mRoundTimes, xCircleTextAllRows, yCircleTextSecondOfTwoRows, i);
-              //Position 8 (first pos, second row), has to be indented slightly.
-              if (i==8) {
-                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
-              } else {
-                mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
-              }
+
+              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
             }
+            //Double digits don't center and need their first digit moved back behind center.
+//            if (i==8) xRoundNumberTextAllRows -= dpConv(5);
           }
           xCircleAllRows += definedXCircleMovement;
           xCircleTextAllRows += definedXTextMovement;
@@ -302,7 +300,6 @@ public class DotDraws extends View {
 
         int dotTextDrawForX = xCircleAllRows - pomRadiusSmall + dpConv(6);
         xRoundNumberTextAllRows = dpConv(25);
-        yRoundNumberTextOneRow = dpConv(125);
 
         int xRectangleStart = xCircleAllRows - dpConv(2);
         int xRectangleEnd = xRectangleStart + dpConv(44);
@@ -362,11 +359,10 @@ public class DotDraws extends View {
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               drawText(mPomTime, xRectangleStart + dpConv(8), yCircleTextOneRow, i);
-//              drawText(mPomTime, dotTextDrawForX, yCircleTextOneRow, i);
               break;
           }
           if (i==7) {
-            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows + dpConv(8), yRoundNumberTextOneRow, mPaintRoundNumbers);
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows - dpConv(6), yRoundNumberTextOneRow, mPaintRoundNumbers);
           } else {
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextOneRow, mPaintRoundNumbers);
           }

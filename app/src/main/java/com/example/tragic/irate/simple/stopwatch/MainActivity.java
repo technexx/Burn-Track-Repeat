@@ -3927,10 +3927,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws.resetDotAlpha();
     if (timer != null) timer.cancel();
     if (endAnimation!=null) endAnimation.cancel();
-//    if (mediaPlayer.isPlaying()) {
-//      mediaPlayer.stop();
-//      mediaPlayer.reset();
-//    }
+    if (mediaPlayer.isPlaying()) {
+      mediaPlayer.stop();
+      mediaPlayer.reset();
+    }
 
     timerIsPaused = true;
     timerEnded = false;
