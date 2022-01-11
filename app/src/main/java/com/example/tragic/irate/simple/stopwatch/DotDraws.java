@@ -167,7 +167,7 @@ public class DotDraws extends View {
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
 
-    int paddedWidth = (int) mPhoneWidth-30;
+    int paddedWidth = (int) mPhoneWidth-dpConv(11);
     double definedCircumference = (double) paddedWidth/8;
     int definedRadius = (int) dpConv((float) definedCircumference/2);
     int definedXCircleMovement = (int) dpConv((float) definedCircumference) + dpConv(3);
@@ -296,30 +296,22 @@ public class DotDraws extends View {
 
         definedXCircleMovement = (int) ((double)dpConv((float) definedCircumference) * 1.03);
         int definedRectangleMovement = (int) ((double)dpConv((float) definedCircumference) * .98);
-        int definedPomTextMovement = (int) ((double) definedXTextMovement * .95);
-        int definedPomTextMovementTwo = (int) ((double) definedXTextMovement * .965);
-        int definedPomTextMovementThree = (int) ((double) definedXTextMovement * .975);
-        int definedPomTextMovementFour = (int) ((double) definedXTextMovement * 1.03);
 
         xCircleAllRows = dpConv(28);
         yCircleOneRow = dpConv(36);
 
-        xCircleTextAllRows = dpConv(16);
-        yCircleTextOneRow = dpConv(105);
+        int dotTextDrawForX = xCircleAllRows - pomRadiusSmall + dpConv(6);
         xRoundNumberTextAllRows = dpConv(25);
         yRoundNumberTextOneRow = dpConv(125);
 
         int xRectangleStart = xCircleAllRows;
-        int xRectangleEnd = xRectangleStart + (pomRadiusLarge*2);
+        int xRectangleEnd = xRectangleStart + (pomRadiusLarge*2) + dpConv(4);
         int yRectangleTop = dpConv(58);
         int yRectangleBottom = dpConv(106);
 
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
           xCircleAllRows = dpConv(30);
           yCircleOneRow = dpConv(82);
-
-          xCircleTextAllRows = dpConv(16);
-          yCircleTextOneRow = dpConv(92);
         }
 
         setDotStyle(false);
@@ -348,7 +340,7 @@ public class DotDraws extends View {
               mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, pomRadiusLarge, mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, xCircleTextAllRows, yCircleTextOneRow, i);
+              drawText(mPomTime, dotTextDrawForX, yCircleTextOneRow, i);
               break;
             case 1: case 3: case 5:
               mPaint.setColor(MINI_BREAK_COLOR);
@@ -356,7 +348,7 @@ public class DotDraws extends View {
               mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, pomRadiusSmall , mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, xCircleTextAllRows, yCircleTextOneRow, i);
+              drawText(mPomTime, dotTextDrawForX, yCircleTextOneRow, i);
               break;
             case 7:
               mPaint.setColor(FULL_BREAK_COLOR);
@@ -364,18 +356,9 @@ public class DotDraws extends View {
               mCanvas.drawRect(xRectangleStart, yRectangleTop, xRectangleEnd, yRectangleBottom, mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, xCircleTextAllRows, yCircleTextOneRow, i);
+              drawText(mPomTime, xRectangleStart + dpConv(8), yCircleTextOneRow, i);
+//              drawText(mPomTime, dotTextDrawForX, yCircleTextOneRow, i);
               break;
-          }
-          switch (i) {
-            case 0: case 1:
-              xCircleTextAllRows += definedPomTextMovement; break;
-            case 2: case 3:
-              xCircleTextAllRows += definedPomTextMovementTwo; break;
-            case 4: case 5:
-              xCircleTextAllRows += definedPomTextMovementThree; break;
-            case 6:
-              xCircleTextAllRows += definedPomTextMovementFour; break;
           }
           if (i==7) {
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows + dpConv(8), yRoundNumberTextOneRow, mPaintRoundNumbers);
@@ -384,6 +367,8 @@ public class DotDraws extends View {
           }
 
           xCircleAllRows += definedXCircleMovement;
+          dotTextDrawForX += definedXCircleMovement;
+          if (i==6) dotTextDrawForX += dpConv(6);
           xRectangleStart += definedRectangleMovement;
           xRectangleEnd += definedRectangleMovement;
           xRoundNumberTextAllRows += definedXRoundNumberMovement;
@@ -400,9 +385,9 @@ public class DotDraws extends View {
     float modeOneTextSizeForMediumDigits = dpConvFloat(23f);
     float modeOneTextSizeForLargeDigits = dpConvFloat(19f);
 
-    float modeThreeTextSizeForMediumDigits = 50f;
-    float modeThreeTextSizeForLargeDigits = 57f;
-    float modeThreeTextSizeForRectangle = 65f;
+    float modeThreeTextSizeForMediumDigits = dpConvFloat(20f);
+    float modeThreeTextSizeForLargeDigits = dpConvFloat(22f);
+    float modeThreeTextSizeForRectangle = dpConvFloat(24f);
 
     int xMediumMod = dpConv(1);
     int yMediumMod = dpConv(3);
@@ -419,13 +404,12 @@ public class DotDraws extends View {
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       modeOneTextSizeForLowDigits = dpConvFloat(30f);
-
       modeOneTextSizeForMediumDigits = dpConvFloat(23f);
       modeOneTextSizeForLargeDigits = dpConvFloat(20f);
 
-      modeThreeTextSizeForMediumDigits = 50f;
-      modeThreeTextSizeForLargeDigits = 57f;
-      modeThreeTextSizeForRectangle = 65f;
+      modeThreeTextSizeForMediumDigits = dpConvFloat(20f);
+      modeThreeTextSizeForLargeDigits = dpConvFloat(22f);
+      modeThreeTextSizeForRectangle = dpConvFloat(24f);
 
       xMediumMod = dpConv(2);
       yMediumMod = dpConv(3);
