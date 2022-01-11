@@ -169,8 +169,8 @@ public class DotDraws extends View {
 
     int paddedWidth = (int) mPhoneWidth-dpConv(11);
     double definedCircumference = (double) paddedWidth/8;
-    int definedRadius = (int) dpConv((float) definedCircumference/2);
-    int definedXCircleMovement = (int) dpConv((float) definedCircumference) + dpConv(3);
+    int definedRadius = (int) dpConv((float) definedCircumference/2) - dpConv(1);
+    int definedXCircleMovement = (int) dpConv((float) definedCircumference) + dpConv(2);
 
     int definedXTextMovement = definedXCircleMovement;
     int definedXRoundNumberMovement = definedXCircleMovement;
@@ -203,6 +203,12 @@ public class DotDraws extends View {
     int yRoundNumberTextTwoOfTwoRows = dpConv(126);
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
+      definedRadius = (int) dpConv((float) definedCircumference/2);
+      definedXCircleMovement = (int) dpConv((float) definedCircumference) + dpConv(3);
+
+      definedXTextMovement = definedXCircleMovement;
+      definedXRoundNumberMovement = definedXCircleMovement;
+
       encloseYStartOneRow = dpConv(40);
       encloseYEndOneRow = dpConv(140);
       encloseYStartTwoRows = dpConv(10);
@@ -271,15 +277,15 @@ public class DotDraws extends View {
               if (i==8) {
                 xCircleAllRows = xCircleStart;
                 xCircleTextAllRows = xTextStart;
-                xRoundNumberTextAllRows = xRoundNumberStart - dpConv(5);
               }
               mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, definedRadius, mPaint);
               drawText(mRoundTimes, xCircleTextAllRows, yCircleTextSecondOfTwoRows, i);
 
               mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
+              if (i==8) {
+                xRoundNumberTextAllRows = xRoundNumberStart - dpConv(5);
+              }
             }
-            //Double digits don't center and need their first digit moved back behind center.
-//            if (i==8) xRoundNumberTextAllRows -= dpConv(5);
           }
           xCircleAllRows += definedXCircleMovement;
           xCircleTextAllRows += definedXTextMovement;
