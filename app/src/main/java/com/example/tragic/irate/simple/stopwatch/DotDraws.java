@@ -84,7 +84,7 @@ public class DotDraws extends View {
     mPaintRoundNumbers = new Paint();
     mPaintRoundNumbers.setAntiAlias(true);
     mPaintRoundNumbers.setColor(Color.WHITE);
-    mPaintRoundNumbers.setTextSize(40f);
+    mPaintRoundNumbers.setTextSize(dpConvFloat(15f));
 
     mPaintBox = new Paint();
     mPaintBox.setColor(Color.WHITE);
@@ -277,13 +277,14 @@ public class DotDraws extends View {
               if (i==8) {
                 xCircleAllRows = xCircleStart;
                 xCircleTextAllRows = xTextStart;
+                xRoundNumberTextAllRows = xRoundNumberStart;
               }
               mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, definedRadius, mPaint);
               drawText(mRoundTimes, xCircleTextAllRows, yCircleTextSecondOfTwoRows, i);
 
               mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
               if (i==8) {
-                xRoundNumberTextAllRows = xRoundNumberStart - dpConv(5);
+                xRoundNumberTextAllRows -= dpConv(5);
               }
             }
           }
@@ -407,7 +408,7 @@ public class DotDraws extends View {
     int xSquareMod = dpConv(7);
     int ySquareMod = dpConv(3);
 
-    mPaintRoundNumbers.setTextSize(32f);
+    mPaintRoundNumbers.setTextSize(dpConvFloat(15f));
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       modeOneTextSizeForLowDigits = dpConvFloat(30f);
@@ -429,7 +430,7 @@ public class DotDraws extends View {
       xSquareMod = dpConv(7);
       ySquareMod = dpConv(3);
 
-      mPaintRoundNumbers.setTextSize(40f);
+      mPaintRoundNumbers.setTextSize(dpConvFloat(17f));
     }
 
     if (list.size() >0) {
