@@ -428,9 +428,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
 
-  //Todo: Got some funky -XXX total set time.
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Test all spannable iterations.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
@@ -3309,6 +3307,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
       //Ensures subsequent rounds will start automatically.
       beginTimerForNextRound = true;
+      timerDurationPlaceHolder = 0;
     }
     if (mode==3) {
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
@@ -3357,6 +3356,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String addedTime = "";
     long remainder = 0;
     if (mode==1) {
+
+      Log.i("testtotal", "setmillis is " + setMillis);
+      Log.i("testtotal", "single is " + cycleSetTimeForSingleRoundInMillis);
+      Log.i("testtotal", "total is " + totalCycleSetTimeInMillis);
+      Log.i("testtotal", "placeholder is " + timerDurationPlaceHolder);
+
       switch (typeOfRound.get(currentRound)) {
         case 1:
           if (resettingTotalTime) {
@@ -3376,6 +3381,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
+          //Todo: Placeholder in non-infinity rounds is set to millis value.
           cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
 
@@ -3433,6 +3439,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: currentRound changes after this is executed in nextRound, but the addition needs to occur before.
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean newRound) {
     if (mode==1) {
       if (newRound) {
@@ -3441,22 +3448,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
-
-        if (typeOfRound.get(currentRound) == 2 || typeOfRound.get(currentRound) == 4) {
-          timerDurationPlaceHolder = 0;
-        }
       } else {
         totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
-
-        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-          timerDurationPlaceHolder = setMillis;
-          cycleSetTimeForSingleRoundInMillis = 0;
-        }
-        if (typeOfRound.get(currentRound) == 3 || typeOfRound.get(currentRound) == 4) {
-          timerDurationPlaceHolder = breakMillis;
-          cycleBreakTimeForSingleRoundInMillis = 0;
-        }
       }
     }
     if (mode==3) {
