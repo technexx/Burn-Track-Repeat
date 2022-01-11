@@ -304,14 +304,19 @@ public class DotDraws extends View {
         xRoundNumberTextAllRows = dpConv(25);
         yRoundNumberTextOneRow = dpConv(125);
 
-        int xRectangleStart = xCircleAllRows;
-        int xRectangleEnd = xRectangleStart + (pomRadiusLarge*2) + dpConv(4);
-        int yRectangleTop = dpConv(58);
-        int yRectangleBottom = dpConv(106);
+        int xRectangleStart = xCircleAllRows - dpConv(2);
+        int xRectangleEnd = xRectangleStart + dpConv(44);
+        int yRectangleTop = dpConv(15);
+        int yRectangleBottom = dpConv(59);
 
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
           xCircleAllRows = dpConv(30);
           yCircleOneRow = dpConv(82);
+
+          xRectangleStart = xCircleAllRows;
+          xRectangleEnd = xRectangleStart + (pomRadiusLarge*2) + dpConv(4);
+          yRectangleTop = dpConv(58);
+          yRectangleBottom = dpConv(106);
         }
 
         setDotStyle(false);
@@ -380,23 +385,23 @@ public class DotDraws extends View {
   private void drawText(ArrayList<String> list, float x, float y, int i) {
     Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
 
-    //Todo: All text draws need to use our dpConvFloat method. Also do mPaintRoundNumbers.
     float modeOneTextSizeForLowDigits = dpConvFloat(30f);
     float modeOneTextSizeForMediumDigits = dpConvFloat(23f);
     float modeOneTextSizeForLargeDigits = dpConvFloat(19f);
 
     float modeThreeTextSizeForMediumDigits = dpConvFloat(20f);
-    float modeThreeTextSizeForLargeDigits = dpConvFloat(22f);
-    float modeThreeTextSizeForRectangle = dpConvFloat(24f);
+    float modeThreeTextSizeForLargeDigits = dpConvFloat(20f);
+    float modeThreeTextSizeForRectangle = dpConvFloat(21f);
 
     int xMediumMod = dpConv(1);
     int yMediumMod = dpConv(3);
     int xSmallMod = dpConv(2);
     int ySmallMod = dpConv(5);
 
+    int xSmallCircleMod = dpConv(3);
     int xBigCircleMod = dpConv(7);
-    int yBigCircleMod = dpConv(2);
-    int ySmallCircleMod = dpConv(3);
+    int yBigCircleMod = dpConv(5);
+    int ySmallCircleMod = dpConv(5);
     int xSquareMod = dpConv(7);
     int ySquareMod = dpConv(3);
 
@@ -449,7 +454,7 @@ public class DotDraws extends View {
               //4 length (X:XX) only used for mini breaks.
               case 1: case 3: case 5:
                 mPaintText.setTextSize(modeThreeTextSizeForMediumDigits);
-                mCanvas.drawText(list.get(i), x, y-ySmallCircleMod, mPaintText);
+                mCanvas.drawText(list.get(i), x-xSmallCircleMod, y-ySmallCircleMod, mPaintText);
                 break;
             }
         }
