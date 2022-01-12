@@ -12,9 +12,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -54,6 +56,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -63,6 +66,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -1002,12 +1006,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundListDivider.setVisibility(View.GONE);
     roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
     roundRecycler.setLayoutManager(lm2);
-//    GridLayoutManager gm = new GridLayoutManager(this, 2);
 
     roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
     roundRecyclerTwo.setLayoutManager(lm3);
+
+    VerticalSpaceItemDecoration verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+            -25);
+    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
+    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
 
     //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
     recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
@@ -2898,7 +2906,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(200);
         roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(20);
       }
-
       roundRecyclerParams.rightMargin = 0;
     } else if (numberOfAdapters==2){
       roundRecyclerTwo.setVisibility(View.VISIBLE);

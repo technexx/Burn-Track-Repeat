@@ -53,7 +53,6 @@
     <string name="empty_cycle_list">Nothing here!</string>
     <string name="empty_laps_list">No laps yet!</string>
 
-    <string name="about">About</string>
     <string name="sounds_and_vibrations">Sounds and Vibrations</string>
     <string name="colors_schemes">Colors</string>
 
@@ -109,6 +108,1280 @@
         <item>yellow_setting</item>
         <item>magenta_setting</item>
         <item>cyan_setting</item>
+    </string-array>
+
+    <string name="basic">Basic</string>
+    <string name="tdee_button">TDEE</string>
+    <string name="met">MET</string>
+    <string name="custom">Custom</string>
+    <string name="imperial">Imperial</string>
+    <string name="metric">Metric</string>
+    <string name="tdee">Daily TDEE:</string>
+    <string name="calories">Calories</string>
+    <string name="average">Avg. Hourly:</string>
+    <string name="bmr">Daily BMR:</string>
+    <string name="calculate">Calculate!</string>
+    <string name="two_part">%1$s  %2$s</string>
+    <string name="add">Add to Custom Calculator</string>
+    <string name="about">About</string>
+
+    <string name="gender">Gender:</string>
+    <string name="age">Age:</string>
+    <string name="weight">Weight:</string>
+    <string name="height">Height:</string>
+    <string name="activity">Activity Level:</string>
+
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+
+    <string name="act_0">Fully Sedentary</string>
+    <string name="act_1">Mostly Inactive</string>
+    <string name="act_2">Slightly Active</string>
+    <string name="act_3">Moderately Active</string>
+    <string name="act_4">Very Active</string>
+    <string name="act_5">Extremely Active</string>
+
+    <string name="categories">Categories:</string>
+    <string name="values">MET Values:</string>
+    <string name="minutes_spent">Minutes Spent:</string>
+    <string name="hours_spent">Hours Spent:</string>
+    <string name="met_score">MET Score:</string>
+    <string name="calories_burned">Calories Burned:</string>
+
+    <string name="categoryHead">Activity</string>
+    <string name="metHead">MET Score</string>
+    <string name="hoursHead">Hours Spent</string>
+    <string name="caloriesHead">Calories Burned</string>
+
+    <string name="bicycling">Bicycling</string>
+    <string name="conditioning">Conditioning</string>
+    <string name="dancing">Dancing</string>
+    <string name="fishing">Fishing &amp; Hunting</string>
+    <string name="home">Home Activities</string>
+    <string name="garden">Lawn &amp; Garden</string>
+    <string name="misc">Miscellaneous</string>
+    <string name="music">Music Playing</string>
+    <string name="occupational">Occupational</string>
+    <string name="running">Running</string>
+    <string name="self_care">Self Care</string>
+    <string name="sexual">Sexual Activity</string>
+    <string name="sports">Sports</string>
+    <string name="walking">Walking</string>
+    <string name="water">Water Activities</string>
+    <string name="winter">Winter Activities</string>
+
+    <string name="about_tdee">\"TDEE\" stands for \"Total Daily Energy Expenditure,\" which is a fancy way of counting how many calories you burn each day.\n\n\"BMR\" stands for \"Basal Metabolic Rate,\" and represents how many calories you burn while doing absolutely nothing (e.g. sitting motionless, sleeping).\n\nThis calculator will show your BMR based upon your physical composition, and approximate your TDEE based on your level of daily activity.</string>
+
+    <string name="about_met">\"MET\" stands for \"Metabolic Equivalent of Task,\" and is used to approximate how many calories per minute various tasks burn. A 1.0 value is equivalent to doing absolutely nothing (e.g. sitting motionless, sleeping).\n\nThis calculator will show the MET value of your chosen activity, in addition to the calories it burns when engaging in it for the chosen duration.\n\nPlease note, these values are approximations only.\n\nSource: Barbara E. Ainsworth, William L. Haskell, Stephen D. Herrmann, et al., \“2011 Compendium of Physical Activities: A Second Update of Codes and MET Values,\” Medicine and Science in Sports and Exercise, Aug. 2011 </string>
+
+    <string-array name="bicycling">
+        <item>Mountain biking - general </item>
+        <item>Mountain biking- uphill and vigorous </item>
+        <item>Mountain biking - competitive and racing </item>
+        <item>BMX biking</item>
+        <item>Under 10 mph biking - leisure </item>
+
+        <item>General biking</item>
+        <item>Biking - 5.5 mph </item>
+        <item>Biking - 9.4 mph  </item>
+        <item>Biking - 10 to 11.9 mph  </item>
+        <item>Biking -  12 to 13.9 mph  </item>
+
+        <item>Biking - 14 to 15.9 mph  </item>
+        <item>Biking - 16 to 19 mph  </item>
+        <item>Biking - over 20 mph  </item>
+        <item>unicycling </item>
+    </string-array>
+
+    <string-array name="conditioning">
+        <item>Active video game (e.g. Wii Fit) - light effort (e.g. yoga, stretching) </item>
+        <item>Active video game (e.g. Wii Fit) - moderate effort (e.g. aerobic) </item>
+        <item>Active video game (e.g. Wii Fit) - vigorous effort (e.g. dancing)</item>
+
+        <item>Calisthenics (e.g. sit-ups, crunches) - light effort </item>
+        <item>Calisthenics (e.g. push-ups, pull-ups) - moderate effort </item>
+        <item>Calisthenics (e.g. push-ups, pull-ups) - vigorous effort </item>
+
+        <item>Circuit training - moderate effort </item>
+        <item>Circuit training - vigorous effort </item>
+
+        <item>Eliptical training - moderate effort </item>
+
+        <item>Obstacle courses and/or boot camp </item>
+
+        <item>Resistance training - multiple exercises, 8 to 15 repetitions </item>
+        <item>Resistance training - squats at slow or explosive effort </item>
+        <item>Resistance training - power lifting or body building at rigorous effort </item>
+
+        <item>Stationary bicycle - 30 to 50 watts - light effort </item>
+        <item>Stationary bicycle - 51 to 89 watts - light to moderate effort </item>
+        <item>Stationary bicycle - 90 to 100 watts - moderate to vigorous effort </item>
+        <item>Stationary bicycle - 101 to 160 watts - vigorous effort </item>
+        <item>Stationary bicycle - 161 to 220 watts - vigorous effort </item>
+        <item>Stationary bicycle - 201 to 270 watts - vigorous effort </item>
+        <item>Stationary bicycle - spin class </item>
+
+        <item>Rope skipping - general </item>
+
+        <item>Rowing - 100 watts</item>
+        <item>Rowing - 150 watts</item>
+        <item>Rowing - 220 watts</item>
+
+        <item>Ski machine - general </item>
+
+        <item>Stretching - mild </item>
+
+        <item>Pilates - general </item>
+
+        <item>Water aerobics or calisthenics </item>
+
+        <item>Video workouts - low effort (e.g. yoga, stretching) </item>
+        <item>Video workouts - moderate effort (e.g. cardio, resistance) </item>
+        <item>Video workouts - vigorous effort (e.g. cardio, resistance) </item>
+
+        <item>Yoga - Hatha </item>
+        <item>Yoga - Power </item>
+        <item>Yoga - Nadisodhana</item>
+        <item>Yoga - Surya Namaskar</item>
+    </string-array>
+
+    <string-array name="dancing">
+        <item>Ballet, Modern, or Jazz - rehearsal or class </item>
+        <item>Ballet, Modern, or Jazz - performance or vigorous effort </item>
+
+        <item>Tap</item>
+
+        <item>Aerobic - low impact </item>
+        <item>Aerobic - high impact </item>
+
+        <item>Bench step class - general </item>
+
+        <item>Ballroom - slow </item>
+        <item>Ballroom - fast </item>
+        <item>Ballroom - competitive </item>
+    </string-array>
+
+    <string-array name="fishing">
+        <item>Fishing - general</item>
+        <item>Hunting - general  </item>
+        <item>Rifle exercises </item>
+    </string-array>
+
+    <string-array name="home">
+        <item>Animal care - general </item>
+
+        <item>Automobile work - general </item>
+
+        <item>Carpentry - general</item>
+        <item>Carpentry - home remodeling tasks at light effort </item>
+        <item>Carpentry - home remodeling tasks at moderate effort </item>
+
+        <item>Child care - general at light effort </item>
+        <item>Child care - general at moderate effort </item>
+
+        <item>Cleaning - sweeping at light effort </item>
+        <item>Cleaning - sweeping at moderate effort </item>
+        <item>Cleaning - mopping at light effort</item>
+        <item>Cleaning - mopping at moderate effort </item>
+        <item>Cleaning - general tasks at light effort </item>
+        <item>Cleaning - general tasks at moderate effort </item>
+        <item>Cleaning - general tasks at vigorous effort </item>
+        <item>Cleaning - dusting </item>
+
+        <item>Cleaning gutters </item>
+
+        <item>Hammering nails </item>
+
+        <item>Home repair - light effort </item>
+        <item>Home repair - moderate effort </item>
+        <item>Home repair - vigorous effort </item>
+
+        <item>Ironing</item>
+
+        <item>Kitchen activity - (e.g. cooking, cleaning) at light effort</item>
+        <item>Kitchen activity - (e.g. cooking, cleaning) at moderate effort </item>
+
+        <item>Knitting or sewing - light effort </item>
+
+        <item>Laundry - folding, packing, hanging at light effort </item>
+        <item>Laundry - folding, washing by hand at moderate effort </item>
+
+        <item>Making beds and changing linens </item>
+
+        <item>Moving furniture or carrying boxes</item>
+
+        <item>Painting - general </item>
+        <item>Plumbing - general </item>
+
+        <item>Roofing - general </item>
+
+        <item>Sanding floors with power sander </item>
+
+        <item>Scrubbing floors - light effort </item>
+        <item>Scrubbing floors - moderate effort  </item>
+        <item>Scrubbing floors - vigorous effort  </item>
+
+        <item>Sewing - machine </item>
+
+        <item>Sharpening tools </item>
+
+        <item>Walking or running while playing with children - light effort </item>
+        <item>Walking or running while playing with children - moderate effort </item>
+        <item>Walking or running while playing with children - vigorous effort</item>
+        <item>Walking or running while playing with animals - light effort </item>
+        <item>Walking or running while playing with animals - moderate effort </item>
+        <item>Walking or running while playing with animals - vigorous effort</item>
+
+        <item>Washing car </item>
+
+        <item>Watering plants </item>
+    </string-array>
+
+    <string-array name="garden">
+        <item>Carrying or loading lumber - moderate effort </item>
+        <item>Carrying or loading lumber - vigorous effort </item>
+
+        <item>Chopping wood - moderate effort </item>
+        <item>Chopping wood - vigorous effort </item>
+
+        <item>Garden work - digging, spading, composting at light effort </item>
+        <item>Garden work - digging, spading, composting at moderate effort </item>
+        <item>Garden work - digging, spading, composting at vigorous effort </item>
+        <item>Garden work - planting at light effort</item>
+        <item>Garden work - planting at moderate effort</item>
+
+        <item>Mowing lawn - hand mower </item>
+        <item>Mowing lawn - power mower </item>
+        <item>Mowing lawn - riding mower </item>
+
+        <item>Picking fruit - moderate effort</item>
+        <item>Picking fruit - vigorous effort</item>
+
+        <item>Shoveling snow - by hand with moderate effort </item>
+        <item>Shoveling snow - by hand with vigorous effort</item>
+        <item>Shoveling dirt - general </item>
+
+        <item>Trimming shrubs or trees - manual cutter </item>
+        <item>Trimming shrubs or trees - power cutter </item>
+
+        <item>Yard work - general at light effort </item>
+        <item>Yard work - general at moderate effort </item>
+        <item>Yard work - general at vigorous effort</item>
+    </string-array>
+
+    <string-array name="misc">
+        <item>Arts and crafts - sitting at light effort </item>
+        <item>Arts and crafts - sitting at moderate effort </item>
+        <item>Arts and crafts - standing at light effort </item>
+        <item>Arts and crafts - standing at moderate effort </item>
+        <item>Arts and crafts - standing at vigorous effort </item>
+
+        <item>Board games - sitting </item>
+
+        <item>Camping - general </item>
+
+        <item>Casino gambling - standing </item>
+
+        <item>Drawing, writing, painting - sitting </item>
+        <item>Drawing, writing, painting - standing </item>
+
+        <item>Reading, texting, talking - sitting </item>
+        <item>Reading, texting, talking - standing </item>
+
+    </string-array>
+
+    <string-array name="music">
+        <item>Accordion - sitting </item>
+
+        <item>Cello - sitting </item>
+
+        <item>Conducting orchestra - standing </item>
+
+        <item>Double bass - standing </item>
+
+        <item>Drums - sitting </item>
+
+        <item>Flute - sitting </item>
+
+        <item>Guitar - sitting </item>
+        <item>Guitar - standing</item>
+
+        <item>Horn - standing </item>
+
+        <item>Marching band - moderate pace</item>
+        <item>Marching band - brisk pace </item>
+
+        <item>Organ - sitting</item>
+
+        <item>Piano - sitting </item>
+
+        <item>Trombone - standing </item>
+
+        <item>Trumpet - standing </item>
+
+        <item>Violin - sitting </item>
+
+        <item>Woodwind - sitting </item>
+    </string-array>
+
+    <string-array name="occupation">
+        <item>Baker - light effort </item>
+        <item>Baker - moderate effort </item>
+
+        <item>Bookbinding</item>
+
+        <item>Directing traffic </item>
+
+        <item>Carpentry - light effort </item>
+        <item>Carpentry - moderate effort </item>
+        <item>Carpentry - vigorous effort </item>
+
+        <item>Coal mining - general </item>
+
+        <item>Chef - general </item>
+
+        <item>Construction - general </item>
+
+        <item>Driver</item>
+
+        <item>Electrician - general </item>
+
+        <item>Farming - light effort </item>
+        <item>Farming - moderate effort </item>
+        <item>Farming - vigorous effort </item>
+
+        <item>Firefighting - general </item>
+
+        <item>Fishing - light effort </item>
+        <item>Fishing - moderate effort </item>
+        <item>Fishing - vigorous effort </item>
+
+        <item>Flight attendant - general</item>
+
+        <item>Garbage collector - general </item>
+
+        <item>Hair stylist - general </item>
+
+        <item>Horse care - light duties </item>
+        <item>Horse care - heavier duties </item>
+
+        <item>Horse racing - walking</item>
+        <item>Horse racing - trotting</item>
+        <item>Horse racing - galloping</item>
+
+        <item>Housekeeper - general</item>
+
+        <item>Lawn and yard work - general </item>
+
+        <item>Machine tooling - light effort </item>
+        <item>Machine tooling - moderate effort </item>
+
+        <item>Masonry - light effort</item>
+        <item>Masonry - moderate effort</item>
+
+        <item>Massage therapist - standing </item>
+
+        <item>Fruit picking - general </item>
+
+        <item>Painting - general </item>
+
+        <item>Plumbing - general </item>
+
+        <item>Shoe repair - general </item>
+
+        <item>Shoveling - moderate effort </item>
+        <item>Shoveling - vigorous effort </item>\
+
+        <item>Standing tasks (e.g. bartending, retail) at light effort </item>
+        <item>Standing tasks (e.g. bartending, retail) at moderate effort </item>
+
+        <item>Steel mill - moderate effort </item>
+        <item>Steel mill - vigorous effort </item>
+
+        <item>Tailoring - general </item>
+
+        <item>Unskilled manual labor - light effort </item>
+        <item>Unskilled manual labor - moderate effort </item>
+        <item>Unskilled manual labor - vigorous effort </item>
+    </string-array>
+
+    <string-array name="running">
+        <item>Running - 4 mph (13 min/mile) </item>
+        <item>Running - 5 mph (12 min/mile)</item>
+        <item>Running - 5.2 mph (11.5 min/mile)</item>
+        <item>Running - 6 mph (10 min/mile)</item>
+        <item>Running - 6.7 mph (9 min/mile)</item>
+
+        <item>Running - 7 mph (8.5 min/mile)</item>
+        <item>Running - 7.5 mph (8 min/mile)</item>
+        <item>Running - 8 mph (7.5 min/mile)</item>
+        <item>Running - 8.6 mph (7 min/mile)</item>
+        <item>Running - 9 mph (6.5 min/mile)</item>
+
+        <item>Running - 10 mph (6 min/mile)</item>
+        <item>Running -11 mph (5.5 min/mile)</item>
+        <item>Running - 12 mph (5 min/mile)</item>
+        <item>Running - 13 mph (4.6 min/mile)</item>
+        <item>Running - 14 mph (4.3 min/mile)</item>
+    </string-array>
+
+    <string-array name="self_care">
+        <item>Getting ready for bed - general </item>
+        <item>Elimination - sitting </item>
+        <item>Bathing </item>
+        <item>Eating - sitting </item>
+        <item>Hair styling - standing </item>
+        <item>Showering </item>
+    </string-array>
+
+    <string-array name="sexual_activity">
+        <item>Sexual Activity - light effort</item>
+        <item>Sexual Activity - moderate effort</item>
+        <item>Sexual Activity - vigorous effort</item>
+    </string-array>
+
+    <string-array name="sports">
+        <item>Archery - general </item>
+
+        <item>Auto racing - open wheel </item>
+
+        <item>Badminton - casual </item>
+        <item>Badminton - competitive </item>
+
+        <item>Basketball - shooting baskets only </item>
+        <item>Basketball - general </item>
+        <item>Basketball - competitive </item>
+
+        <item>Billiards - general</item>
+
+        <item>Boxing - punching bag </item>
+        <item>Boxing - sparring </item>
+        <item>Boxing - in ring </item>
+
+        <item>Broomball </item>
+
+        <item>Catch (e.g. baseball or football) - general </item>
+
+        <item>Children\'s games (e.g. hopscotch, dodgeball) at moderate effort </item>
+
+        <item>Cheerleading or gymnastics - competitive </item>
+
+        <item>Cricket - general </item>
+
+        <item>Croquet - general </item>
+
+        <item>Curling - general </item>
+
+        <item>Darts - general </item>
+
+        <item>Fencing - general </item>
+
+        <item>Football (touch) - light effort </item>
+        <item>Football (touch) - moderate effort </item>
+        <item>Football (contact) - general </item>
+
+        <item>Frisbee - general </item>
+        <item>Frisbee - ultimate </item>
+
+        <item>Golf - general </item>
+
+        <item>Gymnastics - general </item>
+
+        <item>Hackey sack - general </item>
+
+        <item>Handball - general </item>
+        <item>Handball - team play </item>
+
+        <item>Hang gliding </item>
+
+        <item>Hockey (field) - general </item>
+        <item>Hockey (ice) - general </item>
+        <item>Hockey (ice) - competitive </item>
+
+        <item>Horseback riding - general </item>
+
+        <item>Jumping rope - slow pace</item>
+        <item>Jumping rope - moderate pace</item>
+        <item>Jumping rope - fast pace</item>
+
+        <item>Juggling - general</item>
+
+        <item>Kickball - general </item>
+
+        <item>Lacrosse - general </item>
+
+        <item>Lawn bowling - general</item>
+
+        <item>Martial arts - slow or practice pace </item>
+        <item>Martial arts - moderate pace </item>
+
+        <item>Moto-cross - general </item>
+
+        <item>Paddleball - general </item>
+        <item>Paddleball - competitive </item>
+
+        <item>Polo (horseback) - general </item>
+
+        <item>Racquetball - general </item>
+        <item>Racquetball - competitive </item>
+
+        <item>Rock or mountain climbing - general </item>
+
+        <item>Rodeo sports - light effort </item>
+        <item>Rodeo sports - moderate effort </item>
+        <item>Rodeo sports - vigorous effort </item>
+
+        <item>Rugby - general </item>
+        <item>Rugby - competitive </item>
+
+        <item>Rollerskating  - general</item>
+        <item>Rollerblading - recreational pace </item>
+        <item>Rollerblading - moderate pace </item>
+        <item>Rollerblading - fast pace </item>
+        <item>Rollerblading - intense pace </item>
+
+        <item>Shuffleboard </item>
+
+        <item>Skateboarding - general </item>
+        <item>Skateboarding - competitive </item>
+
+        <item>Skydiving or base jumping </item>
+
+        <item>Soccer - casual </item>
+        <item>Soccer - competitive </item>
+
+        <item>Softball - general </item>
+
+        <item>Squash - general </item>
+
+        <item>Table tennis - general </item>
+
+        <item>Tennis - general </item>
+
+        <item>Track and field (e.g. shot, discus, hammer throw) </item>
+        <item>Track and field (e.g. high jump, long jump, javelin) </item>
+        <item>Track and field (e.g. steeplechase, hurdles) </item>
+
+        <item>Trampoline - recreational </item>
+        <item>Trampoline - competitive </item>
+
+        <item>Volleyball (hard surface) - casual </item>
+        <item>Volleyball (hard surface) - competitive </item>
+        <item>Volleyball (sand) - general </item>
+
+        <item>Wrestling - general </item>
+    </string-array>
+
+    <string-array name="walking">
+        <item>Backpacking - general</item>
+
+        <item>Climbing hills (no load) </item>
+        <item>Climbing hills (1 to 9 lb load) </item>
+        <item>Climbing hills (10 to 20 lb load) </item>
+        <item>Climbing hills (21 to 42 lb load) </item>
+        <item>Climbing hills (42+ lb load) </item>
+
+        <item>Climbing stairs - slow pace </item>
+        <item>Climbing stairs - fast pace </item>
+
+        <item>Hiking - general </item>
+
+        <item>Marching - moderate speed </item>
+        <item>Marching - rapid speed </item>
+
+        <item>Walking - 2.5 mph </item>
+        <item>Walking - 3 mph </item>
+        <item>Walking - 3.5 mph </item>
+        <item>Walking - 4 mph </item>
+        <item>Walking - 4.5 mph</item>
+        <item>Walking - 5 mph </item>
+        <item>Walking (backwards) - 3.5 mph</item>
+        <item> </item>
+    </string-array>
+
+    <string-array name="water">
+        <item>Boating - driving powerboat </item>
+
+        <item>Canoeing - general </item>
+        <item>Canoeing - rowing with light effort </item>
+        <item>Canoeing - rowing with moderate effort </item>
+        <item>Canoeing - rowing with vigorous effort </item>
+
+        <item>Diving - general </item>
+
+        <item>Kayaking -general </item>
+
+        <item>Paddle boating - general</item>
+
+        <item>Sailing - general </item>
+        <item>Sailing - competitive </item>
+
+        <item>Skiing - general </item>
+
+        <item>Skindiving - light pace </item>
+        <item>Skindiving - moderate pace </item>
+        <item>Skindiving - fast pace </item>
+
+        <item>Snorkeling - general </item>
+
+        <item>Surfing - general </item>
+        <item>Surfing - competitive </item>
+
+        <item>Swimming (backstroke) - general </item>
+        <item>Swimming - (backstroke) competitive </item>
+        <item>Swimming (breaststroke) - general </item>
+        <item>Swimming - (breaststroke) competitive </item>
+
+        <item>Swimming (butterfly) - general </item>
+
+        <item>Swimming - (sidestroke) - general</item>
+        <item>Swimming (synchronized) - general </item>
+
+        <item>Swimming (treading water ) - moderate effort </item>
+        <item>Swimming (treading water ) - vigorous effort </item>
+
+        <item>Water aerobics - general </item>
+
+        <item>Water polo - general </item>
+
+        <item>Water volleyball - general </item>
+
+        <item>Water jogging - general </item>
+
+        <item>Water walking - slow pace </item>
+        <item>Water walking - moderate pace </item>
+        <item>Water walking - fast pace </item>
+
+        <item>Windsurfing - not pumping for speed </item>
+        <item>Windsurfing - competitive and pumping for speed </item>
+    </string-array>
+
+    <string-array name="winter">
+        <item>Dog sledding (mushing) </item>
+
+        <item>Ice skating - general</item>
+        <item>Ice skating - competitive</item>
+        <item>Ice skating (dancing) </item>
+
+        <item>Skiing - general </item>
+        <item>Skiing (cross country) - 2.5 mph </item>
+        <item>Skiing (cross country) - 4.0 to 4.9 mph </item>
+        <item>Skiing (cross country) - 5.0 to 7.9 mph </item>
+        <item>Skiing (cross country) - over 8 mph</item>
+
+        <item>Sledding or tobogganing - general</item>
+
+        <item>Snow shoeing - moderate effort </item>
+        <item>Snow shoeing - vigorous effort </item>
+
+        <item>Snow shoveling (hand) - moderate effort </item>
+        <item>Snow shoveling (hand) - vigorous effort </item>
+
+        <item>Snow blowing - general </item>
+    </string-array>
+
+    <string-array name="bicycle_values">
+        <item>8.5 </item>
+        <item>14.0 </item>
+        <item>16.0 </item>
+        <item>8.5 </item>
+        <item>4.0 </item>
+
+        <item>7.5 </item>
+        <item>3.5</item>
+        <item>5.8 </item>
+        <item>6.8 </item>
+        <item>8.0 </item>
+
+        <item>10.0 </item>
+        <item>12.0 </item>
+        <item>15.8 </item>
+        <item>5.0 </item>
+        <item> </item>
+    </string-array>
+
+    <string-array name="conditioning_values">
+        <item>2.3 </item>
+        <item>3.8 </item>
+        <item>7.2 </item>
+
+        <item>2.8 </item>
+        <item>3.8 </item>
+        <item>8.0 </item>
+
+        <item>4.3 </item>
+        <item>8.0 </item>
+
+        <item>5.0 </item>
+
+        <item>5.0</item>
+
+        <item>3.5 </item>
+        <item>5.0 </item>
+        <item>6.0 </item>
+
+        <item>12.3 </item>
+
+        <item>7.0</item>
+        <item>8.5</item>
+        <item>12.0</item>
+
+        <item>6.8 </item>
+        <item>8.8 </item>
+        <item>11.0 </item>
+        <item>14.0 </item>
+        <item>8.5</item>
+
+        <item>6.8 </item>
+
+        <item>2.3 </item>
+
+
+        <item>3.0 </item>
+
+        <item>5.3 </item>
+
+        <item>2.3 </item>
+        <item>4.0 </item>
+        <item>6.0 </item>
+
+        <item>2.5 </item>
+        <item>4.0 </item>
+        <item>2.0 </item>
+        <item>3.3 </item>
+    </string-array>
+
+    <string-array name="dancing_values">
+        <item>5.0 </item>
+        <item>6.8 </item>
+
+        <item>4.8 </item>
+
+        <item>5.0 </item>
+        <item>7.3 </item>
+
+        <item>8.5 </item>
+
+        <item>3.0 </item>
+        <item>5.5 </item>
+        <item>11.3 </item>
+    </string-array>
+
+    <string-array name="fishing_values">
+        <item>3.5 </item>
+        <item>5.0 </item>
+        <item>2.4 </item>
+    </string-array>
+
+    <string-array name="home_values">
+        <item>2.3 </item>
+
+        <item>3.5 </item>
+
+        <item>3.0 </item>
+        <item>2.3 </item>
+        <item>4.0 </item>
+
+        <item>2.0 </item>
+        <item>3.0 </item>
+
+        <item>2.3 </item>
+        <item>3.8 </item>
+        <item>2.5 </item>
+        <item>3.5 </item>
+        <item>2.8 </item>
+        <item>3.5 </item>
+        <item>4.3 </item>
+        <item>2.3 </item>
+
+        <item>5.0 </item>
+
+        <item>3.0 </item>
+
+        <item>2.5 </item>
+        <item>4.5</item>
+        <item>6.0 </item>
+
+        <item>1.8 </item>
+
+        <item>2.5 </item>
+        <item>3.3 </item>
+
+        <item>1.3 </item>
+
+        <item>2.0 </item>
+        <item>4.0 </item>
+
+        <item>3.3 </item>
+
+        <item>5.8</item>
+
+        <item>4.5 </item>
+        <item>3.0 </item>
+
+        <item>6.0 </item>
+
+        <item>4.5 </item>
+
+        <item>2.0 </item>
+        <item>3.5 </item>
+        <item>6.5 </item>
+
+        <item>2.8 </item>
+
+        <item>2.0 </item>
+
+        <item>2.2 </item>
+        <item>2.8 </item>
+        <item>3.5 </item>
+        <item>3.0</item>
+        <item>4.0 </item>
+        <item>5.0 </item>
+
+        <item>2.0 </item>
+
+        <item>2.5 </item>
+    </string-array>
+
+    <string-array name="garden_values">
+        <item>3.3 </item>
+        <item>5.5 </item>
+
+        <item>4.5 </item>
+        <item>6.3 </item>
+
+        <item>3.5 </item>
+        <item>5.0 </item>
+        <item>7.8</item>
+        <item>2.0 </item>
+        <item>4.3 </item>
+
+        <item>6.0 </item>
+        <item>5.0 </item>
+        <item>4.5 </item>
+
+        <item>3.5</item>
+        <item>4.5</item>
+
+        <item>5.3 </item>
+        <item>7.0 </item>
+        <item>5.5 </item>
+
+        <item>4.0 </item>
+        <item>3.5 </item>
+
+        <item>3.0 </item>
+        <item>4.0 </item>
+        <item>6.0 </item>
+    </string-array>
+
+    <string-array name="misc_values">
+        <item>1.8 </item>
+        <item>3.0 </item>
+        <item>2.5 </item>
+        <item>3.3 </item>
+        <item>3.5 </item>
+
+        <item>1.5 </item>
+
+        <item>3.5 </item>
+
+        <item>2.5 </item>
+
+        <item>1.3 </item>
+        <item>1.8 </item>
+
+        <item>1.5 </item>
+        <item>1.8 </item>
+    </string-array>
+
+    <string-array name="music_values">
+        <item>1.8 </item>
+
+        <item>2.3 </item>
+
+        <item>2.3 </item>
+
+        <item>2.5 </item>
+
+        <item>3.8 </item>
+
+        <item>2.0 </item>
+
+        <item>2.0 </item>
+        <item>3.0 </item>
+
+        <item>1.8 </item>
+
+        <item>4.0 </item>
+        <item>4.5</item>
+
+        <item>2.0 </item>
+
+        <item>2.3 </item>
+
+        <item>3.5 </item>
+
+        <item>1.8 </item>
+
+        <item>2.5 </item>
+
+        <item>1.8 </item>
+    </string-array>
+
+    <string-array name="occupation_values">
+        <item>2.0 </item>
+        <item>4.0 </item>
+
+        <item>2.3 </item>
+
+        <item>2.0 </item>
+
+        <item>2.5 </item> //CARPENTRY
+        <item>4.3 </item>
+        <item>7.0 </item>
+
+        <item>5.5 </item>
+
+        <item>2.5 </item>
+
+        <item>4.0 </item>
+
+        <item>2.0 </item>
+
+        <item>3.3 </item>
+
+        <item>2.0 </item>
+        <item>4.8 </item>
+        <item>7.8 </item>
+
+        <item>8.0 </item>
+
+        <item>3.5 </item> //FISHING
+        <item>5.0 </item>
+        <item>7.0 </item>
+
+        <item>3.0 </item>
+
+        <item>4.0 </item>
+
+        <item>1.8 </item>
+
+        <item>4.3 </item>
+        <item>7.3 </item>
+
+        <item>3.8 </item>
+        <item>5.8 </item>
+        <item>7.3 </item>
+
+        <item>4.0</item>
+
+        <item>4.0 </item>
+
+        <item>3.0 </item>
+        <item>5.0 </item>
+
+        <item>2.5 </item>
+        <item>4.3 </item>
+
+        <item>4.0 </item> //MASSAGE
+
+        <item>4.5 </item> //FRUIT
+
+        <item>3.3 </item> //PAINTING
+
+        <item>3.0 </item>
+
+        <item>2.0 </item>
+
+        <item>5.0 </item>
+        <item>6.5 </item>
+
+        <item>3.0 </item>
+        <item>4.5 </item>
+
+        <item>5.3 </item>
+        <item>8.3 </item>
+
+        <item>2.5 </item>
+
+        <item>2.8 </item>
+        <item>4.5 </item>
+        <item>6.5 </item>
+    </string-array>
+
+    <string-array name="running_values">
+        <item>6.0 </item>
+        <item>8.3 </item>
+        <item>9.0 </item>
+        <item>9.8 </item>
+        <item>10.5 </item
+            >
+        <item>11.0 </item>
+        <item>11.5 </item>
+        <item>11.8 </item>
+        <item>12.3 </item>
+        <item>12.8 </item>
+
+        <item>14.5 </item>
+        <item>16.0 </item>
+        <item>19.0 </item>
+        <item>19.8 </item>
+        <item>23.0 </item>
+    </string-array>
+
+    <string-array name="self_care_values">
+        <item>2.3 </item>
+        <item>1.8 </item>
+        <item>1.5 </item>
+        <item>1.5 </item>
+        <item>2.5 </item>
+        <item>2.0 </item>
+    </string-array>
+
+    <string-array name="sex_values">
+        <item>1.3 </item>
+        <item>1.8 </item>
+        <item>2.8 </item>
+    </string-array>
+
+    <string-array name="sports_values">
+        <item>4.3 </item>
+
+        <item>8.5 </item>
+
+        <item>5.5 </item>
+        <item>7.0</item>
+
+        <item>4.5 </item>
+        <item>6.5 </item>
+        <item>8.0 </item>
+
+        <item>2.5 </item>
+
+        <item>5.5 </item>
+        <item>7.8 </item>
+        <item>12.8 </item>
+
+        <item>7.0 </item> //BROOMBALL
+
+        <item>2.5 </item>
+
+        <item>5.8 </item>
+
+        <item>6.0 </item>
+
+        <item>4.8 </item>
+
+        <item>3.3 </item>
+
+        <item>4.0 </item>
+
+        <item>2.5 </item>
+
+        <item>6.0 </item>
+
+        <item>4.0 </item> //FOOTBALL
+        <item>8.0 </item>
+        <item>8.0 </item>
+
+        <item>3.0 </item>
+        <item>8.0 </item>
+
+        <item>4.8 </item>
+
+        <item>3.8 </item>
+
+        <item>4.0 </item>
+
+        <item>12.0 </item> //HANDBALL
+        <item>8.0 </item>
+
+        <item>3.5 </item>
+
+        <item>7.8 </item>
+        <item>8.0 </item>
+        <item>10.0 </item>
+
+        <item>5.5 </item>
+
+        <item>8.8 </item>
+        <item>11.8 </item>
+        <item>12.3 </item>  //JUMPING ROPE
+
+        <item>4.0 </item>
+
+        <item>7.0 </item>
+
+        <item>8.0 </item> //LACROSSE
+
+        <item>3.3 </item>
+
+        <item>5.3 </item>
+        <item>10.3 </item>
+
+        <item>4.0 </item> //MOTOCROSS
+
+        <item>6.0 </item>
+        <item>10.0 </item>
+
+        <item>8.0 </item>
+
+        <item>7.0 </item>
+        <item>10.0 </item>
+
+        <item>8.0 </item>
+
+        <item>4.0</item>
+        <item>5.5</item>
+        <item>7.0</item>
+
+        <item>6.3 </item>
+        <item>8.3 </item>
+
+        <item>7.0 </item>
+        <item>7.5 </item>
+        <item>9.8 </item>
+        <item>12.3 </item>
+        <item>14.0 </item>
+
+        <item>3.0 </item>
+
+        <item>5.0 </item>
+        <item>6.0 </item>
+
+        <item>3.5 </item>
+
+        <item>7.0 </item>
+        <item>10.0 </item>  //SOCCER
+
+        <item>5.0 </item>
+
+        <item>12.0 </item>
+
+        <item>4.0 </item>
+
+        <item>7.3 </item>
+
+        <item>4.0 </item>
+        <item>6.0 </item>
+        <item>10.0 </item>
+
+        <item>3.5 </item>
+        <item>4.5 </item>
+
+        <item>4.0 </item>
+        <item>6.0 </item>
+        <item>8.0 </item>
+
+        <item>6.0 </item>
+    </string-array>
+
+    <string-array name="walking_values">
+        <item>7.0 </item>
+
+        <item>6.3 </item>
+        <item>6.5 </item>
+        <item>7.3 </item>
+        <item>8.3 </item>
+        <item>9.0 </item>
+
+        <item>4.0 </item>
+        <item>8.0</item>  ///STAIRS
+
+        <item>5.3</item>
+
+        <item>4.5 </item>
+        <item>8.0 </item>
+
+        <item>3.0 </item>
+        <item>3.5 </item>
+        <item>4.3 </item>
+        <item>5.0 </item>
+        <item>7.0 </item>
+        <item>8.3 </item>
+        <item>6.0 </item>
+    </string-array>
+
+    <string-array name="water_values">
+        <item>2.5</item>
+
+        <item>3.5 </item> //CANOEING
+        <item>2.8 </item>
+        <item>5.8 </item>
+        <item>12.5 </item>
+
+        <item>3.0</item>
+
+        <item>5.0 </item>
+
+        <item>4.0 </item>
+
+        <item>3.3 </item>
+        <item>4.5 </item>
+
+        <item>6.0 </item>
+
+        <item>7.0 </item>
+        <item>11.8 </item>
+        <item>15.8 </item>  //SKINDIVING
+
+        <item>5.0 </item>
+
+        <item>3.0 </item>
+        <item>5.0 </item>
+
+        <item>4.8 </item>
+        <item>9.5 </item>
+        <item>5.3 </item>
+        <item>10.3 </item> //SWIMMMING BACKSTROKE
+
+        <item>13.8 </item>
+
+        <item>7.0</item>
+        <item>8.0 </item>
+
+        <item>3.5 </item>
+        <item>9.8 </item>
+
+        <item>5.5 </item>
+
+        <item>10.0 </item>
+
+        <item>3.0 </item>
+
+        <item>9.8 </item>
+
+        <item>2.5 </item>
+        <item>4.5 </item>
+        <item>6.8 </item>
+
+        <item>5.0 </item>
+        <item>13.5 </item>
+    </string-array>
+
+    <string-array name="winter_values">
+        <item>7.5 </item>
+
+        <item>7.0 </item>
+        <item>13.3 </item>
+        <item>14.0 </item>
+
+        <item>7.0 </item>
+        <item>6.8 </item>
+        <item>9.0 </item>
+        <item>12.5 </item>
+        <item>15.0 </item>
+
+        <item>7.0 </item>
+
+        <item>5.3 </item>
+        <item>10.0 </item>
+
+        <item>5.3 </item>
+        <item>7.5 </item>
+
+        <item>2.5 </item>
     </string-array>
 
 </resources>
