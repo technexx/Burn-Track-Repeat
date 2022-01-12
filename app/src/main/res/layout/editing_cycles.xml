@@ -356,6 +356,19 @@
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:text="Add an activity!"
+        android:id="@+id/tdee_add_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/round_recycler_layout"
+        app:layout_constraintEnd_toEndOf="@id/round_recycler_layout"
+        app:layout_constraintBottom_toTopOf="@id/round_recycler_layout"
+        android:layout_marginBottom="13dp"
+        android:textColor="@color/white"
+        android:textSize="20sp">
+    </TextView>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/round_recycler_layout"
         android:layout_width="240dp"
@@ -363,7 +376,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:paddingTop="4dp"
         android:layout_marginBottom="6dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/recycler_border">
