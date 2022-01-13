@@ -19,4 +19,26 @@
         android:layout_marginTop="8dp">
     </TextView>
 
+    <Spinner
+        android:id="@+id/activity_category_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tdee_add_header_textView"
+        android:layout_marginTop="36dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp">
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/activity_sub_category_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_category_spinner"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp">
+    </Spinner>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

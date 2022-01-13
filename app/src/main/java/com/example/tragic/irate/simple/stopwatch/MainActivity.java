@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
-  //Todo: TDEE in sep popup w/ tabs.
+  //Todo: com.example.tragic.irate.simple.stopwatch.TDEE.TDEE in sep popup w/ tabs.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
