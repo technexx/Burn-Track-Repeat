@@ -432,6 +432,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
 
+  TextView addTDEEActivity;
+  PopupWindow addTDEEPopUpWindow;
+  View addTDEEPopUpView;
+
+  //Todo: Settings popUp needs a stable height across devices.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
@@ -744,13 +749,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
+    addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
 
-    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, 800, 1200, true);
-    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, 750, 375, true);
+    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, dpConv(250), dpConv(450), true);
+    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, dpConv(275), dpConv(150), true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, 1530, true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(500), true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+    addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(400), true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -758,6 +765,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    addTDEEPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
     deleteEditPopUpTimerNumbers = editCyclesPopupView.findViewById(R.id.deleteEditPopUpTimerNumbers);
     number_one = editCyclesPopupView.findViewById(R.id.one_button);
@@ -795,6 +803,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
+    addTDEEActivity = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
     toggleInfinityRounds.setAlpha(0.3f);
 
     sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
@@ -1012,8 +1021,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
     roundRecyclerTwo.setLayoutManager(lm3);
 
-    VerticalSpaceItemDecoration verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-            -25);
+    VerticalSpaceItemDecoration verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(0);
+
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
+      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+              0);
+    } else {
+      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+              -25);
+    }
     roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
     roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
 
@@ -1403,6 +1419,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     buttonToLaunchTimer.setOnClickListener(v-> {
       //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
       launchTimerCycle(true);
+    });
+
+    addTDEEActivity.setOnClickListener(v-> {
+      addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
     });
 
     //Listens to our fadeOut animation, and runs fadeIn when it's done.
@@ -2981,7 +3001,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomArray.set(positionOfSelectedCycle, pomString);
       }
     } else if (action == DELETING_CYCLE) {
-
       int posToRemove = receivedHighlightPositionHolder.get(0);
 
       if (mode==1) {
@@ -4012,5 +4031,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int width = metrics.widthPixels;
 
     dotDraws.receivePhoneDimensions(height, width);
+  }
+
+  public int dpConv(float pixels) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
 }
