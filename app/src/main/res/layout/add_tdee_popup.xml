@@ -6,38 +6,26 @@
     android:backgroundTint="@color/test_grey"
     android:background="@drawable/rounded_corners">
 
-    <TextView
-        android:id="@+id/tdee_add_header_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        android:layout_marginTop="8dp">
-    </TextView>
-
     <Spinner
         android:id="@+id/activity_category_spinner"
-        android:layout_width="195dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tdee_add_header_textView"
-        android:layout_marginTop="36dp"
-        android:layout_marginStart="175dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="6dp"
         android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>
 
     <Spinner
         android:id="@+id/activity_sub_category_spinner"
-        android:layout_width="195dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activity_category_spinner"
         android:layout_marginTop="30dp"
-        android:layout_marginStart="175dp"
+        android:layout_marginStart="6dp"
         android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>

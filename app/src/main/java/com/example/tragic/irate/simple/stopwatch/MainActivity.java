@@ -46,6 +46,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -440,15 +441,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow addTDEEPopUpWindow;
   View addTDEEPopUpView;
 
-  ArrayAdapter tdeeCategoryAdapter;
-  ArrayAdapter tdeeSubCategoryAdapter;
-  Spinner tdee_category_spinner;
-  Spinner tdee_sub_category_spinner;
-
   //Todo: Settings popUp needs a stable height across devices.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
+  //Todo: We get some "unable to parse" lines in Error log w/ divider spacing in round recyclerViews. Seems fine but show caution.
 
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
@@ -805,17 +802,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     addTDEEActivity = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
 
-    tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
-    tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tdee.category_list);
+    Spinner tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
+    ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tdee.category_list);
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
     tdee_category_spinner.setSelection(0);
 
-    tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-    tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout, tdee.bicycling);
+    Spinner tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
+    ArrayAdapter tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout);
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
     tdee_sub_category_spinner.setSelection(0);
+
+    tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        int selectedPosition = tdee_category_spinner.getSelectedItemPosition();
+        tdeeSubCategoryAdapter.clear();
+        tdeeSubCategoryAdapter.addAll(tdee.subCategoryListOfStringArrays.get(selectedPosition));
+        tdee_sub_category_spinner.setSelection(0);
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+      }
+    });
+
+    tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+        int selectedPosition = tdee_category_spinner.getSelectedItemPosition();
+      }
+    });
 
     sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
     sortAlphaEnd = sortCyclePopupView.findViewById(R.id.sort_title_end);

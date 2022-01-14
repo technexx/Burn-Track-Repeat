@@ -11,6 +11,8 @@ public class TDEE {
 
     Context mContext;
     ArrayList<String> category_list;
+    ArrayList<String[]> subCategoryListOfStringArrays;
+    ArrayList<String[]> subValueListOfStringArrays;
 
     String[] bicycling;
     String[] conditioning;
@@ -74,6 +76,7 @@ public class TDEE {
     }
 
     public void populateSubCategoryLists() {
+
         bicycling = mContext.getResources().getStringArray(R.array.bicycling);
         conditioning = mContext.getResources().getStringArray(R.array.conditioning);
         dancing = mContext.getResources().getStringArray(R.array.dancing);
@@ -88,7 +91,7 @@ public class TDEE {
         sexual = mContext.getResources().getStringArray(R.array.sexual_activity);
         sports = mContext.getResources().getStringArray(R.array.sports);
         walking = mContext.getResources().getStringArray(R.array.walking);
-        water = mContext.getResources().getStringArray(R.array.walking);
+        water = mContext.getResources().getStringArray(R.array.water);
         winter = mContext.getResources().getStringArray(R.array.winter);
 
         bicycling_values = mContext.getResources().getStringArray(R.array.bicycle_values);
@@ -108,6 +111,43 @@ public class TDEE {
         water_values = mContext.getResources().getStringArray(R.array.walking_values);
         winter_values = mContext.getResources().getStringArray(R.array.winter_values);
 
+        subCategoryListOfStringArrays = new ArrayList<>();
+
+        subCategoryListOfStringArrays.add(bicycling);
+        subCategoryListOfStringArrays.add(conditioning);
+        subCategoryListOfStringArrays.add(dancing);
+        subCategoryListOfStringArrays.add(fishing);
+        subCategoryListOfStringArrays.add(home);
+        subCategoryListOfStringArrays.add(garden);
+        subCategoryListOfStringArrays.add(misc);
+        subCategoryListOfStringArrays.add(music);
+        subCategoryListOfStringArrays.add(occupational);
+        subCategoryListOfStringArrays.add(running);
+        subCategoryListOfStringArrays.add(self_care);
+        subCategoryListOfStringArrays.add(sexual);
+        subCategoryListOfStringArrays.add(sports);
+        subCategoryListOfStringArrays.add(walking);
+        subCategoryListOfStringArrays.add(water);
+        subCategoryListOfStringArrays.add(winter);
+
+        subValueListOfStringArrays = new ArrayList<>();
+
+        subValueListOfStringArrays.add(bicycling_values);
+        subValueListOfStringArrays.add(conditioning_values);
+        subValueListOfStringArrays.add(dancing_values);
+        subValueListOfStringArrays.add(fishing_values);
+        subValueListOfStringArrays.add(home_values);
+        subValueListOfStringArrays.add(garden_values);
+        subValueListOfStringArrays.add(misc_values);
+        subValueListOfStringArrays.add(music_values);
+        subValueListOfStringArrays.add(occupational_values);
+        subValueListOfStringArrays.add(running_values);
+        subValueListOfStringArrays.add(self_care_values);
+        subValueListOfStringArrays.add(sexual_values);
+        subValueListOfStringArrays.add(sports_values);
+        subValueListOfStringArrays.add(walking_values);
+        subValueListOfStringArrays.add(water_values);
+        subValueListOfStringArrays.add(winter_values);
     }
 
 }
