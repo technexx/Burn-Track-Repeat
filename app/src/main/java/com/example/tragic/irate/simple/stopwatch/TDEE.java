@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch.TDEE;
+package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 
@@ -48,6 +48,8 @@ public class TDEE {
 
     public TDEE (Context context) {
         this.mContext = context;
+        populateCategoryList();
+        populateSubCategoryLists();
     }
 
     public void populateCategoryList() {

@@ -7,7 +7,6 @@
     android:background="@drawable/rounded_corners">
 
     <TextView
-        android:text="Hello!"
         android:id="@+id/tdee_add_header_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +26,8 @@
         app:layout_constraintTop_toBottomOf="@id/tdee_add_header_textView"
         android:layout_marginTop="36dp"
         android:layout_marginStart="175dp"
-        android:textSize="20sp">
+        android:textSize="20sp"
+        android:popupBackground="@color/black">
     </Spinner>
 
     <Spinner
@@ -38,7 +38,8 @@
         app:layout_constraintTop_toBottomOf="@id/activity_category_spinner"
         android:layout_marginTop="30dp"
         android:layout_marginStart="175dp"
-        android:textSize="20sp">
+        android:textSize="20sp"
+        android:popupBackground="@color/black">
     </Spinner>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

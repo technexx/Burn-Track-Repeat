@@ -46,6 +46,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -53,6 +54,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,6 +90,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import static java.security.AccessController.getContext;
+
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
@@ -97,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View tabView;
   View mainView;
   View actionBarView;
-  Gson gson;
   BlankCanvas blankCanvas;
   Calendar calendar;
   SimpleDateFormat simpleDateFormat;
@@ -432,16 +435,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
 
+  TDEE tdee;
   TextView addTDEEActivity;
   PopupWindow addTDEEPopUpWindow;
   View addTDEEPopUpView;
+
+  ArrayAdapter tdeeCategoryAdapter;
+  ArrayAdapter tdeeSubCategoryAdapter;
+  Spinner tdee_category_spinner;
+  Spinner tdee_sub_category_spinner;
 
   //Todo: Settings popUp needs a stable height across devices.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
 
-  //Todo: com.example.tragic.irate.simple.stopwatch.TDEE.TDEE in sep popup w/ tabs.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
@@ -693,17 +701,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mainView = findViewById(R.id.main_layout);
     tabView = findViewById(R.id.tabLayout);
     actionBarView = findViewById(R.id.custom_action_bar);
-    gson = new Gson();
 
+    tdee = new TDEE(getApplicationContext());
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
-
-//    View testView = mainView.getRootView();
-//    int widthPixels = measureSpec.getSize(testView.getWidth());
-//    int widthMode = View.MeasureSpec.getMode(testView.getWidth());
-
-//    Log.i("testSize", "base value is " + widthPixels);
-//    Log.i("testSize", "exact value is " + widthMode);
-
 
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
@@ -804,7 +804,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     addTDEEActivity = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
-    toggleInfinityRounds.setAlpha(0.3f);
+
+    tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
+    tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tdee.category_list);
+    tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
+    tdee_category_spinner.setSelection(0);
+
+    tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
+    tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout, tdee.bicycling);
+    tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
+    tdee_sub_category_spinner.setSelection(0);
 
     sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
     sortAlphaEnd = sortCyclePopupView.findViewById(R.id.sort_title_end);
@@ -1785,7 +1796,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         //Sets up Strings to save into database.
-        gson = new Gson();
+        Gson gson = new Gson();
         workoutString = "";
         roundTypeString = "";
         pomString = "";
@@ -3465,7 +3476,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: currentRound changes after this is executed in nextRound, but the addition needs to occur before.
   public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean newRound) {
     if (mode==1) {
       if (newRound) {
@@ -3750,6 +3760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setDefaultEditRoundViews() {
+    toggleInfinityRounds.setAlpha(0.3f);
     setDefaultTimerValuesAndTheirEditTextViews();
 
     ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
@@ -4033,7 +4044,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws.receivePhoneDimensions(height, width);
   }
 
-  public int dpConv(float pixels) {
+  private int dpConv(float pixels) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+  }
+
+  private void setUpTDEESpinners() {
   }
 }
