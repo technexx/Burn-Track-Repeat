@@ -149,5 +149,4 @@ public class TDEE {
         subValueListOfStringArrays.add(water_values);
         subValueListOfStringArrays.add(winter_values);
     }
-
 }

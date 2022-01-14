@@ -30,4 +30,16 @@
         android:popupBackground="@color/black">
     </Spinner>
 
+    <TextView
+        android:id="@+id/met_score_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"
+        android:layout_marginTop="4dp"
+        android:textSize="26sp"
+        android:textColor="@color/white">
+    </TextView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

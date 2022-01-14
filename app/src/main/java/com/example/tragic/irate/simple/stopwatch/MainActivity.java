@@ -441,6 +441,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow addTDEEPopUpWindow;
   View addTDEEPopUpView;
 
+  TextView metScoreTextView;
+
   //Todo: Settings popUp needs a stable height across devices.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
@@ -801,6 +803,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     addTDEEActivity = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
+    metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
 
     Spinner tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
     ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tdee.category_list);
@@ -831,12 +834,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        int selectedCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
+        String[] valueArray = tdee.subValueListOfStringArrays.get(selectedCategoryPosition);
 
+        int selectedSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
+        metScoreTextView.setText(getString(R.string.met_score, valueArray[selectedSubCategoryPosition]));
       }
 
       @Override
       public void onNothingSelected(AdapterView<?> parent) {
-        int selectedPosition = tdee_category_spinner.getSelectedItemPosition();
       }
     });
 
@@ -4069,8 +4075,5 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private int dpConv(float pixels) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
-  }
-
-  private void setUpTDEESpinners() {
   }
 }
