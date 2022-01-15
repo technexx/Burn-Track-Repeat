@@ -12,11 +12,10 @@ import com.example.tragic.irate.simple.stopwatch.R;
 public class RootSettingsFragment extends PreferenceFragmentCompat {
 
     SharedPreferences sharedPreferences;
-    SharedPreferences.Editor prefEdit;
 
     int SOUND_SETTINGS = 1;
     int COLOR_SETTINGS = 2;
-    int ABOUT_SETTINGS = 3;
+    int TDEE_SETTINGS = 3;
 
     onChangedSettings mOnChangedSettings;
 
@@ -32,11 +31,10 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preference_fragment_layout, rootKey);
         sharedPreferences = getContext().getSharedPreferences("settingsPref", 0);
-        prefEdit = sharedPreferences.edit();
 
         Preference soundOptionPref = findPreference("soundPref");
         Preference colorPref = findPreference("colorPref");
-        Preference aboutPref = findPreference("aboutPref");
+        Preference tdeePref = findPreference("tdeePref");
 
         soundOptionPref.setOnPreferenceClickListener(v-> {
             mOnChangedSettings.settingsData(SOUND_SETTINGS);
@@ -49,8 +47,8 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
             return true;
         });
 
-        aboutPref.setOnPreferenceClickListener(v-> {
-            mOnChangedSettings.settingsData(ABOUT_SETTINGS);
+        tdeePref.setOnPreferenceClickListener(v-> {
+            mOnChangedSettings.settingsData(TDEE_SETTINGS);
 
             return true;
         });

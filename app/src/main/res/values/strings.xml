@@ -110,6 +110,13 @@
         <item>cyan_setting</item>
     </string-array>
 
+    <string-array name="age_setting_options">
+        <item>Test!</item>
+    </string-array>
+
+    <string-array name="age_setting_option_values">
+        <item>test</item>
+    </string-array>
 
     <string name="met_score">MET Score: \n%1$s</string>
     <string name="basic">Basic</string>
@@ -191,7 +198,7 @@
         <item>Biking - 14 to 15.9 mph  </item>
         <item>Biking - 16 to 19 mph  </item>
         <item>Biking - over 20 mph  </item>
-        <item>unicycling </item>
+        <item>Unicycling </item>
     </string-array>
 
     <string-array name="conditioning">
@@ -206,7 +213,7 @@
         <item>Circuit training - moderate effort </item>
         <item>Circuit training - vigorous effort </item>
 
-        <item>Eliptical training - moderate effort </item>
+        <item>Elliptical training - moderate effort </item>
 
         <item>Obstacle courses and/or boot camp </item>
 

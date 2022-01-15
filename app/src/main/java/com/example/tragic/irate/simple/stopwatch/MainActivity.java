@@ -80,6 +80,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.TDEESettingsFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
@@ -421,6 +422,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
   ColorSettingsFragment colorSettingsFragment;
+  TDEESettingsFragment tdeeSettingsFragment;
+
   ChangeSettingsValues changeSettingsValues;
 
   FrameLayout settingsFragmentFrameLayout;
@@ -500,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       aSettingsMenuIsVisible = false;
     }
 
-    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible()) {
+    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
@@ -513,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Fragment fragmentToReplace = new Fragment();
     if (settingNumber==1) fragmentToReplace = soundSettingsFragment;
     if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
+    if (settingNumber==3) fragmentToReplace = tdeeSettingsFragment;
 
     getSupportFragmentManager().beginTransaction()
             .addToBackStack (null)
@@ -707,6 +711,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
+    tdeeSettingsFragment = new TDEESettingsFragment();
 
     settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     settingsFragmentFrameLayout.setVisibility(View.GONE);;
