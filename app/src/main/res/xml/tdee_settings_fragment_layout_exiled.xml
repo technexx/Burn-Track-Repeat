@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <DropDownPreference
+        android:key="gender_setting"
+        android:title="Gender"
+        android:entries="@array/tdee_gender_setting_option"
+        android:entryValues="@array/tdee_gender_setting_option_values">
+    </DropDownPreference>
+
+    <DropDownPreference
+        android:key="age_setting"
+        android:title="Age"
+        android:entries="@array/tdee_filler_setting_options"
+        android:entryValues="@array/tdee_filter_setting_option_values">
+
+    </DropDownPreference>
+
+    <DropDownPreference
+        android:key="height_setting"
+        android:title="Height"
+        android:entries="@array/tdee_filler_setting_options"
+        android:entryValues="@array/tdee_filter_setting_option_values">
+
+    </DropDownPreference>
+
+    <DropDownPreference
+        android:key="weight_setting"
+        android:title="Weight"
+        android:entries="@array/tdee_filler_setting_options"
+        android:entryValues="@array/tdee_filter_setting_option_values">
+    </DropDownPreference>
+
+</PreferenceScreen>

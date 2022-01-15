@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/gender_text"
+        android:text="@string/gender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="4dp"
+        android:textSize="20sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/age_text"
+        android:text="@string/age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/gender_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:textSize="20sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/weight_text"
+        android:text="@string/weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/age_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:textSize="20sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/height_text"
+        android:text="@string/height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/weight_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:textSize="20sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/activity_text"
+        android:text="@string/activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/height_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:textSize="20sp">
+    </TextView>
+
+    <Spinner
+        android:id="@+id/gender_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp">
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/age_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gender_text"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp"
+        >
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/weight_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/age_text"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp"
+        >
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/height_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/weight_text"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp">
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/activity_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/height_text"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp">
+    </Spinner>
+
+    <Button
+        android:id="@+id/calculate"
+        android:text="@string/calculate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_text"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        app:cornerRadius="4dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/black"
+        app:strokeWidth="1dp">
+    </Button>
+
+    <TextView
+        android:id="@+id/bmr_text"
+        android:text="@string/bmr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calculate"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="4dp"
+        android:textSize="24sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/tdee_text"
+        android:text="@string/tdee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bmr_text"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:textSize="24sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/bmr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calculate"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="175dp"
+        android:textSize="24sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/tdee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bmr_text"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="175dp"
+        android:textSize="24sp">
+    </TextView>
+
+    <Button
+        android:id="@+id/about"
+        android:text="@string/about"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="412dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        app:cornerRadius="4dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/black"
+        app:strokeWidth="1dp">
+    </Button>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

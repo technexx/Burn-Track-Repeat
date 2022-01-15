@@ -12,11 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -33,7 +30,6 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -59,7 +55,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -69,7 +64,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -80,7 +74,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
-import com.example.tragic.irate.simple.stopwatch.SettingsFragments.TDEESettingsFragment;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.TDEESettingsFragment_EXILED;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
@@ -91,8 +85,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-
-import static java.security.AccessController.getContext;
 
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
@@ -422,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
   ColorSettingsFragment colorSettingsFragment;
-  TDEESettingsFragment tdeeSettingsFragment;
+  TDEESettingsFragment_EXILED tdeeSettingsFragmentEXILED;
 
   ChangeSettingsValues changeSettingsValues;
 
@@ -503,7 +495,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       aSettingsMenuIsVisible = false;
     }
 
-    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
+    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragmentEXILED.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
@@ -516,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Fragment fragmentToReplace = new Fragment();
     if (settingNumber==1) fragmentToReplace = soundSettingsFragment;
     if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
-    if (settingNumber==3) fragmentToReplace = tdeeSettingsFragment;
+    if (settingNumber==3) fragmentToReplace = tdeeSettingsFragmentEXILED;
 
     getSupportFragmentManager().beginTransaction()
             .addToBackStack (null)
@@ -711,7 +703,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
-    tdeeSettingsFragment = new TDEESettingsFragment();
+    tdeeSettingsFragmentEXILED = new TDEESettingsFragment_EXILED();
 
     settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     settingsFragmentFrameLayout.setVisibility(View.GONE);;
@@ -1066,17 +1058,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
     roundRecyclerTwo.setLayoutManager(lm3);
 
-    VerticalSpaceItemDecoration verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(0);
-
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
-      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-              0);
-    } else {
-      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-              -25);
-    }
-    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
-    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
+//    VerticalSpaceItemDecoration verticalSpaceItemDecoration;
+//
+//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
+//      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+//              0);
+//    } else {
+//      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+//              -25);
+//    }
+//    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
+//    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
 
     //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
     recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
