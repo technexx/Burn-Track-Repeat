@@ -110,23 +110,9 @@
         <item>cyan_setting</item>
     </string-array>
 
-    <string-array name="tdee_gender_setting_option">
-        <item>Male</item>
-        <item>Female</item>
-    </string-array>
 
-    <string-array name="tdee_gender_setting_option_values">
-        <item>male</item>
-        <item>female</item>
-    </string-array>
-
-    <string-array name="tdee_filler_setting_options">
-        <item>Test!</item>
-    </string-array>
-
-    <string-array name="tdee_filter_setting_option_values">
-    <item>test</item>
-    </string-array>
+    <string name="spinner_value">%1$s %2$s</string>
+    <string name="bmr_value">%1$s Calories</string>
 
     <string name="met_score">MET Score: \n%1$s</string>
     <string name="basic">Basic</string>

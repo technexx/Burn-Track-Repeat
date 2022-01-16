@@ -438,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView metScoreTextView;
 
+  //Todo: Add "calories burned per X @ X MET" in "add activity" popUp.
   //Todo: Settings popUp needs a stable height across devices.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
@@ -2658,7 +2659,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       appHeader.startAnimation(fadeIn);
       sortButton.startAnimation(fadeIn);
 
-      //Todo: This b0rk global settings button.
       cancelHighlight.startAnimation(fadeOut);
       cancelHighlight.setVisibility(View.GONE);
 
@@ -3444,7 +3444,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
-          //Todo: Placeholder in non-infinity rounds is set to millis value.
           cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
 
