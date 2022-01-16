@@ -74,7 +74,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
-import com.example.tragic.irate.simple.stopwatch.SettingsFragments.TDEESettingsFragment_EXILED;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.tdeeSettingsFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
   ColorSettingsFragment colorSettingsFragment;
-  TDEESettingsFragment_EXILED tdeeSettingsFragmentEXILED;
+  com.example.tragic.irate.simple.stopwatch.SettingsFragments.tdeeSettingsFragment tdeeSettingsFragment;
 
   ChangeSettingsValues changeSettingsValues;
 
@@ -495,7 +495,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       aSettingsMenuIsVisible = false;
     }
 
-    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragmentEXILED.isVisible()) {
+    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
@@ -508,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Fragment fragmentToReplace = new Fragment();
     if (settingNumber==1) fragmentToReplace = soundSettingsFragment;
     if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
-    if (settingNumber==3) fragmentToReplace = tdeeSettingsFragmentEXILED;
+    if (settingNumber==3) fragmentToReplace = tdeeSettingsFragment;
 
     getSupportFragmentManager().beginTransaction()
             .addToBackStack (null)
@@ -703,10 +703,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
-    tdeeSettingsFragmentEXILED = new TDEESettingsFragment_EXILED();
+    tdeeSettingsFragment = new tdeeSettingsFragment();
 
     settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
-    settingsFragmentFrameLayout.setVisibility(View.GONE);;
+    settingsFragmentFrameLayout.setVisibility(View.GONE);
 
     rootSettingsFragment.sendSettingsData(MainActivity.this);
     soundSettingsFragment.soundSetting(MainActivity.this);

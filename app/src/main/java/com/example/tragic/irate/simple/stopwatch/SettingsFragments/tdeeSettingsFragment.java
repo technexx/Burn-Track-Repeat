@@ -22,12 +22,11 @@ import com.example.tragic.irate.simple.stopwatch.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TDEESettingsFragment extends Fragment {
+public class tdeeSettingsFragment extends Fragment {
 
     private String ageVal;
     private String weightVal;
     private String heightVal;
-    private int activityVal;
 
     private int ageConv;
     private int weightConv;
@@ -38,7 +37,6 @@ public class TDEESettingsFragment extends Fragment {
     private double impFemale;
     private double metMale;
     private double metFemale;
-    private double avg;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 
@@ -53,26 +51,15 @@ public class TDEESettingsFragment extends Fragment {
         final Spinner age_spinner = root.findViewById(R.id.age_spinner);
         final Spinner weight_spinner = root.findViewById(R.id.weight_spinner);
         final Spinner height_spinner = root.findViewById(R.id.height_spinner);
-        final Spinner activity_spinner = root.findViewById(R.id.activity_spinner);
         final TextView bmr = root.findViewById(R.id.bmr);
-        final TextView tdee = root.findViewById(R.id.tdee);
-        final Button calculate = root.findViewById(R.id.calculate);
-        final Button about = root.findViewById(R.id.about);
 
         final List<String> gender = new ArrayList<>();
         final List<String> age = new ArrayList<>();
         List<String> weight = new ArrayList<>();
         final List<String> height = new ArrayList<>();
-        List<String> activity = new ArrayList<>();
 
         gender.add(getString(R.string.male));
         gender.add(getString(R.string.female));
-        activity.add(getString(R.string.act_0));
-        activity.add(getString(R.string.act_1));
-        activity.add(getString(R.string.act_2));
-        activity.add(getString(R.string.act_3));
-        activity.add(getString(R.string.act_4));
-        activity.add(getString(R.string.act_5));
 
         for (int i=18; i<101; i++) {
             age.add(i + " " + "years");
@@ -113,68 +100,44 @@ public class TDEESettingsFragment extends Fragment {
         weight_spinner.setSelection(149);
         height_spinner.setSelection(59);
 
-        calculate.setOnClickListener(view -> {
-            ageVal = age_spinner.getSelectedItem().toString();
-            weightVal = weight_spinner.getSelectedItem().toString();
-            heightVal = height_spinner.getSelectedItem().toString();
-            activityVal = activity_spinner.getSelectedItemPosition();
 
-            String[] conv1 = ageVal.split(" ", 2);
-            String[] conv2 = weightVal.split(" ", 2);
-            String[] conv3 = heightVal.split(" ", 2);
+        ageVal = age_spinner.getSelectedItem().toString();
+        weightVal = weight_spinner.getSelectedItem().toString();
+        heightVal = height_spinner.getSelectedItem().toString();
 
-            String conv4 = conv1[0];
-            String conv5 = conv2[0];
-            String conv6 = conv3[0];
+        String[] conv1 = ageVal.split(" ", 2);
+        String[] conv2 = weightVal.split(" ", 2);
+        String[] conv3 = heightVal.split(" ", 2);
 
-            ageConv = Integer.parseInt(conv4);
-            weightConv = Integer.parseInt(conv5);
-            heightConv = Integer.parseInt(conv6);
+        String conv4 = conv1[0];
+        String conv5 = conv2[0];
+        String conv6 = conv3[0];
 
-            double modVal = 0;
+        ageConv = Integer.parseInt(conv4);
+        weightConv = Integer.parseInt(conv5);
+        heightConv = Integer.parseInt(conv6);
 
-            switch (activityVal) {
-                case 0:
-                    modVal = 1; break;
-                case 1:
-                    modVal = 1.2; break;
-                case 2:
-                    modVal = 1.37; break;
-                case 3:
-                    modVal = 1.55; break;
-                case 4:
-                    modVal = 1.725; break;
-                case 5:
-                    modVal = 1.9;
-            }
+        impMale = ( 66 + (6.2 * weightConv) + (12.7 * heightConv) - (6.76 * ageConv));
+        metMale = ( 66 + (13.7 * weightConv) + (5 * heightConv) - (6.76 * ageConv));
+        impFemale = ( 655.1 + (4.35 * weightConv) + (4.7 * heightConv) - (4.7 * ageConv));
+        metFemale = ( 655.1 + (9.6 * weightConv) + (1.8 * heightConv) - (4.7 * ageConv));
 
-            impMale = ( 66 + (6.2 * weightConv) + (12.7 * heightConv) - (6.76 * ageConv) ) * modVal;
-            metMale = ( 66 + (13.7 * weightConv) + (5 * heightConv) - (6.76 * ageConv) ) * modVal;
-            impFemale = ( 655.1 + (4.35 * weightConv) + (4.7 * heightConv) - (4.7 * ageConv) ) * modVal;
-            metFemale = ( 655.1 + (9.6 * weightConv) + (1.8 * heightConv) - (4.7 * ageConv) ) * modVal;
-            double calories = 0;
+        double calories = 0;
 
-            if (isMetric) {
-                if (gender_spinner.getSelectedItemPosition() == 0) {
-                    calories = metMale;
-                } else {
-                    calories = metFemale;
-                }
+        if (isMetric) {
+            if (gender_spinner.getSelectedItemPosition() == 0) {
+                calories = metMale;
             } else {
-                if (gender_spinner.getSelectedItemPosition() == 0) {
-                    calories = impMale;
-                } else {
-                    calories = impFemale;
-                }
+                calories = metFemale;
             }
-
-            double bmrVal = calories / modVal;
-            bmr.setText(getString(R.string.two_part, String.valueOf(Math.round(bmrVal)), getString(R.string.calories)));
-
-            tdee.setText(getString(R.string.two_part, String.valueOf(Math.round(calories)), getString(R.string.calories)));
-
-            double avg = calories / 24;
-        });
+        } else {
+            if (gender_spinner.getSelectedItemPosition() == 0) {
+                calories = impMale;
+            } else {
+                calories = impFemale;
+            }
+        }
+        bmr.setText(getString(R.string.two_part, String.valueOf(Math.round(calories)), getString(R.string.calories)));
 
         return root;
     }
