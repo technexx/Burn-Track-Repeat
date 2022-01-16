@@ -6,14 +6,44 @@
     android:clickable="true"
     android:focusable="true">
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/imperial_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/metric_setting"
+        android:backgroundTint="@color/Gray"
+        android:textColor="@color/white"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/metric_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imperial_setting"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/Gray"
+        android:textColor="@color/white"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
+
     <TextView
         android:id="@+id/gender_text"
         android:text="@string/gender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imperial_setting"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="18dp"
         android:layout_marginStart="4dp"
         android:textSize="20sp">
     </TextView>
@@ -59,8 +89,8 @@
         android:layout_width="195dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/imperial_setting"
+        android:layout_marginTop="18dp"
         android:layout_marginStart="175dp"
         android:textSize="20sp"
         android:popupBackground="@color/black">
@@ -124,5 +154,21 @@
         android:layout_marginStart="175dp"
         android:textSize="24sp">
     </TextView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/save_tdee_settings_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="6dp"
+        android:layout_marginEnd="6dp"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

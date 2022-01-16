@@ -24,21 +24,21 @@ import java.util.List;
 
 public class tdeeSettingsFragment extends Fragment {
 
-    private String ageVal;
-    private String weightVal;
-    private String heightVal;
-
-    private int ageConv;
-    private int weightConv;
-    private int heightConv;
-
-    private boolean isMetric;
-    private double impMale ;
-    private double impFemale;
-    private double metMale;
-    private double metFemale;
-
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+
+        String ageVal;
+        String weightVal;
+        String heightVal;
+
+        int ageConv;
+        int weightConv;
+        int heightConv;
+
+        boolean isMetric = false;
+        double impMale ;
+        double impFemale;
+        double metMale;
+        double metFemale;
 
         View root = inflater.inflate(R.layout.tdee_settings_fragment_layout, container, false);
 
@@ -52,6 +52,14 @@ public class tdeeSettingsFragment extends Fragment {
         final Spinner weight_spinner = root.findViewById(R.id.weight_spinner);
         final Spinner height_spinner = root.findViewById(R.id.height_spinner);
         final TextView bmr = root.findViewById(R.id.bmr);
+
+        final Button imperialSettingButton = root.findViewById(R.id.imperial_setting);
+        final Button metricSettingButton = root.findViewById(R.id.metric_setting);
+        final Button saveTdeeSettingsButton = root.findViewById(R.id.save_tdee_settings_button);
+
+        imperialSettingButton.setText(R.string.imperial);
+        metricSettingButton.setText(R.string.metric);
+        saveTdeeSettingsButton.setText(R.string.save);
 
         final List<String> gender = new ArrayList<>();
         final List<String> age = new ArrayList<>();
@@ -137,7 +145,20 @@ public class tdeeSettingsFragment extends Fragment {
                 calories = impFemale;
             }
         }
+
         bmr.setText(getString(R.string.two_part, String.valueOf(Math.round(calories)), getString(R.string.calories)));
+
+        imperialSettingButton.setOnClickListener(v-> {
+
+        });
+
+        metricSettingButton.setOnClickListener(v-> {
+
+        });
+
+        saveTdeeSettingsButton.setOnClickListener(v-> {
+            //Todo: Imperial/Metric buttons at top of Fragment. SharedPref here that will be accessed in each cycle.
+        });
 
         return root;
     }
