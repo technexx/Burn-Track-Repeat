@@ -37,6 +37,11 @@ public class tdeeSettingsFragment extends Fragment {
     List<String> weightList;
     List<String> heightList;
 
+    ArrayAdapter<String> genderAdapter;
+    ArrayAdapter<String> ageAdapter;
+    ArrayAdapter<String> weightAdapter;
+    ArrayAdapter<String> heightAdapter;
+
     int AGE = 0;
     int WEIGHT = 1;
     int HEIGHT = 2;
@@ -65,12 +70,12 @@ public class tdeeSettingsFragment extends Fragment {
         weightList = new ArrayList<>();
         heightList = new ArrayList<>();
 
-        populateSpinnerListsWithStrings();
+        populateAllSpinnerStringLists();
 
-        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, genderList);
-        ArrayAdapter<String> ageAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, ageList);
-        ArrayAdapter<String> weightAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, weightList);
-        ArrayAdapter<String> heightAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, heightList);
+        genderAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, genderList);
+        ageAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, ageList);
+        weightAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, weightList);
+        heightAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, heightList);
 
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -84,23 +89,48 @@ public class tdeeSettingsFragment extends Fragment {
 
 
         imperialSettingButton.setOnClickListener(v -> {
-            //Todo: (A) age/weight etc. String List gets set w/ proper append and (B) Adapter list gets cleared/readded and (C) notifyDataSet is called or adapter is re-instantiated.
+            isMetric = false;
+            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
+            clearAndRepopulateWeightAndHeightSpinnerList();
+            refreshWeightAndHeightSpinnerAdapters();
         });
 
         metricSettingButton.setOnClickListener(v -> {
-
+            isMetric = true;
+            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
+            clearAndRepopulateWeightAndHeightSpinnerList();
+            refreshWeightAndHeightSpinnerAdapters();
         });
 
         saveTdeeSettingsButton.setOnClickListener(v -> {
-            //Todo: SharedPref here that will be accessed in each cycle.
             bmrTextView.setText(getString(R.string.bmr_value, String.valueOf(calculateBMR())));
         });
 
         return root;
     }
 
-    public int getIntegerValueFromSpinner(Spinner spinner) {
+    private int getIntegerValueFromSpinner(Spinner spinner) {
         return (int) spinner.getSelectedItem();
+    }
+
+    private void clearAndRepopulateWeightAndHeightSpinnerList() {
+        weightList.clear();
+        weightAdapter.clear();
+        heightList.clear();
+        heightAdapter.clear();
+
+        populateWeightSpinnerStringList();
+        populateHeightSpinnerStringList();
+    }
+
+    private void clearAndRepopulateWeightAndHeighteSpinnerAdapters() {
+        weightAdapter.addAll(weightList);
+        heightAdapter.addAll(heightList);
+    }
+
+    private void refreshWeightAndHeightSpinnerAdapters() {
+        weightAdapter.notifyDataSetChanged();
+        heightAdapter.notifyDataSetChanged();
     }
 
     private int calculateBMR() {
@@ -144,7 +174,7 @@ public class tdeeSettingsFragment extends Fragment {
         return caloriesBurned;
     }
 
-    public String getAppendingStringForSpinnerList(int spinnerValue, int typeOfStat) {
+    private String getAppendingStringForSpinnerList(int spinnerValue, int typeOfStat) {
         String append = "";
 
         if (typeOfStat == WEIGHT) {
@@ -166,26 +196,44 @@ public class tdeeSettingsFragment extends Fragment {
         return getString(R.string.spinner_value, String.valueOf(spinnerValue), append);
     }
 
-    public void populateSpinnerListsWithStrings() {
+    private void populateAllSpinnerStringLists() {
+        populateGenderSpinnerStringList();
+        populateAgeSpinnerStringList();
+        populateWeightSpinnerStringList();
+        populateHeightSpinnerStringList();
+    }
+
+    private void populateGenderSpinnerStringList() {
         genderList.add(getString(R.string.male));
         genderList.add(getString(R.string.female));
+    }
+
+    private void populateAgeSpinnerStringList() {
 
         for (int i = 18; i < 101; i++) {
             ageList.add(i + " " + "years");
         }
+    }
 
+    private void populateWeightSpinnerStringList() {
         if (isMetric) {
             for (int i = 45; i < 151; i++) {
                 weightList.add((getAppendingStringForSpinnerList(i, WEIGHT)));
             }
-            for (int i = 121; i < 250; i++) {
+        } else {
+            for (int i = 100; i < 301; i++) {
+                weightList.add((getAppendingStringForSpinnerList( i, WEIGHT)));
+            }
+        }
+    }
+
+    private void populateHeightSpinnerStringList() {
+        if (isMetric) {
+            for (int i = 120; i < 251; i++) {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
         } else {
-            for (int i = 101; i < 300; i++) {
-                weightList.add((getAppendingStringForSpinnerList( i, WEIGHT)));
-            }
-            for (int i = 48; i<99; i++) {
+            for (int i = 48; i<100; i++) {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
         }
