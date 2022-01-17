@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.AutoScrollHelper;
@@ -42,7 +43,6 @@ public class tdeeSettingsFragment extends Fragment {
     ArrayAdapter<String> weightAdapter;
     ArrayAdapter<String> heightAdapter;
 
-    int AGE = 0;
     int WEIGHT = 1;
     int HEIGHT = 2;
 
@@ -104,6 +104,7 @@ public class tdeeSettingsFragment extends Fragment {
 
         saveTdeeSettingsButton.setOnClickListener(v -> {
             bmrTextView.setText(getString(R.string.bmr_value, String.valueOf(calculateBMR())));
+            Toast.makeText(getActivity(), "Saved", Toast.LENGTH_SHORT).show();
         });
 
         return root;
