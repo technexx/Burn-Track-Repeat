@@ -431,12 +431,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
 
-  TDEE tdee;
+  TDEECategories tdee;
   TextView addTDEEActivity;
   PopupWindow addTDEEPopUpWindow;
   View addTDEEPopUpView;
 
+  Spinner tdee_category_spinner;
+  Spinner tdee_sub_category_spinner;
+
   TextView metScoreTextView;
+  TextView caloriesBurnedPerDurationTextView;
+  Spinner caloriesBurnedPerMinuteSpinner;
+  Spinner caloriesBurnedPerSecondSpinner;
 
   //Todo: Add "calories burned per X @ X MET" in "add activity" popUp.
   //Todo: Settings popUp needs a stable height across devices.
@@ -698,7 +704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabView = findViewById(R.id.tabLayout);
     actionBarView = findViewById(R.id.custom_action_bar);
 
-    tdee = new TDEE(getApplicationContext());
+    tdee = new TDEECategories(getApplicationContext());
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
 
     rootSettingsFragment = new RootSettingsFragment();
@@ -800,16 +806,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
+
     addTDEEActivity = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
+
+    tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
+    tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
     metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
 
-    Spinner tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
+    caloriesBurnedPerDurationTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_per_duration_textView);
+    caloriesBurnedPerMinuteSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_minute_spinner);
+    caloriesBurnedPerSecondSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_second_spinner);
+
     ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tdee.category_list);
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
     tdee_category_spinner.setSelection(0);
 
-    Spinner tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
     ArrayAdapter tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout);
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
@@ -3482,7 +3494,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
             resettingTotalTime = false;
           }
-          //If issue w/ seconds comes up, it's likely in timeDurationPlaceHolder.
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);

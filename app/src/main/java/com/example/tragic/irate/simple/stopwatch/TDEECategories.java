@@ -7,7 +7,7 @@ import com.example.tragic.irate.simple.stopwatch.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TDEE {
+public class TDEECategories {
 
     Context mContext;
     ArrayList<String> category_list;
@@ -48,7 +48,7 @@ public class TDEE {
     String[] water_values;
     String[] winter_values;
 
-    public TDEE (Context context) {
+    public TDEECategories(Context context) {
         this.mContext = context;
         populateCategoryList();
         populateSubCategoryLists();
