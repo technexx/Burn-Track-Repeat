@@ -7,12 +7,15 @@ import com.example.tragic.irate.simple.stopwatch.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TDEECategories {
+public class TDEEChosenActivitySpinnerValues {
 
     Context mContext;
     ArrayList<String> category_list;
     ArrayList<String[]> subCategoryListOfStringArrays;
     ArrayList<String[]> subValueListOfStringArrays;
+
+    ArrayList<Integer> minutesDurationIntegerArray;
+    ArrayList<Integer> secondsDurationIntegerArray;
 
     String[] bicycling;
     String[] conditioning;
@@ -48,13 +51,29 @@ public class TDEECategories {
     String[] water_values;
     String[] winter_values;
 
-    public TDEECategories(Context context) {
+    public TDEEChosenActivitySpinnerValues(Context context) {
         this.mContext = context;
         populateCategoryList();
         populateSubCategoryLists();
     }
 
-    public void populateCategoryList() {
+    public ArrayList<Integer> populateMinuteSpinnerList(int minutes) {
+        minutesDurationIntegerArray = new ArrayList<>();
+        for (int i=1; i<minutes; i++) {
+            minutesDurationIntegerArray.add(i);
+        }
+        return minutesDurationIntegerArray;
+    }
+
+    public ArrayList<Integer> populateSecondsSpinnerList(int seconds) {
+        secondsDurationIntegerArray = new ArrayList<>();
+        for (int i=1; i<seconds; i++) {
+            secondsDurationIntegerArray.add(i);
+        }
+        return secondsDurationIntegerArray;
+    }
+
+    private void populateCategoryList() {
         category_list = new ArrayList<>();
 
         category_list.add(mContext.getString(R.string.bicycling));
@@ -75,7 +94,7 @@ public class TDEECategories {
         category_list.add(mContext.getString(R.string.winter));
     }
 
-    public void populateSubCategoryLists() {
+    private void populateSubCategoryLists() {
 
         bicycling = mContext.getResources().getStringArray(R.array.bicycling);
         conditioning = mContext.getResources().getStringArray(R.array.conditioning);

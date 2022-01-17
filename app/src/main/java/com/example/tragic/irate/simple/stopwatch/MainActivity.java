@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
 
-  TDEECategories tdee;
+  TDEEChosenActivitySpinnerValues tdee;
   TextView addTDEEActivity;
   PopupWindow addTDEEPopUpWindow;
   View addTDEEPopUpView;
@@ -704,7 +704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabView = findViewById(R.id.tabLayout);
     actionBarView = findViewById(R.id.custom_action_bar);
 
-    tdee = new TDEECategories(getApplicationContext());
+    tdee = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
 
     rootSettingsFragment = new RootSettingsFragment();
@@ -811,11 +811,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
     tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-    metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
-
-    caloriesBurnedPerDurationTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_per_duration_textView);
     caloriesBurnedPerMinuteSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_minute_spinner);
     caloriesBurnedPerSecondSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_second_spinner);
+
+    metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
+    caloriesBurnedPerDurationTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_per_duration_textView);
 
     ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tdee.category_list);
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -826,6 +826,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
     tdee_sub_category_spinner.setSelection(0);
+
+    ArrayAdapter caloriesBurnedPerMinuteAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tdee.populateMinuteSpinnerList(60));
+    caloriesBurnedPerMinuteAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+    caloriesBurnedPerMinuteSpinner.setAdapter(caloriesBurnedPerMinuteAdapter);
+    caloriesBurnedPerMinuteSpinner.setSelection(0);
+
+    ArrayAdapter caloriesBurnedPerSecondAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tdee.populateSecondsSpinnerList(60));
+    caloriesBurnedPerSecondAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+    caloriesBurnedPerSecondSpinner.setAdapter(caloriesBurnedPerSecondAdapter);
+    caloriesBurnedPerSecondSpinner.setSelection(31);
 
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
