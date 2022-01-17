@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -103,6 +104,8 @@ public class tdeeSettingsFragment extends Fragment {
         });
 
         saveTdeeSettingsButton.setOnClickListener(v -> {
+            saveSpinnerStatsToSharedPreferences();
+
             bmrTextView.setText(getString(R.string.bmr_value, String.valueOf(calculateBMR())));
             Toast.makeText(getActivity(), "Saved", Toast.LENGTH_SHORT).show();
         });
@@ -110,8 +113,21 @@ public class tdeeSettingsFragment extends Fragment {
         return root;
     }
 
-    private int getIntegerValueFromSpinner(Spinner spinner) {
-        return (int) spinner.getSelectedItem();
+    private void saveSpinnerStatsToSharedPreferences() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("pref", 0);
+        SharedPreferences.Editor prefEdit = sharedPreferences.edit();
+
+        prefEdit.putBoolean("isMetric", isMetric);
+        prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
+        prefEdit.putString("tdeeAge", getStringValueFromSpinner(age_spinner));
+        prefEdit.putString("tdeeWeight", getStringValueFromSpinner(weight_spinner));
+        prefEdit.putString("tdeeHeight", getStringValueFromSpinner(height_spinner));
+
+        prefEdit.apply();
+    }
+
+    private String getStringValueFromSpinner(Spinner spinner) {
+        return (String) spinner.getSelectedItem();
     }
 
     private void clearAndRepopulateWeightAndHeightSpinnerList() {
