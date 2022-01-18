@@ -431,18 +431,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
 
-  TDEEChosenActivitySpinnerValues tdee;
+  TDEEChosenActivitySpinnerValues tDEEChosenActivitySpinnerValues;
   TextView addTDEEActivity;
   PopupWindow addTDEEPopUpWindow;
   View addTDEEPopUpView;
 
   Spinner tdee_category_spinner;
   Spinner tdee_sub_category_spinner;
+  Spinner tdeeMinutesDurationSpinner;
+  Spinner tdeeSecondsDurationSpinner;
 
+  TextView caloriesBurnedTextView;
   TextView metScoreTextView;
-  TextView caloriesBurnedPerDurationTextView;
-  Spinner caloriesBurnedPerMinuteSpinner;
-  Spinner caloriesBurnedPerSecondSpinner;
+
+  boolean isMetric;
+  String userGender;
+  int userAge;
+  int userWeight;
+  int userHeight;
+
+  int tdeeMinutesDuration;
+  int tdeeSecondsDuration;
+  double metScore;
 
   //Todo: Add "calories burned per X @ X MET" in "add activity" popUp.
   //Todo: Settings popUp needs a stable height across devices.
@@ -704,7 +714,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabView = findViewById(R.id.tabLayout);
     actionBarView = findViewById(R.id.custom_action_bar);
 
-    tdee = new TDEEChosenActivitySpinnerValues(getApplicationContext());
+    tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
 
     rootSettingsFragment = new RootSettingsFragment();
@@ -811,13 +821,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
     tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-    caloriesBurnedPerMinuteSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_minute_spinner);
-    caloriesBurnedPerSecondSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_second_spinner);
+    tdeeMinutesDurationSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_minute_spinner);
+    tdeeSecondsDurationSpinner = addTDEEPopUpView.findViewById(R.id.calories_burned_per_second_spinner);
 
     metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
-    caloriesBurnedPerDurationTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_per_duration_textView);
+    caloriesBurnedTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_textView);
 
-    ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tdee.category_list);
+    ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
     tdee_category_spinner.setSelection(0);
@@ -827,23 +837,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
     tdee_sub_category_spinner.setSelection(0);
 
-    ArrayAdapter caloriesBurnedPerMinuteAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tdee.populateMinuteSpinnerList(60));
-    caloriesBurnedPerMinuteAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-    caloriesBurnedPerMinuteSpinner.setAdapter(caloriesBurnedPerMinuteAdapter);
-    caloriesBurnedPerMinuteSpinner.setSelection(0);
+    ArrayAdapter tdeeMinutesDurationAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tDEEChosenActivitySpinnerValues.populateMinuteSpinnerList(60));
+    tdeeMinutesDurationAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+    tdeeMinutesDurationSpinner.setAdapter(tdeeMinutesDurationAdapter);
+    tdeeMinutesDurationSpinner.setSelection(0);
 
-    ArrayAdapter caloriesBurnedPerSecondAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tdee.populateSecondsSpinnerList(60));
-    caloriesBurnedPerSecondAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-    caloriesBurnedPerSecondSpinner.setAdapter(caloriesBurnedPerSecondAdapter);
-    caloriesBurnedPerSecondSpinner.setSelection(31);
+    ArrayAdapter tdeeSecondsDurationAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tDEEChosenActivitySpinnerValues.populateSecondsSpinnerList(60));
+    tdeeSecondsDurationAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+    tdeeSecondsDurationSpinner.setAdapter(tdeeSecondsDurationAdapter);
+    tdeeSecondsDurationSpinner.setSelection(31);
 
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         int selectedPosition = tdee_category_spinner.getSelectedItemPosition();
         tdeeSubCategoryAdapter.clear();
-        tdeeSubCategoryAdapter.addAll(tdee.subCategoryListOfStringArrays.get(selectedPosition));
+        tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedPosition));
         tdee_sub_category_spinner.setSelection(0);
+
+        fetchNumberOfSecondsChosenForActivityFromSpinners();
+        setNumberOfCaloriesBurnedTextView();
       }
 
       @Override
@@ -855,10 +868,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         int selectedCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
-        String[] valueArray = tdee.subValueListOfStringArrays.get(selectedCategoryPosition);
+        String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedCategoryPosition);
 
         int selectedSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
+        double preRoundedMet = Double.parseDouble(valueArray[selectedSubCategoryPosition]);
+        metScore = Math.round(preRoundedMet);
         metScoreTextView.setText(getString(R.string.met_score, valueArray[selectedSubCategoryPosition]));
+
+        fetchNumberOfSecondsChosenForActivityFromSpinners();
+        setNumberOfCaloriesBurnedTextView();
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+      }
+    });
+
+    tdeeMinutesDurationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        fetchNumberOfSecondsChosenForActivityFromSpinners();
+        setNumberOfCaloriesBurnedTextView();
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+      }
+    });
+
+    tdeeSecondsDurationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        fetchNumberOfSecondsChosenForActivityFromSpinners();
+        setNumberOfCaloriesBurnedTextView();
       }
 
       @Override
@@ -4093,4 +4135,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private int dpConv(float pixels) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
+
+
+  private void retrieveUserStats() {
+    SharedPreferences sp = getApplicationContext().getSharedPreferences("pref", 0);
+    isMetric = sp.getBoolean("isMetric", false);
+    userGender = sp.getString("tdeeGender", "");
+    userAge = sp.getInt("tdeeAge,", 18);
+    userWeight = sp.getInt("tdeeWeight,", 150);
+    userHeight = sp.getInt("tdeeHeight,", 66);
+  }
+
+  private double calculateCaloriesBurned(int seconds, double metValue) {
+    double weightConversion = userWeight;
+    if (isMetric) weightConversion = weightConversion / 2.205;
+    double caloriesBurned = (metValue * 3.5 * weightConversion) / 200;
+
+    return Math.round(caloriesBurned);
+  }
+
+  private int calculateNumberOfSecondsFromMinutesAndSeconds(int minutes, int seconds) {
+    return seconds = (minutes * 60) + seconds;
+  }
+
+  private void fetchNumberOfSecondsChosenForActivityFromSpinners() {
+    tdeeMinutesDuration = tdeeMinutesDurationSpinner.getSelectedItemPosition();
+    tdeeSecondsDuration = tdeeSecondsDurationSpinner.getSelectedItemPosition();
+  }
+
+  private void setNumberOfCaloriesBurnedTextView() {
+    double caloriesBurned = calculateCaloriesBurned(tdeeSecondsDuration, tdeeMinutesDuration);
+    caloriesBurnedTextView.setText(String.valueOf(caloriesBurned));
+  }
+
 }

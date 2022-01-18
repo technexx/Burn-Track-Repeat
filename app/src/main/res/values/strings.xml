@@ -113,8 +113,10 @@
 
     <string name="spinner_value">%1$s %2$s</string>
     <string name="bmr_value">%1$s Calories</string>
+    <string name="activity_duration">Duration:</string>
 
     <string name="met_score">MET Score: \n%1$s</string>
+    <string name="calories_burned">Calories Burned: \nn%1$s</string>
     <string name="basic">Basic</string>
     <string name="tdee_button">TDEE</string>
     <string name="met">MET</string>
@@ -151,7 +153,6 @@
     <string name="values">MET Values:</string>
     <string name="minutes_spent">Minutes Spent:</string>
     <string name="hours_spent">Hours Spent:</string>
-    <string name="calories_burned">Calories Burned:</string>
 
     <string name="categoryHead">Activity</string>
     <string name="metHead">MET Score</string>

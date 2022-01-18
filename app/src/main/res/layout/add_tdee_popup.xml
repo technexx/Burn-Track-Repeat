@@ -30,54 +30,70 @@
         android:popupBackground="@color/black">
     </Spinner>
 
+<!--    <TextView-->
+<!--        android:id="@+id/tdee_duration_textView"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"-->
+<!--        android:layout_marginTop="24dp"-->
+<!--        android:layout_marginStart="2dp"-->
+<!--        android:textSize="22sp"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:gravity="center_horizontal">-->
+<!--    </TextView>-->
+
+    <Spinner
+        android:id="@+id/calories_burned_per_minute_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/calories_burned_per_second_spinner"
+        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="12dp"
+        android:textSize="22sp"
+        android:popupBackground="@color/black">
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/calories_burned_per_second_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/calories_burned_per_minute_spinner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="0dp"
+        android:textSize="22sp"
+        android:popupBackground="@color/black">
+    </Spinner>
+
+    <TextView
+        android:id="@+id/calories_burned_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calories_burned_per_minute_spinner"
+        android:layout_marginTop="30dp"
+        android:textSize="26sp"
+        android:textColor="@color/white"
+        android:gravity="center_horizontal">
+    </TextView>
+
     <TextView
         android:id="@+id/met_score_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"
+        app:layout_constraintTop_toBottomOf="@id/calories_burned_textView"
         android:layout_marginTop="24dp"
         android:textSize="26sp"
         android:textColor="@color/white"
         android:gravity="center_horizontal">
     </TextView>
 
-    <TextView
-        android:id="@+id/calories_burned_per_duration_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/met_score_textView"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="6dp"
-        android:textSize="26sp"
-        android:textColor="@color/white"
-        android:gravity="center_horizontal">
-    </TextView>
-
-    <Spinner
-        android:id="@+id/calories_burned_per_minute_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/met_score_textView"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="6dp"
-        android:textSize="20sp"
-        android:popupBackground="@color/black">
-    </Spinner>
-
-    <Spinner
-        android:id="@+id/calories_burned_per_second_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/met_score_textView"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="6dp"
-        android:textSize="20sp"
-        android:popupBackground="@color/black">
-    </Spinner>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

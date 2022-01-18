@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -119,11 +120,15 @@ public class tdeeSettingsFragment extends Fragment {
 
         prefEdit.putBoolean("isMetric", isMetric);
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
-        prefEdit.putString("tdeeAge", getStringValueFromSpinner(age_spinner));
-        prefEdit.putString("tdeeWeight", getStringValueFromSpinner(weight_spinner));
-        prefEdit.putString("tdeeHeight", getStringValueFromSpinner(height_spinner));
+        prefEdit.putInt("tdeeAge", getIntegerValueFromSpinner(age_spinner));
+        prefEdit.putInt("tdeeWeight", getIntegerValueFromSpinner(weight_spinner));
+        prefEdit.putInt("tdeeHeight", getIntegerValueFromSpinner(height_spinner));
 
         prefEdit.apply();
+    }
+
+    private Integer getIntegerValueFromSpinner(Spinner spinner) {
+        return (Integer) spinner.getSelectedItem();
     }
 
     private String getStringValueFromSpinner(Spinner spinner) {
