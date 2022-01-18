@@ -455,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double metScore;
 
   //Todo: Add "calories burned per X @ X MET" in "add activity" popUp.
-  //Todo: Settings popUp needs a stable height across devices.
+  //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
@@ -2046,6 +2046,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setDefaultSettings() {
+    retrieveUserStats();
+
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
 
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
@@ -4137,21 +4139,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
 
+  /////////////////////////////////////////////////////////////////////////////
+
   private void retrieveUserStats() {
     SharedPreferences sp = getApplicationContext().getSharedPreferences("pref", 0);
     isMetric = sp.getBoolean("isMetric", false);
-    userGender = sp.getString("tdeeGender", "");
+    userGender = sp.getString("tdeeGender", "male");
     userAge = sp.getInt("tdeeAge,", 18);
     userWeight = sp.getInt("tdeeWeight,", 150);
     userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
-  private double calculateCaloriesBurned(int seconds, double metValue) {
+  private double calculateCaloriesBurnedPerSecond(int seconds, double metValue) {
     double weightConversion = userWeight;
-    if (isMetric) weightConversion = weightConversion / 2.205;
-    double caloriesBurned = (metValue * 3.5 * weightConversion) / 200;
+    if (!isMetric) weightConversion = weightConversion / 2.205;
 
-    return Math.round(caloriesBurned);
+    double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
+    double caloriesBurnedPerSecond = caloriesBurnedPerMinute/60;
+
+    //Todo: We round early here (less than 1) so 0.XXX == 0.
+    return caloriesBurnedPerSecond;
   }
 
   private int calculateNumberOfSecondsFromMinutesAndSeconds(int minutes, int seconds) {
@@ -4159,13 +4166,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void fetchNumberOfSecondsChosenForActivityFromSpinners() {
-    tdeeMinutesDuration = tdeeMinutesDurationSpinner.getSelectedItemPosition();
-    tdeeSecondsDuration = tdeeSecondsDurationSpinner.getSelectedItemPosition();
+    String minutesString = (String) tdeeMinutesDurationSpinner.getSelectedItem();
+    String secondsString = (String) tdeeSecondsDurationSpinner.getSelectedItem();
+
+    String[] splitMinutesString = minutesString.split(" ");
+    String[] splitSecondsString = secondsString.split(" ");
+
+    tdeeMinutesDuration = Integer.parseInt(splitMinutesString[0]);
+    tdeeSecondsDuration = Integer.parseInt(splitSecondsString[0]);
   }
 
   private void setNumberOfCaloriesBurnedTextView() {
-    double caloriesBurned = calculateCaloriesBurned(tdeeSecondsDuration, tdeeMinutesDuration);
-    caloriesBurnedTextView.setText(String.valueOf(caloriesBurned));
+    int totalSecondsSelected = calculateNumberOfSecondsFromMinutesAndSeconds(tdeeMinutesDuration, tdeeSecondsDuration);
+    double caloriesPerSecond = calculateCaloriesBurnedPerSecond(totalSecondsSelected, metScore);
+
+    double totalCaloriesBurned = Math.round(caloriesPerSecond * totalSecondsSelected);
+    caloriesBurnedTextView.setText(String.valueOf(totalCaloriesBurned));
   }
 
 }
