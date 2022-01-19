@@ -115,6 +115,7 @@
     <string name="bmr_value">%1$s Calories</string>
     <string name="activity_duration">Duration:</string>
 
+    <string name="add_activity">Add an activity!</string>
     <string name="met_score">MET Score: \n%1$s</string>
     <string name="calories_burned">Calories Burned: %1$s</string>
     <string name="calories_burned_per_minute">Calories Burned Per Minute: \n%1$s</string>
