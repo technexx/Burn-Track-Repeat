@@ -459,6 +459,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean cycleHasActivityAssigned;
 
   //Todo: Need more frequent saving of db stuff (esp w/ calories). Every tick/5 ticks?
+  //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: Longer sets/breaks (up to 90 min) for tdee purposes.
   //Todo: Different activites per round option? (i.e. add a eound while adding activity).
@@ -502,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onDestroy() {
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-    executeSaveTotalASyncRunnableAndRemoveCallback();
+    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
     super.onDestroy();
   }
 
@@ -1255,6 +1256,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
+      timerIsPaused = true;
       timerDisabled = false;
       makeCycleAdapterVisible = false;
       timerPopUpIsVisible = false;
@@ -1650,7 +1652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      executeSaveTotalASyncRunnableAndRemoveCallback();
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
     });
 
     new_lap.setOnClickListener(v -> {
@@ -2026,7 +2028,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         }
 
-        mHandler.postDelayed(saveTotalTimesOnPostDelayRunnableInASyncThread, 1000);
+        if (!timerIsPaused) {
+          mHandler.postDelayed(saveTotalTimesOnPostDelayRunnableInASyncThread, 1000);
+        } else {
+          mHandler.removeCallbacks(saveTotalTimesOnPostDelayRunnableInASyncThread);
+        }
 
         Log.i("testRun", "executed!");
       }
@@ -2038,19 +2044,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
       }
     };
-  }
-
-  private void executeSaveTotalASyncRunnable(boolean repeat) {
-
-  }
-
-  private void repeatTotalSaveRunnableEverySetAmountOfSeconds (int interval) {
-    mHandler.postDelayed(saveTotalTimesOnPostDelayRunnableInASyncThread, interval);
-  }
-
-  private void executeSaveTotalASyncRunnableAndRemoveCallback() {
-//    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
-    mHandler.removeCallbacks(saveTotalTimesOnPostDelayRunnableInASyncThread);
   }
 
   private void setDefaultSettings() {
@@ -2510,7 +2503,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetTimer();
       roundedValueForTotalTimes = 0;
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      executeSaveTotalASyncRunnableAndRemoveCallback();
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
     }
   }
 
@@ -3393,7 +3386,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      executeSaveTotalASyncRunnableAndRemoveCallback();
+      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
 
       mHandler.post(endFade);
 
@@ -3736,7 +3729,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
-              executeSaveTotalASyncRunnableAndRemoveCallback();
               timerIsPaused = true;
               if (timer != null) timer.cancel();
               if (objectAnimator != null) objectAnimator.pause();
@@ -3760,7 +3752,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
             } else if (pausing == RESUMING_TIMER) {
               AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
-//              repeatTotalSaveRunnableEverySetAmountOfSeconds(1000);
               reset.setVisibility(View.INVISIBLE);
               if (!activeCycle) activeCycle = true;
               timerIsPaused = false;
@@ -3787,6 +3778,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             }
+            AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
           } else resetTimer();
           break;
         case 3:
@@ -3794,19 +3786,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             reset.setText(R.string.reset);
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
-              executeSaveTotalASyncRunnableAndRemoveCallback();
+              AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
               timerIsPaused = true;
               pomMillisUntilFinished = pomMillis;
               if (objectAnimatorPom != null) objectAnimatorPom.pause();
               if (timer != null) timer.cancel();
               reset.setVisibility(View.VISIBLE);
             } else if (pausing == RESUMING_TIMER) {
-              repeatTotalSaveRunnableEverySetAmountOfSeconds(5000);
               reset.setVisibility(View.INVISIBLE);
               timerIsPaused = false;
               startObjectAnimatorAndTotalCycleTimeCounters();
               startPomTimer();
             }
+            AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
           } else resetTimer();
           break;
         case 4:
