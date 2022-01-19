@@ -5,7 +5,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Cycles.class, CyclesBO.class, PomCycles.class}, version = 1, exportSchema =  false)
+@Database(entities = {Cycles.class, PomCycles.class}, version = 1, exportSchema =  false)
 
 public abstract class CyclesDatabase extends RoomDatabase {
     private static CyclesDatabase INSTANCE;

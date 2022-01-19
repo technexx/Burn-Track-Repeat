@@ -63,12 +63,12 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
-import com.example.tragic.irate.simple.stopwatch.Database.CyclesBO;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
@@ -107,10 +107,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   CyclesDatabase cyclesDatabase;
   Cycles cycles;
-  CyclesBO cyclesBO;
   PomCycles pomCycles;
   List<Cycles> cyclesList;
-  List<CyclesBO> cyclesBOList;
   List<PomCycles> pomCyclesList;
   boolean isNewCycle;
 
@@ -369,12 +367,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean timerPopUpIsVisible;
 
   Runnable saveTotalTimesInDatabaseRunnable;
+  Runnable saveTotalTimesOnPostDelayRunnableInASyncThread;
+  Runnable executeDatabaseSaveEverySetDuration;
   Runnable queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes;
   Runnable queryAndSortAllCyclesFromDatabaseRunnable;
   Runnable deleteTotalCycleTimesASyncRunnable;
   Runnable deleteHighlightedCyclesASyncRunnable;
   Runnable deleteAllCyclesASyncRunnable;
-  Runnable saveCyclesASyncRunnable;
+  Runnable saveAddedOrEditedCycleASyncRunnable;
   Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
 
   NotificationManagerCompat notificationManagerCompat;
@@ -458,6 +458,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
 
+  //Todo: Need more frequent saving of db stuff (esp w/ calories). Every tick/5 ticks?
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: Longer sets/breaks (up to 90 min) for tdee purposes.
   //Todo: Different activites per round option? (i.e. add a eound while adding activity).
@@ -467,6 +468,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
   //Todo: We get some "unable to parse" lines in Error log w/ divider spacing in round recyclerViews. Seems fine but show caution.
 
+  //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
   //Todo: Test everything 10x.
@@ -500,7 +502,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onDestroy() {
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+    executeSaveTotalASyncRunnableAndRemoveCallback();
     super.onDestroy();
   }
 
@@ -937,10 +939,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     receivedHighlightPositionHolder = new ArrayList<>();
     //Database entity lists.
     cyclesList = new ArrayList<>();
-    cyclesBOList = new ArrayList<>();
     pomCyclesList = new ArrayList<>();
     cycles = new Cycles();
-    cyclesBO = new CyclesBO();
     pomCycles = new PomCycles();
 
     mHandler = new Handler();
@@ -1203,6 +1203,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAdapterArrays();
       editCyclesPopupWindow.showAsDropDown(tabLayout);
       setViewsAndColorsToPreventTearingInEditPopUp(true);
+      toggleExistenceOfTdeeActivity(false);
 
       assignOldCycleValuesToCheckForChanges();
     });
@@ -1279,7 +1280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleAdapter.notifyDataSetChanged();
         }
 
-        AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+
         addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
       } else {
         if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
@@ -1649,7 +1650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+      executeSaveTotalASyncRunnableAndRemoveCallback();
     });
 
     new_lap.setOnClickListener(v -> {
@@ -1773,26 +1774,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    saveTotalTimesInDatabaseRunnable = new Runnable() {
-      @Override
-      public void run() {
-        switch (mode) {
-          case 1:
-            cycles.setTotalSetTime((int) totalCycleSetTimeInMillis / 1000);
-            cycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis/1000);
-            cycles.setCyclesCompleted(cyclesCompleted);
-            cyclesDatabase.cyclesDao().updateCycles(cycles);
-            break;
-          case 3:
-            pomCycles.setTotalWorkTime((int) totalCycleSetTimeInMillis / 1000);
-            pomCycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis / 1000);
-            pomCycles.setCyclesCompleted(cyclesCompleted);
-            cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-            break;
-        }
-      }
-    };
-
     queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes = new Runnable() {
       @Override
       public void run() {
@@ -1865,7 +1846,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    saveCyclesASyncRunnable = new Runnable() {
+    saveAddedOrEditedCycleASyncRunnable = new Runnable() {
       @Override
       public void run() {
         //Sets up Strings to save into database.
@@ -1938,6 +1919,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     };
+
 
     deleteTotalCycleTimesASyncRunnable = new Runnable() {
       @Override
@@ -2025,9 +2007,53 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
       }
     };
+
+    saveTotalTimesInDatabaseRunnable = new Runnable() {
+      @Override
+      public void run() {
+        switch (mode) {
+          case 1:
+            cycles.setTotalSetTime((int) totalCycleSetTimeInMillis / 1000);
+            cycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis/1000);
+            cycles.setCyclesCompleted(cyclesCompleted);
+            cyclesDatabase.cyclesDao().updateCycles(cycles);
+            break;
+          case 3:
+            pomCycles.setTotalWorkTime((int) totalCycleSetTimeInMillis / 1000);
+            pomCycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis / 1000);
+            pomCycles.setCyclesCompleted(cyclesCompleted);
+            cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+            break;
+        }
+
+        mHandler.postDelayed(saveTotalTimesOnPostDelayRunnableInASyncThread, 1000);
+
+        Log.i("testRun", "executed!");
+      }
+    };
+
+    saveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
+      @Override
+      public void run() {
+        AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+      }
+    };
   }
 
-  public void setDefaultSettings() {
+  private void executeSaveTotalASyncRunnable(boolean repeat) {
+
+  }
+
+  private void repeatTotalSaveRunnableEverySetAmountOfSeconds (int interval) {
+    mHandler.postDelayed(saveTotalTimesOnPostDelayRunnableInASyncThread, interval);
+  }
+
+  private void executeSaveTotalASyncRunnableAndRemoveCallback() {
+//    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+    mHandler.removeCallbacks(saveTotalTimesOnPostDelayRunnableInASyncThread);
+  }
+
+  private void setDefaultSettings() {
     retrieveUserStats();
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
@@ -2173,7 +2199,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (currentlyEditingACycle) {
         ResumeOrResetCycle(RESETTING_CYCLE_FROM_ADAPTER);
       }
-      AsyncTask.execute(saveCyclesASyncRunnable);
+      AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable);
 
       Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
     }
@@ -2484,7 +2510,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetTimer();
       roundedValueForTotalTimes = 0;
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+      executeSaveTotalASyncRunnableAndRemoveCallback();
     }
   }
 
@@ -3175,7 +3201,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetTimer();
     populateTimerUI();
 
-    if (isNewCycle || saveToDB) AsyncTask.execute(saveCyclesASyncRunnable);
+    if (isNewCycle || saveToDB) AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable);
     AsyncTask.execute(queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes);
 
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
@@ -3367,7 +3393,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+      executeSaveTotalASyncRunnableAndRemoveCallback();
 
       mHandler.post(endFade);
 
@@ -3710,6 +3736,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
+              executeSaveTotalASyncRunnableAndRemoveCallback();
               timerIsPaused = true;
               if (timer != null) timer.cancel();
               if (objectAnimator != null) objectAnimator.pause();
@@ -3732,6 +3759,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             } else if (pausing == RESUMING_TIMER) {
+              AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+//              repeatTotalSaveRunnableEverySetAmountOfSeconds(1000);
               reset.setVisibility(View.INVISIBLE);
               if (!activeCycle) activeCycle = true;
               timerIsPaused = false;
@@ -3765,12 +3794,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             reset.setText(R.string.reset);
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
+              executeSaveTotalASyncRunnableAndRemoveCallback();
               timerIsPaused = true;
               pomMillisUntilFinished = pomMillis;
               if (objectAnimatorPom != null) objectAnimatorPom.pause();
               if (timer != null) timer.cancel();
               reset.setVisibility(View.VISIBLE);
             } else if (pausing == RESUMING_TIMER) {
+              repeatTotalSaveRunnableEverySetAmountOfSeconds(5000);
               reset.setVisibility(View.INVISIBLE);
               timerIsPaused = false;
               startObjectAnimatorAndTotalCycleTimeCounters();
@@ -4153,6 +4184,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       addTDEEActivityTextView.setText(activity);
       cycleHasActivityAssigned = true;
       removeTdeeActivityImageView.setVisibility(View.VISIBLE);
+      setCaloriesBurnedDuringCycleToTextView();
     } else {
       addTDEEActivityTextView.setText(R.string.add_activity);
       cycleHasActivityAssigned = false;

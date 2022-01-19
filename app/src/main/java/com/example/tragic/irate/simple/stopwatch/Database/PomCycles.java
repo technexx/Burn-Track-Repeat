@@ -43,16 +43,8 @@ public class PomCycles {
         this.fullCycle = fullCycle;
     }
 
-    public long getTimeAdded() {
-        return timeAdded;
-    }
-
     public void setTimeAdded(long timeAdded) {
         this.timeAdded = timeAdded;
-    }
-
-    public long getTimeAccessed() {
-        return timeAccessed;
     }
 
     public void setTimeAccessed(long timeAccessed) {

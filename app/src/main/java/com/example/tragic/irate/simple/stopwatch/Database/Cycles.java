@@ -19,6 +19,7 @@ public class Cycles {
     public int totalSetTime;
     public int totalBreakTime;
 
+    public int totalCaloriesBurned;
 
     public Cycles() {
     }
@@ -55,24 +56,12 @@ public class Cycles {
         this.roundType = roundType;
     }
 
-    public long getTimeAdded() {
-        return timeAdded;
-    }
-
     public void setTimeAdded(long timeAdded) {
         this.timeAdded = timeAdded;
     }
 
-    public long getTimeAccessed() {
-        return timeAccessed;
-    }
-
     public void setTimeAccessed(long timeAccessed) {
         this.timeAccessed = timeAccessed;
-    }
-
-    public int getItemCount() {
-        return itemCount;
     }
 
     public void setItemCount(int itemCount) {
@@ -101,5 +90,13 @@ public class Cycles {
 
     public void setTotalBreakTime(int totalBreakTime) {
         this.totalBreakTime = totalBreakTime;
+    }
+
+    public int getTotalCaloriesBurned() {
+        return totalCaloriesBurned;
+    }
+
+    public void setTotalCaloriesBurned(int totalCaloriesBurned) {
+        this.totalCaloriesBurned = totalCaloriesBurned;
     }
 }
