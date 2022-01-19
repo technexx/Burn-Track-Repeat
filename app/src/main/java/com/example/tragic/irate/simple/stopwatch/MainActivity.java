@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View.MeasureSpec measureSpec;
 
   TDEEChosenActivitySpinnerValues tDEEChosenActivitySpinnerValues;
-  TextView addTDEEActivity;
+  TextView addTDEEActivityTextView;
   PopupWindow addTDEEPopUpWindow;
   View addTDEEPopUpView;
 
@@ -453,6 +453,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int tdeeMinutesDuration;
   int tdeeSecondsDuration;
   double metScore;
+  Button confirmActivityAddition;
 
   //Todo: Longer sets/breaks (up to 90 min) for tdee purposes.
   //Todo: Different activites per round option? (i.e. add a eound while adding activity).
@@ -818,7 +819,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
 
-    addTDEEActivity = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
+    addTDEEActivityTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
+    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+    confirmActivityAddition.setText(R.string.okay);
 
     tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
     tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
@@ -879,6 +882,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onNothingSelected(AdapterView<?> parent) {
       }
+    });
+
+    confirmActivityAddition.setOnClickListener(v-> {
+      addTDEEPopUpWindow.dismiss();
+      replaceAddTdeeTextWithSpecificActivity();
     });
 
     sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
@@ -1096,17 +1104,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
     roundRecyclerTwo.setLayoutManager(lm3);
 
-//    VerticalSpaceItemDecoration verticalSpaceItemDecoration;
-//
-//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
-//      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-//              0);
-//    } else {
-//      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-//              -25);
-//    }
-//    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
-//    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
+    VerticalSpaceItemDecoration verticalSpaceItemDecoration;
+
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
+      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+              -10);
+    } else {
+      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+              -25);
+    }
+    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
+    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
 
     //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
     recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
@@ -1496,7 +1504,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       launchTimerCycle(true);
     });
 
-    addTDEEActivity.setOnClickListener(v-> {
+    addTDEEActivityTextView.setOnClickListener(v-> {
       addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
     });
 
@@ -4132,9 +4140,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return caloriesBurnedPerMinute;
   }
 
-  private int calculateNumberOfSecondsFromMinutesAndSeconds(int minutes, int seconds) {
-    return seconds = (minutes * 60) + seconds;
+  private double calculateCaloriesBurnedPerSecond() {
+    return calculateCaloriesBurnedPerMinute(metScore) / 60;
   }
+
+//  private int calculateNumberOfSecondsFromMinutesAndSeconds(int minutes, int seconds) {
+//    return seconds = (minutes * 60) + seconds;
+//  }
 
   private void setNumberOfCaloriesBurnedPerMinuteTextView() {
     double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
@@ -4143,6 +4155,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
 
     caloriesBurnedTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
+  }
+
+  private void addTdeeActivityToCycle() {
+
+  }
+
+  private void replaceAddTdeeTextWithSpecificActivity() {
+    String activity = (String) tdee_sub_category_spinner.getSelectedItem();
+    addTDEEActivityTextView.setText(activity);
+  }
+
+  //Todo: Can we use something like this to simplify totalTimes?
+  private double calculateCaloriesBurnedDuringCycle(int elapsedSeconds) {
+    return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
   }
 
 //  private void fetchNumberOfSecondsChosenForActivityFromSpinners() {
