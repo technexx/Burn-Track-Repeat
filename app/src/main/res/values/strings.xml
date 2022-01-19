@@ -116,7 +116,7 @@
     <string name="activity_duration">Duration:</string>
 
     <string name="met_score">MET Score: \n%1$s</string>
-    <string name="calories_burned">Calories Burned: \n%1$s</string>
+    <string name="calories_burned">Calories Burned: %1$s</string>
     <string name="calories_burned_per_minute">Calories Burned Per Minute: \n%1$s</string>
     <string name="calories_burned_per_cycle">%1$s \n Calories Burned: %2$s</string>
     <string name="okay">Okay</string>

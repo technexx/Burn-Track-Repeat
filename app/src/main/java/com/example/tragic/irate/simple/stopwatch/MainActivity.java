@@ -275,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView total_set_time;
   TextView total_break_time;
   TextView empty_laps;
+  TextView caloriesBurnedInTimerTextView;
 
   boolean activeCycle;
   int PAUSING_TIMER = 1;
@@ -441,7 +442,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Spinner tdeeMinutesDurationSpinner;
   Spinner tdeeSecondsDurationSpinner;
 
-  TextView caloriesBurnedTextView;
+  TextView caloriesBurnedInTdeeAdditionTextView;
   TextView metScoreTextView;
 
   boolean isMetric;
@@ -827,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
 
     metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
-    caloriesBurnedTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_textView);
+    caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
 
     ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -838,16 +839,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
     tdee_sub_category_spinner.setSelection(0);
-
-//    ArrayAdapter tdeeMinutesDurationAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tDEEChosenActivitySpinnerValues.populateMinuteSpinnerList(60));
-//    tdeeMinutesDurationAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-//    tdeeMinutesDurationSpinner.setAdapter(tdeeMinutesDurationAdapter);
-//    tdeeMinutesDurationSpinner.setSelection(0);
-//
-//    ArrayAdapter tdeeSecondsDurationAdapter = new ArrayAdapter(getApplicationContext(), R.layout.tdee_time_duration_spinner_layout, tDEEChosenActivitySpinnerValues.populateSecondsSpinnerList(60));
-//    tdeeSecondsDurationAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-//    tdeeSecondsDurationSpinner.setAdapter(tdeeSecondsDurationAdapter);
-//    tdeeSecondsDurationSpinner.setSelection(31);
 
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
@@ -998,6 +989,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_break_header = timerPopUpView.findViewById(R.id.total_break_header);
     total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
     total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
+    caloriesBurnedInTimerTextView = timerPopUpView.findViewById(R.id.calories_burned_in_timer_textView);
     total_set_header.setText(R.string.total_sets);
     total_break_header.setText(R.string.total_breaks);
     total_set_time.setText("0");
@@ -1568,6 +1560,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
+        setCaloriesBurnedDuringCycleToTextView();
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3258,6 +3251,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
         updateTotalTimeValuesEachTick();
+        setCaloriesBurnedDuringCycleToTextView();
 
         if (!textSizeIncreased && mode==1) {
           if (willWeChangeTextSize) {
@@ -3466,12 +3460,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String addedTime = "";
     long remainder = 0;
     if (mode==1) {
-
-      Log.i("testtotal", "setmillis is " + setMillis);
-      Log.i("testtotal", "single is " + cycleSetTimeForSingleRoundInMillis);
-      Log.i("testtotal", "total is " + totalCycleSetTimeInMillis);
-      Log.i("testtotal", "placeholder is " + timerDurationPlaceHolder);
-
       switch (typeOfRound.get(currentRound)) {
         case 1:
           if (resettingTotalTime) {
@@ -4140,13 +4128,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return caloriesBurnedPerMinute;
   }
 
-  private double calculateCaloriesBurnedPerSecond() {
-    return calculateCaloriesBurnedPerMinute(metScore) / 60;
-  }
-
-//  private int calculateNumberOfSecondsFromMinutesAndSeconds(int minutes, int seconds) {
-//    return seconds = (minutes * 60) + seconds;
-//  }
 
   private void setNumberOfCaloriesBurnedPerMinuteTextView() {
     double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
@@ -4154,11 +4135,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DecimalFormat df = new DecimalFormat("#.#");
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
 
-    caloriesBurnedTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
+    caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
   }
 
-  private void addTdeeActivityToCycle() {
-
+  private double calculateCaloriesBurnedPerSecond() {
+    return calculateCaloriesBurnedPerMinute(metScore) / 60;
   }
 
   private void replaceAddTdeeTextWithSpecificActivity() {
@@ -4167,8 +4148,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Todo: Can we use something like this to simplify totalTimes?
-  private double calculateCaloriesBurnedDuringCycle(int elapsedSeconds) {
+  private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
     return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
+  }
+
+  //Todo: Only use this if activity is added to cycle.
+  private void setCaloriesBurnedDuringCycleToTextView() {
+    double burnedCalories = calculateCaloriesBurnedDuringCycle(totalCycleSetTimeInMillis);
+    DecimalFormat df = new DecimalFormat("#.#");
+    String roundedCalories = df.format(burnedCalories);
+    caloriesBurnedInTimerTextView.setText(getString(R.string.calories_burned, burnedCalories));
   }
 
 //  private void fetchNumberOfSecondsChosenForActivityFromSpinners() {

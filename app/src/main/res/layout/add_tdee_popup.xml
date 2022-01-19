@@ -57,7 +57,7 @@
 <!--    </Spinner>-->
 
     <TextView
-        android:id="@+id/calories_burned_textView"
+        android:id="@+id/calories_burned_in_tdee_addition_popUp_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/calories_burned_textView"
+        app:layout_constraintTop_toBottomOf="@id/calories_burned_in_tdee_addition_popUp_textView"
         android:layout_marginTop="24dp"
         android:textSize="26sp"
         android:textColor="@color/white"
