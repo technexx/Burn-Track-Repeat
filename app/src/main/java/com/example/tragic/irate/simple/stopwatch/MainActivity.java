@@ -3591,9 +3591,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
+
+        addAndRoundDownTdeeTime(true);
+        //Used if nothing is reset, i.e. pausing the time via dismissing timer w/ "pause/resume" option available.
       } else {
         totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
+
+        addAndRoundDownTdeeTime(false);
       }
     }
     if (mode==3) {
@@ -4216,8 +4221,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     burnedCaloriesInCycle = calculateCaloriesBurnedDuringCycle(totalTdeeTimeElapsedLongValue());
     DecimalFormat df = new DecimalFormat("#.#");
     String roundedCalories = df.format(burnedCaloriesInCycle);
-    //Todo: totalTdee time is 0 because it's not actually being iterated.
-    Log.i("testCal", "elapsed time is " + totalTdeeActivityTime);
+
     Log.i("testCal", "burned calories are " + burnedCaloriesInCycle);
     return roundedCalories;
   }
@@ -4237,8 +4241,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(totalTdeeTimeElapsedLongValue());
   }
 
-  //Todo: Mirror addAndRoundDownTotalCycleTimeFromPreviousRounds() from totalTime method.
   private void displayTotalTdeeStatsInTextView() {
     actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,"Test Activity", totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
+  }
+
+  private void addAndRoundDownTdeeTime(boolean newRound) {
+    if (newRound) {
+      totalTdeeActivityTime = (totalTdeeActivityTime + singleInstanceTdeeActivityTime) + 100;
+      totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
+    } else {
+      totalTdeeActivityTime = (totalTdeeActivityTime + singleInstanceTdeeActivityTime);
+    }
   }
 }
