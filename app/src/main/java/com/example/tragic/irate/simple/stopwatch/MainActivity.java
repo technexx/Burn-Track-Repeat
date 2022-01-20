@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean beginTimerForNextRound;
   boolean timerPopUpIsVisible;
 
-  Runnable saveTotalTimesInDatabaseRunnable;
+  Runnable saveTotalTimesAndCaloriesInDatabaseRunnable;
   Runnable saveTotalTimesOnPostDelayRunnableInASyncThread;
   Runnable executeDatabaseSaveEverySetDuration;
   Runnable queryAllCyclesFromDatabaseRunnableAndRetrieveTotalTimes;
@@ -455,10 +455,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int tdeeMinutesDuration;
   int tdeeSecondsDuration;
   double metScore;
+  double burnedCaloriesInCycle;
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
 
-  //Todo: Need more frequent saving of db stuff (esp w/ calories). Every tick/5 ticks?
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: Longer sets/breaks (up to 90 min) for tdee purposes.
@@ -503,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onDestroy() {
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-    AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+    AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
     super.onDestroy();
   }
 
@@ -854,6 +854,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeSubCategoryAdapter.clear();
         tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedPosition));
         tdee_sub_category_spinner.setSelection(0);
+
+        String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedPosition);
+        double preRoundedMet = Double.parseDouble(valueArray[0]);
+        metScore = Math.round(preRoundedMet);
+        metScoreTextView.setText(getString(R.string.met_score, valueArray[0]));
 
         setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
       }
@@ -1652,7 +1657,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
     new_lap.setOnClickListener(v -> {
@@ -2010,7 +2015,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    saveTotalTimesInDatabaseRunnable = new Runnable() {
+    saveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
         switch (mode) {
@@ -2018,6 +2023,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTotalSetTime((int) totalCycleSetTimeInMillis / 1000);
             cycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis/1000);
             cycles.setCyclesCompleted(cyclesCompleted);
+            cycles.setTotalCaloriesBurned(burnedCaloriesInCycle);
             cyclesDatabase.cyclesDao().updateCycles(cycles);
             break;
           case 3:
@@ -2041,7 +2047,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     saveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
       @Override
       public void run() {
-        AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+        AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
       }
     };
   }
@@ -2503,7 +2509,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetTimer();
       roundedValueForTotalTimes = 0;
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
     }
   }
 
@@ -3386,7 +3392,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
 
       mHandler.post(endFade);
 
@@ -3751,7 +3757,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             } else if (pausing == RESUMING_TIMER) {
-              AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+              AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
               reset.setVisibility(View.INVISIBLE);
               if (!activeCycle) activeCycle = true;
               timerIsPaused = false;
@@ -3778,7 +3784,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             }
-            AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+            AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
           } else resetTimer();
           break;
         case 3:
@@ -3786,7 +3792,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             reset.setText(R.string.reset);
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
-              AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+              AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
               timerIsPaused = true;
               pomMillisUntilFinished = pomMillis;
               if (objectAnimatorPom != null) objectAnimatorPom.pause();
@@ -3798,7 +3804,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               startObjectAnimatorAndTotalCycleTimeCounters();
               startPomTimer();
             }
-            AsyncTask.execute(saveTotalTimesInDatabaseRunnable);
+            AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
           } else resetTimer();
           break;
         case 4:
@@ -4184,15 +4190,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Can we use something like this to simplify totalTimes?
+  //Todo: Can't tie this to total times since activity may not be activated.
   private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
     return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
   }
 
   private void setCaloriesBurnedDuringCycleToTextView() {
-    double burnedCalories = calculateCaloriesBurnedDuringCycle(totalCycleSetTimeInMillis);
+    burnedCaloriesInCycle = calculateCaloriesBurnedDuringCycle(totalCycleSetTimeInMillis);
     DecimalFormat df = new DecimalFormat("#.#");
-    String roundedCalories = df.format(burnedCalories);
-    caloriesBurnedInTimerTextView.setText(getString(R.string.calories_burned, burnedCalories));
+    String roundedCalories = df.format(burnedCaloriesInCycle);
+    caloriesBurnedInTimerTextView.setText(getString(R.string.calories_burned, burnedCaloriesInCycle));
   }
 }

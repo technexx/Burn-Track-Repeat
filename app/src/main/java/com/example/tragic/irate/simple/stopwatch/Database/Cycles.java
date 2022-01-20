@@ -19,7 +19,7 @@ public class Cycles {
     public int totalSetTime;
     public int totalBreakTime;
 
-    public int totalCaloriesBurned;
+    public double totalCaloriesBurned;
 
     public Cycles() {
     }
@@ -92,11 +92,11 @@ public class Cycles {
         this.totalBreakTime = totalBreakTime;
     }
 
-    public int getTotalCaloriesBurned() {
+    public double getTotalCaloriesBurned() {
         return totalCaloriesBurned;
     }
 
-    public void setTotalCaloriesBurned(int totalCaloriesBurned) {
+    public void setTotalCaloriesBurned(double totalCaloriesBurned) {
         this.totalCaloriesBurned = totalCaloriesBurned;
     }
 }
