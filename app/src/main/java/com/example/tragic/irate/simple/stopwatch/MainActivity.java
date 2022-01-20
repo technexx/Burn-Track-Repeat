@@ -2046,8 +2046,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
           mHandler.removeCallbacks(saveTotalTimesOnPostDelayRunnableInASyncThread);
         }
-
-        Log.i("testRun", "executed!");
       }
     };
 
@@ -4215,13 +4213,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String totalTdeeCaloriesString() {
-    burnedCaloriesInCycle = calculateCaloriesBurnedDuringCycle(totalTdeeActivityTime);
+    burnedCaloriesInCycle = calculateCaloriesBurnedDuringCycle(totalTdeeTimeElapsedLongValue());
     DecimalFormat df = new DecimalFormat("#.#");
     String roundedCalories = df.format(burnedCaloriesInCycle);
+    //Todo: totalTdee time is 0 because it's not actually being iterated.
+    Log.i("testCal", "elapsed time is " + totalTdeeActivityTime);
+    Log.i("testCal", "burned calories are " + burnedCaloriesInCycle);
     return roundedCalories;
   }
 
-  private String totalTdeeTimeElapsedString() {
+  private long totalTdeeTimeElapsedLongValue() {
     if (typeOfRound.get(currentRound)==1) {
       singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
     } else {
@@ -4229,9 +4230,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         singleInstanceTdeeActivityTime = setMillis - timerDurationPlaceHolder;
       }
     }
-    long displayTime = (totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000;
+    return (totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000;
+  }
 
-    return convertSeconds(displayTime);
+  private String totalTdeeTimeElapsedString() {
+    return convertSeconds(totalTdeeTimeElapsedLongValue());
   }
 
   //Todo: Mirror addAndRoundDownTotalCycleTimeFromPreviousRounds() from totalTime method.
