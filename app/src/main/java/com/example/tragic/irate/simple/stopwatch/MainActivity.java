@@ -3239,6 +3239,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (typeOfRound.get(currentRound).equals(1)) {
           if (currentProgressBarValue==maxProgress) {
             timerDurationPlaceHolder = setMillis;
+            tdeeActivityTimeDurationPlaceHolder = setMillis;
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(setMillis);
           } else {
@@ -3454,6 +3455,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Ensures subsequent rounds will start automatically.
       beginTimerForNextRound = true;
       timerDurationPlaceHolder = 0;
+      tdeeActivityTimeDurationPlaceHolder = 0;
     }
     if (mode==3) {
 
@@ -3990,6 +3992,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     completedLapsParam.topMargin = convertDensityPixelsToScalable(24);
 
     timerDurationPlaceHolder = 0;
+    tdeeActivityTimeDurationPlaceHolder = 0;
     //Setting values based on first round in cycle. Might make this is a global method.
     switch (mode) {
       case 1:
