@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView total_set_time;
   TextView total_break_time;
   TextView empty_laps;
-  TextView caloriesBurnedInTimerTextView;
+  TextView actvitiyStatsInTimerTextView;
 
   boolean activeCycle;
   int PAUSING_TIMER = 1;
@@ -458,6 +458,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double burnedCaloriesInCycle;
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
+
+  long tdeeActivityTimeDurationPlaceHolder;
+  long singleInstanceTdeeActivityTime;
+  long totalTdeeActivityTime;
 
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
@@ -1003,7 +1007,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_break_header = timerPopUpView.findViewById(R.id.total_break_header);
     total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
     total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
-    caloriesBurnedInTimerTextView = timerPopUpView.findViewById(R.id.calories_burned_in_timer_textView);
+    actvitiyStatsInTimerTextView = timerPopUpView.findViewById(R.id.activity_stats_in_timer_textView);
     total_set_header.setText(R.string.total_sets);
     total_break_header.setText(R.string.total_breaks);
     total_set_time.setText("0");
@@ -1576,7 +1580,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
-        if (cycleHasActivityAssigned) setCaloriesBurnedDuringCycleToTextView();
+
+        if (cycleHasActivityAssigned) {
+          displayTotalTdeeStatsInTextView();
+        }
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3284,7 +3291,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
         updateTotalTimeValuesEachTick();
-        if (cycleHasActivityAssigned) setCaloriesBurnedDuringCycleToTextView();
+
+        if (cycleHasActivityAssigned) {
+          displayTotalTdeeStatsInTextView();
+        }
 
         if (!textSizeIncreased && mode==1) {
           if (willWeChangeTextSize) {
@@ -3383,6 +3393,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setEnabled(false);
     timerDisabled = true;
 
+    addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+    AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+
     if (mode==1) {
       if (numberOfRoundsLeft==0) {
         //Triggers in same runnable that knocks our round count down - so it must be canceled here.
@@ -3391,9 +3404,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return;
       }
 
-      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
-      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
-
       mHandler.post(endFade);
 
       //If skipping round manually, cancel timer and objectAnimator.
@@ -3401,7 +3411,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
         progressBar.setProgress(0);
-//        timeLeft.setTextSize(90f);
         if (!activeCycle) activeCycle = true;
       }
 
@@ -3447,7 +3456,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerDurationPlaceHolder = 0;
     }
     if (mode==3) {
-      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
 
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
@@ -3489,7 +3497,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     beginTimerForNextRound = true;
   }
 
-  public void updateTotalTimeValuesEachTick() {
+  private void updateTotalTimeValuesEachTick() {
     String addedTime = "";
     long remainder = 0;
     if (mode==1) {
@@ -3504,6 +3512,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
+
+          if (cycleHasActivityAssigned) {
+            displayTotalTdeeStatsInTextView();
+          }
           break;
         case 2:
           if (resettingTotalTime) {
@@ -3512,6 +3524,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
 
+          //Placeholder set to 0 on nextRound(). In non-infinity, it gets replaced by round millis value.
+          //Placeholder is necessary for resetting total times while setMillis is being used mid-round.
           cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
 
@@ -3568,9 +3582,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean newRound) {
+  private void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean newRound) {
     if (mode==1) {
       if (newRound) {
+        //Divides to keep start @ even XX000 ms, coincides w/ updateTotalTimeValuesEachTick() division.
         totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) + 100;
         totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis / 1000) * 1000;
 
@@ -4182,7 +4197,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       addTDEEActivityTextView.setText(activity);
       cycleHasActivityAssigned = true;
       removeTdeeActivityImageView.setVisibility(View.VISIBLE);
-      setCaloriesBurnedDuringCycleToTextView();
+
+      displayTotalTdeeStatsInTextView();
     } else {
       addTDEEActivityTextView.setText(R.string.add_activity);
       cycleHasActivityAssigned = false;
@@ -4190,15 +4206,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Can't tie this to total times since activity may not be activated.
+  //Todo: Diff. layouts w/ presence/absence of activity?
   private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
     return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
   }
 
-  private void setCaloriesBurnedDuringCycleToTextView() {
-    burnedCaloriesInCycle = calculateCaloriesBurnedDuringCycle(totalCycleSetTimeInMillis);
+  private String totalTdeeCaloriesString() {
+    burnedCaloriesInCycle = calculateCaloriesBurnedDuringCycle(totalTdeeActivityTime);
     DecimalFormat df = new DecimalFormat("#.#");
     String roundedCalories = df.format(burnedCaloriesInCycle);
-    caloriesBurnedInTimerTextView.setText(getString(R.string.calories_burned, burnedCaloriesInCycle));
+    return roundedCalories;
+  }
+
+  private String totalTdeeTimeElapsedString() {
+    if (typeOfRound.get(currentRound)==1) {
+      singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
+    } else {
+      if (typeOfRound.get(currentRound)==2) {
+        singleInstanceTdeeActivityTime = setMillis - timerDurationPlaceHolder;
+      }
+    }
+    long displayTime = (totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000;
+
+    return convertSeconds(displayTime);
+  }
+
+  //Todo: Mirror addAndRoundDownTotalCycleTimeFromPreviousRounds() from totalTime method.
+  private void displayTotalTdeeStatsInTextView() {
+    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,"Test Activity", totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
   }
 }
