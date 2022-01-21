@@ -30,31 +30,17 @@
     </TextView>
 
     <TextView
-        android:text="Resume"
-        android:id="@+id/resume_active_cycle_button_for_mode_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/pom_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/reset_active_cycle_button_for_mode_3"
-        android:layout_marginTop="6dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:textSize="15sp">
-    </TextView>
-
-    <TextView
         android:text="Reset"
         android:id="@+id/reset_active_cycle_button_for_mode_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/pom_view"
-        app:layout_constraintStart_toEndOf="@id/resume_active_cycle_button_for_mode_3"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="6dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:textSize="15sp">
+        android:textSize="18sp">
     </TextView>
 
     <View

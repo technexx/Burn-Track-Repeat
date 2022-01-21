@@ -143,14 +143,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //Used to store highlighted positions that we callback to Main to delete.
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
 
-    workoutHolder.resumeCycle.setVisibility(View.GONE);
     workoutHolder.resetCycle.setVisibility(View.GONE);
     //Adds text to resume/reset underneath active cycle.
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
-        workoutHolder.resumeCycle.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
-        workoutHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER));
         workoutHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER));
       }
     }
@@ -263,7 +260,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     workoutHolder.fullView.setOnClickListener(v -> {
       boolean changed = false;
       //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
-      if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position);
+      if (!mHighlightMode) {
+        if (mActiveCycle) {
+          if (position==mPositionOfActiveCycle) {
+            workoutHolder.resetCycle.setVisibility(View.INVISIBLE);
+            mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
+          }
+        } else {
+          mOnCycleClickListener.onCycleClick(position);
+        }
+      }
       else {
         ArrayList<String> tempList = new ArrayList<>(mPositionList);
         //Iterate through every cycle in list.
@@ -315,7 +321,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView workoutName;
     public TextView workOutCycle;
     public View fullView;
-    public TextView resumeCycle;
     public TextView resetCycle;
 
     @SuppressLint("ResourceAsColor")
@@ -324,7 +329,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       fullView = itemView;
-      resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button_for_mode_1);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
     }
   }

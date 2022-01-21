@@ -472,9 +472,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Different activites per round option? (i.e. add a eound while adding activity).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
+  //Todo: Test reset/resume option alternating between modes/tabs.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
-  //Todo: We get some "unable to parse" lines in Error log w/ divider spacing in round recyclerViews. Seems fine but show caution.
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.

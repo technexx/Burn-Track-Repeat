@@ -119,13 +119,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PomHolder pomHolder = (PomHolder) holder;
 
-        pomHolder.resumeCycle.setVisibility(View.GONE);
         pomHolder.resetCycle.setVisibility(View.GONE);
         if (mActiveCycle) {
             if (position==mPositionOfActiveCycle) {
-                pomHolder.resumeCycle.setVisibility(View.VISIBLE);
                 pomHolder.resetCycle.setVisibility(View.VISIBLE);
-                pomHolder.resumeCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER));
                 pomHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER));
             }
         }
@@ -181,9 +178,16 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         pomHolder.fullView.setOnClickListener(v-> {
             boolean changed = false;
-            if (!mHighlightMode) mOnCycleClickListener.onCycleClick(position); else {
+            if (!mHighlightMode) {
+                if (mActiveCycle) {
+                    if (position==mPositionOfActiveCycle) {
+                        pomHolder.resetCycle.setVisibility(View.INVISIBLE);
+                        mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);                    }
+                } else {
+                    mOnCycleClickListener.onCycleClick(position);
+                }
+            } else {
                 ArrayList<String> tempList = new ArrayList<>(mPositionList);
-
                 //Iterate through every cycle in list.
                 for (int i=0; i<mPomList.size(); i++) {
                     //Using tempList for stable loop since mPositionList changes.
@@ -229,7 +233,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         public TextView pomName;
         public TextView pomView;
         public View fullView;
-        public TextView resumeCycle;
         public TextView resetCycle;
 
         public PomHolder(@NonNull View itemView) {
@@ -237,7 +240,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             pomName = itemView.findViewById(R.id.pom_header);
             pomView = itemView.findViewById(R.id.pom_view);
             fullView = itemView;
-            resumeCycle = itemView.findViewById(R.id.resume_active_cycle_button_for_mode_3);
             resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_3);
         }
     }
