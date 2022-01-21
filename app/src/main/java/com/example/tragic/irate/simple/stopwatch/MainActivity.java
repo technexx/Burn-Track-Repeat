@@ -464,10 +464,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Timer not stopping on timer popUp dismissal.
+  //Todo: Should just have "Reset" instead of Resume/Reset on Main, w/ a click on the row resuming automatically.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: Longer sets/breaks (up to 90 min) for tdee purposes.
+  //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
   //Todo: Different activites per round option? (i.e. add a eound while adding activity).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -1272,12 +1273,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerPopUpIsVisible = false;
       beginTimerForNextRound = false;
       buttonToLaunchTimer.setEnabled(false);
-      roundedValueForTotalTimes = 0;
 
       //Prevents timer from starting. Runnable will just populate values of next round.
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
+      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
 
       if (mode!=4) {
         if (!timerIsPaused) {
@@ -1293,9 +1294,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleRecycler.setVisibility(View.VISIBLE);
           savedPomCycleAdapter.notifyDataSetChanged();
         }
-
-
-        addAndRoundDownTotalCycleTimeFromPreviousRounds(false);
       } else {
         if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
         //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
@@ -1800,37 +1798,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    retrieveTotalCycleTimesAndCaloriesFromDatabaseObjectRunnable = new Runnable() {
-      @Override
-      public void run() {
-        int totalSetTime = 0;
-        int totalBreakTime = 0;
-        double totalCaloriesBurned = 0;
-        if (!isNewCycle) {
-          if (mode==1) {
-            cycles = cyclesList.get(positionOfSelectedCycle);
-
-            totalSetTime = cycles.getTotalSetTime();
-            totalBreakTime = cycles.getTotalBreakTime();
-            totalCaloriesBurned = cycles.getTotalCaloriesBurned();
-            cyclesCompleted = cycles.getCyclesCompleted();
-            burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-          }
-          if (mode==3) {
-            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-            totalSetTime = pomCycles.getTotalWorkTime();
-            totalBreakTime = pomCycles.getTotalBreakTime();
-            cyclesCompleted = pomCycles.getCyclesCompleted();
-          }
-        }
-        totalCycleSetTimeInMillis = totalSetTime*1000;
-        totalCycleBreakTimeInMillis = totalBreakTime*1000;
-        total_set_time.setText(convertSeconds(totalSetTime));
-        total_break_time.setText(convertSeconds(totalBreakTime));
-        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-      }
-    };
-
     queryAndSortAllCyclesFromDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
@@ -2024,6 +1991,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
+      }
+    };
+
+    retrieveTotalCycleTimesAndCaloriesFromDatabaseObjectRunnable = new Runnable() {
+      @Override
+      public void run() {
+        int totalSetTime = 0;
+        int totalBreakTime = 0;
+        double totalCaloriesBurned = 0;
+        if (!isNewCycle) {
+          if (mode==1) {
+            cycles = cyclesList.get(positionOfSelectedCycle);
+
+            totalSetTime = cycles.getTotalSetTime();
+            totalBreakTime = cycles.getTotalBreakTime();
+            totalCaloriesBurned = cycles.getTotalCaloriesBurned();
+            cyclesCompleted = cycles.getCyclesCompleted();
+            burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+          }
+          if (mode==3) {
+            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+            totalSetTime = pomCycles.getTotalWorkTime();
+            totalBreakTime = pomCycles.getTotalBreakTime();
+            cyclesCompleted = pomCycles.getCyclesCompleted();
+          }
+        }
+        totalCycleSetTimeInMillis = totalSetTime*1000;
+        totalCycleBreakTimeInMillis = totalBreakTime*1000;
+        total_set_time.setText(convertSeconds(totalSetTime));
+        total_break_time.setText(convertSeconds(totalBreakTime));
+        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
       }
     };
 
@@ -2664,7 +2662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
       }
       //If between rounds, post runnable for next round without starting timer or object animator.
-      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
+//      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
 
       prefEdit.putInt("savedProgressBarValueForModeOne", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
@@ -2679,7 +2677,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isNewCycle) positionOfSelectedCycle = 7;
         savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
       }
-      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
+//      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
 
       prefEdit.putInt("savedProgressBarValueForModeThree", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
