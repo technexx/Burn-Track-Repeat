@@ -3779,8 +3779,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             } else if (pausing == RESUMING_TIMER) {
-              reset.setVisibility(View.INVISIBLE);
+              //Ensures any non-reset timer lets this be true.
               if (!activeCycle) activeCycle = true;
+
+              reset.setVisibility(View.INVISIBLE);
               timerIsPaused = false;
 
               switch (typeOfRound.get(currentRound)) {
@@ -3805,8 +3807,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             }
-            AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
           } else resetTimer();
+
+          AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
           break;
         case 3:
           if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
@@ -3819,13 +3822,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               if (timer != null) timer.cancel();
               reset.setVisibility(View.VISIBLE);
             } else if (pausing == RESUMING_TIMER) {
+              if (!activeCycle) activeCycle = true;
+
               reset.setVisibility(View.INVISIBLE);
               timerIsPaused = false;
               startObjectAnimatorAndTotalCycleTimeCounters();
               startPomTimer();
             }
-            AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
           } else resetTimer();
+
+          AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
           break;
         case 4:
           if (pausing == RESUMING_TIMER) {
