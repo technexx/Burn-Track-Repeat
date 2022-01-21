@@ -1266,7 +1266,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortHigh.setOnClickListener(sortListener);
     sortLow.setOnClickListener(sortListener);
 
-    //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
       timerDisabled = false;
       makeCycleAdapterVisible = false;
@@ -3780,7 +3779,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             } else if (pausing == RESUMING_TIMER) {
-              AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
               reset.setVisibility(View.INVISIBLE);
               if (!activeCycle) activeCycle = true;
               timerIsPaused = false;
@@ -3815,7 +3813,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             reset.setText(R.string.reset);
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
-              AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
               timerIsPaused = true;
               pomMillisUntilFinished = pomMillis;
               if (objectAnimatorPom != null) objectAnimatorPom.pause();
