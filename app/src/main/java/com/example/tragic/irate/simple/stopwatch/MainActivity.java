@@ -443,6 +443,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Spinner tdeeMinutesDurationSpinner;
   Spinner tdeeSecondsDurationSpinner;
 
+  int selectedTdeeCategoryPosition;
+  int selectedTdeeSubCategoryPosition;
+  int selectedTdeeValuePosition;
+
   TextView caloriesBurnedInTdeeAdditionTextView;
   TextView metScoreTextView;
 
@@ -878,13 +882,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        int selectedCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
-        String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedCategoryPosition);
+        selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
+        String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
 
-        int selectedSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
-        double preRoundedMet = Double.parseDouble(valueArray[selectedSubCategoryPosition]);
+        //Values array corresponds to sub category array.
+        selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
+        selectedTdeeValuePosition = selectedTdeeCategoryPosition;
+
+        double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
         metScore = Math.round(preRoundedMet);
-        metScoreTextView.setText(getString(R.string.met_score, valueArray[selectedSubCategoryPosition]));
+        metScoreTextView.setText(getString(R.string.met_score, valueArray[selectedTdeeSubCategoryPosition]));
 
         setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
       }
@@ -1867,8 +1874,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               cycles.setTotalSetTime(0);
               cycles.setTotalBreakTime(0);
               cycles.setCyclesCompleted(0);
-
               cycles.setTitle(cycleTitle);
+
+              if (cycleHasActivityAssigned) {
+                cycles.setTdeeActivityExists(true);
+                cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
+                cycles.setTdeeValuePosition(selectedTdeeValuePosition);
+              } else {
+                cycles.setTdeeActivityExists(false);
+                cycles.setTdeeCatPosition(0);
+                cycles.setTdeeValuePosition(0);
+              }
+
               cyclesDatabase.cyclesDao().insertCycle(cycles);
               editCycleArrayLists(ADDING_CYCLE);
             } else {
@@ -2008,6 +2025,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             totalCaloriesBurned = cycles.getTotalCaloriesBurned();
             cyclesCompleted = cycles.getCyclesCompleted();
             burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+
+            selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
+            selectedTdeeValuePosition = cycles.getTdeeValuePosition();
           }
           if (mode==3) {
             pomCycles = pomCyclesList.get(positionOfSelectedCycle);
@@ -4191,7 +4211,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return caloriesBurnedPerMinute;
   }
 
-
   private void setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView() {
     double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
     DecimalFormat df = new DecimalFormat("#.#");
@@ -4213,6 +4232,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     }
   }
+
+  private void setTdeeSpinnersToRetrievedDatabaseValues() {
+    tdee_category_spinner.setSelection(selectedTdeeCategoryPosition);
+    tdee_sub_category_spinner.setSelection(selectedTdeeValuePosition);
+  }
+
   private double calculateCaloriesBurnedPerSecond() {
     return calculateCaloriesBurnedPerMinute(metScore) / 60;
   }

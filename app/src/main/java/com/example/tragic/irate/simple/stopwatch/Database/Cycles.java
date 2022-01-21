@@ -19,6 +19,10 @@ public class Cycles {
     public int totalSetTime;
     public int totalBreakTime;
 
+    public boolean tdeeActivityExists;
+    public int tdeeCatPosition;
+    public int tdeeValuePosition;
+
     public double totalCaloriesBurned;
 
     public Cycles() {
@@ -98,5 +102,29 @@ public class Cycles {
 
     public void setTotalCaloriesBurned(double totalCaloriesBurned) {
         this.totalCaloriesBurned = totalCaloriesBurned;
+    }
+
+    public boolean isTdeeActivityExists() {
+        return tdeeActivityExists;
+    }
+
+    public void setTdeeActivityExists(boolean tdeeActivityExists) {
+        this.tdeeActivityExists = tdeeActivityExists;
+    }
+
+    public int getTdeeCatPosition() {
+        return tdeeCatPosition;
+    }
+
+    public void setTdeeCatPosition(int tdeeCatPosition) {
+        this.tdeeCatPosition = tdeeCatPosition;
+    }
+
+    public int getTdeeValuePosition() {
+        return tdeeValuePosition;
+    }
+
+    public void setTdeeValuePosition(int tdeeValuePosition) {
+        this.tdeeValuePosition = tdeeValuePosition;
     }
 }
