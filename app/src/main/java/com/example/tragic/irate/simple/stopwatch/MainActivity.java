@@ -464,6 +464,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Timer not stopping on timer popUp dismissal.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: Longer sets/breaks (up to 90 min) for tdee purposes.
@@ -1266,7 +1267,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Exiting timer popup always brings us back to popup-less Main, so change views accordingly.
     timerPopUpWindow.setOnDismissListener(() -> {
-      timerIsPaused = true;
       timerDisabled = false;
       makeCycleAdapterVisible = false;
       timerPopUpIsVisible = false;
@@ -1280,7 +1280,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setViewsAndColorsToPreventTearingInEditPopUp(false);
 
       if (mode!=4) {
-        if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+        if (!timerIsPaused) {
+          pauseAndResumeTimer(PAUSING_TIMER);
+        }
         //Removes runnable that begins next round.
         mHandler.removeCallbacksAndMessages(null);
 
@@ -4260,6 +4262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
     } else {
       totalTdeeActivityTime = (totalTdeeActivityTime + singleInstanceTdeeActivityTime);
+      burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
     }
   }
 }
