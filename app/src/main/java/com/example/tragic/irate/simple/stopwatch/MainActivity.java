@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable deleteHighlightedCyclesASyncRunnable;
   Runnable deleteAllCyclesASyncRunnable;
   Runnable saveAddedOrEditedCycleASyncRunnable;
-  Runnable retrieveTotalCycleTimesFromDatabaseObjectRunnable;
+  Runnable retrieveTotalCycleTimesAndCaloriesFromDatabaseObjectRunnable;
 
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
@@ -455,7 +455,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int tdeeMinutesDuration;
   int tdeeSecondsDuration;
   double metScore;
-  double burnedCaloriesInCycle;
+  double burnedCaloriesInCurrentLoadingOfCycle;
+  double burnedCaloriesInAllLoadingsOfCycle;
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
 
@@ -1793,22 +1794,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
         if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-        runOnUiThread(retrieveTotalCycleTimesFromDatabaseObjectRunnable);
+        runOnUiThread(retrieveTotalCycleTimesAndCaloriesFromDatabaseObjectRunnable);
       }
     };
 
-    retrieveTotalCycleTimesFromDatabaseObjectRunnable = new Runnable() {
+    retrieveTotalCycleTimesAndCaloriesFromDatabaseObjectRunnable = new Runnable() {
       @Override
       public void run() {
         int totalSetTime = 0;
         int totalBreakTime = 0;
+        double totalCaloriesBurned = 0;
         if (!isNewCycle) {
           if (mode==1) {
             cycles = cyclesList.get(positionOfSelectedCycle);
 
             totalSetTime = cycles.getTotalSetTime();
             totalBreakTime = cycles.getTotalBreakTime();
+            totalCaloriesBurned = cycles.getTotalCaloriesBurned();
             cyclesCompleted = cycles.getCyclesCompleted();
+            burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
           }
           if (mode==3) {
             pomCycles = pomCyclesList.get(positionOfSelectedCycle);
@@ -1934,7 +1938,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-
     deleteTotalCycleTimesASyncRunnable = new Runnable() {
       @Override
       public void run() {
@@ -2030,7 +2033,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTotalSetTime((int) totalCycleSetTimeInMillis / 1000);
             cycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis/1000);
             cycles.setCyclesCompleted(cyclesCompleted);
-            cycles.setTotalCaloriesBurned(burnedCaloriesInCycle);
+            cycles.setTotalCaloriesBurned(burnedCaloriesInAllLoadingsOfCycle);
             cyclesDatabase.cyclesDao().updateCycles(cycles);
             break;
           case 3:
@@ -3592,13 +3595,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
 
-        addAndRoundDownTdeeTime(true);
+        addAndRoundDownTdeeTimeAndTotalCalories(true);
         //Used if nothing is reset, i.e. pausing the time via dismissing timer w/ "pause/resume" option available.
       } else {
         totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
 
-        addAndRoundDownTdeeTime(false);
+        addAndRoundDownTdeeTimeAndTotalCalories(false);
       }
     }
     if (mode==3) {
@@ -4193,10 +4196,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
   }
 
-  private double calculateCaloriesBurnedPerSecond() {
-    return calculateCaloriesBurnedPerMinute(metScore) / 60;
-  }
-
   private void toggleExistenceOfTdeeActivity(boolean activityExists) {
     if (activityExists) {
       String activity = (String) tdee_sub_category_spinner.getSelectedItem();
@@ -4211,6 +4210,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     }
   }
+  private double calculateCaloriesBurnedPerSecond() {
+    return calculateCaloriesBurnedPerMinute(metScore) / 60;
+  }
 
   //Todo: Diff. layouts w/ presence/absence of activity?
   private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
@@ -4218,15 +4220,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String totalTdeeCaloriesString() {
-    burnedCaloriesInCycle = calculateCaloriesBurnedDuringCycle(totalTdeeTimeElapsedLongValue());
+    burnedCaloriesInCurrentLoadingOfCycle = calculateCaloriesBurnedDuringCycle(singleInstanceTdeeTimeElapsedLongValue());
     DecimalFormat df = new DecimalFormat("#.#");
-    String roundedCalories = df.format(burnedCaloriesInCycle);
 
-    Log.i("testCal", "burned calories are " + burnedCaloriesInCycle);
+    String roundedCalories = df.format(burnedCaloriesInAllLoadingsOfCycle + burnedCaloriesInCurrentLoadingOfCycle);
+
+    Log.i("testCal", "burned calories of current loading are " + burnedCaloriesInCurrentLoadingOfCycle);
     return roundedCalories;
   }
 
-  private long totalTdeeTimeElapsedLongValue() {
+  private long singleInstanceTdeeTimeElapsedLongValue() {
     if (typeOfRound.get(currentRound)==1) {
       singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
     } else {
@@ -4234,6 +4237,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         singleInstanceTdeeActivityTime = setMillis - timerDurationPlaceHolder;
       }
     }
+    return singleInstanceTdeeActivityTime/1000;
+  }
+
+  private long totalTdeeTimeElapsedLongValue() {
     return (totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000;
   }
 
@@ -4245,10 +4252,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,"Test Activity", totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
   }
 
-  private void addAndRoundDownTdeeTime(boolean newRound) {
+  private void addAndRoundDownTdeeTimeAndTotalCalories(boolean newRound) {
     if (newRound) {
-      totalTdeeActivityTime = (totalTdeeActivityTime + singleInstanceTdeeActivityTime) + 100;
+      totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
       totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
+
+      burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
     } else {
       totalTdeeActivityTime = (totalTdeeActivityTime + singleInstanceTdeeActivityTime);
     }
