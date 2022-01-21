@@ -23,6 +23,7 @@ public class Cycles {
     public int tdeeCatPosition;
     public int tdeeValuePosition;
 
+    public long totalTdeeActivityTimeElapsed;
     public double totalCaloriesBurned;
 
     public Cycles() {
@@ -96,6 +97,14 @@ public class Cycles {
         this.totalBreakTime = totalBreakTime;
     }
 
+    public long getTotalTdeeActivityTimeElapsed() {
+        return totalTdeeActivityTimeElapsed;
+    }
+
+    public void setTotalTdeeActivityTimeElapsed(long totalTdeeActivityTimeElapsed) {
+        this.totalTdeeActivityTimeElapsed = totalTdeeActivityTimeElapsed;
+    }
+
     public double getTotalCaloriesBurned() {
         return totalCaloriesBurned;
     }
@@ -104,7 +113,7 @@ public class Cycles {
         this.totalCaloriesBurned = totalCaloriesBurned;
     }
 
-    public boolean isTdeeActivityExists() {
+    public boolean getTdeeActivityExists() {
         return tdeeActivityExists;
     }
 

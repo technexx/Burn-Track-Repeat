@@ -901,6 +901,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
+    addTDEEActivityTextView.setOnClickListener(v-> {
+      setTdeeSpinnersToRetrievedDatabaseValues();
+      addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
+    });
+
     confirmActivityAddition.setOnClickListener(v-> {
       addTDEEPopUpWindow.dismiss();
       toggleExistenceOfTdeeActivity(true);
@@ -1523,10 +1528,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       launchTimerCycle(true);
     });
 
-    addTDEEActivityTextView.setOnClickListener(v-> {
-      addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
-    });
-
     //Listens to our fadeOut animation, and runs fadeIn when it's done.
     fadeProgressOut.setAnimationListener(new Animation.AnimationListener() {
       @Override
@@ -1839,90 +1840,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    saveAddedOrEditedCycleASyncRunnable = new Runnable() {
-      @Override
-      public void run() {
-        //Sets up Strings to save into database.
-        Gson gson = new Gson();
-        workoutString = "";
-        roundTypeString = "";
-        pomString = "";
-        date = simpleDateFormat.format(calendar.getTime());
-
-        int cycleID;
-        if (mode==1) {
-          //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
-          if (isNewCycle) cycles = new Cycles(); else if (cyclesList.size()>0) {
-            cycleID = cyclesList.get(positionOfSelectedCycle).getId();
-            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-          }
-          //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
-          workoutString = gson.toJson(workoutTime);
-          workoutString = friendlyString(workoutString);
-          roundTypeString = gson.toJson(typeOfRound);
-          roundTypeString = friendlyString(roundTypeString);
-          //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
-          if (!workoutString.equals("")) {
-            //Adding and inserting into database.
-            cycles.setWorkoutRounds(workoutString);
-            cycles.setRoundType(roundTypeString);
-            cycles.setTimeAccessed(System.currentTimeMillis());
-            cycles.setItemCount(workoutTime.size());
-            //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
-            if (isNewCycle) {
-              cycles.setTimeAdded(System.currentTimeMillis());
-              cycles.setTotalSetTime(0);
-              cycles.setTotalBreakTime(0);
-              cycles.setCyclesCompleted(0);
-              cycles.setTitle(cycleTitle);
-
-              if (cycleHasActivityAssigned) {
-                cycles.setTdeeActivityExists(true);
-                cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
-                cycles.setTdeeValuePosition(selectedTdeeValuePosition);
-              } else {
-                cycles.setTdeeActivityExists(false);
-                cycles.setTdeeCatPosition(0);
-                cycles.setTdeeValuePosition(0);
-              }
-
-              cyclesDatabase.cyclesDao().insertCycle(cycles);
-              editCycleArrayLists(ADDING_CYCLE);
-            } else {
-              cycles.setTitle(cycleTitle);
-              cyclesDatabase.cyclesDao().updateCycles(cycles);
-              editCycleArrayLists(EDITING_CYCLE);
-            }
-          }
-        }
-        if (mode==3) {
-          if (isNewCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
-            cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
-            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
-          }
-          pomString = gson.toJson(pomValuesTime);
-          pomString = friendlyString(pomString);
-
-          if (!pomString.equals("")) {
-            pomCycles.setFullCycle(pomString);
-            pomCycles.setTimeAccessed(System.currentTimeMillis());
-            if (isNewCycle) {
-              pomCycles.setTimeAdded(System.currentTimeMillis());
-              if (cycleTitle.isEmpty()) cycleTitle = date;
-              pomCycles.setTitle(cycleTitle);
-              cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
-              //Adding to adapter list.
-              editCycleArrayLists(ADDING_CYCLE);
-            } else {
-              pomCycles.setTitle(cycleTitle);
-              cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-              editCycleArrayLists(EDITING_CYCLE);
-            }
-          }
-        }
-      }
-    };
-
     deleteTotalCycleTimesASyncRunnable = new Runnable() {
       @Override
       public void run() {
@@ -2026,6 +1943,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cyclesCompleted = cycles.getCyclesCompleted();
             burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
 
+            cycleHasActivityAssigned = cycles.getTdeeActivityExists();
             selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
             selectedTdeeValuePosition = cycles.getTdeeValuePosition();
           }
@@ -2044,14 +1962,103 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
+    //Todo: Some redundancies between this (saving when launching after adding/editing) and the subsequent method which saves frequently as total times/calories are increased.
+    saveAddedOrEditedCycleASyncRunnable = new Runnable() {
+      @Override
+      public void run() {
+        //Sets up Strings to save into database.
+        Gson gson = new Gson();
+        workoutString = "";
+        roundTypeString = "";
+        pomString = "";
+        date = simpleDateFormat.format(calendar.getTime());
+
+        int cycleID;
+        if (mode==1) {
+          //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
+          if (isNewCycle) cycles = new Cycles(); else if (cyclesList.size()>0) {
+            cycleID = cyclesList.get(positionOfSelectedCycle).getId();
+            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+          }
+          //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
+          workoutString = gson.toJson(workoutTime);
+          workoutString = friendlyString(workoutString);
+          roundTypeString = gson.toJson(typeOfRound);
+          roundTypeString = friendlyString(roundTypeString);
+          //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
+          if (!workoutString.equals("")) {
+            //Adding and inserting into database.
+            cycles.setWorkoutRounds(workoutString);
+            cycles.setRoundType(roundTypeString);
+            cycles.setTimeAccessed(System.currentTimeMillis());
+            cycles.setItemCount(workoutTime.size());
+            //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
+            if (isNewCycle) {
+              cycles.setTimeAdded(System.currentTimeMillis());
+              cycles.setTotalSetTime(0);
+              cycles.setTotalBreakTime(0);
+              cycles.setCyclesCompleted(0);
+              cycles.setTitle(cycleTitle);
+
+              if (cycleHasActivityAssigned) {
+                cycles.setTdeeActivityExists(true);
+                cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
+                cycles.setTdeeValuePosition(selectedTdeeValuePosition);
+              } else {
+                cycles.setTdeeActivityExists(false);
+                cycles.setTdeeCatPosition(0);
+                cycles.setTdeeValuePosition(0);
+              }
+
+              cyclesDatabase.cyclesDao().insertCycle(cycles);
+              editCycleArrayLists(ADDING_CYCLE);
+            } else {
+              cycles.setTitle(cycleTitle);
+              cyclesDatabase.cyclesDao().updateCycles(cycles);
+              editCycleArrayLists(EDITING_CYCLE);
+            }
+          }
+        }
+        if (mode==3) {
+          if (isNewCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
+            cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
+            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+          }
+          pomString = gson.toJson(pomValuesTime);
+          pomString = friendlyString(pomString);
+
+          if (!pomString.equals("")) {
+            pomCycles.setFullCycle(pomString);
+            pomCycles.setTimeAccessed(System.currentTimeMillis());
+            if (isNewCycle) {
+              pomCycles.setTimeAdded(System.currentTimeMillis());
+              if (cycleTitle.isEmpty()) cycleTitle = date;
+              pomCycles.setTitle(cycleTitle);
+              cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
+              //Adding to adapter list.
+              editCycleArrayLists(ADDING_CYCLE);
+            } else {
+              pomCycles.setTitle(cycleTitle);
+              cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+              editCycleArrayLists(EDITING_CYCLE);
+            }
+          }
+        }
+      }
+    };
+
     saveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
+        addAndRoundDownTdeeTimeAndTotalCalories(false);
         switch (mode) {
           case 1:
             cycles.setTotalSetTime((int) totalCycleSetTimeInMillis / 1000);
             cycles.setTotalBreakTime((int) totalCycleBreakTimeInMillis/1000);
             cycles.setCyclesCompleted(cyclesCompleted);
+
+            //Todo: Make sure the total var we add is updated (and not just displayed as (old total + running value).
+            cycles.setTotalTdeeActivityTimeElapsed();
             cycles.setTotalCaloriesBurned(burnedCaloriesInAllLoadingsOfCycle);
             cyclesDatabase.cyclesDao().updateCycles(cycles);
             break;
@@ -4252,11 +4259,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DecimalFormat df = new DecimalFormat("#.#");
 
     String roundedCalories = df.format(burnedCaloriesInAllLoadingsOfCycle + burnedCaloriesInCurrentLoadingOfCycle);
-
     Log.i("testCal", "burned calories of current loading are " + burnedCaloriesInCurrentLoadingOfCycle);
     return roundedCalories;
   }
 
+
+  //Todo: Retrieve and set these time vars for cycles that have tdee activities.
   private long singleInstanceTdeeTimeElapsedLongValue() {
     if (typeOfRound.get(currentRound)==1) {
       singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
@@ -4280,6 +4288,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,"Test Activity", totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
   }
 
+  //Todo: This AND
   private void addAndRoundDownTdeeTimeAndTotalCalories(boolean newRound) {
     if (newRound) {
       totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
