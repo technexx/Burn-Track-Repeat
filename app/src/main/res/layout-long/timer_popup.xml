@@ -165,7 +165,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="48dp"
         android:background="@color/black"
         app:cornerRadius="90dp">
     </com.google.android.material.button.MaterialButton>

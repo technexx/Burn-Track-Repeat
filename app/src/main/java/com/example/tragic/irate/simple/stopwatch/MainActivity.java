@@ -464,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Should just have "Reset" instead of Resume/Reset on Main, w/ a click on the row resuming automatically.
+  //Todo: Save last used TDEE activity to cycle (will require db entry).
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: Longer sets/breaks (up to 90 min) for tdee purposes.
