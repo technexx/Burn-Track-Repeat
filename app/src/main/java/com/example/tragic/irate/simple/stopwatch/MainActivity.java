@@ -1662,8 +1662,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     reset.setOnClickListener(v -> {
-      if (mode != 3) resetTimer();
-      else {
+      if (mode != 3) {
+        resetTimer();
+      } else {
         if (reset.getText().equals(getString(R.string.reset)))
           reset.setText(R.string.confirm_cycle_reset);
         else {
@@ -1671,7 +1672,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           resetTimer();
         }
       }
-      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      addAndRoundDownTotalCycleTimes(true);
+      if (mode==1) {
+        addAndRoundDownTdeeTimeAndTotalCalories(true);
+      }
       AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable());
     });
 
@@ -2503,7 +2507,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       resetTimer();
       roundedValueForTotalTimes = 0;
-      addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+      addAndRoundDownTotalCycleTimes(true);
       AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable());
     }
   }
@@ -3386,7 +3390,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setEnabled(false);
     timerDisabled = true;
 
-    addAndRoundDownTotalCycleTimeFromPreviousRounds(true);
+    addAndRoundDownTotalCycleTimes(true);
+    if (mode==1) {
+      addAndRoundDownTdeeTimeAndTotalCalories(true);
+    }
     AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable());
 
     if (mode==1) {
@@ -3576,7 +3583,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void addAndRoundDownTotalCycleTimeFromPreviousRounds(boolean newRound) {
+  private void addAndRoundDownTotalCycleTimes(boolean newRound) {
     if (mode==1) {
       if (newRound) {
         //Divides to keep start @ even XX000 ms, coincides w/ updateTotalTimeValuesEachTick() division.
@@ -3586,17 +3593,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) + 100;
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
 
-        if (cycleHasActivityAssigned) {
-          addAndRoundDownTdeeTimeAndTotalCalories(true);
-        }
         //Used if nothing is reset, i.e. pausing the time via dismissing timer w/ "pause/resume" option available.
       } else {
         totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
         totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
-
-        if (cycleHasActivityAssigned) {
-          addAndRoundDownTdeeTimeAndTotalCalories(false);
-        };
       }
     }
     if (mode==3) {
@@ -3640,6 +3640,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         //Ensures db save will include most recent total times/calories.
+        addAndRoundDownTotalCycleTimes(false);
         addAndRoundDownTdeeTimeAndTotalCalories(false);
         switch (mode) {
           case 1:
