@@ -1789,6 +1789,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
+
     retrieveTimeAndCalorieStatsForSingleCycleRunnable = new Runnable() {
       @Override
       public void run() {
@@ -1802,7 +1803,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             totalSetTime = cycles.getTotalSetTime();
             totalBreakTime = cycles.getTotalBreakTime();
 
-            totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed();
+            totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
+            //Todo: Fetching 0.
             burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
 
             cycleHasActivityAssigned = cycles.getTdeeActivityExists();
@@ -1893,7 +1895,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int cycleID = 0;
         List<Integer> tempIdList = new ArrayList<>();
         tempIdList.addAll(receivedHighlightPositionHolder);
-
 
         if (mode==1) {
           cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
