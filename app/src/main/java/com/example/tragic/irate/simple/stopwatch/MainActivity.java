@@ -2032,6 +2032,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setDefaultSettings() {
     retrieveUserStats();
+    tdeeCategorySpinnerTouchActions();
+    tdeeSubCategorySpinnerTouchActions();
     setTdeeSpinnersToRetrievedDatabaseValues();
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
@@ -4282,7 +4284,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String tdeeActivitySelectedString() {
-    return (String) "k";
+    return (String) tdee_sub_category_spinner.getSelectedItem();
   }
 
   private void tdeeCategorySpinnerTouchActions() {
