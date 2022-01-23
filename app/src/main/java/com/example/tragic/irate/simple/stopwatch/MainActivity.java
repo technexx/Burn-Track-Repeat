@@ -442,6 +442,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Spinner tdee_sub_category_spinner;
   Spinner tdeeMinutesDurationSpinner;
   Spinner tdeeSecondsDurationSpinner;
+  ArrayAdapter tdeeCategoryAdapter;
+  ArrayAdapter tdeeSubCategoryAdapter;
 
   int selectedTdeeCategoryPosition;
   int selectedTdeeSubCategoryPosition;
@@ -848,29 +850,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
     caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
 
-    ArrayAdapter tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
+    tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
-    tdee_category_spinner.setSelection(0);
 
-    ArrayAdapter tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout);
+    tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout);
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
-    tdee_sub_category_spinner.setSelection(0);
 
+    //Todo: Subcat spinner list not populated until spinner is accessed, which occurs after popUp is launched (do not have to touch the spinners).
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        int selectedPosition = tdee_category_spinner.getSelectedItemPosition();
-        tdeeSubCategoryAdapter.clear();
-        tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedPosition));
-        tdee_sub_category_spinner.setSelection(0);
-
-        String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedPosition);
-        double preRoundedMet = Double.parseDouble(valueArray[0]);
-        metScore = Math.round(preRoundedMet);
-        metScoreTextView.setText(getString(R.string.met_score, valueArray[0]));
-
+        tdeeCategorySpinnerTouchActions();
         setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
       }
 
@@ -882,17 +874,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
-        String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
-
-        //Values array corresponds to sub category array.
-        selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
-        selectedTdeeValuePosition = selectedTdeeCategoryPosition;
-
-        double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
-        metScore = Math.round(preRoundedMet);
-        metScoreTextView.setText(getString(R.string.met_score, valueArray[selectedTdeeSubCategoryPosition]));
-
+        tdeeSubCategorySpinnerTouchActions();
         setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
       }
 
@@ -902,7 +884,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     addTDEEActivityTextView.setOnClickListener(v-> {
-      setTdeeSpinnersToRetrievedDatabaseValues();
       addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
     });
 
@@ -2051,6 +2032,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setDefaultSettings() {
     retrieveUserStats();
+    setTdeeSpinnersToRetrievedDatabaseValues();
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -4285,7 +4267,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void displayTotalTdeeStatsInTextView() {
-    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,"Test Activity", totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
+    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,tdeeActivitySelectedString(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
   }
 
   //Defaults to 0 index for both.
@@ -4297,5 +4279,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTdeeActivityTimeAndCaloriesBurnedFromDatabaseValues() {
     totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed();
     burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+  }
+
+  private String tdeeActivitySelectedString() {
+    return (String) "k";
+  }
+
+  private void tdeeCategorySpinnerTouchActions() {
+    int selectedPosition = tdee_category_spinner.getSelectedItemPosition();
+    tdeeSubCategoryAdapter.clear();
+    tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedPosition));
+    tdee_sub_category_spinner.setSelection(0);
+
+    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedPosition);
+    double preRoundedMet = Double.parseDouble(valueArray[0]);
+    metScore = Math.round(preRoundedMet);
+    metScoreTextView.setText(getString(R.string.met_score, valueArray[0]));
+  }
+
+  private void tdeeSubCategorySpinnerTouchActions() {
+    selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
+    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
+
+    //Values array corresponds to sub category array.
+    selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
+    selectedTdeeValuePosition = selectedTdeeCategoryPosition;
+
+    double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
+    metScore = Math.round(preRoundedMet);
+    metScoreTextView.setText(getString(R.string.met_score, valueArray[selectedTdeeSubCategoryPosition]));
   }
 }
