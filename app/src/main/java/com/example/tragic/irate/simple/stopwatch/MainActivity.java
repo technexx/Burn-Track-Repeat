@@ -1672,8 +1672,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           resetTimer();
         }
       }
-      addAndRoundDownTotalCycleTimes(true);
-      addAndRoundDownTdeeTimeAndTotalCalories(true);
+      addAndRoundDownTotalCycleTimes();
+      addAndRoundDownTdeeTimeAndTotalCalories();
       AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable());
     });
 
@@ -2505,7 +2505,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       resetTimer();
       roundedValueForTotalTimes = 0;
-      addAndRoundDownTotalCycleTimes(true);
+      addAndRoundDownTotalCycleTimes();
+      addAndRoundDownTdeeTimeAndTotalCalories();
       AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable());
     }
   }
@@ -3388,8 +3389,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setEnabled(false);
     timerDisabled = true;
 
-    addAndRoundDownTotalCycleTimes(true);
-    addAndRoundDownTdeeTimeAndTotalCalories(true);
+    addAndRoundDownTotalCycleTimes();
+    addAndRoundDownTdeeTimeAndTotalCalories();
     AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable());
 
     if (mode==1) {
@@ -3579,56 +3580,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void addAndRoundDownTotalCycleTimes(boolean newRound) {
+  private void addAndRoundDownTotalCycleTimes() {
     if (mode==1) {
-      if (newRound) {
-        //Divides to keep start @ even XX000 ms, coincides w/ updateTotalTimeValuesEachTick() division.
-        totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
-        totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis / 1000) * 1000;
+      totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
+      totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis / 1000) * 1000;
 
-        totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
-        totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
-
-        //Used if nothing is reset, i.e. pausing the time via dismissing timer w/ "pause/resume" option available.
-      } else {
-        totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis;
-        totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis;
-      }
+      totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
+      totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
     }
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          if (newRound) {
-            totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
-            totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
-          } else {
-            totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis;
-            timerDurationPlaceHolder = setMillis;
-          }
+          totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
+          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
           break;
         case 1: case 3: case 5: case 7:
-          if (newRound) {
-            totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
-            totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
-          } else {
-            totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis;
-            timerDurationPlaceHolder = breakMillis;
-          }
+          totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
+          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
           break;
       }
     }
   }
 
-  private void addAndRoundDownTdeeTimeAndTotalCalories(boolean newRound) {
+  private void addAndRoundDownTdeeTimeAndTotalCalories() {
     if (mode==1 && cycleHasActivityAssigned) {
-      if (newRound) {
-        totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
-        totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
-        burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
-      } else {
-        totalTdeeActivityTime += singleInstanceTdeeActivityTime;
-        burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
-      }
+      totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
+      totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
+      burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
     }
   }
 
