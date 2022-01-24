@@ -3611,7 +3611,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             if (cycleHasActivityAssigned) {
               int tdeeTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalTdeeActivityTime, singleInstanceTdeeActivityTime);
-              int caloriesBurnedToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger((long) burnedCaloriesInAllLoadingsOfCycle, (long) burnedCaloriesInCurrentLoadingOfCycle);
+              double caloriesBurnedToSave = burnedCaloriesInAllLoadingsOfCycle + burnedCaloriesInCurrentLoadingOfCycle;
               cycles.setTotalTdeeActivityTimeElapsed(tdeeTimeToSave);
               cycles.setTotalCaloriesBurned(caloriesBurnedToSave);
             }
