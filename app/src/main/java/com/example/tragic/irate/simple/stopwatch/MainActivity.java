@@ -470,7 +470,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Not retrieving type of activity/calories/tdee time from db for cycles.
+  //Todo: Tdee activity textView not saving/retrieving.
+  //Todo: Need to zero out calorie/total tdee time vars when selecting new cycle.
   //Todo: Calories burned start @ negative value.
   //Todo: Tdee time/calories show incorrectly after reset from Main.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
@@ -859,7 +860,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
 
-    //Todo: Subcat spinner list not populated until spinner is accessed, which occurs after popUp is launched (do not have to touch the spinners).
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -1804,7 +1804,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             totalBreakTime = cycles.getTotalBreakTime();
 
             totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
-            //Todo: Fetching 0.
             burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
 
             cycleHasActivityAssigned = cycles.getTdeeActivityExists();
@@ -2640,7 +2639,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
       }
       //If between rounds, post runnable for next round without starting timer or object animator.
-//      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
+      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
 
       prefEdit.putInt("savedProgressBarValueForModeOne", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
@@ -2655,7 +2654,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isNewCycle) positionOfSelectedCycle = 7;
         savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
       }
-//      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
+      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
 
       prefEdit.putInt("savedProgressBarValueForModeThree", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
