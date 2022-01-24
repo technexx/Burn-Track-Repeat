@@ -376,7 +376,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable deleteHighlightedCyclesASyncRunnable;
   Runnable deleteAllCyclesASyncRunnable;
   Runnable saveAddedOrEditedCycleASyncRunnable;
-  Runnable retrieveTimeAndCalorieStatsForSingleCycleRunnable;
 
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
@@ -471,10 +470,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Tdee activity textView not saving/retrieving.
-  //Todo: Need to zero out calorie/total tdee time vars when selecting new cycle.
-  //Todo: Calories burned start @ negative value.
-  //Todo: Tdee time/calories show incorrectly after reset from Main.
+  //Todo: Calories not iterating.
+  //Todo: Tdee time elapsed moving up by round amount following end of cycle + beginning of new cycle.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
@@ -599,7 +596,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Gets the position clicked on from our saved cycle adapter.
   @Override
   public void onCycleClick(int position) {
     //Active cycle option will automatically be removed if accessing new cycle.
@@ -614,7 +610,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetTimer();
   }
 
-  //Receives highlighted positions from our adapter.
   @Override
   public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
     //Receives list of cycle positions highlighted.
@@ -1787,7 +1782,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
         if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-        runOnUiThread(retrieveTimeAndCalorieStatsForSingleCycleRunnable);
+        runOnUiThread(retrieveTotalSetAndBreakAndCycleValuesRunnableAndSetTheirTextViews());
+        runOnUiThread(retrieveTdeeTimeAndCalorieStatsForSingleCycleRunnable());
       }
     };
 
@@ -1908,42 +1904,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
       runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
-    };
-
-    retrieveTimeAndCalorieStatsForSingleCycleRunnable = new Runnable() {
-      @Override
-      public void run() {
-        int totalSetTime = 0;
-        int totalBreakTime = 0;
-        double totalCaloriesBurned = 0;
-        if (!isNewCycle) {
-          if (mode==1) {
-            cycles = cyclesList.get(positionOfSelectedCycle);
-
-            totalSetTime = cycles.getTotalSetTime();
-            totalBreakTime = cycles.getTotalBreakTime();
-
-            totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
-            burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-
-            cycleHasActivityAssigned = cycles.getTdeeActivityExists();
-            selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
-            selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
-            selectedTdeeValuePosition = cycles.getTdeeValuePosition();
-          }
-          if (mode==3) {
-            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-            totalSetTime = pomCycles.getTotalWorkTime();
-            totalBreakTime = pomCycles.getTotalBreakTime();
-            cyclesCompleted = pomCycles.getCyclesCompleted();
-          }
-        }
-        totalCycleSetTimeInMillis = totalSetTime*1000;
-        totalCycleBreakTimeInMillis = totalBreakTime*1000;
-        total_set_time.setText(convertSeconds(totalSetTime));
-        total_break_time.setText(convertSeconds(totalBreakTime));
-        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-      }
     };
 
     saveAddedOrEditedCycleASyncRunnable = new Runnable() {
@@ -3180,15 +3140,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedPomCycleAdapter.notifyDataSetChanged();
     }
 
-    resetTimer();
-    populateTimerUI();
-
     if (isNewCycle || saveToDB) AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable);
     AsyncTask.execute(queryDatabaseCycleListRunnable);
 
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
+
+    resetTimer();
+    populateTimerUI();
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
@@ -3473,6 +3433,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     beginTimerForNextRound = true;
   }
+
+  private Runnable retrieveTotalSetAndBreakAndCycleValuesRunnableAndSetTheirTextViews() {
+      return new Runnable() {
+        @Override
+        public void run() {
+          int totalSetTime = 0;
+          int totalBreakTime = 0;
+
+          if (mode==1) {
+            totalSetTime = cycles.getTotalSetTime();
+            totalBreakTime = cycles.getTotalBreakTime();
+          }
+
+          if (mode==3) {
+            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+            totalSetTime = pomCycles.getTotalWorkTime();
+            totalBreakTime = pomCycles.getTotalBreakTime();
+            cyclesCompleted = pomCycles.getCyclesCompleted();
+          }
+
+          totalCycleSetTimeInMillis = totalSetTime*1000;
+          totalCycleBreakTimeInMillis = totalBreakTime*1000;
+          total_set_time.setText(convertSeconds(totalSetTime));
+          total_break_time.setText(convertSeconds(totalBreakTime));
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
+        }
+      };
+    }
 
   private void updateTotalTimeValuesEachTick() {
     String addedTime = "";
@@ -4214,6 +4202,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private Runnable retrieveTdeeTimeAndCalorieStatsForSingleCycleRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        double totalCaloriesBurned = 0;
+
+        totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
+        burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+
+        cycleHasActivityAssigned = cycles.getTdeeActivityExists();
+        selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
+        selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
+        selectedTdeeValuePosition = cycles.getTdeeValuePosition();
+
+      }
+    };
+  }
+
+  //Todo: This is launched in populateTimerUI, but is not updated right away when new activity/cycle is set.
   private void displayTotalTdeeStatsInTextView() {
     if (cycleHasActivityAssigned) {
       actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,getTdeeActivityStringFromSavedArrayPosition(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
