@@ -79,6 +79,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -740,6 +741,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
+    logTdeeArraySizes();
 
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
@@ -4219,27 +4221,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private double calculateCaloriesBurnedPerMinute(double metValue) {
-    double weightConversion = userWeight;
-    if (!isMetric) weightConversion = weightConversion / 2.205;
-    double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
-    return caloriesBurnedPerMinute;
+  private void displayTotalTdeeStatsInTextView() {
+    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,getTdeeActivityStringFromSavedArrayPosition(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
   }
 
-  private void setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView() {
-    double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
-    DecimalFormat df = new DecimalFormat("#.#");
-    String truncatedMinutes = df.format(caloriesBurnedPerMinute);
-    caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
-  }
-
-  private double calculateCaloriesBurnedPerSecond() {
-    return calculateCaloriesBurnedPerMinute(metScore) / 60;
-  }
-
-  //Todo: Diff. layouts w/ presence/absence of activity?
-  private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
-    return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
+  private String getTdeeActivityStringFromSavedArrayPosition() {
+    ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
+    String[] subCategoryList = subCategoryArray.get(selectedTdeeCategoryPosition);
+    return (String) subCategoryList[selectedTdeeSubCategoryPosition];
   }
 
   private String totalTdeeCaloriesString() {
@@ -4270,10 +4259,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(totalTdeeTimeElapsedLongValue());
   }
 
-  private void displayTotalTdeeStatsInTextView() {
-    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,getTdeeActivityStringFromDatabasePositionOnSubCategorySpinner(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
+  private double calculateCaloriesBurnedPerMinute(double metValue) {
+    double weightConversion = userWeight;
+    if (!isMetric) weightConversion = weightConversion / 2.205;
+    double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
+    return caloriesBurnedPerMinute;
   }
 
+  private void setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView() {
+    double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
+    DecimalFormat df = new DecimalFormat("#.#");
+    String truncatedMinutes = df.format(caloriesBurnedPerMinute);
+    caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
+  }
+
+  private double calculateCaloriesBurnedPerSecond() {
+    return calculateCaloriesBurnedPerMinute(metScore) / 60;
+  }
+
+  //Todo: Diff. layouts w/ presence/absence of activity?
+  private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
+    return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
+  }
+
+  //Todo: Does nothing if set at app launch since spinners do not have lists attached. Should be kept as a method and set when editing an existing cycle.
   //Defaults to 0 index for both.
   private void setTdeeSpinnersToRetrievedDatabaseValues() {
     tdee_category_spinner.setSelection(selectedTdeeCategoryPosition);
@@ -4283,10 +4292,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTdeeActivityTimeAndCaloriesBurnedFromDatabaseValues() {
     totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed();
     burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-  }
-
-  private String getTdeeActivityStringFromDatabasePositionOnSubCategorySpinner() {
-    return (String) tdee_sub_category_spinner.getItemAtPosition(selectedTdeeSubCategoryPosition);
   }
 
   //Sub Category list and MET score lists in retrieveMetScoreFromSubCategoryPosition() both correspond to saved Category position (e.g. Cycling -> (List of Cycling Activity) + (List of their MET scores).
@@ -4320,5 +4325,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, metScore));
+  }
+
+  ///////////Test methods///////////////////////////
+  private void logTdeeArraySizes() {
+    for (int i=0; i<tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.size(); i++) {
+      String[] arrayToTest = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(i);
+      Log.i("testTdeeArraySizes", "size of " + i + " is " + arrayToTest.length);
+
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 0is 14
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 1is 35
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 2is 9
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 3is 3
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 4is 45
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 5is 22
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 6is 12
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 7is 17
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 8is 48
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 9is 15
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 10is 6
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 11is 3
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 12is 80
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 13is 19
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 14is 35
+      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 15is 15
+    }
   }
 }
