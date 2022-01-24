@@ -741,7 +741,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
-    logTdeeArraySizes();
 
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
@@ -3191,10 +3190,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
 
-    if (cycleHasActivityAssigned) {
-      displayTotalTdeeStatsInTextView();
-    }
-
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
@@ -3274,9 +3269,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
         updateTotalTimeValuesEachTick();
 
-        if (cycleHasActivityAssigned) {
-          displayTotalTdeeStatsInTextView();
-        }
+        displayTotalTdeeStatsInTextView();
 
         if (!textSizeIncreased && mode==1) {
           if (willWeChangeTextSize) {
@@ -3497,9 +3490,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTime);
 
-          if (cycleHasActivityAssigned) {
-            displayTotalTdeeStatsInTextView();
-          }
+          displayTotalTdeeStatsInTextView();
+
           break;
         case 2:
           if (resettingTotalTime) {
@@ -4033,12 +4025,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
-        //Sets timer values and round counts. populateTimerUI() is called at app startup and when resetting timer, so this handles both.
+
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
 
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
+
+        displayTotalTdeeStatsInTextView();
 
         if (workoutTime.size()>0) {
           switch (typeOfRound.get(0)) {
@@ -4196,8 +4190,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
 
-
-  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   private void retrieveUserStats() {
     SharedPreferences sp = getApplicationContext().getSharedPreferences("pref", 0);
@@ -4222,7 +4215,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void displayTotalTdeeStatsInTextView() {
-    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,getTdeeActivityStringFromSavedArrayPosition(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
+    if (cycleHasActivityAssigned) {
+      actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,getTdeeActivityStringFromSavedArrayPosition(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
+    }
   }
 
   private String getTdeeActivityStringFromSavedArrayPosition() {
@@ -4332,23 +4327,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     for (int i=0; i<tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.size(); i++) {
       String[] arrayToTest = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(i);
       Log.i("testTdeeArraySizes", "size of " + i + " is " + arrayToTest.length);
-
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 0is 14
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 1is 35
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 2is 9
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 3is 3
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 4is 45
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 5is 22
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 6is 12
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 7is 17
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 8is 48
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 9is 15
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 10is 6
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 11is 3
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 12is 80
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 13is 19
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 14is 35
-      //2022-01-24 11:25:01.985 5550-5550/com.example.tragic.irate.simple.stopwatch I/testTdeeArraySizes: size of 15is 15
     }
   }
 }
