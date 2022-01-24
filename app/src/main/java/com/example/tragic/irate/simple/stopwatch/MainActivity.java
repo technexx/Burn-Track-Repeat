@@ -3442,6 +3442,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           int totalBreakTime = 0;
 
           if (mode==1) {
+            cycles = cyclesList.get(positionOfSelectedCycle);
             totalSetTime = cycles.getTotalSetTime();
             totalBreakTime = cycles.getTotalBreakTime();
           }
@@ -4206,6 +4207,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
+        cycles = cyclesList.get(positionOfSelectedCycle);
+
         double totalCaloriesBurned = 0;
 
         totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
@@ -4215,6 +4218,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
         selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
         selectedTdeeValuePosition = cycles.getTdeeValuePosition();
+
+        Log.i("testRun", "cat position is " + selectedTdeeCategoryPosition);
+        Log.i("testRun", "sub cat position is " + selectedTdeeSubCategoryPosition);
+        Log.i("testRun", "value position is " + selectedTdeeValuePosition);
 
       }
     };
