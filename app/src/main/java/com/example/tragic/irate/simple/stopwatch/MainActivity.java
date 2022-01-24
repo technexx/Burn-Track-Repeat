@@ -858,6 +858,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout);
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
 
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -1789,43 +1790,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-
-    retrieveTimeAndCalorieStatsForSingleCycleRunnable = new Runnable() {
-      @Override
-      public void run() {
-        int totalSetTime = 0;
-        int totalBreakTime = 0;
-        double totalCaloriesBurned = 0;
-        if (!isNewCycle) {
-          if (mode==1) {
-            cycles = cyclesList.get(positionOfSelectedCycle);
-
-            totalSetTime = cycles.getTotalSetTime();
-            totalBreakTime = cycles.getTotalBreakTime();
-
-            totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
-            burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-
-            cycleHasActivityAssigned = cycles.getTdeeActivityExists();
-            selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
-            selectedTdeeValuePosition = cycles.getTdeeValuePosition();
-          }
-          if (mode==3) {
-            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-            totalSetTime = pomCycles.getTotalWorkTime();
-            totalBreakTime = pomCycles.getTotalBreakTime();
-            cyclesCompleted = pomCycles.getCyclesCompleted();
-          }
-        }
-        totalCycleSetTimeInMillis = totalSetTime*1000;
-        totalCycleBreakTimeInMillis = totalBreakTime*1000;
-        total_set_time.setText(convertSeconds(totalSetTime));
-        total_break_time.setText(convertSeconds(totalBreakTime));
-        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-      }
-    };
-
-
     queryAndSortAllCyclesFromDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
@@ -1917,34 +1881,67 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    deleteAllCyclesASyncRunnable = new Runnable() {
+    deleteAllCyclesASyncRunnable = () -> {
+      if (mode==1) {
+        if (cyclesList.size()>0) {
+          cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+          cyclesDatabase.cyclesDao().deleteAllCycles();
+          runOnUiThread(()->{
+            //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
+            workoutCyclesArray.clear();
+            typeOfRoundArray.clear();
+            workoutTitleArray.clear();
+            savedCycleAdapter.notifyDataSetChanged();
+          });
+        }
+      }
+      if (mode==3) {
+        if (pomCyclesList.size()>0) {
+          pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+          cyclesDatabase.cyclesDao().deleteAllPomCycles();
+          runOnUiThread(()->{
+            pomArray.clear();
+            pomTitleArray.clear();
+            savedPomCycleAdapter.notifyDataSetChanged();
+          });
+        }
+      }
+      runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
+    };
+
+    retrieveTimeAndCalorieStatsForSingleCycleRunnable = new Runnable() {
       @Override
       public void run() {
-        if (mode==1) {
-          if (cyclesList.size()>0) {
-            cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-            cyclesDatabase.cyclesDao().deleteAllCycles();
-            runOnUiThread(()->{
-              //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-              workoutCyclesArray.clear();
-              typeOfRoundArray.clear();
-              workoutTitleArray.clear();
-              savedCycleAdapter.notifyDataSetChanged();
-            });
+        int totalSetTime = 0;
+        int totalBreakTime = 0;
+        double totalCaloriesBurned = 0;
+        if (!isNewCycle) {
+          if (mode==1) {
+            cycles = cyclesList.get(positionOfSelectedCycle);
+
+            totalSetTime = cycles.getTotalSetTime();
+            totalBreakTime = cycles.getTotalBreakTime();
+
+            totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
+            burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+
+            cycleHasActivityAssigned = cycles.getTdeeActivityExists();
+            selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
+            selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
+            selectedTdeeValuePosition = cycles.getTdeeValuePosition();
+          }
+          if (mode==3) {
+            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+            totalSetTime = pomCycles.getTotalWorkTime();
+            totalBreakTime = pomCycles.getTotalBreakTime();
+            cyclesCompleted = pomCycles.getCyclesCompleted();
           }
         }
-        if (mode==3) {
-          if (pomCyclesList.size()>0) {
-            pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-            cyclesDatabase.cyclesDao().deleteAllPomCycles();
-            runOnUiThread(()->{
-              pomArray.clear();
-              pomTitleArray.clear();
-              savedPomCycleAdapter.notifyDataSetChanged();
-            });
-          }
-        }
-        runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
+        totalCycleSetTimeInMillis = totalSetTime*1000;
+        totalCycleBreakTimeInMillis = totalBreakTime*1000;
+        total_set_time.setText(convertSeconds(totalSetTime));
+        total_break_time.setText(convertSeconds(totalBreakTime));
+        cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
       }
     };
 
@@ -1970,6 +1967,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutString = friendlyString(workoutString);
           roundTypeString = gson.toJson(typeOfRound);
           roundTypeString = friendlyString(roundTypeString);
+
+          if (cycleHasActivityAssigned) {
+            cycles.setTdeeActivityExists(true);
+            cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
+            cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
+            cycles.setTdeeValuePosition(selectedTdeeValuePosition);
+          } else {
+            cycles.setTdeeActivityExists(false);
+            cycles.setTdeeCatPosition(0);
+            cycles.setTdeeValuePosition(0);
+          }
           //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
           if (!workoutString.equals("")) {
             //Adding and inserting into database.
@@ -1984,16 +1992,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               cycles.setTotalBreakTime(0);
               cycles.setCyclesCompleted(0);
               cycles.setTitle(cycleTitle);
-
-              if (cycleHasActivityAssigned) {
-                cycles.setTdeeActivityExists(true);
-                cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
-                cycles.setTdeeValuePosition(selectedTdeeValuePosition);
-              } else {
-                cycles.setTdeeActivityExists(false);
-                cycles.setTdeeCatPosition(0);
-                cycles.setTdeeValuePosition(0);
-              }
 
               cyclesDatabase.cyclesDao().insertCycle(cycles);
               editCycleArrayLists(ADDING_CYCLE);
@@ -2035,8 +2033,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setDefaultSettings() {
     retrieveUserStats();
-    tdeeCategorySpinnerTouchActions();
-    tdeeSubCategorySpinnerTouchActions();
+//    tdeeCategorySpinnerTouchActions();
+//    tdeeSubCategorySpinnerTouchActions();
     setTdeeSpinnersToRetrievedDatabaseValues();
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
@@ -3649,6 +3647,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable());
       }
     };
+
+
   }
 
   //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
@@ -4271,7 +4271,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void displayTotalTdeeStatsInTextView() {
-    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,tdeeActivitySelectedString(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
+    actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,getTdeeActivityStringFromDatabasePositionOnSubCategorySpinner(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
   }
 
   //Defaults to 0 index for both.
@@ -4285,32 +4285,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
   }
 
-  private String tdeeActivitySelectedString() {
-    return (String) tdee_sub_category_spinner.getSelectedItem();
+  private String getTdeeActivityStringFromDatabasePositionOnSubCategorySpinner() {
+    return (String) tdee_sub_category_spinner.getItemAtPosition(selectedTdeeSubCategoryPosition);
+  }
+
+  //Sub Category list and MET score lists in retrieveMetScoreFromSubCategoryPosition() both correspond to saved Category position (e.g. Cycling -> (List of Cycling Activity) + (List of their MET scores).
+  private void setTdeeSubCategorySpinnerListFromRetrievedDatabaseValues() {
+    tdeeSubCategoryAdapter.clear();
+    tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
+  }
+
+  private double retrieveMetScoreFromSubCategoryPosition() {
+    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
+    double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
+    return Math.round(preRoundedMet);
   }
 
   private void tdeeCategorySpinnerTouchActions() {
-    int selectedPosition = tdee_category_spinner.getSelectedItemPosition();
+    selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
     tdeeSubCategoryAdapter.clear();
-    tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedPosition));
-    tdee_sub_category_spinner.setSelection(0);
+    tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
 
-    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedPosition);
-    double preRoundedMet = Double.parseDouble(valueArray[0]);
-    metScore = Math.round(preRoundedMet);
-    metScoreTextView.setText(getString(R.string.met_score, valueArray[0]));
+    //0 Used because new category selection will default to first entry in sub category
+    metScore = retrieveMetScoreFromSubCategoryPosition();
+    metScoreTextView.setText(getString(R.string.met_score, metScore));
   }
 
   private void tdeeSubCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
-    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
 
     //Values array corresponds to sub category array.
     selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
     selectedTdeeValuePosition = selectedTdeeCategoryPosition;
 
-    double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
-    metScore = Math.round(preRoundedMet);
-    metScoreTextView.setText(getString(R.string.met_score, valueArray[selectedTdeeSubCategoryPosition]));
+    metScore = retrieveMetScoreFromSubCategoryPosition();
+    metScoreTextView.setText(getString(R.string.met_score, metScore));
   }
 }

@@ -21,6 +21,7 @@ public class Cycles {
 
     public boolean tdeeActivityExists;
     public int tdeeCatPosition;
+    public int tdeeSubCatPosition;
     public int tdeeValuePosition;
 
     public long totalTdeeActivityTimeElapsed;
@@ -127,6 +128,14 @@ public class Cycles {
 
     public void setTdeeCatPosition(int tdeeCatPosition) {
         this.tdeeCatPosition = tdeeCatPosition;
+    }
+
+    public int getTdeeSubCatPosition() {
+        return tdeeSubCatPosition;
+    }
+
+    public void setTdeeSubCatPosition(int tdeeSubCatPosition) {
+        this.tdeeSubCatPosition = tdeeSubCatPosition;
     }
 
     public int getTdeeValuePosition() {
