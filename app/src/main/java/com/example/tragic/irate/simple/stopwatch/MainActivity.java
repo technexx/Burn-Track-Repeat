@@ -1992,9 +1992,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setDefaultSettings() {
     retrieveUserStats();
-//    tdeeCategorySpinnerTouchActions();
-//    tdeeSubCategorySpinnerTouchActions();
-    setTdeeSpinnersToRetrievedDatabaseValues();
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -3119,6 +3116,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Database saves seem fine (if app is restarted, saves line up). The retrieval within is b0rked tho.
   public void launchTimerCycle(boolean saveToDB) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
@@ -3151,6 +3149,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
+  //Todo: This b0rks total times on resetting timer.
   private void testRun() {
     AsyncTask.execute(new Runnable() {
       @Override
@@ -4232,7 +4231,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testRun", "value position is " + selectedTdeeValuePosition);
   }
 
-  //Todo: This is launched in populateTimerUI, but is not updated right away when new activity/cycle is set.
   private void displayTotalTdeeStatsInTextView() {
     if (cycleHasActivityAssigned) {
       actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats,getTdeeActivityStringFromSavedArrayPosition(), totalTdeeTimeElapsedString(), totalTdeeCaloriesString()));
@@ -4291,16 +4289,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return calculateCaloriesBurnedPerMinute(metScore) / 60;
   }
 
-  //Todo: Diff. layouts w/ presence/absence of activity?
   private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
     return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
-  }
-
-  //Todo: Does nothing if set at app launch since spinners do not have lists attached. Should be kept as a method and set when editing an existing cycle.
-  //Defaults to 0 index for both.
-  private void setTdeeSpinnersToRetrievedDatabaseValues() {
-    tdee_category_spinner.setSelection(selectedTdeeCategoryPosition);
-    tdee_sub_category_spinner.setSelection(selectedTdeeValuePosition);
   }
 
   private void setTdeeActivityTimeAndCaloriesBurnedFromDatabaseValues() {
