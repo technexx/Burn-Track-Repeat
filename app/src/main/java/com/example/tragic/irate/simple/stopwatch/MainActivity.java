@@ -1782,6 +1782,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
         if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
+            retrieveTdeeTimeAndCalorieStatsForSingleCycle();
+          }
+        });
       }
     };
 
