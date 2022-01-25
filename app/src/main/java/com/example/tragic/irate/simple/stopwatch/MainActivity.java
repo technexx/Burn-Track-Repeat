@@ -1782,8 +1782,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
         if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-        runOnUiThread(retrieveTotalSetAndBreakAndCycleValuesRunnableAndSetTheirTextViews());
-        runOnUiThread(retrieveTdeeTimeAndCalorieStatsForSingleCycleRunnable());
       }
     };
 
@@ -3153,6 +3151,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
+  private void testRun() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+        if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
+            retrieveTdeeTimeAndCalorieStatsForSingleCycle();
+            timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+          }
+        });
+      }
+    });
+  }
+
   public void instantiateAndStartObjectAnimator(long duration) {
     if (mode==1) {
       objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
@@ -3434,33 +3450,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     beginTimerForNextRound = true;
   }
 
-  private Runnable retrieveTotalSetAndBreakAndCycleValuesRunnableAndSetTheirTextViews() {
-      return new Runnable() {
-        @Override
-        public void run() {
-          int totalSetTime = 0;
-          int totalBreakTime = 0;
+  private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
+    int totalSetTime = 0;
+    int totalBreakTime = 0;
 
-          if (mode==1) {
-            cycles = cyclesList.get(positionOfSelectedCycle);
-            totalSetTime = cycles.getTotalSetTime();
-            totalBreakTime = cycles.getTotalBreakTime();
-          }
+    if (mode==1) {
+      cycles = cyclesList.get(positionOfSelectedCycle);
+      totalSetTime = cycles.getTotalSetTime();
+      totalBreakTime = cycles.getTotalBreakTime();
+    }
 
-          if (mode==3) {
-            pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-            totalSetTime = pomCycles.getTotalWorkTime();
-            totalBreakTime = pomCycles.getTotalBreakTime();
-            cyclesCompleted = pomCycles.getCyclesCompleted();
-          }
+    if (mode==3) {
+      pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+      totalSetTime = pomCycles.getTotalWorkTime();
+      totalBreakTime = pomCycles.getTotalBreakTime();
+      cyclesCompleted = pomCycles.getCyclesCompleted();
+    }
 
-          totalCycleSetTimeInMillis = totalSetTime*1000;
-          totalCycleBreakTimeInMillis = totalBreakTime*1000;
-          total_set_time.setText(convertSeconds(totalSetTime));
-          total_break_time.setText(convertSeconds(totalBreakTime));
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-        }
-      };
+    totalCycleSetTimeInMillis = totalSetTime*1000;
+    totalCycleBreakTimeInMillis = totalBreakTime*1000;
+    total_set_time.setText(convertSeconds(totalSetTime));
+    total_break_time.setText(convertSeconds(totalBreakTime));
+    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
     }
 
   private void updateTotalTimeValuesEachTick() {
@@ -4203,28 +4214,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private Runnable retrieveTdeeTimeAndCalorieStatsForSingleCycleRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        cycles = cyclesList.get(positionOfSelectedCycle);
+  private void retrieveTdeeTimeAndCalorieStatsForSingleCycle() {
+    cycles = cyclesList.get(positionOfSelectedCycle);
 
-        double totalCaloriesBurned = 0;
+    double totalCaloriesBurned = 0;
 
-        totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
-        burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+    totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
+    burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
 
-        cycleHasActivityAssigned = cycles.getTdeeActivityExists();
-        selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
-        selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
-        selectedTdeeValuePosition = cycles.getTdeeValuePosition();
+    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
+    selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
+    selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
+    selectedTdeeValuePosition = cycles.getTdeeValuePosition();
 
-        Log.i("testRun", "cat position is " + selectedTdeeCategoryPosition);
-        Log.i("testRun", "sub cat position is " + selectedTdeeSubCategoryPosition);
-        Log.i("testRun", "value position is " + selectedTdeeValuePosition);
-
-      }
-    };
+    Log.i("testRun", "cat position is " + selectedTdeeCategoryPosition);
+    Log.i("testRun", "sub cat position is " + selectedTdeeSubCategoryPosition);
+    Log.i("testRun", "value position is " + selectedTdeeValuePosition);
   }
 
   //Todo: This is launched in populateTimerUI, but is not updated right away when new activity/cycle is set.
