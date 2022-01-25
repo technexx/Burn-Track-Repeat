@@ -2476,9 +2476,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       }
       resetTimer();
-      roundedValueForTotalTimes = 0;
-      addAndRoundDownTotalCycleTimes();
-      addAndRoundDownTdeeTimeAndTotalCalories();
       AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
     }
   }
@@ -3420,7 +3417,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       tdeeActivityTimeDurationPlaceHolder = 0;
     }
     if (mode==3) {
-
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
           total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
