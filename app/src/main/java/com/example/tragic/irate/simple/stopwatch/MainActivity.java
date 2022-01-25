@@ -370,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable saveTotalTimesAndCaloriesInDatabaseRunnable;
   Runnable saveTotalTimesOnPostDelayRunnableInASyncThread;
 
-  Runnable queryDatabaseCycleListRunnable;
+  Runnable queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable;
   Runnable queryAndSortAllCyclesFromDatabaseRunnable;
   Runnable deleteTotalCycleTimesASyncRunnable;
   Runnable deleteHighlightedCyclesASyncRunnable;
@@ -1777,7 +1777,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    queryDatabaseCycleListRunnable = new Runnable() {
+    queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable = new Runnable() {
       @Override
       public void run() {
         if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
@@ -1800,10 +1800,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (!timerIsPaused) {
           mHandler.postDelayed(saveTotalTimesOnPostDelayRunnableInASyncThread(), 5000);
-          Log.i("testcall", "On delay going!");
         } else {
           mHandler.removeCallbacks(saveTotalTimesOnPostDelayRunnableInASyncThread());
-          Log.i("testcall", "Callback removed!!");
         }
       }
     };
@@ -1812,7 +1810,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
-        Log.i("testcall", "Callback initiated!");
       }
     };
 
@@ -3164,8 +3161,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedPomCycleAdapter.notifyDataSetChanged();
     }
 
-    if (isNewCycle || saveToDB) AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable);
-    AsyncTask.execute(queryDatabaseCycleListRunnable);
+    if (isNewCycle || saveToDB) {
+      AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable);
+    }
+    if (!isNewCycle) {
+      AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable);
+    }
 
     //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
