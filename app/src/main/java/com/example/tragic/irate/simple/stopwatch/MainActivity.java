@@ -3602,6 +3602,59 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
   }
 
+  private void resetTotalTimesAndCaloriesForModeOne(int typeOfRound) {
+    if (resettingTotalTime) {
+      switch (typeOfRound) {
+        case 1:
+          roundedValueForTotalTimes = 1000 - (setMillis%1000);
+          timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
+          if (cycleHasActivityAssigned) {
+            long roundedValueForTdeeTime = 1000 - (setMillis%1000);
+            tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
+          }
+          break;
+        case 2:
+          long remainder = setMillis%1000;
+          timerDurationPlaceHolder = setMillis - remainder;
+          if (cycleHasActivityAssigned) {
+            remainder = setMillis%1000;
+            tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
+          }
+          break;
+        case 3:
+          roundedValueForTotalTimes = 1000 - (breakMillis%1000);
+          timerDurationPlaceHolder = breakMillis + roundedValueForTotalTimes;
+          break;
+        case 4:
+          remainder = breakMillis%1000;
+          timerDurationPlaceHolder = breakMillis - remainder;
+          break;
+      }
+      resettingTotalTime = false;
+    }
+  }
+
+  private void resetTotalTimesForModeThree() {
+    if (resettingTotalTime) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          if (resettingTotalTime) {
+            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
+            resettingTotalTime = false;
+          }
+          break;
+        case 1: case 3: case 5: case 7:
+          if (resettingTotalTime) {
+            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
+            resettingTotalTime = false;
+          }
+          break;
+      }
+    }
+  }
+
   private void updateTotalTimeValuesEachTick() {
     String addedTimeString = "";
     String addedTdeeTimeString = "";
@@ -3609,15 +3662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (setMillis%1000);
-            timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
-            if (cycleHasActivityAssigned) {
-              long roundedValueForTdeeTime = 1000 - (setMillis%1000);
-              tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
-            }
-            resettingTotalTime = false;
-          }
+          resetTotalTimesAndCaloriesForModeOne(1);
 
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
           addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
@@ -3628,6 +3673,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             long addedTdeeTime = ((totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000);
             addedTdeeTimeString = convertSeconds(addedTdeeTime);
 
+            //Todo: Methods for these and add to case 2 below.
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerMinute(metScore)/60;
             burnedCaloriesInAllLoadingsOfCycle = caloriesBurnedPerSecond*addedTdeeTime;
 
@@ -3638,15 +3684,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           break;
         case 2:
-          if (resettingTotalTime) {
-            remainder = setMillis%1000;
-            timerDurationPlaceHolder = setMillis - remainder;
-            if (cycleHasActivityAssigned) {
-              remainder = setMillis%1000;
-              tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
-            }
-            resettingTotalTime = false;
-          }
+          resetTotalTimesAndCaloriesForModeOne(2);
 
           //Placeholder set to 0 on nextRound(). In non-infinity, it gets replaced by round millis value.
           //Placeholder is necessary for resetting total times while setMillis is being used mid-round.
@@ -3658,22 +3696,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           total_set_time.setText(addedTimeString);
           break;
         case 3:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (breakMillis%1000);
-            timerDurationPlaceHolder = breakMillis + roundedValueForTotalTimes;
-            resettingTotalTime = false;
-          }
+          resetTotalTimesAndCaloriesForModeOne(3);
 
           cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
           addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTimeString);
           break;
         case 4:
-          if (resettingTotalTime) {
-            remainder = setMillis%1000;
-            timerDurationPlaceHolder = setMillis - remainder;
-            resettingTotalTime = false;
-          }
+          resetTotalTimesAndCaloriesForModeOne(4);
 
           cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolder;
           addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
@@ -3683,23 +3713,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode==3) {
+      resetTotalTimesForModeThree();
+
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
-            resettingTotalTime = false;
-          }
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
           addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
           total_set_time.setText(addedTimeString);
           break;
         case 1: case 3: case 5: case 7:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
-            resettingTotalTime = false;
-          }
           cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
           addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
           total_break_time.setText(addedTimeString);
