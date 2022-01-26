@@ -2790,6 +2790,128 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
+  private void animateEnding() {
+    endAnimation = new AlphaAnimation(1.0f, 0.0f);
+    endAnimation.setDuration(300);
+    endAnimation.setStartOffset(0);
+    endAnimation.setRepeatMode(Animation.REVERSE);
+    endAnimation.setRepeatCount(Animation.INFINITE);
+    progressBar.startAnimation(endAnimation);
+    timeLeft.startAnimation(endAnimation);
+  }
+
+  //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
+  public void setInitialTextSizeForRounds(long millis) {
+    if (millis>59000) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+        timeLeft.setTextSize(70f);
+      } else {
+        timeLeft.setTextSize(90f);
+      }
+      textSizeIncreased = false;
+    } else {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+        timeLeft.setTextSize(90f);
+      } else {
+        timeLeft.setTextSize(120f);
+      }
+      if (mode==4) textSizeIncreased = false;
+    }
+  }
+
+  public boolean checkIfRunningTextSizeChange(long startingMillis) {
+    if (mode==1) {
+      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
+        if (startingMillis>=60000) return true; else return false;
+      } else {
+        if (startingMillis<=59000) return true; else return false;
+      }
+    } else if (mode==3) {
+      if (startingMillis>=60000) return true; else return false;
+    } else {
+      return false;
+    }
+  }
+
+  public void changeTextSizeWithAnimator(ValueAnimator va, TextView textView) {
+    changeValueAnimatorNumbers();
+    sizeAnimator = va;
+    sizeAnimator.addUpdateListener(animation -> {
+      float sizeChange = (float) va.getAnimatedValue();
+      textView.setTextSize(sizeChange);
+    });
+    sizeAnimator.setRepeatCount(0);
+    sizeAnimator.start();
+  }
+
+  public void changeValueAnimatorNumbers() {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      valueAnimatorDown.setFloatValues(90f, 70f);
+      valueAnimatorUp.setFloatValues(70f, 90f);
+    } else {
+      valueAnimatorDown.setFloatValues(120f, 90f);
+      valueAnimatorUp.setFloatValues(90f, 120f);
+    }
+  }
+
+  public void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (sizeIncrease) {
+        timeLeft.setTextSize(90f);
+      } else {
+        timeLeft.setTextSize(70f);
+      }
+    } else {
+      if (sizeIncrease) {
+        timeLeft.setTextSize(120f);
+      } else {
+        timeLeft.setTextSize(90f);
+      }
+    }
+  }
+
+  public void newLap() {
+    if (lapAdapter.getItemCount()>98) {
+      return;
+    }
+    if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
+
+    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
+
+    if (savedLapList.size()>0) {
+      String retrievedLap = savedLapList.get(savedLapList.size()-1);
+      String[] splitLap = retrievedLap.split(":");
+      int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
+      int convertedMinute = pulledMinute * 60 * 1000;
+      int convertedSecond = Integer.parseInt(splitLap[1]) * 1000;
+      int convertedMs = Integer.parseInt(splitLap[2]) * 10;
+
+      int totalMs = convertedMinute + convertedSecond + convertedMs;
+
+      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
+
+      int newMinutes = (totalNewTime/1000) / 60;
+      int newSeconds = (totalNewTime/1000) % 60;
+      double newMS = ((double) totalNewTime%1000) / 10;
+
+      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
+    } else {
+      newEntries = savedEntries;
+    }
+
+    currentLapList.add(newEntries);
+    savedLapList.add(savedEntries);
+    lapLayout.scrollToPosition(savedLapList.size() - 1);
+
+    lapAdapter.notifyDataSetChanged();
+
+    lapsNumber++;
+    cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
+
+    lapAdapter.resetLapAnimation();
+  }
+
   public void adjustCustom(boolean adding) {
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
@@ -3141,7 +3263,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Database saves seem fine (if app is restarted, saves line up). The retrieval within is b0rked tho.
   public void launchTimerCycle(boolean saveToDB) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
@@ -3491,6 +3612,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (resettingTotalTime) {
             roundedValueForTotalTimes = 1000 - (setMillis%1000);
             timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
+            if (cycleHasActivityAssigned) {
+              long roundedValueForTdeeTime = 1000 - (setMillis%1000);
+              tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
+            }
             resettingTotalTime = false;
           }
 
@@ -3505,6 +3630,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (resettingTotalTime) {
             remainder = setMillis%1000;
             timerDurationPlaceHolder = setMillis - remainder;
+            if (cycleHasActivityAssigned) {
+              remainder = setMillis%1000;
+              tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
+            }
             resettingTotalTime = false;
           }
 
@@ -3646,128 +3775,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       Log.i("testRun", "tdee time saved is " + tdeeTimeToSave);
       Log.i("testRun", "calories saved is " + caloriesBurnedToSave);
     }
-  }
-
-  //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
-  private void animateEnding() {
-    endAnimation = new AlphaAnimation(1.0f, 0.0f);
-    endAnimation.setDuration(300);
-    endAnimation.setStartOffset(0);
-    endAnimation.setRepeatMode(Animation.REVERSE);
-    endAnimation.setRepeatCount(Animation.INFINITE);
-    progressBar.startAnimation(endAnimation);
-    timeLeft.startAnimation(endAnimation);
-  }
-
-  //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
-  public void setInitialTextSizeForRounds(long millis) {
-    if (millis>59000) {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        timeLeft.setTextSize(70f);
-      } else {
-        timeLeft.setTextSize(90f);
-      }
-      textSizeIncreased = false;
-    } else {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        timeLeft.setTextSize(90f);
-      } else {
-        timeLeft.setTextSize(120f);
-      }
-      if (mode==4) textSizeIncreased = false;
-    }
-  }
-
-  public boolean checkIfRunningTextSizeChange(long startingMillis) {
-    if (mode==1) {
-      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
-        if (startingMillis>=60000) return true; else return false;
-      } else {
-        if (startingMillis<=59000) return true; else return false;
-      }
-    } else if (mode==3) {
-      if (startingMillis>=60000) return true; else return false;
-    } else {
-      return false;
-    }
-  }
-
-  public void changeTextSizeWithAnimator(ValueAnimator va, TextView textView) {
-    changeValueAnimatorNumbers();
-    sizeAnimator = va;
-    sizeAnimator.addUpdateListener(animation -> {
-      float sizeChange = (float) va.getAnimatedValue();
-      textView.setTextSize(sizeChange);
-    });
-    sizeAnimator.setRepeatCount(0);
-    sizeAnimator.start();
-  }
-
-  public void changeValueAnimatorNumbers() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-      valueAnimatorDown.setFloatValues(90f, 70f);
-      valueAnimatorUp.setFloatValues(70f, 90f);
-    } else {
-      valueAnimatorDown.setFloatValues(120f, 90f);
-      valueAnimatorUp.setFloatValues(90f, 120f);
-    }
-  }
-
-  public void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-      if (sizeIncrease) {
-        timeLeft.setTextSize(90f);
-      } else {
-        timeLeft.setTextSize(70f);
-      }
-    } else {
-      if (sizeIncrease) {
-        timeLeft.setTextSize(120f);
-      } else {
-        timeLeft.setTextSize(90f);
-      }
-    }
-  }
-
-  public void newLap() {
-    if (lapAdapter.getItemCount()>98) {
-      return;
-    }
-    if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
-
-    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
-
-    if (savedLapList.size()>0) {
-      String retrievedLap = savedLapList.get(savedLapList.size()-1);
-      String[] splitLap = retrievedLap.split(":");
-      int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
-      int convertedMinute = pulledMinute * 60 * 1000;
-      int convertedSecond = Integer.parseInt(splitLap[1]) * 1000;
-      int convertedMs = Integer.parseInt(splitLap[2]) * 10;
-
-      int totalMs = convertedMinute + convertedSecond + convertedMs;
-
-      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
-
-      int newMinutes = (totalNewTime/1000) / 60;
-      int newSeconds = (totalNewTime/1000) % 60;
-      double newMS = ((double) totalNewTime%1000) / 10;
-
-      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
-    } else {
-      newEntries = savedEntries;
-    }
-
-    currentLapList.add(newEntries);
-    savedLapList.add(savedEntries);
-    lapLayout.scrollToPosition(savedLapList.size() - 1);
-
-    lapAdapter.notifyDataSetChanged();
-
-    lapsNumber++;
-    cycles_completed.setText(getString(R.string.laps_completed, String.valueOf(lapsNumber)));
-
-    lapAdapter.resetLapAnimation();
   }
 
   public void pauseAndResumeTimer(int pausing) {
@@ -4256,6 +4263,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return roundedCalories;
   }
 
+  //Todo: Right here.
   private long singleInstanceTdeeTimeElapsedLongValue() {
     if (typeOfRound.get(currentRound)==1) {
       singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
