@@ -1957,6 +1957,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
             cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
             cycles.setTdeeValuePosition(selectedTdeeValuePosition);
+
+            Log.i("testSave", "saved cat is " + selectedTdeeCategoryPosition);
+            Log.i("testSave", "saved sub cat is " + selectedTdeeSubCategoryPosition);
           } else {
             cycles.setTdeeActivityExists(false);
             cycles.setTdeeCatPosition(0);
@@ -3625,7 +3628,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             long addedTdeeTime = ((totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000);
             addedTdeeTimeString = convertSeconds(addedTdeeTime);
 
-            //Todo: Category positions return 0 for metScore, so it displays wrong MET.
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerMinute(metScore)/60;
             burnedCaloriesInAllLoadingsOfCycle = caloriesBurnedPerSecond*addedTdeeTime;
 
@@ -3733,10 +3735,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
       totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
       burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
-
-      //Todo: This is adding w/ negative singleInstance var.
-      Log.i("testRun", "tdee singleTime var is " + singleInstanceTdeeActivityTime);
-      Log.i("testRun", "tdee totalTime var is " + totalTdeeActivityTime);
     }
   }
 
@@ -3785,11 +3783,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycles.setTotalCaloriesBurned(caloriesBurnedToSave);
 
       cyclesDatabase.cyclesDao().updateCycles(cycles);
-
-//      Log.i("testRun", "tdee singleTime var is " + singleInstanceTdeeActivityTime);
-//      Log.i("testRun", "tdee totalTime var is " + totalTdeeActivityTime);
-//      Log.i("testRun", "tdee time saved is " + tdeeTimeToSave);
-//      Log.i("testRun", "calories saved is " + caloriesBurnedToSave);
     }
   }
 
