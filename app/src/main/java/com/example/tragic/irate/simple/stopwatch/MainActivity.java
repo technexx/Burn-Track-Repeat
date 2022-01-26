@@ -3695,6 +3695,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return stringToReturn;
   }
 
+  private String currentTotalTdeeTimeString(int typeOfRound) {
+    String stringToReturn = "";
+
+    if (cycleHasActivityAssigned) {
+      if (typeOfRound==1) {
+        singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
+      }
+      if (typeOfRound==2) {
+        singleInstanceTdeeActivityTime = setMillis - tdeeActivityTimeDurationPlaceHolder;
+      }
+      stringToReturn = convertSeconds((totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000);
+    }
+    return stringToReturn;
+  }
+
   //Todo: Can further refactor from type of round (in method above, removing switch statement below).
   private void updateTotalTimeValuesEachTick() {
     String addedTdeeTimeString = "";
@@ -3705,12 +3720,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           resetTotalTimesAndCaloriesForModeOne(1);
           total_set_time.setText(currentTotalTimeStringForModeOne(1));
 
+          //Todo: Need either method or local vars for 3 input String concat below.
           if (cycleHasActivityAssigned) {
             singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
             long addedTdeeTime = ((totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000);
             addedTdeeTimeString = convertSeconds(addedTdeeTime);
 
-            //Todo: Methods for these and add to case 2 below.
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerMinute(metScore)/60;
             burnedCaloriesInAllLoadingsOfCycle = caloriesBurnedPerSecond*addedTdeeTime;
 
