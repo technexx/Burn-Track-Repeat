@@ -3600,8 +3600,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void updateTotalTimeValuesEachTick() {
-    String addedTime = "";
-    String addedTdeeTime = "";
+    String addedTimeString = "";
+    String addedTdeeTimeString = "";
     long remainder = 0;
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
@@ -3617,17 +3617,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
-          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
-          total_set_time.setText(addedTime);
+          addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          total_set_time.setText(addedTimeString);
 
           if (cycleHasActivityAssigned) {
             singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
-            addedTdeeTime = convertSeconds((totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000);
+            long addedTdeeTime = ((totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000);
+            addedTdeeTimeString = convertSeconds(addedTdeeTime);
 
-            actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), addedTdeeTime, "Boo"));
+            //Todo: Category positions return 0 for metScore, so it displays wrong MET.
+            double caloriesBurnedPerSecond = calculateCaloriesBurnedPerMinute(metScore)/60;
+            burnedCaloriesInAllLoadingsOfCycle = caloriesBurnedPerSecond*addedTdeeTime;
+
+            Log.i("testCal", "met score is " + metScore);
+            Log.i("testCal", "calories burned are " + caloriesBurnedPerSecond);
+
+            actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), addedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle)));
           }
- ;
-
           break;
         case 2:
           if (resettingTotalTime) {
@@ -3643,11 +3649,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Placeholder set to 0 on nextRound(). In non-infinity, it gets replaced by round millis value.
           //Placeholder is necessary for resetting total times while setMillis is being used mid-round.
           cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
-          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
 
           singleInstanceTdeeActivityTime = setMillis - timerDurationPlaceHolder;
 
-          total_set_time.setText(addedTime);
+          total_set_time.setText(addedTimeString);
           break;
         case 3:
           if (resettingTotalTime) {
@@ -3657,8 +3663,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
-          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
-          total_break_time.setText(addedTime);
+          addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          total_break_time.setText(addedTimeString);
           break;
         case 4:
           if (resettingTotalTime) {
@@ -3668,8 +3674,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolder;
-          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
-          total_break_time.setText(addedTime);
+          addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          total_break_time.setText(addedTimeString);
           break;
       }
     }
@@ -3683,8 +3689,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
           cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-          addedTime = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
-          total_set_time.setText(addedTime);
+          addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          total_set_time.setText(addedTimeString);
           break;
         case 1: case 3: case 5: case 7:
           if (resettingTotalTime) {
@@ -3693,8 +3699,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resettingTotalTime = false;
           }
           cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-          addedTime = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
-          total_break_time.setText(addedTime);
+          addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+          total_break_time.setText(addedTimeString);
           break;
       }
     }
@@ -4245,15 +4251,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
     selectedTdeeValuePosition = cycles.getTdeeValuePosition();
 
-    Log.i("testRun", "tdee time retrieved is " + totalTdeeActivityTime);
-    Log.i("testRun", "total calories retrieved are " + burnedCaloriesInAllLoadingsOfCycle);
-  }
+    metScore = retrieveMetScoreFromSubCategoryPosition();
 
-//  private void displayTotalTdeeStatsInTextView() {
-//    if (cycleHasActivityAssigned) {
-//      actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), totalTdeeTimeElapsedString(), "Boo"));
-//    }
-//  }
+    Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
+    Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
+    Log.i("testRetrieve", "tdee time retrieved is " + totalTdeeActivityTime);
+    Log.i("testRetrieve", "total calories retrieved are " + burnedCaloriesInAllLoadingsOfCycle);
+  }
 
   private String getTdeeActivityStringFromSavedArrayPosition() {
     ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
@@ -4261,34 +4265,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (String) subCategoryList[selectedTdeeSubCategoryPosition];
   }
 
-  private long totalTdeeTimeElapsedLongValue() {
-    return (totalTdeeActivityTime + singleInstanceTdeeActivityTime) / 1000;
+  private String formatCalorieString(double calories) {
+    DecimalFormat df = new DecimalFormat("#.#");
+    return df.format(calories);
   }
 
-//  private String totalTdeeTimeElapsedString() {
-//    return convertSeconds(totalTdeeTimeElapsedLongValue());
-//  }
+  private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
+    return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
+  }
 
-//  private String totalTdeeCaloriesString() {
-//    burnedCaloriesInCurrentLoadingOfCycle = calculateCaloriesBurnedDuringCycle(singleInstanceTdeeTimeElapsedLongValue());
-//    DecimalFormat df = new DecimalFormat("#.#");
-//
-//    String roundedCalories = df.format(burnedCaloriesInAllLoadingsOfCycle + burnedCaloriesInCurrentLoadingOfCycle);
-//    return roundedCalories;
-//  }
-
-//  private long singleInstanceTdeeTimeElapsedLongValue() {
-//    if (typeOfRound.get(currentRound)==1) {
-//      singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
-//    } else {
-//      if (typeOfRound.get(currentRound)==2) {
-//        singleInstanceTdeeActivityTime = setMillis - timerDurationPlaceHolder;
-//      }
-//    }
-//    //Todo: Value is -setMillis in initial textView because that is before setMillis is set.
-//    Log.i("testTime", "single tdee is " + singleInstanceTdeeActivityTime);
-//    return singleInstanceTdeeActivityTime/1000;
-//  }
+  private double calculateCaloriesBurnedPerSecond() {
+    return calculateCaloriesBurnedPerMinute(metScore) / 60;
+  }
 
   private double calculateCaloriesBurnedPerMinute(double metValue) {
     double weightConversion = userWeight;
@@ -4302,14 +4290,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DecimalFormat df = new DecimalFormat("#.#");
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
     caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
-  }
-
-  private double calculateCaloriesBurnedPerSecond() {
-    return calculateCaloriesBurnedPerMinute(metScore) / 60;
-  }
-
-  private double calculateCaloriesBurnedDuringCycle(long elapsedSeconds) {
-    return calculateCaloriesBurnedPerSecond() * elapsedSeconds;
   }
 
   //Sub Category list and MET score lists in retrieveMetScoreFromSubCategoryPosition() both correspond to saved Category position (e.g. Cycling -> (List of Cycling Activity) + (List of their MET scores).
