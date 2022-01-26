@@ -3655,18 +3655,55 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private String currentTotalTimeStringForModeOne(int typeOfRound) {
+    String stringToReturn = "";
+
+    switch (typeOfRound) {
+      case 1:
+        cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
+        stringToReturn = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+        break;
+      case 2:
+        cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
+        stringToReturn = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+        break;
+      case 3:
+        cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
+        stringToReturn = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+        break;
+      case 4:
+        cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolder;
+        stringToReturn = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+        break;
+    }
+    return stringToReturn;
+  }
+
+  private String currentTotalTimeStringForModeThree() {
+    String stringToReturn = "";
+
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
+        stringToReturn = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+        break;
+      case 1: case 3: case 5: case 7:
+        cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
+        stringToReturn = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+        break;
+    }
+    return stringToReturn;
+  }
+
+  //Todo: Can further refactor from type of round (in method above, removing switch statement below).
   private void updateTotalTimeValuesEachTick() {
-    String addedTimeString = "";
     String addedTdeeTimeString = "";
     long remainder = 0;
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1:
           resetTotalTimesAndCaloriesForModeOne(1);
-
-          cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
-          addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
-          total_set_time.setText(addedTimeString);
+          total_set_time.setText(currentTotalTimeStringForModeOne(1));
 
           if (cycleHasActivityAssigned) {
             singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
@@ -3685,29 +3722,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
         case 2:
           resetTotalTimesAndCaloriesForModeOne(2);
-
-          //Placeholder set to 0 on nextRound(). In non-infinity, it gets replaced by round millis value.
-          //Placeholder is necessary for resetting total times while setMillis is being used mid-round.
-          cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
-          addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+          total_set_time.setText(currentTotalTimeStringForModeOne(2));
 
           singleInstanceTdeeActivityTime = setMillis - timerDurationPlaceHolder;
 
-          total_set_time.setText(addedTimeString);
           break;
         case 3:
           resetTotalTimesAndCaloriesForModeOne(3);
-
-          cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
-          addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
-          total_break_time.setText(addedTimeString);
+          total_set_time.setText(currentTotalTimeStringForModeOne(1));
           break;
         case 4:
           resetTotalTimesAndCaloriesForModeOne(4);
-
-          cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolder;
-          addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
-          total_break_time.setText(addedTimeString);
+          total_set_time.setText(currentTotalTimeStringForModeOne(1));
           break;
       }
     }
@@ -3717,14 +3743,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-          addedTimeString = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
-          total_set_time.setText(addedTimeString);
+          total_set_time.setText(currentTotalTimeStringForModeThree());
           break;
         case 1: case 3: case 5: case 7:
-          cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-          addedTimeString = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
-          total_break_time.setText(addedTimeString);
+          total_break_time.setText(currentTotalTimeStringForModeThree());
           break;
       }
     }
