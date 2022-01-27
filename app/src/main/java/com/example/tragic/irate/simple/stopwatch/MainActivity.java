@@ -3641,17 +3641,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (resettingTotalTime) {
             roundedValueForTotalTimes = 1000 - (pomMillis%1000);
             timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
-            resettingTotalTime = false;
           }
           break;
         case 1: case 3: case 5: case 7:
           if (resettingTotalTime) {
             roundedValueForTotalTimes = 1000 - (pomMillis%1000);
             timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
-            resettingTotalTime = false;
           }
           break;
       }
+      resettingTotalTime = false;
     }
   }
 
@@ -3721,12 +3720,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long valueToReturn = 0;
 
     if (typeOfRound.get(currentRound)==1) {
-      valueToReturn = tdeeActivityTimeDurationPlaceHolder - setMillis;
+      singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
+      valueToReturn = singleInstanceTdeeActivityTime;
     }
     if (typeOfRound.get(currentRound)==2) {
-      valueToReturn = setMillis - tdeeActivityTimeDurationPlaceHolder;
+      singleInstanceTdeeActivityTime = setMillis - tdeeActivityTimeDurationPlaceHolder;
+      valueToReturn = singleInstanceTdeeActivityTime;
     }
-
     return valueToReturn;
   }
 
@@ -3734,12 +3734,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long elapstedTdeeTimeInSeconds = currentTotalTdeeTimeLongValue()/1000;
     String elapsedTdeeTimeString = convertSeconds(elapstedTdeeTimeInSeconds);
 
-    Log.i("testTime", "calories are " + burnedCaloriesInAllLoadingsOfCycle);
     burnedCaloriesInAllLoadingsOfCycle = calculateCaloriesBurnedPerSecond() * elapstedTdeeTimeInSeconds;
 
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle));
   }
 
+  //Todo: Tdee stuff resetting on reset of cycle.
   private void updateTotalTimeValuesEachTick() {
     long remainder = 0;
     if (mode==1) {
@@ -3784,6 +3784,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
       totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
       burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
+
+      logTdeeTimeAndCalories();
     }
   }
 
@@ -3956,7 +3958,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomTimerValueInEditPopUpTextViewThree.setText(convertedStringThree);
   }
 
-  public void setDefaultEditRoundViews() {
+  private void setDefaultEditRoundViews() {
     toggleInfinityRounds.setAlpha(0.3f);
     removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     setDefaultTimerValuesAndTheirEditTextViews();
@@ -4051,7 +4053,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void populateTimerUI() {
+  private void populateTimerUI() {
     lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
     cycles_completed.setText(R.string.cycles_done);
@@ -4151,7 +4153,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void resetTimer() {
+  private void resetTimer() {
     activeCycle = false;
     vibrator.cancel();
     dotDraws.resetDotAlpha();
@@ -4349,6 +4351,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     metScoreTextView.setText(getString(R.string.met_score, metScore));
   }
 
+
+
+
   ///////////Test methods///////////////////////////
   private void logTdeeCategoryPositions() {
     Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
@@ -4356,8 +4361,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void logTdeeTimeAndCalories() {
-    Log.i("testRetrieve", "tdee time retrieved is " + totalTdeeActivityTime);
-    Log.i("testRetrieve", "total calories retrieved are " + burnedCaloriesInAllLoadingsOfCycle);
+    Log.i("testTdee", "single time retrieved is " + singleInstanceTdeeActivityTime);
+    //0 in first save before single is added.
+    Log.i("testTdee", "tdee time retrieved is " + totalTdeeActivityTime);
+    Log.i("testTdee", "total calories retrieved are " + burnedCaloriesInAllLoadingsOfCycle);
   }
 
   private void logTdeeArraySizes() {
