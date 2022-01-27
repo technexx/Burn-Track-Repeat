@@ -3654,10 +3654,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private String currentTotalTimeStringForModeOne() {
-    return convertSeconds(iterateAndReturnTotalTimeForModeOne()/1000);
-  }
-
   private long iterateAndReturnTotalTimeForModeOne() {
     long valueToReturn = 0;
 
@@ -3682,6 +3678,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return valueToReturn;
   }
 
+  private String currentTotalTimeStringForModeOne() {
+    return convertSeconds(iterateAndReturnTotalTimeForModeOne()/1000);
+  }
+
   private void displayCurrentTotalTimeStringForModeOne() {
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
@@ -3693,20 +3693,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private String currentTotalTimeStringForModeThree() {
-    String stringToReturn = "";
+  private long iterateAndReturnTotalTimeForModeThree() {
+    long valueToReturn = 0;
 
     switch (pomDotCounter) {
       case 0: case 2: case 4: case 6:
         cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-        stringToReturn = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
+        valueToReturn = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
         break;
       case 1: case 3: case 5: case 7:
         cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-        stringToReturn = convertSeconds((totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis) / 1000);
+        valueToReturn = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
         break;
     }
-    return stringToReturn;
+    return valueToReturn;
+  }
+
+  private String currentTotalTimeStringForModeThree() {
+    return convertSeconds(iterateAndReturnTotalTimeForModeThree()/1000);
   }
 
   private void displayCurrentTotalTimeStringForModeThree() {
