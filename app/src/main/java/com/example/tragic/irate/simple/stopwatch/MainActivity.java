@@ -3725,17 +3725,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private long currentTotalTdeeTimeLongValue() {
-    long valueToReturn = 0;
-
     if (typeOfRound.get(currentRound)==1) {
       singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
-      valueToReturn = singleInstanceTdeeActivityTime;
     }
     if (typeOfRound.get(currentRound)==2) {
       singleInstanceTdeeActivityTime = setMillis - tdeeActivityTimeDurationPlaceHolder;
-      valueToReturn = singleInstanceTdeeActivityTime;
     }
-    return valueToReturn;
+    return (totalTdeeActivityTime + singleInstanceTdeeActivityTime);
   }
 
   private String currentTdeeStatString() {
@@ -3747,18 +3743,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle));
   }
 
-  //Todo: Values correct after reset but displaying as 0.
   private void updateTotalTimeValuesEachTick() {
     long remainder = 0;
     if (mode==1) {
       resetTotalTimesAndCaloriesForModeOne();
       displayCurrentTotalTimeStringForModeOne();
-
       if (cycleHasActivityAssigned) {
         actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
       }
     }
-
     if (mode==3) {
       resetTotalTimesForModeThree();
       displayCurrentTotalTimeStringForModeThree();
@@ -3792,8 +3785,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
       totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
       burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
-
-      logTdeeTimeAndCalories();
     }
   }
 
