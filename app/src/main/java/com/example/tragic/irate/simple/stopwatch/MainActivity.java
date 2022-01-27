@@ -3602,9 +3602,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
   }
 
-  private void resetTotalTimesAndCaloriesForModeOne(int typeOfRound) {
+  private void resetTotalTimesAndCaloriesForModeOne() {
     if (resettingTotalTime) {
-      switch (typeOfRound) {
+      switch (typeOfRound.get(currentRound)) {
         case 1:
           roundedValueForTotalTimes = 1000 - (setMillis%1000);
           timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
@@ -3655,10 +3655,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private String currentTotalTimeStringForModeOne(int typeOfRound) {
+  private String currentTotalTimeStringForModeOne() {
     String stringToReturn = "";
 
-    switch (typeOfRound) {
+    switch (typeOfRound.get(currentRound)) {
       case 1:
         cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
         stringToReturn = convertSeconds((totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis) / 1000);
@@ -3679,6 +3679,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return stringToReturn;
   }
 
+  private void displayCurrentTotalTimeStringForModeOne() {
+    switch (typeOfRound.get(currentRound)) {
+      case 1: case 2:
+        total_set_time.setText(currentTotalTimeStringForModeOne());
+        break;
+      case 3: case 4:
+        total_break_time.setText(currentTotalTimeStringForModeOne());
+        break;
+    }
+  }
+
   private String currentTotalTimeStringForModeThree() {
     String stringToReturn = "";
 
@@ -3695,21 +3706,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return stringToReturn;
   }
 
-  private long currentTotalTdeeTimeLongValue(int typeOfRound) {
+  private void displayCurrentTotalTimeStringForModeThree() {
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        total_set_time.setText(currentTotalTimeStringForModeThree());
+        break;
+      case 1: case 3: case 5: case 7:
+        total_break_time.setText(currentTotalTimeStringForModeThree());
+        break;
+    }
+  }
+
+  private long currentTotalTdeeTimeLongValue() {
     long valueToReturn = 0;
 
-    if (typeOfRound==1) {
+    if (typeOfRound.get(currentRound)==1) {
       valueToReturn = tdeeActivityTimeDurationPlaceHolder - setMillis;
     }
-    if (typeOfRound==2) {
+    if (typeOfRound.get(currentRound)==2) {
       valueToReturn = setMillis - tdeeActivityTimeDurationPlaceHolder;
     }
 
     return valueToReturn;
   }
 
-  private String currentTdeeDisplayString(int typeOfRound) {
-    long elapstedTdeeTimeInSeconds = currentTotalTdeeTimeLongValue(typeOfRound)/1000;
+  private String currentTdeeStatString() {
+    long elapstedTdeeTimeInSeconds = currentTotalTdeeTimeLongValue()/1000;
     String elapsedTdeeTimeString = convertSeconds(elapstedTdeeTimeInSeconds);
 
     Log.i("testTime", "calories are " + burnedCaloriesInAllLoadingsOfCycle);
@@ -3718,49 +3740,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle));
   }
 
-  //Todo: Can further refactor from type of round (in method above, removing switch statement below).
   private void updateTotalTimeValuesEachTick() {
     long remainder = 0;
     if (mode==1) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1:
-          resetTotalTimesAndCaloriesForModeOne(1);
-          total_set_time.setText(currentTotalTimeStringForModeOne(1));
+      resetTotalTimesAndCaloriesForModeOne();
+      displayCurrentTotalTimeStringForModeOne();
 
-          if (cycleHasActivityAssigned) {
-            actvitiyStatsInTimerTextView.setText(currentTdeeDisplayString(1));
-          }
-          break;
-        case 2:
-          resetTotalTimesAndCaloriesForModeOne(2);
-          total_set_time.setText(currentTotalTimeStringForModeOne(2));
-
-          if (cycleHasActivityAssigned) {
-            actvitiyStatsInTimerTextView.setText(currentTdeeDisplayString(2));
-          }
-          break;
-        case 3:
-          resetTotalTimesAndCaloriesForModeOne(3);
-          total_set_time.setText(currentTotalTimeStringForModeOne(3));
-          break;
-        case 4:
-          resetTotalTimesAndCaloriesForModeOne(4);
-          total_set_time.setText(currentTotalTimeStringForModeOne(4));
-          break;
+      if (cycleHasActivityAssigned) {
+        actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
       }
     }
 
     if (mode==3) {
       resetTotalTimesForModeThree();
-
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          total_set_time.setText(currentTotalTimeStringForModeThree());
-          break;
-        case 1: case 3: case 5: case 7:
-          total_break_time.setText(currentTotalTimeStringForModeThree());
-          break;
-      }
+      displayCurrentTotalTimeStringForModeThree();
     }
   }
 
