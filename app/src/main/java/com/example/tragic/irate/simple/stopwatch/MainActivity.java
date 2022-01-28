@@ -90,7 +90,6 @@ import java.util.Locale;
 @SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
-  ConstraintLayout editPopUpLayout;
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
   View tabView;
@@ -736,83 +735,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
 
-    tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
-    screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
-
-    rootSettingsFragment = new RootSettingsFragment();
-    soundSettingsFragment = new SoundSettingsFragment();
-    colorSettingsFragment = new ColorSettingsFragment();
-    tdeeSettingsFragment = new tdeeSettingsFragment();
-
-    settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
-    settingsFragmentFrameLayout.setVisibility(View.GONE);
-
-    rootSettingsFragment.sendSettingsData(MainActivity.this);
-    soundSettingsFragment.soundSetting(MainActivity.this);
-    colorSettingsFragment.colorSetting(MainActivity.this);
-
-    ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-    mediaPlayer = MediaPlayer.create(this, ringToneUri);
-
-    changeSettingsValues = new ChangeSettingsValues();
-
-    getSupportFragmentManager().beginTransaction()
-            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
-            .commit();
+    instantiateGlobalClasses();
+    instantiateFragmentsAndTheirCallbacks();
+    instantiatePopUpViewsAndWindows();
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
 
-    fab = findViewById(R.id.fab);
-    stopwatch = findViewById(R.id.stopwatch_button);
-    emptyCycleList = findViewById(R.id.empty_cycle_list);
-    savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
-    savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
-    blankCanvas = findViewById(R.id.blank_canvas);
+
     blankCanvas.setVisibility(View.GONE);
 
-    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-    calendar = Calendar.getInstance();
-    simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-    simpleDateFormat.format(calendar.getTime());
-
-    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
-    deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
-    sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
-    editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
-    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
-    addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
-
-    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, dpConv(250), dpConv(450), true);
-    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, dpConv(275), dpConv(150), true);
-    sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(500), true);
-    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(400), true);
-
-    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimation);
-    editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-    addTDEEPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-
-    deleteEditPopUpTimerNumbers = editCyclesPopupView.findViewById(R.id.deleteEditPopUpTimerNumbers);
-    number_one = editCyclesPopupView.findViewById(R.id.one_button);
-    number_two = editCyclesPopupView.findViewById(R.id.two_button);
-    number_three = editCyclesPopupView.findViewById(R.id.three_button);
-    number_four = editCyclesPopupView.findViewById(R.id.four_button);
-    number_five = editCyclesPopupView.findViewById(R.id.five_button);
-    number_six = editCyclesPopupView.findViewById(R.id.six_button);
-    number_seven = editCyclesPopupView.findViewById(R.id.seven_button);
-    number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
-    number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
-    number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
     editPopUpTimerArray = new ArrayList<>();
     editPopUpTimerArrayCapped = new ArrayList<>();
     savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>();
@@ -821,27 +755,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>();
     savedEditPopUpArrayForThirdHeader = new ArrayList<>();
 
-    editPopUpLayout = findViewById(R.id.edit_cycle_layout);
 
-    cycleNameText = editCyclesPopupView.findViewById(R.id.cycle_name_text);
-    cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
-    firstRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.firstRoundTypeHeaderInEditPopUp);
-    secondRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.secondRoundTypeHeaderInEditPopUp);
-    thirdRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.thirdRoundTypeHeaderInEditPopUp);
-    timerValueInEditPopUpTextView = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUpTextView);
-    pomTimerValueInEditPopUpTextViewOne = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewOne);
-    pomTimerValueInEditPopUpTextViewTwo = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewTwo);
-    pomTimerValueInEditPopUpTextViewThree = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewThree);
-
-    addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
-    subtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
-    toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
-    buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
-    roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
-
-    addTDEEActivityTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
-    removeTdeeActivityImageView = editCyclesPopupView.findViewById(R.id.cancel_activity_for_cycle);
-    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
     confirmActivityAddition.setText(R.string.okay);
 
     tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
@@ -1053,7 +967,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
 
     setDefaultTimerValuesAndTheirEditTextViews();
-    instantiateNotifications();
     sendPhoneResolutionToDotDrawsClass();
 
     AsyncTask.execute(() -> {
@@ -1976,6 +1889,108 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     };
+  }
+
+  private void assignLayoutClassesToTheirIds() {
+    fab = findViewById(R.id.fab);
+    stopwatch = findViewById(R.id.stopwatch_button);
+    emptyCycleList = findViewById(R.id.empty_cycle_list);
+    savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
+    savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
+    blankCanvas = findViewById(R.id.blank_canvas);
+
+    deleteEditPopUpTimerNumbers = editCyclesPopupView.findViewById(R.id.deleteEditPopUpTimerNumbers);
+    number_one = editCyclesPopupView.findViewById(R.id.one_button);
+    number_two = editCyclesPopupView.findViewById(R.id.two_button);
+    number_three = editCyclesPopupView.findViewById(R.id.three_button);
+    number_four = editCyclesPopupView.findViewById(R.id.four_button);
+    number_five = editCyclesPopupView.findViewById(R.id.five_button);
+    number_six = editCyclesPopupView.findViewById(R.id.six_button);
+    number_seven = editCyclesPopupView.findViewById(R.id.seven_button);
+    number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
+    number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
+    number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
+
+    cycleNameText = editCyclesPopupView.findViewById(R.id.cycle_name_text);
+    cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
+    firstRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.firstRoundTypeHeaderInEditPopUp);
+    secondRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.secondRoundTypeHeaderInEditPopUp);
+    thirdRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.thirdRoundTypeHeaderInEditPopUp);
+    timerValueInEditPopUpTextView = editCyclesPopupView.findViewById(R.id.timerValueInEditPopUpTextView);
+    pomTimerValueInEditPopUpTextViewOne = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewOne);
+    pomTimerValueInEditPopUpTextViewTwo = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewTwo);
+    pomTimerValueInEditPopUpTextViewThree = editCyclesPopupView.findViewById(R.id.pomTimerValueInEditPopUpTextViewThree);
+
+    addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
+    subtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
+    toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
+    buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
+    roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
+
+    addTDEEActivityTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
+    removeTdeeActivityImageView = editCyclesPopupView.findViewById(R.id.cancel_activity_for_cycle);
+    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+
+  }
+
+  private void instantiateGlobalClasses() {
+    changeSettingsValues = new ChangeSettingsValues();
+    tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
+    screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
+
+    ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    mediaPlayer = MediaPlayer.create(this, ringToneUri);
+    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    calendar = Calendar.getInstance();
+    simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+    simpleDateFormat.format(calendar.getTime());
+
+  }
+
+  private void instantiateFragmentsAndTheirCallbacks() {
+    rootSettingsFragment = new RootSettingsFragment();
+    soundSettingsFragment = new SoundSettingsFragment();
+    colorSettingsFragment = new ColorSettingsFragment();
+    tdeeSettingsFragment = new tdeeSettingsFragment();
+
+    rootSettingsFragment.sendSettingsData(MainActivity.this);
+    soundSettingsFragment.soundSetting(MainActivity.this);
+    colorSettingsFragment.colorSetting(MainActivity.this);
+
+    settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
+    settingsFragmentFrameLayout.setVisibility(View.GONE);
+
+    getSupportFragmentManager().beginTransaction()
+            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
+            .commit();
+
+  }
+
+  private void instantiatePopUpViewsAndWindows() {
+    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
+    deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
+    sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
+    editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
+    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
+    addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
+
+    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, dpConv(250), dpConv(450), true);
+    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, dpConv(275), dpConv(150), true);
+    sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(500), true);
+    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+    addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(400), true);
+
+    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimation);
+    editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    addTDEEPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
   }
 
   private void setDefaultSettings() {
