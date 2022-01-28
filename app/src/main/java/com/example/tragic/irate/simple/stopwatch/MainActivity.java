@@ -469,10 +469,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long tdeeActivityTimeDurationPlaceHolder;
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
-//  String totalTdeeTimeElapsedString;
 
-  //Todo: Calories not iterating.
-  //Todo: Tdee time elapsed moving up by round amount following end of cycle + beginning of new cycle.
+  //Todo: Starting new cycle doesn't reset the total time values, so they keep iterating up from last cycle.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
@@ -3264,7 +3262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void launchTimerCycle(boolean saveToDB) {
+  private void launchTimerCycle(boolean saveToDB) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
       return;
@@ -3300,7 +3298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
-  public void instantiateAndStartObjectAnimator(long duration) {
+  private void instantiateAndStartObjectAnimator(long duration) {
     if (mode==1) {
       objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
       objectAnimator.setInterpolator(new LinearInterpolator());
@@ -3316,7 +3314,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Controls each mode's object animator. Starts new or resumes current one.
-  public void startObjectAnimatorAndTotalCycleTimeCounters() {
+  private void startObjectAnimatorAndTotalCycleTimeCounters() {
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
@@ -3363,7 +3361,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void startSetTimer() {
+  private void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
 
@@ -3372,11 +3370,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         setNotificationValues();
 
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        setMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
-        if (setMillis < 500) timerDisabled = true;
-
+        setCountDownTimerTickLogic(millisUntilFinished, setMillis);
         updateTotalTimeValuesEachTick();
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
 
@@ -3390,7 +3384,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  public void startBreakTimer() {
+  private void startBreakTimer() {
     setInitialTextSizeForRounds(breakMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
 
@@ -3399,11 +3393,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         setNotificationValues();
 
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        breakMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
-        if (breakMillis < 500) timerDisabled = true;
-
+        setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
         updateTotalTimeValuesEachTick();
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
 
@@ -3417,7 +3407,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  public void startPomTimer() {
+  private void startPomTimer() {
     setInitialTextSizeForRounds(pomMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
 
@@ -3426,11 +3416,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         setNotificationValues();
 
-        currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
-        pomMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-        if (pomMillis < 500) timerDisabled = true;
 
+        setCountDownTimerTickLogic(millisUntilFinished, pomMillis);
         updateTotalTimeValuesEachTick();
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
 
@@ -3442,6 +3429,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
+  }
+
+  private void setCountDownTimerTickLogic(long classMillisUntilFinishedVariable, long typeOfRoundMillis) {
+    if (mode==1) {
+      currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+      if (typeOfRoundMillis==setMillis) {
+        setMillis = classMillisUntilFinishedVariable;
+      }
+      if (typeOfRoundMillis==breakMillis) {
+        breakMillis = classMillisUntilFinishedVariable;
+      }
+    }
+    if (mode==3) {
+      currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
+      pomMillis = classMillisUntilFinishedVariable;
+    }
+    timeLeft.setText(convertSeconds((typeOfRoundMillis + 999) / 1000));
+    if (typeOfRoundMillis < 500) timerDisabled = true;
   }
 
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
