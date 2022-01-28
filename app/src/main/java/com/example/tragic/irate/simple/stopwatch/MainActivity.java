@@ -1637,6 +1637,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       nextRound(true);
     });
 
+
     reset.setOnClickListener(v -> {
       if (mode != 3) {
         resetTimer();
@@ -2823,12 +2824,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public boolean checkIfRunningTextSizeChange(long startingMillis) {
     if (mode==1) {
       if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
-        if (startingMillis>=60000) return true; else return false;
+        return startingMillis>=60000;
       } else {
-        if (startingMillis<=59000) return true; else return false;
+        return startingMillis<=59000;
       }
     } else if (mode==3) {
-      if (startingMillis>=60000) return true; else return false;
+      return startingMillis>=60000;
     } else {
       return false;
     }
@@ -3374,17 +3375,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
-        updateTotalTimeValuesEachTick();
-
-        if (!textSizeIncreased && mode==1) {
-          if (willWeChangeTextSize) {
-            if (setMillis < 59000) {
-              changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-              textSizeIncreased = true;
-            }
-          }
-        }
         if (setMillis < 500) timerDisabled = true;
+
+        updateTotalTimeValuesEachTick();
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+
         dotDraws.reDraw();
       }
 
@@ -3407,18 +3402,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((millisUntilFinished + 999) / 1000));
-        updateTotalTimeValuesEachTick();
-
-        if (!textSizeIncreased && mode==1) {
-          if (willWeChangeTextSize) {
-            if (breakMillis < 59000) {
-              changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-              textSizeIncreased = true;
-            }
-          }
-        }
-
         if (breakMillis < 500) timerDisabled = true;
+
+        updateTotalTimeValuesEachTick();
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+
         dotDraws.reDraw();
       }
 
@@ -3441,18 +3429,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
-        updateTotalTimeValuesEachTick();
-
-        if (!textSizeIncreased && mode==3) {
-          if (willWeChangeTextSize) {
-            if (pomMillis < 59000) {
-              changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-              textSizeIncreased = true;
-            }
-          }
-        }
-
         if (pomMillis < 500) timerDisabled = true;
+
+        updateTotalTimeValuesEachTick();
+        changeTextSizeOnTimerDigitCountTransitionForModeThree();
+
         dotDraws.reDraw();
       }
 
@@ -3463,7 +3444,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  public void nextRound(boolean endingEarly) {
+  private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
+    if (!textSizeIncreased && mode==1) {
+      if (checkIfRunningTextSizeChange(setOrBreakMillis)) {
+        if (setOrBreakMillis < 59000) {
+          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+          textSizeIncreased = true;
+        }
+      }
+    }
+  }
+
+  private void changeTextSizeOnTimerDigitCountTransitionForModeThree() {
+    if (!textSizeIncreased && mode==3) {
+      if (checkIfRunningTextSizeChange(pomMillis)) {
+        if (pomMillis < 59000) {
+          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+          textSizeIncreased = true;
+        }
+      }
+    }
+  }
+
+  private void nextRound(boolean endingEarly) {
     //Fade effect to smooth out progressBar and timer text after animation.
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
@@ -3827,7 +3830,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void pauseAndResumeTimer(int pausing) {
+  private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
       if (fadeInObj != null) fadeInObj.cancel();
       if (fadeOutObj != null) fadeOutObj.cancel();
@@ -3836,9 +3839,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (!timerEnded) {
             if (pausing == PAUSING_TIMER) {
               timerIsPaused = true;
+              reset.setVisibility(View.VISIBLE);
               if (timer != null) timer.cancel();
               if (objectAnimator != null) objectAnimator.pause();
-              reset.setVisibility(View.VISIBLE);
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
@@ -3858,10 +3861,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
             } else if (pausing == RESUMING_TIMER) {
               //Ensures any non-reset timer lets this be true.
-              if (!activeCycle) activeCycle = true;
-
-              reset.setVisibility(View.INVISIBLE);
+              activeCycle = true;
               timerIsPaused = false;
+              reset.setVisibility(View.INVISIBLE);
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
@@ -4349,7 +4351,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, metScore));
   }
-
 
 
 
