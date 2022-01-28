@@ -121,6 +121,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View roundListDivider;
   SavedCycleAdapter savedCycleAdapter;
   SavedPomCycleAdapter savedPomCycleAdapter;
+
+  LinearLayoutManager workoutCyclesRecyclerLayoutManager;
+  LinearLayoutManager roundRecyclerOneLayoutManager;
+  LinearLayoutManager roundRecyclerTwoLayoutManager;
+  LinearLayoutManager pomCyclesRecyclerLayoutManager;
+
   View deleteCyclePopupView;
   View sortCyclePopupView;
   View savedCyclePopupView;
@@ -735,34 +741,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
 
-    instantiateGlobalClasses();
-    instantiateFragmentsAndTheirCallbacks();
-    instantiatePopUpViewsAndWindows();
+    groupAllAppStartInstantiations();
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-
-
-    blankCanvas.setVisibility(View.GONE);
-
-
-    editPopUpTimerArray = new ArrayList<>();
-    editPopUpTimerArrayCapped = new ArrayList<>();
-    savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>();
-    savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>();
-    savedEditPopUpArrayForFirstHeaderModeThree = new ArrayList<>();
-    savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>();
-    savedEditPopUpArrayForThirdHeader = new ArrayList<>();
-
-
-    confirmActivityAddition.setText(R.string.okay);
-
-    tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
-    tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-
-    metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
-    caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
 
     tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -810,60 +793,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleExistenceOfTdeeActivity(false);
     });
 
-    sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
-    sortAlphaEnd = sortCyclePopupView.findViewById(R.id.sort_title_end);
-    sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
-    sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
-    sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
-    sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
-    sortCheckMark = sortCyclePopupView.findViewById(R.id.sortCheckMark);
-
-    delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
-    delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
-    delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_text);
-
     //Custom Action Bar.
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
     getSupportActionBar().setCustomView(R.layout.custom_bar);
 
-    appHeader = findViewById(R.id.app_header);
-    edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
-    delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
-    cancelHighlight = findViewById(R.id.cancel_highlight);
-    sortButton = findViewById(R.id.sortButton);
-    edit_highlighted_cycle.setVisibility(View.INVISIBLE);
-    delete_highlighted_cycle.setVisibility(View.INVISIBLE);
-    cancelHighlight.setVisibility(View.INVISIBLE);
-    cycleNameText.setVisibility(View.INVISIBLE);
-
-    workoutTime = new ArrayList<>();
-    convertedWorkoutTime = new ArrayList<>();
-    workoutTitle = new ArrayList<>();
-    workoutCyclesArray = new ArrayList<>();
-    typeOfRound = new ArrayList<>();
-    typeOfRoundArray = new ArrayList<>();
-
-    roundHolderOne = new ArrayList<>();
-    roundHolderTwo = new ArrayList<>();
-    typeHolderOne = new ArrayList<>();
-    typeHolderTwo = new ArrayList<>();
-
-    pomValuesTime = new ArrayList<>();
-    convertedPomList = new ArrayList<>();
-    pomArray = new ArrayList<>();
-    workoutTitleArray = new ArrayList<>();
-    pomTitleArray = new ArrayList<>();
-    //If highlighting cycles for deletion, contains all POSITIONS (not IDs) of cycles highlighted.
-    receivedHighlightPositions = new ArrayList<>();
-    receivedHighlightPositionHolder = new ArrayList<>();
-    //Database entity lists.
-    cyclesList = new ArrayList<>();
-    pomCyclesList = new ArrayList<>();
-    cycles = new Cycles();
-    pomCycles = new PomCycles();
-
-    mHandler = new Handler();
     inputMethodManager =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
@@ -871,7 +805,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
 
-    timerValueInEditPopUpTextView.setText("00:00");
 
     sortHolder = sortMode;
     int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
@@ -884,69 +817,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
 
-    mHandler = new Handler();
-
     valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
     valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
     valueAnimatorDown.setDuration(2000);
     valueAnimatorUp.setDuration(2000);
 
-    customSetTime = new ArrayList<>();
-    customBreakTime = new ArrayList<>();
-    breaksOnlyTime = new ArrayList<>();
-    currentLapList = new ArrayList<>();
-    savedLapList = new ArrayList<>();
-
-    zeroArraySets = new ArrayList<>();
-    zeroArrayBreaks = new ArrayList<>();
-    setsArray = new ArrayList<>();
-    breaksArray = new ArrayList<>();
-    breaksOnlyArray = new ArrayList<>();
-    pomArray = new ArrayList<>();
-
-    dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
-    lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
-    reset = timerPopUpView.findViewById(R.id.reset);
-    reset.setVisibility(View.INVISIBLE);
-    cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
-
-    cycles_completed = timerPopUpView.findViewById(R.id.cycles_completed);
-    next_round = timerPopUpView.findViewById(R.id.next_round);
-    new_lap = timerPopUpView.findViewById(R.id.new_lap);
-    total_set_header = timerPopUpView.findViewById(R.id.total_set_header);
-    total_break_header = timerPopUpView.findViewById(R.id.total_break_header);
-    total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
-    total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
-    actvitiyStatsInTimerTextView = timerPopUpView.findViewById(R.id.activity_stats_in_timer_textView);
-    total_set_header.setText(R.string.total_sets);
-    total_break_header.setText(R.string.total_breaks);
-    total_set_time.setText("0");
-    total_break_time.setText("0");
-
-    progressBar = timerPopUpView.findViewById(R.id.progressBar);
-    stopWatchView = timerPopUpView.findViewById(R.id.stopWatchView);
-    timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
-    msTime = timerPopUpView.findViewById(R.id.msTime);
-    lapRecycler = timerPopUpView.findViewById(R.id.lap_recycler);
-    pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
     pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
     pauseResumeButton.setRippleColor(null);
-    reset_total_times = timerPopUpView.findViewById(R.id.reset_total_times);
-    empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
-    if (mode!=4) empty_laps.setVisibility(View.INVISIBLE);
 
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
     objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
 
     cycle_title_layout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
     completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
-
-    stopWatchView.setVisibility(View.GONE);
-    savedPomCycleRecycler.setVisibility(View.GONE);
-    lapRecycler.setVisibility(View.GONE);
-    new_lap.setVisibility(View.INVISIBLE);
-
-    cycles_completed.setText(R.string.cycles_done);
 
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
     fadeOut = new AlphaAnimation(1.0f, 0.0f);
@@ -960,14 +843,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeProgressIn.setDuration(300);
     fadeProgressOut.setDuration(300);
 
-    //Adapter and Recycler for round views within our editCycles popUp.
-    LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
-    LinearLayoutManager lm2 = new LinearLayoutManager(getApplicationContext());
-    LinearLayoutManager lm3 = new LinearLayoutManager(getApplicationContext());
-    LinearLayoutManager lm4 = new LinearLayoutManager(getApplicationContext());
-
-    setDefaultTimerValuesAndTheirEditTextViews();
-    sendPhoneResolutionToDotDrawsClass();
+    workoutCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
+    roundRecyclerOneLayoutManager = new LinearLayoutManager(getApplicationContext());
+    roundRecyclerTwoLayoutManager = new LinearLayoutManager(getApplicationContext());
+    pomCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
 
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
@@ -981,7 +860,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
         savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
         savedCycleRecycler.setAdapter(savedCycleAdapter);
-        savedCycleRecycler.setLayoutManager(lm);
+        savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
         //Instantiating callbacks from adapter.
         savedCycleAdapter.setItemClick(MainActivity.this);
         savedCycleAdapter.setHighlight(MainActivity.this);
@@ -989,7 +868,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
         savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
-        savedPomCycleRecycler.setLayoutManager(lm4);
+        savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
         //Instantiating callbacks from adapter.
         savedPomCycleAdapter.setItemClick(MainActivity.this);
         savedPomCycleAdapter.setHighlight(MainActivity.this);
@@ -997,32 +876,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         savedCycleAdapter.notifyDataSetChanged();
 
-        setDefaultSettings();
+        setDefaultUserSettings();
         setDefaultEditRoundViews();
         instantiateNotifications();
       });
     });
 
-    //Our two cycle round adapters.
-    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
-    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
-    cycleRoundsAdapter.fadeFinished(MainActivity.this);
-    cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
-    cycleRoundsAdapter.selectedRound(MainActivity.this);
-    cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
-    //Only first adapter is used for Pom mode, so only needs to be set here.
     cycleRoundsAdapter.setMode(mode);
-
-    roundListDivider = editCyclesPopupView.findViewById(R.id.round_list_divider);
-    roundListDivider.setVisibility(View.GONE);
-    roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
-    roundRecycler.setLayoutManager(lm2);
-
-    roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
-    roundRecycler.setAdapter(cycleRoundsAdapter);
-    roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
-    roundRecyclerTwo.setLayoutManager(lm3);
-
     VerticalSpaceItemDecoration verticalSpaceItemDecoration;
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
@@ -1891,7 +1751,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void assignLayoutClassesToTheirIds() {
+  private void groupAllAppStartInstantiations() {
+    instantiateGlobalClasses();
+    instantiateFragmentsAndTheirCallbacks();
+    instantiatePopUpViewsAndWindows();
+
+    assignMainLayoutClassesToIds();
+    assignEditPopUpLayoutClassesToTheirIds();
+    assignTimerPopUpLayoutClassesToTheirIds();
+    assignSortPopUpLayoutClassesToTheirIds();
+    assignDeletePopUpLayoutClassesToTheirIds();
+    assignTdeePopUpLayoutClassesToTheirIds();
+
+    instantiateArrayLists();
+
+    setDefaultLayoutTexts();
+    setDefaultUserSettings();
+
+    setDefaultTimerValuesAndTheirEditTextViews();
+    sendPhoneResolutionToDotDrawsClass();
+    setDefaultLayoutVisibilities();
+
+  }
+
+  private void assignMainLayoutClassesToIds() {
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
@@ -1899,6 +1782,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
     blankCanvas = findViewById(R.id.blank_canvas);
 
+    appHeader = findViewById(R.id.app_header);
+    edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
+    delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
+    cancelHighlight = findViewById(R.id.cancel_highlight);
+    sortButton = findViewById(R.id.sortButton);
+  }
+
+  private void assignEditPopUpLayoutClassesToTheirIds() {
     deleteEditPopUpTimerNumbers = editCyclesPopupView.findViewById(R.id.deleteEditPopUpTimerNumbers);
     number_one = editCyclesPopupView.findViewById(R.id.one_button);
     number_two = editCyclesPopupView.findViewById(R.id.two_button);
@@ -1925,26 +1816,80 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     subtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
     buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
+
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
+    roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
+    roundListDivider = editCyclesPopupView.findViewById(R.id.round_list_divider);
+    roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
 
     addTDEEActivityTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
     removeTdeeActivityImageView = editCyclesPopupView.findViewById(R.id.cancel_activity_for_cycle);
-    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+  }
 
+  private void assignTimerPopUpLayoutClassesToTheirIds() {
+    dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
+    lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
+    reset = timerPopUpView.findViewById(R.id.reset);
+    cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
+
+    cycles_completed = timerPopUpView.findViewById(R.id.cycles_completed);
+    next_round = timerPopUpView.findViewById(R.id.next_round);
+    new_lap = timerPopUpView.findViewById(R.id.new_lap);
+    total_set_header = timerPopUpView.findViewById(R.id.total_set_header);
+    total_break_header = timerPopUpView.findViewById(R.id.total_break_header);
+    total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
+    total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
+    actvitiyStatsInTimerTextView = timerPopUpView.findViewById(R.id.activity_stats_in_timer_textView);
+
+    progressBar = timerPopUpView.findViewById(R.id.progressBar);
+    stopWatchView = timerPopUpView.findViewById(R.id.stopWatchView);
+    timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
+    msTime = timerPopUpView.findViewById(R.id.msTime);
+    lapRecycler = timerPopUpView.findViewById(R.id.lap_recycler);
+    reset_total_times = timerPopUpView.findViewById(R.id.reset_total_times);
+    empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
+    pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
+  }
+
+  private void assignSortPopUpLayoutClassesToTheirIds() {
+    sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
+    sortAlphaEnd = sortCyclePopupView.findViewById(R.id.sort_title_end);
+    sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
+    sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
+    sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
+    sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
+    sortCheckMark = sortCyclePopupView.findViewById(R.id.sortCheckMark);
+  }
+
+  private void assignDeletePopUpLayoutClassesToTheirIds() {
+    delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
+    delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
+    delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_text);
+  }
+
+  private void assignTdeePopUpLayoutClassesToTheirIds() {
+    tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
+    tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
+    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+    metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
+    caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
   }
 
   private void instantiateGlobalClasses() {
     changeSettingsValues = new ChangeSettingsValues();
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
-    screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
+    mHandler = new Handler();
 
+    cycles = new Cycles();
+    pomCycles = new PomCycles();
+
+    mHandler = new Handler();
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     calendar = Calendar.getInstance();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
     simpleDateFormat.format(calendar.getTime());
-
   }
 
   private void instantiateFragmentsAndTheirCallbacks() {
@@ -1964,6 +1909,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
             .commit();
 
+  }
+
+  private void instantiateAdaptersAndTheirCallbacks() {
+    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
+    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
+    cycleRoundsAdapter.fadeFinished(MainActivity.this);
+    cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
+    cycleRoundsAdapter.selectedRound(MainActivity.this);
+    cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
+  }
+
+  private void setRecyclerMethods() {
+    roundRecycler.setLayoutManager(roundRecyclerOneLayoutManager);
+    roundRecycler.setAdapter(cycleRoundsAdapter);
+    roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
+    roundRecyclerTwo.setLayoutManager(roundRecyclerTwoLayoutManager);
   }
 
   private void instantiatePopUpViewsAndWindows() {
@@ -1993,7 +1954,69 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
   }
 
-  private void setDefaultSettings() {
+  private void instantiateArrayLists() {
+    workoutTime = new ArrayList<>();
+    convertedWorkoutTime = new ArrayList<>();
+    workoutTitle = new ArrayList<>();
+    workoutCyclesArray = new ArrayList<>();
+    typeOfRound = new ArrayList<>();
+    typeOfRoundArray = new ArrayList<>();
+    pomArray = new ArrayList<>();
+
+    roundHolderOne = new ArrayList<>();
+    roundHolderTwo = new ArrayList<>();
+    typeHolderOne = new ArrayList<>();
+    typeHolderTwo = new ArrayList<>();
+
+    pomValuesTime = new ArrayList<>();
+    convertedPomList = new ArrayList<>();
+    pomArray = new ArrayList<>();
+    workoutTitleArray = new ArrayList<>();
+    pomTitleArray = new ArrayList<>();
+    receivedHighlightPositions = new ArrayList<>();
+    receivedHighlightPositionHolder = new ArrayList<>();
+    cyclesList = new ArrayList<>();
+    pomCyclesList = new ArrayList<>();
+
+    editPopUpTimerArray = new ArrayList<>();
+    editPopUpTimerArrayCapped = new ArrayList<>();
+    savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>();
+    savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>();
+    savedEditPopUpArrayForFirstHeaderModeThree = new ArrayList<>();
+    savedEditPopUpArrayForSecondHeaderModeThree = new ArrayList<>();
+    savedEditPopUpArrayForThirdHeader = new ArrayList<>();
+  }
+
+  private void setDefaultLayoutVisibilities() {
+    blankCanvas.setVisibility(View.GONE);
+    edit_highlighted_cycle.setVisibility(View.INVISIBLE);
+    delete_highlighted_cycle.setVisibility(View.INVISIBLE);
+    cancelHighlight.setVisibility(View.INVISIBLE);
+    cycleNameText.setVisibility(View.INVISIBLE);
+
+    reset.setVisibility(View.INVISIBLE);
+    empty_laps.setVisibility(View.INVISIBLE);
+
+    stopWatchView.setVisibility(View.GONE);
+    savedPomCycleRecycler.setVisibility(View.GONE);
+    lapRecycler.setVisibility(View.GONE);
+    new_lap.setVisibility(View.INVISIBLE);
+
+    roundListDivider.setVisibility(View.GONE);
+  }
+
+  private void setDefaultLayoutTexts() {
+    confirmActivityAddition.setText(R.string.okay);
+    timerValueInEditPopUpTextView.setText("00:00");
+
+    total_set_header.setText(R.string.total_sets);
+    total_break_header.setText(R.string.total_breaks);
+    total_set_time.setText("0");
+    total_break_time.setText("0");
+    cycles_completed.setText(R.string.cycles_done);
+  }
+
+  private void setDefaultUserSettings() {
     retrieveUserStats();
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
@@ -2037,6 +2060,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws.changeColorSetting(3, workColorNumericValue);
     dotDraws.changeColorSetting(4, miniBreakColorNumericValue);
     dotDraws.changeColorSetting(5, fullBreakColorNumericValue);
+
     cycleRoundsAdapter.changeColorSetting(1, setColorNumericValue);
     cycleRoundsAdapter.changeColorSetting(2, breakColorNumericValue);
     cycleRoundsAdapter.changeColorSetting(3, workColorNumericValue);
@@ -2051,6 +2075,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter.changeColorSetting(3, workColorNumericValue);
     savedPomCycleAdapter.changeColorSetting(4, miniBreakColorNumericValue);
     savedPomCycleAdapter.changeColorSetting(5, fullBreakColorNumericValue);
+  }
+
+  private void retrieveUserStats() {
+    SharedPreferences sp = getApplicationContext().getSharedPreferences("pref", 0);
+    isMetric = sp.getBoolean("isMetric", false);
+    userGender = sp.getString("tdeeGender", "male");
+    userAge = sp.getInt("tdeeAge,", 18);
+    userWeight = sp.getInt("tdeeWeight,", 150);
+    userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
   public void launchGlobalSettings() {
@@ -4280,15 +4313,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private void retrieveUserStats() {
-    SharedPreferences sp = getApplicationContext().getSharedPreferences("pref", 0);
-    isMetric = sp.getBoolean("isMetric", false);
-    userGender = sp.getString("tdeeGender", "male");
-    userAge = sp.getInt("tdeeAge,", 18);
-    userWeight = sp.getInt("tdeeWeight,", 150);
-    userHeight = sp.getInt("tdeeHeight,", 66);
-  }
 
   private void toggleExistenceOfTdeeActivity(boolean activityExists) {
     if (activityExists) {
