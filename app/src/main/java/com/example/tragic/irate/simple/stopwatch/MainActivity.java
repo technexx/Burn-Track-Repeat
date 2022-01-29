@@ -787,7 +787,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onTabUnselected(TabLayout.Tab tab) {
-        instantiateTabSwitchLogic();
+        tabUnselectedLogic();
 
         if (tab.getPosition()==0) {
           if (savedCycleAdapter.isCycleHighlighted()==true) {
@@ -1580,7 +1580,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
     instantiateTabLayouts();
-    instantiateTabSwitchLogic();
 
     assignMainLayoutClassesToIds();
     assignEditPopUpLayoutClassesToTheirIds();
@@ -1664,7 +1663,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
   }
 
-  private void instantiateTabSwitchLogic() {
+  private void tabUnselectedLogic() {
     //since modes use same String, clear it between tab switches.
     cycleTitle = "";
 
@@ -4077,8 +4076,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRounds.setAlpha(0.3f);
     removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     setDefaultTimerValuesAndTheirEditTextViews();
-
-
 
     timeLeft.setText(timeLeftValueHolder);
     setEditPopUpTimerHeaders(1);
