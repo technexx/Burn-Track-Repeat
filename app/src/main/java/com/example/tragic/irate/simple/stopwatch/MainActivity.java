@@ -475,7 +475,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Starting new cycle doesn't reset the total time values, so they keep iterating up from last cycle.
+  //Todo: Refactor override callbacks to methods to clean them up.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
@@ -734,27 +734,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    mainView = findViewById(R.id.main_layout);
-    tabView = findViewById(R.id.tabLayout);
-    actionBarView = findViewById(R.id.custom_action_bar);
+
+    groupAllAppStartInstantiations();
+
 
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
 
-    groupAllAppStartInstantiations();
 
     TabLayout tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-
-    tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
-    tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
-
-    tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout);
-    tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-    tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
 
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
@@ -793,94 +783,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleExistenceOfTdeeActivity(false);
     });
 
-    //Custom Action Bar.
-    getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-    getSupportActionBar().setDisplayShowCustomEnabled(true);
-    getSupportActionBar().setCustomView(R.layout.custom_bar);
-
-    inputMethodManager =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-    sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
-    prefEdit = sharedPreferences.edit();
-
-    sortMode = sharedPreferences.getInt("sortMode", 1);
-    sortModePom = sharedPreferences.getInt("sortModePom", 1);
-
-
-    sortHolder = sortMode;
-    int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
-    sortCheckMark.setY(checkMarkPosition);
-
-    fadeIn = new AlphaAnimation(0.0f, 1.0f);
-    fadeOut = new AlphaAnimation(1.0f, 0.0f);
-    fadeIn.setDuration(750);
-    fadeOut.setDuration(750);
-    fadeIn.setFillAfter(true);
-    fadeOut.setFillAfter(true);
-
-    valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
-    valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
-    valueAnimatorDown.setDuration(2000);
-    valueAnimatorUp.setDuration(2000);
-
     pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
     pauseResumeButton.setRippleColor(null);
 
-    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-    objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-
     cycle_title_layout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
     completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
-
-    fadeIn = new AlphaAnimation(0.0f, 1.0f);
-    fadeOut = new AlphaAnimation(1.0f, 0.0f);
-    fadeIn.setDuration(1000);
-    fadeOut.setDuration(1000);
-    fadeIn.setFillAfter(true);
-    fadeOut.setFillAfter(true);
-
-    fadeProgressIn = new AlphaAnimation(0.3f, 1.0f);
-    fadeProgressOut = new AlphaAnimation(1.0f, 0.3f);
-    fadeProgressIn.setDuration(300);
-    fadeProgressOut.setDuration(300);
-
-    workoutCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
-    roundRecyclerOneLayoutManager = new LinearLayoutManager(getApplicationContext());
-    roundRecyclerTwoLayoutManager = new LinearLayoutManager(getApplicationContext());
-    pomCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
-
-    AsyncTask.execute(() -> {
-      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-
-      runOnUiThread(() -> {
-        clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
-        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-
-        //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
-        savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
-        savedCycleRecycler.setAdapter(savedCycleAdapter);
-        savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
-        //Instantiating callbacks from adapter.
-        savedCycleAdapter.setItemClick(MainActivity.this);
-        savedCycleAdapter.setHighlight(MainActivity.this);
-        savedCycleAdapter.setResumeOrResetCycle(MainActivity.this);
-
-        savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
-        savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
-        savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
-        //Instantiating callbacks from adapter.
-        savedPomCycleAdapter.setItemClick(MainActivity.this);
-        savedPomCycleAdapter.setHighlight(MainActivity.this);
-        savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
-
-        savedCycleAdapter.notifyDataSetChanged();
-
-        setDefaultUserSettings();
-        setDefaultEditRoundViews();
-        instantiateNotifications();
-      });
-    });
 
     cycleRoundsAdapter.setMode(mode);
     VerticalSpaceItemDecoration verticalSpaceItemDecoration;
@@ -1298,9 +1205,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onAnimationRepeat(Animation animation) {
       }
     });
-
-    sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
-    prefEdit = sharedPreferences.edit();
 
     //Draws dot display depending on which more we're on.
     dotDraws.setMode(mode);
@@ -1752,11 +1656,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void groupAllAppStartInstantiations() {
+
     instantiateGlobalClasses();
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
 
     assignMainLayoutClassesToIds();
+
+    instantiateLayoutManagers();
+    instantiateRoundAdaptersAndTheirCallbacks();
+
     assignEditPopUpLayoutClassesToTheirIds();
     assignTimerPopUpLayoutClassesToTheirIds();
     assignSortPopUpLayoutClassesToTheirIds();
@@ -1764,17 +1673,58 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     assignTdeePopUpLayoutClassesToTheirIds();
 
     instantiateArrayLists();
+    instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents();
 
     setDefaultLayoutTexts();
-    setDefaultUserSettings();
+    retrieveAndImplementCycleSorting();
 
     setDefaultTimerValuesAndTheirEditTextViews();
-    sendPhoneResolutionToDotDrawsClass();
+    setDefaultEditRoundViews();
     setDefaultLayoutVisibilities();
+    instantiateAnimationAndColorMethods();
+    sendPhoneResolutionToDotDrawsClass();
 
+    instantiateNotifications();
+
+    instantiateTdeeSpinnersAndSetThemOnAdapters();
+  }
+
+  private void
+
+  private void instantiateGlobalClasses() {
+    screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
+    changeSettingsValues = new ChangeSettingsValues();
+    tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
+
+    mHandler = new Handler();
+    inputMethodManager =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+    sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
+    prefEdit = sharedPreferences.edit();
+
+    cycles = new Cycles();
+    pomCycles = new PomCycles();
+
+    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+    objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+
+    mHandler = new Handler();
+    ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    mediaPlayer = MediaPlayer.create(this, ringToneUri);
+    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    calendar = Calendar.getInstance();
+    simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
+    simpleDateFormat.format(calendar.getTime());
   }
 
   private void assignMainLayoutClassesToIds() {
+    mainView = findViewById(R.id.main_layout);
+    tabView = findViewById(R.id.tabLayout);
+    actionBarView = findViewById(R.id.custom_action_bar);
+
+    getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+    getSupportActionBar().setDisplayShowCustomEnabled(true);
+    getSupportActionBar().setCustomView(R.layout.custom_bar);
+
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
@@ -1875,23 +1825,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
   }
 
-  private void instantiateGlobalClasses() {
-    changeSettingsValues = new ChangeSettingsValues();
-    tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
-    mHandler = new Handler();
-
-    cycles = new Cycles();
-    pomCycles = new PomCycles();
-
-    mHandler = new Handler();
-    ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-    mediaPlayer = MediaPlayer.create(this, ringToneUri);
-    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-    calendar = Calendar.getInstance();
-    simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
-    simpleDateFormat.format(calendar.getTime());
-  }
-
   private void instantiateFragmentsAndTheirCallbacks() {
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
@@ -1911,7 +1844,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
-  private void instantiateAdaptersAndTheirCallbacks() {
+  private void instantiateCycleAdaptersAndTheirCallbacks() {
+    //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
+    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
+    savedCycleRecycler.setAdapter(savedCycleAdapter);
+    savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
+    //Instantiating callbacks from adapter.
+    savedCycleAdapter.setItemClick(MainActivity.this);
+    savedCycleAdapter.setHighlight(MainActivity.this);
+    savedCycleAdapter.setResumeOrResetCycle(MainActivity.this);
+
+    savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
+    savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
+    savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
+    //Instantiating callbacks from adapter.
+    savedPomCycleAdapter.setItemClick(MainActivity.this);
+    savedPomCycleAdapter.setHighlight(MainActivity.this);
+    savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
+
+    savedCycleAdapter.notifyDataSetChanged();
+  }
+
+  private void instantiateLayoutManagers() {
+    workoutCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
+    roundRecyclerOneLayoutManager = new LinearLayoutManager(getApplicationContext());
+    roundRecyclerTwoLayoutManager = new LinearLayoutManager(getApplicationContext());
+    pomCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
+  }
+
+  private void instantiateRoundAdaptersAndTheirCallbacks() {
     cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
     cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
     cycleRoundsAdapter.fadeFinished(MainActivity.this);
@@ -1925,6 +1886,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
     roundRecyclerTwo.setLayoutManager(roundRecyclerTwoLayoutManager);
+  }
+
+  private void instantiateAnimationAndColorMethods() {
+    fadeIn = new AlphaAnimation(0.0f, 1.0f);
+    fadeOut = new AlphaAnimation(1.0f, 0.0f);
+    fadeIn.setDuration(750);
+    fadeOut.setDuration(750);
+    fadeIn.setFillAfter(true);
+    fadeOut.setFillAfter(true);
+
+    fadeProgressIn = new AlphaAnimation(0.3f, 1.0f);
+    fadeProgressOut = new AlphaAnimation(1.0f, 0.3f);
+    fadeProgressIn.setDuration(300);
+    fadeProgressOut.setDuration(300);
+
+    valueAnimatorDown = new ValueAnimator().ofFloat(90f, 70f);
+    valueAnimatorUp = new ValueAnimator().ofFloat(70f, 90f);
+    valueAnimatorDown.setDuration(2000);
+    valueAnimatorUp.setDuration(2000);
   }
 
   private void instantiatePopUpViewsAndWindows() {
@@ -2014,6 +1994,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_set_time.setText("0");
     total_break_time.setText("0");
     cycles_completed.setText(R.string.cycles_done);
+  }
+
+  private void retrieveAndImplementCycleSorting() {
+    sortMode = sharedPreferences.getInt("sortMode", 1);
+    sortModePom = sharedPreferences.getInt("sortModePom", 1);
+    int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
+
+    sortHolder = sortMode;
+    sortCheckMark.setY(checkMarkPosition);
+  }
+
+  private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
+    AsyncTask.execute(() -> {
+      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+
+      runOnUiThread(() -> {
+        instantiateCycleAdaptersAndTheirCallbacks();
+        clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
+        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+
+        setDefaultUserSettings();
+      });
+    });
+  }
+
+  private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
+    tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
+    tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
+
+    tdeeSubCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_sub_category_spinner_layout);
+    tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+    tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
   }
 
   private void setDefaultUserSettings() {
