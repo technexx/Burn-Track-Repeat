@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
+  TabLayout tabLayout;
   View tabView;
   View mainView;
   View actionBarView;
@@ -242,10 +243,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
-  ConstraintLayout.LayoutParams recyclerLayoutOne;
-  ConstraintLayout.LayoutParams recyclerLayoutTwo;
-  ConstraintLayout.LayoutParams cycle_title_layout;
-  ConstraintLayout.LayoutParams completedLapsParam;
+
+  ConstraintLayout.LayoutParams cycleTitleLayoutParams;
+  ConstraintLayout.LayoutParams completedLapsLayoutParams;
+
+  ConstraintLayout.LayoutParams roundRecyclerParentLayoutParams;
+  ConstraintLayout.LayoutParams roundRecyclerOneLayoutParams;
+  ConstraintLayout.LayoutParams roundRecyclerTwoLayoutParams;
+
+  ConstraintLayout.LayoutParams firstRoundHeaderParams;
+  ConstraintLayout.LayoutParams secondRoundHeaderParams;
+  ConstraintLayout.LayoutParams thirdRoundHeaderParams;
+  ConstraintLayout.LayoutParams secondEditHeaderParams;
+  ConstraintLayout.LayoutParams deleteEditTimerNumbersParams;
+
   int FADE_IN_HIGHLIGHT_MODE = 1;
   int FADE_OUT_HIGHLIGHT_MODE = 2;
   int FADE_IN_EDIT_CYCLE = 3;
@@ -737,38 +748,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     groupAllAppStartInstantiations();
 
-
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
-
-
-    TabLayout tabLayout = findViewById(R.id.tabLayout);
-    tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
-    tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
-
-    tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        tdeeCategorySpinnerTouchActions();
-        setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-      }
-    });
-
-    tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        tdeeSubCategorySpinnerTouchActions();
-        setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-      }
-    });
 
     addTDEEActivityTextView.setOnClickListener(v-> {
       addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
@@ -786,8 +767,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
     pauseResumeButton.setRippleColor(null);
 
-    cycle_title_layout = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
-    completedLapsParam = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
+
 
     cycleRoundsAdapter.setMode(mode);
     VerticalSpaceItemDecoration verticalSpaceItemDecoration;
@@ -802,9 +782,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
     roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
 
-    //Retrieves layout parameters for our recyclerViews. Used to adjust position based on size.
-    recyclerLayoutOne = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
-    recyclerLayoutTwo = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
     setRoundRecyclerViewsWhenChangingAdapterCount(1);
 
     Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
@@ -1651,6 +1628,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateGlobalClasses();
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
+    instantiateTabLayouts();
 
     assignMainLayoutClassesToIds();
     assignEditPopUpLayoutClassesToTheirIds();
@@ -1659,6 +1637,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     assignDeletePopUpLayoutClassesToTheirIds();
     assignTdeePopUpLayoutClassesToTheirIds();
 
+    instantiateLayoutParameterObjects();
     instantiateArrayLists();
 
     instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents();
@@ -1680,6 +1659,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateNotifications();
 
     instantiateTdeeSpinnersAndSetThemOnAdapters();
+    setTdeeSpinnerListeners();
+  }
+
+  private void instantiateLayoutParameterObjects() {
+    cycleTitleLayoutParams = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
+    completedLapsLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
+
+    roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
+    roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
+    roundRecyclerTwoLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
+
+    firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
+    secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
+    thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
+
+    secondEditHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
+    deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
   }
 
   private void instantiateGlobalClasses() {
@@ -1707,6 +1703,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     simpleDateFormat.format(calendar.getTime());
   }
 
+
+  private void instantiateTabLayouts() {
+    tabLayout = findViewById(R.id.tabLayout);
+    tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
+    tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+  }
+
   private void assignMainLayoutClassesToIds() {
     mainView = findViewById(R.id.main_layout);
     tabView = findViewById(R.id.tabLayout);
@@ -1728,6 +1731,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
     sortButton = findViewById(R.id.sortButton);
+  }
+
+  private void instantiateFragmentsAndTheirCallbacks() {
+    rootSettingsFragment = new RootSettingsFragment();
+    soundSettingsFragment = new SoundSettingsFragment();
+    colorSettingsFragment = new ColorSettingsFragment();
+    tdeeSettingsFragment = new tdeeSettingsFragment();
+
+    rootSettingsFragment.sendSettingsData(MainActivity.this);
+    soundSettingsFragment.soundSetting(MainActivity.this);
+    colorSettingsFragment.colorSetting(MainActivity.this);
+
+    settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
+    settingsFragmentFrameLayout.setVisibility(View.GONE);
+
+    getSupportFragmentManager().beginTransaction()
+            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
+            .commit();
+
+  }
+
+  private void assignTdeePopUpLayoutClassesToTheirIds() {
+    tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
+    tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
+    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+    metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
+    caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
   }
 
   private void assignEditPopUpLayoutClassesToTheirIds() {
@@ -1806,33 +1836,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_all_confirm = deleteCyclePopupView.findViewById(R.id.confirm_yes);
     delete_all_cancel = deleteCyclePopupView.findViewById(R.id.confirm_no);
     delete_all_text = deleteCyclePopupView.findViewById(R.id.delete_text);
-  }
-
-  private void assignTdeePopUpLayoutClassesToTheirIds() {
-    tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
-    tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
-    metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
-    caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
-  }
-
-  private void instantiateFragmentsAndTheirCallbacks() {
-    rootSettingsFragment = new RootSettingsFragment();
-    soundSettingsFragment = new SoundSettingsFragment();
-    colorSettingsFragment = new ColorSettingsFragment();
-    tdeeSettingsFragment = new tdeeSettingsFragment();
-
-    rootSettingsFragment.sendSettingsData(MainActivity.this);
-    soundSettingsFragment.soundSetting(MainActivity.this);
-    colorSettingsFragment.colorSetting(MainActivity.this);
-
-    settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
-    settingsFragmentFrameLayout.setVisibility(View.GONE);
-
-    getSupportFragmentManager().beginTransaction()
-            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
-            .commit();
-
   }
 
   private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
@@ -2035,6 +2038,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
+  }
+
+  private void setTdeeSpinnerListeners() {
+    tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        tdeeCategorySpinnerTouchActions();
+        setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+      }
+    });
+
+    tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        tdeeSubCategorySpinnerTouchActions();
+        setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+      }
+    });
   }
 
   private void setDefaultUserSettings() {
@@ -3133,10 +3162,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setRoundRecyclerViewsWhenChangingAdapterCount(int numberOfAdapters) {
-    ConstraintLayout.LayoutParams roundRecyclerLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
 
-    ConstraintLayout.LayoutParams roundRecyclerParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
-    ConstraintLayout.LayoutParams roundRecyclerTwoParams = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
 
     if (numberOfAdapters == 1) {
       roundRecyclerTwo.setVisibility(View.GONE);
@@ -3144,25 +3170,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //16:9 is ~1.7.
       if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(180);
-        roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(60);
+        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
+        roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(60);
       } else {
-        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(200);
-        roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(20);
+        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
+        roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
       }
-      roundRecyclerParams.rightMargin = 0;
+      roundRecyclerOneLayoutParams.rightMargin = 0;
     } else if (numberOfAdapters==2){
       roundRecyclerTwo.setVisibility(View.VISIBLE);
       roundListDivider.setVisibility(View.VISIBLE);
 
       if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(240);
-        roundRecyclerParams.leftMargin = convertDensityPixelsToScalable(10);
+        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
+        roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(10);
 
       } else {
-        roundRecyclerLayoutParams.width = convertDensityPixelsToScalable(260);
-        roundRecyclerParams.rightMargin = convertDensityPixelsToScalable(150);
-        roundRecyclerTwoParams.rightMargin = convertDensityPixelsToScalable(10);
+        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
+        roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
+        roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(10);
       }
     }
   }
@@ -4047,12 +4073,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     setDefaultTimerValuesAndTheirEditTextViews();
 
-    ConstraintLayout.LayoutParams firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
-    ConstraintLayout.LayoutParams secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
-    ConstraintLayout.LayoutParams thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
 
-    ConstraintLayout.LayoutParams secondEditHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
-    ConstraintLayout.LayoutParams deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
 
     timeLeft.setText(timeLeftValueHolder);
     setEditPopUpTimerHeaders(1);
@@ -4158,8 +4179,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
     blankCanvas.setVisibility(View.GONE);
-    cycle_title_layout.topMargin = convertDensityPixelsToScalable(30);
-    completedLapsParam.topMargin = convertDensityPixelsToScalable(24);
+    cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
+    completedLapsLayoutParams.topMargin = convertDensityPixelsToScalable(24);
 
     timerDurationPlaceHolder = 0;
     tdeeActivityTimeDurationPlaceHolder = 0;
@@ -4227,8 +4248,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         new_lap.setVisibility(View.VISIBLE);
         msTime.setVisibility(View.VISIBLE);
         setInitialTextSizeForRounds(0);
-        completedLapsParam.topMargin = 0;
-        cycle_title_layout.topMargin = -25;
+        completedLapsLayoutParams.topMargin = 0;
+        cycleTitleLayoutParams.topMargin = -25;
 
         timerDisabled = false;
         cycle_title_textView.setVisibility(View.INVISIBLE);
