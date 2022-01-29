@@ -488,7 +488,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Refactor override callbacks to methods to clean them up.
+  //Todo: removeHighlight method in saved cycle adapters is always called true - it should be false unless we're canceling our highlight MODE.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
@@ -831,61 +831,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setOnClickListener(individualSortOptionButtonsListener());
 
     timerPopUpWindow.setOnDismissListener(() -> {
-      timerDisabled = false;
-      makeCycleAdapterVisible = false;
-      timerPopUpIsVisible = false;
-      beginTimerForNextRound = false;
-      buttonToLaunchTimer.setEnabled(false);
+      timerPopUpDismissalLogic();
 
-      //Prevents timer from starting. Runnable will just populate values of next round.
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
       AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
-
-      if (mode!=4) {
-        if (!timerIsPaused) {
-          pauseAndResumeTimer(PAUSING_TIMER);
-        }
-        mHandler.removeCallbacksAndMessages(null);
-
-        if (mode==1) {
-          savedCycleRecycler.setVisibility(View.VISIBLE);
-          savedCycleAdapter.notifyDataSetChanged();
-        } else if (mode==3){
-          savedPomCycleRecycler.setVisibility(View.VISIBLE);
-          savedPomCycleAdapter.notifyDataSetChanged();
-        }
-      } else {
-        if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
-        //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
-        mode = savedMode;
-      }
-
-      reset.setVisibility(View.INVISIBLE);
-      dotDraws.setMode(mode);
     });
 
     //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
+      editCyclesPopUpDismissalLogic();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-      //Re-enables FAB button (disabled to prevent overlap when edit popup is active).
-      fab.setEnabled(true);
-      //If closing edit cycle popUp after editing a cycle, do the following.
-      if (currentlyEditingACycle) {
-        saveCycleOnPopUpDismissIfEdited();
-        savedCycleAdapter.removeHighlight(true);
-        //Calls method that sets views for our edit cycles mode.
-        fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
-        currentlyEditingACycle = false;
-      }
-
-      //Updates round adapters so lists show as cleared.
-      cycleRoundsAdapter.notifyDataSetChanged();
-      cycleRoundsAdapterTwo.notifyDataSetChanged();
-      //Removed round divider.
-      roundListDivider.setVisibility(View.GONE);
     });
 
     ////--ActionBar Item onClicks START--////
@@ -2082,7 +2040,51 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private void editCyclesPopUpDismissalLogic() {
+    if (currentlyEditingACycle) {
+      saveCycleOnPopUpDismissIfEdited();
 
+      if (mode==1) {
+        savedCycleAdapter.removeHighlight(true);
+      } else if (mode==3) {
+        savedPomCycleAdapter.removeHighlight(true);
+      }
+      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+      currentlyEditingACycle = false;
+    }
+
+    fab.setEnabled(true);
+    cycleRoundsAdapter.notifyDataSetChanged();
+    cycleRoundsAdapterTwo.notifyDataSetChanged();
+    roundListDivider.setVisibility(View.GONE);
+  }
+
+  private void timerPopUpDismissalLogic() {
+    timerDisabled = false;
+    makeCycleAdapterVisible = false;
+    timerPopUpIsVisible = false;
+    beginTimerForNextRound = false;
+    buttonToLaunchTimer.setEnabled(false);
+    reset.setVisibility(View.INVISIBLE);
+    dotDraws.setMode(mode);
+
+    if (mode!=4) {
+      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+      mHandler.removeCallbacksAndMessages(null);
+
+      if (mode==1) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        savedCycleAdapter.notifyDataSetChanged();
+      } else if (mode==3){
+        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
+    } else {
+      if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+      //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
+      mode = savedMode;
+    }
+  }
 
   private void setDefaultUserSettings() {
     retrieveUserStats();
