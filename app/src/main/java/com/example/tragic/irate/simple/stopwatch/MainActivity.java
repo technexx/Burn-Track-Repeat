@@ -1662,15 +1662,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiatePopUpViewsAndWindows();
 
     assignMainLayoutClassesToIds();
-
-    instantiateLayoutManagers();
-    instantiateRoundAdaptersAndTheirCallbacks();
-
     assignEditPopUpLayoutClassesToTheirIds();
     assignTimerPopUpLayoutClassesToTheirIds();
     assignSortPopUpLayoutClassesToTheirIds();
     assignDeletePopUpLayoutClassesToTheirIds();
     assignTdeePopUpLayoutClassesToTheirIds();
+
+    instantiateLayoutManagers();
+    instantiateRoundAdaptersAndTheirCallbacks();
+    setRoundRecyclersOnAdaptersAndLayoutManagers();
 
     instantiateArrayLists();
     instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents();
@@ -1688,8 +1688,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     instantiateTdeeSpinnersAndSetThemOnAdapters();
   }
-
-  private void
 
   private void instantiateGlobalClasses() {
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
@@ -1881,7 +1879,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
   }
 
-  private void setRecyclerMethods() {
+  private void setRoundRecyclersOnAdaptersAndLayoutManagers() {
     roundRecycler.setLayoutManager(roundRecyclerOneLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
@@ -1947,6 +1945,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundHolderTwo = new ArrayList<>();
     typeHolderOne = new ArrayList<>();
     typeHolderTwo = new ArrayList<>();
+
+    currentLapList = new ArrayList<>();
+    savedLapList = new ArrayList<>();
 
     pomValuesTime = new ArrayList<>();
     convertedPomList = new ArrayList<>();
