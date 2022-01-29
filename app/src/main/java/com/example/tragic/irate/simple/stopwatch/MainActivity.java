@@ -336,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ObjectAnimator fadeOutObj;
   RecyclerView lapRecycler;
   LapAdapter lapAdapter;
-  LinearLayoutManager lapLayout;
+  LinearLayoutManager lapReyclerLayoutManager;
   ConstraintLayout roundRecyclerLayout;
 
   DotDraws dotDraws;
@@ -1211,15 +1211,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Implements callback for end-of-round alpha fade on dots.
     dotDraws.onAlphaSend(MainActivity.this);
 
-    //Recycler view for our stopwatch laps.
-    lapLayout = new LinearLayoutManager(getApplicationContext());
-    lapLayout.setStackFromEnd(true);
-    lapLayout.setReverseLayout(true);
-
-    lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
-    lapRecycler.setAdapter(lapAdapter);
-    lapRecycler.setLayoutManager(lapLayout);
-
     //Sets all progress bars to their start value.
     progressBar.setProgress(maxProgress);
 
@@ -1668,12 +1659,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     assignDeletePopUpLayoutClassesToTheirIds();
     assignTdeePopUpLayoutClassesToTheirIds();
 
+    instantiateArrayLists();
+
+    instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents();
+
     instantiateLayoutManagers();
     instantiateRoundAdaptersAndTheirCallbacks();
     setRoundRecyclersOnAdaptersAndLayoutManagers();
-
-    instantiateArrayLists();
-    instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents();
+    instantiateLapAdapterAndSetRecyclerOnIt();
 
     setDefaultLayoutTexts();
     retrieveAndImplementCycleSorting();
@@ -1705,10 +1698,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
     objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
 
-    mHandler = new Handler();
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
     calendar = Calendar.getInstance();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
     simpleDateFormat.format(calendar.getTime());
@@ -1842,6 +1835,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
+  private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
+    AsyncTask.execute(() -> {
+      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+
+      runOnUiThread(() -> {
+        instantiateCycleAdaptersAndTheirCallbacks();
+        clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
+        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+
+        setDefaultUserSettings();
+      });
+    });
+  }
+
   private void instantiateCycleAdaptersAndTheirCallbacks() {
     //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
     savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
@@ -1868,14 +1877,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerOneLayoutManager = new LinearLayoutManager(getApplicationContext());
     roundRecyclerTwoLayoutManager = new LinearLayoutManager(getApplicationContext());
     pomCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
+
+    lapReyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
+    lapReyclerLayoutManager.setStackFromEnd(true);
+    lapReyclerLayoutManager.setReverseLayout(true);
   }
 
   private void instantiateRoundAdaptersAndTheirCallbacks() {
     cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
-    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
     cycleRoundsAdapter.fadeFinished(MainActivity.this);
-    cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
     cycleRoundsAdapter.selectedRound(MainActivity.this);
+
+    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
+    cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
     cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
   }
 
@@ -1884,6 +1898,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
     roundRecyclerTwo.setLayoutManager(roundRecyclerTwoLayoutManager);
+  }
+
+  private void instantiateLapAdapterAndSetRecyclerOnIt() {
+    lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
+    lapRecycler.setAdapter(lapAdapter);
+    lapRecycler.setLayoutManager(lapReyclerLayoutManager);
   }
 
   private void instantiateAnimationAndColorMethods() {
@@ -2004,22 +2024,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     sortHolder = sortMode;
     sortCheckMark.setY(checkMarkPosition);
-  }
-
-  private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
-    AsyncTask.execute(() -> {
-      cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-
-      runOnUiThread(() -> {
-        instantiateCycleAdaptersAndTheirCallbacks();
-        clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
-        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-
-        setDefaultUserSettings();
-      });
-    });
   }
 
   private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
@@ -2927,7 +2931,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     currentLapList.add(newEntries);
     savedLapList.add(savedEntries);
-    lapLayout.scrollToPosition(savedLapList.size() - 1);
+    lapReyclerLayoutManager.scrollToPosition(savedLapList.size() - 1);
 
     lapAdapter.notifyDataSetChanged();
 
