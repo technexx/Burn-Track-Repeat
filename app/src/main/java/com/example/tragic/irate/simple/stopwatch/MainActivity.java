@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int editHeaderSelected = 1;
 
   Handler mHandler;
+  Handler mSavingCycleHandler;
   boolean currentlyEditingACycle;
   InputMethodManager inputMethodManager;
 
@@ -809,27 +810,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
-      fab.setEnabled(false);
-      buttonToLaunchTimer.setEnabled(true);
-      cycleNameEdit.getText().clear();
-      isNewCycle = true;
-      //Clears round adapter arrays so they can be freshly populated.
-      clearRoundAdapterArrays();
-      editCyclesPopupWindow.showAsDropDown(tabLayout);
-      setViewsAndColorsToPreventTearingInEditPopUp(true);
-      toggleExistenceOfTdeeActivity(false);
-
-      assignOldCycleValuesToCheckForChanges();
+      fabButtonLogic();
     });
 
     stopwatch.setOnClickListener(v-> {
-      savedMode = mode;
-      mode = 4;
-      dotDraws.setMode(4);
-      setInitialTextSizeForRounds(0);
-      populateTimerUI();
-
-      timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+      stopWatchButtonLogic();
     });
 
     //Showing sort popup window.
@@ -838,34 +823,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
-    //Uses single view for all sort buttons. Queries the appropriate cycle sort via the DAO and sets checkmark.
-    View.OnClickListener sortListener = view -> {
-      //Must run this first to get sort mode.
-      //Casting View used by listener to textView, which we then check against its String value.
-      TextView textButton = (TextView) view;
-      //Handles checkmark views.
-      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 1;
-      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 2;
-      if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 3;
-      if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 4;
-      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
-      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
-      //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
-      if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
-
-      AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable);
-
-      prefEdit.putInt("sortMode", sortMode);
-      prefEdit.putInt("sortModePom", sortModePom);
-      prefEdit.apply();
-    };
-
-    sortAlphaStart.setOnClickListener(sortListener);
-    sortAlphaEnd.setOnClickListener(sortListener);
-    sortRecent.setOnClickListener(sortListener);
-    sortNotRecent.setOnClickListener(sortListener);
-    sortHigh.setOnClickListener(sortListener);
-    sortLow.setOnClickListener(sortListener);
+    sortAlphaStart.setOnClickListener(individualSortOptionButtonsListener());
+    sortAlphaEnd.setOnClickListener(individualSortOptionButtonsListener());
+    sortRecent.setOnClickListener(individualSortOptionButtonsListener());
+    sortNotRecent.setOnClickListener(individualSortOptionButtonsListener());
+    sortHigh.setOnClickListener(individualSortOptionButtonsListener());
+    sortLow.setOnClickListener(individualSortOptionButtonsListener());
 
     timerPopUpWindow.setOnDismissListener(() -> {
       timerDisabled = false;
@@ -884,7 +847,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (!timerIsPaused) {
           pauseAndResumeTimer(PAUSING_TIMER);
         }
-        //Removes runnable that begins next round.
         mHandler.removeCallbacksAndMessages(null);
 
         if (mode==1) {
@@ -1617,27 +1579,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnerListeners();
   }
 
-  private TextWatcher cycleNameEditTextWatcher() {
-    return new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-      }
-      @Override
-      public void afterTextChanged(Editable s) {
-        cycleTitle = cycleNameEdit.getText().toString();
-      }
-    };
-  }
-
   private void instantiateGlobalClasses() {
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
     changeSettingsValues = new ChangeSettingsValues();
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
 
     mHandler = new Handler();
+    mSavingCycleHandler = new Handler();
     inputMethodManager =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
@@ -2071,6 +2019,70 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
   }
+
+  private TextWatcher cycleNameEditTextWatcher() {
+    return new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+      }
+      @Override
+      public void afterTextChanged(Editable s) {
+        cycleTitle = cycleNameEdit.getText().toString();
+      }
+    };
+  }
+
+  private void fabButtonLogic() {
+    fab.setEnabled(false);
+    buttonToLaunchTimer.setEnabled(true);
+    cycleNameEdit.getText().clear();
+    isNewCycle = true;
+    //Clears round adapter arrays so they can be freshly populated.
+    clearRoundAdapterArrays();
+    editCyclesPopupWindow.showAsDropDown(tabLayout);
+    setViewsAndColorsToPreventTearingInEditPopUp(true);
+    toggleExistenceOfTdeeActivity(false);
+
+    assignOldCycleValuesToCheckForChanges();
+  }
+
+  private void stopWatchButtonLogic() {
+    savedMode = mode;
+    mode = 4;
+    dotDraws.setMode(4);
+    setInitialTextSizeForRounds(0);
+    populateTimerUI();
+
+    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
+  private View.OnClickListener individualSortOptionButtonsListener() {
+    return view -> {
+      //Must run this first to get sort mode.
+      //Casting View used by listener to textView, which we then check against its String value.
+      TextView textButton = (TextView) view;
+      //Handles checkmark views.
+      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 1;
+      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 2;
+      if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 3;
+      if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 4;
+      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
+      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
+      //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
+      if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
+
+      AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable);
+
+      prefEdit.putInt("sortMode", sortMode);
+      prefEdit.putInt("sortModePom", sortModePom);
+      prefEdit.apply();
+    };
+  }
+
+
 
   private void setDefaultUserSettings() {
     retrieveUserStats();
@@ -4039,7 +4051,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             stopWatchTotalTimeHolder = stopWatchTotalTime;
 
             reset.setVisibility(View.VISIBLE);
-            mHandler.removeCallbacksAndMessages(null);
+            mHandler.removeCallbacks(stopWatchRunnable);
             stopWatchIsPaused = true;
             new_lap.setAlpha(0.3f);
             new_lap.setEnabled(false);
