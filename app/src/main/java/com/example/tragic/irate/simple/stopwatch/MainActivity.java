@@ -243,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
+  Animation slideLeft;
 
   ConstraintLayout.LayoutParams cycleTitleLayoutParams;
   ConstraintLayout.LayoutParams completedLapsLayoutParams;
@@ -357,9 +358,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ValueAnimator valueAnimatorUp;
   AlphaAnimation fadeProgressIn;
   AlphaAnimation fadeProgressOut;
+
+  VerticalSpaceItemDecoration verticalSpaceItemDecoration;
   boolean textSizeIncreased;
-  //Always true initially, since infinity mode starts at 0.
-  boolean textSizeReduced = true;
 
   ArrayList<String> setsArray;
   ArrayList<String> breaksArray;
@@ -750,6 +751,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
+    cycleNameEdit.addTextChangedListener(cycleNameEditTextWatcher());
 
     addTDEEActivityTextView.setOnClickListener(v-> {
       addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
@@ -763,46 +765,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeTdeeActivityImageView.setOnClickListener(v-> {
       toggleExistenceOfTdeeActivity(false);
     });
-
-    pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
-    pauseResumeButton.setRippleColor(null);
-
-
-
-    cycleRoundsAdapter.setMode(mode);
-    VerticalSpaceItemDecoration verticalSpaceItemDecoration;
-
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
-      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-              -10);
-    } else {
-      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-              -25);
-    }
-    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
-    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
-
-    setRoundRecyclerViewsWhenChangingAdapterCount(1);
-
-    Animation slide_left = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
-    slide_left.setDuration(400);
-    savedCycleRecycler.startAnimation(slide_left);
-
-    //Watches editText title box and passes its value into the String that gets saved/updated in database.
-    TextWatcher titleTextWatcher = new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-      }
-      @Override
-      public void afterTextChanged(Editable s) {
-        cycleTitle = cycleNameEdit.getText().toString();
-      }
-    };
-
-    cycleNameEdit.addTextChangedListener(titleTextWatcher);
 
     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
@@ -1645,6 +1607,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateLayoutManagers();
     instantiateRoundAdaptersAndTheirCallbacks();
     setRoundRecyclersOnAdaptersAndLayoutManagers();
+    setRoundRecyclerViewsWhenChangingAdapterCount(1);
+    setVerticalSpaceDecorationForCycleRecyclerViewBasedOnAspectRatio();
     instantiateLapAdapterAndSetRecyclerOnIt();
 
     setDefaultLayoutTexts();
@@ -1658,24 +1622,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     instantiateNotifications();
 
+    setVisualModificationsOnObjects();
+
     instantiateTdeeSpinnersAndSetThemOnAdapters();
     setTdeeSpinnerListeners();
   }
 
-  private void instantiateLayoutParameterObjects() {
-    cycleTitleLayoutParams = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
-    completedLapsLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
-
-    roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
-    roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
-    roundRecyclerTwoLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
-
-    firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
-    secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
-    thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
-
-    secondEditHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
-    deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
+  private TextWatcher cycleNameEditTextWatcher() {
+    return new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+      }
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+      }
+      @Override
+      public void afterTextChanged(Editable s) {
+        cycleTitle = cycleNameEdit.getText().toString();
+      }
+    };
   }
 
   private void instantiateGlobalClasses() {
@@ -1890,6 +1855,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
     cycleRoundsAdapter.fadeFinished(MainActivity.this);
     cycleRoundsAdapter.selectedRound(MainActivity.this);
+    cycleRoundsAdapter.setMode(mode);
 
     cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
     cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
@@ -1901,6 +1867,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler.setAdapter(cycleRoundsAdapter);
     roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
     roundRecyclerTwo.setLayoutManager(roundRecyclerTwoLayoutManager);
+  }
+
+  private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnAspectRatio() {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
+      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+              -10);
+    } else {
+      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+              -25);
+    }
+    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
+    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
   }
 
   private void instantiateLapAdapterAndSetRecyclerOnIt() {
@@ -1916,6 +1894,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeOut.setDuration(750);
     fadeIn.setFillAfter(true);
     fadeOut.setFillAfter(true);
+    slideLeft =  AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
+    slideLeft.setDuration(400);
 
     fadeProgressIn = new AlphaAnimation(0.3f, 1.0f);
     fadeProgressOut = new AlphaAnimation(1.0f, 0.3f);
@@ -1991,6 +1971,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedEditPopUpArrayForThirdHeader = new ArrayList<>();
   }
 
+  private void instantiateLayoutParameterObjects() {
+    cycleTitleLayoutParams = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
+    completedLapsLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed.getLayoutParams();
+
+    roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
+    roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
+    roundRecyclerTwoLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
+
+    firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
+    secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
+    thirdRoundHeaderParams = (ConstraintLayout.LayoutParams) thirdRoundTypeHeaderInEditPopUp.getLayoutParams();
+
+    secondEditHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
+    deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
+  }
+
   private void setDefaultLayoutVisibilities() {
     blankCanvas.setVisibility(View.GONE);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
@@ -2027,6 +2023,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     sortHolder = sortMode;
     sortCheckMark.setY(checkMarkPosition);
+  }
+
+  private void setVisualModificationsOnObjects() {
+    pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
+    pauseResumeButton.setRippleColor(null);
+
+    savedCycleRecycler.startAnimation(slideLeft);
   }
 
   private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
@@ -3162,8 +3165,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public void setRoundRecyclerViewsWhenChangingAdapterCount(int numberOfAdapters) {
-
-
     if (numberOfAdapters == 1) {
       roundRecyclerTwo.setVisibility(View.GONE);
       roundListDivider.setVisibility(View.GONE);
