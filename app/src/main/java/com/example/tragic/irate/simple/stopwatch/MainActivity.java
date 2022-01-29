@@ -772,7 +772,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (tab.getPosition()) {
           case 0:
             mode = 1;
-            //Sets the recyclerView classes for each mode adapters.
             cycleRoundsAdapter.setMode(1);
             dotDraws.setMode(1);
             break;
@@ -788,16 +787,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onTabUnselected(TabLayout.Tab tab) {
-        //since modes use same String, clear it between tab switches.
-        cycleTitle = "";
-        //If in highlight mode (most easily denoted by enabled state of sortButton), exit out its view since we are switching tabs.
-        if (!sortButton.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
-        //Dismisses editCycle popup when switching tabs.
-        if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
-        //Resets callback vars for clicked positions and highlighted positions when switching tabs.
-        positionOfSelectedCycle = 0;
-        receivedHighlightPositions.clear();
-        receivedHighlightPositionHolder.clear();
+        instantiateTabSwitchLogic();
 
         if (tab.getPosition()==0) {
           if (savedCycleAdapter.isCycleHighlighted()==true) {
@@ -805,7 +795,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedCycleAdapter.notifyDataSetChanged();
           }
         }
-
         if (tab.getPosition()==1) {
           if (savedPomCycleAdapter.isCycleHighlighted()==true) {
             removeCycleHighlights();
@@ -1591,6 +1580,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
     instantiateTabLayouts();
+    instantiateTabSwitchLogic();
 
     assignMainLayoutClassesToIds();
     assignEditPopUpLayoutClassesToTheirIds();
@@ -1668,11 +1658,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     simpleDateFormat.format(calendar.getTime());
   }
 
-
   private void instantiateTabLayouts() {
     tabLayout = findViewById(R.id.tabLayout);
     tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
     tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+  }
+
+  private void instantiateTabSwitchLogic() {
+    //since modes use same String, clear it between tab switches.
+    cycleTitle = "";
+
+    //If in highlight mode (most easily denoted by enabled state of sortButton), exit out its view since we are switching tabs.
+    if (!sortButton.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
+
+    //Dismisses editCycle popup when switching tabs.
+    if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
+
+    positionOfSelectedCycle = 0;
+    receivedHighlightPositions.clear();
+    receivedHighlightPositionHolder.clear();
   }
 
   private void assignMainLayoutClassesToIds() {
