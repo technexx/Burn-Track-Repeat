@@ -114,11 +114,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mHighlightDeleted = false;
   }
 
-  public void removeHighlight(boolean cancelMode) {
-    //If boolean is false, highlight has simply been deleted and we clear the highlight list while turning all backgrounds black.
+  public void removeHighlight() {
     mHighlightDeleted = true;
-    //If boolean is true, we have canceled the highlight process entirely, which does the above but also removes the Trash/Back buttons (done in Main) and sets the next row click to launch a timer instead of highlight (done here).
-    if (cancelMode) mHighlightMode = false;
+    mHighlightMode = false;
   }
 
   public void showActiveCycleLayout(int positionOfCycle, int numberOfRoundsCompleted) {

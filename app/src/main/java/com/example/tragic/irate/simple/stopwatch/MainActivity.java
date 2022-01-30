@@ -488,7 +488,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: removeHighlight method in saved cycle adapters is always called true - it should be false unless we're canceling our highlight MODE.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
@@ -1298,7 +1297,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
           }
         }
-        runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
+        runOnUiThread(()->{
+          editCycleArrayLists(DELETING_CYCLE);
+          replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+        });
       }
     };
 
@@ -1955,9 +1957,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       saveCycleOnPopUpDismissIfEdited();
 
       if (mode==1) {
-        savedCycleAdapter.removeHighlight(true);
+        savedCycleAdapter.removeHighlight();
       } else if (mode==3) {
-        savedPomCycleAdapter.removeHighlight(true);
+        savedPomCycleAdapter.removeHighlight();
       }
       fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
       currentlyEditingACycle = false;
@@ -2021,28 +2023,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void removeHighlightFromCycle() {
     if (mode==1) {
-      savedCycleAdapter.removeHighlight(true);
+      savedCycleAdapter.removeHighlight();
     } else if (mode==3) {
-      savedPomCycleAdapter.removeHighlight(true);
+      savedPomCycleAdapter.removeHighlight();
     }
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
   private void deletingHighlightedCycleLogic() {
-    delete_highlighted_cycle.setEnabled(false);
-    fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
-
-
     for (int i=0; i<receivedHighlightPositions.size(); i++) {
       positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
       receivedHighlightPositionHolder.add(positionOfSelectedCycle);
     }
-    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
-    editCycleArrayLists(DELETING_CYCLE);
 
-    if (mode==1) savedCycleAdapter.removeHighlight(true);
-    if (mode==3) savedPomCycleAdapter.removeHighlight(true);
+    delete_highlighted_cycle.setEnabled(false);
+    fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
+
+    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
+
+    if (mode==1) savedCycleAdapter.removeHighlight();
+    if (mode==3) savedPomCycleAdapter.removeHighlight();
 
     Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
   }
@@ -2695,11 +2696,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void removeCycleHighlights() {
     if (mode==1) {
-      savedCycleAdapter.removeHighlight(true);
+      savedCycleAdapter.removeHighlight();
       savedCycleAdapter.notifyDataSetChanged();
     }
     if (mode==3) {
-      savedPomCycleAdapter.removeHighlight(true);
+      savedPomCycleAdapter.removeHighlight();
       savedPomCycleAdapter.notifyDataSetChanged();
     }
   }
