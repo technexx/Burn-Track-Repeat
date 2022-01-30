@@ -858,24 +858,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycleNameEdit.setText(cycleTitle);
 
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
+      assignOldCycleValuesToCheckForChanges();
       setViewsAndColorsToPreventTearingInEditPopUp(true);
+
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
       populateRoundAdapterArraysForHighlightedCycle();
-      assignOldCycleValuesToCheckForChanges();
 
-      if (mode==1) {
-        if (workoutTime.size()<=8) {
-          setRoundRecyclerViewsWhenChangingAdapterCount(1);
-          savedCycleAdapter.removeHighlight(true);
-        } else if (mode==3) {
-          setRoundRecyclerViewsWhenChangingAdapterCount(2);
-          savedPomCycleAdapter.removeHighlight(true);
-        }
-      }
+      setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+      removeHighlightFromCycle();
 
-      cycleRoundsAdapter.notifyDataSetChanged();
-      cycleRoundsAdapterTwo.notifyDataSetChanged();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -1483,7 +1475,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateLayoutManagers();
     instantiateRoundAdaptersAndTheirCallbacks();
     setRoundRecyclersOnAdaptersAndLayoutManagers();
-    setRoundRecyclerViewsWhenChangingAdapterCount(1);
+    setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
     setVerticalSpaceDecorationForCycleRecyclerViewBasedOnAspectRatio();
     instantiateLapAdapterAndSetRecyclerOnIt();
 
@@ -2074,6 +2066,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         for (int i=0; i<pomValuesTime.size(); i++) pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i)/1000));
         break;
     }
+  }
+
+  private void removeHighlightFromCycle() {
+    if (mode==1) {
+      savedCycleAdapter.removeHighlight(true);
+    } else if (mode==3) {
+      savedPomCycleAdapter.removeHighlight(true);
+    }
+    cycleRoundsAdapter.notifyDataSetChanged();
+    cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
   private void setDefaultUserSettings() {
@@ -3087,10 +3089,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
         }
 
-        //If moving from one list to two, set its visibility and change layout params. Only necessary if adding a round.
-        if (workoutTime.size()==9) {
-          setRoundRecyclerViewsWhenChangingAdapterCount(2);
-        }
+        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
         //if replacing a round. Done via add button. Subtract will always subtract.
       } else {
         //Replaces and sends to adapter that replaced position to fade.
@@ -3145,11 +3144,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRound.remove(roundSelectedPosition);
           workoutTime.remove(roundSelectedPosition);
           convertedWorkoutTime.remove(roundSelectedPosition);
-          //If moving from two lists to one, set its visibility and change layout params.
-          if (workoutTime.size()==8) {
-            setRoundRecyclerViewsWhenChangingAdapterCount(1);
-          }
-          //Once a round has been removed (and shown as such) in our recyclerView, we always allow for a new fade animation (for the next one).
+
+          setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+
           subtractedRoundIsFading = false;
         }
         //Resets round selection boolean.
@@ -3169,32 +3166,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setRoundRecyclerViewsWhenChangingAdapterCount(int numberOfAdapters) {
-    if (numberOfAdapters == 1) {
-      roundRecyclerTwo.setVisibility(View.GONE);
-      roundListDivider.setVisibility(View.GONE);
+  public void setRoundRecyclerViewsWhenChangingAdapterCount(ArrayList<Integer> adapterList) {
+    if (mode==1) {
+      if (adapterList.size()<=8) {
+        roundRecyclerTwo.setVisibility(View.GONE);
+        roundListDivider.setVisibility(View.GONE);
 
-      //16:9 is ~1.7.
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
-        roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(60);
+        //16:9 is ~1.7.
+        if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
+          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(60);
+        } else {
+          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
+          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
+        }
+        roundRecyclerOneLayoutParams.rightMargin = 0;
       } else {
-        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
-        roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
-      }
-      roundRecyclerOneLayoutParams.rightMargin = 0;
-    } else if (numberOfAdapters==2){
-      roundRecyclerTwo.setVisibility(View.VISIBLE);
-      roundListDivider.setVisibility(View.VISIBLE);
+        roundRecyclerTwo.setVisibility(View.VISIBLE);
+        roundListDivider.setVisibility(View.VISIBLE);
 
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
-        roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(10);
+        if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
+          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(10);
 
-      } else {
-        roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
-        roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
-        roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(10);
+        } else {
+          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
+          roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
+          roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(10);
+        }
       }
     }
   }
@@ -4144,7 +4143,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTimerValueInEditPopUpTextViewTwo.setVisibility(View.VISIBLE);
         pomTimerValueInEditPopUpTextViewThree.setVisibility(View.VISIBLE);
 
-        setRoundRecyclerViewsWhenChangingAdapterCount(1);
+        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
         sortHigh.setVisibility(View.GONE);
         sortLow.setVisibility(View.GONE);
         roundRecyclerTwo.setVisibility(View.GONE);
