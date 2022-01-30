@@ -488,6 +488,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Try sep activity for Timer (again)?
   //Todo: removeHighlight method in saved cycle adapters is always called true - it should be false unless we're canceling our highlight MODE.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
@@ -878,22 +879,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
     delete_highlighted_cycle.setOnClickListener(v-> {
-      //Disables button until next highlight enables it (to prevent index errors).
-      delete_highlighted_cycle.setEnabled(false);
-      fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
-
-      for (int i=0; i<receivedHighlightPositions.size(); i++) {
-        positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
-        receivedHighlightPositionHolder.add(positionOfSelectedCycle);
-      }
-
-      AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
-      editCycleArrayLists(DELETING_CYCLE);
-
-      if (mode==1) savedCycleAdapter.removeHighlight(true);
-      if (mode==3) savedPomCycleAdapter.removeHighlight(true);
-      Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-
+      deletingHighlightedCycleLogic();
     });
 
     //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
@@ -1013,15 +999,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    //Draws dot display depending on which more we're on.
     dotDraws.setMode(mode);
-    //Implements callback for end-of-round alpha fade on dots.
     dotDraws.onAlphaSend(MainActivity.this);
-
-    //Sets all progress bars to their start value.
     progressBar.setProgress(maxProgress);
 
-    //Used in all timers to smooth out end fade.
     endFade = new Runnable() {
       @Override
       public void run() {
@@ -1066,11 +1047,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    //Disables button for 1 second after push. Re-enables it through runnable after that.
     next_round.setOnClickListener(v -> {
       nextRound(true);
     });
-
 
     reset.setOnClickListener(v -> {
       if (mode != 3) {
@@ -1112,25 +1091,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     delete_all_cancel.setOnClickListener(v -> {
-      //Removes our delete confirm popUp if we cancel.
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
 
     postRoundRunnableForFirstMode = new Runnable() {
       @Override
       public void run() {
-        //Updates dotDraws class w/ round count.
+        defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-        //Resets the alpha value we use to fade dots back to 255 (fully opaque).
         dotDraws.resetDotAlpha();
-        //Resetting values for count-up modes. Simpler to keep them out of switch statement.
+
         setMillis = 0;
         breakMillis = 0;
         countUpMillisHolder = 0;
-        defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-        //Next round begins active by default, so we set our paused mode to false.
         timerIsPaused = false;
-        //Executes next round based on which type is indicated in our typeOfRound list.
+
         if (numberOfRoundsLeft>0) {
           switch (typeOfRound.get(currentRound)) {
             case 1:
@@ -1164,22 +1139,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
           }
-          //If number of rounds left is 0, do the following.
         } else {
-          //Continuous animation for end of cycle.
           animateEnding();
           progressBar.setProgress(0);
-          //Resets current round counter.
           currentRound = 0;
-          //Used to call resetTimer() in pause/resume method. Separate than our disable method.
           timerEnded = true;
-          //Adds to cycles completed counter.
           cyclesCompleted++;
           cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
         }
-        //Re-enables timer clicks, which are disabled for a brief period right before and after round timer ends.
         timerDisabled = false;
-        //Re-enables the button that calls this method, now that it has completed.
         next_round.setEnabled(true);
       }
     };
@@ -1198,7 +1166,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             startPomTimer();
           }
         } else {
-          //Continuous animation for end of cycle.
           animateEnding();
           progressBar.setProgress(0);
           timerEnded = true;
@@ -1376,12 +1343,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         int cycleID;
         if (mode==1) {
-          //If coming from FAB button, create a new instance of Cycles. If coming from a position in our database, get the instance of Cycles in that position.
-          if (isNewCycle) cycles = new Cycles(); else if (cyclesList.size()>0) {
+          if (isNewCycle) {
+            cycles = new Cycles();
+          } else if (cyclesList.size()>0) {
             cycleID = cyclesList.get(positionOfSelectedCycle).getId();
             cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
           }
-          //Converting our String array of rounds in a cycle to a single String so it can be stored in our database. Saving "Count Down" values regardless of how we're counting, as we want them present when toggling between count up/count down.
           workoutString = gson.toJson(workoutTime);
           workoutString = friendlyString(workoutString);
           roundTypeString = gson.toJson(typeOfRound);
@@ -1392,22 +1359,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
             cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
             cycles.setTdeeValuePosition(selectedTdeeValuePosition);
-
-            Log.i("testSave", "saved cat is " + selectedTdeeCategoryPosition);
-            Log.i("testSave", "saved sub cat is " + selectedTdeeSubCategoryPosition);
           } else {
             cycles.setTdeeActivityExists(false);
             cycles.setTdeeCatPosition(0);
             cycles.setTdeeValuePosition(0);
           }
-          //If round list is blank, setString will remain at "", in which case we do not save or update. This is determined after we convert via Json above.
           if (!workoutString.equals("")) {
-            //Adding and inserting into database.
             cycles.setWorkoutRounds(workoutString);
             cycles.setRoundType(roundTypeString);
             cycles.setTimeAccessed(System.currentTimeMillis());
             cycles.setItemCount(workoutTime.size());
-            //If cycle is new, add an initial creation time and populate total times + completed cycle rows to 0.
             if (isNewCycle) {
               cycles.setTimeAdded(System.currentTimeMillis());
               cycles.setTotalSetTime(0);
@@ -1529,13 +1490,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void tabUnselectedLogic() {
-    //since modes use same String, clear it between tab switches.
     cycleTitle = "";
 
-    //If in highlight mode (most easily denoted by enabled state of sortButton), exit out its view since we are switching tabs.
     if (!sortButton.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
-
-    //Dismisses editCycle popup when switching tabs.
     if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
 
     positionOfSelectedCycle = 0;
@@ -1688,11 +1645,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateCycleAdaptersAndTheirCallbacks() {
-    //Instantiates saved cycle adapter w/ ALL list values, to be populated based on the mode we're on.
     savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
     savedCycleRecycler.setAdapter(savedCycleAdapter);
     savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
-    //Instantiating callbacks from adapter.
     savedCycleAdapter.setItemClick(MainActivity.this);
     savedCycleAdapter.setHighlight(MainActivity.this);
     savedCycleAdapter.setResumeOrResetCycle(MainActivity.this);
@@ -1700,7 +1655,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
     savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
     savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
-    //Instantiating callbacks from adapter.
     savedPomCycleAdapter.setItemClick(MainActivity.this);
     savedPomCycleAdapter.setHighlight(MainActivity.this);
     savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
@@ -1957,7 +1911,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     buttonToLaunchTimer.setEnabled(true);
     cycleNameEdit.getText().clear();
     isNewCycle = true;
-    //Clears round adapter arrays so they can be freshly populated.
+
     clearRoundAndCycleAdapterArrayLists();
     editCyclesPopupWindow.showAsDropDown(tabLayout);
     setViewsAndColorsToPreventTearingInEditPopUp(true);
@@ -1978,17 +1932,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private View.OnClickListener individualSortOptionButtonsListener() {
     return view -> {
-      //Must run this first to get sort mode.
-      //Casting View used by listener to textView, which we then check against its String value.
       TextView textButton = (TextView) view;
-      //Handles checkmark views.
+
       if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 1;
       if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 2;
       if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 3;
       if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 4;
       if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
       if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
-      //Assigns one of our sort modes to the sort style depending on which timer mode we're on.
+
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
       AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable);
@@ -2078,6 +2030,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
+  private void deletingHighlightedCycleLogic() {
+    delete_highlighted_cycle.setEnabled(false);
+    fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
+    editCycleArrayLists(DELETING_CYCLE);
+
+    for (int i=0; i<receivedHighlightPositions.size(); i++) {
+      positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
+      receivedHighlightPositionHolder.add(positionOfSelectedCycle);
+    }
+
+    if (mode==1) savedCycleAdapter.removeHighlight(true);
+    if (mode==3) savedPomCycleAdapter.removeHighlight(true);
+
+    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
+
+    Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+  }
+
   private void setDefaultUserSettings() {
     retrieveUserStats();
 
@@ -2148,7 +2118,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
-  public void launchGlobalSettings() {
+  private void launchGlobalSettings() {
     settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
     settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
 
@@ -2161,7 +2131,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     aSettingsMenuIsVisible = true;
   }
 
-  public void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
+  private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
     switch (vibrationSetting) {
       case 2: case 3: case 4:
         if (repeat) {
@@ -2181,7 +2151,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void assignColorSettingValues(int typeOfRound, int settingsNumber) {
+  private void assignColorSettingValues(int typeOfRound, int settingsNumber) {
     int color = changeSettingsValues.assignColor(settingsNumber);
     switch (typeOfRound) {
       case 1:
@@ -2197,7 +2167,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void assignSoundSettingValues(int typeOfRound, int settingNumber) {
+  private void assignSoundSettingValues(int typeOfRound, int settingNumber) {
     switch (typeOfRound) {
       case 0:
         vibrationSettingForSets = settingNumber; break;
@@ -2210,7 +2180,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void saveCycleOnPopUpDismissIfEdited() {
+  private void saveCycleOnPopUpDismissIfEdited() {
     boolean roundIsEdited = false;
 
     if (!timerPopUpWindow.isShowing()) {
@@ -2240,7 +2210,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void assignOldCycleValuesToCheckForChanges() {
+  private void assignOldCycleValuesToCheckForChanges() {
     oldCycleTitleString = cycleTitle;
     if (mode==1) {
       oldCycleRoundListOne = new ArrayList<>(workoutStringListOfRoundValuesForFirstAdapter);
@@ -2251,7 +2221,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setEditPopUpTimerHeaders(int headerToSelect) {
+  private void setEditPopUpTimerHeaders(int headerToSelect) {
     if (headerToSelect == 1) {
       if (mode==1) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
@@ -2323,7 +2293,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     changeEditTimerTextViewColorIfNotEmpty();
   }
 
-  public void toggleInfinityModeAndSetRoundType() {
+  private void toggleInfinityModeAndSetRoundType() {
     if (editHeaderSelected==1) {
       if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
       setAndCapTimerValues(setValue);
@@ -2334,7 +2304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void changeEditTimerTextViewColorIfNotEmpty() {
+  private void changeEditTimerTextViewColorIfNotEmpty() {
     if (editPopUpTimerArray.size()>0) {
       timerValueInEditPopUpTextView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
     } else {
@@ -2342,14 +2312,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void saveEditHeaderTimerStringValues() {
+  private void saveEditHeaderTimerStringValues() {
     if (mode==1) {
       if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
       if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
     }
   }
 
-  public void addToEditPopUpTimerArrays(ArrayList<String> arrayList, TextView textView) {
+  private void addToEditPopUpTimerArrays(ArrayList<String> arrayList, TextView textView) {
     if (arrayList.size()<=3) {
       for (int i=0; i<10; i++)  {
         if (textView.getText().equals(String.valueOf(i))) {
@@ -2359,7 +2329,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setEditPopUpTimerStringValues() {
+  private void setEditPopUpTimerStringValues() {
     String editPopUpTimerString = "";
     if (mode==1) {
       editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
@@ -2398,7 +2368,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     changeEditTimerTextViewColorIfNotEmpty();
   }
 
-  public void convertEditPopUpTimerArrayToStringValues(int chosenMode) {
+  private void convertEditPopUpTimerArrayToStringValues(int chosenMode) {
     if (chosenMode==1) {
 
     }
@@ -2496,14 +2466,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return newList;
   }
 
-  public void setEditPopUpArrayWithCappedValues(ArrayList<String> arrayToSet, int numberOfIndices) {
+  private void setEditPopUpArrayWithCappedValues(ArrayList<String> arrayToSet, int numberOfIndices) {
     arrayToSet.clear();
     for (int i=0; i<numberOfIndices; i++) {
       arrayToSet.add(editPopUpTimerArrayCapped.get(i+(4-numberOfIndices)));
     }
   }
 
-  public void setViewsAndColorsToPreventTearingInEditPopUp(boolean popUpIsActive) {
+  private void setViewsAndColorsToPreventTearingInEditPopUp(boolean popUpIsActive) {
     if (popUpIsActive) {
       //Prevents tearing when soft keyboard pushes up in editCycle popUp.
       if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
@@ -2527,7 +2497,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
-  public void resumeOrResetCycleFromAdapterList(int resumeOrReset){
+  private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
       progressBar.setProgress(currentProgressBarValue);
       timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -2547,7 +2517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void moveSortCheckmark() {
+  private void moveSortCheckmark() {
     int markPosition = 0;
     switch (sortHolder) {
       case 1:
@@ -2589,7 +2559,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (getString(R.string.notification_text_header, selectedMode, roundType));
   }
 
-  public String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
+  private String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
     String currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
     String totalRounds = String.valueOf(startRounds);
 
@@ -2599,7 +2569,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
   }
 
-  public void instantiateNotifications() {
+  private void instantiateNotifications() {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
     if (Build.VERSION.SDK_INT >= 26) {
@@ -2633,7 +2603,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
 
-  public void setNotificationValues() {
+  private void setNotificationValues() {
     if (!dismissNotification) {
       String headerOne = "";
       String headerTwo = "";
@@ -2680,7 +2650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void activateResumeOrResetOptionForCycle() {
+  private void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
       //Only shows restart/resume options of a cycle has been started.
       if (activeCycle) {
@@ -2719,12 +2689,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
 
-  public void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
+  private void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
     if (mode==1) if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
     if (mode==3) if (pomArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
   }
 
-  public void removeCycleHighlights() {
+  private void removeCycleHighlights() {
     if (mode==1) {
       savedCycleAdapter.removeHighlight(true);
       savedCycleAdapter.notifyDataSetChanged();
@@ -2736,7 +2706,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Fades action bar buttons in/out depending on whether we are editing cycles or not.
-  public void fadeEditCycleButtonsIn(int typeOfFade) {
+  private void fadeEditCycleButtonsIn(int typeOfFade) {
     //Clearing all animations. If we don't, their alphas tend to get reset.
     if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
       edit_highlighted_cycle.clearAnimation();
@@ -2751,12 +2721,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.startAnimation(fadeIn);
       appHeader.startAnimation(fadeOut);
       sortButton.startAnimation(fadeOut);
-      //Disabling sort button since it is faded out and still active.
       sortButton.setEnabled(false);
-      //Enabling edit/delete buttons.
       edit_highlighted_cycle.setEnabled(true);
       delete_highlighted_cycle.setEnabled(true);
-      //Views for not-in-edit-mode.
     }
     if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
       edit_highlighted_cycle.startAnimation(fadeOut);
@@ -2779,8 +2746,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Clears the String values of timer Arrays passed to adapter.
-  public void clearRoundAndCycleAdapterArrayLists() {
+  private void clearRoundAndCycleAdapterArrayLists() {
     convertedWorkoutTime.clear();
     workoutStringListOfRoundValuesForFirstAdapter.clear();
     workoutStringListOfRoundValuesForSecondAdapter.clear();
@@ -2794,7 +2760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomStringListOfRoundValues.clear();
   }
 
-  public void setAndCapTimerValues(int value) {
+  private void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
         if (editHeaderSelected==1) setValue = timerValueBoundsFormula(5, 5400, value);
@@ -2808,7 +2774,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
+  private void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
     if (variableToCap==1) pomValue1 = timerValueBoundsFormula(600, 3600, value);
     if (variableToCap==2) pomValue2 = timerValueBoundsFormula(180, 600, value);
     if (variableToCap==3) pomValue3 = timerValueBoundsFormula(900, 3600, value);
@@ -2858,7 +2824,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Set to true if we want to run the animation instantly. False if it is timer dependant, since we do not want it triggering on the wrong prog/timer.
   private void animateEnding() {
     endAnimation = new AlphaAnimation(1.0f, 0.0f);
     endAnimation.setDuration(300);
@@ -2869,8 +2834,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.startAnimation(endAnimation);
   }
 
-  //Sets text size at round start. textSizeIncreased is set to true if timer is >=60 seconds, so the text size can be reduced mid-timer as it drops below.
-  public void setInitialTextSizeForRounds(long millis) {
+  private void setInitialTextSizeForRounds(long millis) {
     if (millis>59000) {
       if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         timeLeft.setTextSize(70f);
@@ -2902,7 +2866,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void changeTextSizeWithAnimator(ValueAnimator va, TextView textView) {
+  private void changeTextSizeWithAnimator(ValueAnimator va, TextView textView) {
     changeValueAnimatorNumbers();
     sizeAnimator = va;
     sizeAnimator.addUpdateListener(animation -> {
@@ -2913,7 +2877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sizeAnimator.start();
   }
 
-  public void changeValueAnimatorNumbers() {
+  private void changeValueAnimatorNumbers() {
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
       valueAnimatorDown.setFloatValues(90f, 70f);
       valueAnimatorUp.setFloatValues(70f, 90f);
@@ -2923,7 +2887,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
+  private void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
       if (sizeIncrease) {
         timeLeft.setTextSize(90f);
@@ -2939,7 +2903,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void newLap() {
+  private void newLap() {
     if (lapAdapter.getItemCount()>98) {
       return;
     }
@@ -2980,10 +2944,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapAdapter.resetLapAnimation();
   }
 
-  public void adjustCustom(boolean adding) {
+  private void adjustCustom(boolean adding) {
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
-      //Converts whatever we've entered as Strings in editText to long values for timer, and caps their values. Only necessary when adding a round.
       if (mode==1) {
         toggleInfinityModeAndSetRoundType();
         switch (roundType) {
@@ -3004,7 +2967,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             addOrReplaceRounds(0, roundIsSelected);
             break;
           default:
-            //Returns from method so we don't add a roundType entry to our list, and the list stays in sync w/ the rounds we are actually adding.
             Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -3033,18 +2995,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     } else {
       if (mode==1) {
-        //removeRound is called at end of fade set below. Here, we overwrite that and remove it beforehand if user clicks before fade is done.
         if (subtractedRoundIsFading) {
           removeRound();
         }
-
         if (workoutTime.size()>0) {
           if (roundSelectedPosition<=7) {
-            //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
             cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
-            //Sets fade positions for rounds. Most recent for subtraction, and -1 (out of bounds) for addition.
             cycleRoundsAdapterTwo.setFadeOutPosition(roundSelectedPosition-8);
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
@@ -3063,7 +3021,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void addOrReplaceRounds(int integerValue, boolean replacingValue) {
+  private void addOrReplaceRounds(int integerValue, boolean replacingValue) {
     if (mode==1) {
       //If adding a round.
       if (!replacingValue) {
@@ -3073,7 +3031,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRound.add(roundType);
           roundSelectedPosition = workoutTime.size()-1;
 
-          //Adds and sends to adapter the newest addition round position to fade.
           if (workoutTime.size()<=8) {
             workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
             workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(typeOfRound.size()-1));
@@ -3090,9 +3047,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
-        //if replacing a round. Done via add button. Subtract will always subtract.
       } else {
-        //Replaces and sends to adapter that replaced position to fade.
         workoutTime.set(roundSelectedPosition, integerValue*1000);
         convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
         typeOfRound.set(roundSelectedPosition, roundType);
@@ -3104,7 +3059,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-          //Since our workOutTime lists are independent of adapter and run from (up to) 0-15, we change the value of roundSelectedPosition back to original.
           workoutStringListOfRoundValuesForSecondAdapter.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
           workoutIntegerListOfRoundTypeForSecondAdapter.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
 
@@ -3117,17 +3071,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void removeRound() {
-    //Rounds only get removed once fade is finished, which we receive status of from callback in adapter.
+  private void removeRound() {
     if (mode==1) {
       if (workoutTime.size()>0) {
         if (workoutTime.size()-1>=roundSelectedPosition) {
-          //If workoutTime list has 8 or less items, or a round is selected and its position is in that first 8 items, remove item from first adapter.
           if (workoutTime.size()<=8 || (roundIsSelected && roundSelectedPosition<=7)) {
             if (workoutStringListOfRoundValuesForFirstAdapter.size()-1>=roundSelectedPosition) {
               workoutStringListOfRoundValuesForFirstAdapter.remove(roundSelectedPosition);
               workoutIntegerListOfRoundTypeForFirstAdapter.remove(roundSelectedPosition);
-              //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
               cycleRoundsAdapter.setFadeOutPosition(-1);
               cycleRoundsAdapter.notifyDataSetChanged();
             }
@@ -3135,7 +3086,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (workoutStringListOfRoundValuesForSecondAdapter.size()-1>=roundSelectedPosition-8) {
               workoutStringListOfRoundValuesForSecondAdapter.remove(roundSelectedPosition-8);
               workoutIntegerListOfRoundTypeForSecondAdapter.remove(roundSelectedPosition-8);
-              //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
               cycleRoundsAdapterTwo.setFadeInPosition(-1);
               cycleRoundsAdapterTwo.notifyDataSetChanged();
             }
@@ -3149,7 +3099,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           subtractedRoundIsFading = false;
         }
-        //Resets round selection boolean.
         if (roundIsSelected) {
           if (roundSelectedPosition<=7) {
             cycleRoundsAdapter.isRoundCurrentlySelected(false);
@@ -3166,7 +3115,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setRoundRecyclerViewsWhenChangingAdapterCount(ArrayList<Integer> adapterList) {
+  private void setRoundRecyclerViewsWhenChangingAdapterCount(ArrayList<Integer> adapterList) {
     if (mode==1) {
       if (adapterList.size()<=8) {
         roundRecyclerTwo.setVisibility(View.GONE);
@@ -3206,17 +3155,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
-  public void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
+  private void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
     if (mode==1 || forAllModes) {
       workoutCyclesArray.clear();
       typeOfRoundArray.clear();
       workoutTitleArray.clear();
       for (int i=0; i<cyclesList.size(); i++) {
-        //Adds the concatenated timer String used in each cycle (e.g. XX - XX - XX) to the String Array that was pass into our cycle list's adapter.
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-        //Retrieves title for use when editing a cycle.
         workoutTitleArray.add(cyclesList.get(i).getTitle());
-        //Adds concatenated roundType String used in each cycle.
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
       }
     }
@@ -3230,11 +3176,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Since we are only updating our adapter's lists, we do not need to reference variables not shown in list (i.e. total times/total cycles). We will only update these in database if they change.
-  public void editCycleArrayLists(int action) {
+  private void editCycleArrayLists(int action) {
     if (action == ADDING_CYCLE) {
       if (mode==1) {
-        //If we are adding a new cycle, no need to query the DB for values after save. Just use what has been passed into them from Arrays. This will add them as the correct last position.
         workoutTitleArray.add(cycleTitle);
         typeOfRoundArray.add(roundTypeString);
         workoutCyclesArray.add(workoutString);
@@ -3246,7 +3190,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     else if (action == EDITING_CYCLE) {
       if (mode==1) {
-        //If we have the values in our workOutTime and typeOFRound arrays already, simply pass them into cycleList's adapter arrays.
         workoutTitleArray.set(positionOfSelectedCycle, cycleTitle);
         workoutCyclesArray.set(positionOfSelectedCycle, workoutString);
         typeOfRoundArray.set(positionOfSelectedCycle, roundTypeString);
@@ -3290,16 +3233,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Populates round list from single cycle.
-  public void populateCycleAdapterArrayList() {
+  private void populateCycleAdapterArrayList() {
     switch (mode) {
       case 1:
-        //Clears the two lists of actual timer values we are populating.
         workoutTime.clear();
         typeOfRound.clear();
-
         if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
-          //Populating our current cycle's list of rounds via Integer Arrays directly with adapter String list values, instead of querying them from the database. This is used whenever we do not need a db query, such as editing or adding a new cycle.
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
           for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
@@ -3329,7 +3268,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
     editCyclesPopupWindow.dismiss();
-    //This is called as false in editCycle's dismissListener, but we call it as true here to black out main view for transitional purposes.
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     if (savedCycleAdapter.isCycleActive()==true) {
@@ -3349,7 +3287,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable);
     }
 
-    //Used to toggle views/updates on Main for visually smooth transitions between popUps.
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
 
@@ -3374,7 +3311,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Controls each mode's object animator. Starts new or resumes current one.
   private void startObjectAnimatorAndTotalCycleTimeCounters() {
     switch (mode) {
       case 1:
@@ -3408,7 +3344,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         if (currentProgressBarValue==maxProgress){
-          //Ensures any features meant for running timer cannot be executed here.
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter);
 
@@ -3431,7 +3366,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
         }
-        //Subtracting the current time from the base (start) time which was set in our pauseResume() method.
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
 
@@ -3454,7 +3388,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
         }
-        //Subtracting the current time from the base (start) time which was set in our pauseResume() method, then adding it to the saved value of our countUpMillis.
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         updateTotalTimeValuesEachTick();
 
@@ -3469,7 +3402,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: put infinity runnables in void method and move them over here, BUT, we need to tag the handler so they can be removed globally when we're stopping the timer.
   private void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
@@ -3581,10 +3513,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
-    //Fade effect to smooth out progressBar and timer text after animation.
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
-    //Retains our progressBar's value between modes. Also determines whether we are starting or resuming an object animator (in startObjectAnimatorAndTotalCycleTimeCounters()).
     currentProgressBarValue = 10000;
     reset.setVisibility(View.INVISIBLE);
     next_round.setEnabled(false);
@@ -3596,7 +3526,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       if (numberOfRoundsLeft==0) {
-        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
         mHandler.removeCallbacks(endFade);
         resetTimer();
         return;
@@ -3604,7 +3533,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       mHandler.post(endFade);
 
-      //If skipping round manually, cancel timer and objectAnimator.
       if (endingEarly) {
         if (timer != null) timer.cancel();
         if (objectAnimator != null) objectAnimator.cancel();
@@ -3649,7 +3577,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       numberOfRoundsLeft--;
       currentRound++;
       mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
-      //Ensures subsequent rounds will start automatically.
+
       beginTimerForNextRound = true;
       timerDurationPlaceHolder = 0;
       tdeeActivityTimeDurationPlaceHolder = 0;
@@ -3672,7 +3600,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
       }
       if (pomDotCounter==8) {
-        //Triggers in same runnable that knocks our round count down - so it must be canceled here.
         mHandler.removeCallbacks(endFade);
         resetTimer();
         return;
@@ -3684,7 +3611,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
 
-      //If skipping round manually, cancel timer and objectAnimator.
       if (endingEarly) {
         if (timer != null) timer.cancel();
         if (objectAnimatorPom != null) objectAnimatorPom.cancel();
@@ -4050,7 +3976,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setDefaultTimerValuesAndTheirEditTextViews() {
+  private void setDefaultTimerValuesAndTheirEditTextViews() {
     setValue = 30;
     breakValue = 30;
     pomValue1 = 1500;
@@ -4187,10 +4113,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     timerDurationPlaceHolder = 0;
     tdeeActivityTimeDurationPlaceHolder = 0;
-    //Setting values based on first round in cycle. Might make this is a global method.
+
     switch (mode) {
       case 1:
-        //Sets the long value in our "count up" rounds back to 0.
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
@@ -4224,12 +4149,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
-        //Here is where we set the initial millis Value  of first pomMillis. Set again on change on our value runnables.
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
           dotDraws.pomDraw(pomDotCounter,pomValuesTime);
-          //Sets initial text size.
           setInitialTextSizeForRounds(pomMillis);
         }
         break;
@@ -4291,14 +4214,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 4: breakMillis = 0; break;
         };
         countUpMillisHolder = 0;
-        //Removing timer callbacks for count up mode.
-        mHandler.removeCallbacks(infinityTimerForSets);
-        mHandler.removeCallbacks(infinityTimerForBreaks);
-        //Setting total number of rounds.
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
-        //Resets current round counter.
         currentRound = 0;
+
+        mHandler.removeCallbacks(infinityTimerForSets);
+        mHandler.removeCallbacks(infinityTimerForBreaks);
+
         if (objectAnimator != null) objectAnimator.cancel();
 
         if (savedCycleAdapter.isCycleActive()==true) {
@@ -4338,7 +4260,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setInitialTextSizeForRounds(0);
         break;
     }
-    //Base of 0 values for stopwatch means we don't want anything populated when resetting.
     if (mode!=4) populateTimerUI();
     setNotificationValues();
   }
@@ -4417,7 +4338,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.calories_burned_per_minute, truncatedMinutes));
   }
 
-  //Sub Category list and MET score lists in retrieveMetScoreFromSubCategoryPosition() both correspond to saved Category position (e.g. Cycling -> (List of Cycling Activity) + (List of their MET scores).
   private void setTdeeSubCategorySpinnerListFromRetrievedDatabaseValues() {
     tdeeSubCategoryAdapter.clear();
     tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
@@ -4442,7 +4362,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void tdeeSubCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
 
-    //Values array corresponds to sub category array.
     selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
     selectedTdeeValuePosition = selectedTdeeCategoryPosition;
 
