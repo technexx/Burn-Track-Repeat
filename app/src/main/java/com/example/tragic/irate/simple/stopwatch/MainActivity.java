@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> workoutTitle;
   ArrayList<String> workoutTitleArray;
   ArrayList<Integer> pomValuesTime;
-  ArrayList<String> convertedPomList;
+  ArrayList<String> pomStringListOfRoundValues;
   ArrayList<String> pomTitleArray;
   ArrayList<String> pomArray;
   String workoutString;
@@ -225,10 +225,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<Integer> typeOfRound;
   ArrayList<String> typeOfRoundArray;
   int roundType;
-  ArrayList<String> roundHolderOne;
-  ArrayList<String> roundHolderTwo;
-  ArrayList<Integer> typeHolderOne;
-  ArrayList<Integer> typeHolderTwo;
+  ArrayList<String> workoutStringListOfRoundValuesForFirstAdapter;
+  ArrayList<String> workoutStringListOfRoundValuesForSecondAdapter;
+  ArrayList<Integer> workoutIntegerListOfRoundTypeForFirstAdapter;
+  ArrayList<Integer> workoutIntegerListOfRoundTypeForSecondAdapter;
 
   int setValue;
   int breakValue;
@@ -621,7 +621,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     isNewCycle = false;
     positionOfSelectedCycle = position;
     //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
-    populateRoundList();
+    populateCycleAdapterArrayList();
     //If clicking on a cycle to launch, it will always be an existing one, and we do not want to call a save method since it is unedited.
     launchTimerCycle(false);
     resetTimer();
@@ -656,17 +656,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (consolidateRoundAdapterLists) {
       //Adapters only need adjusting if second one is populated.
       if (workoutTime.size()>=8){
-        roundHolderOne.clear();
-        typeHolderOne.clear();
-        roundHolderTwo.clear();
-        typeHolderTwo.clear();
+        workoutStringListOfRoundValuesForFirstAdapter.clear();
+        workoutIntegerListOfRoundTypeForFirstAdapter.clear();
+        workoutStringListOfRoundValuesForSecondAdapter.clear();
+        workoutIntegerListOfRoundTypeForSecondAdapter.clear();
         for (int i=0; i<workoutTime.size(); i++) {
           if (i<=7) {
-            roundHolderOne.add(convertedWorkoutTime.get(i));
-            typeHolderOne.add(typeOfRound.get(i));
+            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(i));
+            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
           } else {
-            roundHolderTwo.add(convertedWorkoutTime.get(i));
-            typeHolderTwo.add(typeOfRound.get(i));
+            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTime.get(i));
+            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
           }
         }
         cycleRoundsAdapter.notifyDataSetChanged();
@@ -677,7 +677,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode==3) {
       pomValuesTime.clear();
-      convertedPomList.clear();
+      pomStringListOfRoundValues.clear();
       cycleRoundsAdapter.notifyDataSetChanged();
       cycleRoundsAdapter.disablePomFade();
       subtractRoundFromCycleButton.setClickable(true);
@@ -808,7 +808,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    //Brings up editCycle popUp to create new Cycle.
     fab.setOnClickListener(v -> {
       fabButtonLogic();
     });
@@ -839,76 +838,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
-    //Because this window steals focus from our activity so it can use the soft keyboard, we are using this listener to perform the functions our onBackPressed override would normally handle when the popUp is active.
     editCyclesPopupWindow.setOnDismissListener(() -> {
       editCyclesPopUpDismissalLogic();
+
       setViewsAndColorsToPreventTearingInEditPopUp(false);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
+      editCyclesPopupWindow.showAsDropDown(tabLayout);
       buttonToLaunchTimer.setEnabled(true);
       currentlyEditingACycle = true;
-      //Used when deciding whether to save a new cycle or retrieve/update a current one. Editing will always pull an existing one.
       isNewCycle = false;
-      fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
-      //Displays edit cycles popUp.
-      editCyclesPopupWindow.showAsDropDown(tabLayout);
-      setViewsAndColorsToPreventTearingInEditPopUp(true);
-
-      //Button is only active if list contains exactly ONE position (i.e. only one cycle is selected). Here, we set our retrieved position (same as if we simply clicked a cycle to launch) to the one passed in from our highlight.
       positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
-      //Clears old array values.
-      clearRoundAdapterArrays();
-      //Uses this single position to retrieve cycle and populate timer arrays.
-      populateRoundList();
-      switch (mode) {
-        case 1:
-          //Populating String ArrayLists used to display rounds in editCycle popUp.
-          for (int i=0; i<workoutTime.size(); i++) {
-            //Aggregate list of rounds. Necessary since adjustCustom() uses it.
-            convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
-            //If 8 or less rounds, add to first round adapter's String Array (and roundType).
-            if (i<=7) {
-              roundHolderOne.add(convertSeconds(workoutTime.get(i)/1000));
-              typeHolderOne.add(typeOfRound.get(i));
-            }
-            //If 9 or more rounds, add to second round adapter's String Array (and roundType).
-            if (i>=8) {
-              roundHolderTwo.add(convertSeconds(workoutTime.get(i)/1000));
-              typeHolderTwo.add(typeOfRound.get(i));
-            }
-          }
 
-          roundSelectedPosition = workoutTime.size()-1;
-          break;
-        case 3:
-          //Since our fade animation listener clears our timer and adapter lists, we disable it here when we need to pull up saved cycles.
-          cycleRoundsAdapter.disablePomFade();
-          for (int i=0; i<pomValuesTime.size(); i++) convertedPomList.add(convertSeconds(pomValuesTime.get(i)/1000));
-          break;
-      }
+      cycleNameText.setVisibility(View.INVISIBLE);
+      cycleNameEdit.setVisibility(View.VISIBLE);
+      cycleNameEdit.setText(cycleTitle);
+
+      fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
+      setViewsAndColorsToPreventTearingInEditPopUp(true);
+      clearRoundAndCycleAdapterArrayLists();
+      populateCycleAdapterArrayList();
+      populateRoundAdapterArraysForHighlightedCycle();
       assignOldCycleValuesToCheckForChanges();
 
-      runOnUiThread(()-> {
-        //Changes view layout depending on +/- 8 round count.
-        if (mode==1) {
-          if (workoutTime.size()<=8) {
-            setRoundRecyclerViewsWhenChangingAdapterCount(1);
-            savedCycleAdapter.removeHighlight(true);
-          } else {
-            setRoundRecyclerViewsWhenChangingAdapterCount(2);
-            savedPomCycleAdapter.removeHighlight(true);
-          }
+      if (mode==1) {
+        if (workoutTime.size()<=8) {
+          setRoundRecyclerViewsWhenChangingAdapterCount(1);
+          savedCycleAdapter.removeHighlight(true);
+        } else if (mode==3) {
+          setRoundRecyclerViewsWhenChangingAdapterCount(2);
+          savedPomCycleAdapter.removeHighlight(true);
         }
-        cycleNameText.setVisibility(View.INVISIBLE);
-        cycleNameEdit.setVisibility(View.VISIBLE);
-        cycleNameEdit.setText(cycleTitle);
+      }
 
-        cycleRoundsAdapter.notifyDataSetChanged();
-        cycleRoundsAdapterTwo.notifyDataSetChanged();
-      });
+      cycleRoundsAdapter.notifyDataSetChanged();
+      cycleRoundsAdapterTwo.notifyDataSetChanged();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -1761,12 +1728,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateRoundAdaptersAndTheirCallbacks() {
-    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), roundHolderOne, typeHolderOne, convertedPomList);
+    cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), workoutStringListOfRoundValuesForFirstAdapter, workoutIntegerListOfRoundTypeForFirstAdapter, pomStringListOfRoundValues);
     cycleRoundsAdapter.fadeFinished(MainActivity.this);
     cycleRoundsAdapter.selectedRound(MainActivity.this);
     cycleRoundsAdapter.setMode(mode);
 
-    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), roundHolderTwo, typeHolderTwo);
+    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), workoutStringListOfRoundValuesForSecondAdapter, workoutIntegerListOfRoundTypeForSecondAdapter);
     cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
     cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
   }
@@ -1853,16 +1820,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     typeOfRoundArray = new ArrayList<>();
     pomArray = new ArrayList<>();
 
-    roundHolderOne = new ArrayList<>();
-    roundHolderTwo = new ArrayList<>();
-    typeHolderOne = new ArrayList<>();
-    typeHolderTwo = new ArrayList<>();
+    workoutStringListOfRoundValuesForFirstAdapter = new ArrayList<>();
+    workoutStringListOfRoundValuesForSecondAdapter = new ArrayList<>();
+    workoutIntegerListOfRoundTypeForFirstAdapter = new ArrayList<>();
+    workoutIntegerListOfRoundTypeForSecondAdapter = new ArrayList<>();
 
     currentLapList = new ArrayList<>();
     savedLapList = new ArrayList<>();
 
     pomValuesTime = new ArrayList<>();
-    convertedPomList = new ArrayList<>();
+    pomStringListOfRoundValues = new ArrayList<>();
     pomArray = new ArrayList<>();
     workoutTitleArray = new ArrayList<>();
     pomTitleArray = new ArrayList<>();
@@ -1999,7 +1966,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleNameEdit.getText().clear();
     isNewCycle = true;
     //Clears round adapter arrays so they can be freshly populated.
-    clearRoundAdapterArrays();
+    clearRoundAndCycleAdapterArrayLists();
     editCyclesPopupWindow.showAsDropDown(tabLayout);
     setViewsAndColorsToPreventTearingInEditPopUp(true);
     toggleExistenceOfTdeeActivity(false);
@@ -2083,6 +2050,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
       //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
       mode = savedMode;
+    }
+  }
+
+  private void populateRoundAdapterArraysForHighlightedCycle() {
+    switch (mode) {
+      case 1:
+        for (int i=0; i<workoutTime.size(); i++) {
+          convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
+          if (i<=7) {
+            workoutStringListOfRoundValuesForFirstAdapter.add(convertSeconds(workoutTime.get(i)/1000));
+            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
+          }
+          if (i>=8) {
+            workoutStringListOfRoundValuesForSecondAdapter.add(convertSeconds(workoutTime.get(i)/1000));
+            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
+          }
+        }
+        roundSelectedPosition = workoutTime.size()-1;
+        break;
+      case 3:
+        cycleRoundsAdapter.disablePomFade();
+        for (int i=0; i<pomValuesTime.size(); i++) pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i)/1000));
+        break;
     }
   }
 
@@ -2223,8 +2213,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (!timerPopUpWindow.isShowing()) {
       if (mode==1) {
-        if (!roundHolderOne.isEmpty()){
-          if (!roundHolderOne.equals(oldCycleRoundListOne) || !roundHolderTwo.equals(oldCycleRoundListTwo) || !cycleTitle.equals(oldCycleTitleString)) {
+        if (!workoutStringListOfRoundValuesForFirstAdapter.isEmpty()){
+          if (!workoutStringListOfRoundValuesForFirstAdapter.equals(oldCycleRoundListOne) || !workoutStringListOfRoundValuesForSecondAdapter.equals(oldCycleRoundListTwo) || !cycleTitle.equals(oldCycleTitleString)) {
             roundIsEdited = true;
           }
         }
@@ -2251,8 +2241,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void assignOldCycleValuesToCheckForChanges() {
     oldCycleTitleString = cycleTitle;
     if (mode==1) {
-      oldCycleRoundListOne = new ArrayList<>(roundHolderOne);
-      oldCycleRoundListTwo = new ArrayList<>(roundHolderTwo);
+      oldCycleRoundListOne = new ArrayList<>(workoutStringListOfRoundValuesForFirstAdapter);
+      oldCycleRoundListTwo = new ArrayList<>(workoutStringListOfRoundValuesForSecondAdapter);
     }
     if (mode==3) {
       oldPomRoundList = new ArrayList<>(pomArray);
@@ -2754,7 +2744,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortButton.clearAnimation();
     }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
-      //Boolean used to keep launchCycles() from calling populateRoundLists(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeIn);
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
@@ -2768,7 +2757,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Views for not-in-edit-mode.
     }
     if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
-      //Boolean used to keep launchCycles() from calling populateRoundLists(), which replace our current timer array list w/ one fetched from DB.
       edit_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
       appHeader.startAnimation(fadeIn);
@@ -2790,18 +2778,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Clears the String values of timer Arrays passed to adapter.
-  public void clearRoundAdapterArrays() {
+  public void clearRoundAndCycleAdapterArrayLists() {
     convertedWorkoutTime.clear();
-    roundHolderOne.clear();
-    roundHolderTwo.clear();
-    typeHolderOne.clear();
-    typeHolderTwo.clear();
+    workoutStringListOfRoundValuesForFirstAdapter.clear();
+    workoutStringListOfRoundValuesForSecondAdapter.clear();
+    workoutIntegerListOfRoundTypeForFirstAdapter.clear();
+    workoutIntegerListOfRoundTypeForSecondAdapter.clear();
 
     workoutTime.clear();
     typeOfRound.clear();
     pomValuesTime.clear();
 
-    convertedPomList.clear();
+    pomStringListOfRoundValues.clear();
   }
 
   public void setAndCapTimerValues(int value) {
@@ -3033,7 +3021,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           pomValuesTime.add(pomValue1 * 1000);
           pomValuesTime.add(pomValue3 * 1000);
-          for (int j=0; j<pomValuesTime.size(); j++) convertedPomList.add(convertSeconds(pomValuesTime.get(j)/1000));
+          for (int j=0; j<pomValuesTime.size(); j++) pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(j)/1000));
 
           cycleRoundsAdapter.setPomFade(true);
           cycleRoundsAdapter.notifyDataSetChanged();
@@ -3085,13 +3073,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           //Adds and sends to adapter the newest addition round position to fade.
           if (workoutTime.size()<=8) {
-            roundHolderOne.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-            typeHolderOne.add(typeOfRound.get(typeOfRound.size()-1));
+            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(typeOfRound.size()-1));
             cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
-            roundHolderTwo.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-            typeHolderTwo.add(typeOfRound.get(typeOfRound.size()-1));
+            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
+            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(typeOfRound.size()-1));
             cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
@@ -3110,16 +3098,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
         typeOfRound.set(roundSelectedPosition, roundType);
         if (roundSelectedPosition<=7) {
-          roundHolderOne.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
-          typeHolderOne.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
+          workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
+          workoutIntegerListOfRoundTypeForFirstAdapter.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
 
           cycleRoundsAdapter.isRoundCurrentlySelected(false);
           cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
           //Since our workOutTime lists are independent of adapter and run from (up to) 0-15, we change the value of roundSelectedPosition back to original.
-          roundHolderTwo.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
-          typeHolderTwo.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
+          workoutStringListOfRoundValuesForSecondAdapter.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
+          workoutIntegerListOfRoundTypeForSecondAdapter.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
 
           cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
           cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
@@ -3137,17 +3125,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (workoutTime.size()-1>=roundSelectedPosition) {
           //If workoutTime list has 8 or less items, or a round is selected and its position is in that first 8 items, remove item from first adapter.
           if (workoutTime.size()<=8 || (roundIsSelected && roundSelectedPosition<=7)) {
-            if (roundHolderOne.size()-1>=roundSelectedPosition) {
-              roundHolderOne.remove(roundSelectedPosition);
-              typeHolderOne.remove(roundSelectedPosition);
+            if (workoutStringListOfRoundValuesForFirstAdapter.size()-1>=roundSelectedPosition) {
+              workoutStringListOfRoundValuesForFirstAdapter.remove(roundSelectedPosition);
+              workoutIntegerListOfRoundTypeForFirstAdapter.remove(roundSelectedPosition);
               //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
               cycleRoundsAdapter.setFadeOutPosition(-1);
               cycleRoundsAdapter.notifyDataSetChanged();
             }
           } else {
-            if (roundHolderTwo.size()-1>=roundSelectedPosition-8) {
-              roundHolderTwo.remove(roundSelectedPosition-8);
-              typeHolderTwo.remove(roundSelectedPosition-8);
+            if (workoutStringListOfRoundValuesForSecondAdapter.size()-1>=roundSelectedPosition-8) {
+              workoutStringListOfRoundValuesForSecondAdapter.remove(roundSelectedPosition-8);
+              workoutIntegerListOfRoundTypeForSecondAdapter.remove(roundSelectedPosition-8);
               //Sets fade positions for rounds. -1 (out of bounds) for both, since this adapter refresh simply calls the post-fade listing of current rounds.
               cycleRoundsAdapterTwo.setFadeInPosition(-1);
               cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -3304,7 +3292,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Populates round list from single cycle.
-  public void populateRoundList() {
+  public void populateCycleAdapterArrayList() {
     switch (mode) {
       case 1:
         //Clears the two lists of actual timer values we are populating.
