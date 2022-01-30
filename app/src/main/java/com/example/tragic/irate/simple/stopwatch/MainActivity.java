@@ -488,7 +488,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Try sep activity for Timer (again)?
   //Todo: removeHighlight method in saved cycle adapters is always called true - it should be false unless we're canceling our highlight MODE.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
@@ -2033,17 +2032,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void deletingHighlightedCycleLogic() {
     delete_highlighted_cycle.setEnabled(false);
     fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
-    editCycleArrayLists(DELETING_CYCLE);
+
 
     for (int i=0; i<receivedHighlightPositions.size(); i++) {
       positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
       receivedHighlightPositionHolder.add(positionOfSelectedCycle);
     }
+    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
+    editCycleArrayLists(DELETING_CYCLE);
 
     if (mode==1) savedCycleAdapter.removeHighlight(true);
     if (mode==3) savedPomCycleAdapter.removeHighlight(true);
-
-    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
 
     Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
   }
