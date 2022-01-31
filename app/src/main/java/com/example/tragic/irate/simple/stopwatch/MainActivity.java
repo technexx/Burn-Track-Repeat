@@ -489,7 +489,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalTdeeActivityTime;
 
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
-  //Todo: Let's try a Grid Layout RecyclerView instead of DotDraws.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
   //Todo: Different activites per round option? (i.e. add a eound while adding activity).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
@@ -497,6 +496,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test reset/resume option alternating between modes/tabs.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
+  //Todo: As an improvement to DotDraws: Make width of class xml a minimum that fills smaller phones, and then use that width as the maximum bounds of the canvas draw. That way, wider phones will simply have more horizontal padding and narrower will fill the screen.
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
