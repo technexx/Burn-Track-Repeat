@@ -488,8 +488,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Total stats (for all) start @ neg. Prolly because before timer starts, values for it (i.e. millis we use to count) aren't assigned). Could just set totalTime on launch and transition to update method after.
-  //Todo: Same old time/date saving for newer cycles (prolly just not calling new method).
+  //Todo: Default cycle time/date sets to time app started because our runnable is SET on app start.
+  //Todo: New cycles don't clear tdee stats if no activity is added.
+  //Todo: Set/break total times might add an extra single iteration becauae of new way we're calling at cycle start.
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
@@ -3286,6 +3287,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (!isNewCycle) {
       AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable);
+    } else {
+      toggleTdeeTextViewVisibility();
     }
 
     makeCycleAdapterVisible = true;
@@ -3458,7 +3461,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         setNotificationValues();
 
-
         setCountDownTimerTickLogic(millisUntilFinished, pomMillis);
         displayTotalTimesAndCalories();
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
@@ -3531,7 +3533,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
         return;
       }
-
       mHandler.post(endFade);
 
       if (endingEarly) {
@@ -3644,19 +3645,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_set_time.setText(convertSeconds(totalSetTime));
     total_break_time.setText(convertSeconds(totalBreakTime));
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-
-    retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView();
   }
 
   private void retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView() {
     cycles = cyclesList.get(positionOfSelectedCycle);
-
-    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
-    if (cycleHasActivityAssigned) {
-      actvitiyStatsInTimerTextView.setVisibility(View.VISIBLE);
-    } else {
-      actvitiyStatsInTimerTextView.setVisibility(View.INVISIBLE);
-    }
 
     totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
     burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
@@ -3665,8 +3657,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     selectedTdeeValuePosition = cycles.getTdeeValuePosition();
     metScore = retrieveMetScoreFromSubCategoryPosition();
 
-//    displayTotalTimesAndCalories();
+    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
+    toggleTdeeTextViewVisibility();
     displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly();
+  }
+
+  private void toggleTdeeTextViewVisibility() {
+    if (cycleHasActivityAssigned) {
+      actvitiyStatsInTimerTextView.setVisibility(View.VISIBLE);
+    } else {
+      actvitiyStatsInTimerTextView.setVisibility(View.INVISIBLE);
+    }
   }
 
   private void resetTotalTimesAndCaloriesForModeOne() {
@@ -4394,6 +4395,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   ///////////Test methods///////////////////////////
+  private void logDatabaseStuff() {
+    Log.i("testDB", "tdee booleans are " + cycles.getTdeeActivityExists());
+  }
+
   private void logTdeeCategoryPositions() {
     Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
     Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
