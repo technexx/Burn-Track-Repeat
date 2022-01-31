@@ -488,6 +488,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Same old time/date saving for newer cycles (prolly just not calling new method).
   //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
   //Todo: Different activites per round option? (i.e. add a eound while adding activity).
@@ -1183,7 +1184,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           @Override
           public void run() {
             retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
-            retrieveTdeeTimeAndCalorieStatsForSingleCycle();
+            retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView();
           }
         });
       }
@@ -3367,7 +3368,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           textSizeIncreased = true;
         }
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-        updateTotalTimeValuesEachTick();
+        updateTotalTimesAndCalories();
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3389,7 +3390,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           textSizeIncreased = true;
         }
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-        updateTotalTimeValuesEachTick();
+        updateTotalTimesAndCalories();
 
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
 
@@ -3412,7 +3413,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setNotificationValues();
 
         setCountDownTimerTickLogic(millisUntilFinished, setMillis);
-        updateTotalTimeValuesEachTick();
+        updateTotalTimesAndCalories();
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
 
         dotDraws.reDraw();
@@ -3435,7 +3436,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setNotificationValues();
 
         setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
-        updateTotalTimeValuesEachTick();
+        updateTotalTimesAndCalories();
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
 
         dotDraws.reDraw();
@@ -3459,7 +3460,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
         setCountDownTimerTickLogic(millisUntilFinished, pomMillis);
-        updateTotalTimeValuesEachTick();
+        updateTotalTimesAndCalories();
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
 
         dotDraws.reDraw();
@@ -3786,11 +3787,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle));
   }
 
-  private void updateTotalTimeValuesEachTick() {
+  private void updateTotalTimesAndCalories() {
     long remainder = 0;
     if (mode==1) {
       resetTotalTimesAndCaloriesForModeOne();
       displayCurrentTotalTimeStringForModeOne();
+
       if (cycleHasActivityAssigned) {
         actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
       }
@@ -4293,20 +4295,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void retrieveTdeeTimeAndCalorieStatsForSingleCycle() {
+  private void retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView() {
     cycles = cyclesList.get(positionOfSelectedCycle);
 
-    double totalCaloriesBurned = 0;
+    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
+    if (cycleHasActivityAssigned) {
+      actvitiyStatsInTimerTextView.setVisibility(View.VISIBLE);
+    } else {
+      actvitiyStatsInTimerTextView.setVisibility(View.INVISIBLE);
+    }
 
     totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
     burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-
-    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
     selectedTdeeValuePosition = cycles.getTdeeValuePosition();
-
     metScore = retrieveMetScoreFromSubCategoryPosition();
+
+    updateTotalTimesAndCalories();
   }
 
   private String getTdeeActivityStringFromSavedArrayPosition() {
