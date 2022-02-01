@@ -482,8 +482,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: First cycle of app launch creation not showing title.
-  //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
+  //Todo: Intermittent first cycle of app launch creation not showing title - might be inconsistent threading.
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test reset/resume option alternating between modes/tabs.
@@ -2037,6 +2036,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable());
 
+      roundIsEdited = false;
       Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
     }
   }
@@ -3129,7 +3129,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
-  //Todo: We really only need the direct database write to be in aSync (even cycle class set methods can run in UI). Should really refactor into separate save/update methods.
   private Runnable saveAddedOrEditedCycleASyncRunnable() {
     return new Runnable() {
       @Override
@@ -3173,7 +3172,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycles.setTimeAccessed(System.currentTimeMillis());
             cycles.setItemCount(workoutTime.size());
             if (isNewCycle) {
-              if (cycleTitle.isEmpty()) cycleTitle = date;
+              if (cycleTitle.isEmpty()) {
+                cycleTitle = date;
+              }
               cycles.setTimeAdded(System.currentTimeMillis());
               cycles.setTotalSetTime(0);
               cycles.setTotalBreakTime(0);
@@ -4162,7 +4163,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     beginTimerForNextRound = true;
     cycles_completed.setText(R.string.cycles_done);
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-    if (cycleTitle.isEmpty()) cycleTitle = date;
+    if (cycleTitle.isEmpty()) {
+      cycleTitle = date;
+    }
     cycle_title_textView.setText(cycleTitle);
 
     dotDraws.resetDotAlpha();
