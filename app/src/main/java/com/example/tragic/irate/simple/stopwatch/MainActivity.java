@@ -490,9 +490,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: time to add textview in edit popUp not resetting to 0 on FAB push.
   //Todo: Should really move all runnables to private, non-global methods.
-  //Todo: Test end of cycle (all rounds done) without resetting, followed by timerPopUp dismissal.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -1282,9 +1280,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         List<Integer> tempIdList = new ArrayList<>();
         tempIdList.addAll(receivedHighlightPositionHolder);
 
+        loadCycleListsFromDatabase();
         if (mode==1) {
-          cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-
           for (int i=0; i<tempIdList.size(); i++) {
             cycleID = cyclesList.get(i).getId();
             cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
@@ -1292,8 +1289,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         if (mode==3) {
-          pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-
           for (int i=0; i<tempIdList.size(); i++) {
             cycleID = pomCyclesList.get(i).getId();
             pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
@@ -1308,9 +1303,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
 
     deleteAllCyclesASyncRunnable = () -> {
+      loadCycleListsFromDatabase();
       if (mode==1) {
         if (cyclesList.size()>0) {
-          cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
           cyclesDatabase.cyclesDao().deleteAllCycles();
           runOnUiThread(()->{
             //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
@@ -1323,7 +1318,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       if (mode==3) {
         if (pomCyclesList.size()>0) {
-          pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
           cyclesDatabase.cyclesDao().deleteAllPomCycles();
           runOnUiThread(()->{
             pomArray.clear();
@@ -3304,9 +3298,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
           }
         }
+        loadCycleListsFromDatabase();
         runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
       }
     };
+  }
+
+  private void loadCycleListsFromDatabase() {
+    if (mode==1) {
+      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+    }
+    if (mode==3) {
+      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+    }
   }
 
 //  private void insertCycleIntoDatabase() {
