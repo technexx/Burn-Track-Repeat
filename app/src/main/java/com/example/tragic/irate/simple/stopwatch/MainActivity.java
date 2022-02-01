@@ -3113,11 +3113,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (isNewCycle || saveToDB) {
       AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable());
-    }
-    if (!isNewCycle) {
-      AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable());
     } else {
-      toggleTdeeTextViewVisibility();
+      AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable());
     }
 
     makeCycleAdapterVisible = true;
@@ -3695,10 +3692,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleTdeeTextViewVisibility() {
-    if (cycleHasActivityAssigned) {
-      actvitiyStatsInTimerTextView.setVisibility(View.VISIBLE);
+    if (!cycleHasActivityAssigned) {
+      actvitiyStatsInTimerTextView.setText(R.string.no_activity);
+      actvitiyStatsInTimerTextView.setTextSize(24);
     } else {
-      actvitiyStatsInTimerTextView.setVisibility(View.INVISIBLE);
+      actvitiyStatsInTimerTextView.setTextSize(20);
     }
   }
 
@@ -4218,6 +4216,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               setInitialTextSizeForRounds(0);
               break;
           }
+          toggleTdeeTextViewVisibility();
         }
         break;
       case 3:
