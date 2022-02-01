@@ -225,6 +225,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int EDITING_CYCLE = 2;
   int DELETING_CYCLE = 3;
 
+  Runnable globalSaveTotalTimesAndCaloriesInDatabaseRunnable;
+  Runnable globalSaveTotalTimesOnPostDelayRunnableInASyncThread;
+
   ArrayList<Integer> typeOfRound;
   ArrayList<String> typeOfRoundArray;
   int roundType;
@@ -379,23 +382,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   public Runnable infinityTimerForSets;
   public Runnable infinityTimerForBreaks;
-  public Runnable postRoundRunnableForFirstMode;
-  public Runnable postRoundRunnableForThirdMode;
 
   long defaultProgressBarDurationForInfinityRounds;
   long countUpMillisHolder;
   boolean makeCycleAdapterVisible;
   boolean beginTimerForNextRound;
   boolean timerPopUpIsVisible;
-
-  Runnable saveTotalTimesAndCaloriesInDatabaseRunnable;
-  Runnable saveTotalTimesOnPostDelayRunnableInASyncThread;
-
-  Runnable queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable;
-  Runnable queryAndSortAllCyclesFromDatabaseRunnable;
-  Runnable deleteTotalCycleTimesASyncRunnable;
-  Runnable deleteHighlightedCyclesASyncRunnable;
-  Runnable deleteAllCyclesASyncRunnable;
 
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
@@ -490,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Should really move all runnables to private, non-global methods.
+  //Todo: First cycle of app launch creation not showing title.
   //Todo: "Save" toast pops up when launching a cycle after editing it (only want it when moving back to Main screen).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -533,7 +525,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onDestroy() {
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-    AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     super.onDestroy();
   }
 
@@ -835,7 +827,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
-      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -1063,7 +1055,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       addAndRoundDownTotalCycleTimes();
       addAndRoundDownTdeeTimeAndTotalCalories();
-      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
     new_lap.setOnClickListener(v -> {
@@ -1082,9 +1074,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_all_confirm.setOnClickListener(v-> {
       if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
-        AsyncTask.execute(deleteAllCyclesASyncRunnable);
+        AsyncTask.execute(deleteAllCyclesASyncRunnable());
       } else if (delete_all_text.getText().equals(getString(R.string.delete_total_times))) {
-        AsyncTask.execute(deleteTotalCycleTimesASyncRunnable);
+        AsyncTask.execute(deleteTotalCycleTimesASyncRunnable());
       }
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
@@ -1092,161 +1084,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_all_cancel.setOnClickListener(v -> {
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
+  }
 
-    postRoundRunnableForFirstMode = new Runnable() {
-      @Override
-      public void run() {
-        defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-        dotDraws.resetDotAlpha();
-
-        setMillis = 0;
-        breakMillis = 0;
-        countUpMillisHolder = 0;
-        timerIsPaused = false;
-
-        if (numberOfRoundsLeft>0) {
-          switch (typeOfRound.get(currentRound)) {
-            case 1:
-              setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
-              if (beginTimerForNextRound) {
-                startObjectAnimatorAndTotalCycleTimeCounters();
-                startSetTimer();
-              }
-              break;
-            case 2:
-              timeLeft.setText("0");
-              if (beginTimerForNextRound) {
-                instantiateAndStartObjectAnimator(30000);
-                mHandler.post(infinityTimerForSets);
-              }
-              break;
-            case 3:
-              breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
-              if (beginTimerForNextRound) {
-                startObjectAnimatorAndTotalCycleTimeCounters();
-                startBreakTimer();
-              }
-              break;
-            case 4:
-              timeLeft.setText("0");
-              if (beginTimerForNextRound) {
-                instantiateAndStartObjectAnimator(30000);
-                mHandler.post(infinityTimerForBreaks);
-              }
-              break;
-          }
-        } else {
-          animateEnding();
-          progressBar.setProgress(0);
-          currentRound = 0;
-          timerEnded = true;
-          cyclesCompleted++;
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-        }
-        timerDisabled = false;
-        next_round.setEnabled(true);
-      }
-    };
-
-    postRoundRunnableForThirdMode = new Runnable() {
-      @Override
-      public void run() {
-        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
-        dotDraws.resetDotAlpha();
-
-        if (pomDotCounter<=7) {
-          pomMillis = pomValuesTime.get(pomDotCounter);
-          timeLeft.setText(convertSeconds((pomMillis) / 1000));
-          if (beginTimerForNextRound) {
-            startObjectAnimatorAndTotalCycleTimeCounters();
-            startPomTimer();
-          }
-        } else {
-          animateEnding();
-          progressBar.setProgress(0);
-          timerEnded = true;
-          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-        }
-        timerDisabled = false;
-        next_round.setEnabled(true);
-      }
-    };
-
-    queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable = new Runnable() {
-      @Override
-      public void run() {
-        if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-        if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
-            retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView();
-          }
-        });
-      }
-    };
-
-    saveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
-      @Override
-      public void run() {
-        saveTotalSetAndBreakTimes();
-        saveTotalTdeeTimeAndCalories();
-
-        if (!timerIsPaused) {
-          mHandler.postDelayed(saveTotalTimesOnPostDelayRunnableInASyncThread, 5000);
-        } else {
-          mHandler.removeCallbacks(saveTotalTimesOnPostDelayRunnableInASyncThread);
-        }
-      }
-    };
-
-    saveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
-      @Override
-      public void run() {
-        AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
-      }
-    };
-
-    queryAndSortAllCyclesFromDatabaseRunnable = new Runnable() {
-      @Override
-      public void run() {
-        if (mode==1) {
-          switch (sortMode) {
-            case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
-            case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
-            case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
-            case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
-            case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
-            case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
-          }
-          runOnUiThread(()->{
-            savedCycleAdapter.notifyDataSetChanged();
-          });
-        }
-        if (mode==3) {
-          switch (sortModePom) {
-            case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
-            case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
-            case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
-            case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
-          }
-          runOnUiThread(()->{
-            savedPomCycleAdapter.notifyDataSetChanged();
-          });
-        }
-        runOnUiThread(()-> {
-          clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
-          moveSortCheckmark();
-          sortPopupWindow.dismiss();
-        });
-      }
-    };
-
-    deleteTotalCycleTimesASyncRunnable = new Runnable() {
+  private Runnable deleteTotalCycleTimesASyncRunnable() {
+    return new Runnable() {
       @Override
       public void run() {
         if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
@@ -1267,66 +1108,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
       }
     };
+  }
 
-    deleteHighlightedCyclesASyncRunnable = new Runnable() {
+  private Runnable deleteAllCyclesASyncRunnable() {
+    return new Runnable() {
       @Override
       public void run() {
-        if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
-          runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
-          return;
-        }
-
-        int cycleID = 0;
-        List<Integer> tempIdList = new ArrayList<>();
-        tempIdList.addAll(receivedHighlightPositionHolder);
-
-        loadCycleListsFromDatabase();
-        if (mode==1) {
-          for (int i=0; i<tempIdList.size(); i++) {
-            cycleID = cyclesList.get(i).getId();
-            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-            cyclesDatabase.cyclesDao().deleteCycle(cycles);
+        {
+          loadCycleListsFromDatabase();
+          if (mode==1) {
+            if (cyclesList.size()>0) {
+              cyclesDatabase.cyclesDao().deleteAllCycles();
+              runOnUiThread(()->{
+                //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
+                workoutCyclesArray.clear();
+                typeOfRoundArray.clear();
+                workoutTitleArray.clear();
+                savedCycleAdapter.notifyDataSetChanged();
+              });
+            }
           }
-        }
-        if (mode==3) {
-          for (int i=0; i<tempIdList.size(); i++) {
-            cycleID = pomCyclesList.get(i).getId();
-            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
-            cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
+          if (mode==3) {
+            if (pomCyclesList.size()>0) {
+              cyclesDatabase.cyclesDao().deleteAllPomCycles();
+              runOnUiThread(()->{
+                pomArray.clear();
+                pomTitleArray.clear();
+                savedPomCycleAdapter.notifyDataSetChanged();
+              });
+            }
           }
-        }
-        runOnUiThread(()->{
-          editCycleArrayLists(DELETING_CYCLE);
-          replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-        });
+          runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
+        };
       }
-    };
-
-    deleteAllCyclesASyncRunnable = () -> {
-      loadCycleListsFromDatabase();
-      if (mode==1) {
-        if (cyclesList.size()>0) {
-          cyclesDatabase.cyclesDao().deleteAllCycles();
-          runOnUiThread(()->{
-            //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-            workoutCyclesArray.clear();
-            typeOfRoundArray.clear();
-            workoutTitleArray.clear();
-            savedCycleAdapter.notifyDataSetChanged();
-          });
-        }
-      }
-      if (mode==3) {
-        if (pomCyclesList.size()>0) {
-          cyclesDatabase.cyclesDao().deleteAllPomCycles();
-          runOnUiThread(()->{
-            pomArray.clear();
-            pomTitleArray.clear();
-            savedPomCycleAdapter.notifyDataSetChanged();
-          });
-        }
-      }
-      runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
     };
   }
 
@@ -1371,6 +1185,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     instantiateTdeeSpinnersAndSetThemOnAdapters();
     setTdeeSpinnerListeners();
+    instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
+    instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
   }
 
   private void instantiateGlobalClasses() {
@@ -1780,6 +1596,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
   }
 
+  private void instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable() {
+    globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
+      @Override
+      public void run() {
+        saveTotalSetAndBreakTimes();
+        saveTotalTdeeTimeAndCalories();
+
+        if (!timerIsPaused) {
+          mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 1000);
+        } else {
+          mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
+        }
+      }
+    };
+  };
+
+  private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
+    globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
+      @Override
+      public void run() {
+        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+        Log.i("testSave", "Executed!");
+      }
+    };
+  }
+
   private void setTdeeSpinnerListeners() {
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
@@ -1860,11 +1702,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
-      AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable);
+      AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
 
       prefEdit.putInt("sortMode", sortMode);
       prefEdit.putInt("sortModePom", sortModePom);
       prefEdit.apply();
+    };
+  }
+
+  private Runnable queryAndSortAllCyclesFromDatabaseRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        if (mode==1) {
+          switch (sortMode) {
+            case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
+            case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
+            case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
+            case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
+            case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
+            case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+          }
+          runOnUiThread(()->{
+            savedCycleAdapter.notifyDataSetChanged();
+          });
+        }
+        if (mode==3) {
+          switch (sortModePom) {
+            case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
+            case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
+            case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
+            case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+          }
+          runOnUiThread(()->{
+            savedPomCycleAdapter.notifyDataSetChanged();
+          });
+        }
+        runOnUiThread(()-> {
+          clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
+          moveSortCheckmark();
+          sortPopupWindow.dismiss();
+        });
+      }
     };
   }
 
@@ -1956,12 +1835,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle.setEnabled(false);
     fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
 
-    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable);
+    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable());
 
     if (mode==1) savedCycleAdapter.removeHighlight();
     if (mode==3) savedPomCycleAdapter.removeHighlight();
 
     Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+  }
+
+  private Runnable deleteHighlightedCyclesASyncRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
+          runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
+          return;
+        }
+
+        int cycleID = 0;
+        List<Integer> tempIdList = new ArrayList<>();
+        tempIdList.addAll(receivedHighlightPositionHolder);
+
+        loadCycleListsFromDatabase();
+        if (mode==1) {
+          for (int i=0; i<tempIdList.size(); i++) {
+            cycleID = cyclesList.get(i).getId();
+            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+            cyclesDatabase.cyclesDao().deleteCycle(cycles);
+          }
+        }
+        if (mode==3) {
+          for (int i=0; i<tempIdList.size(); i++) {
+            cycleID = pomCyclesList.get(i).getId();
+            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+            cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
+          }
+        }
+        runOnUiThread(()->{
+          editCycleArrayLists(DELETING_CYCLE);
+          replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+        });
+      }
+    };
   }
 
   private void setDefaultUserSettings() {
@@ -2429,7 +2344,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       }
       resetTimer();
-      AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     }
   }
 
@@ -2574,7 +2489,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
       }
       //If between rounds, post runnable for next round without starting timer or object animator.
-      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode);
+      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode());
 
       prefEdit.putInt("savedProgressBarValueForModeOne", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
@@ -2589,7 +2504,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isNewCycle) positionOfSelectedCycle = 7;
         savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
       }
-      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode);
+      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode());
 
       prefEdit.putInt("savedProgressBarValueForModeThree", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
@@ -3200,7 +3115,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable());
     }
     if (!isNewCycle) {
-      AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable);
+      AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable());
     } else {
       toggleTdeeTextViewVisibility();
     }
@@ -3304,6 +3219,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private Runnable queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+        if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
+            retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView();
+          }
+        });
+      }
+    };
+  }
+
   private void loadCycleListsFromDatabase() {
     if (mode==1) {
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
@@ -3312,24 +3244,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
     }
   }
-
-//  private void insertCycleIntoDatabase() {
-//    if (mode==1) {
-//      cyclesDatabase.cyclesDao().insertCycle(cycles);
-//    }
-//    if (mode==3) {
-//      cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
-//    }
-//  }
-//
-//  private void updateCycleInDatabase() {
-//    if (mode==1) {
-//      cyclesDatabase.cyclesDao().updateCycles(cycles);
-//    }
-//    if (mode==3) {
-//      cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-//    }
-//  }
 
   private void instantiateAndStartObjectAnimator(long duration) {
     if (mode==1) {
@@ -3556,7 +3470,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     addAndRoundDownTotalCycleTimes();
     addAndRoundDownTdeeTimeAndTotalCalories();
-    AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
     if (mode==1) {
       if (numberOfRoundsLeft==0) {
@@ -3609,7 +3523,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       numberOfRoundsLeft--;
       currentRound++;
-      mHandler.postDelayed(postRoundRunnableForFirstMode, 750);
+      mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
 
       beginTimerForNextRound = true;
       timerDurationPlaceHolder = 0;
@@ -3642,7 +3556,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mHandler.post(endFade);
       pomDotCounter++;
 
-      mHandler.postDelayed(postRoundRunnableForThirdMode, 750);
+      mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
 
       if (endingEarly) {
         if (timer != null) timer.cancel();
@@ -3652,6 +3566,92 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     }
     beginTimerForNextRound = true;
+  }
+
+  private Runnable postRoundRunnableForFirstMode() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
+        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
+        dotDraws.resetDotAlpha();
+
+        setMillis = 0;
+        breakMillis = 0;
+        countUpMillisHolder = 0;
+        timerIsPaused = false;
+
+        if (numberOfRoundsLeft>0) {
+          switch (typeOfRound.get(currentRound)) {
+            case 1:
+              setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
+              timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
+              if (beginTimerForNextRound) {
+                startObjectAnimatorAndTotalCycleTimeCounters();
+                startSetTimer();
+              }
+              break;
+            case 2:
+              timeLeft.setText("0");
+              if (beginTimerForNextRound) {
+                instantiateAndStartObjectAnimator(30000);
+                mHandler.post(infinityTimerForSets);
+              }
+              break;
+            case 3:
+              breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
+              timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
+              if (beginTimerForNextRound) {
+                startObjectAnimatorAndTotalCycleTimeCounters();
+                startBreakTimer();
+              }
+              break;
+            case 4:
+              timeLeft.setText("0");
+              if (beginTimerForNextRound) {
+                instantiateAndStartObjectAnimator(30000);
+                mHandler.post(infinityTimerForBreaks);
+              }
+              break;
+          }
+        } else {
+          animateEnding();
+          progressBar.setProgress(0);
+          currentRound = 0;
+          timerEnded = true;
+          cyclesCompleted++;
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
+        }
+        timerDisabled = false;
+        next_round.setEnabled(true);
+      }
+    };
+  };
+
+  private Runnable postRoundRunnableForThirdMode() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
+        dotDraws.resetDotAlpha();
+
+        if (pomDotCounter<=7) {
+          pomMillis = pomValuesTime.get(pomDotCounter);
+          timeLeft.setText(convertSeconds((pomMillis) / 1000));
+          if (beginTimerForNextRound) {
+            startObjectAnimatorAndTotalCycleTimeCounters();
+            startPomTimer();
+          }
+        } else {
+          animateEnding();
+          progressBar.setProgress(0);
+          timerEnded = true;
+          cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
+        }
+        timerDisabled = false;
+        next_round.setEnabled(true);
+      }
+    };
   }
 
   private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
@@ -3997,7 +3997,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             }
-            AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+            AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
           } else resetTimer();
           break;
         case 3:
@@ -4018,7 +4018,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               startObjectAnimatorAndTotalCycleTimeCounters();
               startPomTimer();
             }
-            AsyncTask.execute(saveTotalTimesAndCaloriesInDatabaseRunnable);
+            AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
           } else resetTimer();
           break;
         case 4:
