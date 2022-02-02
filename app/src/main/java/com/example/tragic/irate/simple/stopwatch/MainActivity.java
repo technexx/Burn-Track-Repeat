@@ -4191,6 +4191,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
     blankCanvas.setVisibility(View.GONE);
+    addTDEEActivityTextView.setVisibility(View.VISIBLE);
     cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
     completedLapsLayoutParams.topMargin = convertDensityPixelsToScalable(24);
 
@@ -4263,6 +4264,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timerDisabled = false;
         cycle_title_textView.setVisibility(View.INVISIBLE);
+        addTDEEActivityTextView.setVisibility(View.INVISIBLE);
         if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
         break;
     }
