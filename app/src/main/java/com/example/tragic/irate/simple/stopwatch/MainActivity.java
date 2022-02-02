@@ -482,6 +482,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Total time stopping 1 sec short at end of round, then adding that second at very beginning of next round.
+  //Todo: BUG: Total time going up higher after resets.
+  //Todo: Total times not saving sometimes w/ nextRound + reset from main adapter.
   //Todo: Activity for Pom? (Would also help layout). Could simply replicate Mode 1.
   //Todo: Look at updating MET scores. Some seem weird (e.g. sitting w/ different scores). Reading sitting/standing have same.
   //Todo: Intermittent first cycle of app launch creation not showing title - might be inconsistent threading.
@@ -802,7 +805,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     fab.setOnClickListener(v -> {
-      fabButtonLogic();
+      fabLogic();
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -1664,7 +1667,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void fabButtonLogic() {
+  private void fabLogic() {
     fab.setEnabled(false);
     buttonToLaunchTimer.setEnabled(true);
     cycleNameEdit.getText().clear();
@@ -1676,6 +1679,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleExistenceOfTdeeActivity(false);
 
     assignOldCycleValuesToCheckForChanges();
+    setEditPopUpTimerHeaders(1);
     editPopUpTimerArray.clear();
     timerValueInEditPopUpTextView.setText("00:00");
   }
@@ -4429,8 +4433,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   ///////////Test methods///////////////////////////
-  private void logDatabaseStuff() {
-    Log.i("testDB", "tdee booleans are " + cycles.getTdeeActivityExists());
+
+  private void logTotalSetTimes() {
+    Log.i("testTimes", "single set millis is " + cycleSetTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total set millis is " + totalCycleSetTimeInMillis);
+  }
+
+  private void logTotalBreakTimes() {
+    Log.i("testTimes", "single break millis is " + cycleBreakTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total break millis is " + totalCycleBreakTimeInMillis);
+  }
+
+  private void logTotalTdeeTimes() {
+    Log.i("testTimes", "single tdee millis is " + singleInstanceTdeeActivityTime);
+    Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
   }
 
   private void logTdeeCategoryPositions() {
@@ -4440,7 +4456,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logTdeeTimeAndCalories() {
     Log.i("testTdee", "single time retrieved is " + singleInstanceTdeeActivityTime);
-    //0 in first save before single is added.
     Log.i("testTdee", "tdee time retrieved is " + totalTdeeActivityTime);
     Log.i("testTdee", "total calories retrieved are " + burnedCaloriesInAllLoadingsOfCycle);
   }
