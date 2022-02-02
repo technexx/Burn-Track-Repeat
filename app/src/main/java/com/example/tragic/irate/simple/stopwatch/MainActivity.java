@@ -3876,6 +3876,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Sets AND breaks get their last single var added to them each time this is called. Either (A) Reset var or only call sets/breaks on their respective rounds.
   private void addAndRoundDownTotalCycleTimes() {
     if (mode==1) {
       totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
@@ -3896,6 +3897,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
     }
+    logTotalSetTimes();
+    logTotalTdeeTimes();
   }
 
   private void addAndRoundDownTdeeTimeAndTotalCalories() {
@@ -4452,12 +4455,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTdeeCategoryPositions() {
     Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
     Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
-  }
-
-  private void logTdeeTimeAndCalories() {
-    Log.i("testTdee", "single time retrieved is " + singleInstanceTdeeActivityTime);
-    Log.i("testTdee", "tdee time retrieved is " + totalTdeeActivityTime);
-    Log.i("testTdee", "total calories retrieved are " + burnedCaloriesInAllLoadingsOfCycle);
   }
 
   private void logTdeeArraySizes() {
