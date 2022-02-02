@@ -14,9 +14,6 @@ public class TDEEChosenActivitySpinnerValues {
     ArrayList<String[]> subCategoryListOfStringArrays;
     ArrayList<String[]> subValueListOfStringArrays;
 
-    ArrayList<String> minutesDurationIntegerArray;
-    ArrayList<String> secondsDurationIntegerArray;
-
     String[] bicycling;
     String[] conditioning;
     String[] dancing;
@@ -55,31 +52,6 @@ public class TDEEChosenActivitySpinnerValues {
         this.mContext = context;
         populateCategoryList();
         populateSubCategoryLists();
-    }
-
-    public ArrayList<String> populateMinuteSpinnerList(int minutes) {
-        minutesDurationIntegerArray = new ArrayList<>();
-        for (int i=1; i<minutes; i++) {
-            if (i==1) {
-                minutesDurationIntegerArray.add(i + " minute");
-            } else {
-                minutesDurationIntegerArray.add((i) +  " minutes");
-            }
-        }
-        return minutesDurationIntegerArray;
-    }
-
-    public ArrayList<String> populateSecondsSpinnerList(int seconds) {
-        secondsDurationIntegerArray = new ArrayList<>();
-        for (int i=1; i<seconds; i++) {
-            if (i==1) {
-                secondsDurationIntegerArray.add(i + " second");
-            }
-            else {
-                secondsDurationIntegerArray.add(i + " seconds");
-            }
-        }
-        return secondsDurationIntegerArray;
     }
 
     private void populateCategoryList() {

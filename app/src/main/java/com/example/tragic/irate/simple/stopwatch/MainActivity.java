@@ -86,6 +86,7 @@ import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -482,8 +483,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: MET value fetches are wrong. Index exceptions as well. Works @ app start but switching causing crashes.
+  //Todo: If a 10th index sub-cat is selected, but then we move to a category w/ 5 entries, will crash w/ index exception.
   //Todo: Activity for Pom? (Would also help layout). Could simply replicate Mode 1.
-  //Todo: Look at updating MET scores. Some seem weird (e.g. sitting w/ different scores). Reading sitting/standing have same.
   //Todo: Intermittent first cycle of app launch creation not showing title - might be inconsistent threading.
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -498,6 +500,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test everything 10x.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
+  //Todo: GAME: Word builder w/ letters costing different amount. Earn $ for it (mining/random spots?).
 
   @Override
   public void onResume() {
@@ -4413,36 +4416,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
   }
 
-  private double retrieveMetScoreFromSubCategoryPosition() {
-    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
-    double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
-    return Math.round(preRoundedMet);
-  }
-
   private void tdeeCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
     tdeeSubCategoryAdapter.clear();
     tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
 
+    selectedTdeeSubCategoryPosition = 0;
+    selectedTdeeValuePosition = 0;
     //0 Used because new category selection will default to first entry in sub category
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, metScore));
+
+    logTdeeCategoryPositions();
+    logTdeeCategoryArraysSelected();
   }
 
   private void tdeeSubCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
 
+    //Todo: E.g. if we choose position 10, that position is tried from the valueArray[] size, which we do not want.
     selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
-    selectedTdeeValuePosition = selectedTdeeCategoryPosition;
+    selectedTdeeValuePosition = selectedTdeeSubCategoryPosition;
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, metScore));
+
+    logTdeeCategoryPositions();
+    logTdeeCategoryArraysSelected();
+  }
+
+  private double retrieveMetScoreFromSubCategoryPosition() {
+    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
+    double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
+    return Math.round(preRoundedMet);
   }
 
 
-
   ///////////Test methods///////////////////////////
-
   private void logTotalSetTimes() {
     Log.i("testTimes", "single set millis is " + cycleSetTimeForSingleRoundInMillis);
     Log.i("testTimes", "total set millis is " + totalCycleSetTimeInMillis);
@@ -4461,6 +4471,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTdeeCategoryPositions() {
     Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
     Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
+    Log.i("testRetrieve", "value array position " + selectedTdeeValuePosition);
+  }
+
+  private void logTdeeCategoryArraysSelected() {
+    ArrayList<String[]> valueArrayList = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays;
+    String[] selected = valueArrayList.get(selectedTdeeValuePosition);
+
+    Log.i("testRetrieve", "value ARRAY LIST is " + Arrays.toString(selected));
+
+    for (int i=0; i<valueArrayList.size(); i++) {
+
+    }
   }
 
   private void logTdeeArraySizes() {

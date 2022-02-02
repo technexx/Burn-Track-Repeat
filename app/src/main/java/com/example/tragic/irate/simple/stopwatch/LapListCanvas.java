@@ -28,7 +28,7 @@ public class LapListCanvas extends View {
         setGradientWidth();
     }
 
-    public void drawOutlineBox() {
+    private void drawOutlineBox() {
         mPaint.setColor(Color.WHITE);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(2);
@@ -38,7 +38,7 @@ public class LapListCanvas extends View {
         mCanvas.drawRoundRect(rect, 50, 50, mPaint);
     }
 
-    public void drawGradientBox() {
+    private void drawGradientBox() {
         mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.FILL);
 
@@ -53,7 +53,7 @@ public class LapListCanvas extends View {
         }
     }
 
-    public void setGradientWidth() {
+    private void setGradientWidth() {
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
             gradientWidthAndHeight = 240;
             gradientShadeMovement = 12;
@@ -65,7 +65,7 @@ public class LapListCanvas extends View {
         }
     }
 
-    public int convertDensityPixelsToScalable(float pixels) {
+    private int convertDensityPixelsToScalable(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
     }
 

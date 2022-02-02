@@ -221,6 +221,9 @@
 
         <item>Elliptical training - moderate effort </item>
 
+        <item>Jogging w/ Stroller w/ 25 to 50lb weight at 6mph</item>
+        <item>Kettlebells, interval or continuous swings.</item>
+
         <item>Obstacle courses and/or boot camp </item>
 
         <item>Resistance training - multiple exercises, 8 to 15 repetitions </item>
@@ -237,9 +240,9 @@
 
         <item>Rope skipping - general </item>
 
-        <item>Rowing - 100 watts</item>
-        <item>Rowing - 150 watts</item>
-        <item>Rowing - 220 watts</item>
+        <item>Rowing - 100 watts (moderate effort)</item>
+        <item>Rowing - 150 watts (vigorous effort)</item>
+        <item>Rowing - 220 watts (very vigorous effort)</item>
 
         <item>Ski machine - general </item>
 
@@ -278,7 +281,7 @@
     <string-array name="fishing">
         <item>Fishing - general</item>
         <item>Hunting - general  </item>
-        <item>Rifle exercises </item>
+        <item>Rifle or pistol exercises </item>
     </string-array>
 
     <string-array name="home">
@@ -322,7 +325,7 @@
 
         <item>Making beds and changing linens </item>
 
-        <item>Moving furniture or carrying boxes</item>
+        <item>Moving furniture</item>
 
         <item>Painting - general </item>
         <item>Plumbing - general </item>
@@ -391,8 +394,6 @@
         <item>Arts and crafts - standing at vigorous effort </item>
 
         <item>Board games - sitting </item>
-
-        <item>Camping - general </item>
 
         <item>Casino gambling - standing </item>
 
@@ -827,6 +828,9 @@
 
         <item>5.0 </item>
 
+        <item>10.6</item>
+        <item>9.8</item>
+
         <item>5.0</item>
 
         <item>3.5 </item>
@@ -996,8 +1000,6 @@
         <item>3.5 </item>
 
         <item>1.5 </item>
-
-        <item>3.5 </item>
 
         <item>2.5 </item>
 
