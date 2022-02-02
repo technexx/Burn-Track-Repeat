@@ -482,6 +482,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Activity for Pom? (Would also help layout). Could simply replicate Mode 1.
+  //Todo: Look at updating MET scores. Some seem weird (e.g. sitting w/ different scores). Reading sitting/standing have same.
   //Todo: Intermittent first cycle of app launch creation not showing title - might be inconsistent threading.
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -1173,7 +1175,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     retrieveAndImplementCycleSorting();
 
     setDefaultTimerValuesAndTheirEditTextViews();
-    setDefaultEditRoundViews();
     setDefaultLayoutVisibilities();
     instantiateAnimationAndColorMethods();
     sendPhoneResolutionToDotDrawsClass();
@@ -1370,6 +1371,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
 
         setDefaultUserSettings();
+        setDefaultEditRoundViews();
       });
     });
   }
