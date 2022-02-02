@@ -482,9 +482,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Total time stopping 1 sec short at end of round, then adding that second at very beginning of next round.
-  //Todo: BUG: Total time going up higher after resets.
-  //Todo: Total times not saving sometimes w/ nextRound + reset from main adapter.
   //Todo: Activity for Pom? (Would also help layout). Could simply replicate Mode 1.
   //Todo: Look at updating MET scores. Some seem weird (e.g. sitting w/ different scores). Reading sitting/standing have same.
   //Todo: Intermittent first cycle of app launch creation not showing title - might be inconsistent threading.
@@ -1047,6 +1044,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     reset.setOnClickListener(v -> {
+      addAndRoundDownTotalCycleTimes();
+      addAndRoundDownTdeeTimeAndTotalCalories();
+      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+
       if (mode != 3) {
         resetTimer();
       } else {
@@ -1057,9 +1058,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           resetTimer();
         }
       }
-      addAndRoundDownTotalCycleTimes();
-      addAndRoundDownTdeeTimeAndTotalCalories();
-      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
     new_lap.setOnClickListener(v -> {
@@ -3876,29 +3874,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Sets AND breaks get their last single var added to them each time this is called. Either (A) Reset var or only call sets/breaks on their respective rounds.
   private void addAndRoundDownTotalCycleTimes() {
     if (mode==1) {
-      totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
-      totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
-
-      totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
-      totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
+      switch (typeOfRound.get(currentRound)) {
+        case 1: case 2:
+          totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
+          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
+          cycleSetTimeForSingleRoundInMillis = 0;
+          break;
+        case 3: case 4:
+          totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
+          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
+          cycleBreakTimeForSingleRoundInMillis = 0;
+          break;
+      }
     }
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
           totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
           totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
+          cycleSetTimeForSingleRoundInMillis = 0;
           break;
         case 1: case 3: case 5: case 7:
           totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
           totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
+          cycleBreakTimeForSingleRoundInMillis = 0;
           break;
       }
     }
-    logTotalSetTimes();
-    logTotalTdeeTimes();
   }
 
   private void addAndRoundDownTdeeTimeAndTotalCalories() {
