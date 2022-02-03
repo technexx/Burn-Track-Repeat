@@ -4421,9 +4421,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdeeSubCategoryAdapter.clear();
     tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
 
-    selectedTdeeSubCategoryPosition = 0;
-    selectedTdeeValuePosition = 0;
-    //0 Used because new category selection will default to first entry in sub category
+    tdee_sub_category_spinner.setSelection(0);
+
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, metScore));
 
@@ -4431,7 +4430,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     logTdeeCategoryArraysSelected();
   }
 
-  //Todo: ValueArray needs to mirror Categories.
   private void tdeeSubCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
 
