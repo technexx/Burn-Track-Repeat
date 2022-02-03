@@ -4431,10 +4431,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     logTdeeCategoryArraysSelected();
   }
 
+  //Todo: ValueArray needs to mirror Categories.
   private void tdeeSubCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
 
-    //Todo: E.g. if we choose position 10, that position is tried from the valueArray[] size, which we do not want.
     selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
     selectedTdeeValuePosition = selectedTdeeSubCategoryPosition;
 
@@ -4448,9 +4448,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private double retrieveMetScoreFromSubCategoryPosition() {
     String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
-    return Math.round(preRoundedMet);
+    return preRoundedMet;
   }
 
+
+  private void logTdeeCategoryPositions() {
+    Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
+    Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
+    Log.i("testRetrieve", "value array position " + selectedTdeeValuePosition);
+  }
+
+  private void logTdeeCategoryArraysSelected() {
+    ArrayList<String[]> valueArrayList = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays;
+    String[] selected = valueArrayList.get(selectedTdeeCategoryPosition);
+
+    Log.i("testRetrieve", "value ARRAY LIST is " + Arrays.toString(selected));
+  }
+
+  private void logTdeeArraySizes() {
+    for (int i=0; i<tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.size(); i++) {
+      String[] arrayToTest = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(i);
+      Log.i("testTdeeArraySizes", "size of " + i + " is " + arrayToTest.length);
+    }
+  }
 
   ///////////Test methods///////////////////////////
   private void logTotalSetTimes() {
@@ -4466,29 +4486,5 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTotalTdeeTimes() {
     Log.i("testTimes", "single tdee millis is " + singleInstanceTdeeActivityTime);
     Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
-  }
-
-  private void logTdeeCategoryPositions() {
-    Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
-    Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
-    Log.i("testRetrieve", "value array position " + selectedTdeeValuePosition);
-  }
-
-  private void logTdeeCategoryArraysSelected() {
-    ArrayList<String[]> valueArrayList = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays;
-    String[] selected = valueArrayList.get(selectedTdeeValuePosition);
-
-    Log.i("testRetrieve", "value ARRAY LIST is " + Arrays.toString(selected));
-
-    for (int i=0; i<valueArrayList.size(); i++) {
-
-    }
-  }
-
-  private void logTdeeArraySizes() {
-    for (int i=0; i<tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.size(); i++) {
-      String[] arrayToTest = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(i);
-      Log.i("testTdeeArraySizes", "size of " + i + " is " + arrayToTest.length);
-    }
   }
 }
