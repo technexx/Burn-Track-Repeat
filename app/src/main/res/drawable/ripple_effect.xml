@@ -3,12 +3,9 @@
     android:color="@color/dark_grey">
     <item android:id="@+id/rip">
         <shape android:shape="oval">
-            <padding
-                android:left="20dp">
-
-            </padding>
-            <solid android:color="@color/test_black"/>
+            <solid android:color="@color/black"/>
             <size
+                android:height="40dp"
                 android:width="60dp"
                />
         </shape>

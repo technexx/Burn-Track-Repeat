@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:backgroundTint="@color/test_grey"
-    android:background="@drawable/rounded_corners">
+    android:background="@drawable/black_gradient_background">
 
     <Spinner
         android:id="@+id/activity_category_spinner"
@@ -29,32 +28,6 @@
         android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>
-
-<!--    <Spinner-->
-<!--        android:id="@+id/calories_burned_per_minute_spinner"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/calories_burned_per_second_spinner"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"-->
-<!--        android:layout_marginTop="30dp"-->
-<!--        android:layout_marginStart="12dp"-->
-<!--        android:textSize="22sp"-->
-<!--        android:popupBackground="@color/black">-->
-<!--    </Spinner>-->
-
-<!--    <Spinner-->
-<!--        android:id="@+id/calories_burned_per_second_spinner"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/calories_burned_per_minute_spinner"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"-->
-<!--        android:layout_marginTop="30dp"-->
-<!--        android:layout_marginStart="0dp"-->
-<!--        android:textSize="22sp"-->
-<!--        android:popupBackground="@color/black">-->
-<!--    </Spinner>-->
 
     <TextView
         android:id="@+id/calories_burned_in_tdee_addition_popUp_textView"
