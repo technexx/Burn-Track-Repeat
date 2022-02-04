@@ -484,7 +484,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalTdeeActivityTime;
 
   //Todo: Deleting total times then resetting + restarting cycle will use pre-deleted total time.
-  //Todo: Deleting cycle then creating a new one uses the former's total time.
   //Todo: Infinity mode should toggle off by default for FAB (if last created cycle had it on).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -1624,6 +1623,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     assignOldCycleValuesToCheckForChanges();
     setEditPopUpTimerHeaders(1);
     editPopUpTimerArray.clear();
+    zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
     timerValueInEditPopUpTextView.setText("00:00");
   }
 
@@ -1820,7 +1820,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         runOnUiThread(()->{
-          resetTotalTimesAndCalories();
+          zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
           editCycleArrayLists(DELETING_CYCLE);
           replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         });
@@ -1857,7 +1857,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
           }
           runOnUiThread(()-> {
-            resetTotalTimesAndCalories();
+            zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
             replaceCycleListWithEmptyTextViewIfNoCyclesExist();
           });
         };
@@ -3758,6 +3758,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       resettingTotalTime = false;
+    }
+  }
+
+  private void zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews() {
+    if (mode==1) {
+      roundedValueForTotalTimes = 0;
+      timerDurationPlaceHolder = 0;
+
+      cycleSetTimeForSingleRoundInMillis = 0;
+      totalCycleSetTimeInMillis = 0;
+      cycleBreakTimeForSingleRoundInMillis = 0;
+      totalCycleBreakTimeInMillis = 0;
+
+      tdeeActivityTimeDurationPlaceHolder = 0;
+      singleInstanceTdeeActivityTime = 0;
+      totalTdeeActivityTime = 0;
+
+      total_set_time.setText("0");
+      total_break_time.setText("0");
+      cycles_completed.setText("0");
     }
   }
 
