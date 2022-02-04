@@ -483,8 +483,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Deleting total times then resetting + restarting cycle will use pre-deleted total time.
-  //Todo: Add save cycle to timer popUp dismissal and keep the other auto-save to 5000 ms.
   //Todo: Infinity mode should toggle off by default for FAB (if last created cycle had it on).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -1622,7 +1620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleExistenceOfTdeeActivity(false);
 
     assignOldCycleValuesToCheckForChanges();
-    setEditPopUpTimerHeaders(1);
+    resetEditPopUpTimerHeaders();
     editPopUpTimerArray.clear();
     zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
     timerValueInEditPopUpTextView.setText("00:00");
@@ -2146,6 +2144,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setAndCapTimerValues(breakValue);
     }
   }
+
+  private void resetEditPopUpTimerHeaders() {
+    editHeaderSelected = 1;
+    roundType = 1;
+    toggleInfinityRounds.setAlpha(0.3f);
+  }
+
 
   private void changeEditTimerTextViewColorIfNotEmpty() {
     if (editPopUpTimerArray.size()>0) {
