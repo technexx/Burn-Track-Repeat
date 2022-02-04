@@ -31,7 +31,7 @@
 
 
     <style name="EditButtonTextColor">
-        <item name="android:textColor">@color/off_white</item>
+        <item name="android:textColor">@color/light_white</item>
     </style>
 
 </resources>

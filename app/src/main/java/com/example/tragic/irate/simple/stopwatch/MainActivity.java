@@ -483,8 +483,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: MET value fetches are wrong. Index exceptions as well. Works @ app start but switching causing crashes.
-  //Todo: If a 10th index sub-cat is selected, but then we move to a category w/ 5 entries, will crash w/ index exception.
   //Todo: Activity for Pom? (Would also help layout). Could simply replicate Mode 1.
   //Todo: Intermittent first cycle of app launch creation not showing title - might be inconsistent threading.
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
@@ -501,6 +499,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
   //Todo: GAME: Word builder w/ letters costing different amount. Earn $ for it (mining/random spots?).
+  //Todo: Explode World game w/ 24 hours per day.
 
   @Override
   public void onResume() {
