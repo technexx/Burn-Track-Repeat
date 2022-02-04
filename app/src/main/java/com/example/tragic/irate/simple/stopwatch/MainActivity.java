@@ -483,8 +483,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Activity for Pom? (Would also help layout). Could simply replicate Mode 1.
-  //Todo: Intermittent first cycle of app launch creation not showing title - might be inconsistent threading.
+  //Todo: Deleting total times then resetting + restarting cycle will use pre-deleted total time.
+  //Todo: Deleting cycle then creating a new one uses the former's total time.
+  //Todo: Infinity mode should toggle off by default for FAB (if last created cycle had it on).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test reset/resume option alternating between modes/tabs.
@@ -1088,64 +1089,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_all_cancel.setOnClickListener(v -> {
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
-  }
-
-  private Runnable deleteTotalCycleTimesASyncRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
-        if (mode==3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
-
-        runOnUiThread(()->{
-          deleteCyclePopupWindow.dismiss();
-          totalCycleSetTimeInMillis = 0;
-          totalCycleBreakTimeInMillis = 0;
-
-
-          cyclesCompleted = 0;
-          resettingTotalTime = true;
-
-          total_set_time.setText("0");
-          total_break_time.setText("0");
-          cycles_completed.setText(getString(R.string.cycles_done, "0"));
-        });
-      }
-    };
-  }
-
-  private Runnable deleteAllCyclesASyncRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        {
-          loadCycleListsFromDatabase();
-          if (mode==1) {
-            if (cyclesList.size()>0) {
-              cyclesDatabase.cyclesDao().deleteAllCycles();
-              runOnUiThread(()->{
-                //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-                workoutCyclesArray.clear();
-                typeOfRoundArray.clear();
-                workoutTitleArray.clear();
-                savedCycleAdapter.notifyDataSetChanged();
-              });
-            }
-          }
-          if (mode==3) {
-            if (pomCyclesList.size()>0) {
-              cyclesDatabase.cyclesDao().deleteAllPomCycles();
-              runOnUiThread(()->{
-                pomArray.clear();
-                pomTitleArray.clear();
-                savedPomCycleAdapter.notifyDataSetChanged();
-              });
-            }
-          }
-          runOnUiThread(()-> replaceCycleListWithEmptyTextViewIfNoCyclesExist());
-        };
-      }
-    };
   }
 
   private void groupAllAppStartInstantiations() {
@@ -1877,8 +1820,69 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         runOnUiThread(()->{
+          resetTotalTimesAndCalories();
           editCycleArrayLists(DELETING_CYCLE);
           replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+        });
+      }
+    };
+  }
+
+  private Runnable deleteAllCyclesASyncRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        {
+          loadCycleListsFromDatabase();
+          if (mode==1) {
+            if (cyclesList.size()>0) {
+              cyclesDatabase.cyclesDao().deleteAllCycles();
+              runOnUiThread(()->{
+                //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
+                workoutCyclesArray.clear();
+                typeOfRoundArray.clear();
+                workoutTitleArray.clear();
+                savedCycleAdapter.notifyDataSetChanged();
+              });
+            }
+          }
+          if (mode==3) {
+            if (pomCyclesList.size()>0) {
+              cyclesDatabase.cyclesDao().deleteAllPomCycles();
+              runOnUiThread(()->{
+                pomArray.clear();
+                pomTitleArray.clear();
+                savedPomCycleAdapter.notifyDataSetChanged();
+              });
+            }
+          }
+          runOnUiThread(()-> {
+            resetTotalTimesAndCalories();
+            replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+          });
+        };
+      }
+    };
+  }
+
+  private Runnable deleteTotalCycleTimesASyncRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
+        if (mode==3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
+
+        runOnUiThread(()->{
+          deleteCyclePopupWindow.dismiss();
+          totalCycleSetTimeInMillis = 0;
+          totalCycleBreakTimeInMillis = 0;
+
+          cyclesCompleted = 0;
+          resettingTotalTime = true;
+
+          total_set_time.setText("0");
+          total_break_time.setText("0");
+          cycles_completed.setText(getString(R.string.cycles_done, "0"));
         });
       }
     };
@@ -3706,54 +3710,53 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void resetTotalTimesAndCaloriesForModeOne() {
+  private void resetTotalTimesAndCalories() {
     if (resettingTotalTime) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1:
-          roundedValueForTotalTimes = 1000 - (setMillis%1000);
-          timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
-          if (cycleHasActivityAssigned) {
-            long roundedValueForTdeeTime = 1000 - (setMillis%1000);
-            tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
-          }
-          break;
-        case 2:
-          long remainder = setMillis%1000;
-          timerDurationPlaceHolder = setMillis - remainder;
-          if (cycleHasActivityAssigned) {
-            remainder = setMillis%1000;
-            tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
-          }
-          break;
-        case 3:
-          roundedValueForTotalTimes = 1000 - (breakMillis%1000);
-          timerDurationPlaceHolder = breakMillis + roundedValueForTotalTimes;
-          break;
-        case 4:
-          remainder = breakMillis%1000;
-          timerDurationPlaceHolder = breakMillis - remainder;
-          break;
+      if (mode==1) {
+        switch (typeOfRound.get(currentRound)) {
+          case 1:
+            roundedValueForTotalTimes = 1000 - (setMillis%1000);
+            timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
+            if (cycleHasActivityAssigned) {
+              long roundedValueForTdeeTime = 1000 - (setMillis%1000);
+              tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
+            }
+            break;
+          case 2:
+            long remainder = setMillis%1000;
+            timerDurationPlaceHolder = setMillis - remainder;
+            if (cycleHasActivityAssigned) {
+              remainder = setMillis%1000;
+              tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
+            }
+            break;
+          case 3:
+            roundedValueForTotalTimes = 1000 - (breakMillis%1000);
+            timerDurationPlaceHolder = breakMillis + roundedValueForTotalTimes;
+            break;
+          case 4:
+            remainder = breakMillis%1000;
+            timerDurationPlaceHolder = breakMillis - remainder;
+            break;
+        }
       }
-      resettingTotalTime = false;
-    }
-  }
+      if (mode==3) {
+        switch (pomDotCounter) {
+          case 0: case 2: case 4: case 6:
+            if (resettingTotalTime) {
+              roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+              timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
+            }
+            break;
+          case 1: case 3: case 5: case 7:
+            if (resettingTotalTime) {
+              roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+              timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
+            }
+            break;
+        }
+      }
 
-  private void resetTotalTimesForModeThree() {
-    if (resettingTotalTime) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
-          }
-          break;
-        case 1: case 3: case 5: case 7:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-            timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
-          }
-          break;
-      }
       resettingTotalTime = false;
     }
   }
@@ -3786,15 +3789,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(iterateAndReturnTotalTimeForModeOne()/1000);
   }
 
-  private void displayCurrentTotalTimeStringForModeOne() {
-    switch (typeOfRound.get(currentRound)) {
-      case 1: case 2:
-        total_set_time.setText(currentTotalTimeStringForModeOne());
-        break;
-      case 3: case 4:
-        total_break_time.setText(currentTotalTimeStringForModeOne());
-        break;
+  private void displayCurrentTotalTimeString() {
+    if (mode==1) {
+      switch (typeOfRound.get(currentRound)) {
+        case 1: case 2:
+          total_set_time.setText(currentTotalTimeStringForModeOne());
+          break;
+        case 3: case 4:
+          total_break_time.setText(currentTotalTimeStringForModeOne());
+          break;
+      }
     }
+    if (mode==3) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          total_set_time.setText(currentTotalTimeStringForModeThree());
+          break;
+        case 1: case 3: case 5: case 7:
+          total_break_time.setText(currentTotalTimeStringForModeThree());
+          break;
+      }
+    }
+
   }
 
   private long iterateAndReturnTotalTimeForModeThree() {
@@ -3817,16 +3833,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(iterateAndReturnTotalTimeForModeThree()/1000);
   }
 
-  private void displayCurrentTotalTimeStringForModeThree() {
-    switch (pomDotCounter) {
-      case 0: case 2: case 4: case 6:
-        total_set_time.setText(currentTotalTimeStringForModeThree());
-        break;
-      case 1: case 3: case 5: case 7:
-        total_break_time.setText(currentTotalTimeStringForModeThree());
-        break;
-    }
-  }
 
   private long currentTotalTdeeTimeLongValue() {
     if (typeOfRound.get(currentRound)==1) {
@@ -3849,17 +3855,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void displayTotalTimesAndCalories() {
     long remainder = 0;
-    if (mode==1) {
-      resetTotalTimesAndCaloriesForModeOne();
-      displayCurrentTotalTimeStringForModeOne();
+    resetTotalTimesAndCalories();
+    displayCurrentTotalTimeString();
 
+    if (mode==1) {
       if (cycleHasActivityAssigned) {
         actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
       }
-    }
-    if (mode==3) {
-      resetTotalTimesForModeThree();
-      displayCurrentTotalTimeStringForModeThree();
     }
   }
 
