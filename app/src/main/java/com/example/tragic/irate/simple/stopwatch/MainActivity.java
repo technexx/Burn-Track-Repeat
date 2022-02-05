@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow editCyclesPopupWindow;
   PopupWindow settingsPopupWindow;
 
-  TextView cycleNameText;
   EditText cycleNameEdit;
   TextView firstRoundTypeHeaderInEditPopUp;
   TextView secondRoundTypeHeaderInEditPopUp;
@@ -840,14 +839,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
-      editCyclesPopupWindow.showAsDropDown(tabLayout);
-      buttonToLaunchTimer.setEnabled(true);
-      currentlyEditingACycle = true;
-      isNewCycle = false;
-      positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
+      editingHighlightedCycleLogic();
 
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
-      assignOldCycleValuesToCheckForChanges();
       setViewsAndColorsToPreventTearingInEditPopUp(true);
 
       clearRoundAndCycleAdapterArrayLists();
@@ -857,8 +851,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       removeHighlightFromCycle();
 
-      cycleNameText.setVisibility(View.INVISIBLE);
-      cycleNameEdit.setVisibility(View.VISIBLE);
+      assignOldCycleValuesToCheckForChanges();
       cycleNameEdit.setText(cycleTitle);
     });
 
@@ -871,14 +864,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_highlighted_cycle.setOnClickListener(v-> {
       deletingHighlightedCycleLogic();
-    });
-
-    //When in highlight edit mode, clicking on the textView will remove it, replace it w/ editText field, give that field focus and bring up the soft keyboard.
-    cycleNameText.setOnClickListener(v-> {
-      cycleNameText.setVisibility(View.INVISIBLE);
-      cycleNameEdit.setVisibility(View.VISIBLE);
-      cycleNameEdit.requestFocus();
-      inputMethodManager.showSoftInput(cycleNameEdit, 0);
     });
 
     //Selects all text when long clicking in editText.
@@ -1236,7 +1221,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
     number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
 
-    cycleNameText = editCyclesPopupView.findViewById(R.id.cycle_name_text);
     cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
     firstRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.firstRoundTypeHeaderInEditPopUp);
     secondRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.secondRoundTypeHeaderInEditPopUp);
@@ -1488,7 +1472,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
-    cycleNameText.setVisibility(View.INVISIBLE);
 
     reset.setVisibility(View.INVISIBLE);
     empty_laps.setVisibility(View.INVISIBLE);
@@ -1690,53 +1673,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
       }
     };
-  }
-
-  private void editCyclesPopUpDismissalLogic() {
-    if (currentlyEditingACycle) {
-      saveCycleOnPopUpDismissIfEdited();
-
-      if (mode==1) {
-        savedCycleAdapter.removeHighlight();
-      } else if (mode==3) {
-        savedPomCycleAdapter.removeHighlight();
-      }
-      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
-      currentlyEditingACycle = false;
-    }
-
-    fab.setEnabled(true);
-    cycleRoundsAdapter.notifyDataSetChanged();
-    cycleRoundsAdapterTwo.notifyDataSetChanged();
-    roundListDivider.setVisibility(View.GONE);
-  }
-
-  private void timerPopUpDismissalLogic() {
-    timerDisabled = false;
-    makeCycleAdapterVisible = false;
-    timerPopUpIsVisible = false;
-    beginTimerForNextRound = false;
-    buttonToLaunchTimer.setEnabled(false);
-    reset.setVisibility(View.INVISIBLE);
-    dotDraws.setMode(mode);
-
-    if (mode!=4) {
-      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
-      mHandler.removeCallbacksAndMessages(null);
-
-      if (mode==1) {
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        savedCycleAdapter.notifyDataSetChanged();
-      } else if (mode==3){
-        savedPomCycleRecycler.setVisibility(View.VISIBLE);
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
-      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-    } else {
-      if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
-      //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
-      mode = savedMode;
-    }
   }
 
   private void populateRoundAdapterArraysForHighlightedCycle() {
@@ -2018,9 +1954,57 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void timerPopUpDismissalLogic() {
+    timerDisabled = false;
+    makeCycleAdapterVisible = false;
+    timerPopUpIsVisible = false;
+    beginTimerForNextRound = false;
+    buttonToLaunchTimer.setEnabled(false);
+    reset.setVisibility(View.INVISIBLE);
+    dotDraws.setMode(mode);
+
+    if (mode!=4) {
+      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+      mHandler.removeCallbacksAndMessages(null);
+
+      if (mode==1) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        savedCycleAdapter.notifyDataSetChanged();
+      } else if (mode==3){
+        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
+      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+    } else {
+      if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
+      //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
+      mode = savedMode;
+    }
+  }
+
+  private void editCyclesPopUpDismissalLogic() {
+    if (currentlyEditingACycle) {
+      saveCycleOnPopUpDismissIfEdited();
+
+      if (mode==1) {
+        savedCycleAdapter.removeHighlight();
+      } else if (mode==3) {
+        savedPomCycleAdapter.removeHighlight();
+      }
+      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+      currentlyEditingACycle = false;
+    }
+
+    fab.setEnabled(true);
+    cycleRoundsAdapter.notifyDataSetChanged();
+    cycleRoundsAdapterTwo.notifyDataSetChanged();
+    roundListDivider.setVisibility(View.GONE);
+  }
+
   private void saveCycleOnPopUpDismissIfEdited() {
     boolean roundIsEdited = false;
 
+    //Todo: Old title string equals last accessed cycle, not the string brought up w/ edit.
     if (!timerPopUpWindow.isShowing()) {
       if (mode==1) {
         if (!workoutStringListOfRoundValuesForFirstAdapter.isEmpty()){
@@ -2058,6 +2042,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       oldPomRoundList = new ArrayList<>(pomArray);
     }
+  }
+
+  private void editingHighlightedCycleLogic() {
+    editCyclesPopupWindow.showAsDropDown(tabLayout);
+    buttonToLaunchTimer.setEnabled(true);
+    currentlyEditingACycle = true;
+    isNewCycle = false;
+    positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
   }
 
   private void setEditPopUpTimerHeaders(int headerToSelect) {
@@ -3078,6 +3070,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  //Todo: May be fetching wrong title here.
   private void populateCycleAdapterArrayList() {
     switch (mode) {
       case 1:
