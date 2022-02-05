@@ -482,6 +482,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Infinity toggle not saving correctly between sets/breaks.
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test reset/resume option alternating between modes/tabs.
@@ -943,12 +944,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRounds.setOnClickListener(v-> {
       if (toggleInfinityRounds.getAlpha()==1.0f) {
         toggleInfinityRounds.setAlpha(0.3f);
-        if (mode==1) isSavedInfinityOptionActiveForSets = false;
-        if (mode==3) isSavedInfinityOptionActiveForBreaks = false;
+        if (editHeaderSelected==1) isSavedInfinityOptionActiveForSets = false;
+        if (editHeaderSelected==2) isSavedInfinityOptionActiveForBreaks = false;
       } else {
         toggleInfinityRounds.setAlpha(1.0f);
-        if (mode==1) isSavedInfinityOptionActiveForSets = true;
-        if (mode==3) isSavedInfinityOptionActiveForBreaks = true;
+        if (editHeaderSelected==1) isSavedInfinityOptionActiveForSets = true;
+        if (editHeaderSelected==2) isSavedInfinityOptionActiveForBreaks = true;
       }
     });
 
@@ -2053,18 +2054,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setEditPopUpTimerHeaders(int headerToSelect) {
     if (headerToSelect == 1) {
+      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      editHeaderSelected = 1;
+
       if (mode==1) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
 
         Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
         newDraw.setColorFilter(setColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
-
-        if (isSavedInfinityOptionActiveForSets) {
-          toggleInfinityRounds.setAlpha(1.0f);
-        } else {
-          toggleInfinityRounds.setAlpha(0.3f);
-        }
         toggleInfinityModeAndSetRoundType();
 
         editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
@@ -2072,25 +2071,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==3) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
       }
-
-      secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      editHeaderSelected = 1;
     }
 
     if (headerToSelect == 2) {
+      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
+      editHeaderSelected = 2;
+
       if (mode==1) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(breakColor);
 
         Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
         newDraw.setColorFilter(breakColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
-
-        if (isSavedInfinityOptionActiveForBreaks) {
-          toggleInfinityRounds.setAlpha(1.0f);
-        } else {
-          toggleInfinityRounds.setAlpha(0.3f);
-        }
         toggleInfinityModeAndSetRoundType();
 
         editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
@@ -2098,11 +2091,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==3) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(miniBreakColor);
       }
-
-      firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
-      editHeaderSelected = 2;
-
     }
 
     if (headerToSelect == 3) {
@@ -2125,11 +2113,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleInfinityModeAndSetRoundType() {
     if (editHeaderSelected==1) {
-      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 2; else roundType = 1;
+      if (isSavedInfinityOptionActiveForSets) {
+        toggleInfinityRounds.setAlpha(1.0f);
+        roundType = 2;
+      } else {
+        toggleInfinityRounds.setAlpha(0.3f);
+        roundType = 1;
+      }
       setAndCapTimerValues(setValue);
     }
     if (editHeaderSelected==2) {
-      if (toggleInfinityRounds.getAlpha()==1.0f) roundType = 4; else roundType = 3;
+      if (isSavedInfinityOptionActiveForBreaks) {
+        toggleInfinityRounds.setAlpha(1.0f);
+        roundType = 4;
+      } else {
+        toggleInfinityRounds.setAlpha(0.3f);
+        roundType = 3;
+      }
       setAndCapTimerValues(breakValue);
     }
   }
