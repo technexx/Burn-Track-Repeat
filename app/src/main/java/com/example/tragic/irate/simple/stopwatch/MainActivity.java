@@ -846,10 +846,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       isNewCycle = false;
       positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
 
-      cycleNameText.setVisibility(View.INVISIBLE);
-      cycleNameEdit.setVisibility(View.VISIBLE);
-      cycleNameEdit.setText(cycleTitle);
-
       fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
       assignOldCycleValuesToCheckForChanges();
       setViewsAndColorsToPreventTearingInEditPopUp(true);
@@ -861,6 +857,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       removeHighlightFromCycle();
 
+      cycleNameText.setVisibility(View.INVISIBLE);
+      cycleNameEdit.setVisibility(View.VISIBLE);
+      cycleNameEdit.setText(cycleTitle);
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -3147,7 +3146,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         //Sets up Strings to save into database.
         Gson gson = new Gson();
-        cycleTitle = "";
         workoutString = "";
         roundTypeString = "";
         pomString = "";

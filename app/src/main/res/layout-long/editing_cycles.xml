@@ -133,7 +133,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/timerValueInEditPopUpTextView"
         app:layout_constraintBottom_toTopOf="@id/number_pad_layout"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="32dp"
         android:src="@drawable/cancel_x"
         android:backgroundTint="@color/light_grey"
         android:layout_marginBottom="22dp"
@@ -145,10 +145,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="12dp"
         android:src="@drawable/infinity_large_green"
-        android:layout_marginEnd="-8dp"
+        android:layout_marginStart="42dp"
         android:backgroundTint="@color/test_black">
     </ImageButton>
 
