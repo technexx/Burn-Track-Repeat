@@ -628,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //If at least one item in our cycle list, enable the edit button.
       edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
       //Fading app name text + sort button out, edit and delete buttons in.
-      fadeEditCycleButtonsIn(FADE_IN_HIGHLIGHT_MODE);
+      fadeEditCycleButtonsInAndOut(FADE_IN_HIGHLIGHT_MODE);
     }
     //Enables edit cycle button if we have exactly 1 row selected, disables otherwise.
     if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
@@ -839,9 +839,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ////--ActionBar Item onClicks START--////
     edit_highlighted_cycle.setOnClickListener(v-> {
-      editingHighlightedCycleLogic();
+      editHighlightedCycleButtonClickLogic();
 
-      fadeEditCycleButtonsIn(FADE_IN_EDIT_CYCLE);
+      fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       setViewsAndColorsToPreventTearingInEditPopUp(true);
 
       clearRoundAndCycleAdapterArrayLists();
@@ -858,7 +858,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //Turns off our cycle highlight mode from adapter.
     cancelHighlight.setOnClickListener(v-> {
       removeCycleHighlights();
-      fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
+      fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
     });
 
 
@@ -1150,7 +1150,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void tabUnselectedLogic() {
     cycleTitle = "";
 
-    if (!sortButton.isEnabled()) fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
+    if (!sortButton.isEnabled()) fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
     if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
 
     positionOfSelectedCycle = 0;
@@ -1715,7 +1715,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     delete_highlighted_cycle.setEnabled(false);
-    fadeEditCycleButtonsIn(FADE_OUT_HIGHLIGHT_MODE);
+    fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
 
     AsyncTask.execute(deleteHighlightedCyclesASyncRunnable());
 
@@ -1991,7 +1991,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else if (mode==3) {
         savedPomCycleAdapter.removeHighlight();
       }
-      fadeEditCycleButtonsIn(FADE_OUT_EDIT_CYCLE);
+      fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
       currentlyEditingACycle = false;
     }
 
@@ -2004,7 +2004,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void saveCycleOnPopUpDismissIfEdited() {
     boolean roundIsEdited = false;
 
-    //Todo: Old title string equals last accessed cycle, not the string brought up w/ edit.
     if (!timerPopUpWindow.isShowing()) {
       if (mode==1) {
         if (!workoutStringListOfRoundValuesForFirstAdapter.isEmpty()){
@@ -2044,7 +2043,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void editingHighlightedCycleLogic() {
+  private void editHighlightedCycleButtonClickLogic() {
     editCyclesPopupWindow.showAsDropDown(tabLayout);
     buttonToLaunchTimer.setEnabled(true);
     currentlyEditingACycle = true;
@@ -2543,7 +2542,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Fades action bar buttons in/out depending on whether we are editing cycles or not.
-  private void fadeEditCycleButtonsIn(int typeOfFade) {
+  private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
     //Clearing all animations. If we don't, their alphas tend to get reset.
     if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
       edit_highlighted_cycle.clearAnimation();
@@ -2580,6 +2579,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortButton.setVisibility(View.VISIBLE);
       delete_highlighted_cycle.setVisibility(View.INVISIBLE);
       delete_highlighted_cycle.setEnabled(false);
+
+      sortButton.setEnabled(true);
+      edit_highlighted_cycle.setEnabled(false);
+      delete_highlighted_cycle.setEnabled(false);
+      cancelHighlight.setEnabled(false);
     }
   }
 
@@ -3070,7 +3074,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Todo: May be fetching wrong title here.
   private void populateCycleAdapterArrayList() {
     switch (mode) {
       case 1:
