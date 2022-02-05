@@ -168,7 +168,7 @@
         app:rippleColor="#37474F"
         app:strokeColor="@color/black"
         app:strokeWidth="1dp"
-        android:background="@drawable/ripple_effect_3"
+        android:background="@drawable/ripple_effect_4"
         android:clickable="true"
         android:focusable="true">
     </ImageButton>
@@ -189,7 +189,7 @@
         app:rippleColor="#37474F"
         app:strokeColor="@color/black"
         app:strokeWidth="1dp"
-        android:background="@drawable/ripple_effect_3"
+        android:background="@drawable/ripple_effect_4"
         android:clickable="true"
         android:focusable="true">
     </ImageButton>
