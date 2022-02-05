@@ -131,10 +131,12 @@
         android:id="@+id/deleteEditPopUpTimerNumbers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/timerValueInEditPopUpTextView"
         app:layout_constraintBottom_toTopOf="@id/number_pad_layout"
+        android:layout_marginStart="30dp"
         android:src="@drawable/cancel_x"
-        android:layout_marginBottom="26dp"
+        android:backgroundTint="@color/light_grey"
+        android:layout_marginBottom="22dp"
         android:background="@drawable/ripple_effect_2">
     </ImageButton>
 
@@ -143,22 +145,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewTwo"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="-8dp"
+        android:layout_marginTop="12dp"
         android:src="@drawable/infinity_large_green"
+        android:layout_marginEnd="-8dp"
         android:backgroundTint="@color/test_black">
     </ImageButton>
 
     <ImageButton
         android:id="@+id/addRoundToCycleButton"
         android:src="@drawable/white_plus_circle"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/number_pad_layout"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="4dp"
         android:textSize="15sp"
         android:gravity="center"
@@ -175,11 +176,11 @@
     <ImageButton
         android:id="@+id/subtractRoundFromCycleButton"
         android:src="@drawable/white_sub_circle"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/number_pad_layout"
-        android:layout_marginBottom="72dp"
+        android:layout_marginBottom="88dp"
         android:layout_marginEnd="4dp"
         android:textSize="15sp"
         android:gravity="center"

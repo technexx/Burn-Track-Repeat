@@ -483,7 +483,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Infinity mode should toggle off by default for FAB (if last created cycle had it on).
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test reset/resume option alternating between modes/tabs.
