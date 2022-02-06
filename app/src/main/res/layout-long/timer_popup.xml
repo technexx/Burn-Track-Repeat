@@ -103,7 +103,7 @@
 
     <com.example.tragic.irate.simple.stopwatch.DotDraws
         android:id="@+id/dotdraws"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="200dp"
         app:layout_constraintTop_toBottomOf="@id/reset_total_times"
         app:layout_constraintStart_toStartOf="parent"

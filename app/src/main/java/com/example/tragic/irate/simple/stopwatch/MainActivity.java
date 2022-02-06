@@ -1,5 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -443,6 +444,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
+  int phoneHeight;
+  int phoneWidth;
 
   TDEEChosenActivitySpinnerValues tDEEChosenActivitySpinnerValues;
   TextView addTDEEActivityTextView;
@@ -482,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
+  //Todo: tdee popUp needs a stable height across devices.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
   //Todo: Test reset/resume option alternating between modes/tabs.
@@ -498,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
   //Todo: GAME: Word builder w/ letters costing different amount. Earn $ for it (mining/random spots?).
-  //Todo: Explode World game w/ 24 hours per day.
+  //Todo: Explode World game w/ 24 hours per day (can only play that much each day).
 
   @Override
   public void onResume() {
@@ -749,7 +752,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleNameEdit.addTextChangedListener(cycleNameEditTextWatcher());
 
     addTDEEActivityTextView.setOnClickListener(v-> {
-      addTDEEPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, dpConv(100));
+      View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
+//      addTDEEPopUpWindow.showAtLocation(mainView, Gravity.CENTER | Gravity.TOP, 0, 0);
+      addTDEEPopUpWindow.showAsDropDown(testView);
     });
 
     confirmActivityAddition.setOnClickListener(v-> {
@@ -1400,13 +1405,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
     addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
 
-    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, dpConv(250), dpConv(450), true);
-    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, dpConv(275), dpConv(150), true);
+    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, convertDensityPixelsToScalable(250), convertDensityPixelsToScalable(450), true);
+    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, convertDensityPixelsToScalable(275), convertDensityPixelsToScalable(150), true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(500), true);
+    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(400), true);
+    addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -4380,14 +4385,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DisplayMetrics metrics = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-    int height = metrics.heightPixels;
-    int width = metrics.widthPixels;
+    phoneHeight = metrics.heightPixels;
+    phoneWidth = metrics.widthPixels;
 
-    dotDraws.receivePhoneDimensions(height, width);
-  }
-
-  private int dpConv(float pixels) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+    dotDraws.receivePhoneDimensions(phoneHeight, phoneWidth);
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

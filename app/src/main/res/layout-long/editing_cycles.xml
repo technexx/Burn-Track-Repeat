@@ -389,6 +389,15 @@
         android:layout_marginStart="10dp">
     </ImageView>
 
+<!--    <View-->
+<!--        android:id="@+id/tdee_popup_anchor"-->
+<!--        android:layout_width="1dp"-->
+<!--        android:layout_height="1dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/round_recycler_layout">-->
+<!--    </View>-->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/round_recycler_layout"
         android:layout_width="240dp"
