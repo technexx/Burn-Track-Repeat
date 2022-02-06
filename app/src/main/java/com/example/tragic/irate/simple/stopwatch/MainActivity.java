@@ -482,14 +482,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Infinity toggle not saving correctly between sets/breaks.
   //Todo: Settings popUp needs a stable height across devices. Same w/ tdee activity popUp.
   //Todo: Check sizes on long aspect for all layouts + menus.
+  //Todo: Figure our layout params for checkmark.
   //Todo: Test reset/resume option alternating between modes/tabs.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
   //Todo: As an improvement to DotDraws: Make width of class xml a minimum that fills smaller phones, and then use that width as the maximum bounds of the canvas draw. That way, wider phones will simply have more horizontal padding and narrower will fill the screen.
 
+  //Todo: Track calories by day, week, etc. For this, new db class creates an entry for each day (if a cycle burns calories that day), and saves that day's tdee time elapsed/calories, resetting their values once the next day is reached.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
@@ -2354,6 +2355,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void moveSortCheckmark() {
+    ConstraintLayout.LayoutParams checkMarkParams =  (ConstraintLayout.LayoutParams) sortCheckMark.getLayoutParams();
+
     int markPosition = 0;
     switch (sortHolder) {
       case 1:
