@@ -753,6 +753,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     addTDEEActivityTextView.setOnClickListener(v-> {
       View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
+
 //      addTDEEPopUpWindow.showAtLocation(mainView, Gravity.CENTER | Gravity.TOP, 0, 0);
       addTDEEPopUpWindow.showAsDropDown(testView);
     });

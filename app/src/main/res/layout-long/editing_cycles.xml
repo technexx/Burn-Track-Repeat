@@ -381,7 +381,8 @@
         android:id="@+id/cancel_activity_for_cycle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/cancel_x"
+        android:src="@drawable/cancel_square"
+        android:background="@drawable/ripple_effect_2"
         app:layout_constraintStart_toEndOf="@id/tdee_add_textView"
         app:layout_constraintTop_toTopOf="@id/tdee_add_textView"
         app:layout_constraintBottom_toBottomOf="@id/tdee_add_textView"
@@ -389,14 +390,6 @@
         android:layout_marginStart="10dp">
     </ImageView>
 
-<!--    <View-->
-<!--        android:id="@+id/tdee_popup_anchor"-->
-<!--        android:layout_width="1dp"-->
-<!--        android:layout_height="1dp"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/round_recycler_layout">-->
-<!--    </View>-->
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/round_recycler_layout"
@@ -440,6 +433,7 @@
             android:layout_marginStart="10dp">
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <ImageButton
         android:id="@+id/buttonToLaunchTimer"
