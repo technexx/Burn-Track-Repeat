@@ -486,8 +486,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalTdeeActivityTime;
 
   //Todo: Test reset/resume option alternating between modes/tabs.
-  //Todo: Previous mode's timer textView shows before we click resume when switching tabs when a cycle is paused.
-  //Todo: "Reset" option disappears and cycle is reset if beginning a new one in diff. tab.
+  //Todo: Total time bugs when switching cycles between modes.
 
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
@@ -2349,6 +2348,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
       //Sets paused boolean to true, so next timer click will resume.
       timerIsPaused = true;
+      timeLeft.setText(retrieveTimerValueString());
     } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode==1) {
         savedCycleAdapter.removeActiveCycleLayout();
@@ -3458,6 +3458,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     timeLeft.setText(convertSeconds((typeOfRoundMillis + 999) / 1000));
     if (typeOfRoundMillis < 500) timerDisabled = true;
+  }
+
+  private String retrieveTimerValueString() {
+    long millis;
+    if (mode==1) {
+      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==2) {
+        millis = setMillis;
+      } else {
+        millis = breakMillis;
+      }
+    } else {
+      millis = pomMillis;
+    }
+    return (convertSeconds((millis + 999) / 1000));
   }
 
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
