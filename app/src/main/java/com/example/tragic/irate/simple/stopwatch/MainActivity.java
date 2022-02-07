@@ -485,10 +485,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: tdee popUp needs a stable height across devices.
+  //Todo: Test reset/resume option alternating between modes/tabs.
+  //Todo: Previous mode's timer textView shows before we click resume when switching tabs when a cycle is paused.
+  //Todo: "Reset" option disappears and cycle is reset if beginning a new one in diff. tab.
+
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
-  //Todo: Test reset/resume option alternating between modes/tabs.
   //Todo: Test all notifications.
   //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
   //Todo: As an improvement to DotDraws: Make width of class xml a minimum that fills smaller phones, and then use that width as the maximum bounds of the canvas draw. That way, wider phones will simply have more horizontal padding and narrower will fill the screen.
@@ -3120,14 +3122,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.dismiss();
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
-    if (savedCycleAdapter.isCycleActive()==true) {
-      savedCycleAdapter.removeActiveCycleLayout();
-      savedCycleAdapter.notifyDataSetChanged();
+    if (mode==1) {
+      if (savedCycleAdapter.isCycleActive()==true) {
+        savedCycleAdapter.removeActiveCycleLayout();
+        savedCycleAdapter.notifyDataSetChanged();
+      }
     }
 
-    if (savedPomCycleAdapter.isCycleActive()==true) {
-      savedPomCycleAdapter.removeActiveCycleLayout();
-      savedPomCycleAdapter.notifyDataSetChanged();
+    if (mode==3) {
+      if (savedPomCycleAdapter.isCycleActive()==true) {
+        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
     }
 
     if (isNewCycle || saveToDB) {
