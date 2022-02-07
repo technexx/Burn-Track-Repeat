@@ -315,9 +315,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalCycleSetTimeInMillis;
   long cycleBreakTimeForSingleRoundInMillis;
   long totalCycleBreakTimeInMillis;
-  long timerDurationPlaceHolder;
+  long timerDurationPlaceHolderForModeOne;
 
-
+  long cycleWorkTimeForSingleRoundInMillis;
+  long totalWorkTimeInMillis;
+  long cycleRestTimeForSingleRoundInMillis;
+  long totalCycleRestTimeInMillis;
+  long timerDurationPlaceHolderForModeThree;
 
   String timeLeftValueHolder;
   boolean resettingTotalTime;
@@ -770,13 +774,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             mode = 1;
             cycleRoundsAdapter.setMode(1);
             dotDraws.setMode(1);
-            retrieveTotalTimeVariablesBetweenModes(1);
             break;
           case 1:
             mode = 3;
             cycleRoundsAdapter.setMode(3);
             dotDraws.setMode(3);
-            retrieveTotalTimeVariablesBetweenModes(3);
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -788,14 +790,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabUnselectedLogic();
 
         if (tab.getPosition()==0) {
-          saveTotalTimeVariablesBetweenModes(1);
           if (savedCycleAdapter.isCycleHighlighted()==true) {
             removeCycleHighlights();
             savedCycleAdapter.notifyDataSetChanged();
           }
         }
         if (tab.getPosition()==1) {
-          saveTotalTimeVariablesBetweenModes(3);
           if (savedPomCycleAdapter.isCycleHighlighted()==true) {
             removeCycleHighlights();
             savedPomCycleAdapter.notifyDataSetChanged();
@@ -1077,54 +1077,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_all_cancel.setOnClickListener(v -> {
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
-  }
-
-  private void saveTotalTimeVariablesBetweenModes(int currentMode) {
-    if (currentMode==1) {
-      prefEdit.putLong("singleCycleForSetsModeOne", cycleSetTimeForSingleRoundInMillis);
-      prefEdit.putLong("totalCycleForSetsModeOne", totalCycleSetTimeInMillis);
-      prefEdit.putLong("singleCycleForBreaksModeOne", cycleBreakTimeForSingleRoundInMillis);
-      prefEdit.putLong("totalCycleForBreaksModeOne", totalCycleBreakTimeInMillis);
-      prefEdit.putLong("timeDurationPlaceHolderModeOne", timerDurationPlaceHolder);
-      Log.i("testTab", "saving total vars for Mode One!");
-    }
-    if (currentMode==3) {
-      prefEdit.putLong("singleCycleForSetsModeThree", cycleSetTimeForSingleRoundInMillis);
-      prefEdit.putLong("totalCycleForSetsModeThree", totalCycleSetTimeInMillis);
-      prefEdit.putLong("singleCycleForBreaksModeThree", cycleBreakTimeForSingleRoundInMillis);
-      prefEdit.putLong("totalCycleForBreaksModeOneThree", totalCycleBreakTimeInMillis);
-      prefEdit.putLong("timeDurationPlaceHolderModeOneThree", timerDurationPlaceHolder);
-      Log.i("testTab", "saving total vars for Mode Three!");
-    }
-
-    logTotalSetTimes();
-    logTotalBreakTimes();
-    prefEdit.apply();
-  }
-
-  private void retrieveTotalTimeVariablesBetweenModes(int currentMode) {
-    if (currentMode==1) {
-      cycleSetTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForSetsModeOne", 0);
-      totalCycleSetTimeInMillis = sharedPreferences.getLong("totalCycleForSetsModeOne", 0);
-      cycleBreakTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForBreaksModeOne", 0);
-      totalCycleBreakTimeInMillis = sharedPreferences.getLong("totalCycleForBreaksModeOne", 0);
-      timerDurationPlaceHolder = sharedPreferences.getLong("timeDurationPlaceHolderModeOne", 0);
-      Log.i("testTab", "retrieving total vars for Mode One!");
-    }
-    if (currentMode==3) {
-      cycleSetTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForSetsModeThree", 0);
-      totalCycleSetTimeInMillis = sharedPreferences.getLong("totalCycleForSetsModeThree", 0);
-      cycleBreakTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForBreaksModeThree", 0);
-      totalCycleBreakTimeInMillis = sharedPreferences.getLong("totalCycleForBreaksModeThree", 0);
-      timerDurationPlaceHolder = sharedPreferences.getLong("timeDurationPlaceHolderModeThree", 0);
-      Log.i("testTab", "retrieving total vars for Mode Three!");
-    }
-
-    logTotalSetTimes();
-    logTotalBreakTimes();
-  }
-
-  private void removeTotalTimeSharedPrefEntries() {
   }
 
   private void groupAllAppStartInstantiations() {
@@ -1864,8 +1816,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         runOnUiThread(()->{
           deleteCyclePopupWindow.dismiss();
-          totalCycleSetTimeInMillis = 0;
-          totalCycleBreakTimeInMillis = 0;
+          if (mode==1) {
+            totalCycleSetTimeInMillis = 0;
+            totalCycleBreakTimeInMillis = 0;
+          }
+          if (mode==3) {
+            totalWorkTimeInMillis = 0;
+            totalCycleRestTimeInMillis = 0;
+          }
 
           cyclesCompleted = 0;
           resettingTotalTime = true;
@@ -3334,7 +3292,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
           if (currentProgressBarValue==maxProgress) {
-            timerDurationPlaceHolder = setMillis;
+            timerDurationPlaceHolderForModeOne = setMillis;
             tdeeActivityTimeDurationPlaceHolder = setMillis;
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(setMillis);
@@ -3344,7 +3302,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
           if (currentProgressBarValue==maxProgress) {
-            timerDurationPlaceHolder = breakMillis;
+            timerDurationPlaceHolderForModeOne = breakMillis;
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(breakMillis);
           } else {
@@ -3366,7 +3324,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomMillis = pomValuesTime.get(pomDotCounter);
 
 
-          timerDurationPlaceHolder = pomMillis;
+          timerDurationPlaceHolderForModeThree = pomMillis;
           instantiateAndStartObjectAnimator(pomMillis);
         } else {
           pomMillis = pomMillisUntilFinished;
@@ -3609,21 +3567,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
 
       beginTimerForNextRound = true;
-      timerDurationPlaceHolder = 0;
+      timerDurationPlaceHolderForModeOne = 0;
       tdeeActivityTimeDurationPlaceHolder = 0;
     }
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+          total_set_time.setText(convertSeconds(totalWorkTimeInMillis/1000));
           setEndOfRoundSounds(vibrationSettingForWork, false);
           break;
         case 1: case 3: case 5:
-          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
           setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
           break;
         case 7:
-          total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+          total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
 
           boolean isAlertRepeating = false;
           if (isFullBreakSoundContinuous) isAlertRepeating = true;
@@ -3745,6 +3703,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycles = cyclesList.get(positionOfSelectedCycle);
       totalSetTime = cycles.getTotalSetTime();
       totalBreakTime = cycles.getTotalBreakTime();
+      cyclesCompleted = cycles.getCyclesCompleted();
+
+      totalCycleSetTimeInMillis = totalSetTime * 1000;
+      totalCycleBreakTimeInMillis = totalBreakTime * 1000;
     }
 
     if (mode == 3) {
@@ -3752,10 +3714,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTime = pomCycles.getTotalWorkTime();
       totalBreakTime = pomCycles.getTotalBreakTime();
       cyclesCompleted = pomCycles.getCyclesCompleted();
+
+      totalWorkTimeInMillis = totalSetTime * 1000;
+      totalCycleRestTimeInMillis = totalBreakTime * 1000;
     }
 
-    totalCycleSetTimeInMillis = totalSetTime * 1000;
-    totalCycleBreakTimeInMillis = totalBreakTime * 1000;
     total_set_time.setText(convertSeconds(totalSetTime));
     total_break_time.setText(convertSeconds(totalBreakTime));
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
@@ -3792,7 +3755,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (typeOfRound.get(currentRound)) {
           case 1:
             roundedValueForTotalTimes = 1000 - (setMillis%1000);
-            timerDurationPlaceHolder = setMillis + roundedValueForTotalTimes;
+            timerDurationPlaceHolderForModeOne = setMillis + roundedValueForTotalTimes;
             if (cycleHasActivityAssigned) {
               long roundedValueForTdeeTime = 1000 - (setMillis%1000);
               tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
@@ -3800,7 +3763,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
           case 2:
             long remainder = setMillis%1000;
-            timerDurationPlaceHolder = setMillis - remainder;
+            timerDurationPlaceHolderForModeOne = setMillis - remainder;
             if (cycleHasActivityAssigned) {
               remainder = setMillis%1000;
               tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
@@ -3808,11 +3771,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
           case 3:
             roundedValueForTotalTimes = 1000 - (breakMillis%1000);
-            timerDurationPlaceHolder = breakMillis + roundedValueForTotalTimes;
+            timerDurationPlaceHolderForModeOne = breakMillis + roundedValueForTotalTimes;
             break;
           case 4:
             remainder = breakMillis%1000;
-            timerDurationPlaceHolder = breakMillis - remainder;
+            timerDurationPlaceHolderForModeOne = breakMillis - remainder;
             break;
         }
       }
@@ -3821,13 +3784,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 0: case 2: case 4: case 6:
             if (resettingTotalTime) {
               roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-              timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
+              timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
             }
             break;
           case 1: case 3: case 5: case 7:
             if (resettingTotalTime) {
               roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-              timerDurationPlaceHolder = pomMillis + roundedValueForTotalTimes;
+              timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
             }
             break;
         }
@@ -3839,8 +3802,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews() {
     if (mode==1) {
-//      roundedValueForTotalTimes = 0;
-      timerDurationPlaceHolder = 0;
+      timerDurationPlaceHolderForModeOne = 0;
 
       cycleSetTimeForSingleRoundInMillis = 0;
       totalCycleSetTimeInMillis = 0;
@@ -3850,11 +3812,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       tdeeActivityTimeDurationPlaceHolder = 0;
       singleInstanceTdeeActivityTime = 0;
       totalTdeeActivityTime = 0;
-
-      total_set_time.setText("0");
-      total_break_time.setText("0");
-      cycles_completed.setText("0");
     }
+    if (mode==3) {
+      timerDurationPlaceHolderForModeThree = 0;
+
+      cycleWorkTimeForSingleRoundInMillis = 0;
+      totalWorkTimeInMillis = 0;
+      cycleRestTimeForSingleRoundInMillis = 0;
+      totalCycleRestTimeInMillis = 0;
+    }
+
+    total_set_time.setText("0");
+    total_break_time.setText("0");
+    cycles_completed.setText("0");
   }
 
   private long iterateAndReturnTotalTimeForModeOne() {
@@ -3862,22 +3832,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     switch (typeOfRound.get(currentRound)) {
       case 1:
-        cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - setMillis;
+        cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeOne - setMillis;
         valueToReturn = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
         break;
       case 2:
-        cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolder;
+        cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolderForModeOne;
         valueToReturn = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
         break;
       case 3:
-        cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - breakMillis;
+        cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeOne - breakMillis;
         valueToReturn = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
         break;
       case 4:
-        cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolder;
+        cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolderForModeOne;
         valueToReturn = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
         break;
     };
+    logTotalSetTimes();
+    logTotalBreakTimes();
     return valueToReturn;
   }
 
@@ -3913,14 +3885,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     switch (pomDotCounter) {
       case 0: case 2: case 4: case 6:
-        cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-        valueToReturn = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
+        cycleWorkTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeThree - pomMillis;
+        valueToReturn = (totalWorkTimeInMillis + cycleWorkTimeForSingleRoundInMillis);
         break;
       case 1: case 3: case 5: case 7:
-        cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolder - pomMillis;
-        valueToReturn = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
+        cycleRestTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeThree - pomMillis;
+        valueToReturn = (totalCycleRestTimeInMillis + cycleRestTimeForSingleRoundInMillis);
         break;
     }
+    logTotalWorkTimes();
+    logTotalRestTimes();
     return valueToReturn;
   }
 
@@ -3960,6 +3934,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Are we using this?
   private void displayTotalTimesAsUniqueVarAtCycleLaunchOnly() {
     total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
     total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
@@ -3991,14 +3966,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
-          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
-          cycleSetTimeForSingleRoundInMillis = 0;
+          totalWorkTimeInMillis += cycleWorkTimeForSingleRoundInMillis + 100;
+          totalWorkTimeInMillis = (totalWorkTimeInMillis/1000) * 1000;
+          cycleWorkTimeForSingleRoundInMillis = 0;
           break;
         case 1: case 3: case 5: case 7:
-          totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
-          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis/1000) * 1000;
-          cycleBreakTimeForSingleRoundInMillis = 0;
+          totalCycleRestTimeInMillis += cycleRestTimeForSingleRoundInMillis + 100;
+          totalCycleRestTimeInMillis = (totalCycleRestTimeInMillis/1000) * 1000;
+          cycleRestTimeForSingleRoundInMillis = 0;
           break;
       }
     }
@@ -4024,8 +3999,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().updateCycles(cycles);
         break;
       case 3:
-        int workTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalCycleSetTimeInMillis, cycleSetTimeForSingleRoundInMillis);
-        breakTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalCycleBreakTimeInMillis, cycleBreakTimeForSingleRoundInMillis);
+        int workTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalWorkTimeInMillis, cycleWorkTimeForSingleRoundInMillis);
+        breakTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalCycleRestTimeInMillis, cycleRestTimeForSingleRoundInMillis);
 
         pomCycles.setTotalWorkTime(workTimeToSave);
         pomCycles.setTotalBreakTime(breakTimeToSave);
@@ -4294,11 +4269,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
     completedLapsLayoutParams.topMargin = convertDensityPixelsToScalable(24);
 
-    timerDurationPlaceHolder = 0;
-    tdeeActivityTimeDurationPlaceHolder = 0;
-
     switch (mode) {
       case 1:
+        timerDurationPlaceHolderForModeOne = 0;
+        tdeeActivityTimeDurationPlaceHolder = 0;
+
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
@@ -4333,6 +4308,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
+        timerDurationPlaceHolderForModeThree = 0;
+
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
@@ -4541,7 +4518,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return preRoundedMet;
   }
 
-
   private void logTdeeCategoryPositions() {
     Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
     Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
@@ -4566,11 +4542,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTotalSetTimes() {
     Log.i("testTimes", "single set millis is " + cycleSetTimeForSingleRoundInMillis);
     Log.i("testTimes", "total set millis is " + totalCycleSetTimeInMillis);
+
   }
 
   private void logTotalBreakTimes() {
     Log.i("testTimes", "single break millis is " + cycleBreakTimeForSingleRoundInMillis);
     Log.i("testTimes", "total break millis is " + totalCycleBreakTimeInMillis);
+
+  }
+
+  private void logTotalWorkTimes() {
+    Log.i("testTimes", "single work millis is " + cycleWorkTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total work millis is " + totalWorkTimeInMillis);
+  }
+
+  private void logTotalRestTimes() {
+    Log.i("testTimes", "single rest millis is " + cycleRestTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total rest millis is " + totalCycleRestTimeInMillis);
   }
 
   private void logTotalTdeeTimes() {
