@@ -484,8 +484,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-
-
+  //Todo: Set total time textViews to appropriate vars when launching cycle (in case we've switched modes)
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
   //Todo: Test all notifications.
@@ -616,11 +615,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) savedPomCycleAdapter.removeActiveCycleLayout();
     isNewCycle = false;
     positionOfSelectedCycle = position;
-    //Retrieves timer value lists from cycle adapter list by parsing its Strings, rather than querying database.
+
     populateCycleAdapterArrayList();
-    //If clicking on a cycle to launch, it will always be an existing one, and we do not want to call a save method since it is unedited.
     launchTimerCycle(false);
-    resetTimer();
+//    resetTimer();
   }
 
   @Override
@@ -2354,6 +2352,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Sets paused boolean to true, so next timer click will resume.
       timerIsPaused = true;
       timeLeft.setText(retrieveTimerValueString());
+      displayTotalTimesAndCalories();
     } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode==1) {
         savedCycleAdapter.removeActiveCycleLayout();
@@ -3848,8 +3847,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         valueToReturn = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
         break;
     };
+
     logTotalSetTimes();
     logTotalBreakTimes();
+
     return valueToReturn;
   }
 
@@ -3932,12 +3933,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
       }
     }
-  }
-
-  //Todo: Are we using this?
-  private void displayTotalTimesAsUniqueVarAtCycleLaunchOnly() {
-    total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-    total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
   }
 
   private void displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly() {
