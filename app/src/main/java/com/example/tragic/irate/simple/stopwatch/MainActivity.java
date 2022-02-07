@@ -310,14 +310,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   long setMillis;
   long breakMillis;
+
   long cycleSetTimeForSingleRoundInMillis;
   long totalCycleSetTimeInMillis;
   long cycleBreakTimeForSingleRoundInMillis;
   long totalCycleBreakTimeInMillis;
+  long timerDurationPlaceHolder;
+
+
+
   String timeLeftValueHolder;
   boolean resettingTotalTime;
-  long roundedValueForTotalTimes;
-  long timerDurationPlaceHolder;
 
   long pomMillis;
 
@@ -370,14 +373,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   VerticalSpaceItemDecoration verticalSpaceItemDecoration;
   boolean textSizeIncreased;
 
-  ArrayList<String> setsArray;
-  ArrayList<String> breaksArray;
-  ArrayList<String> breaksOnlyArray;
-  ArrayList<Integer> customSetTime;
-  ArrayList<Integer> customBreakTime;
-  ArrayList<Integer> breaksOnlyTime;
-  ArrayList<Integer> zeroArraySets;
-  ArrayList<Integer> zeroArrayBreaks;
   int receivedAlpha;
   MaterialButton pauseResumeButton;
 
@@ -485,8 +480,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Test reset/resume option alternating between modes/tabs.
-  //Todo: Total time bugs when switching cycles between modes.
+
 
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
@@ -776,11 +770,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             mode = 1;
             cycleRoundsAdapter.setMode(1);
             dotDraws.setMode(1);
+            retrieveTotalTimeVariablesBetweenModes(1);
             break;
           case 1:
             mode = 3;
             cycleRoundsAdapter.setMode(3);
             dotDraws.setMode(3);
+            retrieveTotalTimeVariablesBetweenModes(3);
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -792,12 +788,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabUnselectedLogic();
 
         if (tab.getPosition()==0) {
+          saveTotalTimeVariablesBetweenModes(1);
           if (savedCycleAdapter.isCycleHighlighted()==true) {
             removeCycleHighlights();
             savedCycleAdapter.notifyDataSetChanged();
           }
         }
         if (tab.getPosition()==1) {
+          saveTotalTimeVariablesBetweenModes(3);
           if (savedPomCycleAdapter.isCycleHighlighted()==true) {
             removeCycleHighlights();
             savedPomCycleAdapter.notifyDataSetChanged();
@@ -1081,12 +1079,61 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  private void saveTotalTimeVariablesBetweenModes(int currentMode) {
+    if (currentMode==1) {
+      prefEdit.putLong("singleCycleForSetsModeOne", cycleSetTimeForSingleRoundInMillis);
+      prefEdit.putLong("totalCycleForSetsModeOne", totalCycleSetTimeInMillis);
+      prefEdit.putLong("singleCycleForBreaksModeOne", cycleBreakTimeForSingleRoundInMillis);
+      prefEdit.putLong("totalCycleForBreaksModeOne", totalCycleBreakTimeInMillis);
+      prefEdit.putLong("timeDurationPlaceHolderModeOne", timerDurationPlaceHolder);
+      Log.i("testTab", "saving total vars for Mode One!");
+    }
+    if (currentMode==3) {
+      prefEdit.putLong("singleCycleForSetsModeThree", cycleSetTimeForSingleRoundInMillis);
+      prefEdit.putLong("totalCycleForSetsModeThree", totalCycleSetTimeInMillis);
+      prefEdit.putLong("singleCycleForBreaksModeThree", cycleBreakTimeForSingleRoundInMillis);
+      prefEdit.putLong("totalCycleForBreaksModeOneThree", totalCycleBreakTimeInMillis);
+      prefEdit.putLong("timeDurationPlaceHolderModeOneThree", timerDurationPlaceHolder);
+      Log.i("testTab", "saving total vars for Mode Three!");
+    }
+
+    logTotalSetTimes();
+    logTotalBreakTimes();
+    prefEdit.apply();
+  }
+
+  private void retrieveTotalTimeVariablesBetweenModes(int currentMode) {
+    if (currentMode==1) {
+      cycleSetTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForSetsModeOne", 0);
+      totalCycleSetTimeInMillis = sharedPreferences.getLong("totalCycleForSetsModeOne", 0);
+      cycleBreakTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForBreaksModeOne", 0);
+      totalCycleBreakTimeInMillis = sharedPreferences.getLong("totalCycleForBreaksModeOne", 0);
+      timerDurationPlaceHolder = sharedPreferences.getLong("timeDurationPlaceHolderModeOne", 0);
+      Log.i("testTab", "retrieving total vars for Mode One!");
+    }
+    if (currentMode==3) {
+      cycleSetTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForSetsModeThree", 0);
+      totalCycleSetTimeInMillis = sharedPreferences.getLong("totalCycleForSetsModeThree", 0);
+      cycleBreakTimeForSingleRoundInMillis = sharedPreferences.getLong("singleCycleForBreaksModeThree", 0);
+      totalCycleBreakTimeInMillis = sharedPreferences.getLong("totalCycleForBreaksModeThree", 0);
+      timerDurationPlaceHolder = sharedPreferences.getLong("timeDurationPlaceHolderModeThree", 0);
+      Log.i("testTab", "retrieving total vars for Mode Three!");
+    }
+
+    logTotalSetTimes();
+    logTotalBreakTimes();
+  }
+
+  private void removeTotalTimeSharedPrefEntries() {
+  }
+
   private void groupAllAppStartInstantiations() {
 
     instantiateGlobalClasses();
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
     instantiateTabLayouts();
+//    zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
 
     assignMainLayoutClassesToIds();
     assignEditPopUpLayoutClassesToTheirIds();
@@ -3740,6 +3787,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resetTotalTimesAndCalories() {
     if (resettingTotalTime) {
+      long roundedValueForTotalTimes;
       if (mode==1) {
         switch (typeOfRound.get(currentRound)) {
           case 1:
@@ -3791,7 +3839,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews() {
     if (mode==1) {
-      roundedValueForTotalTimes = 0;
+//      roundedValueForTotalTimes = 0;
       timerDurationPlaceHolder = 0;
 
       cycleSetTimeForSingleRoundInMillis = 0;
@@ -3858,7 +3906,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
     }
-
   }
 
   private long iterateAndReturnTotalTimeForModeThree() {
