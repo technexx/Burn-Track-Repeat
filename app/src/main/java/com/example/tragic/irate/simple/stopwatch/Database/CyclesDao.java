@@ -8,6 +8,10 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
+
 import java.util.List;
 
 @Dao
@@ -17,6 +21,12 @@ CyclesDao {
     @Transaction
     @Query("SELECT * from DayHolder")
     public List<DayWithCycleStats> getDayWithCycleStats();
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertDay(DayHolder dayHolder);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertStats(CycleStats cycleStats);
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();

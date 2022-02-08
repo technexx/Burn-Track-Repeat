@@ -1,6 +1,5 @@
 package com.example.tragic.irate.simple.stopwatch;
 
-import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -64,13 +63,16 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.PomCycleStats;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
@@ -80,10 +82,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1080,7 +1078,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
     instantiateTabLayouts();
-//    zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
 
     assignMainLayoutClassesToIds();
     assignEditPopUpLayoutClassesToTheirIds();
@@ -1117,6 +1114,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnerListeners();
     instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
+
+
   }
 
   private void instantiateGlobalClasses() {
@@ -1293,6 +1292,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+
+      testDb();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -4540,7 +4541,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTotalBreakTimes() {
     Log.i("testTimes", "single break millis is " + cycleBreakTimeForSingleRoundInMillis);
     Log.i("testTimes", "total break millis is " + totalCycleBreakTimeInMillis);
-
   }
 
   private void logTotalWorkTimes() {
@@ -4556,5 +4556,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTotalTdeeTimes() {
     Log.i("testTimes", "single tdee millis is " + singleInstanceTdeeActivityTime);
     Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
+  }
+
+  private void testDb() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        DayHolder dayHolder = new DayHolder();
+        CycleStats cycleStats = new CycleStats();
+        DayWithCycleStats dayWithCycleStats = new DayWithCycleStats();
+
+        List<DayHolder> dayHolderList = new ArrayList<>();
+        List<CycleStats> cycleStatsList = new ArrayList<>();
+
+        cycleStats.setCycleStatsId(0);
+        cycleStats.setActivity("boo one");
+        cycleStats.setTotalSetTime(10);
+        cycleStatsList.add(cycleStats);
+
+        cycleStats.setCycleStatsId(1);
+        cycleStats.setActivity("boo two");
+        cycleStats.setTotalSetTime(20);
+        cycleStatsList.add(cycleStats);
+
+        dayHolder.setDayId(0);
+        dayHolder.setDate("one");
+
+        dayWithCycleStats.setDayHolder(dayHolder);
+        dayWithCycleStats.setCycleStatsList(cycleStatsList);
+
+
+        ///////////////////////////////////////////////////////
+
+
+        cyclesDatabase.cyclesDao().insertDay(dayHolder);
+        cyclesDatabase.cyclesDao().insertStats(cycleStats);
+
+        List<DayWithCycleStats> loadAllDays = new ArrayList<>();
+        loadAllDays = cyclesDatabase.cyclesDao().getDayWithCycleStats();
+
+        Log.i("testdb", "combined list is " + (loadAllDays));
+      }
+    });
+
   }
 }

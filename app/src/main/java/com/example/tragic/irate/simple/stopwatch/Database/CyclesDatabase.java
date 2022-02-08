@@ -5,7 +5,12 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Cycles.class, PomCycles.class, CycleStats.class, PomCycleStats.class}, version = 1, exportSchema =  false)
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.PomCycleStats;
+
+@Database(entities = {Cycles.class, PomCycles.class, CycleStats.class, PomCycleStats.class, DayHolder.class}, version = 1, exportSchema =  false)
 
 public abstract class CyclesDatabase extends RoomDatabase {
     private static CyclesDatabase INSTANCE;
