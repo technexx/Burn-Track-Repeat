@@ -5,6 +5,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import java.util.List;
@@ -12,6 +13,10 @@ import java.util.List;
 @Dao
 public interface
 CyclesDao {
+
+    @Transaction
+    @Query("SELECT * from DayHolder")
+    public List<DayWithCycleStats> getDayWithCycleStats();
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();

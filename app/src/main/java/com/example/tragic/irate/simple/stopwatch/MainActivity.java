@@ -484,14 +484,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Set total time textViews to appropriate vars when launching cycle (in case we've switched modes)
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
   //Todo: Test all notifications.
-  //Todo: We should put any index fetches inside conditionals, BUT make sure nothing (i.e. Timer popup) launches unless those values are fetched.
-  //Todo: As an improvement to DotDraws: Make width of class xml a minimum that fills smaller phones, and then use that width as the maximum bounds of the canvas draw. That way, wider phones will simply have more horizontal padding and narrower will fill the screen.
 
-  //Todo: Track calories by day, week, etc. For this, new db class creates an entry for each day (if a cycle burns calories that day), and saves that day's tdee time elapsed/calories, resetting their values once the next day is reached.
+  //Todo: Track calories by day, week, etc. We do need a new class for this, as each row will represent a day as opposed to a specific cycle. We can set this as a new TAB.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
