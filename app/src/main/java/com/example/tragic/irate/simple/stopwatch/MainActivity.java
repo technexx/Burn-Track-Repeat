@@ -493,6 +493,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test everything 10x.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
+
+  //Todo: GAME: Unscramble for dollars (X number of times). Use dollars to buy letters for Hangman type puzzle.
   //Todo: GAME: Word builder w/ letters costing different amount. Earn $ for it (mining/random spots?).
   //Todo: Explode World game w/ 24 hours per day (can only play that much each day).
 

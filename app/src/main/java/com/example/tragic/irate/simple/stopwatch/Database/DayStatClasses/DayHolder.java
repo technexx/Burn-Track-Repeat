@@ -7,15 +7,15 @@ import androidx.room.PrimaryKey;
 public class DayHolder {
 
     @PrimaryKey (autoGenerate = true)
-    public long dayId;
+    public long daySelectedId;
     public String date;
 
     public long getDayId() {
-        return dayId;
+        return daySelectedId;
     }
 
     public void setDayId(long dayId) {
-        this.dayId = dayId;
+        this.daySelectedId = dayId;
     }
 
     public String getDate() {
