@@ -1293,7 +1293,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
-      testDb();
+//      testDbInsert();
+//      testDbQuery();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -4558,7 +4559,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
   }
 
-  private void testDb() {
+
+  //Todo: Each stat should have the ID of the date it corresponds to - this is how Room enforces entity contraints.
+  private void testDbInsert() {
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
@@ -4568,36 +4571,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         List<DayHolder> dayHolderList = new ArrayList<>();
         List<CycleStats> cycleStatsList = new ArrayList<>();
+        List<DayWithCycleStats> dayWithCycleStatsList= new ArrayList<>();
 
-        cycleStats.setCycleStatsId(0);
-        cycleStats.setActivity("boo one");
-        cycleStats.setTotalSetTime(10);
-        cycleStatsList.add(cycleStats);
-
-        cycleStats.setCycleStatsId(1);
-        cycleStats.setActivity("boo two");
-        cycleStats.setTotalSetTime(20);
-        cycleStatsList.add(cycleStats);
-
-        dayHolder.setDayId(0);
-        dayHolder.setDate("one");
-
-        dayWithCycleStats.setDayHolder(dayHolder);
-        dayWithCycleStats.setCycleStatsList(cycleStatsList);
-
-
-        ///////////////////////////////////////////////////////
-
-
-        cyclesDatabase.cyclesDao().insertDay(dayHolder);
-        cyclesDatabase.cyclesDao().insertStats(cycleStats);
-
-        List<DayWithCycleStats> loadAllDays = new ArrayList<>();
-        loadAllDays = cyclesDatabase.cyclesDao().getDayWithCycleStats();
-
-        Log.i("testdb", "combined list is " + (loadAllDays));
+//        //Todo: Doesn't even create new id keys for cycleStats.
+//        for (int i=0; i<5; i++) {
+//          cycleStats.setTotalSetTime(i);
+//          cycleStatsList.add(cycleStats);
+//        }
       }
     });
+  }
 
+  private void testDbQuery() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        List<DayWithCycleStats> dayWithCycleStatsList = cyclesDatabase.cyclesDao().getDayWithCycleStats();
+
+        Log.i("testDate", "dayWithStats size is " + dayWithCycleStatsList.size());
+        Log.i("testDate", "list size within dayWithStats is position 1 is " + dayWithCycleStatsList.get(0).getCycleStatsList().size());
+        Log.i("testDate", "list size within dayWithStats is position 2 is " + dayWithCycleStatsList.get(1).getCycleStatsList().size());
+
+
+        for (int i=0; i<dayWithCycleStatsList.size(); i++) {
+          String dayHolderDate = dayWithCycleStatsList.get(i).getDayHolder().getDate();
+          List<CycleStats> cycleStatsList = dayWithCycleStatsList.get(i).getCycleStatsList();
+//          Log.i("testDate", "date on position " + i + " is " + dayHolderDate);
+
+          for (int k=0; k<cycleStatsList.size(); k++) {
+            String setActivity = cycleStatsList.get(k).getActivity();
+//            Log.i("testDate", "activity on " + k + " is " + setActivity);
+          }
+        }
+      }
+    });
   }
 }

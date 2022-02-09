@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "DayHolder")
 public class DayHolder {
 
-    @PrimaryKey public long dayId;
+    @PrimaryKey (autoGenerate = true)
+    public long dayId;
     public String date;
 
     public long getDayId() {

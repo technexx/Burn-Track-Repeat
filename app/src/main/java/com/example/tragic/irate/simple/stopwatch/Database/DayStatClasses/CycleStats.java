@@ -5,16 +5,18 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "CycleStats")
 
-//Todo: For a day (one class), each activity, with its time and calorie stats (second class).
+//DATE ->>> ACTIVITY         ->>>>>>>>> TOTAL ACTIVITY SET TIME
+//          TOTAL SET TIME              TOTAL ACTIVITY BREAK TIME
+//          TOTAL BREAK TIME            TOTAL CALORIES BURNED
 
 public class CycleStats {
-    @PrimaryKey public long cycleStatsId;
+    @PrimaryKey (autoGenerate = true)
+    public long cycleStatsId;
 
     //Total times for day irrespective of activity or lack thereof.
     public long totalSetTime;
     public long totalBreakTime;
 
-    ///These will have to be concatenated Strings (can't access List class through Room) to get multiple entries. Each String should split into synchronous String[] objects.
     public String activity;
     public long totalTdeeSetTime;
     public long totalTdeeBreakTime;

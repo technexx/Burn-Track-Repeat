@@ -20,13 +20,23 @@ CyclesDao {
 
     @Transaction
     @Query("SELECT * from DayHolder")
-    public List<DayWithCycleStats> getDayWithCycleStats();
+    List<DayWithCycleStats> getDayWithCycleStats();
+
+    @Query("SELECT * from CycleStats")
+    List<CycleStats> loadAllCycleStats();
+
+//    @Transaction
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    void insertDaysWithCycleStats(DayWithCycleStats dayWithCycleStats);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertDay(DayHolder dayHolder);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertStats(CycleStats cycleStats);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertStatList(List<CycleStats> cycleStatsList);
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
