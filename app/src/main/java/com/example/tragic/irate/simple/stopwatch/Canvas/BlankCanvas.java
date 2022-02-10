@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.Canvas;
 
 import android.content.Context;
 import android.graphics.Canvas;

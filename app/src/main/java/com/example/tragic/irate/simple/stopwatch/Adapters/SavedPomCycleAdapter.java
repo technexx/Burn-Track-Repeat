@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,6 +15,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.tragic.irate.simple.stopwatch.ChangeSettingsValues;
+import com.example.tragic.irate.simple.stopwatch.R;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

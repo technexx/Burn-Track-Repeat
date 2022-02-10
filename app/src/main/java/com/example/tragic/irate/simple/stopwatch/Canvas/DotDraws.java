@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.Canvas;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,6 +11,10 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
+
+import com.example.tragic.irate.simple.stopwatch.ChangeSettingsValues;
+import com.example.tragic.irate.simple.stopwatch.R;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

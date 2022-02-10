@@ -90,14 +90,14 @@
         android:src="@drawable/reset_24">
     </ImageButton>
 
-    <com.example.tragic.irate.simple.stopwatch.DotDraws
+    <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="wrap_content"
         android:layout_height="200dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/reset_total_times"
         android:layout_marginTop="40dp">
-    </com.example.tragic.irate.simple.stopwatch.DotDraws>
+    </com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws>
 
     <TextView
         android:id="@+id/timeLeft"
@@ -172,7 +172,7 @@
         android:paddingBottom="2dp">
     </androidx.recyclerview.widget.RecyclerView>
 
-    <com.example.tragic.irate.simple.stopwatch.LapListCanvas
+    <com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas
         android:id="@+id/lapCanvas"
         android:layout_width="240dp"
         android:layout_height="240dp"
@@ -184,7 +184,7 @@
         android:paddingEnd="10dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp">
-    </com.example.tragic.irate.simple.stopwatch.LapListCanvas>
+    </com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas>
 
     <TextView
         android:id="@+id/empty_laps_text"

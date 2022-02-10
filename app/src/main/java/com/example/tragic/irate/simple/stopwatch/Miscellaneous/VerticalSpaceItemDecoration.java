@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 
 import android.graphics.Rect;
 import android.view.View;

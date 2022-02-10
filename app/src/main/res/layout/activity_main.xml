@@ -9,7 +9,7 @@
     android:id="@+id/main_layout">
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+        android:id="@+id/savedCyclesTabLayout"
         android:layout_width="match_parent"
         android:layout_height="35dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +25,7 @@
         android:id="@+id/cycle_list_recycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintTop_toBottomOf="@id/statsTabLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="10dp"
@@ -36,12 +36,38 @@
         android:id="@+id/pom_list_recycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintTop_toBottomOf="@id/statsTabLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="10dp"
         android:paddingBottom="40dp">
     </androidx.recyclerview.widget.RecyclerView>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/statsTabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/savedCyclesTabLayout"
+        android:background="@color/Gray"
+        app:tabTextColor="@color/white"
+        app:tabIndicatorColor="@color/purple"
+        app:tabTextAppearance="@style/tabText"
+        app:tabIndicatorFullWidth="false"
+        android:layout_marginTop="2dp">
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stats_list_recycler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/statsTabLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="10dp"
+        android:paddingBottom="40dp">
+    </androidx.recyclerview.widget.RecyclerView>
+
 
     <ImageButton
         android:id="@+id/fab"
@@ -82,17 +108,17 @@
         android:textSize="14sp">
     </TextView>
 
-    <com.example.tragic.irate.simple.stopwatch.BlankCanvas
+    <com.example.tragic.irate.simple.stopwatch.Canvas.BlankCanvas
         android:id="@+id/blank_canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.example.tragic.irate.simple.stopwatch.BlankCanvas>
+    </com.example.tragic.irate.simple.stopwatch.Canvas.BlankCanvas>
 
     <FrameLayout
         android:id="@+id/settings_fragment_frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintTop_toBottomOf="@id/savedCyclesTabLayout"
         android:background="@color/dark_grey">
     </FrameLayout>
 

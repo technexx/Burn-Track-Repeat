@@ -52,6 +52,7 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,18 +64,26 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapter;
+import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapterTwo;
+import com.example.tragic.irate.simple.stopwatch.Adapters.LapAdapter;
+import com.example.tragic.irate.simple.stopwatch.Adapters.SavedCycleAdapter;
+import com.example.tragic.irate.simple.stopwatch.Adapters.SavedPomCycleAdapter;
+import com.example.tragic.irate.simple.stopwatch.Canvas.BlankCanvas;
+import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
+import com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas;
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.PomCycleStats;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
@@ -96,8 +105,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
-  TabLayout tabLayout;
-  View tabView;
+
+  TabLayout savedCyclesTabLayout;
+  TabLayout statsTabLayout;
+  TabLayout.Tab savedCyclesTab;
+  TabLayout.Tab cycleStatsTab;
+  View savedCyclesTabView;
   View mainView;
   View actionBarView;
   BlankCanvas blankCanvas;
@@ -117,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   List<PomCycles> pomCyclesList;
   boolean isNewCycle;
 
+  RecyclerView statsListRecycler;
   RecyclerView roundRecycler;
   RecyclerView roundRecyclerTwo;
   RecyclerView savedCycleRecycler;
@@ -749,7 +763,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEActivityTextView.setOnClickListener(v-> {
       View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
 
-//      addTDEEPopUpWindow.showAtLocation(mainView, Gravity.CENTER | Gravity.TOP, 0, 0);
       addTDEEPopUpWindow.showAsDropDown(testView);
     });
 
@@ -760,47 +773,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     removeTdeeActivityImageView.setOnClickListener(v-> {
       toggleExistenceOfTdeeActivity(false);
-    });
-
-    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
-      @Override
-      public void onTabSelected(TabLayout.Tab tab) {
-        switch (tab.getPosition()) {
-          case 0:
-            mode = 1;
-            cycleRoundsAdapter.setMode(1);
-            dotDraws.setMode(1);
-            break;
-          case 1:
-            mode = 3;
-            cycleRoundsAdapter.setMode(3);
-            dotDraws.setMode(3);
-            break;
-        }
-        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-        setDefaultEditRoundViews();
-      }
-
-      @Override
-      public void onTabUnselected(TabLayout.Tab tab) {
-        tabUnselectedLogic();
-
-        if (tab.getPosition()==0) {
-          if (savedCycleAdapter.isCycleHighlighted()==true) {
-            removeCycleHighlights();
-            savedCycleAdapter.notifyDataSetChanged();
-          }
-        }
-        if (tab.getPosition()==1) {
-          if (savedPomCycleAdapter.isCycleHighlighted()==true) {
-            removeCycleHighlights();
-            savedPomCycleAdapter.notifyDataSetChanged();
-          }
-        }
-      }
-      @Override
-      public void onTabReselected(TabLayout.Tab tab) {
-      }
     });
 
     fab.setOnClickListener(v -> {
@@ -1081,6 +1053,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
     instantiateTabLayouts();
+    instantiateTabSelectionListeners();
 
     assignMainLayoutClassesToIds();
     assignEditPopUpLayoutClassesToTheirIds();
@@ -1117,8 +1090,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnerListeners();
     instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
-
-
   }
 
   private void instantiateGlobalClasses() {
@@ -1147,9 +1118,76 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateTabLayouts() {
-    tabLayout = findViewById(R.id.tabLayout);
-    tabLayout.addTab(tabLayout.newTab().setText("Workouts"));
-    tabLayout.addTab(tabLayout.newTab().setText("Pomodoro"));
+    savedCyclesTabLayout = findViewById(R.id.savedCyclesTabLayout);
+    savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Workouts"));
+    savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Pomodoro"));
+
+    statsTabLayout = findViewById(R.id.statsTabLayout);
+    statsTabLayout.addTab(statsTabLayout.newTab().setText("Saved Cycles"));
+    statsTabLayout.addTab(statsTabLayout.newTab().setText("Stats"));
+  }
+
+  private void instantiateTabSelectionListeners() {
+    savedCyclesTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
+      @Override
+      public void onTabSelected(TabLayout.Tab tab) {
+        savedCyclesTab = tab;
+        switch (savedCyclesTab.getPosition()) {
+          case 0:
+            mode = 1;
+            cycleRoundsAdapter.setMode(1);
+            dotDraws.setMode(1);
+            break;
+          case 1:
+            mode = 3;
+            cycleRoundsAdapter.setMode(3);
+            dotDraws.setMode(3);
+            break;
+        }
+        replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+        setDefaultEditRoundViews();
+      }
+
+      @Override
+      public void onTabUnselected(TabLayout.Tab tab) {
+        savedCyclesTab = tab;
+        tabUnselectedLogic();
+
+        if (savedCyclesTab.getPosition()==0) {
+          if (savedCycleAdapter.isCycleHighlighted()==true) {
+            removeCycleHighlights();
+            savedCycleAdapter.notifyDataSetChanged();
+          }
+        }
+        if (savedCyclesTab.getPosition()==1) {
+          if (savedPomCycleAdapter.isCycleHighlighted()==true) {
+            removeCycleHighlights();
+            savedPomCycleAdapter.notifyDataSetChanged();
+          }
+        }
+      }
+      @Override
+      public void onTabReselected(TabLayout.Tab tab) {
+      }
+    });
+
+    statsTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+      @Override
+      public void onTabSelected(TabLayout.Tab tab) {
+        cycleStatsTab = tab;
+
+      }
+
+      @Override
+      public void onTabUnselected(TabLayout.Tab tab) {
+        cycleStatsTab = tab;
+      }
+
+      @Override
+      public void onTabReselected(TabLayout.Tab tab) {
+
+      }
+    });
   }
 
   private void tabUnselectedLogic() {
@@ -1165,7 +1203,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignMainLayoutClassesToIds() {
     mainView = findViewById(R.id.main_layout);
-    tabView = findViewById(R.id.tabLayout);
+    savedCyclesTabView = findViewById(R.id.savedCyclesTabLayout);
     actionBarView = findViewById(R.id.custom_action_bar);
 
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -1175,6 +1213,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab = findViewById(R.id.fab);
     stopwatch = findViewById(R.id.stopwatch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
+
+    statsListRecycler = findViewById(R.id.stats_list_recycler);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
     blankCanvas = findViewById(R.id.blank_canvas);
@@ -1604,7 +1644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     isNewCycle = true;
 
     clearRoundAndCycleAdapterArrayLists();
-    editCyclesPopupWindow.showAsDropDown(tabLayout);
+    editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
     setViewsAndColorsToPreventTearingInEditPopUp(true);
     toggleExistenceOfTdeeActivity(false);
 
@@ -2058,7 +2098,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void editHighlightedCycleButtonClickLogic() {
-    editCyclesPopupWindow.showAsDropDown(tabLayout);
+    editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
     buttonToLaunchTimer.setEnabled(true);
     currentlyEditingACycle = true;
     isNewCycle = false;
