@@ -25,18 +25,23 @@ CyclesDao {
     @Query("SELECT * from CycleStats")
     List<CycleStats> loadAllCycleStats();
 
-//    @Transaction
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    void insertDaysWithCycleStats(DayWithCycleStats dayWithCycleStats);
+    @Query("SELECT * from CycleStats WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
+    List<CycleStats> getStatsForSpecificDate(long uniqueId);
+
+    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime AND activity AND totalTdeeSetTime AND totalTdeeBreakTime AND totalTdeeTime AND totalCaloriesBurned")
+    void deleteActivityAndItsCycleStats();
+
+    @Query("UPDATE CycleStats set totalSetTime=:newSetTime WHERE cycleStatsId=:activityId")
+    void updateStatsTotalSetTime(long newSetTime, int activityId);
+
+    @Query("UPDATE CycleStats set totalSetTime=:newBreakTime WHERE cycleStatsId=:activityId")
+    void updateStatsTotalBreakTime(long newBreakTime, int activityId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertDay(DayHolder dayHolder);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertStats(CycleStats cycleStats);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertStatList(List<CycleStats> cycleStatsList);
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();

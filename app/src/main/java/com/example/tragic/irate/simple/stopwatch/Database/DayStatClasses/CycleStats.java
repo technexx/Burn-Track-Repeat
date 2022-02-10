@@ -11,7 +11,9 @@ import androidx.room.PrimaryKey;
 
 public class CycleStats {
     @PrimaryKey (autoGenerate = true)
-    public long uniqueDayIdTiedToEachOfItsActivities;
+    public long cycleStatsId;
+
+    public long uniqueDayIdPossessedByEachOfItsActivities;
 
     //Total times for day irrespective of activity or lack thereof.
     public long totalSetTime;
@@ -23,12 +25,12 @@ public class CycleStats {
     public long totalTdeeTime;
     public double totalCaloriesBurned;
 
-    public long getCycleStatsId() {
-        return uniqueDayIdTiedToEachOfItsActivities;
+    public long getUniqueDayIdPossessedByEachOfItsActivities() {
+        return uniqueDayIdPossessedByEachOfItsActivities;
     }
 
-    public void setCycleStatsId(long cycleStatsId) {
-        this.uniqueDayIdTiedToEachOfItsActivities = cycleStatsId;
+    public void setUniqueDayIdPossessedByEachOfItsActivities(long cycleStatsId) {
+        this.uniqueDayIdPossessedByEachOfItsActivities = cycleStatsId;
     }
 
     public long getTotalSetTime() {

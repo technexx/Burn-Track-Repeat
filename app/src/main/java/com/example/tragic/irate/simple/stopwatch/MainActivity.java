@@ -63,6 +63,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -1295,8 +1296,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
-//      testDbInsert();
-//      testDbQuery();
+//      testDbInsertDays();
+      testDbQuery();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -4561,25 +4562,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
   }
 
-
-  //Todo: Each stat should have the ID of the date it corresponds to - this is how Room enforces entity contraints.
-  private void testDbInsert() {
+  private void testDbInsertDays() {
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
         DayHolder dayHolder = new DayHolder();
-        CycleStats cycleStats = new CycleStats();
-        DayWithCycleStats dayWithCycleStats = new DayWithCycleStats();
-
         List<DayHolder> dayHolderList = new ArrayList<>();
-        List<CycleStats> cycleStatsList = new ArrayList<>();
-        List<DayWithCycleStats> dayWithCycleStatsList= new ArrayList<>();
 
-//        //Todo: Doesn't even create new id keys for cycleStats.
-//        for (int i=0; i<5; i++) {
-//          cycleStats.setTotalSetTime(i);
-//          cycleStatsList.add(cycleStats);
-//        }
+        dayHolder.setDayId(0);
+        dayHolder.setDate("1");
+        cyclesDatabase.cyclesDao().insertDay(dayHolder);
+      }
+    });
+  }
+
+  //Todo: Each stat should have the ID of the date it corresponds to - this is how Room enforces entity contraints.
+  private void testDbInsertStats() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        CycleStats cycleStats = new CycleStats();
+        List<CycleStats> cycleStatsList = new ArrayList<>();
+
+        cycleStats.setActivity("one");
+        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(0);
+        cyclesDatabase.cyclesDao().insertStats(cycleStats);
+
+        cycleStats.setActivity("two");
+        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(0);
+        cyclesDatabase.cyclesDao().insertStats(cycleStats);
+
+        cycleStats.setActivity("three");
+        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(0);
+        cyclesDatabase.cyclesDao().insertStats(cycleStats);
       }
     });
   }
@@ -4588,23 +4603,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
-        List<DayWithCycleStats> dayWithCycleStatsList = cyclesDatabase.cyclesDao().getDayWithCycleStats();
+        List<DayWithCycleStats> dayWithCycleStatsList = new ArrayList<>();
+        List<CycleStats> cycleStatsList = new ArrayList<>();
 
-        Log.i("testDate", "dayWithStats size is " + dayWithCycleStatsList.size());
-        Log.i("testDate", "list size within dayWithStats is position 1 is " + dayWithCycleStatsList.get(0).getCycleStatsList().size());
-        Log.i("testDate", "list size within dayWithStats is position 2 is " + dayWithCycleStatsList.get(1).getCycleStatsList().size());
-
-
-        for (int i=0; i<dayWithCycleStatsList.size(); i++) {
-          String dayHolderDate = dayWithCycleStatsList.get(i).getDayHolder().getDate();
-          List<CycleStats> cycleStatsList = dayWithCycleStatsList.get(i).getCycleStatsList();
-//          Log.i("testDate", "date on position " + i + " is " + dayHolderDate);
-
-          for (int k=0; k<cycleStatsList.size(); k++) {
-            String setActivity = cycleStatsList.get(k).getActivity();
-//            Log.i("testDate", "activity on " + k + " is " + setActivity);
-          }
-        }
+        dayWithCycleStatsList = cyclesDatabase.cyclesDao().getDayWithCycleStats();
+        cycleStatsList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(0);
       }
     });
   }

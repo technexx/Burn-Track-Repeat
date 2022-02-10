@@ -9,26 +9,10 @@ import java.util.List;
 public class DayWithCycleStats {
     @Embedded public DayHolder dayHolder;
     @Relation(
-            entity = DayHolder.class,
+//            entity = DayHolder.class,
             parentColumn = "daySelectedId",
-            entityColumn = "uniqueDayIdTiedToEachOfItsActivities"
+            entityColumn = "uniqueDayIdPossessedByEachOfItsActivities"
     )
 
     public List<CycleStats> cycleStatsList;
-
-    public DayHolder getDayHolder() {
-        return dayHolder;
-    }
-
-    public void setDayHolder(DayHolder dayHolder) {
-        this.dayHolder = dayHolder;
-    }
-
-    public List<CycleStats> getCycleStatsList() {
-        return cycleStatsList;
-    }
-
-    public void setCycleStatsList(List<CycleStats> cycleStatsList) {
-        this.cycleStatsList = cycleStatsList;
-    }
 }
