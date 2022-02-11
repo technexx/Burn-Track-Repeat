@@ -107,9 +107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SharedPreferences.Editor prefEdit;
 
   TabLayout savedCyclesTabLayout;
-  TabLayout statsTabLayout;
   TabLayout.Tab savedCyclesTab;
-  TabLayout.Tab cycleStatsTab;
   View savedCyclesTabView;
   View mainView;
   View actionBarView;
@@ -411,7 +409,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
-  boolean aSettingsMenuIsVisible;
   int SOUND_SETTINGS;
   int COLOR_SETTINGS;
   int ABOUT_SETTINGS;
@@ -444,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ChangeSettingsValues changeSettingsValues;
 
-  FrameLayout settingsFragmentFrameLayout;
+  FrameLayout mainActivityFragmentFrameLayout;
   FragmentTransaction ft;
 
   long stopWatchstartTime;
@@ -546,16 +543,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
-    if (!timerPopUpIsVisible && settingsFragmentFrameLayout.getVisibility()==View.GONE) {
+    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.GONE) {
       moveTaskToBack(false);
       return;
-
     }
-    if (rootSettingsFragment.isVisible()) {
-      settingsFragmentFrameLayout.setVisibility(View.GONE);
-      settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
 
-      aSettingsMenuIsVisible = false;
+    if (rootSettingsFragment.isVisible() || cycleStatsFragment.isVisible()) {
+      mainActivityFragmentFrameLayout.setVisibility(View.GONE);
+      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
@@ -1122,13 +1117,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclesTabLayout = findViewById(R.id.savedCyclesTabLayout);
     savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Workouts"));
     savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Pomodoro"));
-
-    statsTabLayout = findViewById(R.id.statsTabLayout);
-    statsTabLayout.addTab(statsTabLayout.newTab().setText("Saved Cycles"));
-    statsTabLayout.addTab(statsTabLayout.newTab().setText("Stats"));
   }
-
-  //Todo: Should be a full page for each date instead of rows. Date selection on calendar. Don't even need a recyclerView! Use a Fragment since we already have the FrameLayout for Settings.
 
   private void instantiateTabSelectionListeners() {
     savedCyclesTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
@@ -1171,24 +1160,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       @Override
       public void onTabReselected(TabLayout.Tab tab) {
-      }
-    });
-
-    statsTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-      @Override
-      public void onTabSelected(TabLayout.Tab tab) {
-        cycleStatsTab = tab;
-
-      }
-
-      @Override
-      public void onTabUnselected(TabLayout.Tab tab) {
-        cycleStatsTab = tab;
-      }
-
-      @Override
-      public void onTabReselected(TabLayout.Tab tab) {
-
       }
     });
   }
@@ -1239,8 +1210,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     soundSettingsFragment.soundSetting(MainActivity.this);
     colorSettingsFragment.colorSetting(MainActivity.this);
 
-    settingsFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
-    settingsFragmentFrameLayout.setVisibility(View.GONE);
+    mainActivityFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
+    mainActivityFragmentFrameLayout.setVisibility(View.GONE);
 
     getSupportFragmentManager().beginTransaction()
             .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
@@ -1950,8 +1921,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchGlobalSettings() {
-    settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-    settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
+    mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
     if (rootSettingsFragment !=null) {
       getSupportFragmentManager().beginTransaction()
@@ -1959,7 +1930,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .attach(rootSettingsFragment)
               .commit();
     }
-    aSettingsMenuIsVisible = true;
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
@@ -4656,8 +4626,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void testCalendarFragment() {
-    settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-    settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
+    mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
     if (cycleStatsFragment !=null) {
       getSupportFragmentManager().beginTransaction()
