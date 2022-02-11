@@ -2,22 +2,35 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/StatFragmentTheme">
 
-    <CalendarView
-        android:id="@+id/cycle_stats_calendar_view"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+<!--    <CalendarView-->
+<!--        android:id="@+id/cycle_stats_calendar_view"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent">-->
+<!--    </CalendarView>-->
+
+    <DatePicker
+        android:id="@+id/stats_date_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-    </CalendarView>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:datePickerMode="spinner"
+        android:calendarViewShown="false"
+        android:background="@drawable/date_picker_background"
+        style="@style/ThemeOverlay.App.DatePicker"/>
 
     <TextView
         android:id="@+id/cycle_stats_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cycle_stats_calendar_view"
+        app:layout_constraintTop_toBottomOf="@id/stats_date_picker"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp">
