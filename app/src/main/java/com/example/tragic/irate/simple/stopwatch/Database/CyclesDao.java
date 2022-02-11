@@ -28,7 +28,7 @@ CyclesDao {
     @Query("SELECT * from CycleStats WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
     List<CycleStats> getStatsForSpecificDate(long uniqueId);
 
-    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime AND activity AND totalTdeeSetTime AND totalTdeeBreakTime AND totalTdeeTime AND totalCaloriesBurned")
+    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime AND activity AND totalTdeeSetTime AND totalTdeeBreakTime AND totalCaloriesBurned")
     void deleteActivityAndItsCycleStats();
 
     @Query("UPDATE CycleStats set totalSetTime=:newSetTime WHERE cycleStatsId=:activityId")

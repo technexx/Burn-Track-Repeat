@@ -22,7 +22,6 @@ public class CycleStats {
     public String activity;
     public long totalTdeeSetTime;
     public long totalTdeeBreakTime;
-    public long totalTdeeTime;
     public double totalCaloriesBurned;
 
     public long getUniqueDayIdPossessedByEachOfItsActivities() {
@@ -71,14 +70,6 @@ public class CycleStats {
 
     public void setTotalTdeeBreakTime(long totalTdeeBreakTime) {
         this.totalTdeeBreakTime = totalTdeeBreakTime;
-    }
-
-    public long getTotalTdeeTime() {
-        return totalTdeeTime;
-    }
-
-    public void setTotalTdeeTime(long totalTdeeTime) {
-        this.totalTdeeTime = totalTdeeTime;
     }
 
     public double getTotalCaloriesBurned() {

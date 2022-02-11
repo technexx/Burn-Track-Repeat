@@ -130,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   List<PomCycles> pomCyclesList;
   boolean isNewCycle;
 
-  RecyclerView statsListRecycler;
   RecyclerView roundRecycler;
   RecyclerView roundRecyclerTwo;
   RecyclerView savedCycleRecycler;
@@ -437,6 +436,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   MediaPlayer mediaPlayer;
   AudioManager audioManager;
 
+  CycleStatsFragment cycleStatsFragment;
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
   ColorSettingsFragment colorSettingsFragment;
@@ -776,7 +776,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     fab.setOnClickListener(v -> {
-      fabLogic();
+//      fabLogic();
+      testCalendarFragment();
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -1127,6 +1128,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     statsTabLayout.addTab(statsTabLayout.newTab().setText("Stats"));
   }
 
+  //Todo: Should be a full page for each date instead of rows. Date selection on calendar. Don't even need a recyclerView! Use a Fragment since we already have the FrameLayout for Settings.
+
   private void instantiateTabSelectionListeners() {
     savedCyclesTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
       @Override
@@ -1214,7 +1217,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopwatch = findViewById(R.id.stopwatch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
 
-    statsListRecycler = findViewById(R.id.stats_list_recycler);
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
     blankCanvas = findViewById(R.id.blank_canvas);
@@ -1227,6 +1229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateFragmentsAndTheirCallbacks() {
+    cycleStatsFragment = new CycleStatsFragment();
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
@@ -4650,5 +4653,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleStatsList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(0);
       }
     });
+  }
+
+  private void testCalendarFragment() {
+    settingsFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+    settingsFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+    if (cycleStatsFragment !=null) {
+      getSupportFragmentManager().beginTransaction()
+              .addToBackStack (null)
+              .replace(R.id.settings_fragment_frameLayout, cycleStatsFragment)
+              .commit();
+    }
   }
 }
