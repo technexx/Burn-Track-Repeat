@@ -18,7 +18,7 @@ import java.util.Locale;
 public class CycleStatsFragment extends Fragment {
 
     DatePicker datePicker;
-    int daySelected;
+    int dayOfMonthSelected;
     int monthSelected;
     int yearSelected;
 
@@ -53,22 +53,17 @@ public class CycleStatsFragment extends Fragment {
     }
 
     private void testDatePicker() {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
-        String date = simpleDateFormat.format(calendar.getTime());
+        CalendarValues calendarValues = new CalendarValues();
+        String date = calendarValues.getDateString();
 
         cycleStatsHeader.setText(date);
 
-        yearSelected = calendar.get(Calendar.YEAR);
-        monthSelected = calendar.get(Calendar.MONTH);
-        daySelected = calendar.get(Calendar.DAY_OF_MONTH);
+        yearSelected = calendarValues.getYearSelected();
+        monthSelected = calendarValues.getMonthSelected();
+        dayOfMonthSelected = calendarValues.getDayOfMonthSelected();
 
         cycleStatsHeader.setOnClickListener(v-> {
-            datePicker.updateDate(yearSelected, monthSelected, daySelected);
+            datePicker.updateDate(yearSelected, monthSelected, dayOfMonthSelected);
         });
-    }
-
-    public void getCurrentCalendarValues() {
-
     }
 }

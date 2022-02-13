@@ -81,6 +81,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivityWithinCycle;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View actionBarView;
   BlankCanvas blankCanvas;
   Calendar calendar;
+  CalendarValues calendarValues;
   SimpleDateFormat simpleDateFormat;
   String date = "";
 
@@ -1111,6 +1113,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
     calendar = Calendar.getInstance();
+    calendarValues = new CalendarValues();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
   }
 
@@ -4595,14 +4598,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
-        calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
-        String date = simpleDateFormat.format(calendar.getTime());
-
+        String date = calendarValues.getDateString();
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        int yearSelected = calendar.get(Calendar.YEAR);
-        int monthSelected = calendar.get(Calendar.MONTH);
-        int dayOfMonthSelected = calendar.get(Calendar.DAY_OF_MONTH);
 
         DayHolder dayHolder = new DayHolder();
         CycleStats cycleStats = new CycleStats();
@@ -4611,14 +4608,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dayHolder.setDayId(dayOfYear);
         dayHolder.setDate(date);
 
-        String testIteration = String.valueOf(System.currentTimeMillis());
-        cycleStats.setActivity(testIteration);
+//        String testIteration = String.valueOf(System.currentTimeMillis());
+//        cycleStats.setActivity(testIteration);
+        cycleStats.setActivity(getTdeeActivityStringFromSavedArrayPosition());
         cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
 
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
         cyclesDatabase.cyclesDao().insertStats(cycleStats);
       }
     });
+  }
+
+  //Todo: Needs to correspond to both (A) the day and (B) the specific activity within that day. Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we can simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
+  private void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
+    CycleStats cycleStats = new CycleStats();
+    StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
+
+
+
   }
 
   private void testDbRetrieval() {
