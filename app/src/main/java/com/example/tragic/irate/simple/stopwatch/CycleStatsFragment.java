@@ -67,4 +67,8 @@ public class CycleStatsFragment extends Fragment {
             datePicker.updateDate(yearSelected, monthSelected, daySelected);
         });
     }
+
+    public void getCurrentCalendarValues() {
+
+    }
 }

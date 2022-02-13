@@ -12,10 +12,8 @@ import androidx.room.PrimaryKey;
 public class CycleStats {
     @PrimaryKey (autoGenerate = true)
     public long cycleStatsId;
-
     public long uniqueDayIdPossessedByEachOfItsActivities;
 
-    //Total times for day irrespective of activity or lack thereof.
     public long totalSetTime;
     public long totalBreakTime;
 

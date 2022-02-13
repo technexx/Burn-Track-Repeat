@@ -494,6 +494,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Save db entries for each date.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
   //Todo: Test all notifications.
@@ -771,8 +772,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     fab.setOnClickListener(v -> {
+//      testDbInsert();
+      testDbRetrieval();
 //      fabLogic();
-      testCalendarFragment();
+//      testCalendarFragment();
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -3180,6 +3183,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundTypeString = "";
         pomString = "";
 
+        //Needs to be called for current date every time.
         calendar = Calendar.getInstance();
         date = simpleDateFormat.format(calendar.getTime());
 
@@ -4575,42 +4579,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
   }
 
-  private void testDbInsertDays() {
-    AsyncTask.execute(new Runnable() {
-      @Override
-      public void run() {
-        DayHolder dayHolder = new DayHolder();
-        List<DayHolder> dayHolderList = new ArrayList<>();
-
-        dayHolder.setDayId(0);
-        dayHolder.setDate("1");
-        cyclesDatabase.cyclesDao().insertDay(dayHolder);
-      }
-    });
-  }
-
-  //Todo: Each stat should have the ID of the date it corresponds to - this is how Room enforces entity contraints.
-  private void testDbInsertStats() {
-    AsyncTask.execute(new Runnable() {
-      @Override
-      public void run() {
-        CycleStats cycleStats = new CycleStats();
-        List<CycleStats> cycleStatsList = new ArrayList<>();
-
-        cycleStats.setActivity("one");
-        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(0);
-        cyclesDatabase.cyclesDao().insertStats(cycleStats);
-
-        cycleStats.setActivity("two");
-        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(0);
-        cyclesDatabase.cyclesDao().insertStats(cycleStats);
-
-        cycleStats.setActivity("three");
-        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(0);
-        cyclesDatabase.cyclesDao().insertStats(cycleStats);
-      }
-    });
-  }
 
   private void testDbQuery() {
     AsyncTask.execute(new Runnable() {
@@ -4621,6 +4589,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dayWithCycleStatsList = cyclesDatabase.cyclesDao().getDayWithCycleStats();
         cycleStatsList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(0);
+      }
+    });
+  }
+
+  //Todo: Each stat should have the ID of the date it corresponds to - this is how Room enforces entity contraints.
+  private void testDbInsert() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
+        String date = simpleDateFormat.format(calendar.getTime());
+
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        int yearSelected = calendar.get(Calendar.YEAR);
+        int monthSelected = calendar.get(Calendar.MONTH);
+        int dayOfMonthSelected = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DayHolder dayHolder = new DayHolder();
+        CycleStats cycleStats = new CycleStats();
+
+        //Won't start @ 0, but will correspond to unique day ID in CycleStats (i.e. all CycleStats from "Day 20" will have their unique ID set to 20, and DayHolder's entry ID will also be 20).
+        dayHolder.setDayId(dayOfYear);
+        dayHolder.setDate(date);
+
+        String testIteration = String.valueOf(System.currentTimeMillis());
+        cycleStats.setActivity(testIteration);
+        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
+
+        cyclesDatabase.cyclesDao().insertDay(dayHolder);
+        cyclesDatabase.cyclesDao().insertStats(cycleStats);
+      }
+    });
+  }
+
+  private void testDbRetrieval() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        List<CycleStats> testList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(44);
+        for (int i=0; i<testList.size(); i++) {
+          Log.i("testdb", "value retrieved is " + testList.get(i).getActivity());
+        }
       }
     });
   }

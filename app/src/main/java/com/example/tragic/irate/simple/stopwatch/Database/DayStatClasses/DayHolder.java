@@ -9,7 +9,7 @@ import java.util.List;
 @Entity(tableName = "DayHolder")
 public class DayHolder {
 
-    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey
     //Can just use 1-365 (6).
     public long daySelectedId;
     public String date;
