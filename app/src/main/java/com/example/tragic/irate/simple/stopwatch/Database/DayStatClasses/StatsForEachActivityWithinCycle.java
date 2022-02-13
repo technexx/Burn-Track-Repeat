@@ -6,13 +6,14 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "StatsForEachActivityWithinCycle")
 
 public class StatsForEachActivityWithinCycle {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     public long statsForActivityId;
     public long uniqueActivityIdPossessedByEachOfItsStats;
 
-    public long totalTdeeSetTime;
-    public long totalTdeeBreakTime;
-    public double totalCaloriesBurned;
+    String activity;
+    long totalSetTimeForEachActivity;
+    long totalBreakTimeForEachActivity;
+    double totalCaloriesBurnedForEachActivity;
 
     public long getStatsForActivityId() {
         return statsForActivityId;
@@ -30,27 +31,35 @@ public class StatsForEachActivityWithinCycle {
         this.uniqueActivityIdPossessedByEachOfItsStats = uniqueActivityIdPossessedByEachOfItsStats;
     }
 
-    public long getTotalTdeeSetTime() {
-        return totalTdeeSetTime;
+    public String getActivity() {
+        return activity;
     }
 
-    public void setTotalTdeeSetTime(long totalTdeeSetTime) {
-        this.totalTdeeSetTime = totalTdeeSetTime;
+    public void setActivity(String activity) {
+        this.activity = activity;
     }
 
-    public long getTotalTdeeBreakTime() {
-        return totalTdeeBreakTime;
+    public long getTotalSetTimeForEachActivity() {
+        return totalSetTimeForEachActivity;
     }
 
-    public void setTotalTdeeBreakTime(long totalTdeeBreakTime) {
-        this.totalTdeeBreakTime = totalTdeeBreakTime;
+    public void setTotalSetTimeForEachActivity(long totalSetTimeForEachActivity) {
+        this.totalSetTimeForEachActivity = totalSetTimeForEachActivity;
     }
 
-    public double getTotalCaloriesBurned() {
-        return totalCaloriesBurned;
+    public long getTotalBreakTimeForEachActivity() {
+        return totalBreakTimeForEachActivity;
     }
 
-    public void setTotalCaloriesBurned(double totalCaloriesBurned) {
-        this.totalCaloriesBurned = totalCaloriesBurned;
+    public void setTotalBreakTimeForEachActivity(long totalBreakTimeForEachActivity) {
+        this.totalBreakTimeForEachActivity = totalBreakTimeForEachActivity;
+    }
+
+    public double getTotalCaloriesBurnedForEachActivity() {
+        return totalCaloriesBurnedForEachActivity;
+    }
+
+    public void setTotalCaloriesBurnedForEachActivity(double totalCaloriesBurnedForEachActivity) {
+        this.totalCaloriesBurnedForEachActivity = totalCaloriesBurnedForEachActivity;
     }
 }

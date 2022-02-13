@@ -3,6 +3,8 @@ package com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.List;
+
 @Entity(tableName = "CycleStats")
 
 //DATE ->>> ACTIVITY         ->>>>>>>>> TOTAL ACTIVITY SET TIME
@@ -11,14 +13,21 @@ import androidx.room.PrimaryKey;
 
 public class CycleStats {
     @PrimaryKey (autoGenerate = true)
-    public long cycleStatsId;
-    public long uniqueDayIdPossessedByEachOfItsActivities;
+    long cycleStatsId;
+    long uniqueDayIdPossessedByEachOfItsActivities;
 
-    public long totalSetTime;
-    public long totalBreakTime;
-
-    public String activity;
+    long totalSetTime;
+    long totalBreakTime;
     public double totalCaloriesBurned;
+    public List<String> activityList;
+
+    public long getCycleStatsId() {
+        return cycleStatsId;
+    }
+
+    public void setCycleStatsId(long cycleStatsId) {
+        this.cycleStatsId = cycleStatsId;
+    }
 
     public long getUniqueDayIdPossessedByEachOfItsActivities() {
         return uniqueDayIdPossessedByEachOfItsActivities;
@@ -44,19 +53,19 @@ public class CycleStats {
         this.totalBreakTime = totalBreakTime;
     }
 
-    public String getActivity() {
-        return activity;
-    }
-
-    public void setActivity(String activity) {
-        this.activity = activity;
-    }
-
     public double getTotalCaloriesBurned() {
         return totalCaloriesBurned;
     }
 
     public void setTotalCaloriesBurned(double totalCaloriesBurned) {
         this.totalCaloriesBurned = totalCaloriesBurned;
+    }
+
+    public List<String> getActivityList() {
+        return activityList;
+    }
+
+    public void setActivityList(List<String> activityList) {
+        this.activityList = activityList;
     }
 }

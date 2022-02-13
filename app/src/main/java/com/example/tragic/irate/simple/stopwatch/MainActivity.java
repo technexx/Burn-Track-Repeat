@@ -4610,7 +4610,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 //        String testIteration = String.valueOf(System.currentTimeMillis());
 //        cycleStats.setActivity(testIteration);
-        cycleStats.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+//        cycleStats.setActivity(getTdeeActivityStringFromSavedArrayPosition());
         cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
 
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
@@ -4620,12 +4620,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Todo: Needs to correspond to both (A) the day and (B) the specific activity within that day. Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we can simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
+
+  //Todo: We call this insertion method every time a cycle is launched w/ an activity selected. The DAO Insertion will ignore repeated Strings and only insert activities that don't already exist.
   private void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
     CycleStats cycleStats = new CycleStats();
     StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
 
+    int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
+    statsForEachActivityWithinCycle.setUniqueActivityIdPossessedByEachOfItsStats(dayOfYear);
+    statsForEachActivityWithinCycle.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+    statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(0);
+    statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(0);
+    statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
 
+    //Todo: Set times + calories. Should be in separate update method.
   }
 
   private void testDbRetrieval() {
@@ -4634,7 +4643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         List<CycleStats> testList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(44);
         for (int i=0; i<testList.size(); i++) {
-          Log.i("testdb", "value retrieved is " + testList.get(i).getActivity());
+//          Log.i("testdb", "value retrieved is " + testList.get(i).getActivity());
         }
       }
     });

@@ -11,8 +11,8 @@ public class DayHolder {
 
     @PrimaryKey
     //Can just use 1-365 (6).
-    public long daySelectedId;
-    public String date;
+    long daySelectedId;
+    String date;
     @Ignore List<CycleStats> cycleStatsList;
 
     public long getDayId() {
