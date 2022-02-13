@@ -23,19 +23,24 @@ CyclesDao {
     List<DayWithCycleStats> getDayWithCycleStats();
 
     @Query("SELECT * from CycleStats")
-    List<CycleStats> loadAllCycleStats();
+    List<CycleStats> loadAllCycleStatsForSpecificDay();
 
     @Query("SELECT * from CycleStats WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
     List<CycleStats> getStatsForSpecificDate(long uniqueId);
 
-    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime AND activity AND totalTdeeSetTime AND totalTdeeBreakTime AND totalCaloriesBurned")
-    void deleteActivityAndItsCycleStats();
+    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime AND activity")
+    void deleteCycleStatsFromSpecificDay();
 
     @Query("UPDATE CycleStats set totalSetTime=:newSetTime WHERE cycleStatsId=:activityId")
-    void updateStatsTotalSetTime(long newSetTime, int activityId);
+    void updateTotalSetTimeForSpecificDay(long newSetTime, int activityId);
 
-    @Query("UPDATE CycleStats set totalSetTime=:newBreakTime WHERE cycleStatsId=:activityId")
-    void updateStatsTotalBreakTime(long newBreakTime, int activityId);
+    @Query("UPDATE CycleStats set totalBreakTime=:newBreakTime WHERE cycleStatsId=:activityId")
+    void updateTotalBreakTimeForSpecificDay(long newBreakTime, int activityId);
+
+    @Query("UPDATE CycleStats set totalCaloriesBurned=:newBreakTime WHERE cycleStatsId=:activityId")
+    void updateTotalCaloriesForSpecificDay(long newBreakTime, int activityId);
+
+
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertDay(DayHolder dayHolder);

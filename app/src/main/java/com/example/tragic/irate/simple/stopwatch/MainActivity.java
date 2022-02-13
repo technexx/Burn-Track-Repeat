@@ -772,10 +772,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     fab.setOnClickListener(v -> {
-//      testDbInsert();
       testDbRetrieval();
 //      fabLogic();
-//      testCalendarFragment();
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -4593,8 +4591,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Todo: Each stat should have the ID of the date it corresponds to - this is how Room enforces entity contraints.
-  private void testDbInsert() {
+  private void insertTotalActivitesAndTimesOfSpecificDayIntoDatabase() {
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {

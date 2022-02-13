@@ -14,7 +14,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:datePickerMode="spinner"
         android:calendarViewShown="false"
-        android:background="@drawable/date_picker_background"
         style="@style/ThemeOverlay.App.DatePicker"/>
 
     <TextView
