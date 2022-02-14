@@ -3292,6 +3292,50 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
+    int totalSetTime = 0;
+    int totalBreakTime = 0;
+
+    if (mode == 1) {
+      cycles = cyclesList.get(positionOfSelectedCycle);
+      totalSetTime = cycles.getTotalSetTime();
+      totalBreakTime = cycles.getTotalBreakTime();
+      cyclesCompleted = cycles.getCyclesCompleted();
+
+      totalCycleSetTimeInMillis = totalSetTime * 1000;
+      totalCycleBreakTimeInMillis = totalBreakTime * 1000;
+    }
+
+    if (mode == 3) {
+      pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+      totalSetTime = pomCycles.getTotalWorkTime();
+      totalBreakTime = pomCycles.getTotalBreakTime();
+      cyclesCompleted = pomCycles.getCyclesCompleted();
+
+      totalWorkTimeInMillis = totalSetTime * 1000;
+      totalCycleRestTimeInMillis = totalBreakTime * 1000;
+    }
+
+    total_set_time.setText(convertSeconds(totalSetTime));
+    total_break_time.setText(convertSeconds(totalBreakTime));
+    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
+  }
+
+  private void retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView() {
+    cycles = cyclesList.get(positionOfSelectedCycle);
+
+    totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
+    burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+    selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
+    selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
+    selectedTdeeValuePosition = cycles.getTdeeValuePosition();
+    metScore = retrieveMetScoreFromSubCategoryPosition();
+
+    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
+    toggleTdeeTextViewVisibility();
+    displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly();
+  }
+
   private void loadCycleListsFromDatabase() {
     if (mode==1) {
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
@@ -3726,50 +3770,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         next_round.setEnabled(true);
       }
     };
-  }
-
-  private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
-    int totalSetTime = 0;
-    int totalBreakTime = 0;
-
-    if (mode == 1) {
-      cycles = cyclesList.get(positionOfSelectedCycle);
-      totalSetTime = cycles.getTotalSetTime();
-      totalBreakTime = cycles.getTotalBreakTime();
-      cyclesCompleted = cycles.getCyclesCompleted();
-
-      totalCycleSetTimeInMillis = totalSetTime * 1000;
-      totalCycleBreakTimeInMillis = totalBreakTime * 1000;
-    }
-
-    if (mode == 3) {
-      pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-      totalSetTime = pomCycles.getTotalWorkTime();
-      totalBreakTime = pomCycles.getTotalBreakTime();
-      cyclesCompleted = pomCycles.getCyclesCompleted();
-
-      totalWorkTimeInMillis = totalSetTime * 1000;
-      totalCycleRestTimeInMillis = totalBreakTime * 1000;
-    }
-
-    total_set_time.setText(convertSeconds(totalSetTime));
-    total_break_time.setText(convertSeconds(totalBreakTime));
-    cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-  }
-
-  private void retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView() {
-    cycles = cyclesList.get(positionOfSelectedCycle);
-
-    totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
-    burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-    selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
-    selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
-    selectedTdeeValuePosition = cycles.getTdeeValuePosition();
-    metScore = retrieveMetScoreFromSubCategoryPosition();
-
-    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
-    toggleTdeeTextViewVisibility();
-    displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly();
   }
 
   private void toggleTdeeTextViewVisibility() {
@@ -4642,10 +4642,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(dayOfYear);
         CycleStats cycleStats = cycleStatsList.get(0);
+
         cycleStats.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
         cycleStats.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
         //Todo: Calories.
-
         cyclesDatabase.cyclesDao().updateCycleStats(cycleStats);
       }
     };
@@ -4656,7 +4656,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        CycleStats cycleStats = new CycleStats();
         StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
 
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -4678,7 +4677,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
+        //This retrieves all rows tied key'd to the day we have selected.
+        List<StatsForEachActivityWithinCycle> statsList = cyclesDatabase.cyclesDao().getActivityForSpecificDate(dayOfYear);
+        //Todo: Retrieve the activity in question. Use the Primary ID # within this class.
+        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = statsList.get(0);
+
+        statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+        statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+        statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis);
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivityWithinCycle);
       }
     };
   }
