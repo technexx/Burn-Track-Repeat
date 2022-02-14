@@ -64,6 +64,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -506,6 +507,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long tdeeActivityTimeDurationPlaceHolder;
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
+
+  int activityPositionInDb;
 
   //Todo: Save db entries for each date.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -3326,9 +3329,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
     burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
     selectedTdeeValuePosition = cycles.getTdeeValuePosition();
+
     metScore = retrieveMetScoreFromSubCategoryPosition();
 
     cycleHasActivityAssigned = cycles.getTdeeActivityExists();
@@ -4669,10 +4674,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivityWithinCycle);
+
+        //If activity does not exist, we set the update method's entity instance to the last place in list (most recently added). If it DOES exist, we set its position below.
+        List<StatsForEachActivityWithinCycle> activityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForASpecificDay();
+        for (int i=0; i<activityList.size(); i++) {
+          if (getTdeeActivityStringFromSavedArrayPosition().equals(activityList.get(i).getActivity())) {
+            activityPositionInDb = i;
+          }
+        }
       }
     };
   }
 
+  //Todo: Insertion above should run @ cycle launch. Update below should iterate every X seconds as other save methods do.
   private Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
     return new Runnable() {
       @Override
