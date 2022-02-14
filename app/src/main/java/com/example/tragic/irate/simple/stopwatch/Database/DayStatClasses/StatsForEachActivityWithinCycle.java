@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "StatsForEachActivityWithinCycle")
 
 public class StatsForEachActivityWithinCycle {
-    @PrimaryKey
+    @PrimaryKey (autoGenerate = true)
     public long statsForActivityId;
-    public long uniqueActivityIdPossessedByEachOfItsStats;
+    public long uniqueActivityIdTiedToTheSelectedDay;
 
     String activity;
     long totalSetTimeForEachActivity;
@@ -23,12 +23,12 @@ public class StatsForEachActivityWithinCycle {
         this.statsForActivityId = statsForActivityId;
     }
 
-    public long getUniqueActivityIdPossessedByEachOfItsStats() {
-        return uniqueActivityIdPossessedByEachOfItsStats;
+    public long getuniqueActivityIdTiedToTheSelectedDay() {
+        return uniqueActivityIdTiedToTheSelectedDay;
     }
 
-    public void setUniqueActivityIdPossessedByEachOfItsStats(long uniqueActivityIdPossessedByEachOfItsStats) {
-        this.uniqueActivityIdPossessedByEachOfItsStats = uniqueActivityIdPossessedByEachOfItsStats;
+    public void setuniqueActivityIdTiedToTheSelectedDay(long uniqueActivityIdTiedToTheSelectedDay) {
+        this.uniqueActivityIdTiedToTheSelectedDay = uniqueActivityIdTiedToTheSelectedDay;
     }
 
     public String getActivity() {

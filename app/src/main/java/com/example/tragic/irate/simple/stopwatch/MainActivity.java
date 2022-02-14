@@ -4629,7 +4629,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleStats.setTotalCaloriesBurned(0);
 
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
-        cyclesDatabase.cyclesDao().insertStats(cycleStats);
+        cyclesDatabase.cyclesDao().insertCycleStats(cycleStats);
       }
     });
   }
@@ -4661,11 +4661,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-        statsForEachActivityWithinCycle.setUniqueActivityIdPossessedByEachOfItsStats(dayOfYear);
+        //Primary ID will autogenerate, and each entry will be different except for the unique Id used to tie entity class to date.
+        statsForEachActivityWithinCycle.setuniqueActivityIdTiedToTheSelectedDay(dayOfYear);
         statsForEachActivityWithinCycle.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+
         statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(0);
         statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(0);
         statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
+
+        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivityWithinCycle);
       }
     };
   }

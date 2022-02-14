@@ -11,6 +11,7 @@ import androidx.room.Update;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivityWithinCycle;
 
 import java.util.List;
 
@@ -28,6 +29,15 @@ CyclesDao {
     @Query("SELECT * from CycleStats WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
     List<CycleStats> getStatsForSpecificDate(long uniqueId);
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertDay(DayHolder dayHolder);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertCycleStats(CycleStats cycleStats);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertStatsForEachActivityWithinCycle(StatsForEachActivityWithinCycle statsForEachActivityWithinCycle);
+
     @Update
     void updateCycleStats(CycleStats cycleStats);
 
@@ -42,12 +52,6 @@ CyclesDao {
 
     @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime")
     void deleteCycleStatsFromSpecificDay();
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertDay(DayHolder dayHolder);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertStats(CycleStats cycleStats);
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
