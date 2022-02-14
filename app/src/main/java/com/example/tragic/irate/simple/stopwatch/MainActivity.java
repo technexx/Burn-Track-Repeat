@@ -4695,8 +4695,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //This retrieves all rows tied key'd to the day we have selected.
         List<StatsForEachActivityWithinCycle> statsList = cyclesDatabase.cyclesDao().getActivityForSpecificDate(dayOfYear);
-        //Todo: Retrieve the activity in question. Use the Primary ID # within this class.
-        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = statsList.get(0);
+
+        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
+        if (statsList.size() >= activityPositionInDb+1) {
+           statsForEachActivityWithinCycle = statsList.get(activityPositionInDb);
+        } else {
+          Log.e("Stats Database", "Activity position in StatsForEachActivityWithinCycle does not exist!");
+        }
 
         statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
         statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
