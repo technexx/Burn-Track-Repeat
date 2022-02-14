@@ -3889,22 +3889,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return valueToReturn;
   }
 
-  //Todo: Will need to do daily calories here too.
-  private void iterateTotalTimesForSelectedDay(long millis) {
-    switch (typeOfRound.get(currentRound)) {
-      case 1: case 2:
-        totalSetTimeForCurrentDayInMillis += millis;
-        break;
-      case 3: case 4:
-        totalBreakTimeForCurrentDayInMillis += millis;
-        break;
-    };
-  }
-
-  private void iterateTotalTimesForSpecificActivityOnSelectedDay() {
-
-  }
-
   private String currentTotalTimeStringForModeOne() {
     return convertSeconds(iterateAndReturnTotalTimeForModeOne()/1000);
   }
@@ -3954,7 +3938,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(iterateAndReturnTotalTimeForModeThree()/1000);
   }
 
-
   private long currentTotalTdeeTimeLongValue() {
     if (typeOfRound.get(currentRound)==1) {
       singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
@@ -3965,6 +3948,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (totalTdeeActivityTime + singleInstanceTdeeActivityTime);
   }
 
+  //Todo: Prolly should rename method or separate it. Calories w/ in cycle are iterated here.
+  //Todo: We can use our totalSetTimeForCurrentDayInMillis/break vars in place of elapsedTdee,
   private String currentTdeeStatString() {
     long elapstedTdeeTimeInSeconds = currentTotalTdeeTimeLongValue()/1000;
     String elapsedTdeeTimeString = convertSeconds(elapstedTdeeTimeInSeconds);
@@ -4650,13 +4635,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         cycleStats.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
         cycleStats.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
-        //Todo: Calories.
+        //Todo: Calories. Use totalCals var += Met FORMULA, not the cycle's calories var, since that will cause an exponential increase.
+        cycleStats.setTotalCaloriesBurned();
         cyclesDatabase.cyclesDao().updateCycleStats(cycleStats);
       }
     };
   }
 
-  //Todo: Needs to correspond to both (A) the day and (B) the specific activity within that day. Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we can simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
+  //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
   private Runnable insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayRunnable() {
     return new Runnable() {
       @Override
@@ -4708,6 +4694,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis);
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivityWithinCycle);
       }
+    };
+  }
+
+  //Todo: Will need to do daily calories here too.
+  private void iterateTotalTimesForSelectedDay(long millis) {
+    switch (typeOfRound.get(currentRound)) {
+      case 1: case 2:
+        totalSetTimeForCurrentDayInMillis += millis;
+        break;
+      case 3: case 4:
+        totalBreakTimeForCurrentDayInMillis += millis;
+        break;
     };
   }
 
