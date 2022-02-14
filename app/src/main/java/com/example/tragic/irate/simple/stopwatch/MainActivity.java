@@ -335,6 +335,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalCycleRestTimeInMillis;
   long timerDurationPlaceHolderForModeThree;
 
+  long totalSetTimeForCurrentDayInMillis;
+  long totalBreakTimeForCurrentDayInMillis;
+  long totalCaloriesBurnedForCurrentDay;
+
+  long totalSetTimeForSpecificActivityForCurrentDayInMillis;
+  long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
+  long totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis;
+
   String timeLeftValueHolder;
   boolean resettingTotalTime;
 
@@ -4594,7 +4602,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  private void insertTotalActivitesAndTimesOfSpecificDayIntoDatabase() {
+  private void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
     AsyncTask.execute(new Runnable() {
       @Override
       public void run() {
@@ -4608,10 +4616,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dayHolder.setDayId(dayOfYear);
         dayHolder.setDate(date);
 
-//        String testIteration = String.valueOf(System.currentTimeMillis());
-//        cycleStats.setActivity(testIteration);
-//        cycleStats.setActivity(getTdeeActivityStringFromSavedArrayPosition());
         cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
+        cycleStats.setTotalSetTime(0);
+        cycleStats.setTotalBreakTime(0);
+        cycleStats.setTotalCaloriesBurned(0);
 
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
         cyclesDatabase.cyclesDao().insertStats(cycleStats);
@@ -4619,8 +4627,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Todo: Needs to correspond to both (A) the day and (B) the specific activity within that day. Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we can simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
+  //Todo: Need a total time var that holds just for the day (and not each saved cycle as we currently have).
+  private void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
 
+  }
+
+  //Todo: Needs to correspond to both (A) the day and (B) the specific activity within that day. Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we can simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
   //Todo: We call this insertion method every time a cycle is launched w/ an activity selected. The DAO Insertion will ignore repeated Strings and only insert activities that don't already exist.
   private void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
     CycleStats cycleStats = new CycleStats();
@@ -4633,8 +4645,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(0);
     statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(0);
     statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
+  }
 
-    //Todo: Set times + calories. Should be in separate update method.
+  private void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDay() {
+
   }
 
   private void testDbRetrieval() {
@@ -4649,6 +4663,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  //  long totalSetTimeForCurrentDayInMillis;
+  //  long totalBreakTimeForCurrentDayInMillis;
+  //  long totalCaloriesBurnedForCurrentDay;
+  //
+  //  long totalSetTimeForSpecificActivityForCurrentDayInMillis;
+  //  long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
+  //  long totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis;
+
   private void testCalendarFragment() {
     mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
     mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
@@ -4661,3 +4683,4 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 }
+
