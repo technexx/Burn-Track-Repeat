@@ -18,18 +18,18 @@ import java.util.List;
 public interface
 CyclesDao {
 
-    @Transaction
-    @Query("SELECT * from DayHolder")
-    List<DayWithCycleStats> getDayWithCycleStats();
-
+//    @Transaction
+//    @Query("SELECT * from DayHolder")
+//    List<DayWithCycleStats> getDayWithCycleStats();
+//
     @Query("SELECT * from CycleStats")
     List<CycleStats> loadAllCycleStatsForSpecificDay();
 
     @Query("SELECT * from CycleStats WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
     List<CycleStats> getStatsForSpecificDate(long uniqueId);
 
-    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime AND activity")
-    void deleteCycleStatsFromSpecificDay();
+    @Update
+    void updateCycleStats(CycleStats cycleStats);
 
     @Query("UPDATE CycleStats set totalSetTime=:newSetTime WHERE cycleStatsId=:activityId")
     void updateTotalSetTimeForSpecificDay(long newSetTime, int activityId);
@@ -40,7 +40,8 @@ CyclesDao {
     @Query("UPDATE CycleStats set totalCaloriesBurned=:newBreakTime WHERE cycleStatsId=:activityId")
     void updateTotalCaloriesForSpecificDay(long newBreakTime, int activityId);
 
-
+    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime")
+    void deleteCycleStatsFromSpecificDay();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertDay(DayHolder dayHolder);

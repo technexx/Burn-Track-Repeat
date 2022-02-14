@@ -323,6 +323,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long setMillis;
   long breakMillis;
 
+  int TOTAL_TIMES_FOR_CYCLE;
+  int TOTAL_TIMES_FOR_DAY;
+
   long cycleSetTimeForSingleRoundInMillis;
   long totalCycleSetTimeInMillis;
   long cycleBreakTimeForSingleRoundInMillis;
@@ -1323,7 +1326,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
 //      testDbInsertDays();
-      testDbQuery();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -3371,6 +3373,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
+        iterateTotalTimesForSelectedDay(50);
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3393,6 +3396,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
+        iterateTotalTimesForSelectedDay(50);
 
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
 
@@ -3416,8 +3420,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setCountDownTimerTickLogic(millisUntilFinished, setMillis);
         displayTotalTimesAndCalories();
-        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+        iterateTotalTimesForSelectedDay(50);
 
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
       }
 
@@ -3439,8 +3444,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
         displayTotalTimesAndCalories();
-        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+        iterateTotalTimesForSelectedDay(50);
 
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
       }
 
@@ -3462,8 +3468,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setCountDownTimerTickLogic(millisUntilFinished, pomMillis);
         displayTotalTimesAndCalories();
-        changeTextSizeOnTimerDigitCountTransitionForModeThree();
 
+        changeTextSizeOnTimerDigitCountTransitionForModeThree();
         dotDraws.reDraw();
       }
 
@@ -3776,54 +3782,50 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetTotalTimesAndCalories() {
-    if (resettingTotalTime) {
-      long roundedValueForTotalTimes;
-      if (mode==1) {
-        switch (typeOfRound.get(currentRound)) {
-          case 1:
-            roundedValueForTotalTimes = 1000 - (setMillis%1000);
-            timerDurationPlaceHolderForModeOne = setMillis + roundedValueForTotalTimes;
-            if (cycleHasActivityAssigned) {
-              long roundedValueForTdeeTime = 1000 - (setMillis%1000);
-              tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
-            }
-            break;
-          case 2:
-            long remainder = setMillis%1000;
-            timerDurationPlaceHolderForModeOne = setMillis - remainder;
-            if (cycleHasActivityAssigned) {
-              remainder = setMillis%1000;
-              tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
-            }
-            break;
-          case 3:
-            roundedValueForTotalTimes = 1000 - (breakMillis%1000);
-            timerDurationPlaceHolderForModeOne = breakMillis + roundedValueForTotalTimes;
-            break;
-          case 4:
-            remainder = breakMillis%1000;
-            timerDurationPlaceHolderForModeOne = breakMillis - remainder;
-            break;
-        }
+    long roundedValueForTotalTimes;
+    if (mode==1) {
+      switch (typeOfRound.get(currentRound)) {
+        case 1:
+          roundedValueForTotalTimes = 1000 - (setMillis%1000);
+          timerDurationPlaceHolderForModeOne = setMillis + roundedValueForTotalTimes;
+          if (cycleHasActivityAssigned) {
+            long roundedValueForTdeeTime = 1000 - (setMillis%1000);
+            tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
+          }
+          break;
+        case 2:
+          long remainder = setMillis%1000;
+          timerDurationPlaceHolderForModeOne = setMillis - remainder;
+          if (cycleHasActivityAssigned) {
+            remainder = setMillis%1000;
+            tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
+          }
+          break;
+        case 3:
+          roundedValueForTotalTimes = 1000 - (breakMillis%1000);
+          timerDurationPlaceHolderForModeOne = breakMillis + roundedValueForTotalTimes;
+          break;
+        case 4:
+          remainder = breakMillis%1000;
+          timerDurationPlaceHolderForModeOne = breakMillis - remainder;
+          break;
       }
-      if (mode==3) {
-        switch (pomDotCounter) {
-          case 0: case 2: case 4: case 6:
-            if (resettingTotalTime) {
-              roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-              timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
-            }
-            break;
-          case 1: case 3: case 5: case 7:
-            if (resettingTotalTime) {
-              roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-              timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
-            }
-            break;
-        }
+    }
+    if (mode==3) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          if (resettingTotalTime) {
+            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+            timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
+          }
+          break;
+        case 1: case 3: case 5: case 7:
+          if (resettingTotalTime) {
+            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
+            timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
+          }
+          break;
       }
-
-      resettingTotalTime = false;
     }
   }
 
@@ -3880,6 +3882,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     logTotalBreakTimes();
 
     return valueToReturn;
+  }
+
+  //Todo: Will need to do daily calories here too.
+  private void iterateTotalTimesForSelectedDay(long millis) {
+    switch (typeOfRound.get(currentRound)) {
+      case 1: case 2:
+        totalSetTimeForCurrentDayInMillis += millis;
+        break;
+      case 3: case 4:
+        totalBreakTimeForCurrentDayInMillis += millis;
+        break;
+    };
+  }
+
+  private void iterateTotalTimesForSpecificActivityOnSelectedDay() {
+
   }
 
   private String currentTotalTimeStringForModeOne() {
@@ -3953,7 +3971,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void displayTotalTimesAndCalories() {
     long remainder = 0;
-    resetTotalTimesAndCalories();
+    if (resettingTotalTime) {
+      resetTotalTimesAndCalories();
+      resettingTotalTime = false;
+    }
     displayCurrentTotalTimeString();
 
     if (mode==1) {
@@ -4588,20 +4609,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
   }
 
-
-  private void testDbQuery() {
-    AsyncTask.execute(new Runnable() {
-      @Override
-      public void run() {
-        List<DayWithCycleStats> dayWithCycleStatsList = new ArrayList<>();
-        List<CycleStats> cycleStatsList = new ArrayList<>();
-
-        dayWithCycleStatsList = cyclesDatabase.cyclesDao().getDayWithCycleStats();
-        cycleStatsList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(0);
-      }
-    });
-  }
-
   private void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
     AsyncTask.execute(new Runnable() {
       @Override
@@ -4627,28 +4634,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Todo: Need a total time var that holds just for the day (and not each saved cycle as we currently have).
-  private void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
+  private Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
+        List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(dayOfYear);
+        CycleStats cycleStats = cycleStatsList.get(0);
+        cycleStats.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
+        cycleStats.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
+        //Todo: Calories.
+
+        cyclesDatabase.cyclesDao().updateCycleStats(cycleStats);
+      }
+    };
   }
 
   //Todo: Needs to correspond to both (A) the day and (B) the specific activity within that day. Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we can simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
-  //Todo: We call this insertion method every time a cycle is launched w/ an activity selected. The DAO Insertion will ignore repeated Strings and only insert activities that don't already exist.
-  private void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
-    CycleStats cycleStats = new CycleStats();
-    StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
+  private Runnable insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        CycleStats cycleStats = new CycleStats();
+        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
 
-    int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-    statsForEachActivityWithinCycle.setUniqueActivityIdPossessedByEachOfItsStats(dayOfYear);
-    statsForEachActivityWithinCycle.setActivity(getTdeeActivityStringFromSavedArrayPosition());
-    statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(0);
-    statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(0);
-    statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
+        statsForEachActivityWithinCycle.setUniqueActivityIdPossessedByEachOfItsStats(dayOfYear);
+        statsForEachActivityWithinCycle.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+        statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(0);
+        statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(0);
+        statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
+      }
+    };
   }
 
-  private void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDay() {
+  private Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
 
+      }
+    };
   }
 
   private void testDbRetrieval() {

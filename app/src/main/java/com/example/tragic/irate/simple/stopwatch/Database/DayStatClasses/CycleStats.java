@@ -19,7 +19,6 @@ public class CycleStats {
     long totalSetTime;
     long totalBreakTime;
     public double totalCaloriesBurned;
-    public List<String> activityList;
 
     public long getCycleStatsId() {
         return cycleStatsId;
@@ -59,13 +58,5 @@ public class CycleStats {
 
     public void setTotalCaloriesBurned(double totalCaloriesBurned) {
         this.totalCaloriesBurned = totalCaloriesBurned;
-    }
-
-    public List<String> getActivityList() {
-        return activityList;
-    }
-
-    public void setActivityList(List<String> activityList) {
-        this.activityList = activityList;
     }
 }

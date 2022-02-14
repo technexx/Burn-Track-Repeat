@@ -13,6 +13,7 @@ public class DayHolder {
     //Can just use 1-365 (6).
     long daySelectedId;
     String date;
+    public List<String> activityList;
     @Ignore List<CycleStats> cycleStatsList;
 
     public long getDayId() {
@@ -29,5 +30,13 @@ public class DayHolder {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public List<CycleStats> getCycleStatsList() {
+        return cycleStatsList;
+    }
+
+    public void setCycleStatsList(List<CycleStats> cycleStatsList) {
+        this.cycleStatsList = cycleStatsList;
     }
 }
