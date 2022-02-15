@@ -4596,7 +4596,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return preRoundedMet;
   }
 
-  //Todo: This should run anytime a cycle is launched, since it is meant to track a new date. If nothing is returned, we should call the retrieval method to keep iterating stats from the present date.
   private Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
     return new Runnable() {
       @Override
@@ -4608,7 +4607,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayHolderSize = cyclesDatabase.cyclesDao().loadAllDayHolderRows().size();
         for (int i=1; i<dayHolderSize; i++) {
           if (i==dayOfYear) {
-            //Todo: Run retrieval here, and then the method ends.
             retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase();
             return;
           }
@@ -4632,14 +4630,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //DayHolder primary ID does not auto-increment - we set it to the current dayOfYear.
   private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase() {
     int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     //Always a single row return, since only one exists per day of year.
-    List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(dayOfYear);
+    List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadDayIDs(dayOfYear);
 
-    totalSetTimeForCurrentDayInMillis = cycleStatsList.get(0).getTotalActivitySetTime();
-    totalBreakTimeForCurrentDayInMillis = cycleStatsList.get(0).getTotalActivityBreakTime();
-    totalCaloriesBurnedForCurrentDay = cycleStatsList.get(0).getTotalActivityCaloriesBurned();
+    totalSetTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalSetTime();
+    totalBreakTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalBreakTime();
+    totalCaloriesBurnedForCurrentDay = dayHolderList.get(0).getTotalCaloriesBurned();
   }
 
   private Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {
@@ -4647,16 +4646,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
-        List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(dayOfYear);
-        CycleStats cycleStats = cycleStatsList.get(0);
-
-        cycleStats.setTotalActivitySetTime(totalSetTimeForCurrentDayInMillis);
-        cycleStats.setTotalActivityBreakTime(totalBreakTimeForCurrentDayInMillis);
-
-        cycleStats.setTotalActivityCaloriesBurned(totalCaloriesBurnedForCurrentDay);
-
-        cyclesDatabase.cyclesDao().updateCycleStats(cycleStats);
+        //Todo: For DayHolder. Retrieve row corresponding to day # and set time vars + dao update.
+        DayHolder dayHolder = cyclesDatabase.cyclesDao().
       }
     };
   }
@@ -4670,6 +4661,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
+        //If activity does not exist, we set the update method's entity instance to the last place in list (most recently added). If it DOES exist, we set its position below.
+        List<StatsForEachActivityWithinCycle> activityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForASpecificDay();
+        for (int i=0; i<activityList.size(); i++) {
+          if (getTdeeActivityStringFromSavedArrayPosition().equals(activityList.get(i).getActivity())) {
+            activityPositionInDb = i;
+            retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
+            return;
+          }
+        }
+
         //Primary ID will autogenerate, and each entry will be different except for the unique Id used to tie entity class to date.
         statsForEachActivityWithinCycle.setuniqueActivityIdTiedToTheSelectedDay(dayOfYear);
         statsForEachActivityWithinCycle.setActivity(getTdeeActivityStringFromSavedArrayPosition());
@@ -4679,16 +4680,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivityWithinCycle);
-
-        //If activity does not exist, we set the update method's entity instance to the last place in list (most recently added). If it DOES exist, we set its position below.
-        List<StatsForEachActivityWithinCycle> activityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForASpecificDay();
-        for (int i=0; i<activityList.size(); i++) {
-          if (getTdeeActivityStringFromSavedArrayPosition().equals(activityList.get(i).getActivity())) {
-            activityPositionInDb = i;
-          }
-        }
       }
     };
+  }
+
+  private void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
+    List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(activityPosition);
+    CycleStats cycleStats = cycleStatsList.get(0);
+
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = cycleStats.getTotalActivitySetTime();
+    totalBreakTimeForSpecificActivityForCurrentDayInMillis = cycleStats.getTotalActivityBreakTime();
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = cycleStats.getTotalActivityCaloriesBurned();
   }
 
   private Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -4700,7 +4702,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //This retrieves all rows tied key'd to the day we have selected.
         List<StatsForEachActivityWithinCycle> statsList = cyclesDatabase.cyclesDao().getActivityForSpecificDate(dayOfYear);
 
-        //Todo: This should be in our retrieval method, with the time vars set to their row values.
         StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
         if (statsList.size() >= activityPositionInDb+1) {
            statsForEachActivityWithinCycle = statsList.get(activityPositionInDb);

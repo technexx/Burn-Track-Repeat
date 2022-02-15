@@ -29,6 +29,8 @@ CyclesDao {
     @Query("SELECT * from DayHolder WHERE daySelectedId IS:listID")
     List<DayHolder> loadDayIDs(long listID);
 
+    @Query("SELECT * from DayHolder WHERE ")
+
     @Query("SELECT * from CycleStats")
     List<CycleStats> loadAllCycleStats();
 
