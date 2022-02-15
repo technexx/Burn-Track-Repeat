@@ -16,9 +16,9 @@ public class CycleStats {
     long cycleStatsId;
     long uniqueDayIdPossessedByEachOfItsActivities;
 
-    long totalSetTime;
-    long totalBreakTime;
-    double totalCaloriesBurned;
+    long totalActivitySetTime;
+    long totalActivityBreakTime;
+    double totalActivityCaloriesBurned;
 
     public long getCycleStatsId() {
         return cycleStatsId;
@@ -36,27 +36,27 @@ public class CycleStats {
         this.uniqueDayIdPossessedByEachOfItsActivities = cycleStatsId;
     }
 
-    public long getTotalSetTime() {
-        return totalSetTime;
+    public long getTotalActivitySetTime() {
+        return totalActivitySetTime;
     }
 
-    public void setTotalSetTime(long totalSetTime) {
-        this.totalSetTime = totalSetTime;
+    public void setTotalActivitySetTime(long totalActivitySetTime) {
+        this.totalActivitySetTime = totalActivitySetTime;
     }
 
-    public long getTotalBreakTime() {
-        return totalBreakTime;
+    public long getTotalActivityBreakTime() {
+        return totalActivityBreakTime;
     }
 
-    public void setTotalBreakTime(long totalBreakTime) {
-        this.totalBreakTime = totalBreakTime;
+    public void setTotalActivityBreakTime(long totalActivityBreakTime) {
+        this.totalActivityBreakTime = totalActivityBreakTime;
     }
 
-    public double getTotalCaloriesBurned() {
-        return totalCaloriesBurned;
+    public double getTotalActivityCaloriesBurned() {
+        return totalActivityCaloriesBurned;
     }
 
-    public void setTotalCaloriesBurned(double totalCaloriesBurned) {
-        this.totalCaloriesBurned = totalCaloriesBurned;
+    public void setTotalActivityCaloriesBurned(double totalActivityCaloriesBurned) {
+        this.totalActivityCaloriesBurned = totalActivityCaloriesBurned;
     }
 }

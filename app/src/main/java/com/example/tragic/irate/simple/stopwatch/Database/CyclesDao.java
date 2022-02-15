@@ -26,11 +26,14 @@ CyclesDao {
     @Query("SELECT * from DayHolder")
     List<DayHolder> loadAllDayHolderRows();
 
+    @Query("SELECT * from DayHolder WHERE daySelectedId IS:listID")
+    List<DayHolder> loadDayIDs(long listID);
+
     @Query("SELECT * from CycleStats")
-    List<CycleStats> loadAllCycleStatsForSpecificDay();
+    List<CycleStats> loadAllCycleStats();
 
     @Query("SELECT * from CycleStats WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
-    List<CycleStats> getStatsForSpecificDate(long uniqueId);
+    List<CycleStats> loadStatsFromSpecificDate(long uniqueId);
 
     @Query("SELECT * from StatsForEachActivityWithinCycle")
     List<StatsForEachActivityWithinCycle> loadAllActivitiesAndTheirStatsForASpecificDay();
@@ -53,16 +56,16 @@ CyclesDao {
     @Update
     void updateStatsForEachActivity(StatsForEachActivityWithinCycle statsForEachActivityWithinCycle);
 
-    @Query("UPDATE CycleStats set totalSetTime=:newSetTime WHERE cycleStatsId=:activityId")
+    @Query("UPDATE CycleStats set totalActivitySetTime=:newSetTime WHERE cycleStatsId=:activityId")
     void updateTotalSetTimeForSpecificDay(long newSetTime, int activityId);
 
-    @Query("UPDATE CycleStats set totalBreakTime=:newBreakTime WHERE cycleStatsId=:activityId")
+    @Query("UPDATE CycleStats set totalActivityBreakTime=:newBreakTime WHERE cycleStatsId=:activityId")
     void updateTotalBreakTimeForSpecificDay(long newBreakTime, int activityId);
 
-    @Query("UPDATE CycleStats set totalCaloriesBurned=:newBreakTime WHERE cycleStatsId=:activityId")
+    @Query("UPDATE CycleStats set totalActivityCaloriesBurned=:newBreakTime WHERE cycleStatsId=:activityId")
     void updateTotalCaloriesForSpecificDay(long newBreakTime, int activityId);
 
-    @Query("DELETE from CycleStats WHERE totalSetTime AND totalBreakTime")
+    @Query("DELETE from CycleStats WHERE totalActivitySetTime AND totalActivityBreakTime AND totalActivityCaloriesBurned")
     void deleteCycleStatsFromSpecificDay();
 
     @Query("SELECT * from Cycles")

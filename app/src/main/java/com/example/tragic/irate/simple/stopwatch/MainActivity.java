@@ -4596,6 +4596,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return preRoundedMet;
   }
 
+  //Todo: This should run anytime a cycle is launched, since it is meant to track a new date. If nothing is returned, we should call the retrieval method to keep iterating stats from the present date.
   private Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
     return new Runnable() {
       @Override
@@ -4607,6 +4608,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayHolderSize = cyclesDatabase.cyclesDao().loadAllDayHolderRows().size();
         for (int i=1; i<dayHolderSize; i++) {
           if (i==dayOfYear) {
+            //Todo: Run retrieval here, and then the method ends.
+            retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase();
             return;
           }
         }
@@ -4619,9 +4622,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dayHolder.setDate(date);
 
         cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
-        cycleStats.setTotalSetTime(0);
-        cycleStats.setTotalBreakTime(0);
-        cycleStats.setTotalCaloriesBurned(0);
+        dayHolder.setTotalSetTime(0);
+        dayHolder.setTotalBreakTime(0);
+        dayHolder.setTotalCaloriesBurned(0);
 
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
         cyclesDatabase.cyclesDao().insertCycleStats(cycleStats);
@@ -4629,9 +4632,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
+  private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase() {
     int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+    //Always a single row return, since only one exists per day of year.
+    List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(dayOfYear);
 
+    totalSetTimeForCurrentDayInMillis = cycleStatsList.get(0).getTotalActivitySetTime();
+    totalBreakTimeForCurrentDayInMillis = cycleStatsList.get(0).getTotalActivityBreakTime();
+    totalCaloriesBurnedForCurrentDay = cycleStatsList.get(0).getTotalActivityCaloriesBurned();
   }
 
   private Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {
@@ -4640,13 +4648,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-        List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(dayOfYear);
+        List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(dayOfYear);
         CycleStats cycleStats = cycleStatsList.get(0);
 
-        cycleStats.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
-        cycleStats.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
+        cycleStats.setTotalActivitySetTime(totalSetTimeForCurrentDayInMillis);
+        cycleStats.setTotalActivityBreakTime(totalBreakTimeForCurrentDayInMillis);
 
-        cycleStats.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
+        cycleStats.setTotalActivityCaloriesBurned(totalCaloriesBurnedForCurrentDay);
 
         cyclesDatabase.cyclesDao().updateCycleStats(cycleStats);
       }

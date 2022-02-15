@@ -13,6 +13,9 @@ public class DayHolder {
     //Can just use 1-365 (6).
     long daySelectedId;
     String date;
+    long totalSetTime;
+    long totalBreakTime;
+    long totalCaloriesBurned;
     @Ignore List<CycleStats> cycleStatsList;
 
     public long getDayId() {
@@ -29,6 +32,30 @@ public class DayHolder {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public long getTotalSetTime() {
+        return totalSetTime;
+    }
+
+    public void setTotalSetTime(long totalSetTime) {
+        this.totalSetTime = totalSetTime;
+    }
+
+    public long getTotalBreakTime() {
+        return totalBreakTime;
+    }
+
+    public void setTotalBreakTime(long totalBreakTime) {
+        this.totalBreakTime = totalBreakTime;
+    }
+
+    public long getTotalCaloriesBurned() {
+        return totalCaloriesBurned;
+    }
+
+    public void setTotalCaloriesBurned(long totalCaloriesBurned) {
+        this.totalCaloriesBurned = totalCaloriesBurned;
     }
 
     public List<CycleStats> getCycleStatsList() {
