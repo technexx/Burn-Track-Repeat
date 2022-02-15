@@ -15,7 +15,7 @@ public class DayHolder {
     String date;
     long totalSetTime;
     long totalBreakTime;
-    long totalCaloriesBurned;
+    double totalCaloriesBurned;
     @Ignore List<CycleStats> cycleStatsList;
 
     public long getDayId() {
@@ -50,11 +50,11 @@ public class DayHolder {
         this.totalBreakTime = totalBreakTime;
     }
 
-    public long getTotalCaloriesBurned() {
+    public double getTotalCaloriesBurned() {
         return totalCaloriesBurned;
     }
 
-    public void setTotalCaloriesBurned(long totalCaloriesBurned) {
+    public void setTotalCaloriesBurned(double totalCaloriesBurned) {
         this.totalCaloriesBurned = totalCaloriesBurned;
     }
 

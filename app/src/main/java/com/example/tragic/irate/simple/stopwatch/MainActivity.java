@@ -4634,7 +4634,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase() {
     int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     //Always a single row return, since only one exists per day of year.
-    List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadDayIDs(dayOfYear);
+    List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear);
 
     totalSetTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalSetTime();
     totalBreakTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalBreakTime();
@@ -4647,7 +4647,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         //Todo: For DayHolder. Retrieve row corresponding to day # and set time vars + dao update.
-        DayHolder dayHolder = cyclesDatabase.cyclesDao().
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+        DayHolder dayHolder = dayHolderList.get(dayOfYear);
+
+        dayHolder.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
+        dayHolder.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
+        dayHolder.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
+
+        cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
       }
     };
   }
