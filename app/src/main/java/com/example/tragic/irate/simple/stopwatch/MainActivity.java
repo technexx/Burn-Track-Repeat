@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   long totalSetTimeForSpecificActivityForCurrentDayInMillis;
   long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
-  double totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis;
+  double totalCaloriesBurnedForSpecificActivityForCurrentDay;
 
   String timeLeftValueHolder;
   boolean resettingTotalTime;
@@ -510,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int activityPositionInDb;
 
-  //Todo: Save db entries for each date.
+  //Todo: Retrieval method for activity/times/calories for daily cycle stuff every time cycle launches.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
   //Todo: Test all notifications.
@@ -788,7 +788,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     fab.setOnClickListener(v -> {
-      testDbRetrieval();
 //      fabLogic();
     });
 
@@ -3423,6 +3422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
         iterateTotalTimesForSelectedDay(50);
+        iterateTotalTimesForSelectedActivity(50);
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3446,6 +3446,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
         iterateTotalTimesForSelectedDay(50);
+        iterateTotalTimesForSelectedActivity(50);
 
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
 
@@ -3470,6 +3471,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setCountDownTimerTickLogic(millisUntilFinished, setMillis);
         displayTotalTimesAndCalories();
         iterateTotalTimesForSelectedDay(50);
+        iterateTotalTimesForSelectedActivity(50);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3494,6 +3496,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
         displayTotalTimesAndCalories();
         iterateTotalTimesForSelectedDay(50);
+        iterateTotalTimesForSelectedActivity(50);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3947,9 +3950,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     return (totalTdeeActivityTime + singleInstanceTdeeActivityTime);
   }
-
-  //Todo: Prolly should rename method or separate it. Calories w/ in cycle are iterated here.
-  //Todo: We can use our totalSetTimeForCurrentDayInMillis/break vars in place of elapsedTdee. MET values will change automatically and correct calories should return.
 
   private long elapsedTdeeTimeInSeconds() {
     return currentTotalTdeeTimeLongValueInMillis()/1000;
@@ -4648,7 +4648,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleStats.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
         cycleStats.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
 
-        totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
         cycleStats.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
 
         cyclesDatabase.cyclesDao().updateCycleStats(cycleStats);
@@ -4686,7 +4685,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Insertion above should run @ cycle launch. Update below should iterate every X seconds as other save methods do.
   private Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
     return new Runnable() {
       @Override
@@ -4696,6 +4694,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //This retrieves all rows tied key'd to the day we have selected.
         List<StatsForEachActivityWithinCycle> statsList = cyclesDatabase.cyclesDao().getActivityForSpecificDate(dayOfYear);
 
+        //Todo: This should be in our retrieval method, with the time vars set to their row values.
         StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
         if (statsList.size() >= activityPositionInDb+1) {
            statsForEachActivityWithinCycle = statsList.get(activityPositionInDb);
@@ -4703,15 +4702,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Log.e("Stats Database", "Activity position in StatsForEachActivityWithinCycle does not exist!");
         }
 
+        //Todo: These values need to iterate.
         statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
         statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-        statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis);
+        statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivityWithinCycle);
       }
     };
   }
 
-  //Todo: Will need to do daily calories here too.
   private void iterateTotalTimesForSelectedDay(long millis) {
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
@@ -4723,25 +4722,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void testDbRetrieval() {
-    AsyncTask.execute(new Runnable() {
-      @Override
-      public void run() {
-        List<CycleStats> testList = cyclesDatabase.cyclesDao().getStatsForSpecificDate(44);
-        for (int i=0; i<testList.size(); i++) {
-//          Log.i("testdb", "value retrieved is " + testList.get(i).getActivity());
-        }
-      }
-    });
+  private void iterateTotalTimesForSelectedActivity(long millis) {
+    switch (typeOfRound.get(currentRound)) {
+      case 1: case 2:
+        totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
+        break;
+      case 3: case 4:
+        totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
+        break;
+    };
   }
 
-  //  long totalSetTimeForCurrentDayInMillis;
-  //  long totalBreakTimeForCurrentDayInMillis;
-  //  long totalCaloriesBurnedForCurrentDay;
-  //
-  //  long totalSetTimeForSpecificActivityForCurrentDayInMillis;
-  //  long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
-  //  long totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis;
+  //Calories iterate automatically as the total time methods move.
+  private void iterateTotalCaloriesForSelectedDay() {
+    totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
+  }
+
+  private void iterateTotalCaloriesForSelectedActivity() {
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
+  }
 
   private void testCalendarFragment() {
     mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
