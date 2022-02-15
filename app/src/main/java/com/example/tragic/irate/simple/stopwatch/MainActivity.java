@@ -341,11 +341,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   long totalSetTimeForCurrentDayInMillis;
   long totalBreakTimeForCurrentDayInMillis;
-  long totalCaloriesBurnedForCurrentDay;
+  double totalCaloriesBurnedForCurrentDay;
 
   long totalSetTimeForSpecificActivityForCurrentDayInMillis;
   long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
-  long totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis;
+  double totalCaloriesBurnedForSpecificActivityForCurrentDayInMillis;
 
   String timeLeftValueHolder;
   boolean resettingTotalTime;
@@ -3938,7 +3938,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(iterateAndReturnTotalTimeForModeThree()/1000);
   }
 
-  private long currentTotalTdeeTimeLongValue() {
+  private long currentTotalTdeeTimeLongValueInMillis() {
     if (typeOfRound.get(currentRound)==1) {
       singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
     }
@@ -3949,14 +3949,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Todo: Prolly should rename method or separate it. Calories w/ in cycle are iterated here.
-  //Todo: We can use our totalSetTimeForCurrentDayInMillis/break vars in place of elapsedTdee,
+  //Todo: We can use our totalSetTimeForCurrentDayInMillis/break vars in place of elapsedTdee. MET values will change automatically and correct calories should return.
+
+  private long elapsedTdeeTimeInSeconds() {
+    return currentTotalTdeeTimeLongValueInMillis()/1000;
+  }
+
+  private String elapsedTdeeTimeString() {
+    return convertSeconds(elapsedTdeeTimeInSeconds());
+  }
+
+  private double totalBurnedCaloriesInCycleAsDouble() {
+    return calculateCaloriesBurnedPerSecond() * elapsedTdeeTimeInSeconds();
+  }
+
+  private String totalBurnedCaloriesInCycleAsString() {
+    return formatCalorieString(totalBurnedCaloriesInCycleAsDouble());
+  }
+
   private String currentTdeeStatString() {
-    long elapstedTdeeTimeInSeconds = currentTotalTdeeTimeLongValue()/1000;
-    String elapsedTdeeTimeString = convertSeconds(elapstedTdeeTimeInSeconds);
-
-    burnedCaloriesInAllLoadingsOfCycle = calculateCaloriesBurnedPerSecond() * elapstedTdeeTimeInSeconds;
-
-    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle));
+    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString(), totalBurnedCaloriesInCycleAsString());
   }
 
   private void displayTotalTimesAndCalories() {
@@ -4635,8 +4647,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         cycleStats.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
         cycleStats.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
-        //Todo: Calories. Use totalCals var += Met FORMULA, not the cycle's calories var, since that will cause an exponential increase.
-        cycleStats.setTotalCaloriesBurned();
+
+        totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
+        cycleStats.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
+
         cyclesDatabase.cyclesDao().updateCycleStats(cycleStats);
       }
     };

@@ -18,7 +18,7 @@ public class CycleStats {
 
     long totalSetTime;
     long totalBreakTime;
-    public double totalCaloriesBurned;
+    double totalCaloriesBurned;
 
     public long getCycleStatsId() {
         return cycleStatsId;
