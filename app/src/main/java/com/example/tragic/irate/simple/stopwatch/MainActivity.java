@@ -4596,12 +4596,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return preRoundedMet;
   }
 
-  private void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
-    AsyncTask.execute(new Runnable() {
+  private Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
+    return new Runnable() {
       @Override
       public void run() {
         String date = calendarValues.getDateString();
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
+        //If any row number matches dayOfYear (they sync 1:1), return because row exists for date and we do not need to insert.
+        int dayHolderSize = cyclesDatabase.cyclesDao().loadAllDayHolderRows().size();
+        for (int i=1; i<dayHolderSize; i++) {
+          if (i==dayOfYear) {
+            return;
+          }
+        }
 
         DayHolder dayHolder = new DayHolder();
         CycleStats cycleStats = new CycleStats();
@@ -4618,7 +4626,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
         cyclesDatabase.cyclesDao().insertCycleStats(cycleStats);
       }
-    });
+    };
+  }
+
+  private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
+    int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
   }
 
   private Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {

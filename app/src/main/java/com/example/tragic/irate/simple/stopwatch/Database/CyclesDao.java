@@ -22,7 +22,10 @@ CyclesDao {
 //    @Transaction
 //    @Query("SELECT * from DayHolder")
 //    List<DayWithCycleStats> getDayWithCycleStats();
-//
+
+    @Query("SELECT * from DayHolder")
+    List<DayHolder> loadAllDayHolderRows();
+
     @Query("SELECT * from CycleStats")
     List<CycleStats> loadAllCycleStatsForSpecificDay();
 

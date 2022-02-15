@@ -13,7 +13,6 @@ public class DayHolder {
     //Can just use 1-365 (6).
     long daySelectedId;
     String date;
-    public List<String> activityList;
     @Ignore List<CycleStats> cycleStatsList;
 
     public long getDayId() {
