@@ -2397,6 +2397,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private String retrieveTimerValueString() {
+    long millis;
+    if (mode==1) {
+      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==2) {
+        millis = setMillis;
+      } else {
+        millis = breakMillis;
+      }
+    } else {
+      millis = pomMillis;
+    }
+    return (convertSeconds((millis + 999) / 1000));
+  }
+
   private void moveSortCheckmark() {
     ConstraintLayout.LayoutParams checkMarkParams =  (ConstraintLayout.LayoutParams) sortCheckMark.getLayoutParams();
 
@@ -3532,6 +3546,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
+
   private void setCountDownTimerTickLogic(long classMillisUntilFinishedVariable, long typeOfRoundMillis) {
     if (mode==1) {
       currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
@@ -3550,18 +3565,50 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (typeOfRoundMillis < 500) timerDisabled = true;
   }
 
-  private String retrieveTimerValueString() {
-    long millis;
-    if (mode==1) {
-      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==2) {
-        millis = setMillis;
-      } else {
-        millis = breakMillis;
-      }
-    } else {
-      millis = pomMillis;
+  private void displayTotalTimesAndCalories() {
+    long remainder = 0;
+    if (resettingTotalTime) {
+      resetTotalTimesAndCalories();
+      resettingTotalTime = false;
     }
-    return (convertSeconds((millis + 999) / 1000));
+    displayCurrentTotalTimeString();
+
+    if (mode==1) {
+      if (cycleHasActivityAssigned) {
+        actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
+      }
+    }
+  }
+
+  private void iterateTotalTimesForSelectedDay(long millis) {
+    switch (typeOfRound.get(currentRound)) {
+      case 1: case 2:
+        totalSetTimeForCurrentDayInMillis += millis;
+        break;
+      case 3: case 4:
+        totalBreakTimeForCurrentDayInMillis += millis;
+        break;
+    };
+  }
+
+  private void iterateTotalTimesForSelectedActivity(long millis) {
+    switch (typeOfRound.get(currentRound)) {
+      case 1: case 2:
+        totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
+        break;
+      case 3: case 4:
+        totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
+        break;
+    };
+  }
+
+  //Calories iterate automatically as the total time methods move.
+  private void iterateTotalCaloriesForSelectedDay() {
+    totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
+  }
+
+  private void iterateTotalCaloriesForSelectedActivity() {
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
   }
 
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
@@ -3969,21 +4016,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private String currentTdeeStatString() {
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString(), totalBurnedCaloriesInCycleAsString());
-  }
-
-  private void displayTotalTimesAndCalories() {
-    long remainder = 0;
-    if (resettingTotalTime) {
-      resetTotalTimesAndCalories();
-      resettingTotalTime = false;
-    }
-    displayCurrentTotalTimeString();
-
-    if (mode==1) {
-      if (cycleHasActivityAssigned) {
-        actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
-      }
-    }
   }
 
   private void displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly() {
@@ -4564,53 +4596,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return preRoundedMet;
   }
 
-  private void logTdeeCategoryPositions() {
-    Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
-    Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
-    Log.i("testRetrieve", "value array position " + selectedTdeeValuePosition);
-  }
-
-  private void logTdeeCategoryArraysSelected() {
-    ArrayList<String[]> valueArrayList = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays;
-    String[] selected = valueArrayList.get(selectedTdeeCategoryPosition);
-
-    Log.i("testRetrieve", "value ARRAY LIST is " + Arrays.toString(selected));
-  }
-
-  private void logTdeeArraySizes() {
-    for (int i=0; i<tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.size(); i++) {
-      String[] arrayToTest = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(i);
-      Log.i("testTdeeArraySizes", "size of " + i + " is " + arrayToTest.length);
-    }
-  }
-
-  ///////////Test methods///////////////////////////
-  private void logTotalSetTimes() {
-    Log.i("testTimes", "single set millis is " + cycleSetTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total set millis is " + totalCycleSetTimeInMillis);
-
-  }
-
-  private void logTotalBreakTimes() {
-    Log.i("testTimes", "single break millis is " + cycleBreakTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total break millis is " + totalCycleBreakTimeInMillis);
-  }
-
-  private void logTotalWorkTimes() {
-    Log.i("testTimes", "single work millis is " + cycleWorkTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total work millis is " + totalWorkTimeInMillis);
-  }
-
-  private void logTotalRestTimes() {
-    Log.i("testTimes", "single rest millis is " + cycleRestTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total rest millis is " + totalCycleRestTimeInMillis);
-  }
-
-  private void logTotalTdeeTimes() {
-    Log.i("testTimes", "single tdee millis is " + singleInstanceTdeeActivityTime);
-    Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
-  }
-
   private void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
     AsyncTask.execute(new Runnable() {
       @Override
@@ -4702,44 +4687,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Log.e("Stats Database", "Activity position in StatsForEachActivityWithinCycle does not exist!");
         }
 
-        //Todo: These values need to iterate.
         statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
         statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
         statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivityWithinCycle);
       }
     };
-  }
-
-  private void iterateTotalTimesForSelectedDay(long millis) {
-    switch (typeOfRound.get(currentRound)) {
-      case 1: case 2:
-        totalSetTimeForCurrentDayInMillis += millis;
-        break;
-      case 3: case 4:
-        totalBreakTimeForCurrentDayInMillis += millis;
-        break;
-    };
-  }
-
-  private void iterateTotalTimesForSelectedActivity(long millis) {
-    switch (typeOfRound.get(currentRound)) {
-      case 1: case 2:
-        totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
-        break;
-      case 3: case 4:
-        totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
-        break;
-    };
-  }
-
-  //Calories iterate automatically as the total time methods move.
-  private void iterateTotalCaloriesForSelectedDay() {
-    totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
-  }
-
-  private void iterateTotalCaloriesForSelectedActivity() {
-    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
   }
 
   private void testCalendarFragment() {
@@ -4753,5 +4706,69 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .commit();
     }
   }
-}
 
+  private void logTotalTimesForSelectedDay() {
+    Log.i("testStats", "total set time is " + totalSetTimeForCurrentDayInMillis);
+    Log.i("testStats", "total break time is " + totalBreakTimeForCurrentDayInMillis);
+  }
+
+  private void logTotalCaloriesForSelectedDay() {
+    Log.i("testStats", "total calories time are " + totalCaloriesBurnedForCurrentDay);
+  }
+
+  private void logTotalTimesForSpecificActivityOnSelectedDay() {
+    Log.i("testStats", "total set time for activity is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testStats", "total break time for activity is " + totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private void logTotalCaloriesForSpecificActivityOnSelectedDay() {
+    Log.i("testStats", "total calories for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
+  }
+
+  private void logTdeeCategoryPositions() {
+    Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
+    Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
+    Log.i("testRetrieve", "value array position " + selectedTdeeValuePosition);
+  }
+
+  private void logTdeeCategoryArraysSelected() {
+    ArrayList<String[]> valueArrayList = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays;
+    String[] selected = valueArrayList.get(selectedTdeeCategoryPosition);
+
+    Log.i("testRetrieve", "value ARRAY LIST is " + Arrays.toString(selected));
+  }
+
+  private void logTdeeArraySizes() {
+    for (int i=0; i<tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.size(); i++) {
+      String[] arrayToTest = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(i);
+      Log.i("testTdeeArraySizes", "size of " + i + " is " + arrayToTest.length);
+    }
+  }
+
+  ///////////Test methods///////////////////////////
+  private void logTotalSetTimes() {
+    Log.i("testTimes", "single set millis is " + cycleSetTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total set millis is " + totalCycleSetTimeInMillis);
+
+  }
+
+  private void logTotalBreakTimes() {
+    Log.i("testTimes", "single break millis is " + cycleBreakTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total break millis is " + totalCycleBreakTimeInMillis);
+  }
+
+  private void logTotalWorkTimes() {
+    Log.i("testTimes", "single work millis is " + cycleWorkTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total work millis is " + totalWorkTimeInMillis);
+  }
+
+  private void logTotalRestTimes() {
+    Log.i("testTimes", "single rest millis is " + cycleRestTimeForSingleRoundInMillis);
+    Log.i("testTimes", "total rest millis is " + totalCycleRestTimeInMillis);
+  }
+
+  private void logTotalTdeeTimes() {
+    Log.i("testTimes", "single tdee millis is " + singleInstanceTdeeActivityTime);
+    Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
+  }
+}
