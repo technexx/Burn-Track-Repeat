@@ -46,13 +46,13 @@ CyclesDao {
     void insertDay(DayHolder dayHolder);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertCycleStats(ActivitiesForEachDay activitiesForEachDay);
+    void insertActivitiesForEachDay(ActivitiesForEachDay activitiesForEachDay);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
 
     @Update
-    void updateCycleStats(ActivitiesForEachDay activitiesForEachDay);
+    void updateActivitiesForEachDay(ActivitiesForEachDay activitiesForEachDay);
 
     @Update
     void updateStatsForEachActivity(StatsForEachActivity statsForEachActivity);

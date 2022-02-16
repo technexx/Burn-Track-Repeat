@@ -4628,7 +4628,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dayHolder.setTotalCaloriesBurned(0);
 
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
-        cyclesDatabase.cyclesDao().insertCycleStats(activitiesForEachDay);
+        cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
       }
     };
   }

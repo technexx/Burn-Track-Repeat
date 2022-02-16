@@ -13,17 +13,17 @@ import java.util.List;
 
 public class ActivitiesForEachDay {
     @PrimaryKey (autoGenerate = true)
-    public long cycleStatsId;
+    public long activitiesForEachDayId;
     public long uniqueDayIdPossessedByEachOfItsActivities;
     //Used only to compare Strings in database fetch.
     String activity;
 
-    public long getCycleStatsId() {
-        return cycleStatsId;
+    public long getActivitiesForEachDayId() {
+        return activitiesForEachDayId;
     }
 
-    public void setCycleStatsId(long cycleStatsId) {
-        this.cycleStatsId = cycleStatsId;
+    public void setActivitiesForEachDayId(long activitiesForEachDayId) {
+        this.activitiesForEachDayId = activitiesForEachDayId;
     }
 
     public long getUniqueDayIdPossessedByEachOfItsActivities() {
