@@ -509,6 +509,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int activityPositionInDb;
 
   //Todo: Retrieval method for activity/times/calories for daily cycle stuff every time cycle launches.
+  //Todo: Should remove visibility on Sort/Triple Dots when not in Main (Settings, Edit popUp, etc.).
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure our layout params for checkmark.
   //Todo: Test all notifications.
@@ -743,6 +744,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case R.id.daily_stats:
+        mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+        mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
+                .attach(cycleStatsFragment)
+                .commit();
+        break;
       case R.id.global_settings:
         launchGlobalSettings();
         break;
@@ -4633,30 +4643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void testStatsForDayInsertion(boolean changingDate) {
-    AsyncTask.execute(new Runnable() {
-      @Override
-      public void run() {
-        int dayOfYearChangingTestValue = calendar.get(Calendar.DAY_OF_YEAR);
-
-        List<DayHolder> dayHolderListOfDays = cyclesDatabase.cyclesDao().loadListOfDaysFromDayHolder();
-        int dayHolderSize = dayHolderListOfDays.size();
-
-        for (int i=0; i<dayHolderSize; i++) {
-          if (changingDate) {
-            dayOfYearChangingTestValue = 10*i;
-          }
-
-          long dayInRow = dayHolderListOfDays.get(i).getDayId();
-          if (dayInRow==dayOfYearChangingTestValue) {
-            long dayID = cyclesDatabase.cyclesDao().loadAllDayHolderRows().get(i).getDayId();
-            Log.i("testdb", "dayholder contains dates " + dayID);
-          }
-        }
-      }
-    });
-  }
-
   private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase() {
     int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     //Always a single row return, since only one exists per day of year.
@@ -4716,25 +4702,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void testStatsForEachActivityInsertion() {
-    AsyncTask.execute(new Runnable() {
-      @Override
-      public void run() {
-        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
-
-        statsForEachActivity.setActivity("test" + statsForEachActivityList.size());
-        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
-
-        Log.i("testDb", "number of activities added is " + statsForEachActivityList.size());
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-          Log.i("testDb", "activity name is " + statsForEachActivityList.get(i).getActivity());
-          Log.i("testDb", "unique ID is " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
-        }
-      }
-    });
-  }
-
   private void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
     List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(activityPosition);
     StatsForEachActivity statsForEachActivity = statsForEachActivityList.get(0);
@@ -4765,16 +4732,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void testCalendarFragment() {
-    mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+  private void testStatsForEachActivityInsertion() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
 
-    if (cycleStatsFragment !=null) {
-      getSupportFragmentManager().beginTransaction()
-              .addToBackStack (null)
-              .replace(R.id.settings_fragment_frameLayout, cycleStatsFragment)
-              .commit();
-    }
+        statsForEachActivity.setActivity("test" + statsForEachActivityList.size());
+        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
+
+        Log.i("testDb", "number of activities added is " + statsForEachActivityList.size());
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+          Log.i("testDb", "activity name is " + statsForEachActivityList.get(i).getActivity());
+          Log.i("testDb", "unique ID is " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
+        }
+      }
+    });
+  }
+
+  private void testStatsForDayInsertion(boolean changingDate) {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        int dayOfYearChangingTestValue = calendar.get(Calendar.DAY_OF_YEAR);
+
+        List<DayHolder> dayHolderListOfDays = cyclesDatabase.cyclesDao().loadListOfDaysFromDayHolder();
+        int dayHolderSize = dayHolderListOfDays.size();
+
+        for (int i=0; i<dayHolderSize; i++) {
+          if (changingDate) {
+            dayOfYearChangingTestValue = 10*i;
+          }
+
+          long dayInRow = dayHolderListOfDays.get(i).getDayId();
+          if (dayInRow==dayOfYearChangingTestValue) {
+            long dayID = cyclesDatabase.cyclesDao().loadAllDayHolderRows().get(i).getDayId();
+            Log.i("testdb", "dayholder contains dates " + dayID);
+          }
+        }
+      }
+    });
   }
 
   private void logTotalTimesForSelectedDay() {
