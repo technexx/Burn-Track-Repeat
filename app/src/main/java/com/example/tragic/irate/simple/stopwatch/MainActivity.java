@@ -4627,7 +4627,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //DayHolder primary ID does not auto-increment - we set it to the current dayOfYear.
   private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase() {
     int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     //Always a single row return, since only one exists per day of year.
@@ -4662,10 +4661,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-        //If activity does not exist, we set the update method's entity instance to the last place in list (most recently added). If it DOES exist, we set its position below.
-        List<StatsForEachActivity> activityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForASpecificDay();
-        for (int i=0; i<activityList.size(); i++) {
-          if (getTdeeActivityStringFromSavedArrayPosition().equals(activityList.get(i).getActivity())) {
+        //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+          if (getTdeeActivityStringFromSavedArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
             activityPositionInDb = i;
             retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
             return;
@@ -4687,8 +4687,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
-    List<ActivitiesForEachDay> activitiesForEachDayList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(activityPosition);
-    ActivitiesForEachDay activitiesForEachDay = activitiesForEachDayList.get(0);
+    List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(activityPosition);
+    StatsForEachActivity statsForEachActivity = statsForEachActivityList.get(0);
 
   }
 
@@ -4699,7 +4699,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
         //This retrieves all rows tied key'd to the day we have selected.
-        List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().getActivityForSpecificDate(dayOfYear);
+        List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
 
         StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
         if (statsList.size() >= activityPositionInDb+1) {

@@ -31,16 +31,13 @@ CyclesDao {
     void updateDayHolder(DayHolder dayHolder);
 
     @Query("SELECT * from ActivitiesForEachDay")
-    List<ActivitiesForEachDay> loadAllCycleStats();
+    List<ActivitiesForEachDay> loadAllActivitiesForEachDay();
 
     @Query("SELECT * from ActivitiesForEachDay WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
-    List<ActivitiesForEachDay> loadStatsFromSpecificDate(long uniqueId);
-
-    @Query("SELECT * from StatsForEachActivity")
-    List<StatsForEachActivity> loadAllActivitiesAndTheirStatsForASpecificDay();
+    List<ActivitiesForEachDay> loadAllActivitiesForSpecificDate(long uniqueId);
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
-    List<StatsForEachActivity> getActivityForSpecificDate(long uniqueId);
+    List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertDay(DayHolder dayHolder);
