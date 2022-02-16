@@ -63,6 +63,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -4603,14 +4604,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String date = calendarValues.getDateString();
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-        //Check if current day already exists in db,
-        int dayHolderSize = cyclesDatabase.cyclesDao().loadAllDayHolderRows().size();
-        for (int i=0; i<dayHolderSize; i++) {
-          ///////////Test////////////
-          long dayID = cyclesDatabase.cyclesDao().loadAllDayHolderRows().get(i).getDayId();
-          Log.i("testdb", "dayholder contains dates " + dayID);
+        //Check if current day already exists in db.
+        List<DayHolder> dayHolderListOfDays = cyclesDatabase.cyclesDao().loadListOfDaysFromDayHolder();
+        int dayHolderSize = dayHolderListOfDays.size();
 
-          if (i+1==dayOfYear) {
+        for (int i=0; i<dayHolderSize; i++) {
+          long dayInRow = dayHolderListOfDays.get(i).getDayId();
+          if (dayOfYear==dayInRow) {
             retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase();
             return;
           }
@@ -4631,6 +4631,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
       }
     };
+  }
+
+  private void testStatsForDayInsertion(boolean changingDate) {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        int dayOfYearChangingTestValue = calendar.get(Calendar.DAY_OF_YEAR);
+
+        List<DayHolder> dayHolderListOfDays = cyclesDatabase.cyclesDao().loadListOfDaysFromDayHolder();
+        int dayHolderSize = dayHolderListOfDays.size();
+
+        for (int i=0; i<dayHolderSize; i++) {
+          if (changingDate) {
+            dayOfYearChangingTestValue = 10*i;
+          }
+
+          long dayInRow = dayHolderListOfDays.get(i).getDayId();
+          if (dayInRow==dayOfYearChangingTestValue) {
+            long dayID = cyclesDatabase.cyclesDao().loadAllDayHolderRows().get(i).getDayId();
+            Log.i("testdb", "dayholder contains dates " + dayID);
+          }
+        }
+      }
+    });
   }
 
   private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase() {
@@ -4670,26 +4694,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
 
-//        for (int i=0; i<statsForEachActivityList.size(); i++) {
-//          if (getTdeeActivityStringFromSavedArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
-//            activityPositionInDb = i;
-//            retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
-//            return;
-//          }
-//        }
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+          if (getTdeeActivityStringFromSavedArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
+            activityPositionInDb = i;
+            retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
+            return;
+          }
+        }
 
         StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
         statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
-//        statsForEachActivity.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+        statsForEachActivity.setActivity(getTdeeActivityStringFromSavedArrayPosition());
 
-
-        /////////////////////////////
-        for (int i=0; i<10; i++) {
-          statsForEachActivity.setActivity("test" + i);
-        }
-        List<StatsForEachActivity> statsForEachActivityTestList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
-        Log.i("testDb", "number of activities added is " + statsForEachActivityTestList.size());
-        ///////////////////////////////
 
         statsForEachActivity.setTotalSetTimeForEachActivity(0);
         statsForEachActivity.setTotalBreakTimeForEachActivity(0);
@@ -4698,6 +4714,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
       }
     };
+  }
+
+  private void testStatsForEachActivityInsertion() {
+    AsyncTask.execute(new Runnable() {
+      @Override
+      public void run() {
+        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+
+        statsForEachActivity.setActivity("test" + statsForEachActivityList.size());
+        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
+
+        Log.i("testDb", "number of activities added is " + statsForEachActivityList.size());
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+          Log.i("testDb", "activity name is " + statsForEachActivityList.get(i).getActivity());
+          Log.i("testDb", "unique ID is " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
+        }
+      }
+    });
   }
 
   private void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
