@@ -11,12 +11,12 @@ public class DayHolder {
 
     @PrimaryKey
     //Can just use 1-365 (6).
-    long daySelectedId;
+    public long daySelectedId;
     String date;
     long totalSetTime;
     long totalBreakTime;
     double totalCaloriesBurned;
-    @Ignore List<CycleStats> cycleStatsList;
+    @Ignore List<ActivitiesForEachDay> activitiesForEachDayList;
 
     public long getDayId() {
         return daySelectedId;
@@ -58,11 +58,11 @@ public class DayHolder {
         this.totalCaloriesBurned = totalCaloriesBurned;
     }
 
-    public List<CycleStats> getCycleStatsList() {
-        return cycleStatsList;
+    public List<ActivitiesForEachDay> getActivitiesForEachDayList() {
+        return activitiesForEachDayList;
     }
 
-    public void setCycleStatsList(List<CycleStats> cycleStatsList) {
-        this.cycleStatsList = cycleStatsList;
+    public void setActivitiesForEachDayList(List<ActivitiesForEachDay> activitiesForEachDayList) {
+        this.activitiesForEachDayList = activitiesForEachDayList;
     }
 }

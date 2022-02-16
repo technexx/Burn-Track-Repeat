@@ -52,7 +52,6 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,7 +63,6 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,9 +77,8 @@ import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
 import com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas;
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivityWithinCycle;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
@@ -4603,7 +4600,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         String date = calendarValues.getDateString();
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-        //If any row number matches dayOfYear (they sync 1:1), return because row exists for date and we do not need to insert.
+        //Check if current day already exists in db,
         int dayHolderSize = cyclesDatabase.cyclesDao().loadAllDayHolderRows().size();
         for (int i=1; i<dayHolderSize; i++) {
           if (i==dayOfYear) {
@@ -4613,19 +4610,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         DayHolder dayHolder = new DayHolder();
-        CycleStats cycleStats = new CycleStats();
+        ActivitiesForEachDay activitiesForEachDay = new ActivitiesForEachDay();
 
         //Won't start @ 0, but will correspond to unique day ID in CycleStats (i.e. all CycleStats from "Day 20" will have their unique ID set to 20, and DayHolder's entry ID will also be 20).
         dayHolder.setDayId(dayOfYear);
         dayHolder.setDate(date);
 
-        cycleStats.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
+        activitiesForEachDay.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
         dayHolder.setTotalSetTime(0);
         dayHolder.setTotalBreakTime(0);
         dayHolder.setTotalCaloriesBurned(0);
 
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
-        cyclesDatabase.cyclesDao().insertCycleStats(cycleStats);
+        cyclesDatabase.cyclesDao().insertCycleStats(activitiesForEachDay);
       }
     };
   }
@@ -4646,7 +4643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        //Todo: For DayHolder. Retrieve row corresponding to day # and set time vars + dao update.
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
         DayHolder dayHolder = dayHolderList.get(dayOfYear);
 
@@ -4664,8 +4660,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
-
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
         //If activity does not exist, we set the update method's entity instance to the last place in list (most recently added). If it DOES exist, we set its position below.
@@ -4678,8 +4672,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
 
+        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
+
         //Primary ID will autogenerate, and each entry will be different except for the unique Id used to tie entity class to date.
-        statsForEachActivityWithinCycle.setuniqueActivityIdTiedToTheSelectedDay(dayOfYear);
+        statsForEachActivityWithinCycle.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
         statsForEachActivityWithinCycle.setActivity(getTdeeActivityStringFromSavedArrayPosition());
 
         statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(0);
@@ -4692,12 +4688,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
-    List<CycleStats> cycleStatsList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(activityPosition);
-    CycleStats cycleStats = cycleStatsList.get(0);
+    List<ActivitiesForEachDay> activitiesForEachDayList = cyclesDatabase.cyclesDao().loadStatsFromSpecificDate(activityPosition);
+    ActivitiesForEachDay activitiesForEachDay = activitiesForEachDayList.get(0);
 
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = cycleStats.getTotalActivitySetTime();
-    totalBreakTimeForSpecificActivityForCurrentDayInMillis = cycleStats.getTotalActivityBreakTime();
-    totalCaloriesBurnedForSpecificActivityForCurrentDay = cycleStats.getTotalActivityCaloriesBurned();
   }
 
   private Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {

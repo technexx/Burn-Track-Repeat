@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 public class StatsForEachActivityWithinCycle {
     @PrimaryKey (autoGenerate = true)
     public long statsForActivityId;
-    public long uniqueActivityIdTiedToTheSelectedDay;
+    public long uniqueIdTiedToTheSelectedActivity;
 
     String activity;
     long totalSetTimeForEachActivity;
@@ -23,12 +23,12 @@ public class StatsForEachActivityWithinCycle {
         this.statsForActivityId = statsForActivityId;
     }
 
-    public long getuniqueActivityIdTiedToTheSelectedDay() {
-        return uniqueActivityIdTiedToTheSelectedDay;
+    public long getUniqueIdTiedToTheSelectedActivity() {
+        return uniqueIdTiedToTheSelectedActivity;
     }
 
-    public void setuniqueActivityIdTiedToTheSelectedDay(long uniqueActivityIdTiedToTheSelectedDay) {
-        this.uniqueActivityIdTiedToTheSelectedDay = uniqueActivityIdTiedToTheSelectedDay;
+    public void setUniqueIdTiedToTheSelectedActivity(long uniqueIdTiedToTheSelectedActivity) {
+        this.uniqueIdTiedToTheSelectedActivity = uniqueIdTiedToTheSelectedActivity;
     }
 
     public String getActivity() {

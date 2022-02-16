@@ -5,12 +5,10 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Transaction;
 import androidx.room.Update;
 
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.CycleStats;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayWithCycleStats;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivityWithinCycle;
 
 import java.util.List;
@@ -32,44 +30,32 @@ CyclesDao {
     @Update
     void updateDayHolder(DayHolder dayHolder);
 
-    @Query("SELECT * from CycleStats")
-    List<CycleStats> loadAllCycleStats();
+    @Query("SELECT * from ActivitiesForEachDay")
+    List<ActivitiesForEachDay> loadAllCycleStats();
 
-    @Query("SELECT * from CycleStats WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
-    List<CycleStats> loadStatsFromSpecificDate(long uniqueId);
+    @Query("SELECT * from ActivitiesForEachDay WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
+    List<ActivitiesForEachDay> loadStatsFromSpecificDate(long uniqueId);
 
     @Query("SELECT * from StatsForEachActivityWithinCycle")
     List<StatsForEachActivityWithinCycle> loadAllActivitiesAndTheirStatsForASpecificDay();
 
-    @Query("SELECT * from StatsForEachActivityWithinCycle WHERE uniqueActivityIdTiedToTheSelectedDay IS:uniqueId")
+    @Query("SELECT * from StatsForEachActivityWithinCycle WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivityWithinCycle> getActivityForSpecificDate(long uniqueId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertDay(DayHolder dayHolder);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertCycleStats(CycleStats cycleStats);
+    void insertCycleStats(ActivitiesForEachDay activitiesForEachDay);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertStatsForEachActivityWithinCycle(StatsForEachActivityWithinCycle statsForEachActivityWithinCycle);
 
     @Update
-    void updateCycleStats(CycleStats cycleStats);
+    void updateCycleStats(ActivitiesForEachDay activitiesForEachDay);
 
     @Update
     void updateStatsForEachActivity(StatsForEachActivityWithinCycle statsForEachActivityWithinCycle);
-
-    @Query("UPDATE CycleStats set totalActivitySetTime=:newSetTime WHERE cycleStatsId=:activityId")
-    void updateTotalSetTimeForSpecificDay(long newSetTime, int activityId);
-
-    @Query("UPDATE CycleStats set totalActivityBreakTime=:newBreakTime WHERE cycleStatsId=:activityId")
-    void updateTotalBreakTimeForSpecificDay(long newBreakTime, int activityId);
-
-    @Query("UPDATE CycleStats set totalActivityCaloriesBurned=:newBreakTime WHERE cycleStatsId=:activityId")
-    void updateTotalCaloriesForSpecificDay(long newBreakTime, int activityId);
-
-    @Query("DELETE from CycleStats WHERE totalActivitySetTime AND totalActivityBreakTime AND totalActivityCaloriesBurned")
-    void deleteCycleStatsFromSpecificDay();
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();

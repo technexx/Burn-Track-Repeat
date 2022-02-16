@@ -1,7 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses;
 
 import androidx.room.Embedded;
-import androidx.room.Entity;
 import androidx.room.Relation;
 
 import java.util.List;
@@ -14,5 +13,5 @@ public class DayWithCycleStats {
             entityColumn = "uniqueDayIdPossessedByEachOfItsActivities"
     )
 
-    public List<CycleStats> cycleStatsList;
+    public List<ActivitiesForEachDay> activitiesForEachDayList;
 }
