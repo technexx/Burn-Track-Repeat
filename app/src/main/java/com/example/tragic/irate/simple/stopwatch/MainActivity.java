@@ -786,6 +786,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     fab.setOnClickListener(v -> {
 //      fabLogic();
+//      AsyncTask.execute(insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase());
+      AsyncTask.execute(insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayRunnable());
+
     });
 
     stopwatch.setOnClickListener(v-> {
@@ -4602,8 +4605,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //Check if current day already exists in db,
         int dayHolderSize = cyclesDatabase.cyclesDao().loadAllDayHolderRows().size();
-        for (int i=1; i<dayHolderSize; i++) {
-          if (i==dayOfYear) {
+        for (int i=0; i<dayHolderSize; i++) {
+          ///////////Test////////////
+          long dayID = cyclesDatabase.cyclesDao().loadAllDayHolderRows().get(i).getDayId();
+          Log.i("testdb", "dayholder contains dates " + dayID);
+
+          if (i+1==dayOfYear) {
             retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase();
             return;
           }
@@ -4612,7 +4619,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         DayHolder dayHolder = new DayHolder();
         ActivitiesForEachDay activitiesForEachDay = new ActivitiesForEachDay();
 
-        //Won't start @ 0, but will correspond to unique day ID in CycleStats (i.e. all CycleStats from "Day 20" will have their unique ID set to 20, and DayHolder's entry ID will also be 20).
         dayHolder.setDayId(dayOfYear);
         dayHolder.setDate(date);
 
@@ -4664,18 +4670,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
 
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-          if (getTdeeActivityStringFromSavedArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
-            activityPositionInDb = i;
-            retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
-            return;
-          }
-        }
+//        for (int i=0; i<statsForEachActivityList.size(); i++) {
+//          if (getTdeeActivityStringFromSavedArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
+//            activityPositionInDb = i;
+//            retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
+//            return;
+//          }
+//        }
 
         StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-
         statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
-        statsForEachActivity.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+//        statsForEachActivity.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+
+
+        /////////////////////////////
+        for (int i=0; i<10; i++) {
+          statsForEachActivity.setActivity("test" + i);
+        }
+        List<StatsForEachActivity> statsForEachActivityTestList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+        Log.i("testDb", "number of activities added is " + statsForEachActivityTestList.size());
+        ///////////////////////////////
 
         statsForEachActivity.setTotalSetTimeForEachActivity(0);
         statsForEachActivity.setTotalBreakTimeForEachActivity(0);
