@@ -79,7 +79,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivityWithinCycle;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
@@ -4663,7 +4663,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
         //If activity does not exist, we set the update method's entity instance to the last place in list (most recently added). If it DOES exist, we set its position below.
-        List<StatsForEachActivityWithinCycle> activityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForASpecificDay();
+        List<StatsForEachActivity> activityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForASpecificDay();
         for (int i=0; i<activityList.size(); i++) {
           if (getTdeeActivityStringFromSavedArrayPosition().equals(activityList.get(i).getActivity())) {
             activityPositionInDb = i;
@@ -4672,17 +4672,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
 
-        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
+        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
 
-        //Primary ID will autogenerate, and each entry will be different except for the unique Id used to tie entity class to date.
-        statsForEachActivityWithinCycle.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
-        statsForEachActivityWithinCycle.setActivity(getTdeeActivityStringFromSavedArrayPosition());
+        statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
+        statsForEachActivity.setActivity(getTdeeActivityStringFromSavedArrayPosition());
 
-        statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(0);
-        statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(0);
-        statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(0);
+        statsForEachActivity.setTotalSetTimeForEachActivity(0);
+        statsForEachActivity.setTotalBreakTimeForEachActivity(0);
+        statsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
-        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivityWithinCycle);
+        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
       }
     };
   }
@@ -4700,19 +4699,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
         //This retrieves all rows tied key'd to the day we have selected.
-        List<StatsForEachActivityWithinCycle> statsList = cyclesDatabase.cyclesDao().getActivityForSpecificDate(dayOfYear);
+        List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().getActivityForSpecificDate(dayOfYear);
 
-        StatsForEachActivityWithinCycle statsForEachActivityWithinCycle = new StatsForEachActivityWithinCycle();
+        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
         if (statsList.size() >= activityPositionInDb+1) {
-           statsForEachActivityWithinCycle = statsList.get(activityPositionInDb);
+           statsForEachActivity = statsList.get(activityPositionInDb);
         } else {
           Log.e("Stats Database", "Activity position in StatsForEachActivityWithinCycle does not exist!");
         }
 
-        statsForEachActivityWithinCycle.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-        statsForEachActivityWithinCycle.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-        statsForEachActivityWithinCycle.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
-        cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivityWithinCycle);
+        statsForEachActivity.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+        statsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+        statsForEachActivity.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivity);
       }
     };
   }

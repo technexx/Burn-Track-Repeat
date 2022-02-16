@@ -3,9 +3,9 @@ package com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "StatsForEachActivityWithinCycle")
+@Entity(tableName = "StatsForEachActivity")
 
-public class StatsForEachActivityWithinCycle {
+public class StatsForEachActivity {
     @PrimaryKey (autoGenerate = true)
     public long statsForActivityId;
     public long uniqueIdTiedToTheSelectedActivity;

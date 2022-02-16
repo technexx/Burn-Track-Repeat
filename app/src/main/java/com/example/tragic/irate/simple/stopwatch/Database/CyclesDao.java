@@ -9,7 +9,7 @@ import androidx.room.Update;
 
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivityWithinCycle;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 
 import java.util.List;
 
@@ -36,11 +36,11 @@ CyclesDao {
     @Query("SELECT * from ActivitiesForEachDay WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
     List<ActivitiesForEachDay> loadStatsFromSpecificDate(long uniqueId);
 
-    @Query("SELECT * from StatsForEachActivityWithinCycle")
-    List<StatsForEachActivityWithinCycle> loadAllActivitiesAndTheirStatsForASpecificDay();
+    @Query("SELECT * from StatsForEachActivity")
+    List<StatsForEachActivity> loadAllActivitiesAndTheirStatsForASpecificDay();
 
-    @Query("SELECT * from StatsForEachActivityWithinCycle WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
-    List<StatsForEachActivityWithinCycle> getActivityForSpecificDate(long uniqueId);
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
+    List<StatsForEachActivity> getActivityForSpecificDate(long uniqueId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertDay(DayHolder dayHolder);
@@ -49,13 +49,13 @@ CyclesDao {
     void insertCycleStats(ActivitiesForEachDay activitiesForEachDay);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertStatsForEachActivityWithinCycle(StatsForEachActivityWithinCycle statsForEachActivityWithinCycle);
+    void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
 
     @Update
     void updateCycleStats(ActivitiesForEachDay activitiesForEachDay);
 
     @Update
-    void updateStatsForEachActivity(StatsForEachActivityWithinCycle statsForEachActivityWithinCycle);
+    void updateStatsForEachActivity(StatsForEachActivity statsForEachActivity);
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();

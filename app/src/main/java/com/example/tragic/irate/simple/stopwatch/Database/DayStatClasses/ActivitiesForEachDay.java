@@ -15,6 +15,7 @@ public class ActivitiesForEachDay {
     @PrimaryKey (autoGenerate = true)
     public long cycleStatsId;
     public long uniqueDayIdPossessedByEachOfItsActivities;
+    //Used only to compare Strings in database fetch.
     String activity;
 
     public long getCycleStatsId() {
