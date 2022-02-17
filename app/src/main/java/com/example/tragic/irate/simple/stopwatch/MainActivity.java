@@ -510,6 +510,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int activityPositionInDb;
 
+  //Todo: Remove sort/triple dots when not in Main (e.g. Settings Fragment, Edit PopUp).
+  //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
   //Todo: Retrieval method for activity/times/calories for daily cycle stuff every time cycle launches.
   //Todo: Should remove visibility on Sort/Triple Dots when not in Main (Settings, Edit popUp, etc.).
   //Todo: Check sizes on long aspect for all layouts + menus.

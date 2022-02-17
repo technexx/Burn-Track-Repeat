@@ -43,6 +43,7 @@ public class CycleStatsFragment extends Fragment {
         cycleStatsTotalBreakTimeTextView = root.findViewById(R.id.cycle_stats_total_break_time_textView);
 
         //Todo: Should have recyclerView for multiple activities in day.
+        //Todo: Total Set/Break/Calories @ top under date and invisible recyclerView if no activities. Otherwise, make recyclerView visible which moves total to bottom where they can add up to the recyclerView's values.
         cycleStatsActivityTextView = root.findViewById(R.id.cycle_stats_activity_textView);
         cycleStatsActivityTotalSetTimeTextView = root.findViewById(R.id.cycle_stats_activity_total_set_time_textView);
         cycleStatsActivityTotalBreakTimeTextView = root.findViewById(R.id.cycle_stats_activity_total_break_time_textView);
