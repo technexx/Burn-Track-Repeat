@@ -62,6 +62,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
 
+  FragmentManager fragmentManager;
   TabLayout savedCyclesTabLayout;
   TabLayout.Tab savedCyclesTab;
   View savedCyclesTabView;
@@ -748,9 +750,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
         mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
-        getSupportFragmentManager().beginTransaction()
+        fragmentManager.beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
-                .attach(cycleStatsFragment)
+                .replace(R.id.settings_fragment_frameLayout, cycleStatsFragment)
                 .commit();
         break;
       case R.id.global_settings:
@@ -1116,6 +1118,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateGlobalClasses() {
+    fragmentManager = getSupportFragmentManager();
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
     changeSettingsValues = new ChangeSettingsValues();
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
@@ -1241,9 +1244,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mainActivityFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     mainActivityFragmentFrameLayout.setVisibility(View.GONE);
 
-    getSupportFragmentManager().beginTransaction()
-            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
-            .commit();
+//    getSupportFragmentManager().beginTransaction()
+//            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
+//            .commit();
 
   }
 
