@@ -42,6 +42,7 @@ public class CycleStatsFragment extends Fragment {
         cycleStatsTotalSetTimeTextView = root.findViewById(R.id.cycle_stats_total_set_time_textView);
         cycleStatsTotalBreakTimeTextView = root.findViewById(R.id.cycle_stats_total_break_time_textView);
 
+        //Todo: Should have recyclerView for multiple activities in day.
         cycleStatsActivityTextView = root.findViewById(R.id.cycle_stats_activity_textView);
         cycleStatsActivityTotalSetTimeTextView = root.findViewById(R.id.cycle_stats_activity_total_set_time_textView);
         cycleStatsActivityTotalBreakTimeTextView = root.findViewById(R.id.cycle_stats_activity_total_break_time_textView);

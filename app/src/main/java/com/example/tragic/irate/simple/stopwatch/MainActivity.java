@@ -4615,11 +4615,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
         //Check if current day already exists in db.
-        List<DayHolder> dayHolderListOfDays = cyclesDatabase.cyclesDao().loadListOfDaysFromDayHolder();
-        int dayHolderSize = dayHolderListOfDays.size();
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+        int dayHolderSize = dayHolderList.size();
 
         for (int i=0; i<dayHolderSize; i++) {
-          long dayInRow = dayHolderListOfDays.get(i).getDayId();
+          long dayInRow = dayHolderList.get(i).getDayId();
           if (dayOfYear==dayInRow) {
             retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase();
             return;
@@ -4757,15 +4757,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         int dayOfYearChangingTestValue = calendar.get(Calendar.DAY_OF_YEAR);
 
-        List<DayHolder> dayHolderListOfDays = cyclesDatabase.cyclesDao().loadListOfDaysFromDayHolder();
-        int dayHolderSize = dayHolderListOfDays.size();
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+        int dayHolderSize = dayHolderList.size();
 
         for (int i=0; i<dayHolderSize; i++) {
           if (changingDate) {
             dayOfYearChangingTestValue = 10*i;
           }
 
-          long dayInRow = dayHolderListOfDays.get(i).getDayId();
+          long dayInRow = dayHolderList.get(i).getDayId();
           if (dayInRow==dayOfYearChangingTestValue) {
             long dayID = cyclesDatabase.cyclesDao().loadAllDayHolderRows().get(i).getDayId();
             Log.i("testdb", "dayholder contains dates " + dayID);

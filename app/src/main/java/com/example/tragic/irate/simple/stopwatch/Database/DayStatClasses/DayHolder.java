@@ -10,7 +10,6 @@ import java.util.List;
 public class DayHolder {
 
     @PrimaryKey
-    //Can just use 1-365 (6).
     public long daySelectedId;
     String date;
     long totalSetTime;
