@@ -64,7 +64,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -447,7 +446,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   MediaPlayer mediaPlayer;
   AudioManager audioManager;
 
-  CycleStatsFragment cycleStatsFragment;
+  DailyStatsFragment dailyStatsFragment;
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
   ColorSettingsFragment colorSettingsFragment;
@@ -510,6 +509,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int activityPositionInDb;
 
+  //Todo: Main's buttons (Stopwatch, FAB) are accessible when Fragments' framelayout is overlayed - we can probably correct this by ensuring the frame layout has focus.
   //Todo: Remove sort/triple dots when not in Main (e.g. Settings Fragment, Edit PopUp).
   //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
   //Todo: Retrieval method for activity/times/calories for daily cycle stuff every time cycle launches.
@@ -568,7 +568,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    if (rootSettingsFragment.isVisible() || cycleStatsFragment.isVisible()) {
+    if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
       mainActivityFragmentFrameLayout.setVisibility(View.GONE);
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
     }
@@ -754,7 +754,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         fragmentManager.beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
-                .replace(R.id.settings_fragment_frameLayout, cycleStatsFragment)
+                .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
                 .commit();
         break;
       case R.id.global_settings:
@@ -1233,7 +1233,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateFragmentsAndTheirCallbacks() {
-    cycleStatsFragment = new CycleStatsFragment();
+    dailyStatsFragment = new DailyStatsFragment();
     rootSettingsFragment = new RootSettingsFragment();
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();

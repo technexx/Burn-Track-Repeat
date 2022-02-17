@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/StatFragmentTheme">
+
+<!--    <DatePicker-->
+<!--        android:id="@+id/stats_date_picker"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:datePickerMode="spinner"-->
+<!--        android:spinnersShown="false"/>-->
+
+    <CalendarView
+        android:id="@+id/stats_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+    </CalendarView>
+
+    <TextView
+        android:id="@+id/daily_stats_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp">
+    </TextView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/daily_stats_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        app:layout_constraintTop_toBottomOf="@id/stats_calendar">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/daily_stats_total_set_time_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="60dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/daily_stats_total_break_time_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/daily_stats_total_set_time_textView"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        android:layout_marginStart="60dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/daily_stats_total_calories_burned_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/daily_stats_total_break_time_textView"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        android:layout_marginStart="60dp">
+    </TextView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
