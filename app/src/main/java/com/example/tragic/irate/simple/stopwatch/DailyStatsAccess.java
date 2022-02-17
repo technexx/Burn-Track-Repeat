@@ -25,7 +25,7 @@ public class DailyStatsAccess extends MainActivity {
         this.mContext = context;
     }
 
-    private Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
+    public Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
         return new Runnable() {
             @Override
             public void run() {
@@ -39,7 +39,7 @@ public class DailyStatsAccess extends MainActivity {
                 for (int i=0; i<dayHolderSize; i++) {
                     long dayInRow = dayHolderList.get(i).getDayId();
                     if (dayOfYear==dayInRow) {
-                        retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase();
+                        retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase(dayOfYear);
                         return;
                     }
                 }
@@ -61,7 +61,7 @@ public class DailyStatsAccess extends MainActivity {
         };
     }
 
-    private void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase() {
+    public void retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase(int dayToRetrieve) {
         int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         //Always a single row return, since only one exists per day of year.
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear);
@@ -71,7 +71,7 @@ public class DailyStatsAccess extends MainActivity {
         totalCaloriesBurnedForCurrentDay = dayHolderList.get(0).getTotalCaloriesBurned();
     }
 
-    private Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {
+    public Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {
         return new Runnable() {
             @Override
             public void run() {
@@ -91,7 +91,7 @@ public class DailyStatsAccess extends MainActivity {
 
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
-    private Runnable insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayRunnable() {
+    public Runnable insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayRunnable() {
         return new Runnable() {
             @Override
             public void run() {
@@ -122,12 +122,12 @@ public class DailyStatsAccess extends MainActivity {
         };
     }
 
-    private void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
+    public void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(activityPosition);
         StatsForEachActivity statsForEachActivity = statsForEachActivityList.get(0);
     }
 
-    private Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
+    public Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         return new Runnable() {
             @Override
             public void run() {
@@ -151,7 +151,7 @@ public class DailyStatsAccess extends MainActivity {
         };
     }
 
-    private void testStatsForEachActivityInsertion() {
+    public void testStatsForEachActivityInsertion() {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -170,7 +170,7 @@ public class DailyStatsAccess extends MainActivity {
         });
     }
 
-    private void testStatsForDayInsertion(boolean changingDate) {
+    public void testStatsForDayInsertion(boolean changingDate) {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -194,21 +194,21 @@ public class DailyStatsAccess extends MainActivity {
         });
     }
 
-    private void logTotalTimesForSelectedDay() {
+    public void logTotalTimesForSelectedDay() {
         Log.i("testStats", "total set time is " + totalSetTimeForCurrentDayInMillis);
         Log.i("testStats", "total break time is " + totalBreakTimeForCurrentDayInMillis);
     }
 
-    private void logTotalCaloriesForSelectedDay() {
+    public void logTotalCaloriesForSelectedDay() {
         Log.i("testStats", "total calories time are " + totalCaloriesBurnedForCurrentDay);
     }
 
-    private void logTotalTimesForSpecificActivityOnSelectedDay() {
+    public void logTotalTimesForSpecificActivityOnSelectedDay() {
         Log.i("testStats", "total set time for activity is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
         Log.i("testStats", "total break time for activity is " + totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     }
 
-    private void logTotalCaloriesForSpecificActivityOnSelectedDay() {
+    public void logTotalCaloriesForSpecificActivityOnSelectedDay() {
         Log.i("testStats", "total calories for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
     }
 

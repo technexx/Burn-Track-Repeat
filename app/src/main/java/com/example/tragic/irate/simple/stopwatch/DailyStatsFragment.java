@@ -12,10 +12,15 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 public class DailyStatsFragment extends Fragment {
 
     DailyStatsAccess dailyStatsAccess;
+    Calendar calendar;
     CalendarView calendarView;
+    int dayOfYear;
     RecyclerView dailyStatsRecyclerview;
 
     TextView dailyStatsTotalSetTimeTextView;
@@ -37,7 +42,9 @@ public class DailyStatsFragment extends Fragment {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-
+                calendar = Calendar.getInstance(TimeZone.getDefault());
+                calendar.set(year, month, dayOfMonth);
+                dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
             }
         });
 
@@ -46,6 +53,6 @@ public class DailyStatsFragment extends Fragment {
 
 
     private void assignTotalTimeAndCaloriesForSelectedDayToTextView() {
-
+        dailyStatsAccess.retrieveTotalTimesAndCaloriesBurnedOfCurrentDayFromDatabase(dayOfYear);
     }
 }
