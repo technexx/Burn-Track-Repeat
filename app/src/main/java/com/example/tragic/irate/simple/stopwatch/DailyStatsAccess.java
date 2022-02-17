@@ -212,7 +212,7 @@ public class DailyStatsAccess extends MainActivity {
         Log.i("testStats", "total calories for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
     }
 
-    public void instantiateDatabase() {
+    public void instantiateMainActivityAndDailyStatsDatabase() {
         mainActivity = new MainActivity();
 
         AsyncTask.execute(new Runnable() {

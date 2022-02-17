@@ -14,11 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class DailyStatsFragment extends Fragment {
 
+    DailyStatsAccess dailyStatsAccess;
     CalendarView calendarView;
-    int dayOfMonthSelected;
-    int monthSelected;
-    int yearSelected;
-
     RecyclerView dailyStatsRecyclerview;
 
     TextView dailyStatsTotalSetTimeTextView;
@@ -28,6 +25,7 @@ public class DailyStatsFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
 
+        dailyStatsAccess = new DailyStatsAccess(getContext());
         calendarView = root.findViewById(R.id.stats_calendar);
         dailyStatsRecyclerview = root.findViewById(R.id.daily_stats_recyclerView);
 

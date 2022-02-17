@@ -1114,6 +1114,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnerListeners();
     instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
+
+    DailyStatsAccess dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
+    dailyStatsAccess.instantiateMainActivityAndDailyStatsDatabase();
   }
 
   private void instantiateGlobalClasses() {
