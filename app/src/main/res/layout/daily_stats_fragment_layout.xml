@@ -5,16 +5,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/StatFragmentTheme">
 
-<!--    <DatePicker-->
-<!--        android:id="@+id/stats_date_picker"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        android:datePickerMode="spinner"-->
-<!--        android:spinnersShown="false"/>-->
-
     <CalendarView
         android:id="@+id/stats_calendar"
         android:layout_width="match_parent"
@@ -23,16 +13,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
     </CalendarView>
-
-    <TextView
-        android:id="@+id/daily_stats_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp">
-    </TextView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
