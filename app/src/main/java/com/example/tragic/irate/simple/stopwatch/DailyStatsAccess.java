@@ -41,6 +41,7 @@ public class DailyStatsAccess extends MainActivity {
                     long dayInRow = dayHolderList.get(i).getDayId();
                     if (dayOfYear==dayInRow) {
                         retrieveTotalTimesAndCaloriesBurnedOfSelectedDayFromDatabase(dayOfYear);
+                        Log.i("testInsert", "Returned from Insertion because day already exists");
                         return;
                     }
                 }
@@ -52,12 +53,14 @@ public class DailyStatsAccess extends MainActivity {
                 dayHolder.setDate(date);
 
                 activitiesForEachDay.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
-                dayHolder.setTotalSetTime(30);
-                dayHolder.setTotalBreakTime(60);
-                dayHolder.setTotalCaloriesBurned(90);
+                dayHolder.setTotalSetTime(0);
+                dayHolder.setTotalBreakTime(0);
+                dayHolder.setTotalCaloriesBurned(0);
 
                 cyclesDatabase.cyclesDao().insertDay(dayHolder);
                 cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
+
+                Log.i("testInsert", "Day was Inserted and is day " + dayOfYear);
             }
         };
     }
@@ -73,6 +76,7 @@ public class DailyStatsAccess extends MainActivity {
                     totalSetTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalSetTime();
                     totalBreakTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalBreakTime();
                     totalCaloriesBurnedForCurrentDay = dayHolderList.get(0).getTotalCaloriesBurned();
+                    Log.i("testInsert", "Values returned from attempted Insertion (that belong to an already existing day are " + "set time: " + totalSetTimeForCurrentDayInMillis + " break time: "  + totalBreakTimeForCurrentDayInMillis + " calories burned: " + totalCaloriesBurnedForCurrentDay + " FOR DAY " + dayToRetrieve);
                 } else {
                     totalSetTimeForCurrentDayInMillis = 0;
                     totalBreakTimeForCurrentDayInMillis = 0;
