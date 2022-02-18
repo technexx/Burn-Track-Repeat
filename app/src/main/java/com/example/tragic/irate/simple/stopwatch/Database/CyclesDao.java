@@ -37,7 +37,7 @@ CyclesDao {
     List<ActivitiesForEachDay> loadAllActivitiesForSpecificDate(long uniqueId);
 
     @Query("SELECT * from StatsForEachActivity")
-    List<StatsForEachActivity> loadAllActivitiesForAllDays();
+    List<StatsForEachActivity> loadAllActivitiesAndTheirStatsForAllDays();
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);

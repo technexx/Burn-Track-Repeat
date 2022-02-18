@@ -12,6 +12,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.Activit
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -25,6 +26,16 @@ public class DailyStatsAccess extends MainActivity {
         this.mContext = context;
         instantiateMainActivityAndDailyStatsDatabase();
     }
+
+    public List<String> totalActivitiesListForForAllDays() {
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+        List<String> activitiesList = new ArrayList<>();
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            activitiesList.add(statsForEachActivityList.get(i).getActivity());
+        }
+        return activitiesList;
+    };
 
     public Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
         return new Runnable() {
@@ -175,7 +186,7 @@ public class DailyStatsAccess extends MainActivity {
             @Override
             public void run() {
                 StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-                List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+                List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
 
                 statsForEachActivity.setActivity("test" + statsForEachActivityList.size());
                 cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);

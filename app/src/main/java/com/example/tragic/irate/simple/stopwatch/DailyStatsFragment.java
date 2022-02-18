@@ -16,12 +16,15 @@ import androidx.fragment.app.Fragment;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
+
 import java.util.Calendar;
 import java.util.TimeZone;
 
 public class DailyStatsFragment extends Fragment {
 
     DailyStatsAccess dailyStatsAccess;
+    DailyStatsAdapter dailyStatsAdapter;
     Calendar calendar;
     CalendarView calendarView;
     int dayOfYear;
@@ -35,8 +38,10 @@ public class DailyStatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
 
         dailyStatsAccess = new DailyStatsAccess(getContext());
-        calendarView = root.findViewById(R.id.stats_calendar);
+        //Todo: List access from database.
+        dailyStatsAdapter = new DailyStatsAdapter()
         dailyStatsRecyclerview = root.findViewById(R.id.daily_stats_recyclerView);
+        calendarView = root.findViewById(R.id.stats_calendar);
 //        dailyStatsRecyclerview.setVisibility(View.GONE);
 
         dailyStatsTotalSetTimeTextView = root.findViewById(R.id.daily_stats_total_set_time_textView);
