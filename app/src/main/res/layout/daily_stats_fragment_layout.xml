@@ -53,4 +53,14 @@
         android:gravity="center">
     </TextView>
 
+    <Button
+        android:id="@+id/test_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toTopOf="@id/daily_stats_total_calories_burned_textView"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/fab_plus">
+    </Button>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

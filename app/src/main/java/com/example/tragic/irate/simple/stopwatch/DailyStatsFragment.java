@@ -1,15 +1,18 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Calendar;
@@ -33,6 +36,7 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsAccess = new DailyStatsAccess(getContext());
         calendarView = root.findViewById(R.id.stats_calendar);
         dailyStatsRecyclerview = root.findViewById(R.id.daily_stats_recyclerView);
+        dailyStatsRecyclerview.setVisibility(View.GONE);
 
         dailyStatsTotalSetTimeTextView = root.findViewById(R.id.daily_stats_total_set_time_textView);
         dailyStatsTotalBreakTimeTextView = root.findViewById(R.id.daily_stats_total_break_time_textView);
@@ -50,17 +54,33 @@ public class DailyStatsFragment extends Fragment {
             }
         });
 
+        Button testButton = root.findViewById(R.id.test_button);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AsyncTask.execute(dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase());
+            }
+        });
+
         return root;
     }
 
-
     private void assignTotalTimeAndCaloriesForSelectedDayToTextView() {
-        dailyStatsAccess.retrieveTotalTimesAndCaloriesBurnedOfSelectedDayFromDatabase(dayOfYear);
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                dailyStatsAccess.retrieveTotalTimesAndCaloriesBurnedOfSelectedDayFromDatabase(dayOfYear);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(dailyStatsAccess.totalSetTimeForCurrentDayInMillis)));
 
-        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(dailyStatsAccess.totalSetTimeForCurrentDayInMillis)));
+                        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(dailyStatsAccess.totalBreakTimeForCurrentDayInMillis)));
 
-        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(dailyStatsAccess.totalBreakTimeForCurrentDayInMillis)));
-
-        dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(dailyStatsAccess.totalCaloriesBurnedForCurrentDay)));
+                        dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(dailyStatsAccess.totalCaloriesBurnedForCurrentDay)));
+                    }
+                });
+            }
+        });
     }
 }

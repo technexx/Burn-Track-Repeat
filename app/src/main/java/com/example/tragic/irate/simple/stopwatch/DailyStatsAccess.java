@@ -52,9 +52,9 @@ public class DailyStatsAccess extends MainActivity {
                 dayHolder.setDate(date);
 
                 activitiesForEachDay.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
-                dayHolder.setTotalSetTime(0);
-                dayHolder.setTotalBreakTime(0);
-                dayHolder.setTotalCaloriesBurned(0);
+                dayHolder.setTotalSetTime(30);
+                dayHolder.setTotalBreakTime(60);
+                dayHolder.setTotalCaloriesBurned(90);
 
                 cyclesDatabase.cyclesDao().insertDay(dayHolder);
                 cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
@@ -184,7 +184,7 @@ public class DailyStatsAccess extends MainActivity {
         });
     }
 
-    public void testStatsForDayInsertion(boolean changingDate) {
+    public void testStatsForDayInsertion() {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -193,10 +193,8 @@ public class DailyStatsAccess extends MainActivity {
                 List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
                 int dayHolderSize = dayHolderList.size();
 
+                //If we enter a value other than 0, insert
                 for (int i=0; i<dayHolderSize; i++) {
-                    if (changingDate) {
-                        dayOfYearChangingTestValue = 10*i;
-                    }
 
                     long dayInRow = dayHolderList.get(i).getDayId();
                     if (dayInRow==dayOfYearChangingTestValue) {
