@@ -35,8 +35,7 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     LayoutInflater inflater = LayoutInflater.from(context);
     View view = inflater.inflate(R.layout.lap_recycler_layout, parent, false);
 
-    LapViewHolder lapViewHolder = new LapViewHolder(view);
-    return lapViewHolder;
+    return new LapViewHolder(view);
   }
 
   @Override

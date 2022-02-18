@@ -37,7 +37,7 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsAccess = new DailyStatsAccess(getContext());
         calendarView = root.findViewById(R.id.stats_calendar);
         dailyStatsRecyclerview = root.findViewById(R.id.daily_stats_recyclerView);
-        dailyStatsRecyclerview.setVisibility(View.GONE);
+//        dailyStatsRecyclerview.setVisibility(View.GONE);
 
         dailyStatsTotalSetTimeTextView = root.findViewById(R.id.daily_stats_total_set_time_textView);
         dailyStatsTotalBreakTimeTextView = root.findViewById(R.id.daily_stats_total_break_time_textView);

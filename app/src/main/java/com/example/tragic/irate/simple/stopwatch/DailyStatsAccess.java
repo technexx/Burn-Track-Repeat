@@ -76,6 +76,7 @@ public class DailyStatsAccess extends MainActivity {
                     totalSetTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalSetTime();
                     totalBreakTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalBreakTime();
                     totalCaloriesBurnedForCurrentDay = dayHolderList.get(0).getTotalCaloriesBurned();
+
                     Log.i("testInsert", "Values returned from attempted Insertion (that belong to an already existing day are " + "set time: " + totalSetTimeForCurrentDayInMillis + " break time: "  + totalBreakTimeForCurrentDayInMillis + " calories burned: " + totalCaloriesBurnedForCurrentDay + " FOR DAY " + dayToRetrieve);
                 } else {
                     totalSetTimeForCurrentDayInMillis = 0;
