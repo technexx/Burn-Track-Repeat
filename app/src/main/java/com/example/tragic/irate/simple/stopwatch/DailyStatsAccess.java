@@ -22,13 +22,18 @@ public class DailyStatsAccess extends MainActivity {
     CyclesDatabase cyclesDatabase;
     CalendarValues calendarValues = new CalendarValues();
 
+    List<StatsForEachActivity> statsForEachActivityList;
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateMainActivityAndDailyStatsDatabase();
     }
 
+    public void assignListOfAllActivitiesAndTheirStatsToItsGlobalVariable() {
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+    }
+
     public List<String> totalActivitiesListForForAllDays() {
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
         List<String> activitiesList = new ArrayList<>();
 
         for (int i=0; i<statsForEachActivityList.size(); i++) {
@@ -36,6 +41,35 @@ public class DailyStatsAccess extends MainActivity {
         }
         return activitiesList;
     };
+
+    public List<Long> totalSetTimeListForEachActivityForAllDays() {
+        List<Long> setTimeList = new ArrayList<>();
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            setTimeList.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+        }
+        return setTimeList;
+    }
+
+    public List<Long> totalBreakTimeListForEachActivityForAllDays() {
+        List<Long> breakTimeList = new ArrayList<>();
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            breakTimeList.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+        }
+
+        return breakTimeList;
+    }
+
+    public List<Double> totalCaloriesBurnedForEachActivityForAllDays() {
+        List<Double> caloriesBurnedList = new ArrayList<>();
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            caloriesBurnedList.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+        }
+
+        return caloriesBurnedList;
+    }
 
     public Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
         return new Runnable() {
