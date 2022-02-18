@@ -1116,7 +1116,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
 
     DailyStatsAccess dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
-    dailyStatsAccess.instantiateMainActivityAndDailyStatsDatabase();
+//    dailyStatsAccess.instantiateMainActivityAndDailyStatsDatabase();
   }
 
   private void instantiateGlobalClasses() {

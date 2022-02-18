@@ -69,7 +69,7 @@
     <string name="workout_mode">Workout Mode</string>
     <string name="pomodoro_mode">Pomodoro Mode</string>
 
-    <string name="daily_stats_string">%1$s: %2$s</string>
+    <string name="daily_stats_string">%1$s\n%2$s</string>
     <string name="daily_set_time">Set Time:</string>
     <string name="daily_break_time">Break Time:</string>
     <string name="daily_calories_burned">Calories Burned</string>
