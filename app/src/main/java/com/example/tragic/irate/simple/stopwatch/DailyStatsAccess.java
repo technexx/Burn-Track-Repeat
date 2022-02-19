@@ -24,51 +24,61 @@ public class DailyStatsAccess extends MainActivity {
 
     List<StatsForEachActivity> statsForEachActivityList;
 
+    List<String> totalActivitiesListForForAllDays;
+    List<Long> totalSetTimeListForEachActivityForAllDays;
+    List<Long> totalBreakTimeListForEachActivityForAllDays;
+    List<Double> totalCaloriesBurnedForEachActivityForAllDays;
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateMainActivityAndDailyStatsDatabase();
     }
 
-    public void assignListOfAllActivitiesAndTheirStatsToItsGlobalVariable() {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+    public void executeAllAssignToListMethods() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+
+                clearArrayListsOfActivitiesAndTheirStats();
+
+                assignTotalActivitiesListForForAllDaysToList();
+                assignTotalSetTimeListForEachActivityForAllDaysToList();
+                assignTotalBreakTimeListForEachActivityForAllDaysToList();
+                assignCaloriesBurnedForEachActivityForAllDaysToList();
+            }
+        });
     }
 
-    public List<String> totalActivitiesListForForAllDays() {
-        List<String> activitiesList = new ArrayList<>();
+    private void clearArrayListsOfActivitiesAndTheirStats() {
+        totalActivitiesListForForAllDays = new ArrayList<>();
+        totalSetTimeListForEachActivityForAllDays = new ArrayList<>();
+        totalBreakTimeListForEachActivityForAllDays = new ArrayList<>();
+        totalCaloriesBurnedForEachActivityForAllDays = new ArrayList<>();
+    }
 
+    private void assignTotalActivitiesListForForAllDaysToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            activitiesList.add(statsForEachActivityList.get(i).getActivity());
+            totalActivitiesListForForAllDays.add(statsForEachActivityList.get(i).getActivity());
         }
-        return activitiesList;
     };
 
-    public List<Long> totalSetTimeListForEachActivityForAllDays() {
-        List<Long> setTimeList = new ArrayList<>();
-
+    private void assignTotalSetTimeListForEachActivityForAllDaysToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            setTimeList.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+            totalSetTimeListForEachActivityForAllDays.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
         }
-        return setTimeList;
     }
 
-    public List<Long> totalBreakTimeListForEachActivityForAllDays() {
-        List<Long> breakTimeList = new ArrayList<>();
-
+    private void assignTotalBreakTimeListForEachActivityForAllDaysToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            breakTimeList.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+            totalBreakTimeListForEachActivityForAllDays.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
         }
-
-        return breakTimeList;
     }
 
-    public List<Double> totalCaloriesBurnedForEachActivityForAllDays() {
-        List<Double> caloriesBurnedList = new ArrayList<>();
-
+    private void assignCaloriesBurnedForEachActivityForAllDaysToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            caloriesBurnedList.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+            totalCaloriesBurnedForEachActivityForAllDays.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
         }
-
-        return caloriesBurnedList;
     }
 
     public Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {

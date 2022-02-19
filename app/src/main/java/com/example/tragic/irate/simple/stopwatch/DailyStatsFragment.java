@@ -21,7 +21,7 @@ import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DailyStatsFragment extends Fragment {
+public class DailyStatsFragment extends Fragment implements DailyStatsAccess{
 
     DailyStatsAccess dailyStatsAccess;
     DailyStatsAdapter dailyStatsAdapter;
@@ -38,8 +38,6 @@ public class DailyStatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
 
         dailyStatsAccess = new DailyStatsAccess(getContext());
-        //Todo: List access from database.
-        dailyStatsAdapter = new DailyStatsAdapter()
         dailyStatsRecyclerview = root.findViewById(R.id.daily_stats_recyclerView);
         calendarView = root.findViewById(R.id.stats_calendar);
 //        dailyStatsRecyclerview.setVisibility(View.GONE);
@@ -48,6 +46,9 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalBreakTimeTextView = root.findViewById(R.id.daily_stats_total_break_time_textView);
         dailyStatsTotalCaloriesBurnedTextView = root.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
+        //Todo: List access from database.
+        dailyStatsAccess.executeAllAssignToListMethods();
+        dailyStatsAdapter = new DailyStatsAdapter(getContext(),)
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
