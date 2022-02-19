@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
+        ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
+        activityViewHolder.activity.setText(mActivities.get(position));
+        activityViewHolder.setTime.setText(String.valueOf(mSetTimes.get(position)));
+        activityViewHolder.breakTime.setText(String.valueOf(mBreakTimes.get(position)));
+        activityViewHolder.caloriesBurned.setText(String.valueOf(mCaloriesBurned.get(position)));
+
+        Log.i("testStat", "return size is " + mActivities.size());
     }
 
     @Override

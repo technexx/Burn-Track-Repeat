@@ -41,12 +41,18 @@ public class DailyStatsFragment extends Fragment{
         mRoot = root;
 
         instantiateTextViewsAndMiscClasses();
-        instantiateRecyclerViewAndAdapter();
 
         dailyStatsAccess = new DailyStatsAccess(getContext());
+        //Todo: This aSync thread doesn't finish before lists are called below. May have to run entire thing on another thread.
         dailyStatsAccess.executeAllAssignToListMethods();
 
         dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForForAllDays, dailyStatsAccess.totalSetTimeListForEachActivityForAllDays, dailyStatsAccess.totalBreakTimeListForEachActivityForAllDays, dailyStatsAccess.totalCaloriesBurnedForEachActivityForAllDays);
+
+        dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+
+        dailyStatsRecyclerView.setLayoutManager(lm);
+        dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -69,6 +75,8 @@ public class DailyStatsFragment extends Fragment{
 
         return root;
     }
+
+
 
     private void assignTotalTimeAndCaloriesForSelectedDayToTextView() {
         AsyncTask.execute(new Runnable() {
@@ -100,8 +108,6 @@ public class DailyStatsFragment extends Fragment{
     }
 
     private void instantiateRecyclerViewAndAdapter() {
-        dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
-        LinearLayoutManager lm = new LinearLayoutManager(getContext());
-        dailyStatsRecyclerView.setLayoutManager(lm);
+
     }
 }

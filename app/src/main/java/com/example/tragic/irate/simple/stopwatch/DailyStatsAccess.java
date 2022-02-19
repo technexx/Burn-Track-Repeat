@@ -46,6 +46,8 @@ public class DailyStatsAccess extends MainActivity {
                 assignTotalSetTimeListForEachActivityForAllDaysToList();
                 assignTotalBreakTimeListForEachActivityForAllDaysToList();
                 assignCaloriesBurnedForEachActivityForAllDaysToList();
+
+
             }
         });
     }
