@@ -24,6 +24,7 @@ import java.util.TimeZone;
 
 public class DailyStatsFragment extends Fragment{
 
+    View mRoot;
     DailyStatsAccess dailyStatsAccess;
     DailyStatsAdapter dailyStatsAdapter;
     Calendar calendar;
@@ -37,20 +38,12 @@ public class DailyStatsFragment extends Fragment{
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
+        mRoot = root;
+
+        instantiateTextViewsAndMiscClasses();
+        instantiateRecyclerViewAndAdapter();
 
         dailyStatsAccess = new DailyStatsAccess(getContext());
-
-        dailyStatsRecyclerView = root.findViewById(R.id.daily_stats_recyclerView);
-        LinearLayoutManager lm = new LinearLayoutManager(getContext());
-        dailyStatsRecyclerView.setLayoutManager(lm);
-
-        calendarView = root.findViewById(R.id.stats_calendar);
-
-        dailyStatsTotalSetTimeTextView = root.findViewById(R.id.daily_stats_total_set_time_textView);
-        dailyStatsTotalBreakTimeTextView = root.findViewById(R.id.daily_stats_total_break_time_textView);
-        dailyStatsTotalCaloriesBurnedTextView = root.findViewById(R.id.daily_stats_total_calories_burned_textView);
-
-
         dailyStatsAccess.executeAllAssignToListMethods();
 
         dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForForAllDays, dailyStatsAccess.totalSetTimeListForEachActivityForAllDays, dailyStatsAccess.totalBreakTimeListForEachActivityForAllDays, dailyStatsAccess.totalCaloriesBurnedForEachActivityForAllDays);
@@ -96,5 +89,19 @@ public class DailyStatsFragment extends Fragment{
                 });
             }
         });
+    }
+
+    private void instantiateTextViewsAndMiscClasses() {
+        dailyStatsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
+        dailyStatsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
+        dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+
+        calendarView = mRoot.findViewById(R.id.stats_calendar);
+    }
+
+    private void instantiateRecyclerViewAndAdapter() {
+        dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        dailyStatsRecyclerView.setLayoutManager(lm);
     }
 }
