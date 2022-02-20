@@ -50,11 +50,7 @@ public class DailyStatsFragment extends Fragment {
             public void run() {
                 dailyStatsAccess.executeAllAssignToListMethods();
 
-                List<String> activitiesForSelectedDay = new ArrayList<>();
-
-                //Todo: If pulling all at once, we need an instance of List<StatsForEachActivity> passed in, which we can then get just the unique ID from. If not, we can receive a POJO lists of values w/ unique ID.
-                //Todo: Should just pull single, no need to waste resources loading a ton of days.
-                dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForForAllDays, dailyStatsAccess.totalSetTimeListForEachActivityForAllDays, dailyStatsAccess.totalBreakTimeListForEachActivityForAllDays, dailyStatsAccess.totalCaloriesBurnedForEachActivityForAllDays);
+                dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedForEachActivityForSelectedDay);
 
                 dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
                 LinearLayoutManager lm = new LinearLayoutManager(getContext());

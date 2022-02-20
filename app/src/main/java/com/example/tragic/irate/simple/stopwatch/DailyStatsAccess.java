@@ -24,17 +24,14 @@ public class DailyStatsAccess extends MainActivity {
 
     List<StatsForEachActivity> statsForEachActivityList;
 
-    List<String> totalActivitiesListForForAllDays;
-    List<Long> totalSetTimeListForEachActivityForAllDays;
-    List<Long> totalBreakTimeListForEachActivityForAllDays;
-    List<Double> totalCaloriesBurnedForEachActivityForAllDays;
-
-    int currentDayOfYear;
+    List<String> totalActivitiesListForSelectedDay;
+    List<Long> totalSetTimeListForEachActivityForSelectedDay;
+    List<Long> totalBreakTimeListForEachActivityForSelectedDay;
+    List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateMainActivityAndDailyStatsDatabase();
-        assignCurrentDayOfYearToVariable();
     }
 
     private void instantiateMainActivityAndDailyStatsDatabase() {
@@ -48,51 +45,53 @@ public class DailyStatsAccess extends MainActivity {
         });
     }
 
-    private void assignCurrentDayOfYearToVariable() {
-        currentDayOfYear = calendarValues.getCurrentDayOfYear();
+    private int currentDayOfYear() {
+        return calendarValues.getCurrentDayOfYear();
     }
 
     public void executeAllAssignToListMethods() {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+//        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(currentDayOfYear());
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(47);
 
         clearArrayListsOfActivitiesAndTheirStats();
 
-        assignTotalActivitiesListForForAllDaysToList();
-        assignTotalSetTimeListForEachActivityForAllDaysToList();
-        assignTotalBreakTimeListForEachActivityForAllDaysToList();
-        assignCaloriesBurnedForEachActivityForAllDaysToList();
+        assignTotalActivitiesListForOnSelectedDayToList();
+        assignTotalSetTimeForEachActivityOnSelectedDayToList();
+        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
+        assignTotalCaloriesForEachActivityOnSelectedDayToList();
     }
 
     private void clearArrayListsOfActivitiesAndTheirStats() {
-        totalActivitiesListForForAllDays = new ArrayList<>();
-        totalSetTimeListForEachActivityForAllDays = new ArrayList<>();
-        totalBreakTimeListForEachActivityForAllDays = new ArrayList<>();
-        totalCaloriesBurnedForEachActivityForAllDays = new ArrayList<>();
+        totalActivitiesListForSelectedDay = new ArrayList<>();
+        totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
+        totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
+        totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
     }
 
-    private void assignTotalActivitiesListForForAllDaysToList() {
+    private void assignTotalActivitiesListForOnSelectedDayToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalActivitiesListForForAllDays.add(statsForEachActivityList.get(i).getActivity());
-        }
-    };
-
-    private void assignTotalSetTimeListForEachActivityForAllDaysToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalSetTimeListForEachActivityForAllDays.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+            totalActivitiesListForSelectedDay.add(statsForEachActivityList.get(i).getActivity());
         }
     }
 
-    private void assignTotalBreakTimeListForEachActivityForAllDaysToList() {
+    private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalBreakTimeListForEachActivityForAllDays.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+            totalSetTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
         }
     }
 
-    private void assignCaloriesBurnedForEachActivityForAllDaysToList() {
+    private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalCaloriesBurnedForEachActivityForAllDays.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+            totalBreakTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
         }
     }
+
+    private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+        }
+    }
+
 
     public Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
         return new Runnable() {
