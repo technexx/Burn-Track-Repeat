@@ -29,20 +29,27 @@ public class DailyStatsAccess extends MainActivity {
     List<Long> totalBreakTimeListForEachActivityForAllDays;
     List<Double> totalCaloriesBurnedForEachActivityForAllDays;
 
+    int currentDayOfYear;
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateMainActivityAndDailyStatsDatabase();
+        assignCurrentDayOfYearToVariable();
     }
 
-    public void instantiateMainActivityAndDailyStatsDatabase() {
+    private void instantiateMainActivityAndDailyStatsDatabase() {
         mainActivity = new MainActivity();
-        
+
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 cyclesDatabase = CyclesDatabase.getDatabase(mContext);
             }
         });
+    }
+
+    private void assignCurrentDayOfYearToVariable() {
+        currentDayOfYear = calendarValues.getCurrentDayOfYear();
     }
 
     public void executeAllAssignToListMethods() {
