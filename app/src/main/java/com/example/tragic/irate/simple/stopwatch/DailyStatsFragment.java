@@ -22,7 +22,7 @@ import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DailyStatsFragment extends Fragment{
+public class DailyStatsFragment extends Fragment {
 
     View mRoot;
     DailyStatsAccess dailyStatsAccess;
@@ -41,18 +41,22 @@ public class DailyStatsFragment extends Fragment{
         mRoot = root;
 
         instantiateTextViewsAndMiscClasses();
+        dailyStatsAccess = new DailyStatsAccess(getActivity());
 
-        dailyStatsAccess = new DailyStatsAccess(getContext());
-        //Todo: This aSync thread doesn't finish before lists are called below. May have to run entire thing on another thread.
-        dailyStatsAccess.executeAllAssignToListMethods();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                dailyStatsAccess.executeAllAssignToListMethods();
 
-        dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForForAllDays, dailyStatsAccess.totalSetTimeListForEachActivityForAllDays, dailyStatsAccess.totalBreakTimeListForEachActivityForAllDays, dailyStatsAccess.totalCaloriesBurnedForEachActivityForAllDays);
+                dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForForAllDays, dailyStatsAccess.totalSetTimeListForEachActivityForAllDays, dailyStatsAccess.totalBreakTimeListForEachActivityForAllDays, dailyStatsAccess.totalCaloriesBurnedForEachActivityForAllDays);
 
-        dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
-        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+                dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
+                LinearLayoutManager lm = new LinearLayoutManager(getContext());
+                dailyStatsRecyclerView.setLayoutManager(lm);
+                dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
+            }
+        });
 
-        dailyStatsRecyclerView.setLayoutManager(lm);
-        dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -105,9 +109,5 @@ public class DailyStatsFragment extends Fragment{
         dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
         calendarView = mRoot.findViewById(R.id.stats_calendar);
-    }
-
-    private void instantiateRecyclerViewAndAdapter() {
-
     }
 }

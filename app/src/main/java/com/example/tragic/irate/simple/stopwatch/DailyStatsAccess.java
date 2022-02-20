@@ -31,25 +31,28 @@ public class DailyStatsAccess extends MainActivity {
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
+        mainActivity = new MainActivity();
         instantiateMainActivityAndDailyStatsDatabase();
     }
 
-    public void executeAllAssignToListMethods() {
+    public void instantiateMainActivityAndDailyStatsDatabase() {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
-
-                clearArrayListsOfActivitiesAndTheirStats();
-
-                assignTotalActivitiesListForForAllDaysToList();
-                assignTotalSetTimeListForEachActivityForAllDaysToList();
-                assignTotalBreakTimeListForEachActivityForAllDaysToList();
-                assignCaloriesBurnedForEachActivityForAllDaysToList();
-
-
+                cyclesDatabase = CyclesDatabase.getDatabase(mContext);
             }
         });
+    }
+
+    public void executeAllAssignToListMethods() {
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+
+        clearArrayListsOfActivitiesAndTheirStats();
+
+        assignTotalActivitiesListForForAllDaysToList();
+        assignTotalSetTimeListForEachActivityForAllDaysToList();
+        assignTotalBreakTimeListForEachActivityForAllDaysToList();
+        assignCaloriesBurnedForEachActivityForAllDaysToList();
     }
 
     private void clearArrayListsOfActivitiesAndTheirStats() {
@@ -284,16 +287,5 @@ public class DailyStatsAccess extends MainActivity {
 
     public void logTotalCaloriesForSpecificActivityOnSelectedDay() {
         Log.i("testStats", "total calories for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
-    }
-
-    public void instantiateMainActivityAndDailyStatsDatabase() {
-        mainActivity = new MainActivity();
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                cyclesDatabase = CyclesDatabase.getDatabase(mContext);
-            }
-        });
     }
 }
