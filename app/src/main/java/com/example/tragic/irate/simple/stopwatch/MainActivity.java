@@ -512,6 +512,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Main's buttons (Stopwatch, FAB) are accessible when Fragments' framelayout is overlayed - we can probably correct this by ensuring the frame layout has focus.
   //Todo: Remove sort/triple dots when not in Main (e.g. Settings Fragment, Edit PopUp).
   //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
+  //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Retrieval method for activity/times/calories for daily cycle stuff every time cycle launches.
   //Todo: Should remove visibility on Sort/Triple Dots when not in Main (Settings, Edit popUp, etc.).
   //Todo: Check sizes on long aspect for all layouts + menus.

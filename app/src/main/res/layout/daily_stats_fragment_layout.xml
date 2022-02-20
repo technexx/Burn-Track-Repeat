@@ -17,10 +17,13 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="280dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="2dp">
     </androidx.recyclerview.widget.RecyclerView>
 
     <TextView

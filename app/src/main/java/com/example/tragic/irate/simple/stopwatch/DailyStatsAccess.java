@@ -31,11 +31,12 @@ public class DailyStatsAccess extends MainActivity {
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
-        mainActivity = new MainActivity();
         instantiateMainActivityAndDailyStatsDatabase();
     }
 
     public void instantiateMainActivityAndDailyStatsDatabase() {
+        mainActivity = new MainActivity();
+        
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
