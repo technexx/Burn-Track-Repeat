@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 public class DailyStatsFragment extends Fragment {
@@ -48,6 +50,10 @@ public class DailyStatsFragment extends Fragment {
             public void run() {
                 dailyStatsAccess.executeAllAssignToListMethods();
 
+                List<String> activitiesForSelectedDay = new ArrayList<>();
+
+                //Todo: If pulling all at once, we need an instance of List<StatsForEachActivity> passed in, which we can then get just the unique ID from. If not, we can receive a POJO lists of values w/ unique ID.
+                //Todo: Should just pull single, no need to waste resources loading a ton of days.
                 dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForForAllDays, dailyStatsAccess.totalSetTimeListForEachActivityForAllDays, dailyStatsAccess.totalBreakTimeListForEachActivityForAllDays, dailyStatsAccess.totalCaloriesBurnedForEachActivityForAllDays);
 
                 dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
