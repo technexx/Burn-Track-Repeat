@@ -34,46 +34,22 @@ public class DailyStatsAccess extends MainActivity {
         instantiateMainActivityAndDailyStatsDatabase();
     }
 
-    private void instantiateMainActivityAndDailyStatsDatabase() {
-        mainActivity = new MainActivity();
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                cyclesDatabase = CyclesDatabase.getDatabase(mContext);
-            }
-        });
+    public void queryStatsForEachActivityForSelectedDay(int daySelected) {
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
     }
 
-    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
-    public void assignTotalActivitiesAndTheirStatsToEntityClassList() {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
-    }
-    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
-
-
-
-    ////////////////////////// Queries selected day only ///////////////////////////////////////
-    private int currentDayOfYear() {
-        return calendarValues.getCurrentDayOfYear();
-    }
-
-    public void executeAllAssignToListMethods() {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(currentDayOfYear());
-
-        clearArrayListsOfActivitiesAndTheirStats();
-
-        assignTotalActivitiesListForOnSelectedDayToList();
-        assignTotalSetTimeForEachActivityOnSelectedDayToList();
-        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
-        assignTotalCaloriesForEachActivityOnSelectedDayToList();
-    }
-
-    private void clearArrayListsOfActivitiesAndTheirStats() {
+    public void clearArrayListsOfActivitiesAndTheirStats() {
         totalActivitiesListForSelectedDay = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
         totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
         totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
+    }
+
+    public void populateDailyActivityStatsForSelectedDayPojoLists() {
+        assignTotalActivitiesListForOnSelectedDayToList();
+        assignTotalSetTimeForEachActivityOnSelectedDayToList();
+        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
+        assignTotalCaloriesForEachActivityOnSelectedDayToList();
     }
 
     private void assignTotalActivitiesListForOnSelectedDayToList() {
@@ -99,11 +75,6 @@ public class DailyStatsAccess extends MainActivity {
             totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
         }
     }
-    ////////////////////////// Queries selected day only ///////////////////////////////////////
-
-
-
-
 
     public Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
         return new Runnable() {
@@ -249,6 +220,27 @@ public class DailyStatsAccess extends MainActivity {
         };
     }
 
+    private void instantiateMainActivityAndDailyStatsDatabase() {
+        mainActivity = new MainActivity();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                cyclesDatabase = CyclesDatabase.getDatabase(mContext);
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
+    /////////////////////////////////////////////////////
+
     public void testStatsForEachActivityInsertion() {
         AsyncTask.execute(new Runnable() {
             @Override
@@ -289,6 +281,12 @@ public class DailyStatsAccess extends MainActivity {
             }
         });
     }
+
+    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
+    public void assignTotalActivitiesAndTheirStatsToEntityClassList() {
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+    }
+    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
 
     public void logTotalTimesForSelectedDay() {
         Log.i("testStats", "total set time is " + totalSetTimeForCurrentDayInMillis);

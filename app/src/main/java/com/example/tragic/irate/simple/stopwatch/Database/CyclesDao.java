@@ -16,11 +16,7 @@ import java.util.List;
 @Dao
 public interface
 CyclesDao {
-
-//    @Transaction
-//    @Query("SELECT * from DayHolder")
-//    List<DayWithCycleStats> getDayWithCycleStats();
-
+    
     @Query("SELECT * from DayHolder")
     List<DayHolder> loadAllDayHolderRows();
 
