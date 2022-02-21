@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.R;
 
 import java.util.List;
@@ -21,10 +22,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     List<Long> mBreakTimes;
     List<Double> mCaloriesBurned;
 
-//    public DailyStatsAdapter() {
-//    }
-
-    //Todo: Each recycler row represents one day, while the lists represent the activities and their respective values for that day (always 1:1). Therefore, these lists should contain ALL day and their values.
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
     }

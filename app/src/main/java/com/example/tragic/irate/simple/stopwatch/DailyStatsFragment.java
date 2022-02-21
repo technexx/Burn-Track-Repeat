@@ -38,19 +38,45 @@ public class DailyStatsFragment extends Fragment {
     TextView dailyStatsTotalBreakTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
 
+    List<String> totalActivitiesListForSelectedDay;
+    List<Long> totalSetTimeListForEachActivityForSelectedDay;
+    List<Long> totalBreakTimeListForEachActivityForSelectedDay;
+    List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
+
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
-        instantiateTextViewsAndMiscClasses();
         dailyStatsAccess = new DailyStatsAccess(getActivity());
+        instantiateTextViewsAndMiscClasses();
+        instantiateArrayLists();
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                dailyStatsAccess.executeAllAssignToListMethods();
+                ////////Queries each day from full list already queried by database in DailyStatsAccess//////////
+                dayOfYear = 47;
+//                dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+                dailyStatsAccess.assignTotalActivitiesAndTheirStatsToEntityClassList();
 
-                dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedForEachActivityForSelectedDay);
+                for (int i=0; i<dailyStatsAccess.statsForEachActivityList.size(); i++) {
+                    if (dailyStatsAccess.statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==dayOfYear) {
+                        totalActivitiesListForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getActivity());
+                        totalSetTimeListForEachActivityForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+                        totalBreakTimeListForEachActivityForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+                        totalCaloriesBurnedForEachActivityForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+                    }
+                }
+
+                dailyStatsAdapter = new DailyStatsAdapter(getContext(), totalActivitiesListForSelectedDay, totalSetTimeListForEachActivityForSelectedDay, totalBreakTimeListForEachActivityForSelectedDay, totalCaloriesBurnedForEachActivityForSelectedDay);
+                ////////Queries each day from full list already queried by database in DailyStatsAccess//////////
+
+
+
+                ////////////Queries each day directly from database////////////
+//                dailyStatsAccess.executeAllAssignToListMethods();
+//                dailyStatsAdapter = new DailyStatsAdapter(getContext(),dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedForEachActivityForSelectedDay);
+                ////////////Queries each day directly from database////////////
 
                 dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
                 LinearLayoutManager lm = new LinearLayoutManager(getContext());
@@ -58,7 +84,6 @@ public class DailyStatsFragment extends Fragment {
                 dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
             }
         });
-
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -82,7 +107,21 @@ public class DailyStatsFragment extends Fragment {
         return root;
     }
 
+    private void updateActivitiesAndStatsListsAndAdapter() {
+        //Todo: Unlike instantiating adapter, notify needs to be called on UI thread, so we need to sync it w/ the aSync database thread.
+        //Todo: Bleh, maybe less calls are better and one total query of DB works best.
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
 
+            }
+        });
+        dailyStatsAdapter.notifyDataSetChanged();
+    }
+
+    private void assignActivitiesAndTheirStatsForSelectedDayRecyclerView() {
+
+    }
 
     private void assignTotalTimeAndCaloriesForSelectedDayToTextView() {
         AsyncTask.execute(new Runnable() {
@@ -111,5 +150,12 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
         calendarView = mRoot.findViewById(R.id.stats_calendar);
+    }
+
+    private void instantiateArrayLists() {
+       totalActivitiesListForSelectedDay = new ArrayList<>();
+       totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
+       totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
+       totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
     }
 }

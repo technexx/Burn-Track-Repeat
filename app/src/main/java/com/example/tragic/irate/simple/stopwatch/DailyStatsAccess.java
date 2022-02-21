@@ -45,13 +45,21 @@ public class DailyStatsAccess extends MainActivity {
         });
     }
 
+    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
+    public void assignTotalActivitiesAndTheirStatsToEntityClassList() {
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
+    }
+    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
+
+
+
+    ////////////////////////// Queries selected day only ///////////////////////////////////////
     private int currentDayOfYear() {
         return calendarValues.getCurrentDayOfYear();
     }
 
     public void executeAllAssignToListMethods() {
-//        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(currentDayOfYear());
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(47);
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(currentDayOfYear());
 
         clearArrayListsOfActivitiesAndTheirStats();
 
@@ -91,6 +99,10 @@ public class DailyStatsAccess extends MainActivity {
             totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
         }
     }
+    ////////////////////////// Queries selected day only ///////////////////////////////////////
+
+
+
 
 
     public Runnable insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
