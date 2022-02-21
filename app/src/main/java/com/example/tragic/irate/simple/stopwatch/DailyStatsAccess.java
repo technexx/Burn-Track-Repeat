@@ -91,7 +91,7 @@ public class DailyStatsAccess extends MainActivity {
                 for (int i=0; i<dayHolderSize; i++) {
                     long dayInRow = dayHolderList.get(i).getDayId();
                     if (dayOfYear==dayInRow) {
-                        retrieveTotalTimesAndCaloriesBurnedOfSelectedDayFromDatabase(dayOfYear);
+                        queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
                         Log.i("testInsert", "Returned from Insertion because day already exists");
                         return;
                     }
@@ -116,26 +116,23 @@ public class DailyStatsAccess extends MainActivity {
         };
     }
 
-    public void retrieveTotalTimesAndCaloriesBurnedOfSelectedDayFromDatabase(int dayToRetrieve) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                //Always a single row return, since only one exists per day of year.
-                List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+    public void queryTotalTimesAndCaloriesBurnedFromSelectedDay(int dayToRetrieve) {
+        //Always a single row return, since only one exists per day of year.
+        //Todo: This needs to be in a separate thread. We put it back on UI here since it is also called in DailyStatsFragment which runs its own aSync thread.
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
 
-                if (dayHolderList.size()>0) {
-                    totalSetTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalSetTime();
-                    totalBreakTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalBreakTime();
-                    totalCaloriesBurnedForCurrentDay = dayHolderList.get(0).getTotalCaloriesBurned();
+        if (dayHolderList.size()>0) {
+            totalSetTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalSetTime();
+            totalBreakTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalBreakTime();
+            totalCaloriesBurnedForCurrentDay = dayHolderList.get(0).getTotalCaloriesBurned();
 
-                    Log.i("testInsert", "Values returned from attempted Insertion (that belong to an already existing day are " + "set time: " + totalSetTimeForCurrentDayInMillis + " break time: "  + totalBreakTimeForCurrentDayInMillis + " calories burned: " + totalCaloriesBurnedForCurrentDay + " FOR DAY " + dayToRetrieve);
-                } else {
-                    totalSetTimeForCurrentDayInMillis = 0;
-                    totalBreakTimeForCurrentDayInMillis = 0;
-                    totalCaloriesBurnedForCurrentDay = 0;
-                }
-            }
-        });
+        } else {
+            totalSetTimeForCurrentDayInMillis = 0;
+            totalBreakTimeForCurrentDayInMillis = 0;
+            totalCaloriesBurnedForCurrentDay = 0;
+        }
+
+        Log.i("testInsert", "Values returned from attempted Insertion (that belong to an already existing day are " + "set time: " + totalSetTimeForCurrentDayInMillis + " break time: "  + totalBreakTimeForCurrentDayInMillis + " calories burned: " + totalCaloriesBurnedForCurrentDay + " FOR DAY " + dayToRetrieve);
     }
 
     public Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {

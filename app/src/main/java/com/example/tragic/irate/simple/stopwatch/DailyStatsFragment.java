@@ -51,8 +51,8 @@ public class DailyStatsFragment extends Fragment {
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
 
-//        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(Calendar.DAY_OF_YEAR);
-        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(47);
+        //On Fragment launch, queries + displays current day.
+        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(Calendar.DAY_OF_YEAR);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -61,7 +61,7 @@ public class DailyStatsFragment extends Fragment {
                 calendar.set(year, month, dayOfMonth);
                 dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-                assignTotalTimeAndCaloriesForSelectedDayToTextView();
+                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
             }
         });
 
@@ -79,12 +79,26 @@ public class DailyStatsFragment extends Fragment {
 
     private void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
+            dailyStatsAccess.queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
-            dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
+
             getActivity().runOnUiThread(()-> {
+                populateDailyTotalTimesAndCaloriesTextViews();
+                dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
                 dailyStatsAdapter.notifyDataSetChanged();
+
             });
         });
+    }
+
+    private void populateDailyTotalTimesAndCaloriesTextViews() {
+        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(dailyStatsAccess.totalSetTimeForCurrentDayInMillis)));
+
+        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(dailyStatsAccess.totalBreakTimeForCurrentDayInMillis)));
+
+        dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(dailyStatsAccess.totalCaloriesBurnedForCurrentDay)));
+
+        Toast.makeText(getContext(), "Day is " + dayOfYear, Toast.LENGTH_SHORT).show();
     }
 
     private void updateActivitiesAndStatsListsAndAdapter() {
@@ -95,31 +109,6 @@ public class DailyStatsFragment extends Fragment {
             }
         });
         dailyStatsAdapter.notifyDataSetChanged();
-    }
-
-    private void assignActivitiesAndTheirStatsForSelectedDayRecyclerView() {
-
-    }
-
-    private void assignTotalTimeAndCaloriesForSelectedDayToTextView() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                dailyStatsAccess.retrieveTotalTimesAndCaloriesBurnedOfSelectedDayFromDatabase(dayOfYear);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(dailyStatsAccess.totalSetTimeForCurrentDayInMillis)));
-
-                        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(dailyStatsAccess.totalBreakTimeForCurrentDayInMillis)));
-
-                        dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(dailyStatsAccess.totalCaloriesBurnedForCurrentDay)));
-
-                        Toast.makeText(getContext(), "Day is " + dayOfYear, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
     }
 
     private void instantiateTextViewsAndMiscClasses() {
