@@ -16,7 +16,7 @@ import java.util.List;
 @Dao
 public interface
 CyclesDao {
-    
+
     @Query("SELECT * from DayHolder")
     List<DayHolder> loadAllDayHolderRows();
 
@@ -28,9 +28,6 @@ CyclesDao {
 
     @Query("SELECT * from ActivitiesForEachDay")
     List<ActivitiesForEachDay> loadAllActivitiesForEachDay();
-
-    @Query("SELECT * from ActivitiesForEachDay WHERE uniqueDayIdPossessedByEachOfItsActivities IS:uniqueId")
-    List<ActivitiesForEachDay> loadAllActivitiesForSpecificDate(long uniqueId);
 
     @Query("SELECT * from StatsForEachActivity")
     List<StatsForEachActivity> loadAllActivitiesAndTheirStatsForAllDays();

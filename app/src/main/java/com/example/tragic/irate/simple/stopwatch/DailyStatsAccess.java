@@ -32,6 +32,7 @@ public class DailyStatsAccess extends MainActivity {
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateMainActivityAndDailyStatsDatabase();
+        instantiateArrayListsOfActivitiesAndTheirStats();
     }
 
     public void queryStatsForEachActivityForSelectedDay(int daySelected) {
@@ -39,13 +40,13 @@ public class DailyStatsAccess extends MainActivity {
     }
 
     public void clearArrayListsOfActivitiesAndTheirStats() {
-        totalActivitiesListForSelectedDay = new ArrayList<>();
-        totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
-        totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
-        totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
+        totalActivitiesListForSelectedDay.clear();
+        totalSetTimeListForEachActivityForSelectedDay.clear();
+        totalBreakTimeListForEachActivityForSelectedDay.clear();
+        totalCaloriesBurnedForEachActivityForSelectedDay.clear();
     }
 
-    public void populateDailyActivityStatsForSelectedDayPojoLists() {
+    public void populatePojoListsForDailyActivityStatsForSelectedDay() {
         assignTotalActivitiesListForOnSelectedDayToList();
         assignTotalSetTimeForEachActivityOnSelectedDayToList();
         assignTotalBreakTimeForEachActivityOnSelectedDayToList();
@@ -231,7 +232,12 @@ public class DailyStatsAccess extends MainActivity {
         });
     }
 
-
+    private void instantiateArrayListsOfActivitiesAndTheirStats() {
+        totalActivitiesListForSelectedDay = new ArrayList<>();
+        totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
+        totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
+        totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
+    }
 
 
 

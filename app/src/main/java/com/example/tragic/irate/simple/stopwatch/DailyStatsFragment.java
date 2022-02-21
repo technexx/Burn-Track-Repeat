@@ -42,25 +42,17 @@ public class DailyStatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
+        Button testButton = root.findViewById(R.id.test_button);
+
+        calendar = Calendar.getInstance();
         calendarView = mRoot.findViewById(R.id.stats_calendar);
         dailyStatsAccess = new DailyStatsAccess(getActivity());
+
         instantiateTextViewsAndMiscClasses();
+        instantiateRecyclerViewAndItsAdapter();
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                dailyStatsAccess.queryStatsForEachActivityForSelectedDay(calendar.get(Calendar.DAY_OF_YEAR));
-                dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
-                dailyStatsAccess.populateDailyActivityStatsForSelectedDayPojoLists();
-
-                dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedForEachActivityForSelectedDay);
-
-                dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
-                LinearLayoutManager lm = new LinearLayoutManager(getContext());
-                dailyStatsRecyclerView.setLayoutManager(lm);
-                dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
-            }
-        });
+//        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(Calendar.DAY_OF_YEAR);
+        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(47);
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -73,15 +65,26 @@ public class DailyStatsFragment extends Fragment {
             }
         });
 
-        Button testButton = root.findViewById(R.id.test_button);
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncTask.execute(dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase());
-            }
-        });
-
         return root;
+    }
+
+    private void instantiateRecyclerViewAndItsAdapter() {
+        dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedForEachActivityForSelectedDay);
+
+        dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        dailyStatsRecyclerView.setLayoutManager(lm);
+        dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
+    }
+
+    private void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
+            dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
+            getActivity().runOnUiThread(()-> {
+                dailyStatsAdapter.notifyDataSetChanged();
+            });
+        });
     }
 
     private void updateActivitiesAndStatsListsAndAdapter() {
