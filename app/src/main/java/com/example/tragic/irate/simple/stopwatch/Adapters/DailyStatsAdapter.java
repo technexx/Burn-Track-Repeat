@@ -38,13 +38,17 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
-
         activityViewHolder.activity.setText(mActivities.get(position));
         activityViewHolder.setTime.setText(String.valueOf(mSetTimes.get(position)));
         activityViewHolder.breakTime.setText(String.valueOf(mBreakTimes.get(position)));
         activityViewHolder.caloriesBurned.setText(String.valueOf(mCaloriesBurned.get(position)));
 
         Log.i("testStat", "return size is " + mActivities.size());
+
+//        activityViewHolder.activity.setText(mContext.getString(R.string.activity_text_header));
+//        activityViewHolder.setTime.setText(mContext.getString(R.string.set_time_text_header));
+//        activityViewHolder.breakTime.setText(mContext.getString(R.string.break_time_text_header));
+//        activityViewHolder.caloriesBurned.setText(mContext.getString(R.string.calories_burned_text_header));
     }
 
     @Override

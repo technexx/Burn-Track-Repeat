@@ -14,6 +14,101 @@
         app:layout_constraintEnd_toEndOf="parent">
     </CalendarView>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/daily_stats_total_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/daily_total_stats_border">
+
+        <TextView
+            android:id="@+id/daily_stats_header"
+            android:text="@string/day_total_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@id/daily_stats_total_break_time_textView"
+            app:layout_constraintEnd_toEndOf="@id/daily_stats_total_break_time_textView"
+            android:textStyle="bold"
+            android:layout_marginBottom="2dp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/daily_stats_total_set_time_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/daily_stats_header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/daily_stats_total_break_time_textView"
+            android:gravity="center">
+        </TextView>
+
+        <TextView
+            android:id="@+id/daily_stats_total_break_time_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/daily_stats_total_set_time_textView"
+            app:layout_constraintEnd_toEndOf="@id/daily_stats_total_calories_burned_textView"
+            app:layout_constraintTop_toBottomOf="@id/daily_stats_header"
+            android:gravity="center">
+        </TextView>
+
+        <TextView
+            android:id="@+id/daily_stats_total_calories_burned_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/daily_stats_total_break_time_textView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/daily_stats_header"
+            android:gravity="center">
+        </TextView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/activity_in_daily_stats_header"
+        android:text="@string/activity_text_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"
+        android:gravity="center"
+        android:maxWidth="200dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/set_time_in_daily_stats_header"
+        android:text="@string/set_time_text_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats_header"
+        app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats_header"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"
+        android:gravity="center">
+    </TextView>
+
+    <TextView
+        android:id="@+id/break_time_in_daily_stats_header"
+        android:text="@string/break_time_text_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/set_time_in_daily_stats_header"
+        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_header"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"
+        android:gravity="center">
+    </TextView>
+
+    <TextView
+        android:id="@+id/calories_burned_in_daily_stats_header"
+        android:text="@string/calories_burned_text_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/break_time_in_daily_stats_header"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"
+        android:gravity="center">
+    </TextView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
         android:layout_width="match_parent"
@@ -22,45 +117,15 @@
         android:paddingEnd="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="2dp">
+        app:layout_constraintTop_toBottomOf="@id/activity_in_daily_stats_header"
+        android:layout_marginTop="4dp">
     </androidx.recyclerview.widget.RecyclerView>
-
-    <TextView
-        android:id="@+id/daily_stats_total_set_time_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/daily_stats_total_break_time_textView"
-        android:gravity="center">
-    </TextView>
-
-    <TextView
-        android:id="@+id/daily_stats_total_break_time_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/daily_stats_total_set_time_textView"
-        app:layout_constraintEnd_toEndOf="@id/daily_stats_total_calories_burned_textView"
-        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
-        android:gravity="center">
-    </TextView>
-
-    <TextView
-        android:id="@+id/daily_stats_total_calories_burned_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/daily_stats_total_break_time_textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
-        android:gravity="center">
-    </TextView>
 
     <Button
         android:id="@+id/test_button"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toTopOf="@id/daily_stats_total_calories_burned_textView"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="30dp"
         android:background="@drawable/fab_plus">

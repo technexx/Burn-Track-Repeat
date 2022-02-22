@@ -42,6 +42,7 @@ public class DailyStatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
+        //Todo: Test insertion + update + deletion.
         Button testButton = root.findViewById(R.id.test_button);
 
         calendar = Calendar.getInstance();
@@ -83,6 +84,7 @@ public class DailyStatsFragment extends Fragment {
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
             getActivity().runOnUiThread(()-> {
+                dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
                 populateDailyTotalTimesAndCaloriesTextViews();
                 dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
                 dailyStatsAdapter.notifyDataSetChanged();

@@ -70,9 +70,15 @@
     <string name="pomodoro_mode">Pomodoro Mode</string>
 
     <string name="daily_stats_string">%1$s\n%2$s</string>
-    <string name="daily_set_time">Set Time:</string>
-    <string name="daily_break_time">Break Time:</string>
-    <string name="daily_calories_burned">Calories Burned</string>
+    <string name="day_total_header">Daily Totals</string>
+    <string name="daily_set_time">Sets:</string>
+    <string name="daily_break_time">Breaks:</string>
+    <string name="daily_calories_burned">Calories:</string>
+
+    <string name="activity_text_header">Activity:</string>
+    <string name="set_time_text_header">Sets:</string>
+    <string name="break_time_text_header">Breaks:</string>
+    <string name="calories_burned_text_header">Calories:</string>
 
     <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s </string>
     <string name="bunch_of_spaces">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>
