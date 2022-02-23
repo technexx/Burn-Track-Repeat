@@ -55,6 +55,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTime.setText(String.valueOf(mSetTimes.get(position+-1)));
             activityViewHolder.breakTime.setText(String.valueOf(mBreakTimes.get(position-1)));
             activityViewHolder.caloriesBurned.setText(String.valueOf(mCaloriesBurned.get(position-1)));
+
+            activityViewHolder.activity.setBackgroundResource(0);
+            activityViewHolder.setTime.setBackgroundResource(0);
+            activityViewHolder.breakTime.setBackgroundResource(0);
+            activityViewHolder.caloriesBurned.setBackgroundResource(0);
         }
     }
 

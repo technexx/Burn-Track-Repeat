@@ -48,5 +48,15 @@
         android:gravity="center">
     </TextView>
 
+    <!--Todo: Messing w/ height will push everything else way down. Just use VerticalSpace class-->
+    <View
+        android:id="@+id/divider_view"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats"
+        android:layout_marginStart="4dp"
+        android:background="@color/black">
+    </View>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

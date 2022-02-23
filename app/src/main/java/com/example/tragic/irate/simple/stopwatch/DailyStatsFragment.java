@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.loader.content.AsyncTaskLoader;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -76,6 +77,9 @@ public class DailyStatsFragment extends Fragment {
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
         dailyStatsRecyclerView.setLayoutManager(lm);
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
+        dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
     private void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {

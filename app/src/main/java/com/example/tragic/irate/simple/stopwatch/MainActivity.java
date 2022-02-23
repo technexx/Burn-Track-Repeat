@@ -386,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ObjectAnimator fadeOutObj;
   RecyclerView lapRecycler;
   LapAdapter lapAdapter;
-  LinearLayoutManager lapReyclerLayoutManager;
+  LinearLayoutManager lapRecyclerLayoutManager;
   ConstraintLayout roundRecyclerLayout;
 
   DotDraws dotDraws;
@@ -1381,9 +1381,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerTwoLayoutManager = new LinearLayoutManager(getApplicationContext());
     pomCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
 
-    lapReyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
-    lapReyclerLayoutManager.setStackFromEnd(true);
-    lapReyclerLayoutManager.setReverseLayout(true);
+    lapRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
+    lapRecyclerLayoutManager.setStackFromEnd(true);
+    lapRecyclerLayoutManager.setReverseLayout(true);
   }
 
   private void instantiateRoundAdaptersAndTheirCallbacks() {
@@ -1419,7 +1419,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void instantiateLapAdapterAndSetRecyclerOnIt() {
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
     lapRecycler.setAdapter(lapAdapter);
-    lapRecycler.setLayoutManager(lapReyclerLayoutManager);
+    lapRecycler.setLayoutManager(lapRecyclerLayoutManager);
   }
 
   private void instantiateAnimationAndColorMethods() {
@@ -2852,7 +2852,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     currentLapList.add(newEntries);
     savedLapList.add(savedEntries);
-    lapReyclerLayoutManager.scrollToPosition(savedLapList.size() - 1);
+    lapRecyclerLayoutManager.scrollToPosition(savedLapList.size() - 1);
 
     lapAdapter.notifyDataSetChanged();
 

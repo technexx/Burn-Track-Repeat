@@ -75,67 +75,6 @@
         android:layout_marginTop="4dp">
     </androidx.recyclerview.widget.RecyclerView>
 
-<!--    <TextView-->
-<!--        android:id="@+id/activity_in_daily_stats_header"-->
-<!--        android:text="@string/activity_text_header"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"-->
-<!--        android:maxWidth="200dp">-->
-<!--    </TextView>-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/set_time_in_daily_stats_header"-->
-<!--        android:text="@string/set_time_text_header"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats_header"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats_header"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"-->
-<!--        android:layout_marginStart="40dp">-->
-<!--    </TextView>-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/break_time_in_daily_stats_header"-->
-<!--        android:text="@string/break_time_text_header"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/set_time_in_daily_stats_header"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_header"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout">-->
-<!--    </TextView>-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/calories_burned_in_daily_stats_header"-->
-<!--        android:text="@string/calories_burned_text_header"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/break_time_in_daily_stats_header"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout">-->
-<!--    </TextView>-->
-
-
-<!--    -->
-<!--    <View-->
-<!--        android:layout_width="1dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/set_time_in_daily_stats_header"-->
-<!--        android:layout_marginEnd="6dp"-->
-<!--        android:background="@color/black">-->
-<!--    </View>-->
-
-<!--    <View-->
-<!--        android:layout_width="1dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"-->
-<!--        app:layout_constraintStart_toEndOf="@id/set_time_in_daily_stats_header"-->
-<!--        android:layout_marginStart="6dp"-->
-<!--        android:background="@color/black">-->
-<!--    </View>-->
-
     <Button
         android:id="@+id/test_button"
         android:layout_width="30dp"
