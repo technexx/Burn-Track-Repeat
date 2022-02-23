@@ -78,7 +78,10 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsRecyclerView.setLayoutManager(lm);
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
+        DividerItemDecoration testDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), RecyclerView.VERTICAL);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
+
+//        dailyStatsRecyclerView.addItemDecoration(testDecoration);
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
@@ -92,7 +95,6 @@ public class DailyStatsFragment extends Fragment {
                 populateDailyTotalTimesAndCaloriesTextViews();
                 dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
                 dailyStatsAdapter.notifyDataSetChanged();
-
             });
         });
     }

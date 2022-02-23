@@ -1,6 +1,8 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +37,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         return new ActivityViewHolder(view);
     }
 
-    //Todo: Grid view?
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
@@ -46,20 +47,22 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.breakTime.setText(mContext.getString(R.string.break_time_text_header));
             activityViewHolder.caloriesBurned.setText(mContext.getString(R.string.calories_burned_text_header));
 
-            activityViewHolder.activity.setBackgroundResource(R.drawable.daily_total_stats_border);
-            activityViewHolder.setTime.setBackgroundResource(R.drawable.daily_total_stats_border);
-            activityViewHolder.breakTime.setBackgroundResource(R.drawable.daily_total_stats_border);
-            activityViewHolder.caloriesBurned.setBackgroundResource(R.drawable.daily_total_stats_border);
+            activityViewHolder.activity.setTypeface(Typeface.DEFAULT_BOLD);
+            activityViewHolder.setTime.setTypeface(Typeface.DEFAULT_BOLD);
+            activityViewHolder.breakTime.setTypeface(Typeface.DEFAULT_BOLD);
+            activityViewHolder.caloriesBurned.setTypeface(Typeface.DEFAULT_BOLD);
+
+//            activityViewHolder.activity.setPaintFlags(activityViewHolder.activity.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
         } else {
             activityViewHolder.activity.setText(mActivities.get(position-1));
             activityViewHolder.setTime.setText(String.valueOf(mSetTimes.get(position+-1)));
             activityViewHolder.breakTime.setText(String.valueOf(mBreakTimes.get(position-1)));
             activityViewHolder.caloriesBurned.setText(String.valueOf(mCaloriesBurned.get(position-1)));
 
-            activityViewHolder.activity.setBackgroundResource(0);
-            activityViewHolder.setTime.setBackgroundResource(0);
-            activityViewHolder.breakTime.setBackgroundResource(0);
-            activityViewHolder.caloriesBurned.setBackgroundResource(0);
+            activityViewHolder.activity.setTypeface(Typeface.DEFAULT);
+            activityViewHolder.setTime.setTypeface(Typeface.DEFAULT);
+            activityViewHolder.breakTime.setTypeface(Typeface.DEFAULT);
+            activityViewHolder.caloriesBurned.setTypeface(Typeface.DEFAULT);
         }
     }
 
