@@ -35,7 +35,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         return new ActivityViewHolder(view);
     }
 
-    //Todo: Grid view? Remember, if we separate with hardcoded View lines outside recyclerView they won't adjust with size of number values. Even headers will have trouble. We should prolly go back to having it be part of the recyclerView.
+    //Todo: Grid view?
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
@@ -45,6 +45,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTime.setText(mContext.getString(R.string.set_time_text_header));
             activityViewHolder.breakTime.setText(mContext.getString(R.string.break_time_text_header));
             activityViewHolder.caloriesBurned.setText(mContext.getString(R.string.calories_burned_text_header));
+
+            activityViewHolder.activity.setBackgroundResource(R.drawable.daily_total_stats_border);
+            activityViewHolder.setTime.setBackgroundResource(R.drawable.daily_total_stats_border);
+            activityViewHolder.breakTime.setBackgroundResource(R.drawable.daily_total_stats_border);
+            activityViewHolder.caloriesBurned.setBackgroundResource(R.drawable.daily_total_stats_border);
         } else {
             activityViewHolder.activity.setText(mActivities.get(position-1));
             activityViewHolder.setTime.setText(String.valueOf(mSetTimes.get(position+-1)));

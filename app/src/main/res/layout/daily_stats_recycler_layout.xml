@@ -12,16 +12,19 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:maxWidth="200dp">
+        android:layout_marginStart="2dp"
+        android:maxWidth="140dp"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp">
     </TextView>
 
     <TextView
         android:id="@+id/set_time_in_daily_stats"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="140dp"
+        android:layout_marginEnd="6dp"
         android:gravity="center">
     </TextView>
 
@@ -29,9 +32,9 @@
         android:id="@+id/break_time_in_daily_stats"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="220dp"
+        android:layout_marginEnd="6dp"
         android:gravity="center">
     </TextView>
 
@@ -39,9 +42,9 @@
         android:id="@+id/calories_burned_in_daily_stats"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="300dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="2dp"
         android:gravity="center">
     </TextView>
 
