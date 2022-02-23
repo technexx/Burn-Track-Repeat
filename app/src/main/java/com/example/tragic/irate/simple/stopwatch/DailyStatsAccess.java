@@ -118,7 +118,6 @@ public class DailyStatsAccess extends MainActivity {
 
     public void queryTotalTimesAndCaloriesBurnedFromSelectedDay(int dayToRetrieve) {
         //Always a single row return, since only one exists per day of year.
-        //Todo: This needs to be in a separate thread. We put it back on UI here since it is also called in DailyStatsFragment which runs its own aSync thread.
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
 
         if (dayHolderList.size()>0) {
@@ -163,7 +162,7 @@ public class DailyStatsAccess extends MainActivity {
                 List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
 
                 for (int i=0; i<statsForEachActivityList.size(); i++) {
-                    if (mainActivity.getTdeeActivityStringFromSavedArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
+                    if (mainActivity.getTdeeActivityStringFromArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
                         activityPositionInDb = i;
                         retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
                         return;
@@ -172,8 +171,7 @@ public class DailyStatsAccess extends MainActivity {
 
                 StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
                 statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
-                statsForEachActivity.setActivity(getTdeeActivityStringFromSavedArrayPosition());
-
+                statsForEachActivity.setActivity(getTdeeActivityStringFromArrayPosition());
 
                 statsForEachActivity.setTotalSetTimeForEachActivity(0);
                 statsForEachActivity.setTotalBreakTimeForEachActivity(0);

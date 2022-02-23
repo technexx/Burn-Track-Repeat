@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
 
+  DailyStatsAccess dailyStatsAccess;
   FragmentManager fragmentManager;
   TabLayout savedCyclesTabLayout;
   TabLayout.Tab savedCyclesTab;
@@ -1115,9 +1116,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnerListeners();
     instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
-
-    DailyStatsAccess dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
-//    dailyStatsAccess.instantiateMainActivityAndDailyStatsDatabase();
   }
 
   private void instantiateGlobalClasses() {
@@ -1125,6 +1123,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
     changeSettingsValues = new ChangeSettingsValues();
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
+    dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
 
     mHandler = new Handler();
     mSavingCycleHandler = new Handler();
@@ -3214,6 +3213,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetTimer();
     populateTimerUI();
 
+    AsyncTask.execute(dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase());
+    if (cycleHasActivityAssigned) {
+      AsyncTask.execute(dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayRunnable());
+    }
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
@@ -4032,14 +4035,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String currentTdeeStatString() {
-    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString(), totalBurnedCaloriesInCycleAsString());
+    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), elapsedTdeeTimeString(), totalBurnedCaloriesInCycleAsString());
   }
 
   private void displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly() {
     if (cycleHasActivityAssigned) {
       String elapsedTdeeTimeString = convertSeconds(totalTdeeActivityTime/1000);
 
-      actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromSavedArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle)));
+      actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle)));
     }
   }
 
@@ -4546,7 +4549,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public String getTdeeActivityStringFromSavedArrayPosition() {
+  public String getTdeeActivityStringFromArrayPosition() {
     ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
     String[] subCategoryList = subCategoryArray.get(selectedTdeeCategoryPosition);
     return (String) subCategoryList[selectedTdeeSubCategoryPosition];

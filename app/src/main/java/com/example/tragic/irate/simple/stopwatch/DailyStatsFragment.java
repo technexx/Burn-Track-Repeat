@@ -67,6 +67,13 @@ public class DailyStatsFragment extends Fragment {
             }
         });
 
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         return root;
     }
 
@@ -78,10 +85,7 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsRecyclerView.setLayoutManager(lm);
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
-        DividerItemDecoration testDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), RecyclerView.VERTICAL);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
-
-//        dailyStatsRecyclerView.addItemDecoration(testDecoration);
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
@@ -125,6 +129,15 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
     }
 }
+
+
+
+
+
+
+
+
+
 
 /////////////////////////Db Query implementation of all of StatsForEachActivity//////////////////
 //    private void instantiateArrayLists() {

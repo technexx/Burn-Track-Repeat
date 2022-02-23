@@ -51,7 +51,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTime.setTypeface(Typeface.DEFAULT_BOLD);
             activityViewHolder.breakTime.setTypeface(Typeface.DEFAULT_BOLD);
             activityViewHolder.caloriesBurned.setTypeface(Typeface.DEFAULT_BOLD);
-
 //            activityViewHolder.activity.setPaintFlags(activityViewHolder.activity.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
         } else {
             activityViewHolder.activity.setText(mActivities.get(position-1));
