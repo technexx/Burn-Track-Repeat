@@ -75,10 +75,10 @@
     <string name="daily_break_time">Breaks:</string>
     <string name="daily_calories_burned">Calories:</string>
 
-    <string name="activity_text_header">Activity:</string>
-    <string name="set_time_text_header">Sets:</string>
-    <string name="break_time_text_header">Breaks:</string>
-    <string name="calories_burned_text_header">Calories:</string>
+    <string name="activity_text_header"><u>Activity</u></string>
+    <string name="set_time_text_header"><u>Sets</u></string>
+    <string name="break_time_text_header"><u>Breaks</u></string>
+    <string name="calories_burned_text_header"><u>Calories</u></string>
 
     <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s </string>
     <string name="bunch_of_spaces">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>
