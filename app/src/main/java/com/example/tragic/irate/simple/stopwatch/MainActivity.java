@@ -3194,14 +3194,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     if (mode==1) {
-      if (savedCycleAdapter.isCycleActive()==true) {
+      if (savedCycleAdapter.isCycleActive()) {
         savedCycleAdapter.removeActiveCycleLayout();
         savedCycleAdapter.notifyDataSetChanged();
       }
     }
 
     if (mode==3) {
-      if (savedPomCycleAdapter.isCycleActive()==true) {
+      if (savedPomCycleAdapter.isCycleActive()) {
         savedPomCycleAdapter.removeActiveCycleLayout();
         savedPomCycleAdapter.notifyDataSetChanged();
       }
@@ -3219,10 +3219,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetTimer();
     populateTimerUI();
 
-    AsyncTask.execute(dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase());
-    if (cycleHasActivityAssigned) {
-      AsyncTask.execute(dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayRunnable());
-    }
+    AsyncTask.execute(()-> {
+      int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+
+      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase();
+      dailyStatsAccess.queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
+      dailyStatsAccess.assignRetrievedTotalTimesAndCaloriesBurnedFromSelectedDayToIteratingVariables();
+      dailyStatsAccess.retrieveDayHolderListForSingleDay(dayOfYear);
+
+      if (cycleHasActivityAssigned) {
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
+      }
+    });
+
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
@@ -4597,7 +4606,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner.setSelection(0);
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
-    metScoreTextView.setText(getString(R.string.met_score, metScore));
+    metScoreTextView.setText(getString(R.string.met_score, String.valueOf(metScore)));
 
     logTdeeCategoryPositions();
     logTdeeCategoryArraysSelected();
@@ -4610,7 +4619,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     selectedTdeeValuePosition = selectedTdeeSubCategoryPosition;
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
-    metScoreTextView.setText(getString(R.string.met_score, metScore));
+    metScoreTextView.setText(getString(R.string.met_score, String.valueOf(metScore)));
 
     logTdeeCategoryPositions();
     logTdeeCategoryArraysSelected();
