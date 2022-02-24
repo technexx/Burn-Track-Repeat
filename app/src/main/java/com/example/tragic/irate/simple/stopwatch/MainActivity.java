@@ -1583,6 +1583,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveTotalSetAndBreakTimes();
         saveTotalTdeeTimeAndCalories();
 
+        //Todo: Should separate the retrieval and update of values from these methods. Do not want or need a db query every 5 seconds.
+        dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+        if (cycleHasActivityAssigned) {
+          dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
+        }
+
         if (!timerIsPaused) {
           mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 1000);
         } else {

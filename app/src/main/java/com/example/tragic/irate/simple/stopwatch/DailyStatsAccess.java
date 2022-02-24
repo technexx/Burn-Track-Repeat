@@ -116,15 +116,15 @@ public class DailyStatsAccess extends MainActivity {
         };
     }
 
+    //Todo: Added input dayToRetrieve for DailyStatsFragment's sake.
     public void queryTotalTimesAndCaloriesBurnedFromSelectedDay(int dayToRetrieve) {
         //Always a single row return, since only one exists per day of year.
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+        List<DayHolder> dayHolderList = queryDayHolderList(dayToRetrieve);
 
         if (dayHolderList.size()>0) {
             totalSetTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalSetTime();
             totalBreakTimeForCurrentDayInMillis = dayHolderList.get(0).getTotalBreakTime();
             totalCaloriesBurnedForCurrentDay = dayHolderList.get(0).getTotalCaloriesBurned();
-
         } else {
             totalSetTimeForCurrentDayInMillis = 0;
             totalBreakTimeForCurrentDayInMillis = 0;
@@ -134,21 +134,20 @@ public class DailyStatsAccess extends MainActivity {
         Log.i("testInsert", "Values returned from attempted Insertion (that belong to an already existing day are " + "set time: " + totalSetTimeForCurrentDayInMillis + " break time: "  + totalBreakTimeForCurrentDayInMillis + " calories burned: " + totalCaloriesBurnedForCurrentDay + " FOR DAY " + dayToRetrieve);
     }
 
-    public Runnable updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabaseRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-                List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-                DayHolder dayHolder = dayHolderList.get(dayOfYear);
+    public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
+        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+        DayHolder dayHolder = dayHolderList.get(dayOfYear);
 
-                dayHolder.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
-                dayHolder.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
-                dayHolder.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
+        dayHolder.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
+        dayHolder.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
+        dayHolder.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
 
-                cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
-            }
-        };
+        cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
+    }
+
+    public List<DayHolder> queryDayHolderList(int daySelected) {
+        return cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -192,28 +191,23 @@ public class DailyStatsAccess extends MainActivity {
         });
     }
 
-    public Runnable updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
+        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
-                //This retrieves all rows tied key'd to the day we have selected.
-                List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
+        //This retrieves all rows tied key'd to the day we have selected.
+        List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
 
-                StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-                if (statsList.size() >= activityPositionInDb+1) {
-                    statsForEachActivity = statsList.get(activityPositionInDb);
-                } else {
-                    Log.e("Stats Database", "Activity position in StatsForEachActivityWithinCycle does not exist!");
-                }
+        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
+        if (statsList.size() >= activityPositionInDb+1) {
+            statsForEachActivity = statsList.get(activityPositionInDb);
+        } else {
+            Log.e("Stats Database", "Activity position in StatsForEachActivityWithinCycle does not exist!");
+        }
 
-                statsForEachActivity.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-                statsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-                statsForEachActivity.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
-                cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivity);
-            }
-        };
+        statsForEachActivity.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+        statsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+        statsForEachActivity.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivity);
     }
 
     private void instantiateMainActivityAndDailyStatsDatabase() {
