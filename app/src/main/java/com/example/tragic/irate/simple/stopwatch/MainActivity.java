@@ -3222,7 +3222,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase();
-      dailyStatsAccess.queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
       dailyStatsAccess.assignRetrievedTotalTimesAndCaloriesBurnedFromSelectedDayToIteratingVariables();
       dailyStatsAccess.retrieveDayHolderListForSingleDay(dayOfYear);
 

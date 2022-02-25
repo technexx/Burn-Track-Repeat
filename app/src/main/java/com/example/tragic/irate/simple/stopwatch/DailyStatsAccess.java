@@ -96,7 +96,7 @@ public class DailyStatsAccess extends MainActivity {
             long dayInRow = dayHolderList.get(i).getDayId();
             if (dayOfYear==dayInRow) {
                 queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
-                Log.i("testInsert", "Returned from Insertion because day already exists");
+                Log.i("testInsert", "Returned from insertion because day already exists");
                 return;
             }
         }
@@ -115,7 +115,9 @@ public class DailyStatsAccess extends MainActivity {
         cyclesDatabase.cyclesDao().insertDay(dayHolder);
         cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
 
-        Log.i("testInsert", "Day was Inserted and is day " + dayOfYear);
+        zeroOutIteratingTotalTimesAndCaloriesForDailyStats();
+
+        Log.i("testInsert", "Day was inserted and is day " + dayOfYear);
     }
 
     public void queryTotalTimesAndCaloriesBurnedFromSelectedDay(int dayToRetrieve) {
@@ -131,6 +133,12 @@ public class DailyStatsAccess extends MainActivity {
             retrievedTotalBreakTime = 0;
             retrievedTotalCaloriesBurned = 0;
         }
+    }
+
+    public void zeroOutIteratingTotalTimesAndCaloriesForDailyStats() {
+        totalSetTimeForCurrentDayInMillis = 0;
+        totalBreakTimeForCurrentDayInMillis = 0;
+        totalCaloriesBurnedForCurrentDay = 0;
     }
 
     public void assignRetrievedTotalTimesAndCaloriesBurnedFromSelectedDayToIteratingVariables() {
