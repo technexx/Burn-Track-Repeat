@@ -34,6 +34,8 @@ public class DailyStatsAccess extends MainActivity {
     long retrievedTotalBreakTime;
     double retrievedTotalCaloriesBurned;
 
+    StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateMainActivityAndDailyStatsDatabase();
@@ -116,7 +118,6 @@ public class DailyStatsAccess extends MainActivity {
         Log.i("testInsert", "Day was Inserted and is day " + dayOfYear);
     }
 
-//    //Todo: This is for Daily Stats Fragment display.
     public void queryTotalTimesAndCaloriesBurnedFromSelectedDay(int dayToRetrieve) {
         //Always a single row return, since only one exists per day of year.
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
@@ -161,7 +162,6 @@ public class DailyStatsAccess extends MainActivity {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             if (mainActivity.getTdeeActivityStringFromArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInDb = i;
-                retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(activityPositionInDb);
                 return;
             }
         }
@@ -177,33 +177,23 @@ public class DailyStatsAccess extends MainActivity {
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
     }
 
-    public void retrieveTotalTimesAndCaloriesForActivityWithinASpecificDayRunnable(int activityPosition) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(activityPosition);
-                StatsForEachActivity statsForEachActivity = statsForEachActivityList.get(0);
-            }
-        });
+    public void retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
+        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+        List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
+
+        //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
+        if (statsList.size() >= activityPositionInDb+1) {
+            retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay = statsList.get(activityPositionInDb);
+        } else {
+            retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay = new StatsForEachActivity();
+        }
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
-        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-
-        //This retrieves all rows tied key'd to the day we have selected.
-        List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
-
-        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-        if (statsList.size() >= activityPositionInDb+1) {
-            statsForEachActivity = statsList.get(activityPositionInDb);
-        } else {
-            Log.e("Stats Database", "Activity position in StatsForEachActivityWithinCycle does not exist!");
-        }
-
-        statsForEachActivity.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-        statsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-        statsForEachActivity.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
-        cyclesDatabase.cyclesDao().updateStatsForEachActivity(statsForEachActivity);
+        retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+        retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+        retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay);
     }
 
     private void instantiateMainActivityAndDailyStatsDatabase() {
@@ -224,60 +214,6 @@ public class DailyStatsAccess extends MainActivity {
         totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
     }
 
-
-
-
-
-
-
-    /////////////////////////////////////////////////////
-
-    public void testStatsForEachActivityInsertion() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-                List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
-
-                statsForEachActivity.setActivity("test" + statsForEachActivityList.size());
-                cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
-
-                Log.i("testDb", "number of activities added is " + statsForEachActivityList.size());
-                for (int i=0; i<statsForEachActivityList.size(); i++) {
-                    Log.i("testDb", "activity name is " + statsForEachActivityList.get(i).getActivity());
-                    Log.i("testDb", "unique ID is " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
-                }
-            }
-        });
-    }
-
-    public void testStatsForDayInsertion() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                int dayOfYearChangingTestValue = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-
-                List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-                int dayHolderSize = dayHolderList.size();
-
-                //If we enter a value other than 0, insert
-                for (int i=0; i<dayHolderSize; i++) {
-
-                    long dayInRow = dayHolderList.get(i).getDayId();
-                    if (dayInRow==dayOfYearChangingTestValue) {
-                        long dayID = cyclesDatabase.cyclesDao().loadAllDayHolderRows().get(i).getDayId();
-                        Log.i("testdb", "dayholder contains dates " + dayID);
-                    }
-                }
-            }
-        });
-    }
-
-    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
-    public void assignTotalActivitiesAndTheirStatsToEntityClassList() {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesAndTheirStatsForAllDays();
-    }
-    ////////////////////////// Queries all days (Selected days plucked from list in Fragment) ///////////////////////////////////////
 
     public void logTotalTimesForSelectedDay() {
         Log.i("testStats", "total set time is " + totalSetTimeForCurrentDayInMillis);

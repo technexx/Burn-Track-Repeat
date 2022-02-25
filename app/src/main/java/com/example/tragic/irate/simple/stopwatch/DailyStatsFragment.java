@@ -129,37 +129,3 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
     }
 }
-
-
-
-
-
-
-
-
-
-
-/////////////////////////Db Query implementation of all of StatsForEachActivity//////////////////
-//    private void instantiateArrayLists() {
-//       totalActivitiesListForSelectedDay = new ArrayList<>();
-//       totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
-//       totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
-//       totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
-//    }
-
-//    private void queryEntireStatsForEachActivityEntity() {
-//        dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-//        dailyStatsAccess.assignTotalActivitiesAndTheirStatsToEntityClassList();
-//
-//        for (int i=0; i<dailyStatsAccess.statsForEachActivityList.size(); i++) {
-//            if (dailyStatsAccess.statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==dayOfYear) {
-//                totalActivitiesListForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getActivity());
-//                totalSetTimeListForEachActivityForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
-//                totalBreakTimeListForEachActivityForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
-//                totalCaloriesBurnedForEachActivityForSelectedDay.add(dailyStatsAccess.statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
-//            }
-//        }
-//
-//        dailyStatsAdapter = new DailyStatsAdapter(getContext(), totalActivitiesListForSelectedDay, totalSetTimeListForEachActivityForSelectedDay, totalBreakTimeListForEachActivityForSelectedDay, totalCaloriesBurnedForEachActivityForSelectedDay);
-//    }
-//}

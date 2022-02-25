@@ -1583,7 +1583,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveTotalSetAndBreakTimes();
         saveTotalTdeeTimeAndCalories();
 
-        //Todo: Should separate the retrieval and update of values from these methods. Do not want or need a db query every 5 seconds.
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
         if (cycleHasActivityAssigned) {
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
@@ -3229,6 +3228,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (cycleHasActivityAssigned) {
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
+        dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
       }
     });
 
@@ -3239,7 +3239,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        //Sets up Strings to save into database.
         Gson gson = new Gson();
         workoutString = "";
         roundTypeString = "";
