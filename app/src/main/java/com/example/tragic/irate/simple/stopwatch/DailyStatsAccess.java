@@ -148,8 +148,8 @@ public class DailyStatsAccess extends MainActivity {
     }
 
     public void retrieveDayHolderListForSingleDay(int dayToRetrieve) {
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-        retrievedDayHolderInstanceForSingleDay = dayHolderList.get(dayToRetrieve);
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+        retrievedDayHolderInstanceForSingleDay = dayHolderList.get(0);
     }
 
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
