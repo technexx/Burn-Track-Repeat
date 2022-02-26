@@ -100,7 +100,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-@SuppressWarnings({"depreciation"})
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
   SharedPreferences sharedPreferences;
@@ -1580,6 +1579,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
+        Log.i("testDb", "set time saved in Main's runnable is " + totalSetTimeForCurrentDayInMillis);
+        Log.i("testDb", "set time saved in Main's runnable accessing DailyStats is " + dailyStatsAccess.totalSetTimeForCurrentDayInMillis);
+
         saveTotalSetAndBreakTimes();
         saveTotalTdeeTimeAndCalories();
 
@@ -3222,7 +3224,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase();
-      dailyStatsAccess.assignRetrievedTotalTimesAndCaloriesBurnedFromSelectedDayToIteratingVariables();
+//      dailyStatsAccess.assignRetrievedTotalTimesAndCaloriesBurnedFromSelectedDayToIteratingVariables();
       dailyStatsAccess.retrieveDayHolderListForSingleDay(dayOfYear);
 
       if (cycleHasActivityAssigned) {
@@ -3622,6 +3624,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalBreakTimeForCurrentDayInMillis += millis;
         break;
     };
+    Log.i("testDb", "total set time is " + totalSetTimeForCurrentDayInMillis);
+    Log.i("testDb", "total break time is " + totalBreakTimeForCurrentDayInMillis);
   }
 
   private void iterateTotalTimesForSelectedActivity(long millis) {

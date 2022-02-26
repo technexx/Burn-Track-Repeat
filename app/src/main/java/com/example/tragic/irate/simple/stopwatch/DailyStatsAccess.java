@@ -95,6 +95,7 @@ public class DailyStatsAccess extends MainActivity {
         for (int i=0; i<dayHolderSize; i++) {
             long dayInRow = dayHolderList.get(i).getDayId();
             if (dayOfYear==dayInRow) {
+
                 queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
                 Log.i("testInsert", "Returned from insertion because day already exists");
                 return;
@@ -117,7 +118,7 @@ public class DailyStatsAccess extends MainActivity {
 
         zeroOutIteratingTotalTimesAndCaloriesForDailyStats();
 
-        Log.i("testInsert", "Day was inserted and is day " + dayOfYear);
+        Log.i("testDb", "Day was inserted and is day " + dayOfYear);
     }
 
     public void queryTotalTimesAndCaloriesBurnedFromSelectedDay(int dayToRetrieve) {
@@ -128,6 +129,11 @@ public class DailyStatsAccess extends MainActivity {
             retrievedTotalSetTime = dayHolderList.get(0).getTotalSetTime();
             retrievedTotalBreakTime = dayHolderList.get(0).getTotalBreakTime();
             retrievedTotalCaloriesBurned = dayHolderList.get(0).getTotalCaloriesBurned();
+
+            //Todo: Need to make these values are being saved on resets as well. Not saving at all currently.
+            Log.i("testdb", "retrieved set time is " + retrievedTotalSetTime);
+            Log.i("testdb", "retrieved break time is " + retrievedTotalBreakTime);
+            Log.i("testdb", "retrieved calories burned is " + retrievedTotalCaloriesBurned);
         } else {
             retrievedTotalSetTime = 0;
             retrievedTotalBreakTime = 0;
@@ -150,6 +156,8 @@ public class DailyStatsAccess extends MainActivity {
     public void retrieveDayHolderListForSingleDay(int dayToRetrieve) {
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         retrievedDayHolderInstanceForSingleDay = dayHolderList.get(0);
+
+        Log.i("testDb", "DayHolder instance ID (day) retrieved is " + retrievedDayHolderInstanceForSingleDay.getDayId());
     }
 
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
@@ -157,7 +165,9 @@ public class DailyStatsAccess extends MainActivity {
         retrievedDayHolderInstanceForSingleDay.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
         retrievedDayHolderInstanceForSingleDay.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
 
+        //Todo: Does this not get the same instance of variable as an extension of class? Correct.
         cyclesDatabase.cyclesDao().updateDayHolder(retrievedDayHolderInstanceForSingleDay);
+        Log.i("testDb", "set time saved in DailyStatsAccess is " + totalSetTimeForCurrentDayInMillis);
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -220,12 +230,6 @@ public class DailyStatsAccess extends MainActivity {
         totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
         totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
         totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
-    }
-
-
-    public void logTotalTimesForSelectedDay() {
-        Log.i("testStats", "total set time is " + totalSetTimeForCurrentDayInMillis);
-        Log.i("testStats", "total break time is " + totalBreakTimeForCurrentDayInMillis);
     }
 
     public void logTotalCaloriesForSelectedDay() {
