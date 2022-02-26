@@ -165,7 +165,8 @@ public class DailyStatsAccess extends MainActivity {
         retrievedDayHolderInstanceForSingleDay.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
         retrievedDayHolderInstanceForSingleDay.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
 
-        //Todo: Does this not get the same instance of variable as an extension of class? Correct.
+        //Todo: Does not get the same instance of variable as an extension of class. It simply gains access to the declared variable, not whatever value has been assigned to it within the original class.
+        //Todo: Can probably create a singleton since we only need a small selection of variables.
         cyclesDatabase.cyclesDao().updateDayHolder(retrievedDayHolderInstanceForSingleDay);
         Log.i("testDb", "set time saved in DailyStatsAccess is " + totalSetTimeForCurrentDayInMillis);
     }

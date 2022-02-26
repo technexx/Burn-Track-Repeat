@@ -1579,7 +1579,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
-        Log.i("testDb", "set time saved in Main's runnable is " + totalSetTimeForCurrentDayInMillis);
         Log.i("testDb", "set time saved in Main's runnable accessing DailyStats is " + dailyStatsAccess.totalSetTimeForCurrentDayInMillis);
 
         saveTotalSetAndBreakTimes();
