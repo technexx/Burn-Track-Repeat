@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,16 +29,20 @@ import java.util.TimeZone;
 public class DailyStatsFragment extends Fragment {
 
     View mRoot;
-    DailyStatsAccess dailyStatsAccess;
-    DailyStatsAdapter dailyStatsAdapter;
     Calendar calendar;
     CalendarView calendarView;
     int dayOfYear;
+
+    DailyStatsAccess dailyStatsAccess;
+    DailyStatsAdapter dailyStatsAdapter;
     RecyclerView dailyStatsRecyclerView;
 
     TextView dailyStatsTotalSetTimeTextView;
     TextView dailyStatsTotalBreakTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
+
+    DayHolder dayHolder;
+    List<DayHolder> dayHolderList;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
@@ -91,7 +96,11 @@ public class DailyStatsFragment extends Fragment {
 
     private void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
-            dailyStatsAccess.queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
+
+            dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
+            dayHolder = dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDay(dayHolderList);
+
+            dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDay(dayHolderList);
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
             getActivity().runOnUiThread(()-> {
@@ -103,12 +112,17 @@ public class DailyStatsFragment extends Fragment {
         });
     }
 
+    //Todo: We could pull a DayHolder instance here, set our >0 conditional, and use it as an input in StatsAccess' methods.
     private void populateDailyTotalTimesAndCaloriesTextViews() {
-        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(dailyStatsAccess.retrievedTotalSetTime)));
+        long totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder);
+        long totalBreakTime = dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder);
+        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder);
 
-        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(dailyStatsAccess.retrievedTotalBreakTime)));
+        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(totalSetTime)));
 
-        dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(dailyStatsAccess.retrievedTotalCaloriesBurned)));
+        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(totalBreakTime)));
+
+        dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(totalCaloriesBurned)));
 
         Toast.makeText(getContext(), "Day is " + dayOfYear, Toast.LENGTH_SHORT).show();
     }
