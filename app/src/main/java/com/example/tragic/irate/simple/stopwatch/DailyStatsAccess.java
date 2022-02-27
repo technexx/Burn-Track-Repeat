@@ -86,7 +86,7 @@ public class DailyStatsAccess {
         return cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
     }
 
-    public DayHolder queryAndSetGlobalDayHolderInstanceForSelectedDayFromDayHolderList(List<DayHolder> dayHolderList) {
+    public DayHolder queryAndSetDayHolderInstanceForSelectedDay(List<DayHolder> dayHolderList) {
         return dayHolderList.get(0);
     }
 
@@ -107,33 +107,63 @@ public class DailyStatsAccess {
     }
 
 
-    public void checkIfActivityAlreadyExistsInDatabaseForSelectedDay (int daySelected) {
-
-    }
-
-    //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
-    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
-        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    public boolean checkIfActivityAlreadyExistsInDatabaseForSelectedDay (int daySelected) {
+        boolean activityExists = false;
 
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
 
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             if (mainActivity.getTdeeActivityStringFromArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInDb = i;
-                return;
+                activityExists = true;
+            } else {
+                activityExists = false;
             }
         }
+        return activityExists;
+    }
 
-        StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-        statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
-        statsForEachActivity.setActivity(getTdeeActivityStringFromArrayPosition());
+    //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
+    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
+        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
-        statsForEachActivity.setTotalSetTimeForEachActivity(0);
-        statsForEachActivity.setTotalBreakTimeForEachActivity(0);
-        statsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
+        //Nothing to do if activity already exists.
+        if (!checkIfDayAlreadyExistsInDatabase(dayOfYear)) {
+            StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
+            statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
+            statsForEachActivity.setActivity(activitySelected);
 
-        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
+            statsForEachActivity.setTotalSetTimeForEachActivity(0);
+            statsForEachActivity.setTotalBreakTimeForEachActivity(0);
+            statsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
+
+            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
+        }
+    }
+
+    public List<StatsForEachActivity> queryStatsForEachActivityForSingleDay(int dayToRetrieve) {
+        return cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
+    }
+
+    public StatsForEachActivity queryAndSetStatsForEachActivityInstanceForSelectedActivity(List<StatsForEachActivity> statsForEachActivityList, int activityPosition) {
+        return statsForEachActivityList.get(activityPosition);
+    }
+
+    public String getActivityStringForSelectedActivity(StatsForEachActivity statsForEachActivity) {
+        return statsForEachActivity.getActivity();
+    }
+
+    public long getTotalSetTimeForSelectedActivity(StatsForEachActivity statsForEachActivity) {
+        return statsForEachActivity.getTotalSetTimeForEachActivity();
+    }
+
+    public long getTotalBreakTimeForSelectedActivity(StatsForEachActivity statsForEachActivity) {
+        return statsForEachActivity.getTotalBreakTimeForEachActivity();
+    }
+
+    public double getTotalCaloriesBurnedForSelectedActivity(StatsForEachActivity statsForEachActivity) {
+        return statsForEachActivity.getTotalCaloriesBurnedForEachActivity();
     }
 
     public void retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {

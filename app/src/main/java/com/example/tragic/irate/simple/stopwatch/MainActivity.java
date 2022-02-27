@@ -507,7 +507,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-
   //Todo: Main's buttons (Stopwatch, FAB) are accessible when Fragments' framelayout is overlayed - we can probably correct this by ensuring the frame layout has focus.
   //Todo: Remove sort/triple dots when not in Main (e.g. Settings Fragment, Edit PopUp).
   //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
@@ -3223,7 +3222,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.dayExistsInDatabase);
 
       if (cycleHasActivityAssigned) {
-        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
       }
     });
@@ -3240,7 +3239,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
-      DayHolder dayHolder = dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDayFromDayHolderList(dayHolderList);
+      DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder);
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder);

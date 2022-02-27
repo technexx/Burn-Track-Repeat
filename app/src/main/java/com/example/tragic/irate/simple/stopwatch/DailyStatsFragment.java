@@ -97,7 +97,7 @@ public class DailyStatsFragment extends Fragment {
         AsyncTask.execute(()-> {
 
             dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
-            dayHolder = dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDayFromDayHolderList(dayHolderList);
+            dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
 
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
