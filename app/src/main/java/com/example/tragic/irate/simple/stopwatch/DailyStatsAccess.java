@@ -102,64 +102,13 @@ public class DailyStatsAccess {
         return dayHolder.getTotalCaloriesBurned();
     }
 
-    public void setValueOfTotalSetTimeForCurrentDayFromDatabase(DayHolder dayHolder, long setTime) {
-        dayHolder.setTotalSetTime(setTime);
-    }
-
-    public void setValueOfTotalBreakTimeForCurrentDayFromDatabase(DayHolder dayholder, long breakTime) {
-        dayholder.setTotalBreakTime(breakTime);
-    }
-
-    public void setValueOfTotalCaloriesBurnedForCurrentDayFromDatabase(DayHolder dayHolder, double caloriesBurned) {
-        dayHolder.setTotalCaloriesBurned(caloriesBurned);
-    }
-
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(DayHolder dayHolder) {
         cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
     }
 
 
+    public void checkIfActivityAlreadyExistsInDatabaseForSelectedDay (int daySelected) {
 
-    public void queryStatsForEachActivityForSelectedDay(int daySelected) {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
-    }
-
-    public void clearArrayListsOfActivitiesAndTheirStats() {
-        totalActivitiesListForSelectedDay.clear();
-        totalSetTimeListForEachActivityForSelectedDay.clear();
-        totalBreakTimeListForEachActivityForSelectedDay.clear();
-        totalCaloriesBurnedForEachActivityForSelectedDay.clear();
-    }
-
-    public void populatePojoListsForDailyActivityStatsForSelectedDay() {
-        assignTotalActivitiesListForOnSelectedDayToList();
-        assignTotalSetTimeForEachActivityOnSelectedDayToList();
-        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
-        assignTotalCaloriesForEachActivityOnSelectedDayToList();
-    }
-
-    private void assignTotalActivitiesListForOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalActivitiesListForSelectedDay.add(statsForEachActivityList.get(i).getActivity());
-        }
-    }
-
-    private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalSetTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
-        }
-    }
-
-    private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalBreakTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
-        }
-    }
-
-    private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
-        }
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -204,6 +153,48 @@ public class DailyStatsAccess {
         retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
         retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay);
+    }
+
+    public void queryStatsForEachActivityForSelectedDay(int daySelected) {
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
+    }
+
+    public void clearArrayListsOfActivitiesAndTheirStats() {
+        totalActivitiesListForSelectedDay.clear();
+        totalSetTimeListForEachActivityForSelectedDay.clear();
+        totalBreakTimeListForEachActivityForSelectedDay.clear();
+        totalCaloriesBurnedForEachActivityForSelectedDay.clear();
+    }
+
+    public void populatePojoListsForDailyActivityStatsForSelectedDay() {
+        assignTotalActivitiesListForOnSelectedDayToList();
+        assignTotalSetTimeForEachActivityOnSelectedDayToList();
+        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
+        assignTotalCaloriesForEachActivityOnSelectedDayToList();
+    }
+
+    private void assignTotalActivitiesListForOnSelectedDayToList() {
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            totalActivitiesListForSelectedDay.add(statsForEachActivityList.get(i).getActivity());
+        }
+    }
+
+    private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            totalSetTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+        }
+    }
+
+    private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            totalBreakTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+        }
+    }
+
+    private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+        }
     }
 
     private void instantiateMainActivityAndDailyStatsDatabase() {
