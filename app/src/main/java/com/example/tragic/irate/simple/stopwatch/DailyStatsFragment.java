@@ -98,9 +98,8 @@ public class DailyStatsFragment extends Fragment {
         AsyncTask.execute(()-> {
 
             dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
-            dayHolder = dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDay(dayHolderList);
+            dayHolder = dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDayFromDayHolderList(dayHolderList);
 
-            dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDay(dayHolderList);
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
             getActivity().runOnUiThread(()-> {
@@ -112,7 +111,6 @@ public class DailyStatsFragment extends Fragment {
         });
     }
 
-    //Todo: We could pull a DayHolder instance here, set our >0 conditional, and use it as an input in StatsAccess' methods.
     private void populateDailyTotalTimesAndCaloriesTextViews() {
         long totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder);
         long totalBreakTime = dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder);

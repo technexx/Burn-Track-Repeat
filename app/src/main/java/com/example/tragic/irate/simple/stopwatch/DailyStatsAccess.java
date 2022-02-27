@@ -39,60 +39,52 @@ public class DailyStatsAccess {
         instantiateArrayListsOfActivitiesAndTheirStats();
     }
 
-    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase() {
-        String date = calendarValues.getDateString();
-        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-
+    //Todo: Calling this to check, and calling insert if returns false.
+    //Todo: May want to split this again, since we the day instance and the boolean.
+    public boolean checkIfDayAlreadyExistsInDatabase(int daySelected) {
+        boolean dayExists = false;
         //Check if current day already exists in db.
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
         int dayHolderSize = dayHolderList.size();
 
         for (int i=0; i<dayHolderSize; i++) {
-            long dayInRow = dayHolderList.get(i).getDayId();
-            if (dayOfYear==dayInRow) {
-
-                queryTotalTimesAndCaloriesBurnedFromSelectedDay(dayOfYear);
-                Log.i("testInsert", "Returned from insertion because day already exists");
-                return;
+            long dayThatExistsInDatabase = dayHolderList.get(i).getDayId();
+            if (daySelected==dayThatExistsInDatabase) {
+                dayExists = true;
             }
         }
-
-        DayHolder dayHolder = new DayHolder();
-        ActivitiesForEachDay activitiesForEachDay = new ActivitiesForEachDay();
-
-        dayHolder.setDayId(dayOfYear);
-        dayHolder.setDate(date);
-
-        activitiesForEachDay.setUniqueDayIdPossessedByEachOfItsActivities(dayOfYear);
-        dayHolder.setTotalSetTime(0);
-        dayHolder.setTotalBreakTime(0);
-        dayHolder.setTotalCaloriesBurned(0);
-
-        cyclesDatabase.cyclesDao().insertDay(dayHolder);
-        cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
+        return dayExists;
     }
 
-    public List<DayHolder> queryDayHolderListFromSelectedDay(int dayToRetrieve) {
-        //Always a single row return, since only one exists per day of year.
-        return cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-
-        if (dayHolderList.size()>0) {
-            retrievedTotalSetTime = dayHolderList.get(0).getTotalSetTime();
-            retrievedTotalBreakTime = dayHolderList.get(0).getTotalBreakTime();
-            retrievedTotalCaloriesBurned = dayHolderList.get(0).getTotalCaloriesBurned();
+    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
+        if (checkIfDayAlreadyExistsInDatabase(daySelected)) {
+            //Todo: Day exists, query it and return so we can access its values.
         } else {
-            retrievedTotalSetTime = 0;
-            retrievedTotalBreakTime = 0;
-            retrievedTotalCaloriesBurned = 0;
+            //Day does not exist. Insert it w/ default values.
+            String date = calendarValues.getDateString();
+
+            DayHolder dayHolder = new DayHolder();
+            ActivitiesForEachDay activitiesForEachDay = new ActivitiesForEachDay();
+
+            dayHolder.setDayId(daySelected);
+            dayHolder.setDate(date);
+
+            activitiesForEachDay.setUniqueDayIdPossessedByEachOfItsActivities(daySelected);
+            dayHolder.setTotalSetTime(0);
+            dayHolder.setTotalBreakTime(0);
+            dayHolder.setTotalCaloriesBurned(0);
+
+            cyclesDatabase.cyclesDao().insertDay(dayHolder);
+            cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
         }
+
     }
 
-    //Todo: Advantage of having DayHolder NOT global is we can pull a local instance in our Fragment/Activity and set a >0 conditional there.
     public List<DayHolder> queryDayHolderListForSingleDay(int dayToRetrieve) {
         return cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
     }
 
-    public DayHolder queryAndSetGlobalDayHolderInstanceForSelectedDay(List<DayHolder> dayHolderList) {
+    public DayHolder queryAndSetGlobalDayHolderInstanceForSelectedDayFromDayHolderList(List<DayHolder> dayHolderList) {
         return dayHolderList.get(0);
     }
 
