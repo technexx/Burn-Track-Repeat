@@ -23,6 +23,7 @@ public class DailyStatsAccess {
     CalendarValues calendarValues = new CalendarValues();
 
     List<StatsForEachActivity> statsForEachActivityList;
+    boolean dayExistsInDatabase;
 
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
@@ -30,8 +31,7 @@ public class DailyStatsAccess {
     List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
 
     StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
-
-//    DayHolder dayHolder;
+    int activityPositionInDb;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -39,11 +39,9 @@ public class DailyStatsAccess {
         instantiateArrayListsOfActivitiesAndTheirStats();
     }
 
-    //Todo: Calling this to check, and calling insert if returns false.
-    //Todo: May want to split this again, since we the day instance and the boolean.
     public boolean checkIfDayAlreadyExistsInDatabase(int daySelected) {
         boolean dayExists = false;
-        //Check if current day already exists in db.
+
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
         int dayHolderSize = dayHolderList.size();
 
@@ -58,9 +56,8 @@ public class DailyStatsAccess {
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
         if (checkIfDayAlreadyExistsInDatabase(daySelected)) {
-            //Todo: Day exists, query it and return so we can access its values.
+            dayExistsInDatabase = true;
         } else {
-            //Day does not exist. Insert it w/ default values.
             String date = calendarValues.getDateString();
 
             DayHolder dayHolder = new DayHolder();
@@ -76,8 +73,13 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(dayHolder);
             cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
-        }
 
+            dayExistsInDatabase = false;
+        }
+    }
+
+    public boolean dayExistsInDatabase() {
+        return dayExistsInDatabase;
     }
 
     public List<DayHolder> queryDayHolderListForSingleDay(int dayToRetrieve) {
@@ -115,9 +117,6 @@ public class DailyStatsAccess {
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(DayHolder dayHolder) {
         cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
     }
-
-
-
 
 
 

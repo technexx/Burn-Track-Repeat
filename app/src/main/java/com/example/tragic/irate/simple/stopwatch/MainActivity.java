@@ -507,7 +507,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  int activityPositionInDb;
 
   //Todo: Main's buttons (Stopwatch, FAB) are accessible when Fragments' framelayout is overlayed - we can probably correct this by ensuring the frame layout has focus.
   //Todo: Remove sort/triple dots when not in Main (e.g. Settings Fragment, Edit PopUp).
@@ -3220,10 +3219,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()-> {
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
-      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase();
-//      dailyStatsAccess.assignRetrievedTotalTimesAndCaloriesBurnedFromSelectedDayToIteratingVariables();
-      dailyStatsAccess.retrieveDayHolderListForSingleDay(dayOfYear);
-
+      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
+      assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.dayExistsInDatabase);
       if (cycleHasActivityAssigned) {
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
@@ -3231,6 +3228,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
+  private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {
+    if (!dayExists) {
+      totalSetTimeForCurrentDayInMillis = 0;
+      totalBreakTimeForCurrentDayInMillis = 0;
+      totalCaloriesBurnedForCurrentDay = 0;
+    } else {
+      int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+
+      List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
+      DayHolder dayHolder = dailyStatsAccess.queryAndSetGlobalDayHolderInstanceForSelectedDayFromDayHolderList(dayHolderList);
+
+      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder);
+      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder);
+      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder);
+    }
   }
 
   private Runnable saveAddedOrEditedCycleASyncRunnable() {

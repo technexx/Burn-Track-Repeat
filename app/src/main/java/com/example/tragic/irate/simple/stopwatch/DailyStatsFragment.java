@@ -48,7 +48,6 @@ public class DailyStatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
-        //Todo: Test insertion + update + deletion.
         Button testButton = root.findViewById(R.id.test_button);
 
         calendar = Calendar.getInstance();
@@ -117,9 +116,7 @@ public class DailyStatsFragment extends Fragment {
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder);
 
         dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(totalSetTime)));
-
         dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(totalBreakTime)));
-
         dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(totalCaloriesBurned)));
 
         Toast.makeText(getContext(), "Day is " + dayOfYear, Toast.LENGTH_SHORT).show();
