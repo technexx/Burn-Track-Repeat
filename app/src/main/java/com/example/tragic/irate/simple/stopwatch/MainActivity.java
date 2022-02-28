@@ -3234,9 +3234,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (cycleHasActivityAssigned) {
+        dailyStatsAccess.checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
-        assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+        assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
     });
 
@@ -3262,8 +3263,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    boolean doesActivityExistInDatabase = dailyStatsAccess.doesActivityExistInDatabase();
 
-    if (dailyStatsAccess.checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition(dayOfYear)) {
+    if (!doesActivityExistInDatabase) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;

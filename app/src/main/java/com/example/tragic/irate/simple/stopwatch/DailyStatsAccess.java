@@ -46,6 +46,17 @@ public class DailyStatsAccess {
         instantiateArrayListsOfActivitiesAndTheirStats();
     }
 
+    private void instantiateMainActivityAndDailyStatsDatabase() {
+        mainActivity = new MainActivity();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                cyclesDatabase = CyclesDatabase.getDatabase(mContext);
+            }
+        });
+    }
+
     public boolean checkIfDayAlreadyExistsInDatabase(int daySelected) {
         boolean dayExists = false;
 
@@ -120,7 +131,7 @@ public class DailyStatsAccess {
 
 
 
-    public boolean checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition (int daySelected) {
+    public void checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition (int daySelected) {
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
 
@@ -132,7 +143,6 @@ public class DailyStatsAccess {
                 activityExistsInDatabase = false;
             }
         }
-        return activityExistsInDatabase;
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -140,7 +150,7 @@ public class DailyStatsAccess {
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
         //Nothing to do if activity already exists.
-        if (!checkIfDayAlreadyExistsInDatabase(dayOfYear)) {
+        if (!activityExistsInDatabase) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(dayOfYear);
             statsForEachActivity.setActivity(activitySelected);
@@ -159,6 +169,10 @@ public class DailyStatsAccess {
 
     public StatsForEachActivity queryAndSetStatsForEachActivityInstanceForSelectedActivity(List<StatsForEachActivity> statsForEachActivityList, int activityPosition) {
         return statsForEachActivityList.get(activityPosition);
+    }
+
+    public boolean doesActivityExistInDatabase() {
+        return activityExistsInDatabase;
     }
 
     public int getActivityPosition() {
@@ -208,6 +222,8 @@ public class DailyStatsAccess {
 
 
 
+    //////////////////Daily Stats Fragment Methods/////////////////////////////////////////////
+
     public void queryStatsForEachActivityForSelectedDay(int daySelected) {
         statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
     }
@@ -248,17 +264,6 @@ public class DailyStatsAccess {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
         }
-    }
-
-    private void instantiateMainActivityAndDailyStatsDatabase() {
-        mainActivity = new MainActivity();
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                cyclesDatabase = CyclesDatabase.getDatabase(mContext);
-            }
-        });
     }
 
     private void instantiateArrayListsOfActivitiesAndTheirStats() {
