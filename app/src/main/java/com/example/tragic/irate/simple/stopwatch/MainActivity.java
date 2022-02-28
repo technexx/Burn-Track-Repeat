@@ -1591,6 +1591,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(dayHolder);
 
         if (cycleHasActivityAssigned) {
+          dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+          dailyStatsAccess.setTotalBreakTimeForSelectedActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+          dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
         }
 

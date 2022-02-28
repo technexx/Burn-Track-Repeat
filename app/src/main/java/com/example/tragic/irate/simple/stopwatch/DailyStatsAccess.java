@@ -33,6 +33,9 @@ public class DailyStatsAccess {
     List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
 
     StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
+    long totalDailySetTimeForActivityToSave;
+    long totalDailyBreakTimeForActivityToSave;
+    double totalDailyCaloriesBurnedForActivityToSave;
 
     boolean activityExistsInDatabase;
     int activityPositionInDb;
@@ -162,18 +165,6 @@ public class DailyStatsAccess {
         return activityPositionInDb;
     }
 
-    public long getTotalSetTimeForSelectedActivity(StatsForEachActivity statsForEachActivity) {
-        return statsForEachActivity.getTotalSetTimeForEachActivity();
-    }
-
-    public long getTotalBreakTimeForSelectedActivity(StatsForEachActivity statsForEachActivity) {
-        return statsForEachActivity.getTotalBreakTimeForEachActivity();
-    }
-
-    public double getTotalCaloriesBurnedForSelectedActivity(StatsForEachActivity statsForEachActivity) {
-        return statsForEachActivity.getTotalCaloriesBurnedForEachActivity();
-    }
-
     public void retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
         List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
@@ -186,12 +177,36 @@ public class DailyStatsAccess {
         }
     }
 
+    public long getTotalSetTimeForSelectedActivity(StatsForEachActivity statsForEachActivity) {
+        return statsForEachActivity.getTotalSetTimeForEachActivity();
+    }
+
+    public long getTotalBreakTimeForSelectedActivity(StatsForEachActivity statsForEachActivity) {
+        return statsForEachActivity.getTotalBreakTimeForEachActivity();
+    }
+
+    public double getTotalCaloriesBurnedForSelectedActivity(StatsForEachActivity statsForEachActivity) {
+        return statsForEachActivity.getTotalCaloriesBurnedForEachActivity();
+    }
+
+    public void setTotalSetTimeForSelectedActivity(long totalSetTimeForActivity) {
+        this.totalDailySetTimeForActivityToSave = totalSetTimeForActivity;
+    }
+
+    public void setTotalBreakTimeForSelectedActivity(long totalBreakTimeForActivity) {
+        this.totalDailyBreakTimeForActivityToSave = totalBreakTimeForActivity;
+    }
+
+    public void setTotalCaloriesBurnedForSelectedActivity(double caloriesBurnedForActivity) {
+        this.totalDailyCaloriesBurnedForActivityToSave = caloriesBurnedForActivity;
+    }
+
+
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
-        retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalSetTimeForEachActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-        retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalBreakTimeForEachActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-        retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay);
     }
+
+
 
     public void queryStatsForEachActivityForSelectedDay(int daySelected) {
         statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
