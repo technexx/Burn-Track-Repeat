@@ -23,6 +23,9 @@ public class DailyStatsAccess {
     CalendarValues calendarValues = new CalendarValues();
 
     List<StatsForEachActivity> statsForEachActivityList;
+    long totalDailySetTimeToSave;
+    long totalDailyBreakTimeToSave;
+    double totalDailyCaloriesBurnedToSave;
 
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
@@ -95,9 +98,23 @@ public class DailyStatsAccess {
         return dayHolder.getTotalCaloriesBurned();
     }
 
+    public void setTotalSetTimeFromActivity(long totalSetTime) {
+        this.totalDailySetTimeToSave = totalSetTime;
+    }
+
+    public void setTotalBreakTimeFromActivity(long totalBreakTime) {
+        this.totalDailyBreakTimeToSave = totalBreakTime;
+    }
+
+    public void setTotalCaloriesBurnedFromActivity(double totalCalories) {
+        this.totalDailyCaloriesBurnedToSave = totalCalories;
+    }
+
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(DayHolder dayHolder) {
         cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
     }
+
+
 
 
     public boolean checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition (int daySelected) {
@@ -116,7 +133,6 @@ public class DailyStatsAccess {
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
-    //Todo: Need boolean for activityExists to set vars in Main.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 

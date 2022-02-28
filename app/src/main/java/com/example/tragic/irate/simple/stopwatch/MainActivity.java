@@ -64,6 +64,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -1580,7 +1581,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveTotalSetAndBreakTimes();
         saveTotalTdeeTimeAndCalories();
 
-        dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+        List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
+        DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
+
+        dailyStatsAccess.setTotalSetTimeFromActivity(totalSetTimeForCurrentDayInMillis);
+        dailyStatsAccess.setTotalBreakTimeFromActivity(totalBreakTimeForCurrentDayInMillis);
+        dailyStatsAccess.setTotalCaloriesBurnedFromActivity(totalCaloriesBurnedForCurrentDay);
+        dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(dayHolder);
+
         if (cycleHasActivityAssigned) {
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
         }
