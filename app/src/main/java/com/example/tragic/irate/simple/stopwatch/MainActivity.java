@@ -3219,10 +3219,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
-      assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.dayExistsInDatabase);
+      assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (cycleHasActivityAssigned) {
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
+        assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
       }
     });
@@ -3244,6 +3245,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder);
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder);
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder);
+    }
+  }
+
+  private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
+    int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+
+    if (dailyStatsAccess.checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition(dayOfYear)) {
+      totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
+      totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
+      totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
+    } else {
+      int activityPosition = dailyStatsAccess.getActivityPosition();
+
+      List<StatsForEachActivity> statsForEachActivityList = dailyStatsAccess.queryStatsForEachActivityForSingleDay(dayOfYear);
+      StatsForEachActivity statsForEachActivity = dailyStatsAccess.queryAndSetStatsForEachActivityInstanceForSelectedActivity(statsForEachActivityList, activityPosition);
+
+      totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity(statsForEachActivity);
+      totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity(statsForEachActivity);
+      totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity(statsForEachActivity);
+
     }
   }
 

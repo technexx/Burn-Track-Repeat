@@ -23,7 +23,6 @@ public class DailyStatsAccess {
     CalendarValues calendarValues = new CalendarValues();
 
     List<StatsForEachActivity> statsForEachActivityList;
-    boolean dayExistsInDatabase;
 
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
@@ -31,6 +30,8 @@ public class DailyStatsAccess {
     List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
 
     StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
+
+    boolean activityExistsInDatabase;
     int activityPositionInDb;
 
     public DailyStatsAccess(Context context) {
@@ -55,9 +56,7 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
-        if (checkIfDayAlreadyExistsInDatabase(daySelected)) {
-            dayExistsInDatabase = true;
-        } else {
+        if (!checkIfDayAlreadyExistsInDatabase(daySelected)) {
             String date = calendarValues.getDateString();
 
             DayHolder dayHolder = new DayHolder();
@@ -73,13 +72,7 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(dayHolder);
             cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
-
-            dayExistsInDatabase = false;
         }
-    }
-
-    public boolean dayExistsInDatabase() {
-        return dayExistsInDatabase;
     }
 
     public List<DayHolder> queryDayHolderListForSingleDay(int dayToRetrieve) {
@@ -107,24 +100,23 @@ public class DailyStatsAccess {
     }
 
 
-    public boolean checkIfActivityAlreadyExistsInDatabaseForSelectedDay (int daySelected) {
-        boolean activityExists = false;
-
+    public boolean checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition (int daySelected) {
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
 
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             if (mainActivity.getTdeeActivityStringFromArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInDb = i;
-                activityExists = true;
+                activityExistsInDatabase = true;
             } else {
-                activityExists = false;
+                activityExistsInDatabase = false;
             }
         }
-        return activityExists;
+        return activityExistsInDatabase;
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
+    //Todo: Need boolean for activityExists to set vars in Main.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
@@ -150,8 +142,8 @@ public class DailyStatsAccess {
         return statsForEachActivityList.get(activityPosition);
     }
 
-    public String getActivityStringForSelectedActivity(StatsForEachActivity statsForEachActivity) {
-        return statsForEachActivity.getActivity();
+    public int getActivityPosition() {
+        return activityPositionInDb;
     }
 
     public long getTotalSetTimeForSelectedActivity(StatsForEachActivity statsForEachActivity) {
