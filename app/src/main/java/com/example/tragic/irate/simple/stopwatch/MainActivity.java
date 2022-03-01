@@ -1582,6 +1582,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         saveTotalTdeeTimeAndCalories();
 
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+        //Todo: Rather than query db for day every time, can just compare instance of dayOfYear to previous one, and only query new List object if they differ.
         List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
         DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
 
@@ -1589,6 +1590,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.setTotalBreakTimeFromActivity(totalBreakTimeForCurrentDayInMillis);
         dailyStatsAccess.setTotalCaloriesBurnedFromActivity(totalCaloriesBurnedForCurrentDay);
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(dayHolder);
+
+        Log.i("testdb", "total set time retrieved " + dailyStatsAccess.get);
+
+        Log.i("testdb", "db day ID is " + dayHolder.getDayId());
+        Log.i("testdb", "total set time variable in SAVE METHOD is " + totalSetTimeForCurrentDayInMillis);
+        Log.i("testdb", "total break time variable in SAVE METHOD is " + totalBreakTimeForCurrentDayInMillis);
 
         if (cycleHasActivityAssigned) {
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -1611,7 +1618,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-        Log.i("testSave", "Executed!");
       }
     };
   }
@@ -3239,9 +3245,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
+
+      testDailyStats();
     });
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
+  private void testDailyStats() {
+    int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
+    List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(currentDay);
+    DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
+
+    Log.i("testdb", "total set time is " + dayHolder.getTotalSetTime());
+    Log.i("testdb", "total break time is " + dayHolder.getTotalBreakTime());
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {
@@ -3670,8 +3687,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalBreakTimeForCurrentDayInMillis += millis;
         break;
     };
-    Log.i("testDb", "total set time is " + totalSetTimeForCurrentDayInMillis);
-    Log.i("testDb", "total break time is " + totalBreakTimeForCurrentDayInMillis);
+//    Log.i("testDb", "total set time variable iterating is " + totalSetTimeForCurrentDayInMillis);
+//    Log.i("testDb", "total break time variable iterating is " + totalBreakTimeForCurrentDayInMillis);
   }
 
   private void iterateTotalTimesForSelectedActivity(long millis) {

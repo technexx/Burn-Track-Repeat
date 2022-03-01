@@ -124,7 +124,11 @@ public class DailyStatsAccess {
         this.totalDailyCaloriesBurnedToSave = totalCalories;
     }
 
+    //Todo: Value here are 0, but they are correct in Setter method. They may want to be localized in calling method tho because otherwise they'll be reinstantiated anytime this method is.
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(DayHolder dayHolder) {
+        Log.i("testdb", "db day ID IN ACCESS is " + dayHolder.getDayId());
+        Log.i("testdb", "total set time variable IN ACCESS is " + totalDailySetTimeForActivityToSave);
+        Log.i("testdb", "total break time variable IN ACCESS is " + totalDailyBreakTimeForActivityToSave);
         cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
     }
 
@@ -179,6 +183,7 @@ public class DailyStatsAccess {
         return activityPositionInDb;
     }
 
+    //Todo: Ideally, we would not have this StatForActivity class instantiated here, but called locally from the method. This is how we're handling DayHolder.
     public void retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
         List<StatsForEachActivity> statsList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
@@ -219,8 +224,6 @@ public class DailyStatsAccess {
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay);
     }
-
-
 
     //////////////////Daily Stats Fragment Methods/////////////////////////////////////////////
 
