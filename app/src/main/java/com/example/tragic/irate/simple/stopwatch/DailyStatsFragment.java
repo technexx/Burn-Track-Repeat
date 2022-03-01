@@ -50,13 +50,12 @@ public class DailyStatsFragment extends Fragment {
 
         Button testButton = root.findViewById(R.id.test_button);
 
-        calendar = Calendar.getInstance();
         calendarView = mRoot.findViewById(R.id.stats_calendar);
         dailyStatsAccess = new DailyStatsAccess(getActivity());
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
-        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(calendar.get(Calendar.DAY_OF_YEAR));
+        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(getCurrentDayOfYear());
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -73,7 +72,8 @@ public class DailyStatsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AsyncTask.execute(()-> {
-                    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase((calendar.get(Calendar.DAY_OF_YEAR)));
+                    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(getCurrentDayOfYear());
+                    dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay("Run!");
                 });
                 Toast.makeText(getContext(), "Inserted!", Toast.LENGTH_SHORT).show();
             }
@@ -98,13 +98,15 @@ public class DailyStatsFragment extends Fragment {
         AsyncTask.execute(()-> {
 
             dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayToPopulate);
+
             if (dayHolderList.size()>0) {
                 dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
                 dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
                 getActivity().runOnUiThread(()-> {
-                    dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
                     populateDailyTotalTimesAndCaloriesTextViews();
+
+                    dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
                     dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
                     dailyStatsAdapter.notifyDataSetChanged();
                 });
@@ -122,19 +124,14 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(totalCaloriesBurned)));
     }
 
-    private void updateActivitiesAndStatsListsAndAdapter() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
-        dailyStatsAdapter.notifyDataSetChanged();
-    }
-
     private void instantiateTextViewsAndMiscClasses() {
         dailyStatsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         dailyStatsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
         dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+    }
+
+    private int getCurrentDayOfYear() {
+        calendar = Calendar.getInstance();
+        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 }

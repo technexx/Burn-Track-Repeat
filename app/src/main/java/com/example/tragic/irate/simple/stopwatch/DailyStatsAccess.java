@@ -131,7 +131,7 @@ public class DailyStatsAccess {
 
 
 
-    public void checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition (int daySelected) {
+    public void checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition(int daySelected) {
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
 
