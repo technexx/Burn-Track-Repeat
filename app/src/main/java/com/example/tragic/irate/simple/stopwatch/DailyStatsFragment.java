@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,6 @@ public class DailyStatsFragment extends Fragment {
     View mRoot;
     Calendar calendar;
     CalendarView calendarView;
-    int dayOfYear;
 
     DailyStatsAccess dailyStatsAccess;
     DailyStatsAdapter dailyStatsAdapter;
@@ -56,16 +56,14 @@ public class DailyStatsFragment extends Fragment {
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
-
-        //On Fragment launch, queries + displays current day.
-        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(Calendar.DAY_OF_YEAR);
+        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(calendar.get(Calendar.DAY_OF_YEAR));
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 calendar = Calendar.getInstance(TimeZone.getDefault());
                 calendar.set(year, month, dayOfMonth);
-                dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+                int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
                 queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
             }
@@ -74,7 +72,10 @@ public class DailyStatsFragment extends Fragment {
         testButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                AsyncTask.execute(()-> {
+                    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase((calendar.get(Calendar.DAY_OF_YEAR)));
+                });
+                Toast.makeText(getContext(), "Inserted!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -96,17 +97,18 @@ public class DailyStatsFragment extends Fragment {
     private void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
 
-            dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
-            dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
+            dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayToPopulate);
+            if (dayHolderList.size()>0) {
+                dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
+                dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
-            dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
-
-            getActivity().runOnUiThread(()-> {
-                dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
-                populateDailyTotalTimesAndCaloriesTextViews();
-                dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
-                dailyStatsAdapter.notifyDataSetChanged();
-            });
+                getActivity().runOnUiThread(()-> {
+                    dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
+                    populateDailyTotalTimesAndCaloriesTextViews();
+                    dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
+                    dailyStatsAdapter.notifyDataSetChanged();
+                });
+            }
         });
     }
 
@@ -118,8 +120,6 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(totalSetTime)));
         dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(totalBreakTime)));
         dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(totalCaloriesBurned)));
-
-        Toast.makeText(getContext(), "Day is " + dayOfYear, Toast.LENGTH_SHORT).show();
     }
 
     private void updateActivitiesAndStatsListsAndAdapter() {
