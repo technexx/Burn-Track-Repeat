@@ -61,8 +61,8 @@ public class DailyStatsFragment extends Fragment {
                 calendar = Calendar.getInstance(TimeZone.getDefault());
                 calendar.set(year, month, dayOfMonth);
 
-                int dayOfYear = (dailyStatsAccess.getCurrentDayOfYear());
-                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
+                int daySelected = calendar.get(Calendar.DAY_OF_YEAR);
+                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelected);
             }
         });
 
