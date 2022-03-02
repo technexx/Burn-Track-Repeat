@@ -1588,6 +1588,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
         if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
           dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
+          dailyStatsAccess.setOldDayHolderId(dayOfYear);
         }
 
         dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);

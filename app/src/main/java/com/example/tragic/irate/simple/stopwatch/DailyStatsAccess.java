@@ -105,6 +105,10 @@ public class DailyStatsAccess {
         return mOldDayHolderId;
     }
 
+    public void setOldDayHolderId(int oldId) {
+        this.mOldDayHolderId = oldId;
+    }
+
     public long getDayIdFromDayHolder() {
         return mDayHolder.getDayId();
     }
