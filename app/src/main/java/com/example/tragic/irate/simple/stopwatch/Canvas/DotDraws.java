@@ -519,10 +519,6 @@ public class DotDraws extends View {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }
 
-//  public double dpConvDouble(double pixels) {
-//    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
-//  }
-
   public float dpConvFloat(float pixels) {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
   }

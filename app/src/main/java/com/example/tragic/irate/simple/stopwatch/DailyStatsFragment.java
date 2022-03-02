@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -115,12 +116,12 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void populateDailyTotalTimesAndCaloriesTextViews() {
-        long totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder);
-        long totalBreakTime = dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder);
-        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder);
+        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder));
+        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder));
+        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder)/1000;
 
-        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), String.valueOf(totalSetTime)));
-        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), String.valueOf(totalBreakTime)));
+        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
+        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
         dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned), String.valueOf(totalCaloriesBurned)));
     }
 
@@ -133,5 +134,19 @@ public class DailyStatsFragment extends Fragment {
     private int getCurrentDayOfYear() {
         calendar = Calendar.getInstance();
         return calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private String convertSeconds(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+        totalSeconds = totalSeconds/1000;
+
+        if (totalSeconds >=60) {
+            minutes = totalSeconds/60;
+            remainingSeconds = totalSeconds % 60;
+            return (minutes + ":" + df.format(remainingSeconds));
+        } else if (totalSeconds >=10) return "0:" + totalSeconds;
+        else return "0:0" + totalSeconds;
     }
 }

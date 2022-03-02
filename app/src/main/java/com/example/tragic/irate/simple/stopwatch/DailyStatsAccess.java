@@ -22,17 +22,22 @@ public class DailyStatsAccess {
     CyclesDatabase cyclesDatabase;
     CalendarValues calendarValues = new CalendarValues();
 
+    List<DayHolder> dayHolderList;
+    DayHolder dayHolder;
+    long totalSetTimeForCurrentDayInMillis;
+    long totalBreakTimeForCurrentDayInMillis;
+    double totalCaloriesBurnedForCurrentDay;
+
     List<StatsForEachActivity> statsForEachActivityList;
+    StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
+    long totalDailySetTimeForActivityToSave;
+    long totalDailyBreakTimeForActivityToSave;
+    double totalDailyCaloriesBurnedForActivityToSave;
 
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
     List<Long> totalBreakTimeListForEachActivityForSelectedDay;
     List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
-
-    StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
-    long totalDailySetTimeForActivityToSave;
-    long totalDailyBreakTimeForActivityToSave;
-    double totalDailyCaloriesBurnedForActivityToSave;
 
     boolean activityExistsInDatabase;
     int activityPositionInDb;
@@ -95,6 +100,10 @@ public class DailyStatsAccess {
 
     public DayHolder queryAndSetDayHolderInstanceForSelectedDay(List<DayHolder> dayHolderList) {
         return dayHolderList.get(0);
+    }
+
+    public void setTotalSetTimeFromDayHolder(DayHolder dayHolder) {
+
     }
 
     public long getTotalSetTimeFromDayHolder(DayHolder dayHolder) {

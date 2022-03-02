@@ -301,15 +301,4 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         } else if (totalSeconds >=10) return "0:" + totalSeconds;
         else return "0:0" + totalSeconds;
     }
-
-//    public String convertSeconds(long totalSeconds) {
-//        DecimalFormat df = new DecimalFormat("00");
-//        long minutes;
-//        long remainingSeconds;
-//        totalSeconds = totalSeconds/1000;
-//
-//        minutes = totalSeconds/60;
-//        remainingSeconds = totalSeconds % 60;
-//        return (df.format(minutes) + ":" + df.format(remainingSeconds));
-//    }
 }
