@@ -42,9 +42,6 @@ public class DailyStatsFragment extends Fragment {
     TextView dailyStatsTotalBreakTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
 
-    DayHolder dayHolder;
-    List<DayHolder> dayHolderList;
-
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
@@ -58,14 +55,14 @@ public class DailyStatsFragment extends Fragment {
         instantiateRecyclerViewAndItsAdapter();
         queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dailyStatsAccess.getCurrentDayOfYear());
 
-        //Todo: Clear lists + update adapter on changes.
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 calendar = Calendar.getInstance(TimeZone.getDefault());
                 calendar.set(year, month, dayOfMonth);
 
-                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dailyStatsAccess.getCurrentDayOfYear());
+                int dayOfYear = (dailyStatsAccess.getCurrentDayOfYear());
+                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
             }
         });
 
@@ -99,20 +96,15 @@ public class DailyStatsFragment extends Fragment {
         AsyncTask.execute(()-> {
 
             dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayToPopulate);
-            DayHolder dayHolder = dailyStatsAccess.getDayHolderEntityRowFromSingleDay();
+            dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
-            //Day ID is always at least 1 (1-365).
-            if (dayHolder.getDayId()>0) {
-                dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
+            getActivity().runOnUiThread(()-> {
+                populateDailyTotalTimesAndCaloriesTextViews();
 
-                getActivity().runOnUiThread(()-> {
-                    populateDailyTotalTimesAndCaloriesTextViews();
-
-                    dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
-                    dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
-                    dailyStatsAdapter.notifyDataSetChanged();
-                });
-            }
+                dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
+                dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
+                dailyStatsAdapter.notifyDataSetChanged();
+            });
         });
     }
 

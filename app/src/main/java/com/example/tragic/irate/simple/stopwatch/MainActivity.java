@@ -1596,10 +1596,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
-        Log.i("testdb", "db day ID is " + dailyStatsAccess.getDayIdFromDayHolder());
-        Log.i("testdb", "total set time variable in save method is " + dailyStatsAccess.getTotalSetTimeFromDayHolder());
-
         if (cycleHasActivityAssigned) {
+          dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
+
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
           dailyStatsAccess.setTotalBreakTimeForSelectedActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
           dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
