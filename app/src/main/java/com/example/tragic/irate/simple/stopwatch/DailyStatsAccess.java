@@ -23,9 +23,6 @@ public class DailyStatsAccess {
     CalendarValues calendarValues = new CalendarValues();
 
     List<StatsForEachActivity> statsForEachActivityList;
-    long totalDailySetTimeToSave;
-    long totalDailyBreakTimeToSave;
-    double totalDailyCaloriesBurnedToSave;
 
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
@@ -112,23 +109,7 @@ public class DailyStatsAccess {
         return dayHolder.getTotalCaloriesBurned();
     }
 
-    public void setTotalSetTimeFromActivity(long totalSetTime) {
-        this.totalDailySetTimeToSave = totalSetTime;
-    }
-
-    public void setTotalBreakTimeFromActivity(long totalBreakTime) {
-        this.totalDailyBreakTimeToSave = totalBreakTime;
-    }
-
-    public void setTotalCaloriesBurnedFromActivity(double totalCalories) {
-        this.totalDailyCaloriesBurnedToSave = totalCalories;
-    }
-
-    //Todo: Value here are 0, but they are correct in Setter method. They may want to be localized in calling method tho because otherwise they'll be reinstantiated anytime this method is.
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(DayHolder dayHolder) {
-        Log.i("testdb", "db day ID IN ACCESS is " + dayHolder.getDayId());
-        Log.i("testdb", "total set time variable IN ACCESS is " + totalDailySetTimeForActivityToSave);
-        Log.i("testdb", "total break time variable IN ACCESS is " + totalDailyBreakTimeForActivityToSave);
         cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
     }
 

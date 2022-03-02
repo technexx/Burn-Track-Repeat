@@ -26,9 +26,6 @@ CyclesDao {
     @Update
     void updateDayHolder(DayHolder dayHolder);
 
-    @Query("SELECT * from ActivitiesForEachDay")
-    List<ActivitiesForEachDay> loadAllActivitiesForEachDay();
-
     @Query("SELECT * from StatsForEachActivity")
     List<StatsForEachActivity> loadAllActivitiesAndTheirStatsForAllDays();
 

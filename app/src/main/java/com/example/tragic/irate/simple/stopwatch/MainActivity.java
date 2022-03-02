@@ -1578,6 +1578,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
+        //For individual cycles.
         saveTotalSetAndBreakTimes();
         saveTotalTdeeTimeAndCalories();
 
@@ -1586,16 +1587,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
         DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
 
-        dailyStatsAccess.setTotalSetTimeFromActivity(totalSetTimeForCurrentDayInMillis);
-        dailyStatsAccess.setTotalBreakTimeFromActivity(totalBreakTimeForCurrentDayInMillis);
-        dailyStatsAccess.setTotalCaloriesBurnedFromActivity(totalCaloriesBurnedForCurrentDay);
+        dayHolder.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
+        dayHolder.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
+        dayHolder.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
+
+        cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(dayHolder);
 
-        Log.i("testdb", "total set time retrieved " + dailyStatsAccess.get);
-
         Log.i("testdb", "db day ID is " + dayHolder.getDayId());
+        Log.i("testdb", "db date is " + dayHolder.getDate());
         Log.i("testdb", "total set time variable in SAVE METHOD is " + totalSetTimeForCurrentDayInMillis);
-        Log.i("testdb", "total break time variable in SAVE METHOD is " + totalBreakTimeForCurrentDayInMillis);
+        Log.i("testdb", "pulled set time from db is " + dayHolder.getTotalSetTime());
 
         if (cycleHasActivityAssigned) {
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -1605,7 +1607,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (!timerIsPaused) {
-          mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 1000);
+          mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
         } else {
           mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
         }
