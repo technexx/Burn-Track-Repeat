@@ -18,11 +18,8 @@ public class DailyStatsAccess {
     CyclesDatabase cyclesDatabase;
     CalendarValues calendarValues = new CalendarValues();
 
-    List<DayHolder> mDayHolderList;
     DayHolder mDayHolder;
-    long mTotalSetTimeForCurrentDayInMillis;
-    long mTotalBreakTimeForCurrentDayInMillis;
-    double mTotalCaloriesBurnedForCurrentDay;
+    long mOldDayHolderId;
 
     List<StatsForEachActivity> statsForEachActivityList;
     StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
@@ -101,6 +98,14 @@ public class DailyStatsAccess {
 
     public DayHolder getDayHolderEntityRowFromSingleDay() {
         return mDayHolder;
+    }
+
+    public void setOldDayHolderId() {
+        this.mOldDayHolderId = mDayHolder.getDayId();
+    }
+
+    public long getOldDayHolderId() {
+        return mOldDayHolderId;
     }
 
     public long getDayIdFromDayHolder() {

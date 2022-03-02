@@ -58,6 +58,7 @@ public class DailyStatsFragment extends Fragment {
         instantiateRecyclerViewAndItsAdapter();
         queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(getCurrentDayOfYear());
 
+        //Todo: Clear lists + update adapter on changes.
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
