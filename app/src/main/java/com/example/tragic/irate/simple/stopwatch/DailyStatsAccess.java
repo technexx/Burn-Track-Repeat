@@ -24,10 +24,6 @@ public class DailyStatsAccess {
     List<StatsForEachActivity> statsForEachActivityList;
     StatsForEachActivity mStatsForEachActivity;
 
-    long totalDailySetTimeForActivityToSave;
-    long totalDailyBreakTimeForActivityToSave;
-    double totalDailyCaloriesBurnedForActivityToSave;
-
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
     List<Long> totalBreakTimeListForEachActivityForSelectedDay;
@@ -35,6 +31,7 @@ public class DailyStatsAccess {
 
     boolean activityExistsInDatabase;
     int activityPositionInDb;
+    int mOldActivityPositionInDb;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -174,20 +171,28 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
-    }
-
-    public List<StatsForEachActivity> getStatsForEachActivityList() {
-        return statsForEachActivityList;
-    }
-
     public boolean doesActivityExistInDatabase() {
         return activityExistsInDatabase;
     }
 
     public int getActivityPosition() {
         return activityPositionInDb;
+    }
+
+    public void setOldActivityPositionInDb(int oldActivityPositionInDb) {
+        this.mOldActivityPositionInDb = oldActivityPositionInDb;
+    }
+
+    public int getOldActivityPosition() {
+        return mOldActivityPositionInDb;
+    }
+
+    public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
+        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
+    }
+
+    public List<StatsForEachActivity> getStatsForEachActivityList() {
+        return statsForEachActivityList;
     }
 
     public void retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
