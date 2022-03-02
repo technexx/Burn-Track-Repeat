@@ -1590,7 +1590,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
         }
 
-        //Todo: Not retrieving these values when calling cycle (via launch).
         dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
         dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
         dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
@@ -3248,7 +3247,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
-
     });
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -3261,15 +3259,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCaloriesBurnedForCurrentDay = 0;
     } else {
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-
       dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
+
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
     }
   }
 
-  //Todo: Remove globals here, make local to dailyStatsAccess.
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
     boolean doesActivityExistInDatabase = dailyStatsAccess.doesActivityExistInDatabase();
@@ -3279,15 +3276,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
     } else {
-      int activityPosition = dailyStatsAccess.getActivityPosition();
-
-      List<StatsForEachActivity> statsForEachActivityList = dailyStatsAccess.queryStatsForEachActivityForSingleDay(dayOfYear);
-      StatsForEachActivity statsForEachActivity = dailyStatsAccess.queryAndSetStatsForEachActivityInstanceForSelectedActivity(statsForEachActivityList, activityPosition);
-
-      totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity(statsForEachActivity);
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity(statsForEachActivity);
-      totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity(statsForEachActivity);
-
+      totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
+      totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
+      totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
     }
   }
 

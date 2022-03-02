@@ -21,9 +21,4 @@ public class CalendarValues {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
         return simpleDateFormat.format(calendar.getTime());
     }
-
-    public int getCurrentDayOfYear() {
-        calendar = Calendar.getInstance();
-        return calendar.get(Calendar.DAY_OF_YEAR);
-    }
 }

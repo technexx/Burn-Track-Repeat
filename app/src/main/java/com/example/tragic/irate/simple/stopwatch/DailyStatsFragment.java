@@ -56,7 +56,7 @@ public class DailyStatsFragment extends Fragment {
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
-        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(getCurrentDayOfYear());
+        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dailyStatsAccess.getCurrentDayOfYear());
 
         //Todo: Clear lists + update adapter on changes.
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -64,9 +64,8 @@ public class DailyStatsFragment extends Fragment {
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 calendar = Calendar.getInstance(TimeZone.getDefault());
                 calendar.set(year, month, dayOfMonth);
-                int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
+                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dailyStatsAccess.getCurrentDayOfYear());
             }
         });
 
@@ -74,7 +73,7 @@ public class DailyStatsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AsyncTask.execute(()-> {
-                    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(getCurrentDayOfYear());
+                    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dailyStatsAccess.getCurrentDayOfYear());
                     dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay("Run!");
                 });
                 Toast.makeText(getContext(), "Inserted!", Toast.LENGTH_SHORT).show();
@@ -131,11 +130,6 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         dailyStatsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
         dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
-    }
-
-    private int getCurrentDayOfYear() {
-        calendar = Calendar.getInstance();
-        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 
     private String convertSeconds(long totalSeconds) {
