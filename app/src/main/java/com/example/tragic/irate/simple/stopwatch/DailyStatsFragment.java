@@ -98,10 +98,11 @@ public class DailyStatsFragment extends Fragment {
     private void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
 
-            dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayToPopulate);
+            dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayToPopulate);
+            DayHolder dayHolder = dailyStatsAccess.getDayHolderEntityRowFromSingleDay();
 
-            if (dayHolderList.size()>0) {
-                dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
+            //Day ID is always at least 1 (1-365).
+            if (dayHolder.getDayId()>0) {
                 dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
                 getActivity().runOnUiThread(()-> {
@@ -116,9 +117,9 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void populateDailyTotalTimesAndCaloriesTextViews() {
-        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder));
-        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder));
-        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder)/1000;
+        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolder());
+        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolder());
+        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
 
         dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
         dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));

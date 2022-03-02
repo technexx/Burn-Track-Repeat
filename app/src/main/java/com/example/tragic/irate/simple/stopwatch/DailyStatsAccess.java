@@ -2,11 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import androidx.loader.content.AsyncTaskLoader;
-
-import com.example.tragic.irate.simple.stopwatch.Database.CyclesDao_Impl;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
@@ -22,11 +18,11 @@ public class DailyStatsAccess {
     CyclesDatabase cyclesDatabase;
     CalendarValues calendarValues = new CalendarValues();
 
-    List<DayHolder> dayHolderList;
-    DayHolder dayHolder;
-    long totalSetTimeForCurrentDayInMillis;
-    long totalBreakTimeForCurrentDayInMillis;
-    double totalCaloriesBurnedForCurrentDay;
+    List<DayHolder> mDayHolderList;
+    DayHolder mDayHolder;
+    long mTotalSetTimeForCurrentDayInMillis;
+    long mTotalBreakTimeForCurrentDayInMillis;
+    double mTotalCaloriesBurnedForCurrentDay;
 
     List<StatsForEachActivity> statsForEachActivityList;
     StatsForEachActivity retrievedStatForEachActivityInstanceForSpecificActivityWithinSelectedDay;
@@ -94,32 +90,49 @@ public class DailyStatsAccess {
         }
     }
 
-    public List<DayHolder> queryDayHolderListForSingleDay(int dayToRetrieve) {
-        return cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+    public void setDayHolderEntityRowFromSingleDay(int dayToRetrieve) {
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+        if (dayHolderList.size()>0) {
+            this.mDayHolder = dayHolderList.get(0);
+        } else {
+            this.mDayHolder = new DayHolder();
+        }
     }
 
-    public DayHolder queryAndSetDayHolderInstanceForSelectedDay(List<DayHolder> dayHolderList) {
-        return dayHolderList.get(0);
+    public DayHolder getDayHolderEntityRowFromSingleDay() {
+        return mDayHolder;
     }
 
-    public void setTotalSetTimeFromDayHolder(DayHolder dayHolder) {
-
+    public long getDayIdFromDayHolder() {
+        return mDayHolder.getDayId();
     }
 
-    public long getTotalSetTimeFromDayHolder(DayHolder dayHolder) {
-        return dayHolder.getTotalSetTime();
+    public void setTotalSetTimeFromDayHolder(long totalSetTime) {
+        mDayHolder.setTotalSetTime(totalSetTime);
     }
 
-    public long getTotalBreakTimeFromDayHolder(DayHolder dayHolder) {
-        return dayHolder.getTotalBreakTime();
+    public long getTotalSetTimeFromDayHolder() {
+        return mDayHolder.getTotalSetTime();
     }
 
-    public double getTotalCaloriesBurnedFromDayHolder(DayHolder dayHolder) {
-        return dayHolder.getTotalCaloriesBurned();
+    public void setTotalBreakTimeFromDayHolder(long totalBreakTime) {
+        mDayHolder.setTotalBreakTime(totalBreakTime);
     }
 
-    public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(DayHolder dayHolder) {
-        cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
+    public long getTotalBreakTimeFromDayHolder() {
+        return mDayHolder.getTotalBreakTime();
+    }
+
+    public void setTotalCaloriesBurnedFromDayHolder(double totalCaloriesBurned) {
+        mDayHolder.setTotalCaloriesBurned(totalCaloriesBurned);
+    }
+
+    public double getTotalCaloriesBurnedFromDayHolder() {
+        return mDayHolder.getTotalCaloriesBurned();
+    }
+
+    public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
+        cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
 
 

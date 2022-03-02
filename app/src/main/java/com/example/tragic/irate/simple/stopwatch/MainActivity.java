@@ -1585,20 +1585,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
         //Todo: Rather than query db for day every time, can just compare instance of dayOfYear to previous one, and only query new List object if they differ.
-        List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
-        DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
+        dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
 
-        dayHolder.setTotalSetTime(totalSetTimeForCurrentDayInMillis);
-        dayHolder.setTotalBreakTime(totalBreakTimeForCurrentDayInMillis);
-        dayHolder.setTotalCaloriesBurned(totalCaloriesBurnedForCurrentDay);
+        dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
+        dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
+        dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
 
-        cyclesDatabase.cyclesDao().updateDayHolder(dayHolder);
-        dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase(dayHolder);
+        dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
-        Log.i("testdb", "db day ID is " + dayHolder.getDayId());
-        Log.i("testdb", "db date is " + dayHolder.getDate());
-        Log.i("testdb", "total set time variable in SAVE METHOD is " + totalSetTimeForCurrentDayInMillis);
-        Log.i("testdb", "pulled set time from db is " + dayHolder.getTotalSetTime());
+        Log.i("testdb", "db day ID is " + dailyStatsAccess.getDayIdFromDayHolder());
+        Log.i("testdb", "total set time variable in SAVE METHOD is " + dailyStatsAccess.getTotalSetTimeFromDayHolder());
+        Log.i("testdb", "total set time variable in PULLED is " + dailyStatsAccess.getTotalSetTimeFromDayHolder());
 
         if (cycleHasActivityAssigned) {
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -3249,19 +3246,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 
-      testDailyStats();
     });
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-  }
-
-  private void testDailyStats() {
-    int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
-    List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(currentDay);
-    DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
-
-    Log.i("testdb", "total set time is " + dayHolder.getTotalSetTime());
-    Log.i("testdb", "total break time is " + dayHolder.getTotalBreakTime());
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {
@@ -3272,15 +3259,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
-      List<DayHolder> dayHolderList = dailyStatsAccess.queryDayHolderListForSingleDay(dayOfYear);
-      DayHolder dayHolder = dailyStatsAccess.queryAndSetDayHolderInstanceForSelectedDay(dayHolderList);
-
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder(dayHolder);
-      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder(dayHolder);
-      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder(dayHolder);
+      dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
+      dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
+      dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
+      dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
     }
   }
 
+  //Todo: Remove globals here, make local to dailyStatsAccess.
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
     boolean doesActivityExistInDatabase = dailyStatsAccess.doesActivityExistInDatabase();
