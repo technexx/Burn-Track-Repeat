@@ -1586,7 +1586,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
         //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
-        //Todo: Wrong activity position saved on cycle recall after app launch.
+        //Todo: Wrong activity position saved on cycle recall after app launch. activityPositionInDb defaults to 0.
         if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
           dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
           dailyStatsAccess.setOldDayHolderId(dayOfYear);
@@ -2115,7 +2115,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (currentlyEditingACycle) {
         ResumeOrResetCycle(RESETTING_CYCLE_FROM_ADAPTER);
       }
-      AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable());
+      AsyncTask.execute(()-> {
+        saveAddedOrEditedCycleASyncRunnable();
+      });
 
       roundIsEdited = false;
       Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
@@ -3232,12 +3234,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    if (isNewCycle || saveToDB) {
-      AsyncTask.execute(saveAddedOrEditedCycleASyncRunnable());
-    } else {
-      AsyncTask.execute(queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable());
-    }
-
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
 
@@ -3245,6 +3241,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     populateTimerUI();
 
     AsyncTask.execute(()-> {
+      if (isNewCycle || saveToDB) {
+        saveAddedOrEditedCycleASyncRunnable();
+      } else {
+        queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable();
+      }
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
@@ -3253,7 +3254,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (cycleHasActivityAssigned) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
-        dailyStatsAccess.checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition(dayOfYear);
+        dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
@@ -3294,111 +3295,120 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private Runnable saveAddedOrEditedCycleASyncRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        Gson gson = new Gson();
-        workoutString = "";
-        roundTypeString = "";
-        pomString = "";
+  private void saveAddedOrEditedCycleASyncRunnable() {
+    Gson gson = new Gson();
+    workoutString = "";
+    roundTypeString = "";
+    pomString = "";
 
-        //Needs to be called for current date every time.
-        calendar = Calendar.getInstance();
-        date = simpleDateFormat.format(calendar.getTime());
+    //Needs to be called for current date every time.
+    calendar = Calendar.getInstance();
+    date = simpleDateFormat.format(calendar.getTime());
 
-        int cycleID;
-        if (mode==1) {
-          if (isNewCycle) {
-            cycles = new Cycles();
-          } else if (cyclesList.size()>0) {
-            cycleID = cyclesList.get(positionOfSelectedCycle).getId();
-            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-          }
-          workoutString = gson.toJson(workoutTime);
-          workoutString = friendlyString(workoutString);
-          roundTypeString = gson.toJson(typeOfRound);
-          roundTypeString = friendlyString(roundTypeString);
-
-          if (cycleHasActivityAssigned) {
-            cycles.setTdeeActivityExists(true);
-            cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
-            cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
-            cycles.setTdeeValuePosition(selectedTdeeValuePosition);
-          } else {
-            cycles.setTdeeActivityExists(false);
-            cycles.setTdeeCatPosition(0);
-            cycles.setTdeeValuePosition(0);
-          }
-          if (!workoutString.equals("")) {
-            cycles.setWorkoutRounds(workoutString);
-            cycles.setRoundType(roundTypeString);
-            cycles.setTimeAccessed(System.currentTimeMillis());
-            cycles.setItemCount(workoutTime.size());
-            if (isNewCycle) {
-              if (cycleTitle.isEmpty()) {
-                cycleTitle = date;
-              }
-              cycles.setTimeAdded(System.currentTimeMillis());
-              cycles.setTotalSetTime(0);
-              cycles.setTotalBreakTime(0);
-              cycles.setCyclesCompleted(0);
-              cycles.setTitle(cycleTitle);
-
-              cyclesDatabase.cyclesDao().insertCycle(cycles);
-              editCycleArrayLists(ADDING_CYCLE);
-            } else {
-              cycles.setTitle(cycleTitle);
-              cyclesDatabase.cyclesDao().updateCycles(cycles);
-              editCycleArrayLists(EDITING_CYCLE);
-            }
-          }
-        }
-        if (mode==3) {
-          if (isNewCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
-            cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
-            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
-          }
-          pomString = gson.toJson(pomValuesTime);
-          pomString = friendlyString(pomString);
-
-          if (!pomString.equals("")) {
-            pomCycles.setFullCycle(pomString);
-            pomCycles.setTimeAccessed(System.currentTimeMillis());
-            if (isNewCycle) {
-              pomCycles.setTimeAdded(System.currentTimeMillis());
-              pomCycles.setTitle(cycleTitle);
-              cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
-              //Adding to adapter list.
-              editCycleArrayLists(ADDING_CYCLE);
-            } else {
-              pomCycles.setTitle(cycleTitle);
-              cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-              editCycleArrayLists(EDITING_CYCLE);
-            }
-          }
-        }
-        loadCycleListsFromDatabase();
-        runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
+    int cycleID;
+    if (mode==1) {
+      if (isNewCycle) {
+        cycles = new Cycles();
+      } else if (cyclesList.size()>0) {
+        cycleID = cyclesList.get(positionOfSelectedCycle).getId();
+        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
-    };
+      workoutString = gson.toJson(workoutTime);
+      workoutString = friendlyString(workoutString);
+      roundTypeString = gson.toJson(typeOfRound);
+      roundTypeString = friendlyString(roundTypeString);
+
+      if (cycleHasActivityAssigned) {
+        cycles.setTdeeActivityExists(true);
+        cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
+        cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
+        cycles.setTdeeValuePosition(selectedTdeeValuePosition);
+      } else {
+        cycles.setTdeeActivityExists(false);
+        cycles.setTdeeCatPosition(0);
+        cycles.setTdeeValuePosition(0);
+      }
+      if (!workoutString.equals("")) {
+        cycles.setWorkoutRounds(workoutString);
+        cycles.setRoundType(roundTypeString);
+        cycles.setTimeAccessed(System.currentTimeMillis());
+        cycles.setItemCount(workoutTime.size());
+        if (isNewCycle) {
+          if (cycleTitle.isEmpty()) {
+            cycleTitle = date;
+          }
+          cycles.setTimeAdded(System.currentTimeMillis());
+          cycles.setTotalSetTime(0);
+          cycles.setTotalBreakTime(0);
+          cycles.setCyclesCompleted(0);
+          cycles.setTitle(cycleTitle);
+
+          cyclesDatabase.cyclesDao().insertCycle(cycles);
+          editCycleArrayLists(ADDING_CYCLE);
+        } else {
+          cycles.setTitle(cycleTitle);
+          cyclesDatabase.cyclesDao().updateCycles(cycles);
+          editCycleArrayLists(EDITING_CYCLE);
+        }
+      }
+    }
+    if (mode==3) {
+      if (isNewCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
+        cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
+        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+      }
+      pomString = gson.toJson(pomValuesTime);
+      pomString = friendlyString(pomString);
+
+      if (!pomString.equals("")) {
+        pomCycles.setFullCycle(pomString);
+        pomCycles.setTimeAccessed(System.currentTimeMillis());
+        if (isNewCycle) {
+          pomCycles.setTimeAdded(System.currentTimeMillis());
+          pomCycles.setTitle(cycleTitle);
+          cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
+          //Adding to adapter list.
+          editCycleArrayLists(ADDING_CYCLE);
+        } else {
+          pomCycles.setTitle(cycleTitle);
+          cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+          editCycleArrayLists(EDITING_CYCLE);
+        }
+      }
+    }
+    loadCycleListsFromDatabase();
+    runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
   }
 
-  private Runnable queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable() {
-    return new Runnable() {
+  private void queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable() {
+    if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+    if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+
+    retrieveTdeeTimeAndCaloriesValuesFromDatabaseEntity();
+
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-        if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
-            retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView();
-          }
-        });
+        toggleTdeeTextViewVisibility();
+        displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly();
+        retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
       }
-    };
+    });
+  }
+
+  private void retrieveTdeeTimeAndCaloriesValuesFromDatabaseEntity() {
+    cycles = cyclesList.get(positionOfSelectedCycle);
+
+    totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
+    burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
+
+    selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
+    selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
+    selectedTdeeValuePosition = cycles.getTdeeValuePosition();
+
+    metScore = retrieveMetScoreFromSubCategoryPosition();
+
+    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
   }
 
   private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
@@ -3428,23 +3438,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_set_time.setText(convertSeconds(totalSetTime));
     total_break_time.setText(convertSeconds(totalBreakTime));
     cycles_completed.setText(getString(R.string.cycles_done, String.valueOf(cyclesCompleted)));
-  }
-
-  private void retrieveTdeeTimeAndCalorieStatsAndSetTheirTextView() {
-    cycles = cyclesList.get(positionOfSelectedCycle);
-
-    totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
-    burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-
-    selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
-    selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
-    selectedTdeeValuePosition = cycles.getTdeeValuePosition();
-
-    metScore = retrieveMetScoreFromSubCategoryPosition();
-
-    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
-    toggleTdeeTextViewVisibility();
-    displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly();
   }
 
   private void loadCycleListsFromDatabase() {
