@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.R;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     List<Long> mSetTimes;
     List<Long> mBreakTimes;
     List<Double> mCaloriesBurned;
+    LongToStringConverters longToStringConverters = new LongToStringConverters();
 
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
@@ -54,8 +56,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 //            activityViewHolder.activity.setPaintFlags(activityViewHolder.activity.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
         } else {
             activityViewHolder.activity.setText(mActivities.get(position-1));
-            activityViewHolder.setTime.setText(String.valueOf(mSetTimes.get(position+-1)));
-            activityViewHolder.breakTime.setText(String.valueOf(mBreakTimes.get(position-1)));
+            activityViewHolder.setTime.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
+            activityViewHolder.breakTime.setText(longToStringConverters.convertSeconds(mBreakTimes.get(position-1)));
             activityViewHolder.caloriesBurned.setText(String.valueOf(mCaloriesBurned.get(position-1)));
 
             activityViewHolder.activity.setTypeface(Typeface.DEFAULT);

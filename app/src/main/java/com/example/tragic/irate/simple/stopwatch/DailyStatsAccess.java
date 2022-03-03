@@ -206,7 +206,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: Entity is returning null on timer exit.
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(totalSetTime);
     }
