@@ -1586,9 +1586,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
         //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
+        //Todo: Wrong activity position saved on cycle recall after app launch.
         if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
           dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
           dailyStatsAccess.setOldDayHolderId(dayOfYear);
+
+          dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
+          dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         }
 
         dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
@@ -1603,7 +1607,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           if (currentActivityPosition!=oldActivityPosition) {
             dailyStatsAccess.setOldActivityPositionInDb(currentActivityPosition);
-            dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
           }
 
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
