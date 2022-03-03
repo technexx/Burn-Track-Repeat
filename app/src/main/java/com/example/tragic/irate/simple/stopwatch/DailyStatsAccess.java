@@ -13,7 +13,6 @@ import java.util.Calendar;
 import java.util.List;
 
 public class DailyStatsAccess {
-    MainActivity mainActivity;
     Context mContext;
     CyclesDatabase cyclesDatabase;
     CalendarValues calendarValues = new CalendarValues();
@@ -30,18 +29,17 @@ public class DailyStatsAccess {
     List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
 
     boolean activityExistsInDatabase;
+    String mActivityString;
     int activityPositionInDb;
     int mOldActivityPositionInDb;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
-        instantiateMainActivityAndDailyStatsDatabase();
+        instantiateDailyStatsDatabase();
         instantiateArrayListsOfActivitiesAndTheirStats();
     }
 
-    private void instantiateMainActivityAndDailyStatsDatabase() {
-        mainActivity = new MainActivity();
-
+    private void instantiateDailyStatsDatabase() {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -145,13 +143,17 @@ public class DailyStatsAccess {
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
 
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            if (mainActivity.getTdeeActivityStringFromArrayPosition().equals(statsForEachActivityList.get(i).getActivity())) {
+            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInDb = i;
                 activityExistsInDatabase = true;
             } else {
                 activityExistsInDatabase = false;
             }
         }
+    }
+
+    public void setActivityString(String activityString) {
+        this.mActivityString = activityString;
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -204,6 +206,7 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: Entity is returning null on timer exit.
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(totalSetTime);
     }

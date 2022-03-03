@@ -3245,11 +3245,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
+      dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (cycleHasActivityAssigned) {
+        dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.checkIfActivityAlreadyExistsInDatabaseForSelectedDayAndSetActivityPosition(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
+        dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
@@ -4625,6 +4628,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String[] subCategoryList = subCategoryArray.get(selectedTdeeCategoryPosition);
     return (String) subCategoryList[selectedTdeeSubCategoryPosition];
   }
+
+
 
   private String formatCalorieString(double calories) {
     DecimalFormat df = new DecimalFormat("#.#");
