@@ -747,22 +747,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.daily_stats:
-        mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-        mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
-
-        //Fragment is never dismissed, so we simply refresh it IF it is already attached/visible.
-        if (dailyStatsFragment.isVisible()) {
-        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        dailyStatsFragment.queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
-      }
-
-        fragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
-                .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
-                .commit();
+        launchDailyStatsFragment();
         break;
       case R.id.global_settings:
-        launchGlobalSettings();
+        launchGlobalSettingsFragment();
         break;
       case R.id.delete_all_cycles:
         if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
@@ -1986,7 +1974,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
-  private void launchGlobalSettings() {
+  private void launchDailyStatsFragment() {
+    mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+    //Fragment is never dismissed, so we simply refresh it IF it is already attached/visible.
+    if (dailyStatsFragment.isVisible()) {
+      int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+      dailyStatsFragment.queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
+    }
+
+    fragmentManager.beginTransaction()
+            .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
+            .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
+            .commit();
+  }
+
+  private void launchGlobalSettingsFragment() {
     mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
     mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
