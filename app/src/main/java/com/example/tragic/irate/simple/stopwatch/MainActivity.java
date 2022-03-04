@@ -602,7 +602,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void changeColorSetting(int receivedMode, int typeOFRound, int settingNumber) {
-
     cycleRoundsAdapter.changeColorSetting(typeOFRound, settingNumber);
     if (receivedMode==1) {
       savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
@@ -752,6 +751,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case R.id.daily_stats:
         mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
         mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+        //Fragment is never dismissed, so we simply refresh it IF it is already attached/visible.
+        if (dailyStatsFragment.isVisible()) {
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        dailyStatsFragment.queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
+      }
 
         fragmentManager.beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)

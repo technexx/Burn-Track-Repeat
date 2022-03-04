@@ -42,6 +42,7 @@ public class DailyStatsFragment extends Fragment {
     TextView dailyStatsTotalBreakTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
 
+    //Todo: Fragment is not being re-instantiated, which is why adapter isn't updating. Just call notify on .replace.
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
@@ -92,9 +93,10 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    private void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
-        AsyncTask.execute(()-> {
+    public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
+        Log.i("testFrag", "method run!");
 
+        AsyncTask.execute(()-> {
             dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayToPopulate);
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
