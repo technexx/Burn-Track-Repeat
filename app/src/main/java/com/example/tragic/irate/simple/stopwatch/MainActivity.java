@@ -508,6 +508,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
+  //Todo: Ghosting as our Settings/Daily Stats fragments replace each other.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Main's buttons (Stopwatch, FAB) are accessible when Fragments' framelayout is overlayed - we can probably correct this by ensuring the frame layout has focus.
   //Todo: Remove sort/triple dots when not in Main (e.g. Settings Fragment, Edit PopUp).
@@ -759,7 +760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
         fragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
+                .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
                 .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
                 .commit();
         break;
@@ -1250,10 +1251,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mainActivityFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     mainActivityFragmentFrameLayout.setVisibility(View.GONE);
 
-//    getSupportFragmentManager().beginTransaction()
-//            .add((R.id.settings_fragment_frameLayout), rootSettingsFragment)
-//            .commit();
-
+    //Fragment is attached with an invisible FrameLayout. Can simply replace fragments as needed.
+    getSupportFragmentManager().beginTransaction()
+            .attach(rootSettingsFragment)
+            .commit();
   }
 
   private void assignTdeePopUpLayoutClassesToTheirIds() {
@@ -1994,8 +1995,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (rootSettingsFragment !=null) {
       getSupportFragmentManager().beginTransaction()
-              .setCustomAnimations(R.anim.slide_in_from_bottom, R.anim.slide_in_from_bottom)
-              .attach(rootSettingsFragment)
+              .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
+              .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
     }
   }

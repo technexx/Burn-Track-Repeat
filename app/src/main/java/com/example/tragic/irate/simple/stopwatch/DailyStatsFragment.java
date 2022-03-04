@@ -94,8 +94,6 @@ public class DailyStatsFragment extends Fragment {
     }
 
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
-        Log.i("testFrag", "method run!");
-
         AsyncTask.execute(()-> {
             dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayToPopulate);
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
