@@ -508,16 +508,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Ghosting as our Settings/Daily Stats fragments replace each other.
-  //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
-  //Todo: Main's buttons (Stopwatch, FAB) are accessible when Fragments' framelayout is overlayed - we can probably correct this by ensuring the frame layout has focus.
-  //Todo: Remove sort/triple dots when not in Main (e.g. Settings Fragment, Edit PopUp).
+  //Todo: Slide effect remains when launching Fragments via Main - so we see old one being slid out. Just attach/de-attach?
+  //Todo: Remove sort and change onOptionsSelected menu when in Main.
   //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
-  //Todo: Retrieval method for activity/times/calories for daily cycle stuff every time cycle launches.
-  //Todo: Should remove visibility on Sort/Triple Dots when not in Main (Settings, Edit popUp, etc.).
+  //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Figure our layout params for checkmark.
+  //Todo: Figure out layout params for checkmark.
   //Todo: Test all notifications.
 
   //Todo: Track calories by day, week, etc. We do need a new class for this, as each row will represent a day as opposed to a specific cycle. We can set this as a new TAB.
