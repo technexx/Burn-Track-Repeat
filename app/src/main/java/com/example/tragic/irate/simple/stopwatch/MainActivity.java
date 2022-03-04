@@ -570,6 +570,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
       mainActivityFragmentFrameLayout.setVisibility(View.GONE);
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
+      sortButton.setVisibility(View.VISIBLE);
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
@@ -1975,19 +1976,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchDailyStatsFragment() {
-    mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
-
-    //Fragment is never dismissed, so we simply refresh it IF it is already attached/visible.
-    if (dailyStatsFragment.isVisible()) {
+    if (!dailyStatsFragment.isVisible()) {
+      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+      fragmentManager.beginTransaction()
+              .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
+              .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
+              .commit();
+      sortButton.setVisibility(View.INVISIBLE);
+    } else {
       int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
       dailyStatsFragment.queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
     }
-
-    fragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
-            .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
-            .commit();
   }
 
   private void launchGlobalSettingsFragment() {
@@ -2000,6 +2000,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
     }
+    sortButton.setVisibility(View.INVISIBLE);
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
