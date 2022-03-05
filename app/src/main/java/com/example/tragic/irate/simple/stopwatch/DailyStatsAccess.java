@@ -83,7 +83,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setDayHolderEntityRowFromSingleDay(int dayToRetrieve) {
+    public void assignDayHolderEntityRowFromSingleDay(int dayToRetrieve) {
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         if (dayHolderList.size()>0) {
             this.mDayHolder = dayHolderList.get(0);
@@ -232,6 +232,10 @@ public class DailyStatsAccess {
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+    }
+
+    public void deleteDayHolderEntity(DayHolder dayHolder) {
+        cyclesDatabase.cyclesDao().deleteDayHolder(dayHolder);
     }
 
 

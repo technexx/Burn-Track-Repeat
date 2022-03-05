@@ -514,7 +514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Dismissing daily cycle stats fragment does not render it invisible right now, so it does not re-appear when clicking to access it again.
+  //Todo: onOptionsSelected logic for Daily Stats Fragment.
   //Todo: In Settings onOptions: TBD.
   //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -1605,7 +1605,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
         if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
-          dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
+          dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
           dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
           dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
@@ -2003,23 +2003,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTypeOFMenu(int menuType) {
     mMenuType = menuType;
   }
-
-  private void launchDailyStatsFragment() {
-    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
-      fragmentManager.beginTransaction()
-              .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
-              .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
-              .commit();
-      sortButton.setVisibility(View.INVISIBLE);
-      setTypeOFMenu(DAILY_SETTINGS_MENU);
-    } else {
-      int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-      dailyStatsFragment.queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
-    }
-  }
-
   private void launchGlobalSettingsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
@@ -2033,6 +2016,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       sortButton.setVisibility(View.INVISIBLE);
     }
+  }
+
+  private void launchDailyStatsFragment() {
+    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
+      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+      fragmentManager.beginTransaction()
+              .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
+              .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
+              .commit();
+      sortButton.setVisibility(View.INVISIBLE);
+      setTypeOFMenu(DAILY_SETTINGS_MENU);
+    } else {
+      refreshDailyStats();
+    }
+  }
+
+  private void refreshDailyStats() {
+    int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+    dailyStatsFragment.queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
+  }
+
+  private void deleteDailyStatsForSelectedDay() {
+    AsyncTask.execute(()->{
+      int daySelected = dailyStatsFragment.getDaySelectedFromCalendar();
+      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(daySelected);
+
+      DayHolder dayHolder = dailyStatsAccess.getDayHolderEntityRowFromSingleDay();
+      dailyStatsAccess.deleteDayHolderEntity(dayHolder);
+
+      refreshDailyStats();
+    });
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
@@ -3289,7 +3304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
-      dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (cycleHasActivityAssigned) {
@@ -3312,7 +3327,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCaloriesBurnedForCurrentDay = 0;
     } else {
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-      dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();

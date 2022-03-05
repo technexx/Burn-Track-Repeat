@@ -47,6 +47,9 @@ CyclesDao {
     @Update
     void updateStatsForEachActivity(StatsForEachActivity statsForEachActivity);
 
+    @Delete
+    void deleteDayHolder(DayHolder dayHolder);
+
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
 

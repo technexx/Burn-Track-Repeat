@@ -33,6 +33,7 @@ public class DailyStatsFragment extends Fragment {
     View mRoot;
     Calendar calendar;
     CalendarView calendarView;
+    int daySelectedFromCalendar;
 
     DailyStatsAccess dailyStatsAccess;
     DailyStatsAdapter dailyStatsAdapter;
@@ -42,7 +43,6 @@ public class DailyStatsFragment extends Fragment {
     TextView dailyStatsTotalBreakTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
 
-    //Todo: Fragment is not being re-instantiated, which is why adapter isn't updating. Just call notify on .replace.
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
@@ -62,8 +62,8 @@ public class DailyStatsFragment extends Fragment {
                 calendar = Calendar.getInstance(TimeZone.getDefault());
                 calendar.set(year, month, dayOfMonth);
 
-                int daySelected = calendar.get(Calendar.DAY_OF_YEAR);
-                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelected);
+                daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
+                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelectedFromCalendar);
             }
         });
 
@@ -81,6 +81,10 @@ public class DailyStatsFragment extends Fragment {
         return root;
     }
 
+    public int getDaySelectedFromCalendar() {
+        return daySelectedFromCalendar;
+    }
+
     private void instantiateRecyclerViewAndItsAdapter() {
         dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedForEachActivityForSelectedDay);
 
@@ -95,7 +99,7 @@ public class DailyStatsFragment extends Fragment {
 
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
-            dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayToPopulate);
+            dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayToPopulate);
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
             getActivity().runOnUiThread(()-> {
