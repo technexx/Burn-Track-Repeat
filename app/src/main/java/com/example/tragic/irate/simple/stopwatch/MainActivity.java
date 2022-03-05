@@ -106,6 +106,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
 
+  Menu onOptionsMenu;
+  int mMenuType;
+  int DEFAULT_MENU = 0;
+  int DAILY_SETTINGS_MENU = 1;
+  int SETTINGS_MENU = 2;
+
   DailyStatsAccess dailyStatsAccess;
   FragmentManager fragmentManager;
   TabLayout savedCyclesTabLayout;
@@ -508,8 +514,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Slide effect remains when launching Fragments via Main - so we see old one being slid out. Just attach/de-attach?
-  //Todo: Remove sort and change onOptionsSelected menu when in Main.
+  //Todo: Dismissing daily cycle stats fragment does not render it invisible right now, so it does not re-appear when clicking to access it again.
+  //Todo: In Settings onOptions: TBD.
   //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -562,15 +568,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onBackPressed() {
-    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.GONE) {
+    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       moveTaskToBack(false);
       return;
     }
 
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
-      mainActivityFragmentFrameLayout.setVisibility(View.GONE);
+      mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
       sortButton.setVisibility(View.VISIBLE);
+      setTypeOFMenu(DEFAULT_MENU);
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
@@ -579,6 +586,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
     }
+  }
+
+  @SuppressLint("NonConstantResourceId")
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.daily_stats:
+        launchDailyStatsFragment();
+        break;
+      case R.id.global_settings:
+        launchGlobalSettingsFragment();
+        break;
+      case R.id.delete_all_cycles:
+        if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
+          Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
+        } else {
+          delete_all_text.setText(R.string.delete_all_cycles);
+          deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
+        }
+        break;
+
+      case R.id.refresh_daily_stats:
+        break;
+      case R.id.delete_single_day_from_daily_stats:
+        break;
+      case R.id.delete_all_days_from_daily_stats:
+        break;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    menu.clear();
+    if (mMenuType==DEFAULT_MENU) {
+      getMenuInflater().inflate(R.menu.main_options_menu, menu);
+    }
+    if (mMenuType==DAILY_SETTINGS_MENU) {
+      getMenuInflater().inflate(R.menu.daily_stats_options_menu, menu);
+    }
+    return super.onPrepareOptionsMenu(menu);
   }
 
   @Override
@@ -741,28 +789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     MenuInflater inflater = getMenuInflater();
     inflater.inflate(R.menu.main_options_menu, menu);
     return true;
-  }
-
-  @SuppressLint("NonConstantResourceId")
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case R.id.daily_stats:
-        launchDailyStatsFragment();
-        break;
-      case R.id.global_settings:
-        launchGlobalSettingsFragment();
-        break;
-      case R.id.delete_all_cycles:
-        if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
-          Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
-        } else {
-          delete_all_text.setText(R.string.delete_all_cycles);
-          deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
-        }
-        break;
-    }
-    return super.onOptionsItemSelected(item);
   }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
@@ -1235,7 +1261,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     colorSettingsFragment.colorSetting(MainActivity.this);
 
     mainActivityFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
-    mainActivityFragmentFrameLayout.setVisibility(View.GONE);
+    mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
 
     //Fragment is attached with an invisible FrameLayout. Can simply replace fragments as needed.
     getSupportFragmentManager().beginTransaction()
@@ -1578,7 +1604,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
         //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
-        //Todo: Wrong activity position saved on cycle recall after app launch. activityPositionInDb defaults to 0.
         if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
           dailyStatsAccess.setDayHolderEntityRowFromSingleDay(dayOfYear);
           dailyStatsAccess.setOldDayHolderId(dayOfYear);
@@ -1975,8 +2000,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
+  private void setTypeOFMenu(int menuType) {
+    mMenuType = menuType;
+  }
+
   private void launchDailyStatsFragment() {
-    if (!dailyStatsFragment.isVisible()) {
+    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
       mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
       fragmentManager.beginTransaction()
@@ -1984,6 +2013,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
               .commit();
       sortButton.setVisibility(View.INVISIBLE);
+      setTypeOFMenu(DAILY_SETTINGS_MENU);
     } else {
       int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
       dailyStatsFragment.queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dayOfYear);
@@ -1991,16 +2021,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchGlobalSettingsFragment() {
-    mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
-    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
+      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
-    if (rootSettingsFragment !=null) {
-      getSupportFragmentManager().beginTransaction()
-              .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
-              .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
-              .commit();
+      if (rootSettingsFragment !=null) {
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
+                .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
+                .commit();
+      }
+      sortButton.setVisibility(View.INVISIBLE);
     }
-    sortButton.setVisibility(View.INVISIBLE);
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
