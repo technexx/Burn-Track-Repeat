@@ -608,10 +608,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
 
       case R.id.refresh_daily_stats:
+        AsyncTask.execute(()-> {
+          refreshDailyStats();
+        });
         break;
       case R.id.delete_single_day_from_daily_stats:
+        AsyncTask.execute(()-> {
+          deleteDailyStatsForSelectedDay();
+        });
         break;
       case R.id.delete_all_days_from_daily_stats:
+        AsyncTask.execute(()-> {
+          deleteDailyStatsForAllDays();
+        });
         break;
     }
     return super.onOptionsItemSelected(item);
@@ -1609,7 +1618,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
           dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
-          dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+          dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         }
 
         dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
@@ -2039,15 +2048,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteDailyStatsForSelectedDay() {
-    AsyncTask.execute(()->{
-      int daySelected = dailyStatsFragment.getDaySelectedFromCalendar();
-      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(daySelected);
+    int daySelected = dailyStatsFragment.getDaySelectedFromCalendar();
 
-      DayHolder dayHolder = dailyStatsAccess.getDayHolderEntityRowFromSingleDay();
-      dailyStatsAccess.deleteDayHolderEntity(dayHolder);
+    dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(daySelected);
+    DayHolder dayHolder = dailyStatsAccess.getDayHolderEntity();
+    dailyStatsAccess.deleteDayHolderEntity(dayHolder);
 
-      refreshDailyStats();
-    });
+    dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(daySelected);
+    StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
+
+    refreshDailyStats();
+  }
+
+  private void deleteDailyStatsForAllDays() {
+    dailyStatsAccess.deleteAllDayHolderEntries();
+    dailyStatsAccess.deleteAllStatsForEachActivityEntries();
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
@@ -3312,7 +3327,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
-        dailyStatsAccess.retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
     });

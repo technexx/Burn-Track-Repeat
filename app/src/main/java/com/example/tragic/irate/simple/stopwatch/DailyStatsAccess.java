@@ -92,7 +92,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public DayHolder getDayHolderEntityRowFromSingleDay() {
+    public DayHolder getDayHolderEntity() {
         return mDayHolder;
     }
 
@@ -136,6 +136,13 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
 
+    public void deleteDayHolderEntity(DayHolder dayHolder) {
+        cyclesDatabase.cyclesDao().deleteDayHolder(dayHolder);
+    }
+
+    public void deleteAllDayHolderEntries() {
+        cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
+    }
 
 
     public void setActivityPositionAndExistenceOfActivityInDatabaseBoolean(int daySelected) {
@@ -193,11 +200,11 @@ public class DailyStatsAccess {
         statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    public List<StatsForEachActivity> getStatsForEachActivityList() {
-        return statsForEachActivityList;
+    public StatsForEachActivity getStatsForEachActivityEntity() {
+        return mStatsForEachActivity;
     }
 
-    public void retrieveStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
+    public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (statsForEachActivityList.size() >= activityPositionInDb+1) {
             mStatsForEachActivity = statsForEachActivityList.get(activityPositionInDb);
@@ -234,10 +241,13 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
-    public void deleteDayHolderEntity(DayHolder dayHolder) {
-        cyclesDatabase.cyclesDao().deleteDayHolder(dayHolder);
+    public void deleteStatForEachActivityEntity() {
+        cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
     }
 
+    public void deleteAllStatsForEachActivityEntries() {
+        cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
+    }
 
     //////////////////Daily Stats Fragment Methods/////////////////////////////////////////////
     public void queryStatsForEachActivityForSelectedDay(int daySelected) {

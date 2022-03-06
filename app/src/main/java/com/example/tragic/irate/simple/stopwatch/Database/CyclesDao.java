@@ -26,14 +26,20 @@ CyclesDao {
     @Update
     void updateDayHolder(DayHolder dayHolder);
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertDay(DayHolder dayHolder);
+
+    @Delete
+    void deleteDayHolder(DayHolder dayHolder);
+
+    @Query("DELETE from DayHolder")
+    void deleteAllDayHolderEntries();
+
     @Query("SELECT * from StatsForEachActivity")
     List<StatsForEachActivity> loadAllActivitiesAndTheirStatsForAllDays();
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertDay(DayHolder dayHolder);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertActivitiesForEachDay(ActivitiesForEachDay activitiesForEachDay);
@@ -42,13 +48,13 @@ CyclesDao {
     void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
 
     @Update
-    void updateActivitiesForEachDay(ActivitiesForEachDay activitiesForEachDay);
-
-    @Update
     void updateStatsForEachActivity(StatsForEachActivity statsForEachActivity);
 
     @Delete
-    void deleteDayHolder(DayHolder dayHolder);
+    void deleteStatsForEachActivity(StatsForEachActivity statsForEachActivity);
+
+    @Query("DELETE from StatsForEachActivity")
+    void deleteAllStatsForEachActivityEntries();
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
