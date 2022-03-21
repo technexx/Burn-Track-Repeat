@@ -101,7 +101,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
@@ -692,6 +692,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Toggle.
+  @Override
+  public void toggleTdeeMode(boolean tdeeToggle) {
+    cycleHasActivityAssigned = tdeeToggle;
+  }
+
   @Override
   public void onCycleClick(int position) {
     //Active cycle option will automatically be removed if accessing new cycle.
@@ -702,7 +708,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     populateCycleAdapterArrayList();
     launchTimerCycle(false);
-//    resetTimer();
   }
 
   @Override
@@ -1387,6 +1392,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
     savedCycleRecycler.setAdapter(savedCycleAdapter);
     savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
+    savedCycleAdapter.setTdeeToggle(MainActivity.this);
     savedCycleAdapter.setItemClick(MainActivity.this);
     savedCycleAdapter.setHighlight(MainActivity.this);
     savedCycleAdapter.setResumeOrResetCycle(MainActivity.this);

@@ -50,6 +50,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
   onResumeOrResetCycle mOnResumeOrResetCycle;
+  onTdeeModeToggle mOnTdeeModeToggle;
 
   int RESUMING_CYCLE_FROM_TIMER = 1;
   int RESETTING_CYCLE_FROM_TIMER = 2;
@@ -70,6 +71,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int SET_COLOR;
   int BREAK_COLOR;
 
+  boolean isTdeeModeActive;
+
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
     if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -87,24 +90,32 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     void onCycleClick (int position);
   }
 
-  public interface onHighlightListener {
-    void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
-  }
-
-  public interface onResumeOrResetCycle{
-    void ResumeOrResetCycle(int resumingOrResetting);
-  }
-
   public void setItemClick(onCycleClickListener xOnCycleClickListener) {
     this.mOnCycleClickListener = xOnCycleClickListener;
+  }
+
+  public interface onHighlightListener {
+    void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
   }
 
   public void setHighlight(onHighlightListener xOnHighlightListener) {
     this.mOnHighlightListener = xOnHighlightListener;
   }
 
+  public interface onResumeOrResetCycle {
+    void ResumeOrResetCycle(int resumingOrResetting);
+  }
+
   public void setResumeOrResetCycle(onResumeOrResetCycle xOnResumeOrResetCycle) {
     this.mOnResumeOrResetCycle = xOnResumeOrResetCycle;
+  }
+
+  public interface onTdeeModeToggle {
+    void toggleTdeeMode(boolean tdeeToggle);
+  }
+
+  public void setTdeeToggle(onTdeeModeToggle xOnTdeeModeToggle) {
+    this.mOnTdeeModeToggle = xOnTdeeModeToggle;
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
@@ -308,6 +319,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
       return true;
     });
+
+    workoutHolder.tdeeToggle.setOnClickListener(v-> {
+      toggleTdeeMode();
+      workoutHolder.tdeeToggle.setAlpha(setTdeeModeTextViewAlpha());
+      mOnTdeeModeToggle.toggleTdeeMode(isTdeeModeActive);
+    });
   }
 
   @Override
@@ -316,19 +333,29 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public class WorkoutHolder extends RecyclerView.ViewHolder {
+    public View fullView;
     public TextView workoutName;
     public TextView workOutCycle;
-    public View fullView;
     public TextView resetCycle;
+    public TextView tdeeToggle;
 
     @SuppressLint("ResourceAsColor")
     public WorkoutHolder(@NonNull View itemView) {
       super(itemView) ;
+      fullView = itemView;
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
-      fullView = itemView;
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
+      tdeeToggle = itemView.findViewById(R.id.tdee_toggle);
     }
+  }
+
+  private void toggleTdeeMode() {
+    isTdeeModeActive = !isTdeeModeActive;
+  }
+
+  private float setTdeeModeTextViewAlpha() {
+    if (isTdeeModeActive) return 1.0f; else return 0.3f;
   }
 
   public ArrayList<String> convertTime(ArrayList<String> time) {
