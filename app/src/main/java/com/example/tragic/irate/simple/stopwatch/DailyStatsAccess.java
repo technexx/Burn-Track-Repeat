@@ -200,8 +200,11 @@ public class DailyStatsAccess {
         statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    public StatsForEachActivity getStatsForEachActivityEntity() {
-        return mStatsForEachActivity;
+    public void assignStatForEachActivityInstanceForAllActivitiesOnASpecificDay(int dayToRetrieve) {
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
+        if (statsForEachActivityList.size()>0) {
+            mStatsForEachActivity = statsForEachActivityList.get(0);
+        }
     }
 
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
@@ -211,6 +214,10 @@ public class DailyStatsAccess {
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
         }
+    }
+
+    public StatsForEachActivity getStatsForEachActivityEntity() {
+        return mStatsForEachActivity;
     }
 
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {

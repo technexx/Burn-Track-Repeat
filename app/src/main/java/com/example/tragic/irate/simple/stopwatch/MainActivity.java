@@ -514,16 +514,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: onOptionsSelected logic for Daily Stats Fragment.
-  //Todo: In Settings onOptions: TBD.
-  //Todo: Disable/override onClick for datePicker since it brings up soft kb and causes popUp tearing.
+  //Todo: Separate activity / non-activity cycle additions (maybe w/ separate tab) OR toggle within cycle to remove tracking.
+      //Todo: cycleHasActivityAssigned boolean can be set to false if we use a toggle.
+      //Todo: Toggle should be on recyclerView, esp. since we're changing the Timer views.
+  //Todo: All times/total resettings on edit cycles + re-launch.
+  //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Figure out layout params for checkmark.
   //Todo: Test all notifications.
 
-  //Todo: Track calories by day, week, etc. We do need a new class for this, as each row will represent a day as opposed to a specific cycle. We can set this as a new TAB.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
@@ -2054,8 +2055,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DayHolder dayHolder = dailyStatsAccess.getDayHolderEntity();
     dailyStatsAccess.deleteDayHolderEntity(dayHolder);
 
-    dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(daySelected);
+    dailyStatsAccess.assignStatForEachActivityInstanceForAllActivitiesOnASpecificDay(daySelected);
     StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
+    dailyStatsAccess.deleteStatForEachActivityEntity();
 
     refreshDailyStats();
   }
@@ -2063,6 +2065,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void deleteDailyStatsForAllDays() {
     dailyStatsAccess.deleteAllDayHolderEntries();
     dailyStatsAccess.deleteAllStatsForEachActivityEntries();
+    refreshDailyStats();
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
@@ -2501,6 +2504,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
       //Sets paused boolean to true, so next timer click will resume.
       timerIsPaused = true;
+      //Todo: Crash w/ non-existent index place on edit cycle -> back to Main -> re-launch cycle.
       timeLeft.setText(retrieveTimerValueString());
       displayTotalTimesAndCalories();
     } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
