@@ -514,9 +514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Separate activity / non-activity cycle additions (maybe w/ separate tab) OR toggle within cycle to remove tracking.
-      //Todo: cycleHasActivityAssigned boolean can be set to false if we use a toggle.
-      //Todo: Toggle should be on recyclerView, esp. since we're changing the Timer views.
+  //Todo: Remove Set Time/Break Time/Reset ImageButton/Cycles Completed for active activity, and replace w/ "Total Calories" only. Do not track the former during activity, and recall it when activity tracking is toggled off.
   //Todo: All times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -692,9 +690,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Toggle.
   @Override
   public void toggleTdeeMode(boolean tdeeToggle) {
+    //Todo: Boolean is set in conjunction w/ a selected activity. Also, we'd still want to track times for the activity.
     cycleHasActivityAssigned = tdeeToggle;
   }
 
@@ -2512,7 +2510,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIsPaused = true;
       //Todo: Crash w/ non-existent index place on edit cycle -> back to Main -> re-launch cycle.
       timeLeft.setText(retrieveTimerValueString());
-      displayTotalTimesAndCalories();
+      displayTotalTimesAndCalories();//
     } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode==1) {
         savedCycleAdapter.removeActiveCycleLayout();
