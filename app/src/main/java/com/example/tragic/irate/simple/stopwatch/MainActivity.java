@@ -514,9 +514,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long singleInstanceTdeeActivityTime;
   long totalTdeeActivityTime;
 
-  //Todo: Remove Set Time/Break Time/Reset ImageButton/Cycles Completed for active activity, and replace w/ "Total Calories" only. Do not track the former during activity, and recall it when activity tracking is toggled off. Use default 3.0 MET if nothing selected.
+  //Todo: Not-tracking: Same as now.
+  //Todo: Tracking: Activity, Set Time for day (no break), Calories for day (not for each activity).
+        //Todo: Do not count non-tracking during track, and vice-versa.
+        //Todo: Resetting from Daily Stats fragment is fine and should be reflected when tracking in cycle.
+        //Todo: We have separate values for daily total set/break and specific cycles already saving, so we can use either.
 
-  //Todo: Any textViews timer/calorie counts will re-appear as their value is updated.
   //Todo: All times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -3486,9 +3489,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     selectedTdeeValuePosition = cycles.getTdeeValuePosition();
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
-
-    //Todo: Removed this since we want it to now be a toggle.
-//    cycleHasActivityAssigned = cycles.getTdeeActivityExists();
   }
 
   private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
@@ -4499,13 +4499,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles_completed.setText(getString(R.string.cycles_done, value));
       }
     }
-    Log.i("testSwitch", "activity assigned boolean is " + cycleHasActivityAssigned);
     if (mode==3) {
       cycles_completed.setText(getString(R.string.cycles_done, value));
     }
     if (mode==4) {
       cycles_completed.setText(getString(R.string.laps_completed, value));
     }
+  }
+
+  private void queryDatabaseAndPopulatePojoListsForDailyCycleStats(int dayToPopulate) {
+    AsyncTask.execute(()-> {
+      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayToPopulate);
+      dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
+
+      runOnUiThread(()-> {
+        dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
+        dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
+      });
+    });
   }
 
   private void populateTimerUI() {
@@ -4711,7 +4722,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void toggleActivityAssignedViews(boolean activityExists) {
     if (activityExists) {
       removeTdeeActivityImageView.setVisibility(View.VISIBLE);
-      cycles_completed.setVisibility(View.GONE);
       total_set_header.setVisibility(View.GONE);
       total_set_time.setVisibility(View.GONE);
       total_break_header.setVisibility(View.GONE);
@@ -4720,7 +4730,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       actvitiyStatsInTimerTextView.setVisibility(View.VISIBLE);
     } else {
       removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
-      cycles_completed.setVisibility(View.VISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
       total_break_header.setVisibility(View.VISIBLE);

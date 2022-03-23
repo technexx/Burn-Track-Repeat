@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses;
+ package com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

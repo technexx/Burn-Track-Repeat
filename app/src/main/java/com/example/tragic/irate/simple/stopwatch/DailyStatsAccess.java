@@ -216,6 +216,7 @@ public class DailyStatsAccess {
         }
     }
 
+    //Currently, we always retrieve an entity instance for a specific day. Or, we create a new one and saved its key as a specific day. So, all methods below end up retrieving for a specific day.
     public StatsForEachActivity getStatsForEachActivityEntity() {
         return mStatsForEachActivity;
     }
@@ -231,6 +232,7 @@ public class DailyStatsAccess {
     public void setTotalBreakTimeForSelectedActivity(long totalBreakTime) {
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTime);
     }
+    
 
     public long getTotalBreakTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
@@ -293,6 +295,7 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: This already works for specific activity + specific day calories (used in daily stats save).
     private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());

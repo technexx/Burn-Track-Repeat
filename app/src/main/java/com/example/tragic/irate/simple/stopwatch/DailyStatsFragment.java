@@ -99,6 +99,7 @@ public class DailyStatsFragment extends Fragment {
 
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
+            //Todo: Pull these for daily stats. Prolly still wanna do total times for calories tracking.
             dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayToPopulate);
             dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
 
