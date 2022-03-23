@@ -515,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalTdeeActivityTime;
 
   //Todo: Not-tracking: Same as now.
-  //Todo: Tracking: Activity, Set Time for day (no break), Calories for day (not for each activity).
+  //Todo: Tracking: Activity, Set time/calories for selected activity (one row), and for day total (second row).
         //Todo: Do not count non-tracking during track, and vice-versa.
         //Todo: Resetting from Daily Stats fragment is fine and should be reflected when tracking in cycle.
         //Todo: We have separate values for daily total set/break and specific cycles already saving, so we can use either.
@@ -3330,6 +3330,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
+      //Todo: We already fetch daily stats here.
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
@@ -3741,7 +3742,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       if (cycleHasActivityAssigned) {
-        updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView((totalBurnedCaloriesInCycleAsString()));
+        updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView("///set locally///");
         actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
       }
     }
@@ -3751,6 +3752,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
         totalSetTimeForCurrentDayInMillis += millis;
+        iterateTotalCaloriesForSelectedDay();
         break;
       case 3: case 4:
         totalBreakTimeForCurrentDayInMillis += millis;
@@ -3762,6 +3764,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
         totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
+        iterateTotalCaloriesForSelectedActivity();
         break;
       case 3: case 4:
         totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
@@ -4181,7 +4184,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return formatCalorieString(totalBurnedCaloriesInCycleAsDouble());
   }
 
-  //Todo: totalBurned should be just for specific activity.
+  //Todo: Right now this is using stats for each cycle. Prolly have no need of that anymore.
   private String currentTdeeStatString() {
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), elapsedTdeeTimeString(), totalBurnedCaloriesInCycleAsString());
   }
@@ -4271,8 +4274,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cyclesDatabase.cyclesDao().updateCycles(cycles);
     }
   }
-
-
 
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
@@ -4494,7 +4495,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView(String value) {
     if (mode==1) {
       if (cycleHasActivityAssigned) {
-        cycles_completed.setText(getString(R.string.total_calories_burned, value));
+        cycles_completed.setText(getString(R.string.total_calories_burned, formatCalorieString(totalCaloriesBurnedForCurrentDay), convertSeconds(totalSetTimeForCurrentDayInMillis/1000)));
       } else {
         cycles_completed.setText(getString(R.string.cycles_done, value));
       }
@@ -4505,18 +4506,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==4) {
       cycles_completed.setText(getString(R.string.laps_completed, value));
     }
-  }
-
-  private void queryDatabaseAndPopulatePojoListsForDailyCycleStats(int dayToPopulate) {
-    AsyncTask.execute(()-> {
-      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayToPopulate);
-      dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
-
-      runOnUiThread(()-> {
-        dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
-        dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
-      });
-    });
   }
 
   private void populateTimerUI() {
@@ -4748,7 +4737,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   private String formatCalorieString(double calories) {
-    DecimalFormat df = new DecimalFormat("#.#");
+    DecimalFormat df = new DecimalFormat("#.##");
     return df.format(calories);
   }
 

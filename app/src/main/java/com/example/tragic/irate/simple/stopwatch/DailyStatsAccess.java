@@ -23,6 +23,8 @@ public class DailyStatsAccess {
     List<StatsForEachActivity> statsForEachActivityList;
     StatsForEachActivity mStatsForEachActivity;
 
+
+
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
     List<Long> totalBreakTimeListForEachActivityForSelectedDay;
@@ -232,7 +234,7 @@ public class DailyStatsAccess {
     public void setTotalBreakTimeForSelectedActivity(long totalBreakTime) {
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTime);
     }
-    
+
 
     public long getTotalBreakTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
