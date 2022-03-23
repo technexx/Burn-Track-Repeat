@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView total_set_time;
   TextView total_break_time;
   TextView empty_laps;
-  TextView actvitiyStatsInTimerTextView;
+  TextView activityStatsInTimerTextView;
 
   boolean activeCycle;
   int PAUSING_TIMER = 1;
@@ -1344,7 +1344,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_break_header = timerPopUpView.findViewById(R.id.total_break_header);
     total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
     total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
-    actvitiyStatsInTimerTextView = timerPopUpView.findViewById(R.id.activity_stats_in_timer_textView);
+    activityStatsInTimerTextView = timerPopUpView.findViewById(R.id.activity_stats_in_timer_textView);
 
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
     stopWatchView = timerPopUpView.findViewById(R.id.stopWatchView);
@@ -3473,7 +3473,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         toggleTdeeTextViewVisibility();
-        displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly();
+        activityStatsInTimerTextView.setText(currentTdeeStatString());
         retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
       }
     });
@@ -3743,7 +3743,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       if (cycleHasActivityAssigned) {
         updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView("///set locally///");
-        actvitiyStatsInTimerTextView.setText(currentTdeeStatString());
+        activityStatsInTimerTextView.setText(currentTdeeStatString());
       }
     }
   }
@@ -3999,10 +3999,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleTdeeTextViewVisibility() {
     if (!cycleHasActivityAssigned) {
-      actvitiyStatsInTimerTextView.setText(R.string.no_activity);
-      actvitiyStatsInTimerTextView.setTextSize(24);
+      activityStatsInTimerTextView.setText(R.string.no_activity);
+      activityStatsInTimerTextView.setTextSize(24);
     } else {
-      actvitiyStatsInTimerTextView.setTextSize(20);
+      activityStatsInTimerTextView.setTextSize(20);
     }
   }
 
@@ -4184,17 +4184,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return formatCalorieString(totalBurnedCaloriesInCycleAsDouble());
   }
 
-  //Todo: Right now this is using stats for each cycle. Prolly have no need of that anymore.
   private String currentTdeeStatString() {
-    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), elapsedTdeeTimeString(), totalBurnedCaloriesInCycleAsString());
-  }
-
-  private void displayTotalTdeeTimeAndCaloriesAsUniqueVarAtCycleLaunchOnly() {
-    if (cycleHasActivityAssigned) {
-      String elapsedTdeeTimeString = convertSeconds(totalTdeeActivityTime/1000);
-
-      actvitiyStatsInTimerTextView.setText(getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), elapsedTdeeTimeString, formatCalorieString(burnedCaloriesInAllLoadingsOfCycle)));
-    }
+    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(totalSetTimeForSpecificActivityForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
   private void addAndRoundDownTotalCycleTimes() {
@@ -4495,7 +4486,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView(String value) {
     if (mode==1) {
       if (cycleHasActivityAssigned) {
-        cycles_completed.setText(getString(R.string.total_calories_burned, formatCalorieString(totalCaloriesBurnedForCurrentDay), convertSeconds(totalSetTimeForCurrentDayInMillis/1000)));
+        cycles_completed.setText(getString(R.string.total_calories_burned, convertSeconds(totalSetTimeForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForCurrentDay)));
       } else {
         cycles_completed.setText(getString(R.string.cycles_done, value));
       }
@@ -4716,7 +4707,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_header.setVisibility(View.GONE);
       total_break_time.setVisibility(View.GONE);
       reset_total_times.setVisibility(View.GONE);
-      actvitiyStatsInTimerTextView.setVisibility(View.VISIBLE);
+      activityStatsInTimerTextView.setVisibility(View.VISIBLE);
     } else {
       removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
@@ -4724,7 +4715,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_header.setVisibility(View.VISIBLE);
       total_break_time.setVisibility(View.VISIBLE);
       reset_total_times.setVisibility(View.VISIBLE);
-      actvitiyStatsInTimerTextView.setVisibility(View.GONE);
+      activityStatsInTimerTextView.setVisibility(View.GONE);
     }
   }
 
