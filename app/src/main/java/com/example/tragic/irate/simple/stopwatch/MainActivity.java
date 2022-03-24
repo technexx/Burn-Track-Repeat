@@ -505,14 +505,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int tdeeMinutesDuration;
   int tdeeSecondsDuration;
   double metScore;
-  double burnedCaloriesInCurrentLoadingOfCycle;
-  double burnedCaloriesInAllLoadingsOfCycle;
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
-
-  long tdeeActivityTimeDurationPlaceHolder;
-  long singleInstanceTdeeActivityTime;
-  long totalTdeeActivityTime;
 
   //Todo: Not-tracking: Same as now.
   //Todo: Tracking: Activity, Set time/calories for selected activity (one row), and for day total (second row).
@@ -1065,7 +1059,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     reset.setOnClickListener(v -> {
       addAndRoundDownTotalCycleTimes();
-      addAndRoundDownTdeeTimeAndTotalCalories();
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
       if (mode != 3) {
@@ -1618,7 +1611,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         //For individual cycles.
         saveTotalSetAndBreakTimes();
-        saveTotalTdeeTimeAndCalories();
 
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
@@ -3482,9 +3474,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void retrieveTdeeTimeAndCaloriesValuesFromDatabaseEntity() {
     cycles = cyclesList.get(positionOfSelectedCycle);
 
-    totalTdeeActivityTime = cycles.getTotalTdeeActivityTimeElapsed() * 1000;
-    burnedCaloriesInAllLoadingsOfCycle = cycles.getTotalCaloriesBurned();
-
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
     selectedTdeeValuePosition = cycles.getTdeeValuePosition();
@@ -3551,7 +3540,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (typeOfRound.get(currentRound).equals(1)) {
           if (currentProgressBarValue==maxProgress) {
             timerDurationPlaceHolderForModeOne = setMillis;
-            tdeeActivityTimeDurationPlaceHolder = setMillis;
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(setMillis);
           } else {
@@ -3570,7 +3558,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         if (typeOfRound.get(currentRound).equals(2)) {
           cycleSetTimeForSingleRoundInMillis = setMillis;
-          singleInstanceTdeeActivityTime = setMillis;
         }
         if (typeOfRound.get(currentRound).equals(4)) {
           cycleSetTimeForSingleRoundInMillis = breakMillis;
@@ -3812,7 +3799,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerDisabled = true;
 
     addAndRoundDownTotalCycleTimes();
-    addAndRoundDownTdeeTimeAndTotalCalories();
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
     if (mode==1) {
@@ -3870,7 +3856,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       beginTimerForNextRound = true;
       timerDurationPlaceHolderForModeOne = 0;
-      tdeeActivityTimeDurationPlaceHolder = 0;
     }
     if (mode==3) {
       switch (pomDotCounter) {
@@ -4015,7 +4000,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerDurationPlaceHolderForModeOne = setMillis + roundedValueForTotalTimes;
           if (cycleHasActivityAssigned) {
             long roundedValueForTdeeTime = 1000 - (setMillis%1000);
-            tdeeActivityTimeDurationPlaceHolder = setMillis + roundedValueForTdeeTime;
           }
           break;
         case 2:
@@ -4023,7 +4007,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerDurationPlaceHolderForModeOne = setMillis - remainder;
           if (cycleHasActivityAssigned) {
             remainder = setMillis%1000;
-            tdeeActivityTimeDurationPlaceHolder = setMillis - remainder;
           }
           break;
         case 3:
@@ -4062,10 +4045,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCycleSetTimeInMillis = 0;
       cycleBreakTimeForSingleRoundInMillis = 0;
       totalCycleBreakTimeInMillis = 0;
-
-      tdeeActivityTimeDurationPlaceHolder = 0;
-      singleInstanceTdeeActivityTime = 0;
-      totalTdeeActivityTime = 0;
     }
     if (mode==3) {
       timerDurationPlaceHolderForModeThree = 0;
@@ -4158,24 +4137,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(iterateAndReturnTotalTimeForModeThree()/1000);
   }
 
-  private long currentTotalTdeeTimeLongValueInMillis() {
-    if (typeOfRound.get(currentRound)==1) {
-      singleInstanceTdeeActivityTime = tdeeActivityTimeDurationPlaceHolder - setMillis;
-    }
-    if (typeOfRound.get(currentRound)==2) {
-      singleInstanceTdeeActivityTime = setMillis - tdeeActivityTimeDurationPlaceHolder;
-    }
-    return (totalTdeeActivityTime + singleInstanceTdeeActivityTime);
-  }
-
-  private long elapsedTdeeTimeInSeconds() {
-    return currentTotalTdeeTimeLongValueInMillis()/1000;
-  }
-
-  private String elapsedTdeeTimeString() {
-    return convertSeconds(elapsedTdeeTimeInSeconds());
-  }
-
   private String currentTdeeStatStringForSpecificActivity() {
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(totalSetTimeForSpecificActivityForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
@@ -4227,14 +4188,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void addAndRoundDownTdeeTimeAndTotalCalories() {
-    if (mode==1 && cycleHasActivityAssigned) {
-      totalTdeeActivityTime += singleInstanceTdeeActivityTime + 100;
-      totalTdeeActivityTime = (totalTdeeActivityTime/1000) * 1000;
-      burnedCaloriesInAllLoadingsOfCycle += burnedCaloriesInCurrentLoadingOfCycle;
-    }
-  }
-
   private void saveTotalSetAndBreakTimes() {
     switch (mode) {
       case 1:
@@ -4260,18 +4213,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private int totalValueAddedToSingleValueAndDividedBy1000ToInteger(long totalVar, long singleVar) {
     return (int) (totalVar += singleVar) / 1000;
-  }
-
-  private void saveTotalTdeeTimeAndCalories() {
-    if (cycleHasActivityAssigned) {
-      int tdeeTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalTdeeActivityTime, singleInstanceTdeeActivityTime);
-      double caloriesBurnedToSave = burnedCaloriesInAllLoadingsOfCycle + burnedCaloriesInCurrentLoadingOfCycle;
-
-      cycles.setTotalTdeeActivityTimeElapsed(tdeeTimeToSave);
-      cycles.setTotalCaloriesBurned(caloriesBurnedToSave);
-
-      cyclesDatabase.cyclesDao().updateCycles(cycles);
-    }
   }
 
   private void pauseAndResumeTimer(int pausing) {
@@ -4515,7 +4456,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         timerDurationPlaceHolderForModeOne = 0;
-        tdeeActivityTimeDurationPlaceHolder = 0;
 
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
@@ -4819,10 +4759,5 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTotalRestTimes() {
     Log.i("testTimes", "single rest millis is " + cycleRestTimeForSingleRoundInMillis);
     Log.i("testTimes", "total rest millis is " + totalCycleRestTimeInMillis);
-  }
-
-  private void logTotalTdeeTimes() {
-    Log.i("testTimes", "single tdee millis is " + singleInstanceTdeeActivityTime);
-    Log.i("testTimes", "total tdee millis is " + totalTdeeActivityTime);
   }
 }
