@@ -3473,7 +3473,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         toggleTdeeTextViewVisibility();
-        activityStatsInTimerTextView.setText(currentTdeeStatString());
+        activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
         retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
       }
     });
@@ -3743,7 +3743,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       if (cycleHasActivityAssigned) {
         updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView("///set locally///");
-        activityStatsInTimerTextView.setText(currentTdeeStatString());
+        activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
       }
     }
   }
@@ -3772,7 +3772,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Calories iterate automatically as the total time methods move.
+  //Todo: These and set times should sync so header/sub-header iterate at same time.
   private void iterateTotalCaloriesForSelectedDay() {
     totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
   }
@@ -4176,16 +4176,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return convertSeconds(elapsedTdeeTimeInSeconds());
   }
 
-  private double totalBurnedCaloriesInCycleAsDouble() {
-    return calculateCaloriesBurnedPerSecond() * elapsedTdeeTimeInSeconds();
-  }
-
-  private String totalBurnedCaloriesInCycleAsString() {
-    return formatCalorieString(totalBurnedCaloriesInCycleAsDouble());
-  }
-
-  private String currentTdeeStatString() {
+  private String currentTdeeStatStringForSpecificActivity() {
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(totalSetTimeForSpecificActivityForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+  }
+
+  private void updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView(String value) {
+    if (mode==1) {
+      if (cycleHasActivityAssigned) {
+        cycles_completed.setText(getString(R.string.total_calories_burned, convertSeconds(totalSetTimeForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForCurrentDay)));
+      } else {
+        cycles_completed.setText(getString(R.string.cycles_done, value));
+      }
+    }
+    if (mode==3) {
+      cycles_completed.setText(getString(R.string.cycles_done, value));
+    }
+    if (mode==4) {
+      cycles_completed.setText(getString(R.string.laps_completed, value));
+    }
   }
 
   private void addAndRoundDownTotalCycleTimes() {
@@ -4480,22 +4488,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerEnded = sharedPreferences.getBoolean("modeThreeTimerEnded", false);
         timerDisabled = sharedPreferences.getBoolean("modeThreeTimerDisabled", false);
         break;
-    }
-  }
-
-  private void updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView(String value) {
-    if (mode==1) {
-      if (cycleHasActivityAssigned) {
-        cycles_completed.setText(getString(R.string.total_calories_burned, convertSeconds(totalSetTimeForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForCurrentDay)));
-      } else {
-        cycles_completed.setText(getString(R.string.cycles_done, value));
-      }
-    }
-    if (mode==3) {
-      cycles_completed.setText(getString(R.string.cycles_done, value));
-    }
-    if (mode==4) {
-      cycles_completed.setText(getString(R.string.laps_completed, value));
     }
   }
 
