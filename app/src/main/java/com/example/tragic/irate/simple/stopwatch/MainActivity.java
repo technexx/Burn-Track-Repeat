@@ -508,6 +508,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
 
+  int timerRunnableDelay = 50;
+
   //Todo: Not-tracking: Same as now.
   //Todo: Tracking: Activity, Set time/calories for selected activity (one row), and for day total (second row).
         //Todo: Do not count non-tracking during track, and vice-versa.
@@ -3618,11 +3620,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
 
-        iterateTotalTimesForSelectedDay(50);
-        iterateTotalTimesForSelectedActivity(50);
+        iterateTotalTimesForSelectedDay(timerRunnableDelay);
+        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
-        iterateTotalCaloriesForSelectedDay(50);
-        iterateTotalCaloriesForSelectedActivity(50);
+        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
 
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
 
@@ -3630,7 +3632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
 
         setNotificationValues();
-        mHandler.postDelayed(this, 50);
+        mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
   }
