@@ -3592,11 +3592,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
 
-        iterateTotalTimesForSelectedDay(50);
-        iterateTotalTimesForSelectedActivity(50);
+        iterateTotalTimesForSelectedDay(timerRunnableDelay);
+        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
-        iterateTotalCaloriesForSelectedDay(50);
-        iterateTotalCaloriesForSelectedActivity(50);
+        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3604,7 +3604,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
 
         setNotificationValues();
-        mHandler.postDelayed(this, 50);
+        mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
   }
@@ -3641,7 +3641,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setInitialTextSizeForRounds(setMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
 
-    timer = new CountDownTimer(setMillis, 50) {
+    timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
         setNotificationValues();
@@ -3650,11 +3650,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Todo: Issue likely with display as that is where the sync is missing.
         displayTotalTimesAndCalories();
 
-        iterateTotalTimesForSelectedDay(50);
-        iterateTotalTimesForSelectedActivity(50);
+        iterateTotalTimesForSelectedDay(timerRunnableDelay);
+        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
-        iterateTotalCaloriesForSelectedDay(50);
-        iterateTotalCaloriesForSelectedActivity(50);
+        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3671,7 +3671,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setInitialTextSizeForRounds(breakMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
 
-    timer = new CountDownTimer(breakMillis, 50) {
+    timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
         setNotificationValues();
@@ -3679,11 +3679,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
         displayTotalTimesAndCalories();
 
-        iterateTotalTimesForSelectedDay(50);
-        iterateTotalTimesForSelectedActivity(50);
+        iterateTotalTimesForSelectedDay(timerRunnableDelay);
+        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
-        iterateTotalCaloriesForSelectedDay(50);
-        iterateTotalCaloriesForSelectedActivity(50);
+        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3700,7 +3700,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setInitialTextSizeForRounds(pomMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
 
-    timer = new CountDownTimer(pomMillis, 50) {
+    timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
         setNotificationValues();
