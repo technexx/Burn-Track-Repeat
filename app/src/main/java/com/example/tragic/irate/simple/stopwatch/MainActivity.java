@@ -3589,8 +3589,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
+
         iterateTotalTimesForSelectedDay(50);
         iterateTotalTimesForSelectedActivity(50);
+
+        iterateTotalCaloriesForSelectedDay(50);
+        iterateTotalCaloriesForSelectedActivity(50);
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3613,8 +3617,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         displayTotalTimesAndCalories();
+
         iterateTotalTimesForSelectedDay(50);
         iterateTotalTimesForSelectedActivity(50);
+
+        iterateTotalCaloriesForSelectedDay(50);
+        iterateTotalCaloriesForSelectedActivity(50);
 
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
 
@@ -3637,9 +3645,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setNotificationValues();
 
         setCountDownTimerTickLogic(millisUntilFinished, setMillis);
+        //Todo: Issue likely with display as that is where the sync is missing.
         displayTotalTimesAndCalories();
+
         iterateTotalTimesForSelectedDay(50);
         iterateTotalTimesForSelectedActivity(50);
+
+        iterateTotalCaloriesForSelectedDay(50);
+        iterateTotalCaloriesForSelectedActivity(50);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3663,8 +3676,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
         displayTotalTimesAndCalories();
+
         iterateTotalTimesForSelectedDay(50);
         iterateTotalTimesForSelectedActivity(50);
+
+        iterateTotalCaloriesForSelectedDay(50);
+        iterateTotalCaloriesForSelectedActivity(50);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3721,6 +3738,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void displayTotalTimesAndCalories() {
     long remainder = 0;
+
     if (resettingTotalTime) {
       resetTotalTimesAndCalories();
       resettingTotalTime = false;
@@ -3735,11 +3753,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: These and set times should sync so header/sub-header iterate at same time.
+  //Todo: The total set time will also need to reset or use a diff. variable when in non-tracking mode if we want it to be a separate value (e.g. based on cycle instead of day).
+  //Todo: May want to ditch CountDownTimer class and just use Runnables for non-infinity stuff.
   private void iterateTotalTimesForSelectedDay(long millis) {
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
         totalSetTimeForCurrentDayInMillis += millis;
-        iterateTotalCaloriesForSelectedDay();
         break;
       case 3: case 4:
         totalBreakTimeForCurrentDayInMillis += millis;
@@ -3747,11 +3767,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private void iterateTotalCaloriesForSelectedDay(long millis) {
+    totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
+  }
+
   private void iterateTotalTimesForSelectedActivity(long millis) {
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
         totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
-        iterateTotalCaloriesForSelectedActivity();
         break;
       case 3: case 4:
         totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
@@ -3759,13 +3782,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: These and set times should sync so header/sub-header iterate at same time.
-  private void iterateTotalCaloriesForSelectedDay() {
-    totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
+  private void iterateTotalCaloriesForSelectedActivity(long millis) {
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
   }
 
-  private void iterateTotalCaloriesForSelectedActivity() {
-    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
+  private String currentTdeeStatStringForSpecificActivity() {
+    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(totalSetTimeForSpecificActivityForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+  }
+
+  private void updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView(String value) {
+    if (mode==1) {
+      if (cycleHasActivityAssigned) {
+        cycles_completed.setText(getString(R.string.total_calories_burned, convertSeconds(totalSetTimeForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForCurrentDay)));
+      } else {
+        cycles_completed.setText(getString(R.string.cycles_done, value));
+      }
+    }
+    if (mode==3) {
+      cycles_completed.setText(getString(R.string.cycles_done, value));
+    }
+    if (mode==4) {
+      cycles_completed.setText(getString(R.string.laps_completed, value));
+    }
   }
 
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
@@ -4135,26 +4173,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private String currentTotalTimeStringForModeThree() {
     return convertSeconds(iterateAndReturnTotalTimeForModeThree()/1000);
-  }
-
-  private String currentTdeeStatStringForSpecificActivity() {
-    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(totalSetTimeForSpecificActivityForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
-  }
-
-  private void updateTotalCyclesCompletedsAndTotalCaloriesBurnedTextView(String value) {
-    if (mode==1) {
-      if (cycleHasActivityAssigned) {
-        cycles_completed.setText(getString(R.string.total_calories_burned, convertSeconds(totalSetTimeForCurrentDayInMillis/1000), formatCalorieString(totalCaloriesBurnedForCurrentDay)));
-      } else {
-        cycles_completed.setText(getString(R.string.cycles_done, value));
-      }
-    }
-    if (mode==3) {
-      cycles_completed.setText(getString(R.string.cycles_done, value));
-    }
-    if (mode==4) {
-      cycles_completed.setText(getString(R.string.laps_completed, value));
-    }
   }
 
   private void addAndRoundDownTotalCycleTimes() {
