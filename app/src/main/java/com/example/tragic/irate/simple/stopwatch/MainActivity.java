@@ -3600,13 +3600,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           textSizeIncreased = true;
         }
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+
         displayTotalTimesAndCalories();
-
-        iterateTotalTimesForSelectedDay(timerRunnableDelay);
-        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
-
-        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
-        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         timeLeft.setText(convertSeconds((setMillis) / 1000));
 
@@ -3628,13 +3624,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           textSizeIncreased = true;
         }
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+
         displayTotalTimesAndCalories();
-
-        iterateTotalTimesForSelectedDay(timerRunnableDelay);
-        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
-
-        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
-        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         timeLeft.setText(convertSeconds((breakMillis) / 1000));
 
@@ -3657,14 +3649,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setNotificationValues();
 
         setCountDownTimerTickLogic(millisUntilFinished, setMillis);
-        //Todo: Issue likely with display as that is where the sync is missing.
         displayTotalTimesAndCalories();
-
-        iterateTotalTimesForSelectedDay(timerRunnableDelay);
-        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
-
-        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
-        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3688,12 +3674,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
         displayTotalTimesAndCalories();
-
-        iterateTotalTimesForSelectedDay(timerRunnableDelay);
-        iterateTotalTimesForSelectedActivity(timerRunnableDelay);
-
-        iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
-        iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3704,6 +3685,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
+  }
+
+  private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
+    iterateTotalTimesForSelectedDay(timerRunnableDelay);
+    iterateTotalTimesForSelectedActivity(timerRunnableDelay);
+
+    iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+    iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
   }
 
   private void startPomTimer() {
