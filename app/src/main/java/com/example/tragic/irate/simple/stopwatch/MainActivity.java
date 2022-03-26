@@ -688,7 +688,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void toggleTdeeMode(boolean tdeeToggle) {
     cycleHasActivityAssigned = tdeeToggle;
-    toggleExistenceOfTdeeActivity(cycleHasActivityAssigned);
   }
 
   @Override
@@ -698,6 +697,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) savedPomCycleAdapter.removeActiveCycleLayout();
     isNewCycle = false;
     positionOfSelectedCycle = position;
+    toggleExistenceOfTdeeActivity(cycleHasActivityAssigned);
 
     populateCycleAdapterArrayList();
     launchTimerCycle(false);
