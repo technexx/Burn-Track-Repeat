@@ -510,8 +510,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int timerRunnableDelay = 50;
 
-  //Todo: Sync set/break time to timer time (off by ~50ms) in non-tracking mode.
-
+  //Todo: Double textView in timer on launch.
   //Todo: All times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -3498,6 +3497,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTime = cycles.getTotalBreakTime();
       cyclesCompleted = cycles.getCyclesCompleted();
 
+      //These are saved as whole ints in db.
       totalCycleSetTimeInMillis = totalSetTime * 1000;
       totalCycleBreakTimeInMillis = totalBreakTime * 1000;
     }
@@ -3728,7 +3728,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
       pomMillis = classMillisUntilFinishedVariable;
     }
-    timeLeft.setText(convertSeconds((typeOfRoundMillis + 999) / 1000));
+    timeLeft.setText(convertSeconds((typeOfRoundMillis / 1000)));
     if (typeOfRoundMillis < 500) timerDisabled = true;
   }
 
@@ -3948,7 +3948,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (typeOfRound.get(currentRound)) {
             case 1:
               setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
+              timeLeft.setText(convertSeconds((setMillis / 1000)));
               if (beginTimerForNextRound) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
@@ -3963,7 +3963,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
+              timeLeft.setText(convertSeconds((breakMillis / 1000)));
               if (beginTimerForNextRound) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startBreakTimer();
@@ -4487,12 +4487,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (typeOfRound.get(0)) {
             case 1:
               setMillis = workoutTime.get(0);
-              timeLeft.setText(convertSeconds((setMillis + 999) / 1000));
+              timeLeft.setText(convertSeconds((setMillis / 1000)));
               setInitialTextSizeForRounds(setMillis);
               break;
             case 3:
               breakMillis = workoutTime.get(0);
-              timeLeft.setText(convertSeconds((breakMillis + 999) / 1000));
+              timeLeft.setText(convertSeconds((breakMillis / 1000)));
               setInitialTextSizeForRounds(breakMillis);
               break;
             case 2:
@@ -4511,7 +4511,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
-          timeLeft.setText(convertSeconds((pomMillis + 999) / 1000));
+          timeLeft.setText(convertSeconds((pomMillis / 1000)));
           dotDraws.pomDraw(pomDotCounter,pomValuesTime);
           setInitialTextSizeForRounds(pomMillis);
         }
