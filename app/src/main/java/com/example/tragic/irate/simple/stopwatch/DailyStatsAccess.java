@@ -182,7 +182,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public boolean doesActivityExistInDatabase() {
+    public boolean getDoesCylceHaveActivityAssignedBoolean() {
         return activityExistsInDatabase;
     }
 

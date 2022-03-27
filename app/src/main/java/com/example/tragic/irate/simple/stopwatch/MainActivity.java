@@ -507,6 +507,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double metScore;
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
+  boolean trackActivityWithinCycle;
 
   int timerRunnableDelay = 50;
   String timerTextViewStringOne = "";
@@ -689,7 +690,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void toggleTdeeMode(boolean tdeeToggle) {
-    cycleHasActivityAssigned = tdeeToggle;
+//    cycleHasActivityAssigned = tdeeToggle;
+    trackActivityWithinCycle = tdeeToggle;
   }
 
   @Override
@@ -2816,7 +2818,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  //Conversion of Long->String for CIRCLE TIMER textViews.
   private String convertSeconds(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
@@ -3366,7 +3367,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-    boolean doesActivityExistInDatabase = dailyStatsAccess.doesActivityExistInDatabase();
+    boolean doesActivityExistInDatabase = dailyStatsAccess.getDoesCylceHaveActivityAssignedBoolean();
 
     if (!doesActivityExistInDatabase) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
@@ -3379,6 +3380,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+
+      cycleHasActivityAssigned = dailyStatsAccess.getDoesCylceHaveActivityAssignedBoolean();
     }
   }
 
