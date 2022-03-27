@@ -512,9 +512,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
 
-  //Todo: On launch of cycle and timer start, total time moves up instantly. Does not happen if we reset within the cycle.
   //Todo: Will need unique booleans for each cycle tracking toggle, since a single toggle won't carry over to other cycles.
-  //Todo: All times/total resettings on edit cycles + re-launch.
+  //Todo: Tdee times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -2809,13 +2808,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else return value;
   }
 
-  //Todo: This caused retrieved values of total times to move up their timer text display right away.
-      //Todo: e.g. 8000 + 50 = 8050 -> + 999/1000 = 81.
   private long dividedMillisForTimerDisplay(long millis) {
     return (millis+999)/1000;
   }
 
-  private long millisForTotalTimesDisplay(long millis) {
+  private long dividedMillisForTotalTimesDisplay(long millis) {
     return millis/1000;
   }
 
@@ -3773,7 +3770,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
         totalSetTimeForCurrentDayInMillis += millis;
-        Log.i("testTotal", "setMillis total is " + totalSetTimeForCurrentDayInMillis);
         break;
       case 3: case 4:
         totalBreakTimeForCurrentDayInMillis += millis;
@@ -3821,7 +3817,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String currentTotalTimesAndCaloriesForTrackingMode() {
-    return getString(R.string.total_calories_burned, convertSeconds(dividedMillisForTimerDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
+    return getString(R.string.total_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
@@ -3877,14 +3873,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           timeLeft.setText("0");
           changeTextSizeWithoutAnimator(true);
-          total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
+          total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
           if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForSets, false);
           break;
         case 2:
           mHandler.removeCallbacks(infinityTimerForSets);
-          total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
+          total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
           if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForSets, false);
@@ -3892,14 +3888,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 3:
           timeLeft.setText("0");
           changeTextSizeWithoutAnimator(true);
-          total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleBreakTimeInMillis)));
+          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
 
           if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForBreaks, false);
           break;
         case 4:
           mHandler.removeCallbacks(infinityTimerForBreaks);
-          total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleBreakTimeInMillis)));
+          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
 
           if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
           setEndOfRoundSounds(vibrationSettingForBreaks, false);
@@ -3916,15 +3912,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalWorkTimeInMillis)));
+          total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalWorkTimeInMillis)));
           setEndOfRoundSounds(vibrationSettingForWork, false);
           break;
         case 1: case 3: case 5:
-          total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleRestTimeInMillis)));
+          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
           setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
           break;
         case 7:
-          total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleRestTimeInMillis)));
+          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
 
           boolean isAlertRepeating = false;
           if (isFullBreakSoundContinuous) isAlertRepeating = true;
@@ -4145,7 +4141,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String currentTotalTimeStringForModeOne() {
-    return convertSeconds(dividedMillisForTimerDisplay(iterateAndReturnTotalTimeForModeOne()));
+    return convertSeconds(dividedMillisForTotalTimesDisplay(iterateAndReturnTotalTimeForModeOne()));
   }
 
   private void displayCurrentTotalTimeString() {
@@ -4190,7 +4186,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String currentTotalTimeStringForModeThree() {
-    return convertSeconds(dividedMillisForTimerDisplay(iterateAndReturnTotalTimeForModeThree()));
+    return convertSeconds(dividedMillisForTotalTimesDisplay(iterateAndReturnTotalTimeForModeThree()));
   }
 
   private void addAndRoundDownTotalCycleTimes() {
