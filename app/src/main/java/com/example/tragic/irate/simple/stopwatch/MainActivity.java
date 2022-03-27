@@ -512,7 +512,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
 
-  //Todo: Tdee stat timer out of sync. It's likely a display issue w/ how often the actual textView values update.
   //Todo: On launch of cycle and timer start, total time moves up instantly. Does not happen if we reset within the cycle.
   //Todo: Will need unique booleans for each cycle tracking toggle, since a single toggle won't carry over to other cycles.
   //Todo: All times/total resettings on edit cycles + re-launch.
@@ -2810,8 +2809,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else return value;
   }
 
+  //Todo: This caused retrieved values of total times to move up their timer text display right away.
+      //Todo: e.g. 8000 + 50 = 8050 -> + 999/1000 = 81.
   private long dividedMillisForTimerDisplay(long millis) {
     return (millis+999)/1000;
+  }
+
+  private long millisForTotalTimesDisplay(long millis) {
+    return millis/1000;
   }
 
   //Conversion of Long->String for CIRCLE TIMER textViews.
@@ -3708,7 +3713,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  //Todo: Compare textView Strings of timeLeft ticks and only update total times/calories etc. if they have changed.
   private boolean hasTextViewChanged(TextView textView, TextView textViewTwo) {
     return !textView.equals(textViewTwo);
   }
@@ -3769,6 +3773,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
         totalSetTimeForCurrentDayInMillis += millis;
+        Log.i("testTotal", "setMillis total is " + totalSetTimeForCurrentDayInMillis);
         break;
       case 3: case 4:
         totalBreakTimeForCurrentDayInMillis += millis;
