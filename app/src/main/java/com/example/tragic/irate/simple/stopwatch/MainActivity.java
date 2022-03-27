@@ -509,8 +509,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean cycleHasActivityAssigned;
 
   int timerRunnableDelay = 50;
-  String timerStringOne;
-  String timerStringTwo;
+  String timerStringOne = "";
+  String timerStringTwo = "";
 
   //Todo: Tdee stat timer out of sync. It's likely a display issue w/ how often the actual textView values update.
   //Todo: On launch of cycle and timer start, total time moves up instantly. Does not happen if we reset within the cycle.
@@ -3654,9 +3654,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
         if (setMillis < 500) timerDisabled = true;
 
+        timerStringOne = (String) timeLeft.getText();
+        if (!timerStringTwo.equals(timerStringOne)) {
+          timerStringTwo = (String) timeLeft.getText();
+          displayTotalTimesAndCalories();
+        }
 
-
-        displayTotalTimesAndCalories();
+//        displayTotalTimesAndCalories();
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
