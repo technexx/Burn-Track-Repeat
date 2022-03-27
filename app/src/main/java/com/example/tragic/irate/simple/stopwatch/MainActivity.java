@@ -3334,7 +3334,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-      if (cycleHasActivityAssigned) {
+      if (trackActivityWithinCycle) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
@@ -3367,7 +3367,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-    boolean doesActivityExistInDatabase = dailyStatsAccess.getDoesCylceHaveActivityAssignedBoolean();
+    boolean doesActivityExistInDatabase = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
 
     if (!doesActivityExistInDatabase) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
@@ -3381,7 +3381,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
 
-      cycleHasActivityAssigned = dailyStatsAccess.getDoesCylceHaveActivityAssignedBoolean();
+      cycleHasActivityAssigned = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
     }
   }
 
@@ -3412,7 +3412,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
 
-      if (cycleHasActivityAssigned) {
+      if (trackActivityWithinCycle) {
         cycles.setTdeeActivityExists(true);
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
@@ -3762,7 +3762,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     displayCurrentTotalTimeString();
 
     if (mode==1) {
-      if (cycleHasActivityAssigned) {
+      if (trackActivityWithinCycle) {
         cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalTimesAndCaloriesForTrackingMode());
         activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
       }
@@ -3805,7 +3805,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleTotalCyclesCompletedsAndTotalCaloriesBurnedTextView() {
     if (mode==1) {
-      if (cycleHasActivityAssigned) {
+      if (trackActivityWithinCycle) {
         cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalTimesAndCaloriesForTrackingMode());
       } else {
         cycles_completed_and_total_daily_stats_header_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
@@ -4038,7 +4038,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleTdeeTextViewVisibility() {
-    if (!cycleHasActivityAssigned) {
+    if (!trackActivityWithinCycle) {
       activityStatsInTimerTextView.setText(R.string.no_activity);
       activityStatsInTimerTextView.setTextSize(24);
     } else {
@@ -4053,14 +4053,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 1:
           roundedValueForTotalTimes = 1000 - (setMillis%1000);
           timerDurationPlaceHolderForModeOne = setMillis + roundedValueForTotalTimes;
-          if (cycleHasActivityAssigned) {
+          if (trackActivityWithinCycle) {
             long roundedValueForTdeeTime = 1000 - (setMillis%1000);
           }
           break;
         case 2:
           long remainder = setMillis%1000;
           timerDurationPlaceHolderForModeOne = setMillis - remainder;
-          if (cycleHasActivityAssigned) {
+          if (trackActivityWithinCycle) {
             remainder = setMillis%1000;
           }
           break;
@@ -4607,6 +4607,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
         }
+
+        roundDownAllTotalTimeValuesToEnsureSyncing();
         break;
       case 3:
         pomDotCounter = 0;
@@ -4643,6 +4645,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setNotificationValues();
   }
 
+  private void roundDownAllTotalTimeValuesToEnsureSyncing() {
+    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
+    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
+
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
   private void sendPhoneResolutionToDotDrawsClass() {
     DisplayMetrics metrics = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -4659,12 +4669,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (activityExists) {
       String activity = (String) tdee_sub_category_spinner.getSelectedItem();
       addTDEEActivityTextView.setText(activity);
-      cycleHasActivityAssigned = true;
+      trackActivityWithinCycle = true;
     } else {
       addTDEEActivityTextView.setText(R.string.add_activity);
-      cycleHasActivityAssigned = false;
+      trackActivityWithinCycle = false;
     }
-    toggleActivityAssignedViews(cycleHasActivityAssigned);
+    toggleActivityAssignedViews(trackActivityWithinCycle);
   }
 
   private void toggleActivityAssignedViews(boolean activityExists) {
