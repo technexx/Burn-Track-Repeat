@@ -509,8 +509,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean cycleHasActivityAssigned;
 
   int timerRunnableDelay = 50;
-  String timerStringOne = "";
-  String timerStringTwo = "";
+  String timerTextViewStringOne = "";
+  String timerTextViewStringTwo = "";
 
   //Todo: Tdee stat timer out of sync. It's likely a display issue w/ how often the actual textView values update.
   //Todo: On launch of cycle and timer start, total time moves up instantly. Does not happen if we reset within the cycle.
@@ -2345,17 +2345,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       int totalTimeOne = 0;
       int totalTimeTwo = 0;
       int totalTimeThree = 0;
-      String editPopUpTimerStringOne = "";
-      String editPopUpTimerStringTwo = "";
+      String editPopUptimerTextViewStringOne = "";
+      String editPopUptimerTextViewStringTwo = "";
       String editPopUpTimerStringThree = "";
 
-      editPopUpTimerStringOne =  convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
-      totalTimeOne = convertStringToSecondsValue(editPopUpTimerStringOne);
-      pomTimerValueInEditPopUpTextViewOne.setText(editPopUpTimerStringOne);
+      editPopUptimerTextViewStringOne =  convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
+      totalTimeOne = convertStringToSecondsValue(editPopUptimerTextViewStringOne);
+      pomTimerValueInEditPopUpTextViewOne.setText(editPopUptimerTextViewStringOne);
 
-      editPopUpTimerStringTwo = convertedTimerArrayToString(savedEditPopUpArrayForSecondHeaderModeThree);
-      totalTimeTwo = convertStringToSecondsValue(editPopUpTimerStringTwo);
-      pomTimerValueInEditPopUpTextViewTwo.setText(editPopUpTimerStringTwo);
+      editPopUptimerTextViewStringTwo = convertedTimerArrayToString(savedEditPopUpArrayForSecondHeaderModeThree);
+      totalTimeTwo = convertStringToSecondsValue(editPopUptimerTextViewStringTwo);
+      pomTimerValueInEditPopUpTextViewTwo.setText(editPopUptimerTextViewStringTwo);
 
       editPopUpTimerStringThree = convertedTimerArrayToString(savedEditPopUpArrayForThirdHeader);
       totalTimeThree = convertStringToSecondsValue(editPopUpTimerStringThree);
@@ -3644,7 +3644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);;
 
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
@@ -3654,14 +3654,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
         if (setMillis < 500) timerDisabled = true;
 
-        timerStringOne = (String) timeLeft.getText();
-        if (!timerStringTwo.equals(timerStringOne)) {
-          timerStringTwo = (String) timeLeft.getText();
-          displayTotalTimesAndCalories();
-        }
-
-//        displayTotalTimesAndCalories();
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3673,6 +3667,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
+  }
+
+  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
+    timerTextViewStringOne = (String) timeLeft.getText();
+    if (hasTimerTextViewChanged()) {
+      timerTextViewStringTwo = (String) timeLeft.getText();
+      displayTotalTimesAndCalories();
+    }
+  }
+
+  private boolean hasTimerTextViewChanged() {
+    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
   }
 
   private void startBreakTimer() {
@@ -3687,8 +3693,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
 
-        displayTotalTimesAndCalories();
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3728,7 +3734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        displayTotalTimesAndCalories();
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
         dotDraws.reDraw();
