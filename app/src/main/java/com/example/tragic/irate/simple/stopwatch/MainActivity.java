@@ -509,8 +509,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean cycleHasActivityAssigned;
 
   int timerRunnableDelay = 50;
+  String timerStringOne;
+  String timerStringTwo;
 
   //Todo: Tdee stat timer out of sync. It's likely a display issue w/ how often the actual textView values update.
+  //Todo: On launch of cycle and timer start, total time moves up instantly. Does not happen if we reset within the cycle.
   //Todo: Will need unique booleans for each cycle tracking toggle, since a single toggle won't carry over to other cycles.
   //Todo: All times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
@@ -3646,14 +3649,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
-        setNotificationValues();
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+        setMillis = millisUntilFinished;
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+        if (setMillis < 500) timerDisabled = true;
 
-        setCountDownTimerTickLogic(millisUntilFinished, setMillis);
+
+
         displayTotalTimesAndCalories();
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
+        setNotificationValues();
       }
 
       @Override
@@ -3670,14 +3678,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
-        setNotificationValues();
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+        breakMillis = millisUntilFinished;
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+        if (breakMillis < 500) timerDisabled = true;
 
-        setCountDownTimerTickLogic(millisUntilFinished, breakMillis);
         displayTotalTimesAndCalories();
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
+        setNotificationValues();
       }
 
       @Override
@@ -3685,6 +3696,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
+  }
+
+  //Todo: Compare textView Strings of timeLeft ticks and only update total times/calories etc. if they have changed.
+  private boolean hasTextViewChanged(TextView textView, TextView textViewTwo) {
+    return !textView.equals(textViewTwo);
   }
 
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
@@ -3702,13 +3718,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
-        setNotificationValues();
 
-        setCountDownTimerTickLogic(millisUntilFinished, pomMillis);
+        currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
+        pomMillis = millisUntilFinished;
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+        if (pomMillis < 500) timerDisabled = true;
+
         displayTotalTimesAndCalories();
 
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
         dotDraws.reDraw();
+        setNotificationValues();
       }
 
       @Override
@@ -3716,25 +3736,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
-  }
-
-
-  private void setCountDownTimerTickLogic(long classMillisUntilFinishedVariable, long typeOfRoundMillis) {
-    if (mode==1) {
-      currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-      if (typeOfRoundMillis==setMillis) {
-        setMillis = classMillisUntilFinishedVariable;
-      }
-      if (typeOfRoundMillis==breakMillis) {
-        breakMillis = classMillisUntilFinishedVariable;
-      }
-    }
-    if (mode==3) {
-      currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
-      pomMillis = classMillisUntilFinishedVariable;
-    }
-    timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(typeOfRoundMillis)));
-    if (typeOfRoundMillis < 500) timerDisabled = true;
   }
 
   private void displayTotalTimesAndCalories() {
