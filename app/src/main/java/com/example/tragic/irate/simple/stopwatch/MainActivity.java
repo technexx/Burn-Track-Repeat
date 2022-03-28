@@ -513,7 +513,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
 
-  //Todo: Going from one cycle to another doesn't correctly fetch/implement the tracking toggle.
   //Todo: Ensure switching to tracking mode mid-cycle works.
   //Todo: Tdee times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
@@ -4676,7 +4675,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       addTDEEActivityTextView.setText(R.string.add_activity);
       trackActivityWithinCycle = false;
     }
-    toggleActivityAssignedViews(trackActivityWithinCycle);
+    toggleActivityAssignedViews(activityExists);
   }
 
   private void toggleActivityAssignedViews(boolean activityExists) {
