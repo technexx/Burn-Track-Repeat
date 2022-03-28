@@ -513,7 +513,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
 
-  //Todo: Will need unique booleans for each cycle tracking toggle, since a single toggle won't carry over to other cycles.
+  //Todo: Going from one cycle to another doesn't correctly fetch/implement the tracking toggle.
+  //Todo: Ensure switching to tracking mode mid-cycle works.
   //Todo: Tdee times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -701,7 +702,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) savedPomCycleAdapter.removeActiveCycleLayout();
     isNewCycle = false;
     positionOfSelectedCycle = position;
-    toggleExistenceOfTdeeActivity(cycleHasActivityAssigned);
+
+    boolean trackingCycle = savedCycleAdapter.retrieveActiveTdeeModeToggleList(position);
+    toggleExistenceOfTdeeActivity(trackingCycle);
+    Log.i("testToggle", "boolean called back to main is " + trackingCycle + " at position " + position);
 
     populateCycleAdapterArrayList();
     launchTimerCycle(false);
@@ -1370,8 +1374,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
-//      testDbInsertDays();
-
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
@@ -1379,6 +1381,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setDefaultUserSettings();
         setDefaultEditRoundViews();
+        savedCycleAdapter.instantiateAndPopulateActiveTdeeModeToggleList();
+        savedCycleAdapter.notifyDataSetChanged();
       });
     });
   }
@@ -1398,8 +1402,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter.setItemClick(MainActivity.this);
     savedPomCycleAdapter.setHighlight(MainActivity.this);
     savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
-
-    savedCycleAdapter.notifyDataSetChanged();
   }
 
   private void instantiateLayoutManagers() {

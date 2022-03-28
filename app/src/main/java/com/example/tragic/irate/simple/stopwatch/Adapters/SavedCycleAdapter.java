@@ -72,6 +72,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int BREAK_COLOR;
 
   boolean isTdeeModeActive;
+  List<Boolean> mActiveTdeeModeBooleanList;
 
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -140,6 +141,35 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mActiveCycle = false;
   }
 
+  public void instantiateAndPopulateActiveTdeeModeToggleList() {
+    mActiveTdeeModeBooleanList = new ArrayList<>();
+    for (int i=0; i<mWorkoutList.size(); i++) {
+      mActiveTdeeModeBooleanList.add(i, true);
+    }
+  }
+
+  //Sets list position to 0/1 for on/off, and boolean to true/false (for textView highlight).
+  public void modifyActiveTdeeModeToggleList(int positionToToggle) {
+    if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
+      mActiveTdeeModeBooleanList.set(positionToToggle, false);
+      isTdeeModeActive = false;
+    } else {
+      isTdeeModeActive = true;
+      mActiveTdeeModeBooleanList.set(positionToToggle, true);
+    }
+    Log.i("testToggle", "list total on toggle click is " + mActiveTdeeModeBooleanList);
+  }
+
+  public boolean retrieveActiveTdeeModeToggleList(int positionToCheckForToggle) {
+    Log.i("testToggle", "boolean on selected position is " + mActiveTdeeModeBooleanList.get(positionToCheckForToggle));
+    Log.i("testToggle", "list total on cycle click is " + mActiveTdeeModeBooleanList);
+    return mActiveTdeeModeBooleanList.get(positionToCheckForToggle);
+  }
+
+  private float setTdeeModeTextViewAlpha() {
+    if (isTdeeModeActive) return 1.0f; else return 0.3f;
+  }
+
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -153,15 +183,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     //Used to store highlighted positions that we callback to Main to delete.
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
-
     workoutHolder.resetCycle.setVisibility(View.GONE);
-    //Adds text to resume/reset underneath active cycle.
+
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER));
       }
     }
+
+    workoutHolder.tdeeToggle.setOnClickListener(v-> {
+      modifyActiveTdeeModeToggleList(position);
+      workoutHolder.tdeeToggle.setAlpha(setTdeeModeTextViewAlpha());
+      mOnTdeeModeToggle.toggleTdeeMode(isTdeeModeActive);
+    });
 
     workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.
@@ -319,12 +354,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
       return true;
     });
-
-    workoutHolder.tdeeToggle.setOnClickListener(v-> {
-      toggleTdeeMode();
-      workoutHolder.tdeeToggle.setAlpha(setTdeeModeTextViewAlpha());
-      mOnTdeeModeToggle.toggleTdeeMode(isTdeeModeActive);
-    });
   }
 
   @Override
@@ -348,14 +377,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
       tdeeToggle = itemView.findViewById(R.id.tdee_toggle);
     }
-  }
-
-  private void toggleTdeeMode() {
-    isTdeeModeActive = !isTdeeModeActive;
-  }
-
-  private float setTdeeModeTextViewAlpha() {
-    if (isTdeeModeActive) return 1.0f; else return 0.3f;
   }
 
   public ArrayList<String> convertTime(ArrayList<String> time) {
