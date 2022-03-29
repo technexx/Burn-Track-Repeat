@@ -234,6 +234,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> workoutCyclesArray;
   ArrayList<String> workoutTitle;
   ArrayList<String> workoutTitleArray;
+  ArrayList<Boolean> activeTdeeTrackingBooleanList;
+
   ArrayList<Integer> pomValuesTime;
   ArrayList<String> pomStringListOfRoundValues;
   ArrayList<String> pomTitleArray;
@@ -1376,18 +1378,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
+        instantiateActiveTdeeBooleanList();
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
 
         setDefaultUserSettings();
         setDefaultEditRoundViews();
-        savedCycleAdapter.instantiateAndPopulateActiveTdeeModeToggleList();
         savedCycleAdapter.notifyDataSetChanged();
       });
     });
   }
 
+  private void instantiateActiveTdeeBooleanList() {
+    for (int i=0; i<workoutCyclesArray.size(); i++) {
+      activeTdeeTrackingBooleanList.add(i, true);
+    }
+  }
+
   private void instantiateCycleAdaptersAndTheirCallbacks() {
-    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray);
+    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray, activeTdeeTrackingBooleanList);
     savedCycleRecycler.setAdapter(savedCycleAdapter);
     savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
     savedCycleAdapter.setTdeeToggle(MainActivity.this);
@@ -1519,6 +1527,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomStringListOfRoundValues = new ArrayList<>();
     pomArray = new ArrayList<>();
     workoutTitleArray = new ArrayList<>();
+    activeTdeeTrackingBooleanList = new ArrayList<>();
+
     pomTitleArray = new ArrayList<>();
     receivedHighlightPositions = new ArrayList<>();
     receivedHighlightPositionHolder = new ArrayList<>();
@@ -1637,13 +1647,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dailyStatsAccess.setOldActivityPositionInDb(currentActivityPosition);
           }
 
+          //Todo: These are saving, but creating new entries for the same activity.
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
           dailyStatsAccess.setTotalBreakTimeForSelectedActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
           dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
         }
 
-        //Todo: We are we removing this when timer is paused?
         if (!timerIsPaused) {
           mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
         } else {
@@ -1890,6 +1900,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 workoutCyclesArray.clear();
                 typeOfRoundArray.clear();
                 workoutTitleArray.clear();
+                activeTdeeTrackingBooleanList.clear();
                 savedCycleAdapter.notifyDataSetChanged();
               });
             }
@@ -3214,6 +3225,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTitleArray.add(cycleTitle);
         typeOfRoundArray.add(roundTypeString);
         workoutCyclesArray.add(workoutString);
+        activeTdeeTrackingBooleanList.add(activeTdeeTrackingBooleanList.size(), true);
       }
       if (mode==3) {
         pomTitleArray.add(cycleTitle);
@@ -3238,6 +3250,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTitleArray.remove(posToRemove);
           typeOfRoundArray.remove(posToRemove);
           workoutCyclesArray.remove(posToRemove);
+          activeTdeeTrackingBooleanList.remove(posToRemove);
           posToRemove = receivedHighlightPositionHolder.get(i);
           if (posToRemove>=1) {
             posToRemove--;
@@ -3260,8 +3273,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     runOnUiThread(()-> {
-      if (mode==1) savedCycleAdapter.notifyDataSetChanged();
-      if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
+      if (mode==1) {
+        savedCycleAdapter.notifyDataSetChanged();
+      }
+      if (mode==3) {
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
     });
   }
 
@@ -3368,11 +3385,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: This launches w/ timerCycle. Also, try default greyed out "Tracking" w/ toast saying no activity assigned.
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-    boolean doesActivityExistInDatabase = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
+//    boolean doesActivityExistInDatabase = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
 
-    if (!doesActivityExistInDatabase) {
+    if (!trackActivityWithinCycle) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
@@ -3384,7 +3402,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
 
-      cycleHasActivityAssigned = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
+//      cycleHasActivityAssigned = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
     }
   }
 

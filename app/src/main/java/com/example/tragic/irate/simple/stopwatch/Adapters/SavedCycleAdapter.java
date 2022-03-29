@@ -120,8 +120,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
-  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle) {
-    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle;
+  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> activeTdeeModeBooleanList) {
+    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
@@ -141,14 +141,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mActiveCycle = false;
   }
 
-  public void instantiateAndPopulateActiveTdeeModeToggleList() {
-    mActiveTdeeModeBooleanList = new ArrayList<>();
-    for (int i=0; i<mWorkoutList.size(); i++) {
-      mActiveTdeeModeBooleanList.add(i, true);
-    }
-  }
-
-  //Sets list position to 0/1 for on/off, and boolean to true/false (for textView highlight).
+  //Sets list position to 0/1 for on /off, and boolean to true/false (for textView highlight).
   public void modifyActiveTdeeModeToggleList(int positionToToggle) {
     if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
       mActiveTdeeModeBooleanList.set(positionToToggle, false);

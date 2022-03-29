@@ -23,14 +23,12 @@ public class DailyStatsAccess {
     List<StatsForEachActivity> statsForEachActivityList;
     StatsForEachActivity mStatsForEachActivity;
 
-
-
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
     List<Long> totalBreakTimeListForEachActivityForSelectedDay;
     List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
 
-    boolean activityExistsInDatabase;
+    boolean activityExistsInDatabaseForSelectedDay;
     String mActivityString;
     int activityPositionInDb;
     int mOldActivityPositionInDb;
@@ -146,7 +144,7 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-
+    //Todo: Primary ID key of entity is auto-generating instead of being linked to/replaced by unique activity ID.
     public void setActivityPositionAndExistenceOfActivityInDatabaseBoolean(int daySelected) {
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
@@ -154,9 +152,9 @@ public class DailyStatsAccess {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInDb = i;
-                activityExistsInDatabase = true;
+                activityExistsInDatabaseForSelectedDay = true;
             } else {
-                activityExistsInDatabase = false;
+                activityExistsInDatabaseForSelectedDay = false;
             }
         }
     }
@@ -169,7 +167,7 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
 
         //Nothing to do if activity already exists.
-        if (!activityExistsInDatabase) {
+        if (!activityExistsInDatabaseForSelectedDay) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
             statsForEachActivity.setActivity(activitySelected);
@@ -183,7 +181,7 @@ public class DailyStatsAccess {
     }
 
     public boolean getDoesCycleHaveActivityAssignedBoolean() {
-        return activityExistsInDatabase;
+        return activityExistsInDatabaseForSelectedDay;
     }
 
     public int getActivityPosition() {
@@ -297,7 +295,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: This already works for specific activity + specific day calories (used in daily stats save).
     private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());

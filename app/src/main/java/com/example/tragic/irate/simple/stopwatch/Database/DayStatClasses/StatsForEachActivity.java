@@ -6,8 +6,10 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "StatsForEachActivity")
 
 public class StatsForEachActivity {
-    @PrimaryKey (autoGenerate = true)
+//    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey
     public long statsForActivityId;
+
     public long uniqueIdTiedToTheSelectedActivity;
 
     String activity;
