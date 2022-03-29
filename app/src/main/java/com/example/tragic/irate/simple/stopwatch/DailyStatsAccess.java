@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
@@ -144,23 +145,23 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-    //Todo: Primary ID key of entity is auto-generating instead of being linked to/replaced by unique activity ID.
     public void setActivityPositionAndExistenceOfActivityInDatabaseBoolean(int daySelected) {
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
 
+        //Todo: Non-ideal conditional since list will be empty on new day.
+        //Todo: As long as activityExistsInDatabaseForSelectedDay defaults to false, insert method should work even for new days.
+        Log.i("testInsert", "activity String under consideration is " + mActivityString);
+
+        activityExistsInDatabaseForSelectedDay = false;
         for (int i=0; i<statsForEachActivityList.size(); i++) {
+            Log.i("testInsert", "activity list for current day is " + statsForEachActivityList.get(i).getActivity());
             if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInDb = i;
                 activityExistsInDatabaseForSelectedDay = true;
-            } else {
-                activityExistsInDatabaseForSelectedDay = false;
             }
         }
-    }
-
-    public void setActivityString(String activityString) {
-        this.mActivityString = activityString;
+        Log.i("testInsert", "activityExists boolean return is " + activityExistsInDatabaseForSelectedDay);
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -170,6 +171,7 @@ public class DailyStatsAccess {
         if (!activityExistsInDatabaseForSelectedDay) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
+
             statsForEachActivity.setActivity(activitySelected);
 
             statsForEachActivity.setTotalSetTimeForEachActivity(0);
@@ -221,6 +223,14 @@ public class DailyStatsAccess {
         return mStatsForEachActivity;
     }
 
+    public void setActivityString(String activityString) {
+        this.mActivityString = activityString;
+    }
+
+    public String getActivityString() {
+        return mStatsForEachActivity.getActivity();
+    }
+
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(totalSetTime);
     }
@@ -232,7 +242,6 @@ public class DailyStatsAccess {
     public void setTotalBreakTimeForSelectedActivity(long totalBreakTime) {
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTime);
     }
-
 
     public long getTotalBreakTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalBreakTimeForEachActivity();

@@ -3351,10 +3351,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
-        //Todo: Activity String is pulling from spinner. It should pull from the String saved w/ in database.
+        //Todo: Pulling from array to compare activity we're adding to the ones in database.
+
+        //Todo: getTdeeActivityStringFromArrayPosition() uses position saved in CYCLE entity. It displays regardless of whether it's being saved in db. Since we're saving based on DAY now, a new day will not contain the activity, but it will still be retrieved as mActivityString w/ in DailyStatsAccess because it is assigned to the Cycle.
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
-        //Todo: This is where we're inserting duplicate rows using auto-generating primary key ID. Above method should trigger boolean on whether the insertion method executes.
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
 
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
@@ -3362,7 +3363,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
-
     });
 
     resetTimer();
