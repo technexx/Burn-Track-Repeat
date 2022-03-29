@@ -513,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
 
-  //Todo: Ensure switching to tracking mode mid-cycle works.
+  //Todo: Some instant tdee value changes when restarting cycle.
   //Todo: Tdee times/total resettings on edit cycles + re-launch.
   //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -1643,6 +1643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
         }
 
+        //Todo: We are we removing this when timer is paused?
         if (!timerIsPaused) {
           mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
         } else {
@@ -3320,9 +3321,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
 
-    resetTimer();
-    populateTimerUI();
-
     AsyncTask.execute(()-> {
       if (isNewCycle || saveToDB) {
         saveAddedOrEditedCycleASyncRunnable();
@@ -3343,7 +3341,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
+
     });
+
+    resetTimer();
+    populateTimerUI();
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
@@ -3384,10 +3386,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       cycleHasActivityAssigned = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
     }
-  }
-
-  private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
-    return millisToRound - (millisToRound%1000);
   }
 
   private void saveAddedOrEditedCycleASyncRunnable() {
@@ -4646,12 +4644,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setNotificationValues();
   }
 
+  //Todo: This also needs to execute anytime we launch a cycle that is not being resumed, tho we do call it via resetTimer() tho it may also be a threading issue and the times may load after resetTimer() is called.
   private void roundDownAllTotalTimeValuesToEnsureSyncing() {
     totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
     totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
+    return millisToRound - (millisToRound%1000);
   }
 
   private void sendPhoneResolutionToDotDrawsClass() {
@@ -4762,6 +4765,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
     return preRoundedMet;
+  }
+
+  private void logAllTimesAndCalories() {
+    Log.i("testTotals", "total set time for current day is " + totalSetTimeForCurrentDayInMillis);
+    Log.i("testTotals", "total break time for current day is " + totalBreakTimeForCurrentDayInMillis);
+    Log.i("testTotals", "total set time for current day AND activity is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testTotals", "total break time for current day AND activity is " + totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void logTdeeCategoryPositions() {
