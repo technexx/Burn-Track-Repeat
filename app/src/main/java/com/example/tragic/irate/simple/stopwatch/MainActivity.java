@@ -3351,11 +3351,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
+        //Todo: Activity String is pulling from spinner. It should pull from the String saved w/ in database.
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
+        //Todo: This is where we're inserting duplicate rows using auto-generating primary key ID. Above method should trigger boolean on whether the insertion method executes.
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
+
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 
@@ -3388,7 +3392,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: This launches w/ timerCycle. Also, try default greyed out "Tracking" w/ toast saying no activity assigned.
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-//    boolean doesActivityExistInDatabase = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
 
     if (!trackActivityWithinCycle) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
@@ -3401,8 +3404,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-
-//      cycleHasActivityAssigned = dailyStatsAccess.getDoesCycleHaveActivityAssignedBoolean();
     }
   }
 
