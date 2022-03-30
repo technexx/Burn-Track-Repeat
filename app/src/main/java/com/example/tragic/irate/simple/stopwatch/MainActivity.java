@@ -706,7 +706,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     boolean trackingCycle = savedCycleAdapter.retrieveActiveTdeeModeToggleList(position);
     toggleExistenceOfTdeeActivity(trackingCycle);
-    Log.i("testToggle", "boolean called back to main is " + trackingCycle + " at position " + position);
 
     populateCycleAdapterArrayList();
     launchTimerCycle(false);
@@ -2068,7 +2067,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DayHolder dayHolder = dailyStatsAccess.getDayHolderEntity();
     dailyStatsAccess.deleteDayHolderEntity(dayHolder);
 
-    dailyStatsAccess.assignStatForEachActivityInstanceForAllActivitiesOnASpecificDay(daySelected);
+    dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(daySelected);
     StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
     dailyStatsAccess.deleteStatForEachActivityEntity();
 
@@ -3351,7 +3350,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
-        //Todo: Unlike DayHolder where we can retain entity class, in StatsForEachActivity we need to re-query and fetch the given activity and its times for each cycle we click.
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
 
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
@@ -3359,6 +3357,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+        dailyStatsAccess.assignActivityFromStatsForEachActivityListForASpecificDay(positionOfSelectedCycle);
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }

@@ -192,7 +192,7 @@ public class DailyStatsAccess {
         return mOldActivityPositionInDb;
     }
 
-    //Todo: This gets executed on both timer launch and save runnable. We need to retrieve not just the day (i.e. the uniqueID each activity ties itself to), but also the Primary ID Key of the actual activity (e.g 4 activites will have 1-4 primary keys).
+    //Todo: This gets executed on both timer launch and save runnable. We need to retrieve not just the day (i.e. the uniqueID each activity ties itself to), but also the Primary ID Key of the actual activity (e.g 4 activities will have 1-4 primary keys).
     public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
         statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
@@ -207,11 +207,10 @@ public class DailyStatsAccess {
         }
     }
 
-    //Used only for deleting a single day's stats within fragment at the moment.
-    public void assignStatForEachActivityInstanceForAllActivitiesOnASpecificDay(int dayToRetrieve) {
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
-        if (statsForEachActivityList.size()>0) {
-            mStatsForEachActivity = statsForEachActivityList.get(0);
+    //Todo: This is where we need to fetch the entity w/ the Primary Key ID. From the statsForEachActivity list, we get the row tied to the cycle clicked on. This should correspond to the positions within the list, regardless of ID. In fact, we may be able to ignore the Primary Key if everything is tied to positions.
+    public void assignActivityFromStatsForEachActivityListForASpecificDay(int positionOfCycleClicked) {
+        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
+            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(positionOfCycleClicked);
         }
     }
 
