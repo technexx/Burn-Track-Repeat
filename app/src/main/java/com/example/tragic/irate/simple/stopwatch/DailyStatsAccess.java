@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -21,7 +22,7 @@ public class DailyStatsAccess {
     DayHolder mDayHolder;
     long mOldDayHolderId;
 
-    List<StatsForEachActivity> statsForEachActivityList;
+    List<StatsForEachActivity> statsForEachActivityListOfAllActivitiesForASpecificDate;
     StatsForEachActivity mStatsForEachActivity;
 
     List<String> totalActivitiesListForSelectedDay;
@@ -149,29 +150,24 @@ public class DailyStatsAccess {
         //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
 
-        //Todo: Non-ideal conditional since list will be empty on new day.
-        //Todo: As long as activityExistsInDatabaseForSelectedDay defaults to false, insert method should work even for new days.
-        Log.i("testInsert", "activity String under consideration is " + mActivityString);
-
         activityExistsInDatabaseForSelectedDay = false;
+
         for (int i=0; i<statsForEachActivityList.size(); i++) {
-            Log.i("testInsert", "activity list for current day is " + statsForEachActivityList.get(i).getActivity());
             if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInDb = i;
                 activityExistsInDatabaseForSelectedDay = true;
             }
         }
-        Log.i("testInsert", "activityExists boolean return is " + activityExistsInDatabaseForSelectedDay);
     }
 
+    //
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
 
-        //Nothing to do if activity already exists.
         if (!activityExistsInDatabaseForSelectedDay) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
-            statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
 
+            statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
             statsForEachActivity.setActivity(activitySelected);
 
             statsForEachActivity.setTotalSetTimeForEachActivity(0);
@@ -179,11 +175,9 @@ public class DailyStatsAccess {
             statsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
-        }
-    }
 
-    public boolean getDoesCycleHaveActivityAssignedBoolean() {
-        return activityExistsInDatabaseForSelectedDay;
+            Log.i("testInsert", "StatsForEachActivity inserted with day #" + getCurrentDayOfYear() + " and activity of " + activitySelected);
+        }
     }
 
     public int getActivityPosition() {
@@ -198,23 +192,26 @@ public class DailyStatsAccess {
         return mOldActivityPositionInDb;
     }
 
+    //Todo: This gets executed on both timer launch and save runnable. We need to retrieve not just the day (i.e. the uniqueID each activity ties itself to), but also the Primary ID Key of the actual activity (e.g 4 activites will have 1-4 primary keys).
     public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
+        statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
+    //Todo: This is creating new instances of entity here (it should for first times of new day).
+    public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
+        //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
+        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size() >= activityPositionInDb+1) {
+            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInDb);
+        } else {
+            mStatsForEachActivity = new StatsForEachActivity();
+        }
+    }
+
+    //Used only for deleting a single day's stats within fragment at the moment.
     public void assignStatForEachActivityInstanceForAllActivitiesOnASpecificDay(int dayToRetrieve) {
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
         if (statsForEachActivityList.size()>0) {
             mStatsForEachActivity = statsForEachActivityList.get(0);
-        }
-    }
-
-    public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
-        //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
-        if (statsForEachActivityList.size() >= activityPositionInDb+1) {
-            mStatsForEachActivity = statsForEachActivityList.get(activityPositionInDb);
-        } else {
-            mStatsForEachActivity = new StatsForEachActivity();
         }
     }
 
@@ -269,7 +266,7 @@ public class DailyStatsAccess {
 
     //////////////////Daily Stats Fragment Methods/////////////////////////////////////////////
     public void queryStatsForEachActivityForSelectedDay(int daySelected) {
-        statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
+        statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
     }
 
     public void clearArrayListsOfActivitiesAndTheirStats() {
@@ -287,26 +284,26 @@ public class DailyStatsAccess {
     }
 
     private void assignTotalActivitiesListForOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalActivitiesListForSelectedDay.add(statsForEachActivityList.get(i).getActivity());
+        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
+            totalActivitiesListForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getActivity());
         }
     }
 
     private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalSetTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
+            totalSetTimeListForEachActivityForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getTotalSetTimeForEachActivity());
         }
     }
 
     private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalBreakTimeListForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
+            totalBreakTimeListForEachActivityForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getTotalBreakTimeForEachActivity());
         }
     }
 
     private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
+            totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getTotalCaloriesBurnedForEachActivity());
         }
     }
 

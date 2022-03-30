@@ -1639,7 +1639,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
-        if (cycleHasActivityAssigned) {
+        if (trackActivityWithinCycle) {
           int currentActivityPosition = dailyStatsAccess.getActivityPosition();
           int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
 
@@ -3351,10 +3351,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
-        //Todo: Pulling from array to compare activity we're adding to the ones in database.
-
-        //Todo: getTdeeActivityStringFromArrayPosition() uses position saved in CYCLE entity. It displays regardless of whether it's being saved in db. Since we're saving based on DAY now, a new day will not contain the activity, but it will still be retrieved as mActivityString w/ in DailyStatsAccess because it is assigned to the Cycle.
+        //Todo: Unlike DayHolder where we can retain entity class, in StatsForEachActivity we need to re-query and fetch the given activity and its times for each cycle we click.
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
+
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
 
@@ -3389,7 +3388,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This launches w/ timerCycle. Also, try default greyed out "Tracking" w/ toast saying no activity assigned.
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
