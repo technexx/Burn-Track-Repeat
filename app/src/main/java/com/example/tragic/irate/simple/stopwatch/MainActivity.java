@@ -3349,11 +3349,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (trackActivityWithinCycle) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
-
+        dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
+
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
 
-        dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         dailyStatsAccess.assignActivityFromStatsForEachActivityListForASpecificDay();
 

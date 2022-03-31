@@ -167,6 +167,8 @@ public class DailyStatsAccess {
         if (!activityExistsInDatabaseForSelectedDay) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
 
+            //Since a new list with the new day's ID is created every day, this iterating ID will auto reset to 0 each day.
+            statsForEachActivity.setIteratingIdsForSpecificDay(statsForEachActivityListOfAllActivitiesForASpecificDate.size());
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
             statsForEachActivity.setActivity(activitySelected);
 
@@ -192,7 +194,6 @@ public class DailyStatsAccess {
         return mOldActivityPositionInDb;
     }
 
-    //Todo: This list becomes 0 on new day.
     public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
         statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
@@ -206,36 +207,35 @@ public class DailyStatsAccess {
         }
     }
 
-//    public void assignActivityFromStatsForEachActivityListForASpecificDay(int positionOfCycleClicked) {
-//        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
-//            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(positionOfCycleClicked);
-//        }
-//    }
-
     private long retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay() {
         long idToReturn = 0;
+
         for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
             if (statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getActivity().equalsIgnoreCase(mActivityString)) {
-                idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getStatsForActivityId();
+                idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getIteratingIdsForSpecificDay();
             }
         }
-        //Todo: Id will keep iterating up despite new days (e.g. first row in new day will be 4, if previous day had 3 activities).
+        //Todo: This will return 0 by default, if the activity does not already exist for the day.
         return idToReturn;
     }
 
     public void assignActivityFromStatsForEachActivityListForASpecificDay() {
-        int primaryIdKey = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
+        int iteratingId = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
+
         if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
-            //Todo: New day causes index exception here.
-            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(primaryIdKey-1);
+            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(iteratingId);
         }
 
-        Log.i("testId", "returned ID is " + primaryIdKey);
+        Log.i("testId", "returned ID is " + iteratingId);
         Log.i("testId", "activity in row w/ returned ID is " + mStatsForEachActivity.getActivity());
     }
 
     public StatsForEachActivity getStatsForEachActivityEntity() {
         return mStatsForEachActivity;
+    }
+
+    private long getIteratingIdForSpecificDay() {
+        return mStatsForEachActivity.getIteratingIdsForSpecificDay();
     }
 
     public void setActivityString(String activityString) {

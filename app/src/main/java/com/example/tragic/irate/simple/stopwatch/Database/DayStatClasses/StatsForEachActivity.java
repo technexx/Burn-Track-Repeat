@@ -9,6 +9,7 @@ public class StatsForEachActivity {
     @PrimaryKey (autoGenerate = true)
     public long statsForActivityId;
 
+    public long iteratingIdsForSpecificDay;
     public long uniqueIdTiedToTheSelectedActivity;
 
     String activity;
@@ -22,6 +23,14 @@ public class StatsForEachActivity {
 
     public void setStatsForActivityId(long statsForActivityId) {
         this.statsForActivityId = statsForActivityId;
+    }
+
+    public long getIteratingIdsForSpecificDay() {
+        return iteratingIdsForSpecificDay;
+    }
+
+    public void setIteratingIdsForSpecificDay(long iteratingIdsForSpecificDay) {
+        this.iteratingIdsForSpecificDay = iteratingIdsForSpecificDay;
     }
 
     public long getUniqueIdTiedToTheSelectedActivity() {
