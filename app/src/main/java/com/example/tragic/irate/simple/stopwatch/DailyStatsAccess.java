@@ -192,12 +192,10 @@ public class DailyStatsAccess {
         return mOldActivityPositionInDb;
     }
 
-    //Todo: This gets executed on both timer launch and save runnable. We need to retrieve not just the day (i.e. the uniqueID each activity ties itself to), but also the Primary ID Key of the actual activity (e.g 4 activities will have 1-4 primary keys).
     public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
         statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    //Todo: This is creating new instances of entity here (it should for first times of new day).
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (statsForEachActivityListOfAllActivitiesForASpecificDate.size() >= activityPositionInDb+1) {
@@ -207,14 +205,34 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: This is where we need to fetch the entity w/ the Primary Key ID. From the statsForEachActivity list, we get the row tied to the cycle clicked on. This should correspond to the positions within the list, regardless of ID. In fact, we may be able to ignore the Primary Key if everything is tied to positions.
-    public void assignActivityFromStatsForEachActivityListForASpecificDay(int positionOfCycleClicked) {
-        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
-            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(positionOfCycleClicked);
+    //Todo: We should assign Primary IDs based on the String of activity selected. This way, we can change the activity within any cycle and have its stats recalled correctly. Right now, the primary ID is tied to the Cycle, NOT the activity.
+    //Todo: How about: Iterate over all rows in list below, and check each activity String entry to mActivityString.
+//    public void assignActivityFromStatsForEachActivityListForASpecificDay(int positionOfCycleClicked) {
+//        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
+//            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(positionOfCycleClicked);
+//        }
+//    }
+
+    private long retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay() {
+        long idToReturn = 0;
+        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
+            if (statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getActivity().equalsIgnoreCase(mActivityString)) {
+                idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getStatsForActivityId();
+            }
         }
+        return idToReturn;
     }
 
-    //Currently, we always retrieve an entity instance for a specific day. Or, we create a new one and saved its key as a specific day. So, all methods below end up retrieving for a specific day.
+    public void assignActivityFromStatsForEachActivityListForASpecificDay() {
+        int primaryIdKey = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
+        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
+            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(primaryIdKey-1);
+        }
+
+        Log.i("testId", "returned ID is " + primaryIdKey);
+        Log.i("testId", "activity in row w/ returned ID is " + mStatsForEachActivity.getActivity());
+    }
+
     public StatsForEachActivity getStatsForEachActivityEntity() {
         return mStatsForEachActivity;
     }
