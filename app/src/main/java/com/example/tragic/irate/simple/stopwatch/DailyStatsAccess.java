@@ -192,6 +192,7 @@ public class DailyStatsAccess {
         return mOldActivityPositionInDb;
     }
 
+    //Todo: This list becomes 0 on new day.
     public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
         statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
@@ -205,8 +206,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: We should assign Primary IDs based on the String of activity selected. This way, we can change the activity within any cycle and have its stats recalled correctly. Right now, the primary ID is tied to the Cycle, NOT the activity.
-    //Todo: How about: Iterate over all rows in list below, and check each activity String entry to mActivityString.
 //    public void assignActivityFromStatsForEachActivityListForASpecificDay(int positionOfCycleClicked) {
 //        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
 //            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(positionOfCycleClicked);
@@ -220,12 +219,14 @@ public class DailyStatsAccess {
                 idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getStatsForActivityId();
             }
         }
+        //Todo: Id will keep iterating up despite new days (e.g. first row in new day will be 4, if previous day had 3 activities).
         return idToReturn;
     }
 
     public void assignActivityFromStatsForEachActivityListForASpecificDay() {
         int primaryIdKey = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
         if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
+            //Todo: New day causes index exception here.
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(primaryIdKey-1);
         }
 

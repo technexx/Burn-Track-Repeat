@@ -352,7 +352,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double totalCaloriesBurnedForCurrentDay;
 
   long totalSetTimeForSpecificActivityForCurrentDayInMillis;
-  long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
   double totalCaloriesBurnedForSpecificActivityForCurrentDay;
 
   String timeLeftValueHolder;
@@ -516,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
 
   //Todo: Stats for new cycle + activity display previously launched one at beginning. Fine after.
-  //Todo: Activity selected on new cycle doesn't show textView on Timer launch.
+  //Todo: Some total times start iterating immediately on timer start.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -1061,6 +1060,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     reset.setOnClickListener(v -> {
       addAndRoundDownTotalCycleTimes();
+      roundDownAllTotalTimeValuesToEnsureSyncing();
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
       if (mode != 3) {
@@ -1647,7 +1647,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           //Todo: These are saving, but creating new entries for the same activity.
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-          dailyStatsAccess.setTotalBreakTimeForSelectedActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
           dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
         }
@@ -3391,15 +3390,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (!trackActivityWithinCycle) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
     } else {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
       totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
       totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     }
   }
 
@@ -3803,9 +3799,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1: case 2:
         totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
         break;
-      case 3: case 4:
-        totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
-        break;
     };
   }
 
@@ -3868,6 +3861,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerDisabled = true;
 
     addAndRoundDownTotalCycleTimes();
+    roundDownAllTotalTimeValuesToEnsureSyncing();
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
     if (mode==1) {
@@ -4235,6 +4229,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
     }
+  }
+
+  //Todo: This also needs to execute anytime we launch a cycle that is not being resumed, tho we do call it via resetTimer() tho it may also be a threading issue and the times may load after resetTimer() is called.
+  private void roundDownAllTotalTimeValuesToEnsureSyncing() {
+    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
+    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
+
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
+    return millisToRound - (millisToRound%1000);
   }
 
   private void saveTotalSetAndBreakTimes() {
@@ -4621,8 +4627,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
         }
-
-        roundDownAllTotalTimeValuesToEnsureSyncing();
         break;
       case 3:
         pomDotCounter = 0;
@@ -4657,19 +4661,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (mode!=4) populateTimerUI();
     setNotificationValues();
-  }
-
-  //Todo: This also needs to execute anytime we launch a cycle that is not being resumed, tho we do call it via resetTimer() tho it may also be a threading issue and the times may load after resetTimer() is called.
-  private void roundDownAllTotalTimeValuesToEnsureSyncing() {
-    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
-    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
-
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-  }
-
-  private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
-    return millisToRound - (millisToRound%1000);
   }
 
   private void sendPhoneResolutionToDotDrawsClass() {
@@ -4786,7 +4777,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testTotals", "total set time for current day is " + totalSetTimeForCurrentDayInMillis);
     Log.i("testTotals", "total break time for current day is " + totalBreakTimeForCurrentDayInMillis);
     Log.i("testTotals", "total set time for current day AND activity is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTotals", "total break time for current day AND activity is " + totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void logTdeeCategoryPositions() {
