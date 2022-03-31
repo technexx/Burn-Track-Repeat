@@ -1645,7 +1645,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dailyStatsAccess.setOldActivityPositionInDb(currentActivityPosition);
           }
 
-          //Todo: These are saving, but creating new entries for the same activity.
           dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
           dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
@@ -3790,8 +3789,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Todo: totalTime iterates correctly but calories returning differently when switching cycles. This is because the MET score determines the formula and that changes.
+  //Todo: Try: totalCals += (calculateCaloriesBurnedPerSecond()/50)
   private void iterateTotalCaloriesForSelectedDay(long millis) {
     totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
+    Log.i("testCals", "total set time is " + totalSetTimeForCurrentDayInMillis);
+    Log.i("testCals", "total calories burned are " + totalCaloriesBurnedForCurrentDay);
   }
 
   private void iterateTotalTimesForSelectedActivity(long millis) {
@@ -4231,7 +4234,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This also needs to execute anytime we launch a cycle that is not being resumed, tho we do call it via resetTimer() tho it may also be a threading issue and the times may load after resetTimer() is called.
   private void roundDownAllTotalTimeValuesToEnsureSyncing() {
     totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
     totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
