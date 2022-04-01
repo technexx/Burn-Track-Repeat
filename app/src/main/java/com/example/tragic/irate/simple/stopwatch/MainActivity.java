@@ -3379,6 +3379,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
 
+      Log.i("testCals", "total calories RETRIEVED are " + totalCaloriesBurnedForCurrentDay);
+      Log.i("testCals", "total calories RETRIEVED and formatted are " + formatCalorieString(totalCaloriesBurnedForCurrentDay));
+
       totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
       totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
     }
@@ -3683,18 +3686,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
-    timerTextViewStringOne = (String) timeLeft.getText();
-    if (hasTimerTextViewChanged()) {
-      timerTextViewStringTwo = (String) timeLeft.getText();
-      displayTotalTimesAndCalories();
-    }
-  }
-
-  private boolean hasTimerTextViewChanged() {
-    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
-  }
-
   private void startBreakTimer() {
     setInitialTextSizeForRounds(breakMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
@@ -3720,10 +3711,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
-  }
-
-  private boolean hasTextViewChanged(TextView textView, TextView textViewTwo) {
-    return !textView.equals(textViewTwo);
   }
 
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
@@ -3761,21 +3748,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  private void displayTotalTimesAndCalories() {
-    long remainder = 0;
 
-    if (resettingTotalTime) {
-      resetTotalTimesAndCalories();
-      resettingTotalTime = false;
+  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
+    timerTextViewStringOne = (String) timeLeft.getText();
+    if (hasTimerTextViewChanged()) {
+      timerTextViewStringTwo = (String) timeLeft.getText();
+      displayTotalTimesAndCalories();
     }
-    displayCurrentTotalTimeString();
+  }
 
-    if (mode==1) {
-      if (trackActivityWithinCycle) {
-        cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalTimesAndCaloriesForTrackingMode());
-        activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
-      }
-    }
+  private boolean hasTimerTextViewChanged() {
+    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
   }
 
   private void iterateTotalTimesForSelectedDay(long millis) {
@@ -3799,6 +3782,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void iterateTotalCaloriesForSelectedDay(long millis) {
     totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
+    Log.i("testCals", "total calories are " + totalCaloriesBurnedForCurrentDay);
+    Log.i("testCals", "total calories formatted are " + formatCalorieString(totalCaloriesBurnedForCurrentDay));
+    Log.i("testCals", "split String is " + getLastDisplayedTotalCaloriesString());
   }
 
   private void iterateTotalCaloriesForSelectedActivity(long millis) {
@@ -3831,8 +3817,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
   }
 
+  private String currentTotalTimesAndCaloriesForTrackingMode() {
+    return getString(R.string.total_daily_time_and_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
+  }
+
   private String currentTdeeStatStringForSpecificActivity() {
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTimerDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+  }
+
+  private String getLastDisplayedTotalCaloriesString() {
+    String stringFromTextview = (String) cycles_completed_and_total_daily_stats_header_textView.getText();
+    return getSplitStringFromFullString(stringFromTextview, 6);
+  }
+
+  private String getLastDisplayedTotalCalorieForSpecificActivityString() {
+    String stringFromTextView = (String) activityStatsInTimerTextView.getText();
+    return getSplitStringFromFullString(stringFromTextView, 9);
+  }
+
+  private String getSplitStringFromFullString(String stringToSplit, int positionToRetrieve) {
+    String[] stringArray = stringToSplit.split(" ");
+    return stringArray[positionToRetrieve];
+  }
+
+  private void displayTotalTimesAndCalories() {
+    long remainder = 0;
+
+    if (resettingTotalTime) {
+      resetTotalTimesAndCalories();
+      resettingTotalTime = false;
+    }
+    displayCurrentTotalTimeString();
+
+    if (mode==1) {
+      if (trackActivityWithinCycle) {
+        cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalTimesAndCaloriesForTrackingMode());
+        activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
+      }
+    }
   }
 
   private void toggleTotalCyclesCompletedsAndTotalCaloriesBurnedTextView() {
@@ -3849,10 +3871,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==4) {
       cycles_completed_and_total_daily_stats_header_textView.setText(getString(R.string.laps_completed, lapsNumber));
     }
-  }
-
-  private String currentTotalTimesAndCaloriesForTrackingMode() {
-    return getString(R.string.total_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
