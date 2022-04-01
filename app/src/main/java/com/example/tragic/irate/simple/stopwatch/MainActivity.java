@@ -3789,13 +3789,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: totalTime iterates correctly but calories returning differently when switching cycles. This is because the MET score determines the formula and that changes.
-  //Todo: Try: totalCals += (calculateCaloriesBurnedPerSecond()/50)
   private void iterateTotalCaloriesForSelectedDay(long millis) {
-    totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForCurrentDayInMillis/1000);
+    totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
     Log.i("testCals", "total set time is " + totalSetTimeForCurrentDayInMillis);
     Log.i("testCals", "total calories burned are " + totalCaloriesBurnedForCurrentDay);
   }
+
+  private double calculateCaloriesBurnedPerTick(long millisTick) {
+    return calculateCaloriesBurnedPerSecond() / millisTick;
+  }
+
+
 
   private void iterateTotalTimesForSelectedActivity(long millis) {
     switch (typeOfRound.get(currentRound)) {
@@ -3807,6 +3811,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void iterateTotalCaloriesForSelectedActivity(long millis) {
     totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
+  }
+
+  private String formatCalorieString(double calories) {
+    DecimalFormat df = new DecimalFormat("#.##");
+    return df.format(calories);
+  }
+
+  private double calculateCaloriesBurnedPerMinute(double metValue) {
+    double weightConversion = userWeight;
+    if (!isMetric) weightConversion = weightConversion / 2.205;
+    double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
+    return caloriesBurnedPerMinute;
+  }
+
+  private double calculateCaloriesBurnedPerSecond() {
+    return calculateCaloriesBurnedPerMinute(metScore) / 60;
+  }
+
+  private void setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView() {
+    double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
+    DecimalFormat df = new DecimalFormat("#.#");
+    String truncatedMinutes = df.format(caloriesBurnedPerMinute);
   }
 
   private String currentTdeeStatStringForSpecificActivity() {
@@ -4713,28 +4739,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
     String[] subCategoryList = subCategoryArray.get(selectedTdeeCategoryPosition);
     return (String) subCategoryList[selectedTdeeSubCategoryPosition];
-  }
-
-  private String formatCalorieString(double calories) {
-    DecimalFormat df = new DecimalFormat("#.##");
-    return df.format(calories);
-  }
-
-  private double calculateCaloriesBurnedPerSecond() {
-    return calculateCaloriesBurnedPerMinute(metScore) / 60;
-  }
-
-  private double calculateCaloriesBurnedPerMinute(double metValue) {
-    double weightConversion = userWeight;
-    if (!isMetric) weightConversion = weightConversion / 2.205;
-    double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
-    return caloriesBurnedPerMinute;
-  }
-
-  private void setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView() {
-    double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
-    DecimalFormat df = new DecimalFormat("#.#");
-    String truncatedMinutes = df.format(caloriesBurnedPerMinute);
   }
 
   private void setTdeeSubCategorySpinnerListFromRetrievedDatabaseValues() {
