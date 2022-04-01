@@ -3789,18 +3789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void iterateTotalCaloriesForSelectedDay(long millis) {
-    totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
-    Log.i("testCals", "total set time is " + totalSetTimeForCurrentDayInMillis);
-    Log.i("testCals", "total calories burned are " + totalCaloriesBurnedForCurrentDay);
-  }
-
-  private double calculateCaloriesBurnedPerTick(long millisTick) {
-    return calculateCaloriesBurnedPerSecond() / millisTick;
-  }
-
-
-
   private void iterateTotalTimesForSelectedActivity(long millis) {
     switch (typeOfRound.get(currentRound)) {
       case 1: case 2:
@@ -3809,13 +3797,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void iterateTotalCaloriesForSelectedActivity(long millis) {
-    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedPerSecond() * (totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
+  private void iterateTotalCaloriesForSelectedDay(long millis) {
+    totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
   }
 
-  private String formatCalorieString(double calories) {
-    DecimalFormat df = new DecimalFormat("#.##");
-    return df.format(calories);
+  private void iterateTotalCaloriesForSelectedActivity(long millis) {
+    totalCaloriesBurnedForSpecificActivityForCurrentDay += calculateCaloriesBurnedPerTick(millis);
+  }
+
+  private double calculateCaloriesBurnedPerTick(long millisTick) {
+    return calculateCaloriesBurnedPerSecond() / millisTick;
+  }
+
+  private double calculateCaloriesBurnedPerSecond() {
+    return calculateCaloriesBurnedPerMinute(metScore) / 60;
   }
 
   private double calculateCaloriesBurnedPerMinute(double metValue) {
@@ -3825,8 +3820,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return caloriesBurnedPerMinute;
   }
 
-  private double calculateCaloriesBurnedPerSecond() {
-    return calculateCaloriesBurnedPerMinute(metScore) / 60;
+  private String formatCalorieString(double calories) {
+    DecimalFormat df = new DecimalFormat("#.##");
+    return df.format(calories);
   }
 
   private void setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView() {
