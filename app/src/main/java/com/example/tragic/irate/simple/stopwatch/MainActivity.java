@@ -860,6 +860,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+
+      if (mode==1 && trackActivityWithinCycle) {
+        setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
+//        setTotalCaloriesBurnedForSpecificActivityForCurrentDayToLastDisplayedTextView();
+      }
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -3839,6 +3844,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String[] stringArray = stringToSplit.split(" ");
     return stringArray[positionToRetrieve];
   }
+
+  private void setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView() {
+    totalCaloriesBurnedForCurrentDay = Double.parseDouble(getLastDisplayedTotalCaloriesString());
+  }
+
+  //Todo: Won't work for specific activities (as they change), unless we do a savedPref/DB thing.
+//  private void setTotalCaloriesBurnedForSpecificActivityForCurrentDayToLastDisplayedTextView() {
+//    totalCaloriesBurnedForSpecificActivityForCurrentDay = Double.parseDouble(getLastDisplayedTotalCalorieForSpecificActivityString());
+//  }
 
   private void displayTotalTimesAndCalories() {
     long remainder = 0;
