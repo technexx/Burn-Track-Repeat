@@ -514,6 +514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
 
+  //Todo: Total time for activity skipping a bit. We're better off just ensuring everything is rounded down and keeps the same method of division display.
   //Todo: Stats for new cycle + activity display previously launched one at beginning. Fine after.
   //Todo: Will need hasTimeTextViewChanged to sync timers for infinity runnables.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -3665,6 +3666,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (setMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+
         if (setMillis <= initialMillisValue-1000) {
           updateDailyStatTextViewsIfTimerHasAlsoUpdated();
         }
@@ -3821,7 +3823,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String currentTdeeStatStringForSpecificActivity() {
-    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTimerDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
   private String getLastDisplayedTotalCaloriesString() {
