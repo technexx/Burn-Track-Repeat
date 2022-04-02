@@ -514,7 +514,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
 
-  //Todo: Total time for activity skipping a bit. We're better off just ensuring everything is rounded down and keeps the same method of division display.
   //Todo: Stats for new cycle + activity display previously launched one at beginning. Fine after.
   //Todo: Will need hasTimeTextViewChanged to sync timers for infinity runnables.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -3614,10 +3613,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
 
-        displayTotalTimesAndCalories();
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        timeLeft.setText(convertSeconds(setMillis/1000));
 
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+        if (setMillis>=1000) {
+          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        }
 
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
@@ -3638,10 +3639,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
 
-        displayTotalTimesAndCalories();
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        timeLeft.setText(convertSeconds(breakMillis/1000));
 
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+        if (breakMillis>=1000) {
+          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        }
 
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
