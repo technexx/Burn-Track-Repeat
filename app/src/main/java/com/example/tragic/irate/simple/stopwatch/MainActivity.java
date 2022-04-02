@@ -515,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
 
   //Todo: Stats for new cycle + activity display previously launched one at beginning. Fine after.
-  //Todo: Some total times start iterating immediately on timer start.
+  //Todo: Will need hasTimeTextViewChanged to sync timers for infinity runnables.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -863,7 +863,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode==1 && trackActivityWithinCycle) {
         setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
-//        setTotalCaloriesBurnedForSpecificActivityForCurrentDayToLastDisplayedTextView();
       }
     });
 
@@ -2824,14 +2823,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else return value;
   }
 
-  private long dividedMillisForTimerDisplay(long millis) {
-    return (millis+999)/1000;
-  }
-
-  private long dividedMillisForTotalTimesDisplay(long millis) {
-    return millis/1000;
-  }
-
   private String convertSeconds(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
@@ -3384,9 +3375,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
 
-      Log.i("testCals", "total calories RETRIEVED are " + totalCaloriesBurnedForCurrentDay);
-      Log.i("testCals", "total calories RETRIEVED and formatted are " + formatCalorieString(totalCaloriesBurnedForCurrentDay));
-
       totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
       totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
     }
@@ -3412,7 +3400,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundTypeString = "";
     pomString = "";
 
-    //Needs to be called for current date every time.
     calendar = Calendar.getInstance();
     date = simpleDateFormat.format(calendar.getTime());
 
@@ -3666,7 +3653,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void startSetTimer() {
     setInitialTextSizeForRounds(setMillis);
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);;
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
+    long initialMillisValue = setMillis;
 
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
@@ -3677,7 +3665,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (setMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        if (setMillis <= initialMillisValue-1000) {
+          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        }
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3694,6 +3684,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void startBreakTimer() {
     setInitialTextSizeForRounds(breakMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
+    long initialMillisValue = breakMillis;
 
     timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
@@ -3704,8 +3695,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (breakMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-
+        if (breakMillis <= initialMillisValue-1000) {
+          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        }
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
         setNotificationValues();
@@ -3729,6 +3721,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void startPomTimer() {
     setInitialTextSizeForRounds(pomMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
+    long initialMillisValue = pomMillis;
 
     timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
       @Override
@@ -3739,7 +3732,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        if (pomMillis <= initialMillisValue-1000) {
+          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        }
 
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
         dotDraws.reDraw();
@@ -3788,7 +3783,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void iterateTotalCaloriesForSelectedDay(long millis) {
     totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
     Log.i("testCals", "total calories are " + totalCaloriesBurnedForCurrentDay);
-    Log.i("testCals", "total calories formatted are " + formatCalorieString(totalCaloriesBurnedForCurrentDay));
     Log.i("testCals", "split String is " + getLastDisplayedTotalCaloriesString());
   }
 
@@ -3849,10 +3843,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalCaloriesBurnedForCurrentDay = Double.parseDouble(getLastDisplayedTotalCaloriesString());
   }
 
-  //Todo: Won't work for specific activities (as they change), unless we do a savedPref/DB thing.
-//  private void setTotalCaloriesBurnedForSpecificActivityForCurrentDayToLastDisplayedTextView() {
-//    totalCaloriesBurnedForSpecificActivityForCurrentDay = Double.parseDouble(getLastDisplayedTotalCalorieForSpecificActivityString());
-//  }
+  private void roundDownAllTotalTimeValuesToEnsureSyncing() {
+    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
+    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
+
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
+    return millisToRound - (millisToRound%1000);
+  }
+
+  private long dividedMillisForTimerDisplay(long millis) {
+    return (millis+999)/1000;
+  }
+
+  private long dividedMillisForTotalTimesDisplay(long millis) {
+    return millis/1000;
+  }
 
   private void displayTotalTimesAndCalories() {
     long remainder = 0;
@@ -4202,9 +4210,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
     };
 
-    logTotalSetTimes();
-    logTotalBreakTimes();
-
     return valueToReturn;
   }
 
@@ -4248,8 +4253,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         valueToReturn = (totalCycleRestTimeInMillis + cycleRestTimeForSingleRoundInMillis);
         break;
     }
-    logTotalWorkTimes();
-    logTotalRestTimes();
     return valueToReturn;
   }
 
@@ -4286,17 +4289,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       }
     }
-  }
-
-  private void roundDownAllTotalTimeValuesToEnsureSyncing() {
-    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
-    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
-
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-  }
-
-  private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
-    return millisToRound - (millisToRound%1000);
   }
 
   private void saveTotalSetAndBreakTimes() {
@@ -4783,9 +4775,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, String.valueOf(metScore)));
-
-    logTdeeCategoryPositions();
-    logTdeeCategoryArraysSelected();
   }
 
   private void tdeeSubCategorySpinnerTouchActions() {
@@ -4796,62 +4785,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, String.valueOf(metScore)));
-
-    logTdeeCategoryPositions();
-    logTdeeCategoryArraysSelected();
   }
 
   private double retrieveMetScoreFromSubCategoryPosition() {
     String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
     return preRoundedMet;
-  }
-
-  private void logAllTimesAndCalories() {
-    Log.i("testTotals", "total set time for current day is " + totalSetTimeForCurrentDayInMillis);
-    Log.i("testTotals", "total break time for current day is " + totalBreakTimeForCurrentDayInMillis);
-    Log.i("testTotals", "total set time for current day AND activity is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-  }
-
-  private void logTdeeCategoryPositions() {
-    Log.i("testRetrieve", "cat position is " + selectedTdeeCategoryPosition);
-    Log.i("testRetrieve", "sub cat position " + selectedTdeeSubCategoryPosition);
-    Log.i("testRetrieve", "value array position " + selectedTdeeValuePosition);
-  }
-
-  private void logTdeeCategoryArraysSelected() {
-    ArrayList<String[]> valueArrayList = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays;
-    String[] selected = valueArrayList.get(selectedTdeeCategoryPosition);
-
-    Log.i("testRetrieve", "value ARRAY LIST is " + Arrays.toString(selected));
-  }
-
-  private void logTdeeArraySizes() {
-    for (int i=0; i<tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.size(); i++) {
-      String[] arrayToTest = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(i);
-      Log.i("testTdeeArraySizes", "size of " + i + " is " + arrayToTest.length);
-    }
-  }
-
-  ///////////Test methods///////////////////////////
-  private void logTotalSetTimes() {
-    Log.i("testTimes", "single set millis is " + cycleSetTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total set millis is " + totalCycleSetTimeInMillis);
-
-  }
-
-  private void logTotalBreakTimes() {
-    Log.i("testTimes", "single break millis is " + cycleBreakTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total break millis is " + totalCycleBreakTimeInMillis);
-  }
-
-  private void logTotalWorkTimes() {
-    Log.i("testTimes", "single work millis is " + cycleWorkTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total work millis is " + totalWorkTimeInMillis);
-  }
-
-  private void logTotalRestTimes() {
-    Log.i("testTimes", "single rest millis is " + cycleRestTimeForSingleRoundInMillis);
-    Log.i("testTimes", "total rest millis is " + totalCycleRestTimeInMillis);
   }
 }
