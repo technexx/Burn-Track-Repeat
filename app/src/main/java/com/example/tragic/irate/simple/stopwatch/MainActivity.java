@@ -513,9 +513,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int timerRunnableDelay = 50;
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
+  int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Pause/resume issues w/ total times sync'd to timer.
   //Todo: Stats for new cycle + activity display previously launched one at beginning. Fine after.
-  //Todo: Will need hasTimeTextViewChanged to sync timers for infinity runnables.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -3669,10 +3670,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (setMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-
-        if (setMillis <= initialMillisValue-1000) {
-          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        }
+        timerSyncDelayMethod(timerRunnableDelay);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -3700,9 +3698,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (breakMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        if (breakMillis <= initialMillisValue-1000) {
-          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        }
+        timerSyncDelayMethod(timerRunnableDelay);
+
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
         setNotificationValues();
@@ -3737,9 +3734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        if (pomMillis <= initialMillisValue-1000) {
-          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        }
+        timerSyncDelayMethod(timerRunnableDelay);
 
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
         dotDraws.reDraw();
@@ -3753,7 +3748,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
     if (hasTimerTextViewChanged()) {
@@ -3764,6 +3758,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private boolean hasTimerTextViewChanged() {
     return !timerTextViewStringTwo.equals(timerTextViewStringOne);
+  }
+
+  private void timerSyncDelayMethod(int millisTickValue) {
+    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
+      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
+    } else {
+      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+    }
   }
 
   private void iterateTotalTimesForSelectedDay(long millis) {
@@ -3787,8 +3789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void iterateTotalCaloriesForSelectedDay(long millis) {
     totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
-    Log.i("testCals", "total calories are " + totalCaloriesBurnedForCurrentDay);
-    Log.i("testCals", "split String is " + getLastDisplayedTotalCaloriesString());
   }
 
   private void iterateTotalCaloriesForSelectedActivity(long millis) {
@@ -4336,6 +4336,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               if (timer != null) timer.cancel();
               if (objectAnimator != null) objectAnimator.pause();
 
+
               switch (typeOfRound.get(currentRound)) {
                 case 1:
                   setMillisUntilFinished = setMillis;
@@ -4353,7 +4354,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                   break;
               }
             } else if (pausing == RESUMING_TIMER) {
-              //Ensures any non-reset timer lets this be true.
               activeCycle = true;
               timerIsPaused = false;
               reset.setVisibility(View.INVISIBLE);
@@ -4381,7 +4381,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
             }
             AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-          } else resetTimer();
+          } else {
+            resetTimer();
+          }
           break;
         case 3:
           if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
@@ -4402,7 +4404,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               startPomTimer();
             }
             AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-          } else resetTimer();
+          } else {
+            resetTimer();
+          }
           break;
         case 4:
           if (pausing == RESUMING_TIMER) {
@@ -4655,6 +4659,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     progressBar.setProgress(10000);
     currentProgressBarValue = 10000;
+    delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
     reset.setVisibility(View.INVISIBLE);
 
