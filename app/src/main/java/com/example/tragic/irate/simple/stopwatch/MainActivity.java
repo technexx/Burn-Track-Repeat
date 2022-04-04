@@ -339,13 +339,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalCycleSetTimeInMillis;
   long cycleBreakTimeForSingleRoundInMillis;
   long totalCycleBreakTimeInMillis;
-  long timerDurationPlaceHolderForModeOne;
 
   long cycleWorkTimeForSingleRoundInMillis;
   long totalWorkTimeInMillis;
   long cycleRestTimeForSingleRoundInMillis;
-  long totalCycleRestTimeInMillis;
-  long timerDurationPlaceHolderForModeThree;
+  long totalRestTimeInMillis;
 
   long totalSetTimeForCurrentDayInMillis;
   long totalBreakTimeForCurrentDayInMillis;
@@ -1065,7 +1063,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     reset.setOnClickListener(v -> {
-      addAndRoundDownTotalCycleTimes();
       roundDownAllTotalTimeValuesToEnsureSyncing();
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
@@ -1730,7 +1727,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     assignOldCycleValuesToCheckForChanges();
     resetEditPopUpTimerHeaders();
     editPopUpTimerArray.clear();
-    zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
     timerValueInEditPopUpTextView.setText("00:00");
   }
 
@@ -1881,7 +1877,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
         runOnUiThread(()->{
-          zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
           editCycleArrayLists(DELETING_CYCLE);
           replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         });
@@ -1919,7 +1914,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
           }
           runOnUiThread(()-> {
-            zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews();
             replaceCycleListWithEmptyTextViewIfNoCyclesExist();
           });
         };
@@ -1942,7 +1936,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           if (mode==3) {
             totalWorkTimeInMillis = 0;
-            totalCycleRestTimeInMillis = 0;
+            totalRestTimeInMillis = 0;
           }
 
           cyclesCompleted = 0;
@@ -3374,10 +3368,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
         }
       });
-
     });
-
-
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {
@@ -3525,20 +3516,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
-    int totalSetTime = 0;
-    int totalBreakTime = 0;
+    long totalSetTime = 0;
+    long totalBreakTime = 0;
 
     if (mode == 1) {
       cycles = cyclesList.get(positionOfSelectedCycle);
-      totalSetTime = cycles.getTotalSetTime();
-      totalBreakTime = cycles.getTotalBreakTime();
+      totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolder();
+      totalBreakTime = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
+      //Todo: Add to DayHolder.
       cyclesCompleted = cycles.getCyclesCompleted();
 
-      //These are saved as whole ints in db.
       totalCycleSetTimeInMillis = totalSetTime * 1000;
       totalCycleBreakTimeInMillis = totalBreakTime * 1000;
     }
 
+    //Todo: Add getter/setter to DayHolder.
     if (mode == 3) {
       pomCycles = pomCyclesList.get(positionOfSelectedCycle);
       totalSetTime = pomCycles.getTotalWorkTime();
@@ -3546,7 +3538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cyclesCompleted = pomCycles.getCyclesCompleted();
 
       totalWorkTimeInMillis = totalSetTime * 1000;
-      totalCycleRestTimeInMillis = totalBreakTime * 1000;
+      totalRestTimeInMillis = totalBreakTime * 1000;
     }
 
     total_set_time.setText(convertSeconds(totalSetTime));
@@ -3583,7 +3575,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
           if (currentProgressBarValue==maxProgress) {
-            timerDurationPlaceHolderForModeOne = setMillis;
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(setMillis);
           } else {
@@ -3592,7 +3583,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
           if (currentProgressBarValue==maxProgress) {
-            timerDurationPlaceHolderForModeOne = breakMillis;
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(breakMillis);
           } else {
@@ -3611,9 +3601,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (currentProgressBarValue==maxProgress){
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter);
-
-
-          timerDurationPlaceHolderForModeThree = pomMillis;
           instantiateAndStartObjectAnimator(pomMillis);
         } else {
           pomMillis = pomMillisUntilFinished;
@@ -3731,14 +3718,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
-    iterateTotalTimesForSelectedDay(timerRunnableDelay);
-    iterateTotalTimesForSelectedActivity(timerRunnableDelay);
-
-    iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
-    iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
-  }
-
   private void startPomTimer() {
     setInitialTextSizeForRounds(pomMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
@@ -3767,6 +3746,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
+  private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
+    iterateTotalTimesForSelectedDay(timerRunnableDelay);
+    iterateTotalTimesForSelectedActivity(timerRunnableDelay);
+
+    iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+    iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+  }
+
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
     if (hasTimerTextViewChanged()) {
@@ -3788,14 +3775,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void iterateTotalTimesForSelectedDay(long millis) {
-    switch (typeOfRound.get(currentRound)) {
-      case 1: case 2:
-        totalSetTimeForCurrentDayInMillis += millis;
-        break;
-      case 3: case 4:
-        totalBreakTimeForCurrentDayInMillis += millis;
-        break;
-    };
+    if (mode==1) {
+      switch (typeOfRound.get(currentRound)) {
+        case 1: case 2:
+          totalSetTimeForCurrentDayInMillis += millis;
+          break;
+        case 3: case 4:
+          totalBreakTimeForCurrentDayInMillis += millis;
+          break;
+      };
+    }
+    if (mode==3) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          cycleWorkTimeForSingleRoundInMillis += millis;
+          break;
+        case 1: case 3: case 5: case 7:
+          cycleRestTimeForSingleRoundInMillis += millis;
+          break;
+      }
+    }
   }
 
   private void iterateTotalTimesForSelectedActivity(long millis) {
@@ -3840,7 +3839,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
   }
 
-  private String currentTotalTimesAndCaloriesForTrackingMode() {
+  private String currentTotalSetTimeForNonTrackingMode() {
+    return convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis));
+  }
+
+  private String currentTotalBreakTimeForNonTrackingMode() {
+    return convertSeconds(dividedMillisForTotalTimesDisplay(totalBreakTimeForCurrentDayInMillis));
+  }
+
+  private String currentTotalWorkTime() {
+    return convertSeconds(dividedMillisForTotalTimesDisplay(totalWorkTimeInMillis));
+  }
+
+  private String currentTotalRestTime() {
+    return convertSeconds(dividedMillisForTotalTimesDisplay(totalRestTimeInMillis));
+  }
+
+  private String currentTotalSetTimeAndCaloriesForTrackingMode() {
     return getString(R.string.total_daily_time_and_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
@@ -3888,14 +3903,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void displayTotalTimesAndCalories() {
     if (resettingTotalTime) {
-      resetTotalTimesAndCalories();
       resettingTotalTime = false;
     }
-    displayCurrentTotalTimeString();
 
     if (mode==1) {
       if (trackActivityWithinCycle) {
-        cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalTimesAndCaloriesForTrackingMode());
+        cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
         activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
       }
     }
@@ -3904,7 +3917,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void toggleTotalCyclesCompletedsAndTotalCaloriesBurnedTextView() {
     if (mode==1) {
       if (trackActivityWithinCycle) {
-        cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalTimesAndCaloriesForTrackingMode());
+        cycles_completed_and_total_daily_stats_header_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
       } else {
         cycles_completed_and_total_daily_stats_header_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
       }
@@ -3947,7 +3960,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setEnabled(false);
     timerDisabled = true;
 
-    addAndRoundDownTotalCycleTimes();
     roundDownAllTotalTimeValuesToEnsureSyncing();
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
@@ -4005,7 +4017,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
 
       beginTimerForNextRound = true;
-      timerDurationPlaceHolderForModeOne = 0;
     }
     if (mode==3) {
       switch (pomDotCounter) {
@@ -4014,11 +4025,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setEndOfRoundSounds(vibrationSettingForWork, false);
           break;
         case 1: case 3: case 5:
-          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
+          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalRestTimeInMillis)));
           setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
           break;
         case 7:
-          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
+          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalRestTimeInMillis)));
 
           boolean isAlertRepeating = false;
           if (isFullBreakSoundContinuous) isAlertRepeating = true;
@@ -4140,175 +4151,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void resetTotalTimesAndCalories() {
-    long roundedValueForTotalTimes;
-    if (mode==1) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1:
-          roundedValueForTotalTimes = 1000 - (setMillis%1000);
-          timerDurationPlaceHolderForModeOne = setMillis + roundedValueForTotalTimes;
-          if (trackActivityWithinCycle) {
-            long roundedValueForTdeeTime = 1000 - (setMillis%1000);
-          }
-          break;
-        case 2:
-          long remainder = setMillis%1000;
-          timerDurationPlaceHolderForModeOne = setMillis - remainder;
-          if (trackActivityWithinCycle) {
-            remainder = setMillis%1000;
-          }
-          break;
-        case 3:
-          roundedValueForTotalTimes = 1000 - (breakMillis%1000);
-          timerDurationPlaceHolderForModeOne = breakMillis + roundedValueForTotalTimes;
-          break;
-        case 4:
-          remainder = breakMillis%1000;
-          timerDurationPlaceHolderForModeOne = breakMillis - remainder;
-          break;
-      }
-    }
-    if (mode==3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-            timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
-          }
-          break;
-        case 1: case 3: case 5: case 7:
-          if (resettingTotalTime) {
-            roundedValueForTotalTimes = 1000 - (pomMillis%1000);
-            timerDurationPlaceHolderForModeThree = pomMillis + roundedValueForTotalTimes;
-          }
-          break;
-      }
-    }
-  }
-
-  private void zeroOutAllTotalTimeAndCalorieVariablesAndTheirTextViews() {
-    if (mode==1) {
-      timerDurationPlaceHolderForModeOne = 0;
-
-      cycleSetTimeForSingleRoundInMillis = 0;
-      totalCycleSetTimeInMillis = 0;
-      cycleBreakTimeForSingleRoundInMillis = 0;
-      totalCycleBreakTimeInMillis = 0;
-    }
-    if (mode==3) {
-      timerDurationPlaceHolderForModeThree = 0;
-
-      cycleWorkTimeForSingleRoundInMillis = 0;
-      totalWorkTimeInMillis = 0;
-      cycleRestTimeForSingleRoundInMillis = 0;
-      totalCycleRestTimeInMillis = 0;
-    }
-
-    total_set_time.setText("0");
-    total_break_time.setText("0");
-    cycles_completed_and_total_daily_stats_header_textView.setText("0");
-  }
-
-  private long iterateAndReturnTotalTimeForModeOne() {
-    long valueToReturn = 0;
-
-    switch (typeOfRound.get(currentRound)) {
-      case 1:
-        cycleSetTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeOne - setMillis;
-        valueToReturn = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
-        break;
-      case 2:
-        cycleSetTimeForSingleRoundInMillis = setMillis - timerDurationPlaceHolderForModeOne;
-        valueToReturn = (totalCycleSetTimeInMillis + cycleSetTimeForSingleRoundInMillis);
-        break;
-      case 3:
-        cycleBreakTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeOne - breakMillis;
-        valueToReturn = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
-        break;
-      case 4:
-        cycleBreakTimeForSingleRoundInMillis = breakMillis - timerDurationPlaceHolderForModeOne;
-        valueToReturn = (totalCycleBreakTimeInMillis + cycleBreakTimeForSingleRoundInMillis);
-        break;
-    };
-
-    return valueToReturn;
-  }
-
-  private String currentTotalTimeStringForModeOne() {
-    return convertSeconds(dividedMillisForTotalTimesDisplay(iterateAndReturnTotalTimeForModeOne()));
-  }
-
+  //Todo: Change to daily for Pom as well, or simply keep it for cycle since we're not doing any tracking in it.
   private void displayCurrentTotalTimeString() {
     if (mode==1) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1: case 2:
-          total_set_time.setText(currentTotalTimeStringForModeOne());
-          break;
-        case 3: case 4:
-          total_break_time.setText(currentTotalTimeStringForModeOne());
-          break;
-      }
+      total_set_time.setText(currentTotalSetTimeForNonTrackingMode());
+      total_break_time.setText(currentTotalBreakTimeForNonTrackingMode());
     }
     if (mode==3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          total_set_time.setText(currentTotalTimeStringForModeThree());
-          break;
-        case 1: case 3: case 5: case 7:
-          total_break_time.setText(currentTotalTimeStringForModeThree());
-          break;
-      }
-    }
-  }
-
-  private long iterateAndReturnTotalTimeForModeThree() {
-    long valueToReturn = 0;
-
-    switch (pomDotCounter) {
-      case 0: case 2: case 4: case 6:
-        cycleWorkTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeThree - pomMillis;
-        valueToReturn = (totalWorkTimeInMillis + cycleWorkTimeForSingleRoundInMillis);
-        break;
-      case 1: case 3: case 5: case 7:
-        cycleRestTimeForSingleRoundInMillis = timerDurationPlaceHolderForModeThree - pomMillis;
-        valueToReturn = (totalCycleRestTimeInMillis + cycleRestTimeForSingleRoundInMillis);
-        break;
-    }
-    return valueToReturn;
-  }
-
-  private String currentTotalTimeStringForModeThree() {
-    return convertSeconds(dividedMillisForTotalTimesDisplay(iterateAndReturnTotalTimeForModeThree()));
-  }
-
-  private void addAndRoundDownTotalCycleTimes() {
-    if (mode==1) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1: case 2:
-          totalCycleSetTimeInMillis += cycleSetTimeForSingleRoundInMillis + 100;
-          totalCycleSetTimeInMillis = (totalCycleSetTimeInMillis/1000) * 1000;
-          cycleSetTimeForSingleRoundInMillis = 0;
-          break;
-        case 3: case 4:
-          totalCycleBreakTimeInMillis += cycleBreakTimeForSingleRoundInMillis + 100;
-          totalCycleBreakTimeInMillis = (totalCycleBreakTimeInMillis / 1000) * 1000;
-          cycleBreakTimeForSingleRoundInMillis = 0;
-          break;
-      }
-    }
-    if (mode==3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          totalWorkTimeInMillis += cycleWorkTimeForSingleRoundInMillis + 100;
-          totalWorkTimeInMillis = (totalWorkTimeInMillis/1000) * 1000;
-          cycleWorkTimeForSingleRoundInMillis = 0;
-          break;
-        case 1: case 3: case 5: case 7:
-          totalCycleRestTimeInMillis += cycleRestTimeForSingleRoundInMillis + 100;
-          totalCycleRestTimeInMillis = (totalCycleRestTimeInMillis/1000) * 1000;
-          cycleRestTimeForSingleRoundInMillis = 0;
-          break;
-      }
+      total_set_time.setText(currentTotalWorkTime());
+      total_break_time.setText(currentTotalRestTime());
     }
   }
 
@@ -4325,7 +4176,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         int workTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalWorkTimeInMillis, cycleWorkTimeForSingleRoundInMillis);
-        breakTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalCycleRestTimeInMillis, cycleRestTimeForSingleRoundInMillis);
+        breakTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalRestTimeInMillis, cycleRestTimeForSingleRoundInMillis);
 
         pomCycles.setTotalWorkTime(workTimeToSave);
         pomCycles.setTotalBreakTime(breakTimeToSave);
@@ -4584,8 +4435,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     switch (mode) {
       case 1:
-        timerDurationPlaceHolderForModeOne = 0;
-
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
@@ -4620,8 +4469,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
-        timerDurationPlaceHolderForModeThree = 0;
-
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
