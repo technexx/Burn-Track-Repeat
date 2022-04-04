@@ -28,7 +28,6 @@ import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -64,7 +63,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,7 +77,6 @@ import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
 import com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas;
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
@@ -96,7 +93,6 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -1622,9 +1618,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
-        //For individual cycles.
-        saveTotalSetAndBreakTimes();
-
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
         //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
@@ -3446,10 +3439,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (cycleTitle.isEmpty()) {
             cycleTitle = date;
           }
-          cycles.setTimeAdded(System.currentTimeMillis());
-          cycles.setTotalSetTime(0);
-          cycles.setTotalBreakTime(0);
-          cycles.setCyclesCompleted(0);
+          cycles.setTimeAdded(System.currentTimeMillis());;
           cycles.setTitle(cycleTitle);
 
           cyclesDatabase.cyclesDao().insertCycle(cycles);
@@ -3515,27 +3505,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     metScore = retrieveMetScoreFromSubCategoryPosition();
   }
 
+  //Todo: Rename this.
   private void retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews() {
     long totalSetTime = 0;
     long totalBreakTime = 0;
 
     if (mode == 1) {
-      cycles = cyclesList.get(positionOfSelectedCycle);
       totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolder();
       totalBreakTime = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
-      //Todo: Add to DayHolder.
-      cyclesCompleted = cycles.getCyclesCompleted();
+      cyclesCompleted = dailyStatsAccess.getCyclesCompletedForModeOne();
 
       totalCycleSetTimeInMillis = totalSetTime * 1000;
       totalCycleBreakTimeInMillis = totalBreakTime * 1000;
     }
 
-    //Todo: Add getter/setter to DayHolder.
     if (mode == 3) {
-      pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-      totalSetTime = pomCycles.getTotalWorkTime();
-      totalBreakTime = pomCycles.getTotalBreakTime();
-      cyclesCompleted = pomCycles.getCyclesCompleted();
+      totalSetTime = dailyStatsAccess.getTotalWorkTimeFromDayHolder();
+      totalBreakTime = dailyStatsAccess.getTotalRestTimeFromDayHolder();
+      cyclesCompleted = dailyStatsAccess.getCyclesCompletedForModeThree();
 
       totalWorkTimeInMillis = totalSetTime * 1000;
       totalRestTimeInMillis = totalBreakTime * 1000;
@@ -4160,29 +4147,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       total_set_time.setText(currentTotalWorkTime());
       total_break_time.setText(currentTotalRestTime());
-    }
-  }
-
-  private void saveTotalSetAndBreakTimes() {
-    switch (mode) {
-      case 1:
-        int setTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalCycleSetTimeInMillis, cycleSetTimeForSingleRoundInMillis);
-        int breakTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalCycleBreakTimeInMillis, cycleBreakTimeForSingleRoundInMillis);
-        cycles.setTotalSetTime(setTimeToSave);
-        cycles.setTotalBreakTime(breakTimeToSave);
-        cycles.setCyclesCompleted(cyclesCompleted);
-
-        cyclesDatabase.cyclesDao().updateCycles(cycles);
-        break;
-      case 3:
-        int workTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalWorkTimeInMillis, cycleWorkTimeForSingleRoundInMillis);
-        breakTimeToSave = totalValueAddedToSingleValueAndDividedBy1000ToInteger(totalRestTimeInMillis, cycleRestTimeForSingleRoundInMillis);
-
-        pomCycles.setTotalWorkTime(workTimeToSave);
-        pomCycles.setTotalBreakTime(breakTimeToSave);
-        pomCycles.setCyclesCompleted(cyclesCompleted);
-        cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-        break;
     }
   }
 

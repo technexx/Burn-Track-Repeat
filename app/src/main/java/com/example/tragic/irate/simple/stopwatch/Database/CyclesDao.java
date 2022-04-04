@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 

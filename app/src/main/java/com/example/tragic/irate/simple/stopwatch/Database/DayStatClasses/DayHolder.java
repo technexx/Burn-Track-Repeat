@@ -12,10 +12,16 @@ public class DayHolder {
     @PrimaryKey
     public long daySelectedId;
     String date;
+
     long totalSetTime;
     long totalBreakTime;
     double totalCaloriesBurned;
-    @Ignore List<ActivitiesForEachDay> activitiesForEachDayList;
+
+    long totalWorkTime;
+    long totalRestTime;
+
+    int cyclesCompletedForModeOne;
+    int cyclesCompletedForModeThree;
 
     public long getDayId() {
         return daySelectedId;
@@ -57,11 +63,35 @@ public class DayHolder {
         this.totalCaloriesBurned = totalCaloriesBurned;
     }
 
-    public List<ActivitiesForEachDay> getActivitiesForEachDayList() {
-        return activitiesForEachDayList;
+    public int getCyclesCompletedForModeOne() {
+        return cyclesCompletedForModeOne;
     }
 
-    public void setActivitiesForEachDayList(List<ActivitiesForEachDay> activitiesForEachDayList) {
-        this.activitiesForEachDayList = activitiesForEachDayList;
+    public void setCyclesCompletedForModeOne(int cyclesCompleted) {
+        this.cyclesCompletedForModeOne = cyclesCompleted;
+    }
+
+    public long getTotalWorkTime() {
+        return totalWorkTime;
+    }
+
+    public void setTotalWorkTime(long totalWorkTime) {
+        this.totalWorkTime = totalWorkTime;
+    }
+
+    public long getTotalRestTime() {
+        return totalRestTime;
+    }
+
+    public void setTotalRestTime(long totalRestTime) {
+        this.totalRestTime = totalRestTime;
+    }
+
+    public int getCyclesCompletedForModeThree() {
+        return cyclesCompletedForModeThree;
+    }
+
+    public void setCyclesCompletedForModeThree(int cyclesCompletedForModeThree) {
+        this.cyclesCompletedForModeThree = cyclesCompletedForModeThree;
     }
 }

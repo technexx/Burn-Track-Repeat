@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.ActivitiesForEachDay;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 
@@ -67,18 +66,15 @@ public class DailyStatsAccess {
             String date = calendarValues.getDateString();
 
             DayHolder dayHolder = new DayHolder();
-            ActivitiesForEachDay activitiesForEachDay = new ActivitiesForEachDay();
 
             dayHolder.setDayId(daySelected);
             dayHolder.setDate(date);
 
-            activitiesForEachDay.setUniqueDayIdPossessedByEachOfItsActivities(daySelected);
             dayHolder.setTotalSetTime(0);
             dayHolder.setTotalBreakTime(0);
             dayHolder.setTotalCaloriesBurned(0);
 
             cyclesDatabase.cyclesDao().insertDay(dayHolder);
-            cyclesDatabase.cyclesDao().insertActivitiesForEachDay(activitiesForEachDay);
         }
     }
 
@@ -131,6 +127,37 @@ public class DailyStatsAccess {
         return mDayHolder.getTotalCaloriesBurned();
     }
 
+    public void setCyclesCompletedForModeOne(int cyclesCompleted) {
+        mDayHolder.setCyclesCompletedForModeOne(cyclesCompleted);
+    }
+
+    public int getCyclesCompletedForModeOne() {
+        return mDayHolder.getCyclesCompletedForModeOne();
+    }
+
+    public void setTotalWorkTimeFromDayHolder(long totalWorkTime) {
+        mDayHolder.setTotalWorkTime(totalWorkTime);
+    }
+
+    public long getTotalWorkTimeFromDayHolder() {
+        return mDayHolder.getTotalWorkTime();
+    }
+
+    public void setTotalRestTimeFromDayHolder(long totalRestTime) {
+        mDayHolder.setTotalRestTime(totalRestTime);
+    }
+
+    public long getTotalRestTimeFromDayHolder() {
+        return mDayHolder.getTotalRestTime();
+    }
+
+    public void setCyclesCompletedForModeThree(int cyclesCompleted) {
+        mDayHolder.setCyclesCompletedForModeThree(cyclesCompleted);
+    }
+
+    public int getCyclesCompletedForModeThree() {
+        return mDayHolder.getCyclesCompletedForModeThree();
+    }
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
@@ -157,7 +184,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
 
