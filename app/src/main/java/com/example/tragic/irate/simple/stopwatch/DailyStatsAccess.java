@@ -42,11 +42,8 @@ public class DailyStatsAccess {
     }
 
     private void instantiateDailyStatsDatabase() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                cyclesDatabase = CyclesDatabase.getDatabase(mContext);
-            }
+        AsyncTask.execute(()->{
+            cyclesDatabase = CyclesDatabase.getDatabase(mContext);
         });
     }
 

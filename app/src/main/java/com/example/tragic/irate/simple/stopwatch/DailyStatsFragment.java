@@ -47,8 +47,6 @@ public class DailyStatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
-        Button testButton = root.findViewById(R.id.test_button);
-
         calendarView = mRoot.findViewById(R.id.stats_calendar);
         dailyStatsAccess = new DailyStatsAccess(getActivity());
 
@@ -64,17 +62,6 @@ public class DailyStatsFragment extends Fragment {
 
                 daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
                 queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelectedFromCalendar);
-            }
-        });
-
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncTask.execute(()-> {
-                    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dailyStatsAccess.getCurrentDayOfYear());
-                    dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay("Run!");
-                });
-                Toast.makeText(getContext(), "Inserted!", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -24,6 +24,9 @@ public class Cycles {
     public int tdeeSubCatPosition;
     public int tdeeValuePosition;
 
+//    //Used for ease of viewing database entries.
+    public String activityString;
+
     public Cycles() {
     }
 
@@ -125,5 +128,13 @@ public class Cycles {
 
     public void setTdeeValuePosition(int tdeeValuePosition) {
         this.tdeeValuePosition = tdeeValuePosition;
+    }
+
+    public String getActivityString() {
+        return activityString;
+    }
+
+    public void setActivityString(String activityString) {
+        this.activityString = activityString;
     }
 }

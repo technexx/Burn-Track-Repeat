@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortMode = 1;
   int sortModePom = 1;
   int sortHolder = 1;
-  int positionOfSelectedCycle;
+  int positionOfSelectedCycle = 0;
   String cycleTitle = "";
   List<String> receivedHighlightPositions;
   List<Integer> receivedHighlightPositionHolder;
@@ -515,8 +515,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Pause/resume issues w/ total times sync'd to timer.
   //Todo: Stats for new cycle + activity display previously launched one at beginning. Fine after.
+  //Todo: DB viewer shows that half our cycles have negative total set times.
+  //Todo: Swipe to delete option for cycles on Main.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -1111,6 +1112,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void groupAllAppStartInstantiations() {
 
     instantiateGlobalClasses();
+    removeAllTimerSharedPreferences();
+
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
     instantiateTabLayouts();
@@ -1238,7 +1241,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!sortButton.isEnabled()) fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
     if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
 
-    positionOfSelectedCycle = 0;
+
     receivedHighlightPositions.clear();
     receivedHighlightPositionHolder.clear();
   }
@@ -2703,7 +2706,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==3) {
       if (activeCycle) {
-        if (isNewCycle) positionOfSelectedCycle = 7;
+        if (isNewCycle) positionOfSelectedCycle = pomArray.size()-1;
         savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
       }
       if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode());
@@ -3332,11 +3335,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = true;
 
     AsyncTask.execute(()-> {
-      if (isNewCycle || saveToDB) {
-        saveAddedOrEditedCycleASyncRunnable();
-      } else {
-        queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable();
-      }
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
@@ -3355,6 +3353,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
+
+      if (isNewCycle || saveToDB) {
+        saveAddedOrEditedCycleASyncRunnable();
+      } else {
+        queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable();
+      }
+
+
+      //Todo: Still issues w/ pulling correct values. Seems to correct after a couple different cycle clicks.
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          toggleTdeeTextViewVisibility();
+          activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
+          retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
+
+          displayTotalTimesAndCalories();
+        }
+      });
+
     });
 
     resetTimer();
@@ -3422,6 +3440,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setTdeeValuePosition(selectedTdeeValuePosition);
+        cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
+
       } else {
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
@@ -3868,8 +3888,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void displayTotalTimesAndCalories() {
-    long remainder = 0;
-
     if (resettingTotalTime) {
       resetTotalTimesAndCalories();
       resettingTotalTime = false;
@@ -4801,5 +4819,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
     return preRoundedMet;
+  }
+
+  private void removeAllTimerSharedPreferences() {
+    prefEdit.remove("savedProgressBarValueForModeOne");
+    prefEdit.remove("timeLeftValueForModeOne");
+    prefEdit.remove("positionOfSelectedCycleForModeOne");
+    prefEdit.remove("modeOneTimerPaused");
+    prefEdit.remove("modeOneTimerEnded");
+    prefEdit.remove("modeOneTimerDisabled");
+    prefEdit.remove("savedProgressBarValueForModeThree");
+    prefEdit.remove("timeLeftValueForModeThree");
+    prefEdit.remove("positionOfSelectedCycleForModeThree");
+    prefEdit.remove("modeThreeTimerPaused");
+    prefEdit.remove("modeThreeTimerEnded");
+    prefEdit.remove("modeThreeTimerDisabled");
+    prefEdit.apply();
   }
 }
