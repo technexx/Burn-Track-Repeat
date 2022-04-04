@@ -515,6 +515,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Negative set time increases just by launching, exiting, and re-launching cycle.
+  //Todo: TextView toggle for tdee tracking not always working.
   //Todo: Stats for new cycle + activity display previously launched one at beginning. Fine after.
   //Todo: DB viewer shows that half our cycles have negative total set times.
   //Todo: Swipe to delete option for cycles on Main.
@@ -692,7 +694,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void toggleTdeeMode(boolean tdeeToggle) {
-//    cycleHasActivityAssigned = tdeeToggle;
     trackActivityWithinCycle = tdeeToggle;
   }
 
@@ -705,7 +706,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     positionOfSelectedCycle = position;
 
     boolean trackingCycle = savedCycleAdapter.retrieveActiveTdeeModeToggleList(position);
-    toggleExistenceOfTdeeActivity(trackingCycle);
 
     populateCycleAdapterArrayList();
     launchTimerCycle(false);
@@ -1726,7 +1726,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     clearRoundAndCycleAdapterArrayLists();
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
     setViewsAndColorsToPreventTearingInEditPopUp(true);
-    toggleExistenceOfTdeeActivity(false);
 
     assignOldCycleValuesToCheckForChanges();
     resetEditPopUpTimerHeaders();
@@ -3360,25 +3359,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable();
       }
 
-
-      //Todo: Still issues w/ pulling correct values. Seems to correct after a couple different cycle clicks.
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          toggleTdeeTextViewVisibility();
-          activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
+          toggleTdeeTextViewSize();
           retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
-
           displayTotalTimesAndCalories();
+
+          toggleExistenceOfTdeeActivity(trackActivityWithinCycle);
+
+          resetTimer();
+          populateTimerUI();
+
+          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
         }
       });
 
     });
 
-    resetTimer();
-    populateTimerUI();
 
-    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {
@@ -3508,7 +3507,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        toggleTdeeTextViewVisibility();
+        toggleTdeeTextViewSize();
         activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
         retrieveTotalSetAndBreakAndCycleValuesAndSetTheirTextViews();
       }
@@ -4133,9 +4132,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void toggleTdeeTextViewVisibility() {
+  private void toggleTdeeTextViewSize() {
     if (!trackActivityWithinCycle) {
-      activityStatsInTimerTextView.setText(R.string.no_activity);
       activityStatsInTimerTextView.setTextSize(24);
     } else {
       activityStatsInTimerTextView.setTextSize(20);
@@ -4618,7 +4616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               setInitialTextSizeForRounds(0);
               break;
           }
-          toggleTdeeTextViewVisibility();
+          toggleTdeeTextViewSize();
         }
         break;
       case 3:
