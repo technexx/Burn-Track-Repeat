@@ -13,8 +13,8 @@ public class PomCycles {
     public long timeAdded;
     public long timeAccessed;
     public int cyclesCompleted;
-    public int totalWorkTime;
-    public int totalBreakTime;
+    public long totalWorkTime;
+    public long totalRestTime;
 
     public PomCycles() {
     }
@@ -59,19 +59,19 @@ public class PomCycles {
         this.cyclesCompleted = cyclesCompleted;
     }
 
-    public int getTotalWorkTime() {
+    public long getTotalWorkTime() {
         return totalWorkTime;
     }
 
-    public void setTotalWorkTime(int totalWorkTime) {
+    public void setTotalWorkTime(long totalWorkTime) {
         this.totalWorkTime = totalWorkTime;
     }
 
-    public int getTotalBreakTime() {
-        return totalBreakTime;
+    public long getTotalRestTime() {
+        return totalRestTime;
     }
 
-    public void setTotalBreakTime(int totalBreakTime) {
-        this.totalBreakTime = totalBreakTime;
+    public void setTotalRestTime(long totalRestTime) {
+        this.totalRestTime = totalRestTime;
     }
 }

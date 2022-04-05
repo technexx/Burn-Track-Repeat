@@ -12,6 +12,10 @@ public class Cycles {
     public String workoutRounds;
     public String roundType;
 
+    public long totalSetTime;
+    public long totalBreakTime;
+    public int cyclesCompleted;
+
     public long timeAdded;
     public long timeAccessed;
     public int itemCount;
@@ -57,6 +61,30 @@ public class Cycles {
 
     public void setRoundType(String roundType) {
         this.roundType = roundType;
+    }
+
+    public long getTotalSetTime() {
+        return totalSetTime;
+    }
+
+    public void setTotalSetTime(long totalSetTime) {
+        this.totalSetTime = totalSetTime;
+    }
+
+    public long getTotalBreakTime() {
+        return totalBreakTime;
+    }
+
+    public void setTotalBreakTime(long totalBreakTime) {
+        this.totalBreakTime = totalBreakTime;
+    }
+
+    public int getCyclesCompleted() {
+        return cyclesCompleted;
+    }
+
+    public void setCyclesCompleted(int cyclesCompleted) {
+        this.cyclesCompleted = cyclesCompleted;
     }
 
     public void setTimeAdded(long timeAdded) {
