@@ -21,7 +21,19 @@
     </TextView>
 
     <TextView
-        android:id="@+id/cycles_completed_and_total_daily_stats_header_textView"
+        android:id="@+id/cycles_completed_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/white"
+        android:textSize="24sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/daily_or_cycles_based_total_time_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
@@ -36,7 +48,7 @@
         android:id="@+id/total_set_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cycles_completed_and_total_daily_stats_header_textView"
+        app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reset_total_times"
         android:layout_marginTop="25dp"
@@ -47,7 +59,7 @@
         android:id="@+id/total_break_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/cycles_completed_and_total_daily_stats_header_textView"
+        app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/reset_total_times"
         android:layout_marginTop="25dp"
@@ -175,7 +187,7 @@
         android:id="@+id/lap_recycler"
         android:layout_width="280dp"
         android:layout_height="280dp"
-        app:layout_constraintTop_toBottomOf="@id/cycles_completed_and_total_daily_stats_header_textView"
+        app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="30dp"
@@ -189,7 +201,7 @@
         android:id="@+id/lapCanvas"
         android:layout_width="280dp"
         android:layout_height="300dp"
-        app:layout_constraintTop_toBottomOf="@id/cycles_completed_and_total_daily_stats_header_textView"
+        app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
