@@ -823,11 +823,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     confirmActivityAddition.setOnClickListener(v-> {
       addTDEEPopUpWindow.dismiss();
-      toggleExistenceOfTdeeActivity(true);
+      toggleEditPopUpViewsForAddingActivity(true);
     });
 
     removeTdeeActivityImageView.setOnClickListener(v-> {
-      toggleExistenceOfTdeeActivity(false);
+      toggleEditPopUpViewsForAddingActivity(false);
     });
 
     fab.setOnClickListener(v -> {
@@ -2531,6 +2531,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeft.setText(retrieveTimerValueString());
       displayCycleOrDailyTotals();
       setCyclesCompletedTextView();
+      toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
       timerIsPaused = true;
       timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -3378,7 +3379,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           displayCycleOrDailyTotals();
 
           toggleTdeeTextViewSize();
-          toggleExistenceOfTdeeActivity(trackActivityWithinCycle);
+          toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
           retrieveTotalDailySetAndBreakTimes();
           displayCycleOrDailyTotals();
@@ -3583,7 +3584,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This should replace setCyclesCompletedTextView() and setTotalCycleTimeTextView().
+  //Todo: This should replace setCyclesCompletedTextView() and setTotalCycleTimeTextView() but only in Tracking mode.
   private void setTotalDailyTimeAndCaloriesTextView() {
     daily_total_time_and_calories_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
   }
@@ -3594,6 +3595,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void setTrackingModeViewsInTimer() {
+    if (trackActivityWithinCycle) {
+
+    }
+  }
+
   private void toggleViewsForCycleAndDailyTotal() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
       cycles_completed_textView.setVisibility(View.VISIBLE);
@@ -3601,6 +3608,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
       cycles_completed_textView.setVisibility(View.INVISIBLE);
       daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
+      setTotalDailyTimeAndCaloriesTextView();
     }
   }
 
@@ -4607,21 +4615,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  private void toggleExistenceOfTdeeActivity(boolean activityExists) {
+
+  private void toggleEditPopUpViewsForAddingActivity(boolean activityExists) {
     if (activityExists) {
       String activity = (String) tdee_sub_category_spinner.getSelectedItem();
       addTDEEActivityTextView.setText(activity);
+      removeTdeeActivityImageView.setVisibility(View.VISIBLE);
       trackActivityWithinCycle = true;
     } else {
       addTDEEActivityTextView.setText(R.string.add_activity);
+      removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
       trackActivityWithinCycle = false;
     }
-    toggleActivityAssignedViews(activityExists);
   }
 
-  private void toggleActivityAssignedViews(boolean activityExists) {
+  //Todo: Executes in launchCycle, but not in resume/reset option.
+  private void toggleTimerPopUpViewsForTrackingModeForCycles(boolean activityExists) {
     if (activityExists) {
-      removeTdeeActivityImageView.setVisibility(View.VISIBLE);
       total_set_header.setVisibility(View.GONE);
       total_set_time.setVisibility(View.GONE);
       total_break_header.setVisibility(View.GONE);
@@ -4629,13 +4639,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       reset_total_times.setVisibility(View.GONE);
       activityStatsInTimerTextView.setVisibility(View.VISIBLE);
     } else {
-      removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
       total_break_header.setVisibility(View.VISIBLE);
       total_break_time.setVisibility(View.VISIBLE);
       reset_total_times.setVisibility(View.VISIBLE);
-      activityStatsInTimerTextView.setVisibility(View.GONE);
+      activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
     }
   }
 
