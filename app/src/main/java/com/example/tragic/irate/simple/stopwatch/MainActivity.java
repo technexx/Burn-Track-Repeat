@@ -3574,6 +3574,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Toggle between this + cycles completed and total daily time + calories burned in tracking mode.
   private void setTotalCycleTimeTextView() {
     if (mode==1) {
       total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
@@ -3585,7 +3586,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This should replace setCyclesCompletedTextView() and setTotalCycleTimeTextView() but only in Tracking mode.
   private void setTotalDailyTimeAndCaloriesTextView() {
     daily_total_time_and_calories_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
   }
@@ -3596,17 +3596,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setTrackingModeViewsInTimer() {
-    if (trackActivityWithinCycle) {
-
-    }
-  }
-
   private void toggleViewsForCycleAndDailyTotal() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
       cycles_completed_textView.setVisibility(View.VISIBLE);
       daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
-    } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
+    }
+    if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
       cycles_completed_textView.setVisibility(View.INVISIBLE);
       daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
       setTotalDailyTimeAndCaloriesTextView();
@@ -4622,15 +4617,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Executes in launchCycle, but not in resume/reset option.
-  private void toggleTimerPopUpViewsForTrackingModeForCycles(boolean activityExists) {
-    if (activityExists) {
+  private void toggleTimerPopUpViewsForTrackingModeForCycles(boolean trackingActivity) {
+    if (trackingActivity) {
       total_set_header.setVisibility(View.GONE);
       total_set_time.setVisibility(View.GONE);
       total_break_header.setVisibility(View.GONE);
       total_break_time.setVisibility(View.GONE);
       reset_total_times.setVisibility(View.GONE);
       activityStatsInTimerTextView.setVisibility(View.VISIBLE);
+      toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
     } else {
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
@@ -4638,6 +4633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_time.setVisibility(View.VISIBLE);
       reset_total_times.setVisibility(View.VISIBLE);
       activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
+      toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
     }
   }
 
