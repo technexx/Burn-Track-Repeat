@@ -33,7 +33,7 @@
     </TextView>
 
     <TextView
-        android:id="@+id/daily_or_cycles_based_total_time_textView"
+        android:id="@+id/daily_total_time_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
@@ -89,13 +89,25 @@
     </TextView>
 
     <ImageButton
-        android:id="@+id/reset_total_times"
+        android:id="@+id/toggle_cycle_and_daily_display"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/total_set_header"
         app:layout_constraintEnd_toStartOf="@id/total_break_header"
         app:layout_constraintTop_toTopOf="@id/total_set_header"
         app:layout_constraintBottom_toBottomOf="@id/total_set_header"
+        android:background="@color/black"
+        android:src="@drawable/arrow_switch_icon">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/reset_total_times"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/total_set_header"
+        app:layout_constraintEnd_toStartOf="@id/total_break_header"
+        app:layout_constraintTop_toBottomOf="@id/toggle_cycle_and_daily_display"
+        android:layout_marginBottom="4dp"
         android:background="@color/black"
         android:src="@drawable/reset_24">
     </ImageButton>
