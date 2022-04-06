@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView cycle_title_textView;
   TextView cycles_completed_textView;
-  TextView daily_total_time_textView;
+  TextView daily_total_time_and_calories_textView;
   ImageButton new_lap;
   ImageButton next_round;
   ImageButton reset_total_times;
@@ -860,7 +860,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
       if (mode==1 && trackActivityWithinCycle) {
-        setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
+        if (isTextViewVisible(daily_total_time_and_calories_textView)) {
+          setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
+        }
       }
     });
 
@@ -1345,7 +1347,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
 
     cycles_completed_textView = timerPopUpView.findViewById(R.id.cycles_completed_textView);
-    daily_total_time_textView = timerPopUpView.findViewById(R.id.daily_total_time_textView);
+    daily_total_time_and_calories_textView = timerPopUpView.findViewById(R.id.daily_total_time_and_calories_textView);
     next_round = timerPopUpView.findViewById(R.id.next_round);
     new_lap = timerPopUpView.findViewById(R.id.new_lap);
     total_set_header = timerPopUpView.findViewById(R.id.total_set_header);
@@ -3341,6 +3343,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
+    toggleViewsForCycleAndDailyTotal();
 
     AsyncTask.execute(()-> {
 
@@ -3563,7 +3566,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeTextView() {
-    daily_total_time_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
+    daily_total_time_and_calories_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
   }
 
   private void setTotalCycleTimeTextView() {
@@ -3578,27 +3581,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeAndCaloriesForSpecificActivityTextView() {
-    if (mode==1) {
+    if (mode==1 && trackActivityWithinCycle) {
       activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
-    }
-  }
-
-  private void displayCycleOrDailyTotals() {
-    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-      setTotalCycleTimeTextView();
-      setCyclesCompletedTextView();
-    } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      setTotalDailyTimeTextView();
     }
   }
 
   private void toggleViewsForCycleAndDailyTotal() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
       cycles_completed_textView.setVisibility(View.VISIBLE);
-      daily_total_time_textView.setVisibility(View.INVISIBLE);
+      daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
     } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
       cycles_completed_textView.setVisibility(View.INVISIBLE);
-      daily_total_time_textView.setVisibility(View.VISIBLE);
+      daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
     }
   }
 
@@ -3643,6 +3637,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (hasTimerTextViewChanged()) {
       timerTextViewStringTwo = (String) timeLeft.getText();
       displayCycleOrDailyTotals();
+      setTotalDailyTimeAndCaloriesForSpecificActivityTextView();
+    }
+  }
+
+  private void displayCycleOrDailyTotals() {
+    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
+      setTotalCycleTimeTextView();
+      setCyclesCompletedTextView();
+    } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
+      setTotalDailyTimeTextView();
     }
   }
 
@@ -3739,8 +3743,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
+
+  //Todo: String returning empty when we try to split it on timer dismissal. TextView is visible but empty.
   private String getLastDisplayedTotalCaloriesString() {
-    String stringFromTextview = (String) cycles_completed_textView.getText();
+    String stringFromTextview = (String) daily_total_time_and_calories_textView.getText();
     return getSplitStringFromFullString(stringFromTextview, 6);
   }
 
@@ -3752,6 +3758,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private String getSplitStringFromFullString(String stringToSplit, int positionToRetrieve) {
     String[] stringArray = stringToSplit.split(" ");
     return stringArray[positionToRetrieve];
+  }
+
+  private boolean isTextViewVisible(TextView textView) {
+    return textView.getVisibility()==View.VISIBLE;
   }
 
   private void setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView() {
