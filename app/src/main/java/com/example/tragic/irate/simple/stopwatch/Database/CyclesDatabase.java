@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 
-@Database(entities = {Cycles.class, PomCycles.class, DayHolder.class, ActivitiesForEachDay.class, StatsForEachActivity.class, PomCycleStats.class}, version = 1, exportSchema =  false)
+@Database(entities = {Cycles.class, PomCycles.class, DayHolder.class, StatsForEachActivity.class}, version = 1, exportSchema =  false)
 
 public abstract class CyclesDatabase extends RoomDatabase {
     private static CyclesDatabase INSTANCE;

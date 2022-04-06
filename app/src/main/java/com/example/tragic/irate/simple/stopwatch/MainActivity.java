@@ -3586,6 +3586,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void displayCycleOrDailyTotals() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
       setTotalCycleTimeTextView();
+      setCyclesCompletedTextView();
     } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
       setTotalDailyTimeTextView();
     }
@@ -3601,10 +3602,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Will toggle this if tracking mode if off. Otherwise, set to invisible.
-  private void setCyclesCompletedTextView() {
+ private void setCyclesCompletedTextView() {
     if (mode!=4) {
-      cycles_completed_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
+      cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
     } else {
       cycles_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
     }
@@ -3618,191 +3618,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void instantiateAndStartObjectAnimator(long duration) {
-    if (mode==1) {
-      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-      objectAnimator.setInterpolator(new LinearInterpolator());
-      objectAnimator.setDuration(duration);
-      objectAnimator.start();
-    }
-    if (mode==3) {
-      objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-      objectAnimatorPom.setInterpolator(new LinearInterpolator());
-      objectAnimatorPom.setDuration(duration);
-      objectAnimatorPom.start();
-    }
-  }
-
-  private void startObjectAnimatorAndTotalCycleTimeCounters() {
-    switch (mode) {
-      case 1:
-        if (typeOfRound.get(currentRound).equals(1)) {
-          if (currentProgressBarValue==maxProgress) {
-            timerIsPaused = false;
-            instantiateAndStartObjectAnimator(setMillis);
-          } else {
-            setMillis = setMillisUntilFinished;
-            if (objectAnimator != null) objectAnimator.resume();
-          }
-        } else if (typeOfRound.get(currentRound).equals(3)) {
-          if (currentProgressBarValue==maxProgress) {
-            timerIsPaused = false;
-            instantiateAndStartObjectAnimator(breakMillis);
-          } else {
-            breakMillis = breakMillisUntilFinished;
-            if (objectAnimator != null) objectAnimator.resume();
-          }
-        }
-        break;
-      case 3:
-        if (currentProgressBarValue==maxProgress){
-          timerIsPaused = false;
-          pomMillis = pomValuesTime.get(pomDotCounter);
-          instantiateAndStartObjectAnimator(pomMillis);
-        } else {
-          pomMillis = pomMillisUntilFinished;
-          if (objectAnimatorPom != null) objectAnimatorPom.resume();
-        }
-        break;
-    }
-  }
-
-  private Runnable infinityRunnableForSets() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        if (setMillis>=60000 && !textSizeIncreased) {
-          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-          textSizeIncreased = true;
-        }
-        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        timeLeft.setText(convertSeconds(setMillis/1000));
-
-        if (setMillis>=1000) {
-          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        }
-
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
-        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-
-        setNotificationValues();
-        mHandler.postDelayed(this, timerRunnableDelay);
-      }
-    };
-  }
-
-  private Runnable infinityRunnableForBreaks() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        if (breakMillis>=60000 && !textSizeIncreased) {
-          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-          textSizeIncreased = true;
-        }
-        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
-
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        timeLeft.setText(convertSeconds(breakMillis/1000));
-
-        if (breakMillis>=1000) {
-          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        }
-
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
-        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
-
-        setNotificationValues();
-        mHandler.postDelayed(this, timerRunnableDelay);
-      }
-    };
-  }
-
-  private void startSetTimer() {
-    setInitialTextSizeForRounds(setMillis);
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
-    long initialMillisValue = setMillis;
-
-    timer = new CountDownTimer(setMillis, timerRunnableDelay) {
-      @Override
-      public void onTick(long millisUntilFinished) {
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        setMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
-        if (setMillis < 500) timerDisabled = true;
-
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        timerSyncDelayMethod(timerRunnableDelay);
-
-        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
-        dotDraws.reDraw();
-        setNotificationValues();
-      }
-
-      @Override
-      public void onFinish() {
-        nextRound(false);
-      }
-    }.start();
-  }
-
-  private void startBreakTimer() {
-    setInitialTextSizeForRounds(breakMillis);
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
-    long initialMillisValue = breakMillis;
-
-    timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
-      @Override
-      public void onTick(long millisUntilFinished) {
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
-        breakMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
-        if (breakMillis < 500) timerDisabled = true;
-
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        timerSyncDelayMethod(timerRunnableDelay);
-
-        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
-        dotDraws.reDraw();
-        setNotificationValues();
-      }
-
-      @Override
-      public void onFinish() {
-        nextRound(false);
-      }
-    }.start();
-  }
-
-  private void startPomTimer() {
-    setInitialTextSizeForRounds(pomMillis);
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
-    long initialMillisValue = pomMillis;
-
-    timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
-      @Override
-      public void onTick(long millisUntilFinished) {
-
-        currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
-        pomMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
-        if (pomMillis < 500) timerDisabled = true;
-
-        timerSyncDelayMethod(timerRunnableDelay);
-
-        changeTextSizeOnTimerDigitCountTransitionForModeThree();
-        dotDraws.reDraw();
-        setNotificationValues();
-      }
-
-      @Override
-      public void onFinish() {
-        nextRound(false);
-      }
-    }.start();
-  }
-
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
     iterateTotalTimesForSelectedDay(timerRunnableDelay);
     iterateTotalTimesForSelectedActivity(timerRunnableDelay);
@@ -3811,23 +3626,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
   }
 
+  private boolean hasTimerTextViewChanged() {
+    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
+  }
+
+  private void updateStatsInSyncWithMainTimer(int millisTickValue) {
+    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
+      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
+    } else {
+      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+    }
+  }
+
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
     if (hasTimerTextViewChanged()) {
       timerTextViewStringTwo = (String) timeLeft.getText();
       displayCycleOrDailyTotals();
-    }
-  }
-
-  private boolean hasTimerTextViewChanged() {
-    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
-  }
-
-  private void timerSyncDelayMethod(int millisTickValue) {
-    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
-      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
-    } else {
-      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
     }
   }
 
@@ -3964,8 +3779,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-
-
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
     if (!textSizeIncreased && mode==1) {
       if (checkIfRunningTextSizeChange(setOrBreakMillis)) {
@@ -3986,6 +3799,191 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     }
+  }
+
+  private void instantiateAndStartObjectAnimator(long duration) {
+    if (mode==1) {
+      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+      objectAnimator.setInterpolator(new LinearInterpolator());
+      objectAnimator.setDuration(duration);
+      objectAnimator.start();
+    }
+    if (mode==3) {
+      objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+      objectAnimatorPom.setInterpolator(new LinearInterpolator());
+      objectAnimatorPom.setDuration(duration);
+      objectAnimatorPom.start();
+    }
+  }
+
+  private void startObjectAnimatorAndTotalCycleTimeCounters() {
+    switch (mode) {
+      case 1:
+        if (typeOfRound.get(currentRound).equals(1)) {
+          if (currentProgressBarValue==maxProgress) {
+            timerIsPaused = false;
+            instantiateAndStartObjectAnimator(setMillis);
+          } else {
+            setMillis = setMillisUntilFinished;
+            if (objectAnimator != null) objectAnimator.resume();
+          }
+        } else if (typeOfRound.get(currentRound).equals(3)) {
+          if (currentProgressBarValue==maxProgress) {
+            timerIsPaused = false;
+            instantiateAndStartObjectAnimator(breakMillis);
+          } else {
+            breakMillis = breakMillisUntilFinished;
+            if (objectAnimator != null) objectAnimator.resume();
+          }
+        }
+        break;
+      case 3:
+        if (currentProgressBarValue==maxProgress){
+          timerIsPaused = false;
+          pomMillis = pomValuesTime.get(pomDotCounter);
+          instantiateAndStartObjectAnimator(pomMillis);
+        } else {
+          pomMillis = pomMillisUntilFinished;
+          if (objectAnimatorPom != null) objectAnimatorPom.resume();
+        }
+        break;
+    }
+  }
+
+  private Runnable infinityRunnableForSets() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        if (setMillis>=60000 && !textSizeIncreased) {
+          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
+          textSizeIncreased = true;
+        }
+        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        timeLeft.setText(convertSeconds(setMillis/1000));
+
+        if (setMillis>=1000) {
+          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        }
+
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
+        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+
+        setNotificationValues();
+        mHandler.postDelayed(this, timerRunnableDelay);
+      }
+    };
+  }
+
+  private Runnable infinityRunnableForBreaks() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        if (breakMillis>=60000 && !textSizeIncreased) {
+          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
+          textSizeIncreased = true;
+        }
+        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        timeLeft.setText(convertSeconds(breakMillis/1000));
+
+        if (breakMillis>=1000) {
+          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        }
+
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
+        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+
+        setNotificationValues();
+        mHandler.postDelayed(this, timerRunnableDelay);
+      }
+    };
+  }
+
+  private void startSetTimer() {
+    setInitialTextSizeForRounds(setMillis);
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
+    long initialMillisValue = setMillis;
+
+    timer = new CountDownTimer(setMillis, timerRunnableDelay) {
+      @Override
+      public void onTick(long millisUntilFinished) {
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+        setMillis = millisUntilFinished;
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+        if (setMillis < 500) timerDisabled = true;
+
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        updateStatsInSyncWithMainTimer(timerRunnableDelay);
+
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+        dotDraws.reDraw();
+        setNotificationValues();
+      }
+
+      @Override
+      public void onFinish() {
+        nextRound(false);
+      }
+    }.start();
+  }
+
+  private void startBreakTimer() {
+    setInitialTextSizeForRounds(breakMillis);
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
+    long initialMillisValue = breakMillis;
+
+    timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
+      @Override
+      public void onTick(long millisUntilFinished) {
+        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+        breakMillis = millisUntilFinished;
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+        if (breakMillis < 500) timerDisabled = true;
+
+        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+        updateStatsInSyncWithMainTimer(timerRunnableDelay);
+
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+        dotDraws.reDraw();
+        setNotificationValues();
+      }
+
+      @Override
+      public void onFinish() {
+        nextRound(false);
+      }
+    }.start();
+  }
+
+  private void startPomTimer() {
+    setInitialTextSizeForRounds(pomMillis);
+    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
+    long initialMillisValue = pomMillis;
+
+    timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
+      @Override
+      public void onTick(long millisUntilFinished) {
+
+        currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
+        pomMillis = millisUntilFinished;
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+        if (pomMillis < 500) timerDisabled = true;
+
+        updateStatsInSyncWithMainTimer(timerRunnableDelay);
+
+        changeTextSizeOnTimerDigitCountTransitionForModeThree();
+        dotDraws.reDraw();
+        setNotificationValues();
+      }
+
+      @Override
+      public void onFinish() {
+        nextRound(false);
+      }
+    }.start();
   }
 
   private void nextRound(boolean endingEarly) {
@@ -4184,18 +4182,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       activityStatsInTimerTextView.setTextSize(24);
     } else {
       activityStatsInTimerTextView.setTextSize(20);
-    }
-  }
-
-  //Todo: Change to daily for Pom as well, or simply keep it for cycle since we're not doing any tracking in it.
-  private void displayCurrentTotalTimeString() {
-    if (mode==1) {
-      total_set_time.setText(currentTotalSetTimeForNonTrackingMode());
-      total_break_time.setText(currentTotalBreakTimeForNonTrackingMode());
-    }
-    if (mode==3) {
-      total_set_time.setText(currentTotalWorkTime());
-      total_break_time.setText(currentTotalRestTime());
     }
   }
 
@@ -4425,6 +4411,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void populateTimerUI() {
+//////////////
+    reset_total_times.setVisibility(View.GONE);
+////////////////
     lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
     cycles_completed_textView.setText(R.string.cycles_done);

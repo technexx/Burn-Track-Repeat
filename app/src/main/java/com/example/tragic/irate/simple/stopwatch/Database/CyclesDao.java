@@ -41,9 +41,6 @@ CyclesDao {
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertActivitiesForEachDay(ActivitiesForEachDay activitiesForEachDay);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
 
     @Update
@@ -109,7 +106,7 @@ CyclesDao {
     @Query("DELETE from CYCLES where totalSetTime AND totalBreakTime AND cyclesCompleted")
     void deleteTotalTimesCycle();
 
-    @Query("DELETE from POMCYCLES WHERE cyclesCompleted AND totalWorkTime AND totalBreakTime")
+    @Query("DELETE from POMCYCLES WHERE cyclesCompleted AND totalWorkTime AND totalRestTime")
     void deleteTotalTimesPom();
 
     @Update
