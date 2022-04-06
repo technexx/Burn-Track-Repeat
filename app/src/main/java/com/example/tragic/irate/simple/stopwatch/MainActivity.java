@@ -3346,7 +3346,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleViewsForCycleAndDailyTotal();
 
     AsyncTask.execute(()-> {
-
       //For Cycles.
       if (isNewCycle || saveToDB) {
         saveAddedOrEditedCycleASyncRunnable();
@@ -3565,19 +3564,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setTotalDailyTimeTextView() {
-    daily_total_time_and_calories_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
+  private void setCyclesCompletedTextView() {
+    if (mode!=4) {
+      cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
+    } else {
+      cycles_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
+    }
   }
 
   private void setTotalCycleTimeTextView() {
     if (mode==1) {
-    total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-    total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-  }
+      total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+      total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+    }
     if (mode==3) {
       total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
       total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
     }
+  }
+
+  //Todo: This should replace setCyclesCompletedTextView() and setTotalCycleTimeTextView().
+  private void setTotalDailyTimeAndCaloriesTextView() {
+    daily_total_time_and_calories_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
   }
 
   private void setTotalDailyTimeAndCaloriesForSpecificActivityTextView() {
@@ -3596,13 +3604,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
- private void setCyclesCompletedTextView() {
-    if (mode!=4) {
-      cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
-    } else {
-      cycles_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
-    }
-  }
   private void loadCycleListsFromDatabase() {
     if (mode==1) {
       cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
@@ -3646,7 +3647,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTotalCycleTimeTextView();
       setCyclesCompletedTextView();
     } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      setTotalDailyTimeTextView();
+      setTotalDailyTimeAndCaloriesTextView();
     }
   }
 
@@ -3743,8 +3744,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
-
-  //Todo: String returning empty when we try to split it on timer dismissal. TextView is visible but empty.
   private String getLastDisplayedTotalCaloriesString() {
     String stringFromTextview = (String) daily_total_time_and_calories_textView.getText();
     return getSplitStringFromFullString(stringFromTextview, 6);
