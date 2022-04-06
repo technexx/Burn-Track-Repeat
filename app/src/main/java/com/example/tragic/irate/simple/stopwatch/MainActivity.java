@@ -2531,6 +2531,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeft.setText(retrieveTimerValueString());
       displayCycleOrDailyTotals();
       setCyclesCompletedTextView();
+      toggleTdeeTextViewSize();
       toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
       timerIsPaused = true;
@@ -4194,14 +4195,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void toggleTdeeTextViewSize() {
-    if (!trackActivityWithinCycle) {
-      activityStatsInTimerTextView.setTextSize(24);
-    } else {
-      activityStatsInTimerTextView.setTextSize(20);
-    }
-  }
-
   private int totalValueAddedToSingleValueAndDividedBy1000ToInteger(long totalVar, long singleVar) {
     return (int) (totalVar += singleVar) / 1000;
   }
@@ -4645,6 +4638,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_time.setVisibility(View.VISIBLE);
       reset_total_times.setVisibility(View.VISIBLE);
       activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
+    }
+  }
+
+  private void toggleTdeeTextViewSize() {
+    if (!trackActivityWithinCycle) {
+      activityStatsInTimerTextView.setTextSize(24);
+    } else {
+      activityStatsInTimerTextView.setTextSize(20);
     }
   }
 
