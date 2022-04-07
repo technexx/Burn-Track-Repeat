@@ -514,6 +514,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Activity stats should disappear on toggle as well.
+  //Todo: Do we even need tracking option in Main if we have a toggle in Timer? Should we remove Timer toggle instead?
   //Todo: Re-implement Reset option for total times.
   //Todo: Swipe to delete option for cycles on Main.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -4595,14 +4597,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       reset_total_times.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
       toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
-      activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
     } else {
       typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
 
       reset_total_times.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
       toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
-      activityStatsInTimerTextView.setVisibility(View.VISIBLE);
     }
 
     toggleViewsForTotalDailyAndCycleTimes();
@@ -4617,6 +4617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_time.setVisibility(View.VISIBLE);
 
       setTotalCycleTimeTextView();
+      activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
       daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
@@ -4626,6 +4627,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_header.setVisibility(View.INVISIBLE);
       total_break_time.setVisibility(View.INVISIBLE);
 
+      activityStatsInTimerTextView.setVisibility(View.VISIBLE);
       daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
 
       setTotalDailyTimeAndCaloriesTextView();
