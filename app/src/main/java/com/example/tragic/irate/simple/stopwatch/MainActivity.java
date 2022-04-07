@@ -514,7 +514,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Activity stats should disappear on toggle as well.
   //Todo: Do we even need tracking option in Main if we have a toggle in Timer? Should we remove Timer toggle instead?
   //Todo: Re-implement Reset option for total times.
   //Todo: Swipe to delete option for cycles on Main.
@@ -1641,11 +1640,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1){
           cycles.setTotalSetTime(totalCycleSetTimeInMillis);
           cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
+          cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
 
         if (mode==3) {
           pomCycles.setTotalWorkTime(totalCycleWorkTimeInMillis);
           pomCycles.setTotalRestTime(totalCycleRestTimeInMillis);
+          cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         }
 
         //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
