@@ -1094,7 +1094,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
       }
-      toggleViewsForCycleAndDailyTotal();
+      toggleViewsForTotalDailyAndCycleTimes();
     });
 
     reset_total_times.setOnClickListener(v -> {
@@ -3596,25 +3596,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void toggleViewsForCycleAndDailyTotal() {
-    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-      cycles_completed_textView.setVisibility(View.VISIBLE);
-      total_set_header.setVisibility(View.VISIBLE);
-      total_set_time.setVisibility(View.VISIBLE);
-      total_break_header.setVisibility(View.VISIBLE);
-      total_break_time.setVisibility(View.VISIBLE);
-      daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
-    }
-    if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      cycles_completed_textView.setVisibility(View.INVISIBLE);
-      total_set_header.setVisibility(View.INVISIBLE);
-      total_set_time.setVisibility(View.INVISIBLE);
-      total_break_header.setVisibility(View.INVISIBLE);
-      total_break_time.setVisibility(View.INVISIBLE);
-      daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
-      setTotalDailyTimeAndCaloriesTextView();
-    }
-  }
+
 
   private void loadCycleListsFromDatabase() {
     if (mode==1) {
@@ -4625,31 +4607,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This and toggleViewsForCycleAndDailyTotal() are essentially doing the same thing. Method below also controls activityStatsInTimerTextView and toggle.
   private void toggleTimerPopUpViewsForTrackingModeForCycles(boolean trackingActivity) {
-    if (trackingActivity) {
-      cycles_completed_textView.setVisibility(View.VISIBLE);
-      total_set_header.setVisibility(View.INVISIBLE);
-      total_set_time.setVisibility(View.INVISIBLE);
-      total_break_header.setVisibility(View.INVISIBLE);
-      total_break_time.setVisibility(View.INVISIBLE);
-      reset_total_times.setVisibility(View.INVISIBLE);
-      toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
-      daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
-      activityStatsInTimerTextView.setVisibility(View.VISIBLE);
-    } else {
+    if (!trackingActivity) {
+      typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
+
+      reset_total_times.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
+      toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
+      activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
+    } else {
+      typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
+
+      reset_total_times.setVisibility(View.INVISIBLE);
+      cycles_completed_textView.setVisibility(View.VISIBLE);
+      toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
+      activityStatsInTimerTextView.setVisibility(View.VISIBLE);
+    }
+
+    toggleViewsForTotalDailyAndCycleTimes();
+  }
+  private void toggleViewsForTotalDailyAndCycleTimes() {
+    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
+      cycles_completed_textView.setVisibility(View.VISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
       total_break_header.setVisibility(View.VISIBLE);
       total_break_time.setVisibility(View.VISIBLE);
-      reset_total_times.setVisibility(View.VISIBLE);
-      toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
-      daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
-      activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
-    }
-  }
 
+      daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
+    }
+    if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
+      cycles_completed_textView.setVisibility(View.INVISIBLE);
+      total_set_header.setVisibility(View.INVISIBLE);
+      total_set_time.setVisibility(View.INVISIBLE);
+      total_break_header.setVisibility(View.INVISIBLE);
+      total_break_time.setVisibility(View.INVISIBLE);
+
+      daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
+
+      setTotalDailyTimeAndCaloriesTextView();
+    }
+
+  }
   private void toggleTdeeTextViewSize() {
     if (!trackActivityWithinCycle) {
       activityStatsInTimerTextView.setTextSize(24);
