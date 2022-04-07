@@ -28,6 +28,7 @@ import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -513,8 +514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Re-add total set/break time to both Cycle lists and use a toggle for them and daily total times.
-        //Todo: We can iterate both at the same time, but they must be retrieved differently (Cycles will be position dependent, while DayHolder will be date dependant).
+  //Todo: Tracking mode should default to On, with top toggle, and simply display specific activity if it exists.
   //Todo: Swipe to delete option for cycles on Main.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -3510,6 +3510,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
   }
 
+  private void loadCycleListsFromDatabase() {
+    if (mode==1) {
+      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+    }
+    if (mode==3) {
+      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+    }
+  }
+
   private void queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable() {
     if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
     if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
@@ -3574,7 +3583,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Toggle between this + cycles completed and total daily time + calories burned in tracking mode.
   private void setTotalCycleTimeTextView() {
     if (mode==1) {
       total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
@@ -3587,23 +3595,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeAndCaloriesTextView() {
-    daily_total_time_and_calories_textView.setText(currentTotalSetTimeAndCaloriesForTrackingMode());
+    daily_total_time_and_calories_textView.setText(currentTotalDailySetTimeAndCalories());
   }
 
   private void setTotalDailyTimeAndCaloriesForSpecificActivityTextView() {
     if (mode==1 && trackActivityWithinCycle) {
       activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
-    }
-  }
-
-
-
-  private void loadCycleListsFromDatabase() {
-    if (mode==1) {
-      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-    }
-    if (mode==3) {
-      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
     }
   }
 
@@ -3714,24 +3711,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
   }
 
-  private String currentTotalSetTimeForNonTrackingMode() {
-    return convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis));
-  }
-
-  private String currentTotalBreakTimeForNonTrackingMode() {
-    return convertSeconds(dividedMillisForTotalTimesDisplay(totalBreakTimeForCurrentDayInMillis));
-  }
-
-  private String currentTotalWorkTime() {
-    return convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleWorkTimeInMillis));
-  }
-
-  private String currentTotalRestTime() {
-    return convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis));
-  }
-
-  private String currentTotalSetTimeAndCaloriesForTrackingMode() {
-    return getString(R.string.total_daily_time_and_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis/1000)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
+  private String currentTotalDailySetTimeAndCalories() {
+    return getString(R.string.total_daily_time_and_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
   private String currentTdeeStatStringForSpecificActivity() {
@@ -4626,6 +4607,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     toggleViewsForTotalDailyAndCycleTimes();
   }
+
   private void toggleViewsForTotalDailyAndCycleTimes() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
       cycles_completed_textView.setVisibility(View.VISIBLE);
