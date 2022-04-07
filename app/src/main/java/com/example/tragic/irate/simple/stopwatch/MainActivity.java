@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Animation slideLeft;
 
   ConstraintLayout.LayoutParams cycleTitleLayoutParams;
-  ConstraintLayout.LayoutParams completedLapsLayoutParams;
+  ConstraintLayout.LayoutParams cyclesCompletedLayoutParams;
 
   ConstraintLayout.LayoutParams roundRecyclerParentLayoutParams;
   ConstraintLayout.LayoutParams roundRecyclerOneLayoutParams;
@@ -507,14 +507,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double metScore;
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
-  boolean trackActivityWithinCycle;
+  boolean trackActivityWithinCycle = true;
 
   int timerRunnableDelay = 50;
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Tracking mode should default to On, with top toggle, and simply display specific activity if it exists.
+  //Todo: Re-implement Reset option for total times.
+  //Todo: Total times toggle displays old total set time for first tick (but daily total is fine on switch).
   //Todo: Swipe to delete option for cycles on Main.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -1561,7 +1562,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateLayoutParameterObjects() {
     cycleTitleLayoutParams = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
-    completedLapsLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed_textView.getLayoutParams();
+    cyclesCompletedLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed_textView.getLayoutParams();
 
     roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
     roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
@@ -4407,7 +4408,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     blankCanvas.setVisibility(View.GONE);
     addTDEEActivityTextView.setVisibility(View.VISIBLE);
     cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
-    completedLapsLayoutParams.topMargin = convertDensityPixelsToScalable(24);
+    cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
 
     setCyclesCompletedTextView();
 
@@ -4471,7 +4472,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         new_lap.setVisibility(View.VISIBLE);
         msTime.setVisibility(View.VISIBLE);
         setInitialTextSizeForRounds(0);
-        completedLapsLayoutParams.topMargin = 0;
+        cyclesCompletedLayoutParams.topMargin = 0;
         cycleTitleLayoutParams.topMargin = -25;
 
         timerDisabled = false;

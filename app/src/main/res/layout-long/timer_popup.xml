@@ -15,7 +15,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="0dp"
         android:textColor="@color/teal_200"
         android:textSize="25sp">
     </TextView>
@@ -27,7 +26,7 @@
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         android:textColor="@color/white"
         android:textSize="24sp">
     </TextView>
@@ -39,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="10dp"
         android:textColor="@color/white"
         android:textSize="24sp">
     </TextView>
@@ -51,7 +50,7 @@
         app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/toggle_cycle_and_daily_display"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="10dp"
         android:textSize="24sp">
     </TextView>
 
@@ -62,7 +61,7 @@
         app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/toggle_cycle_and_daily_display"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="10dp"
         android:textSize="24sp">
     </TextView>
 
@@ -95,6 +94,7 @@
         app:layout_constraintStart_toEndOf="@id/total_set_header"
         app:layout_constraintEnd_toStartOf="@id/total_break_header"
         app:layout_constraintBottom_toTopOf="@id/activity_stats_in_timer_textView"
+        android:layout_marginBottom="12dp"
         android:background="@color/black"
         android:src="@drawable/arrow_switch_icon">
     </ImageButton>
@@ -164,7 +164,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="16dp"
         style="?android:attr/progressBarStyleHorizontal"
         android:max="10000"
         android:progressDrawable="@drawable/circle_progress"
@@ -178,7 +178,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/circle_stopwatch">
     </ImageView>
 
@@ -189,7 +189,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="36dp"
         android:background="@color/black"
         app:cornerRadius="90dp">
     </com.google.android.material.button.MaterialButton>
