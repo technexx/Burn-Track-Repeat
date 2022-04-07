@@ -515,7 +515,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   //Todo: Re-implement Reset option for total times.
-  //Todo: Total times toggle displays old total set time for first tick (but daily total is fine on switch).
   //Todo: Swipe to delete option for cycles on Main.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -4617,6 +4616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_header.setVisibility(View.VISIBLE);
       total_break_time.setVisibility(View.VISIBLE);
 
+      setTotalCycleTimeTextView();
       daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
