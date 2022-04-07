@@ -1087,6 +1087,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
+    //Todo: If tracking turned off, even after reset, Daily Times/Calories remain.
     toggle_cycle_and_daily_display.setOnClickListener(v-> {
       if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
         typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
@@ -3345,7 +3346,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
-    toggleViewsForCycleAndDailyTotal();
 
     AsyncTask.execute(()-> {
       //For Cycles.
@@ -3599,10 +3599,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void toggleViewsForCycleAndDailyTotal() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
       cycles_completed_textView.setVisibility(View.VISIBLE);
+      total_set_header.setVisibility(View.VISIBLE);
+      total_set_time.setVisibility(View.VISIBLE);
+      total_break_header.setVisibility(View.VISIBLE);
+      total_break_time.setVisibility(View.VISIBLE);
       daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
       cycles_completed_textView.setVisibility(View.INVISIBLE);
+      total_set_header.setVisibility(View.INVISIBLE);
+      total_set_time.setVisibility(View.INVISIBLE);
+      total_break_header.setVisibility(View.INVISIBLE);
+      total_break_time.setVisibility(View.INVISIBLE);
       daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
       setTotalDailyTimeAndCaloriesTextView();
     }
@@ -4617,23 +4625,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: This and toggleViewsForCycleAndDailyTotal() are essentially doing the same thing. Method below also controls activityStatsInTimerTextView and toggle.
   private void toggleTimerPopUpViewsForTrackingModeForCycles(boolean trackingActivity) {
     if (trackingActivity) {
-      total_set_header.setVisibility(View.GONE);
-      total_set_time.setVisibility(View.GONE);
-      total_break_header.setVisibility(View.GONE);
-      total_break_time.setVisibility(View.GONE);
-      reset_total_times.setVisibility(View.GONE);
-      activityStatsInTimerTextView.setVisibility(View.VISIBLE);
+      cycles_completed_textView.setVisibility(View.VISIBLE);
+      total_set_header.setVisibility(View.INVISIBLE);
+      total_set_time.setVisibility(View.INVISIBLE);
+      total_break_header.setVisibility(View.INVISIBLE);
+      total_break_time.setVisibility(View.INVISIBLE);
+      reset_total_times.setVisibility(View.INVISIBLE);
       toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
+      daily_total_time_and_calories_textView.setVisibility(View.VISIBLE);
+      activityStatsInTimerTextView.setVisibility(View.VISIBLE);
     } else {
+      cycles_completed_textView.setVisibility(View.INVISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
       total_break_header.setVisibility(View.VISIBLE);
       total_break_time.setVisibility(View.VISIBLE);
       reset_total_times.setVisibility(View.VISIBLE);
-      activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
       toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
+      daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
+      activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
     }
   }
 

@@ -21,7 +21,7 @@
     </TextView>
 
     <TextView
-        android:id="@+id/cycles_completed_textView"
+        android:id="@+id/daily_total_time_and_calories_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
@@ -33,7 +33,7 @@
     </TextView>
 
     <TextView
-        android:id="@+id/daily_total_time_and_calories_textView"
+        android:id="@+id/cycles_completed_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/reset_total_times"
+        app:layout_constraintEnd_toStartOf="@id/toggle_cycle_and_daily_display"
         android:layout_marginTop="25dp"
         android:textSize="24sp">
     </TextView>
@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/reset_total_times"
+        app:layout_constraintStart_toEndOf="@id/toggle_cycle_and_daily_display"
         android:layout_marginTop="25dp"
         android:textSize="24sp">
     </TextView>
@@ -94,8 +94,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/total_set_header"
         app:layout_constraintEnd_toStartOf="@id/total_break_header"
-        app:layout_constraintTop_toBottomOf="@id/total_set_header"
-        app:layout_constraintBottom_toBottomOf="@id/total_set_header"
+        app:layout_constraintBottom_toTopOf="@id/activity_stats_in_timer_textView"
         android:background="@color/black"
         android:src="@drawable/arrow_switch_icon">
     </ImageButton>
@@ -112,6 +111,7 @@
         android:src="@drawable/reset_24">
     </ImageButton>
 
+    <!--Todo: Constraint is to canvas class itself, not the width of the drawn borders-->
     <TextView
         android:id="@+id/activity_stats_in_timer_textView"
         android:layout_width="wrap_content"
@@ -119,7 +119,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/dotdraws"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="0dp"
         android:textSize="20sp"
         android:gravity="center">
     </TextView>
@@ -127,7 +127,7 @@
     <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="175dp"
         app:layout_constraintBottom_toTopOf="@id/progressBar"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp">
