@@ -522,7 +522,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Figure out layout params for checkmark - can just highlight instead.
   //Todo: Test all notifications.
 
   //Todo: Run code inspector for redundancies, etc.
@@ -1612,7 +1611,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
 
     sortHolder = sortMode;
-//    sortCheckMark.setY(checkMarkPosition);
+    highlightSortTextView();
   }
 
   private void setVisualModificationsOnObjects() {
@@ -1869,7 +1868,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         runOnUiThread(()-> {
           clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
-//          moveSortCheckmark();
           sortPopupWindow.dismiss();
         });
       }
