@@ -35,6 +35,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -81,6 +82,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.OnSwipeTouchListener;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
@@ -811,6 +813,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setContentView(R.layout.activity_main);
 
     groupAllAppStartInstantiations();
+
+//    savedCycleRecycler.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
+//      @Override
+//      public void onSwipeLeft() {
+//        Toast.makeText(getApplicationContext(), "Swiping left!", Toast.LENGTH_SHORT).show();
+//      }
+//    });
 
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
