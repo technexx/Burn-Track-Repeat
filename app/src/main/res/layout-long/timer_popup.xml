@@ -111,7 +111,7 @@
         android:src="@drawable/reset_24">
     </ImageButton>
 
-    <!--Todo: Constraint is to canvas class itself, not the width of the drawn borders-->
+    <!--Constraint is to canvas class itself, not the width of the drawn borders-->
     <TextView
         android:id="@+id/activity_stats_in_timer_textView"
         android:layout_width="wrap_content"

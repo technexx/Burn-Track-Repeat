@@ -516,6 +516,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Should have solid differentiation between Cycle times (that don't reset daily) and total daily times.
+      //Todo: TextView that changes? ("Daily Stats" // "Saved Cycle Stats")
+  //Todo: Timer text not changing from small -> large on <=60 seconds. Does change after pause/resume though.
   //Todo: Do we even need tracking option in Main if we have a toggle in Timer? Should we remove Timer toggle instead?
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
@@ -530,10 +533,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test everything 10x.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
-
-  //Todo: GAME: Unscramble for dollars (X number of times). Use dollars to buy letters for Hangman type puzzle.
-  //Todo: GAME: Word builder w/ letters costing different amount. Earn $ for it (mining/random spots?).
-  //Todo: Explode World game w/ 24 hours per day (can only play that much each day).
 
   @Override
   public void onResume() {
@@ -1089,7 +1088,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
-    //Todo: If tracking turned off, even after reset, Daily Times/Calories remain.
     toggle_cycle_and_daily_display.setOnClickListener(v-> {
       if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
         typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
@@ -2921,75 +2919,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.startAnimation(endAnimation);
   }
 
-  private void setInitialTextSizeForRounds(long millis) {
-    if (millis>59000) {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        timeLeft.setTextSize(70f);
-      } else {
-        timeLeft.setTextSize(90f);
-      }
-      textSizeIncreased = false;
-    } else {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-        timeLeft.setTextSize(90f);
-      } else {
-        timeLeft.setTextSize(120f);
-      }
-      if (mode==4) textSizeIncreased = false;
-    }
-  }
-
-  public boolean checkIfRunningTextSizeChange(long startingMillis) {
-    if (mode==1) {
-      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
-        return startingMillis>=60000;
-      } else {
-        return startingMillis<=59000;
-      }
-    } else if (mode==3) {
-      return startingMillis>=60000;
-    } else {
-      return false;
-    }
-  }
-
-  private void changeTextSizeWithAnimator(ValueAnimator va, TextView textView) {
-    changeValueAnimatorNumbers();
-    sizeAnimator = va;
-    sizeAnimator.addUpdateListener(animation -> {
-      float sizeChange = (float) va.getAnimatedValue();
-      textView.setTextSize(sizeChange);
-    });
-    sizeAnimator.setRepeatCount(0);
-    sizeAnimator.start();
-  }
-
-  private void changeValueAnimatorNumbers() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-      valueAnimatorDown.setFloatValues(90f, 70f);
-      valueAnimatorUp.setFloatValues(70f, 90f);
-    } else {
-      valueAnimatorDown.setFloatValues(120f, 90f);
-      valueAnimatorUp.setFloatValues(90f, 120f);
-    }
-  }
-
-  private void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-      if (sizeIncrease) {
-        timeLeft.setTextSize(90f);
-      } else {
-        timeLeft.setTextSize(70f);
-      }
-    } else {
-      if (sizeIncrease) {
-        timeLeft.setTextSize(120f);
-      } else {
-        timeLeft.setTextSize(90f);
-      }
-    }
-  }
-
   private void newLap() {
     if (lapAdapter.getItemCount()>98) {
       return;
@@ -3475,6 +3404,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (isNewCycle) {
         cycles = new Cycles();
       } else if (cyclesList.size()>0) {
+        //Todo: Index exception on editing a cycle here. Occurred: Two cycles, deleted one, tried to edit + launch the next.
         cycleID = cyclesList.get(positionOfSelectedCycle).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
@@ -3797,28 +3727,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
-    if (!textSizeIncreased && mode==1) {
-      if (checkIfRunningTextSizeChange(setOrBreakMillis)) {
-        if (setOrBreakMillis < 59000) {
-          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-          textSizeIncreased = true;
-        }
-      }
-    }
-  }
-
-  private void changeTextSizeOnTimerDigitCountTransitionForModeThree() {
-    if (!textSizeIncreased && mode==3) {
-      if (checkIfRunningTextSizeChange(pomMillis)) {
-        if (pomMillis < 59000) {
-          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-          textSizeIncreased = true;
-        }
-      }
-    }
-  }
-
   private void instantiateAndStartObjectAnimator(long duration) {
     if (mode==1) {
       objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
@@ -3936,7 +3844,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateStatsInSyncWithMainTimer(timerRunnableDelay);
 
-        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
         dotDraws.reDraw();
         setNotificationValues();
       }
@@ -4002,6 +3910,97 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         nextRound(false);
       }
     }.start();
+  }
+
+  private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
+    if (!textSizeIncreased && mode==1) {
+      if (checkIfRunningTextSizeChange(setOrBreakMillis)) {
+        if (setOrBreakMillis < 59000) {
+          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+          textSizeIncreased = true;
+        }
+      }
+    }
+  }
+
+  private void changeTextSizeOnTimerDigitCountTransitionForModeThree() {
+    if (!textSizeIncreased && mode==3) {
+      if (checkIfRunningTextSizeChange(pomMillis)) {
+        if (pomMillis < 59000) {
+          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+          textSizeIncreased = true;
+        }
+      }
+    }
+  }
+
+  private void setInitialTextSizeForRounds(long millis) {
+    if (millis>59000) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+        timeLeft.setTextSize(70f);
+      } else {
+        timeLeft.setTextSize(90f);
+      }
+      textSizeIncreased = false;
+    } else {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+        timeLeft.setTextSize(90f);
+      } else {
+        timeLeft.setTextSize(120f);
+      }
+      if (mode==4) textSizeIncreased = false;
+    }
+  }
+
+  public boolean checkIfRunningTextSizeChange(long startingMillis) {
+    if (mode==1) {
+      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
+        return startingMillis<=60000;
+      } else {
+        return startingMillis>60000;
+      }
+    } else if (mode==3) {
+      return startingMillis<=60000;
+    } else {
+      return false;
+    }
+  }
+
+  private void changeTextSizeWithAnimator(ValueAnimator va, TextView textView) {
+    changeValueAnimatorNumbers();
+    sizeAnimator = va;
+    sizeAnimator.addUpdateListener(animation -> {
+      float sizeChange = (float) va.getAnimatedValue();
+      textView.setTextSize(sizeChange);
+    });
+    sizeAnimator.setRepeatCount(0);
+    sizeAnimator.start();
+  }
+
+  private void changeValueAnimatorNumbers() {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      valueAnimatorDown.setFloatValues(90f, 70f);
+      valueAnimatorUp.setFloatValues(70f, 90f);
+    } else {
+      valueAnimatorDown.setFloatValues(120f, 90f);
+      valueAnimatorUp.setFloatValues(90f, 120f);
+    }
+  }
+
+  private void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (sizeIncrease) {
+        timeLeft.setTextSize(90f);
+      } else {
+        timeLeft.setTextSize(70f);
+      }
+    } else {
+      if (sizeIncrease) {
+        timeLeft.setTextSize(120f);
+      } else {
+        timeLeft.setTextSize(90f);
+      }
+    }
   }
 
   private void nextRound(boolean endingEarly) {
