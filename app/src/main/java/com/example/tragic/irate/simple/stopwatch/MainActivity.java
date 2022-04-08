@@ -1813,29 +1813,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setBackgroundColor(noHighlight);
   }
 
-//  private void moveSortCheckmark() {
-//    ConstraintLayout.LayoutParams checkMarkParams =  (ConstraintLayout.LayoutParams) sortCheckMark.getLayoutParams();
-//
-//    int markPosition = 0;
-//    switch (sortHolder) {
-//      case 1:
-//        markPosition = convertDensityPixelsToScalable(10); break;
-//      case 2:
-//        markPosition = convertDensityPixelsToScalable(42); break;
-//      case 3:
-//        markPosition = convertDensityPixelsToScalable(74); break;
-//      case 4:
-//        markPosition = convertDensityPixelsToScalable(106); break;
-//      case 5:
-//        markPosition = convertDensityPixelsToScalable(138); break;
-//      case 6:
-//        markPosition = convertDensityPixelsToScalable(170); break;
-//    }
-//    sortCheckMark.setY(markPosition);
-//    prefEdit.putInt("checkMarkPosition", markPosition);
-//    prefEdit.apply();
-//  }
-
   private Runnable queryAndSortAllCyclesFromDatabaseRunnable() {
     return new Runnable() {
       @Override
@@ -1935,7 +1912,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         List<Integer> tempIdList = new ArrayList<>();
         tempIdList.addAll(receivedHighlightPositionHolder);
 
+        //Todo: We should never be using this method, since our cycles are always sorted in some way. Should always call from       AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
         loadCycleListsFromDatabase();
+
         if (mode==1) {
           for (int i=0; i<tempIdList.size(); i++) {
             cycleID = cyclesList.get(i).getId();
@@ -3404,8 +3383,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (isNewCycle) {
         cycles = new Cycles();
       } else if (cyclesList.size()>0) {
-        //Todo: Index exception on editing a cycle here. Occurred: Two cycles, deleted one, tried to edit + launch the next.
+        //Todo: We probably don't have a new instance of cycleList, so the ID fetched that is used below is wrong. The only places we actually called it are
         cycleID = cyclesList.get(positionOfSelectedCycle).getId();
+        //Todo: Index exception (0 index/0 size) on editing a cycle here. Occurred: Two cycles, deleted one, tried to edit + launch the next. Issue is there is no Cycles row falling under the cycleID listed.
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
       workoutString = gson.toJson(workoutTime);
