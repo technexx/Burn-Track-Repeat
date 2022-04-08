@@ -518,7 +518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Do we even need tracking option in Main if we have a toggle in Timer? Should we remove Timer toggle instead?
   //Todo: Re-implement Reset option for total times.
-  //Todo: Swipe to delete option for cycles on Main.
+  //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
@@ -813,13 +813,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setContentView(R.layout.activity_main);
 
     groupAllAppStartInstantiations();
-
-//    savedCycleRecycler.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
-//      @Override
-//      public void onSwipeLeft() {
-//        Toast.makeText(getApplicationContext(), "Swiping left!", Toast.LENGTH_SHORT).show();
-//      }
-//    });
 
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();

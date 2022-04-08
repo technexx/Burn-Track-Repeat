@@ -16,6 +16,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsFo
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.R;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.ActivityViewHolder> {
@@ -58,7 +59,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.activity.setText(mActivities.get(position-1));
             activityViewHolder.setTime.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
             activityViewHolder.breakTime.setText(longToStringConverters.convertSeconds(mBreakTimes.get(position-1)));
-            activityViewHolder.caloriesBurned.setText(String.valueOf(mCaloriesBurned.get(position-1)));
+            activityViewHolder.caloriesBurned.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
 
             activityViewHolder.activity.setTypeface(Typeface.DEFAULT);
             activityViewHolder.setTime.setTypeface(Typeface.DEFAULT);
@@ -85,5 +86,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             breakTime = itemView.findViewById(R.id.break_time_in_daily_stats);
             caloriesBurned = itemView.findViewById(R.id.calories_burned_in_daily_stats);
         }
+    }
+
+    private String formatCalorieString(double calories) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(calories);
     }
 }
