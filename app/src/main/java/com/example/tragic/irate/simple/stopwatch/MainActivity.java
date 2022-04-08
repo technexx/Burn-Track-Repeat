@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ImageButton fab;
   ImageButton stopwatch;
-  ImageView sortCheckMark;
+//  ImageView sortCheckMark;
   TextView emptyCycleList;
 
   CyclesDatabase cyclesDatabase;
@@ -522,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Figure out layout params for checkmark.
+  //Todo: Figure out layout params for checkmark - can just highlight instead.
   //Todo: Test all notifications.
 
   //Todo: Run code inspector for redundancies, etc.
@@ -843,14 +843,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
-      moveSortCheckmark();
+//      moveSortCheckmark();
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
-    sortAlphaStart.setOnClickListener(individualSortOptionButtonsListener());
-    sortAlphaEnd.setOnClickListener(individualSortOptionButtonsListener());
     sortRecent.setOnClickListener(individualSortOptionButtonsListener());
     sortNotRecent.setOnClickListener(individualSortOptionButtonsListener());
+    sortAlphaStart.setOnClickListener(individualSortOptionButtonsListener());
+    sortAlphaEnd.setOnClickListener(individualSortOptionButtonsListener());
     sortHigh.setOnClickListener(individualSortOptionButtonsListener());
     sortLow.setOnClickListener(individualSortOptionButtonsListener());
 
@@ -1378,7 +1378,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
-    sortCheckMark = sortCyclePopupView.findViewById(R.id.sortCheckMark);
+//    sortCheckMark = sortCyclePopupView.findViewById(R.id.sortCheckMark);
   }
 
   private void assignDeletePopUpLayoutClassesToTheirIds() {
@@ -1612,7 +1612,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
 
     sortHolder = sortMode;
-    sortCheckMark.setY(checkMarkPosition);
+//    sortCheckMark.setY(checkMarkPosition);
   }
 
   private void setVisualModificationsOnObjects() {
@@ -1777,6 +1777,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
+      unHighlightSortTextViews();
+      highlightSortTextView();
+
       AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
 
       prefEdit.putInt("sortMode", sortMode);
@@ -1784,6 +1787,57 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       prefEdit.apply();
     };
   }
+
+  private void highlightSortTextView() {
+    int colorToHighlight = getResources().getColor(R.color.test_highlight_2);
+    switch (sortHolder) {
+      case 1:
+        sortRecent.setBackgroundColor(colorToHighlight); break;
+      case 2:
+        sortNotRecent.setBackgroundColor(colorToHighlight); break;
+      case 3:
+        sortAlphaStart.setBackgroundColor(colorToHighlight); break;
+      case 4:
+        sortAlphaEnd.setBackgroundColor(colorToHighlight); break;
+      case 5:
+        sortHigh.setBackgroundColor(colorToHighlight); break;
+      case 6:
+        sortLow.setBackgroundColor(colorToHighlight); break;
+    }
+  }
+
+  private void unHighlightSortTextViews() {
+    int noHighlight = Color.TRANSPARENT;
+    sortAlphaStart.setBackgroundColor(noHighlight);
+    sortAlphaEnd.setBackgroundColor(noHighlight);
+    sortRecent.setBackgroundColor(noHighlight);
+    sortNotRecent.setBackgroundColor(noHighlight);
+    sortHigh.setBackgroundColor(noHighlight);
+    sortLow.setBackgroundColor(noHighlight);
+  }
+
+//  private void moveSortCheckmark() {
+//    ConstraintLayout.LayoutParams checkMarkParams =  (ConstraintLayout.LayoutParams) sortCheckMark.getLayoutParams();
+//
+//    int markPosition = 0;
+//    switch (sortHolder) {
+//      case 1:
+//        markPosition = convertDensityPixelsToScalable(10); break;
+//      case 2:
+//        markPosition = convertDensityPixelsToScalable(42); break;
+//      case 3:
+//        markPosition = convertDensityPixelsToScalable(74); break;
+//      case 4:
+//        markPosition = convertDensityPixelsToScalable(106); break;
+//      case 5:
+//        markPosition = convertDensityPixelsToScalable(138); break;
+//      case 6:
+//        markPosition = convertDensityPixelsToScalable(170); break;
+//    }
+//    sortCheckMark.setY(markPosition);
+//    prefEdit.putInt("checkMarkPosition", markPosition);
+//    prefEdit.apply();
+//  }
 
   private Runnable queryAndSortAllCyclesFromDatabaseRunnable() {
     return new Runnable() {
@@ -1815,7 +1869,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         runOnUiThread(()-> {
           clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
-          moveSortCheckmark();
+//          moveSortCheckmark();
           sortPopupWindow.dismiss();
         });
       }
@@ -2567,29 +2621,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       millis = pomMillis;
     }
     return (convertSeconds((millis + 999) / 1000));
-  }
-
-  private void moveSortCheckmark() {
-    ConstraintLayout.LayoutParams checkMarkParams =  (ConstraintLayout.LayoutParams) sortCheckMark.getLayoutParams();
-
-    int markPosition = 0;
-    switch (sortHolder) {
-      case 1:
-        markPosition = convertDensityPixelsToScalable(10); break;
-      case 2:
-        markPosition = convertDensityPixelsToScalable(42); break;
-      case 3:
-        markPosition = convertDensityPixelsToScalable(74); break;
-      case 4:
-        markPosition = convertDensityPixelsToScalable(106); break;
-      case 5:
-        markPosition = convertDensityPixelsToScalable(138); break;
-      case 6:
-        markPosition = convertDensityPixelsToScalable(170); break;
-    }
-    sortCheckMark.setY(markPosition);
-    prefEdit.putInt("checkMarkPosition", markPosition);
-    prefEdit.apply();
   }
 
   //These broadcast the Pending Intents we have created. MUST BE DECLARED IN MANIFEST.
