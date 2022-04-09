@@ -1664,7 +1664,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
-        if (trackActivityWithinCycle) {
+        if (cycleHasActivityAssigned) {
           int currentActivityPosition = dailyStatsAccess.getActivityPosition();
           int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
 
@@ -3302,7 +3302,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-      if (trackActivityWithinCycle) {
+      if (cycleHasActivityAssigned) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
@@ -3357,7 +3357,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
-    if (!trackActivityWithinCycle) {
+    if (!cycleHasActivityAssigned) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
     } else {
@@ -3390,15 +3390,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
 
-      if (trackActivityWithinCycle) {
+      if (cycleHasActivityAssigned) {
+        cycles.setTdeeActivityExists(true);
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setTdeeValuePosition(selectedTdeeValuePosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
-
       } else {
+        //Todo: If we default to non-tracking, remove toggle, and don't iterate, that should be fine for no activity existing.
+        //Todo: Should tracking toggle in Main act as the toggle w/ in Timer? That way we can disable it if no activity exists, and we don't need to have the in-timer toggle. This would also help to differentiate between days and cycles.
+        cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
+        cycles.setTdeeSubCatPosition(0);
         cycles.setTdeeValuePosition(0);
+        cycles.setActivityString("No activity assigned!");
       }
       if (!workoutString.equals("")) {
         cycles.setWorkoutRounds(workoutString);
