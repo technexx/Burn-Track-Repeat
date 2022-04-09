@@ -315,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton new_lap;
   ImageButton next_round;
   ImageButton reset_total_times;
-  ImageButton toggle_cycle_and_daily_display;
+//  ImageButton toggle_cycle_and_daily_display;
 
   int typeOfTotalTimeToDisplay;
   int TOTAL_CYCLE_TIMES = 0;
@@ -1084,14 +1084,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
-    toggle_cycle_and_daily_display.setOnClickListener(v-> {
-      if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-        typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
-      } else {
-        typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
-      }
-      toggleViewsForTotalDailyAndCycleTimes();
-    });
+//    toggle_cycle_and_daily_display.setOnClickListener(v-> {
+//      if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
+//        typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
+//      } else {
+//        typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
+//      }
+//      toggleViewsForTotalDailyAndCycleTimes();
+//    });
 
     reset_total_times.setOnClickListener(v -> {
       delete_all_text.setText(R.string.delete_total_times);
@@ -1359,7 +1359,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     msTime = timerPopUpView.findViewById(R.id.msTime);
     lapRecycler = timerPopUpView.findViewById(R.id.lap_recycler);
     reset_total_times = timerPopUpView.findViewById(R.id.reset_total_times);
-    toggle_cycle_and_daily_display = timerPopUpView.findViewById(R.id.toggle_cycle_and_daily_display);
+//    toggle_cycle_and_daily_display = timerPopUpView.findViewById(R.id.toggle_cycle_and_daily_display);
     empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
   }
@@ -1371,7 +1371,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
-//    sortCheckMark = sortCyclePopupView.findViewById(R.id.sortCheckMark);
   }
 
   private void assignDeletePopUpLayoutClassesToTheirIds() {
@@ -4594,13 +4593,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       reset_total_times.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
-      toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
+//      toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
     } else {
       typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
 
       reset_total_times.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
-      toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
+//      toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
     }
 
     toggleViewsForTotalDailyAndCycleTimes();
