@@ -335,7 +335,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     });
 
-//    //Highlight cycle on long click and make visible action bar buttons. Sets mHighlightMode to true so no cycles can be launched in timer.
     workoutHolder.fullView.setOnLongClickListener(v -> {
       if (!mHighlightMode) {
         //Adds position of clicked item to position list.

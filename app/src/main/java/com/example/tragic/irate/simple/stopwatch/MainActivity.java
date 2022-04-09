@@ -518,10 +518,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Creating new cycle w/ out activity shows last used cycle's activity stats.
       //Todo: Replace activity String w/ "No activity selected" AND do not track total calories. Should probably use boolean in cycle db for this.
-  //Todo: Should have solid differentiation between Cycle times (that don't reset daily) and total daily times.
-      //Todo: TextView that changes? ("Daily Stats" // "Saved Cycle Stats")
-  //Todo: Timer text not changing from small -> large on <=60 seconds. Does change after pause/resume though.
-  //Todo: Do we even need tracking option in Main if we have a toggle in Timer? Should we remove Timer toggle instead?
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -843,7 +839,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
-//      moveSortCheckmark();
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
@@ -1658,13 +1653,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         }
 
-        dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
-        dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
-        dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
-
-        dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
-
         if (cycleHasActivityAssigned) {
+          dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
+          dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
+          dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
+
+          dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+
           int currentActivityPosition = dailyStatsAccess.getActivityPosition();
           int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
 
@@ -3397,8 +3392,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeValuePosition(selectedTdeeValuePosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
       } else {
-        //Todo: If we default to non-tracking, remove toggle, and don't iterate, that should be fine for no activity existing.
         //Todo: Should tracking toggle in Main act as the toggle w/ in Timer? That way we can disable it if no activity exists, and we don't need to have the in-timer toggle. This would also help to differentiate between days and cycles.
+        //Todo: Main's toggle will now also need to disable iteration of any daily/activity values.
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
@@ -3530,7 +3525,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeAndCaloriesTextView() {
-    daily_total_time_and_calories_textView.setText(currentTotalDailySetTimeAndCalories());
+    daily_total_time_and_calories_textView.setText(currentTotalDailySetTimeAndCaloriesString());
   }
 
   private void setTotalDailyTimeAndCaloriesForSpecificActivityTextView() {
@@ -3540,41 +3535,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
-    iterateTotalTimesForSelectedDay(timerRunnableDelay);
-    iterateTotalTimesForSelectedActivity(timerRunnableDelay);
+    if (cycleHasActivityAssigned) {
+      iterateTotalTimesForSelectedDay(timerRunnableDelay);
+      iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
-    iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
-    iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
-
-  }
-
-  private boolean hasTimerTextViewChanged() {
-    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
-  }
-
-  private void updateStatsInSyncWithMainTimer(int millisTickValue) {
-    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
-      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
-    } else {
-      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-    }
-  }
-
-  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
-    timerTextViewStringOne = (String) timeLeft.getText();
-    if (hasTimerTextViewChanged()) {
-      timerTextViewStringTwo = (String) timeLeft.getText();
-      displayCycleOrDailyTotals();
-      setTotalDailyTimeAndCaloriesForSpecificActivityTextView();
-    }
-  }
-
-  private void displayCycleOrDailyTotals() {
-    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-      setTotalCycleTimeTextView();
-      setCyclesCompletedTextView();
-    } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      setTotalDailyTimeAndCaloriesTextView();
+      iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+      iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
     }
   }
 
@@ -3647,7 +3613,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
   }
 
-  private String currentTotalDailySetTimeAndCalories() {
+  private String currentTotalDailySetTimeAndCaloriesString() {
     return getString(R.string.total_daily_time_and_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
@@ -3697,6 +3663,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private long dividedMillisForTotalTimesDisplay(long millis) {
     return millis/1000;
+  }
+
+  private boolean hasTimerTextViewChanged() {
+    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
+  }
+
+  private void updateStatsInSyncWithMainTimer(int millisTickValue) {
+    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
+      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
+    } else {
+      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+    }
+  }
+
+  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
+    timerTextViewStringOne = (String) timeLeft.getText();
+    if (hasTimerTextViewChanged()) {
+      timerTextViewStringTwo = (String) timeLeft.getText();
+      displayCycleOrDailyTotals();
+      setTotalDailyTimeAndCaloriesForSpecificActivityTextView();
+    }
+  }
+
+  private void displayCycleOrDailyTotals() {
+    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
+      setTotalCycleTimeTextView();
+      setCyclesCompletedTextView();
+    } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
+      setTotalDailyTimeAndCaloriesTextView();
+    }
   }
 
   private void instantiateAndStartObjectAnimator(long duration) {
