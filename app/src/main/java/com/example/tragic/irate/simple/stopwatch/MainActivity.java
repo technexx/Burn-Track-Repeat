@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton addRoundToCycleButton;
   ImageButton subtractRoundFromCycleButton;
   ImageButton toggleInfinityRounds;
-  ImageButton buttonToLaunchTimer;
+  ImageButton buttonToLaunchTimerFromEditPopUp;
 
   ArrayList<Integer> workoutTime;
   ArrayList<String> convertedWorkoutTime;
@@ -516,6 +516,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Creating new cycle w/ out activity shows last used cycle's activity stats.
+      //Todo: Replace activity String w/ "No activity selected" AND do not track total calories. Should probably use boolean in cycle db for this.
   //Todo: Should have solid differentiation between Cycle times (that don't reset daily) and total daily times.
       //Todo: TextView that changes? ("Daily Stats" // "Saved Cycle Stats")
   //Todo: Timer text not changing from small -> large on <=60 seconds. Does change after pause/resume though.
@@ -989,8 +991,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     ////--EditCycles Menu Item onClicks START--////
-    buttonToLaunchTimer.setOnClickListener(v-> {
-      //Launched from editCyclePopUp and calls TimerInterface. First input controls whether it is a new cycle, and the second will always be true since a cycle launch should automatically save/update it in database.
+    buttonToLaunchTimerFromEditPopUp.setOnClickListener(v-> {
       launchTimerCycle(true);
     });
 
@@ -1330,7 +1331,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addRoundToCycleButton = editCyclesPopupView.findViewById(R.id.addRoundToCycleButton);
     subtractRoundFromCycleButton = editCyclesPopupView.findViewById(R.id.subtractRoundFromCycleButton);
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
-    buttonToLaunchTimer = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimer);
+    buttonToLaunchTimerFromEditPopUp = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimerFromEditPopUp);
 
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
@@ -1737,7 +1738,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void fabLogic() {
     fab.setEnabled(false);
-    buttonToLaunchTimer.setEnabled(true);
+    buttonToLaunchTimerFromEditPopUp.setEnabled(true);
     cycleNameEdit.getText().clear();
     isNewCycle = true;
 
@@ -1912,8 +1913,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         List<Integer> tempIdList = new ArrayList<>();
         tempIdList.addAll(receivedHighlightPositionHolder);
 
-        //Todo: We should never be using this method, since our cycles are always sorted in some way. Should always call from       AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
-        loadCycleListsFromDatabase();
+        AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
 
         if (mode==1) {
           for (int i=0; i<tempIdList.size(); i++) {
@@ -1942,7 +1942,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         {
-          loadCycleListsFromDatabase();
+          AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
           if (mode==1) {
             if (cyclesList.size()>0) {
               cyclesDatabase.cyclesDao().deleteAllCycles();
@@ -2184,7 +2184,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     makeCycleAdapterVisible = false;
     timerPopUpIsVisible = false;
     beginTimerForNextRound = false;
-    buttonToLaunchTimer.setEnabled(false);
+    buttonToLaunchTimerFromEditPopUp.setEnabled(false);
     reset.setVisibility(View.INVISIBLE);
     dotDraws.setMode(mode);
 
@@ -2272,7 +2272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void editHighlightedCycleButtonClickLogic() {
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
-    buttonToLaunchTimer.setEnabled(true);
+    buttonToLaunchTimerFromEditPopUp.setEnabled(true);
     currentlyEditingACycle = true;
     isNewCycle = false;
     positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
@@ -3244,7 +3244,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
           for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
-          buttonToLaunchTimer.setEnabled(true);
+          buttonToLaunchTimerFromEditPopUp.setEnabled(true);
         }
         break;
       case 3:
@@ -3252,7 +3252,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
           cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
-          buttonToLaunchTimer.setEnabled(true);
+          buttonToLaunchTimerFromEditPopUp.setEnabled(true);
 
           /////---------Testing pom round iterations---------------/////////
 //          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
@@ -3290,11 +3290,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = true;
 
     AsyncTask.execute(()-> {
-      //For Cycles.
       if (isNewCycle || saveToDB) {
         saveAddedOrEditedCycleASyncRunnable();
       } else {
-        queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable();
+        queryDatabaseAndRetrieveCycleTimesRunnable();
       }
 
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
@@ -3383,9 +3382,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (isNewCycle) {
         cycles = new Cycles();
       } else if (cyclesList.size()>0) {
-        //Todo: We probably don't have a new instance of cycleList, so the ID fetched that is used below is wrong. The only places we actually called it are
         cycleID = cyclesList.get(positionOfSelectedCycle).getId();
-        //Todo: Index exception (0 index/0 size) on editing a cycle here. Occurred: Two cycles, deleted one, tried to edit + launch the next. Issue is there is no Cycles row falling under the cycleID listed.
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
       workoutString = gson.toJson(workoutTime);
@@ -3394,14 +3391,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundTypeString = friendlyString(roundTypeString);
 
       if (trackActivityWithinCycle) {
-        cycles.setTdeeActivityExists(true);
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setTdeeValuePosition(selectedTdeeValuePosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
       } else {
-        cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeValuePosition(0);
       }
@@ -3450,20 +3445,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     }
-    loadCycleListsFromDatabase();
+    AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
     runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
   }
 
-  private void loadCycleListsFromDatabase() {
-    if (mode==1) {
-      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-    }
-    if (mode==3) {
-      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-    }
-  }
-
-  private void queryDatabaseAndRetrieveCycleTimesAndCaloriesRunnable() {
+  private void queryDatabaseAndRetrieveCycleTimesRunnable() {
     if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
     if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
@@ -3554,6 +3540,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
     iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+
   }
 
   private boolean hasTimerTextViewChanged() {
@@ -4587,17 +4574,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
   private void toggleEditPopUpViewsForAddingActivity(boolean activityExists) {
     if (activityExists) {
       String activity = (String) tdee_sub_category_spinner.getSelectedItem();
       addTDEEActivityTextView.setText(activity);
       removeTdeeActivityImageView.setVisibility(View.VISIBLE);
-      trackActivityWithinCycle = true;
+      cycleHasActivityAssigned = true;
     } else {
       addTDEEActivityTextView.setText(R.string.add_activity);
       removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
-      trackActivityWithinCycle = false;
+      cycleHasActivityAssigned = false;
     }
   }
 

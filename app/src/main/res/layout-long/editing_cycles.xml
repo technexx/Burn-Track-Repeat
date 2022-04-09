@@ -436,7 +436,7 @@
 
 
     <ImageButton
-        android:id="@+id/buttonToLaunchTimer"
+        android:id="@+id/buttonToLaunchTimerFromEditPopUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
