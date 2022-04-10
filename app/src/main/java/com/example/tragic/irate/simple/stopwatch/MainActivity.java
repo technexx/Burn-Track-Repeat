@@ -688,16 +688,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
-  public void toggleTdeeMode(boolean tdeeToggle, int positionToToggle) {
+  public void toggleTdeeMode(int positionToToggle) {
     if (cyclesList.get(positionToToggle).getTdeeActivityExists()) {
-      trackActivityWithinCycle = tdeeToggle;
       savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
       savedCycleAdapter.setDoesActivityExistInCycle(true);
       savedCycleAdapter.setPositionToToggle(positionToToggle);
       savedCycleAdapter.notifyDataSetChanged();
+
+      trackActivityWithinCycle = savedCycleAdapter.getIsTdeeModeActive();
     } else {
       trackActivityWithinCycle = false;
       savedCycleAdapter.setDoesActivityExistInCycle(false);
+      Toast.makeText(getApplicationContext(), "No activity assigned!", Toast.LENGTH_SHORT).show();
     }
   }
 

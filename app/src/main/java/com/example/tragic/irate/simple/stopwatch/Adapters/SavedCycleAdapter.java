@@ -117,7 +117,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public interface onTdeeModeToggle {
-    void toggleTdeeMode(boolean tdeeToggle, int positionToToggle);
+    void toggleTdeeMode(int positionToToggle);
   }
 
   public void setTdeeToggle(onTdeeModeToggle xOnTdeeModeToggle) {
@@ -175,6 +175,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mPositionToToggle = position;
   }
 
+  public boolean getIsTdeeModeActive() {
+    return isTdeeModeActive;
+  }
+
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -191,7 +195,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
     workoutHolder.tdeeToggle.setOnClickListener(v-> {
-      mOnTdeeModeToggle.toggleTdeeMode(isTdeeModeActive, position);
+      mOnTdeeModeToggle.toggleTdeeMode(position);
     });
 
     if (mDoesActivityExistInCycle) {
