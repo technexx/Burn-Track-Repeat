@@ -516,6 +516,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Set default tracking for cycles (true if activity assigned, false if not). Maybe just remove the textView altogether if no activity exists.
+        //Todo: We can create a header over "Track Calories" and change column textView to a shortened description of the assigned activity. Where would the header go tho?
   //Todo: Creating new cycle w/ out activity shows last used cycle's activity stats.
       //Todo: Replace activity String w/ "No activity selected" AND do not track total calories. Should probably use boolean in cycle db for this.
   //Todo: Re-implement Reset option for total times.
@@ -687,6 +689,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: We may want to also fetch our adapter's mActiveTdeeModeBooleanList position for our launched cycle as the best way to ensure the correct toggle. We would then remove it being set below, which we should do anyway because trackActivityWithinCycle as a global boolean doesn't reflect whichever cycle we'd select.
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     if (cyclesList.get(positionToToggle).getTdeeActivityExists()) {
@@ -694,14 +697,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.setDoesActivityExistInCycle(true);
       savedCycleAdapter.setPositionToToggle(positionToToggle);
       savedCycleAdapter.notifyDataSetChanged();
-
-      trackActivityWithinCycle = savedCycleAdapter.getIsTdeeModeActive();
     } else {
-      trackActivityWithinCycle = false;
       savedCycleAdapter.setDoesActivityExistInCycle(false);
       Toast.makeText(getApplicationContext(), "No activity assigned!", Toast.LENGTH_SHORT).show();
     }
   }
+
 
   @Override
   public void onCycleClick(int position) {
@@ -711,7 +712,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     isNewCycle = false;
     positionOfSelectedCycle = position;
 
-    boolean trackingCycle = savedCycleAdapter.retrieveActiveTdeeModeToggleList(position);
+    trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
 
     populateCycleAdapterArrayList();
     launchTimerCycle(false);

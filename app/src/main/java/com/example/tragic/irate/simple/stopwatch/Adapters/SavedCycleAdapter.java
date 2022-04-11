@@ -73,7 +73,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int SET_COLOR;
   int BREAK_COLOR;
 
-  boolean isTdeeModeActive;
+  boolean isTdeeModeActiveForCurrentPosition;
   List<Boolean> mActiveTdeeModeBooleanList;
 
   boolean mDoesActivityExistInCycle;
@@ -146,7 +146,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mActiveCycle = false;
   }
 
-  public boolean retrieveActiveTdeeModeToggleList(int positionToCheckForToggle) {
+  public boolean retrieveActiveTdeeModeBoolean(int positionToCheckForToggle) {
     Log.i("testToggle", "boolean on selected position is " + mActiveTdeeModeBooleanList.get(positionToCheckForToggle));
     Log.i("testToggle", "list total on cycle click is " + mActiveTdeeModeBooleanList);
     return mActiveTdeeModeBooleanList.get(positionToCheckForToggle);
@@ -155,16 +155,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public void modifyActiveTdeeModeToggleList(int positionToToggle) {
     if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
       mActiveTdeeModeBooleanList.set(positionToToggle, false);
-      isTdeeModeActive = false;
+      isTdeeModeActiveForCurrentPosition = false;
     } else {
-      isTdeeModeActive = true;
+      isTdeeModeActiveForCurrentPosition = true;
       mActiveTdeeModeBooleanList.set(positionToToggle, true);
     }
     Log.i("testToggle", "list total on toggle click is " + mActiveTdeeModeBooleanList);
   }
 
   private float getTdeeModeTextViewAlpha() {
-    if (isTdeeModeActive) return 1.0f; else return 0.3f;
+    if (isTdeeModeActiveForCurrentPosition) return 1.0f; else return 0.3f;
   }
 
   public void setDoesActivityExistInCycle(boolean doesActivityExist) {
@@ -173,10 +173,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public void setPositionToToggle(int position) {
     this.mPositionToToggle = position;
-  }
-
-  public boolean getIsTdeeModeActive() {
-    return isTdeeModeActive;
   }
 
   @NonNull
