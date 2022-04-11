@@ -78,6 +78,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   boolean mDoesActivityExistInCycle;
   int mPositionToToggle;
+  List<String> mActivityStringList;
 
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -175,6 +176,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mPositionToToggle = position;
   }
 
+  public void setActivityStringListFromMain(List<String> receivedList) {
+    this.mActivityStringList = receivedList;
+  }
+
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -206,6 +211,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         workoutHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER));
       }
     }
+
+    workoutHolder.tdeeToggle.setText(mActivityStringList.get(position));
 
     workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.

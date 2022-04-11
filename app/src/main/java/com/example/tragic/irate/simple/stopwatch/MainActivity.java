@@ -516,10 +516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Set default tracking for cycles (true if activity assigned, false if not). Maybe just remove the textView altogether if no activity exists.
-        //Todo: We can create a header over "Track Calories" and change column textView to a shortened description of the assigned activity. Where would the header go tho?
-  //Todo: Creating new cycle w/ out activity shows last used cycle's activity stats.
-      //Todo: Replace activity String w/ "No activity selected" AND do not track total calories. Should probably use boolean in cycle db for this.
+  //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -689,7 +686,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: We may want to also fetch our adapter's mActiveTdeeModeBooleanList position for our launched cycle as the best way to ensure the correct toggle. We would then remove it being set below, which we should do anyway because trackActivityWithinCycle as a global boolean doesn't reflect whichever cycle we'd select.
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     if (cyclesList.get(positionToToggle).getTdeeActivityExists()) {
@@ -703,6 +699,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void setCycleActivityStringsInRecyclerView() {
+    List<String> listToSend = new ArrayList<>();
+
+    for (int i=0; i<cyclesList.size(); i++) {
+      listToSend.add(cyclesList.get(i).getActivityString());
+    }
+
+    savedCycleAdapter.setActivityStringListFromMain(listToSend);
+    savedCycleAdapter.notifyDataSetChanged();
+  }
 
   @Override
   public void onCycleClick(int position) {
@@ -1405,6 +1411,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setDefaultUserSettings();
         setDefaultEditRoundViews();
+        setCycleActivityStringsInRecyclerView();
         savedCycleAdapter.notifyDataSetChanged();
       });
     });
@@ -3231,6 +3238,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     runOnUiThread(()-> {
       if (mode==1) {
+        setCycleActivityStringsInRecyclerView();
         savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode==3) {
@@ -3403,8 +3411,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeValuePosition(selectedTdeeValuePosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
       } else {
-        //Todo: Should tracking toggle in Main act as the toggle w/ in Timer? That way we can disable it if no activity exists, and we don't need to have the in-timer toggle. This would also help to differentiate between days and cycles.
-        //Todo: Main's toggle will now also need to disable iteration of any daily/activity values.
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);

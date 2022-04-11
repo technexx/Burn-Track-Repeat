@@ -238,7 +238,6 @@ public class DailyStatsAccess {
                 idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getIteratingIdsForSpecificDay();
             }
         }
-        //Todo: This will return 0 by default, if the activity does not already exist for the day.
         return idToReturn;
     }
 
