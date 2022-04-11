@@ -34,9 +34,6 @@ CyclesDao {
     @Query("DELETE from DayHolder")
     void deleteAllDayHolderEntries();
 
-    @Query("SELECT * from StatsForEachActivity")
-    List<StatsForEachActivity> loadAllActivitiesAndTheirStatsForAllDays();
-
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
 

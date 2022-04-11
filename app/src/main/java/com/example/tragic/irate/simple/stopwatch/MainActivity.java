@@ -516,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Editing a cycle defaults to no activity.
   //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
@@ -699,6 +700,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: When adding a new cycle, this list lags behind and causes index exception.
   private void setCycleActivityStringsInRecyclerView() {
     List<String> listToSend = new ArrayList<>();
 
@@ -905,6 +907,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       assignOldCycleValuesToCheckForChanges();
       cycleNameEdit.setText(cycleTitle);
+
+      if (cycleHasActivityAssigned) {
+        addTDEEActivityTextView.setText(cyclesList.get(positionOfSelectedCycle).getActivityString());
+        removeTdeeActivityImageView.setVisibility(View.VISIBLE);
+      } else {
+        addTDEEActivityTextView.setText(getString(R.string.add_activity));
+        removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
+      }
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -4611,13 +4621,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       reset_total_times.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
-//      toggle_cycle_and_daily_display.setVisibility(View.INVISIBLE);
     } else {
       typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
 
       reset_total_times.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
-//      toggle_cycle_and_daily_display.setVisibility(View.VISIBLE);
     }
 
     toggleViewsForTotalDailyAndCycleTimes();
