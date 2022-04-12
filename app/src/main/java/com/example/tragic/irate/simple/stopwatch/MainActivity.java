@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> workoutTitle;
   ArrayList<String> workoutTitleArray;
   ArrayList<Boolean> activeTdeeTrackingBooleanList;
+  ArrayList<String> workoutActivityStringArray;
 
   ArrayList<Integer> pomValuesTime;
   ArrayList<String> pomStringListOfRoundValues;
@@ -698,18 +699,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.setDoesActivityExistInCycle(false);
       Toast.makeText(getApplicationContext(), "No activity assigned!", Toast.LENGTH_SHORT).show();
     }
-  }
-
-  //Todo: When adding a new cycle, this list lags behind and causes index exception.
-  private void setCycleActivityStringsInRecyclerView() {
-    List<String> listToSend = new ArrayList<>();
-
-    for (int i=0; i<cyclesList.size(); i++) {
-      listToSend.add(cyclesList.get(i).getActivityString());
-    }
-
-    savedCycleAdapter.setActivityStringListFromMain(listToSend);
-    savedCycleAdapter.notifyDataSetChanged();
   }
 
   @Override
@@ -1421,7 +1410,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setDefaultUserSettings();
         setDefaultEditRoundViews();
-        setCycleActivityStringsInRecyclerView();
         savedCycleAdapter.notifyDataSetChanged();
       });
     });
@@ -1434,7 +1422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateCycleAdaptersAndTheirCallbacks() {
-    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray, activeTdeeTrackingBooleanList);
+    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray, activeTdeeTrackingBooleanList, workoutActivityStringArray);
     savedCycleRecycler.setAdapter(savedCycleAdapter);
     savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
     savedCycleAdapter.setTdeeToggle(MainActivity.this);
@@ -1567,6 +1555,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomArray = new ArrayList<>();
     workoutTitleArray = new ArrayList<>();
     activeTdeeTrackingBooleanList = new ArrayList<>();
+    workoutActivityStringArray = new ArrayList<>();
 
     pomTitleArray = new ArrayList<>();
     receivedHighlightPositions = new ArrayList<>();
@@ -1975,6 +1964,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 typeOfRoundArray.clear();
                 workoutTitleArray.clear();
                 activeTdeeTrackingBooleanList.clear();
+                workoutActivityStringArray.clear();
                 savedCycleAdapter.notifyDataSetChanged();
               });
             }
@@ -3177,10 +3167,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutCyclesArray.clear();
       typeOfRoundArray.clear();
       workoutTitleArray.clear();
+      workoutActivityStringArray.clear();
       for (int i=0; i<cyclesList.size(); i++) {
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         workoutTitleArray.add(cyclesList.get(i).getTitle());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+        workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
       }
     }
     if (mode==3 || forAllModes) {
@@ -3200,6 +3192,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         typeOfRoundArray.add(roundTypeString);
         workoutCyclesArray.add(workoutString);
         activeTdeeTrackingBooleanList.add(activeTdeeTrackingBooleanList.size(), true);
+        workoutActivityStringArray.add((String) addTDEEActivityTextView.getText());
       }
       if (mode==3) {
         pomTitleArray.add(cycleTitle);
@@ -3211,6 +3204,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTitleArray.set(positionOfSelectedCycle, cycleTitle);
         workoutCyclesArray.set(positionOfSelectedCycle, workoutString);
         typeOfRoundArray.set(positionOfSelectedCycle, roundTypeString);
+        workoutActivityStringArray.set(positionOfSelectedCycle, (String) addTDEEActivityTextView.getText());
       }
       if (mode==3) {
         pomTitleArray.set(positionOfSelectedCycle, cycleTitle);
@@ -3225,6 +3219,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRoundArray.remove(posToRemove);
           workoutCyclesArray.remove(posToRemove);
           activeTdeeTrackingBooleanList.remove(posToRemove);
+          workoutActivityStringArray.remove(posToRemove);
           posToRemove = receivedHighlightPositionHolder.get(i);
           if (posToRemove>=1) {
             posToRemove--;
@@ -3248,7 +3243,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     runOnUiThread(()-> {
       if (mode==1) {
-        setCycleActivityStringsInRecyclerView();
         savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode==3) {

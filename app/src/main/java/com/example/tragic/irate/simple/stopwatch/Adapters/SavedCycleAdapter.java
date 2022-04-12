@@ -48,6 +48,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mWorkoutList;
   ArrayList<String> mRoundType;
   ArrayList<String> mWorkoutTitle;
+  ArrayList<String> mWorkoutActivityString;
 
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
@@ -78,7 +79,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   boolean mDoesActivityExistInCycle;
   int mPositionToToggle;
-  List<String> mActivityStringList;
 
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -126,8 +126,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
-  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> activeTdeeModeBooleanList) {
-    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList;
+  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
+    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
@@ -176,10 +176,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mPositionToToggle = position;
   }
 
-  public void setActivityStringListFromMain(List<String> receivedList) {
-    this.mActivityStringList = receivedList;
-  }
-
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -212,7 +208,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     }
 
-    workoutHolder.tdeeToggle.setText(mActivityStringList.get(position));
+    workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
 
     workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.
