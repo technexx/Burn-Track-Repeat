@@ -518,6 +518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   //Todo: Reset button should appear on non-active, non-tracking cycles for resetting cycle times.
+  //Todo: Getting some skip over a number (e.g. 2 -> 4) after resetting cycle times during cycle.
   //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
@@ -1100,15 +1101,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode!=4) if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
       else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
-
-//    toggle_cycle_and_daily_display.setOnClickListener(v-> {
-//      if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-//        typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
-//      } else {
-//        typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
-//      }
-//      toggleViewsForTotalDailyAndCycleTimes();
-//    });
 
     reset_total_times.setOnClickListener(v -> {
       delete_all_text.setText(R.string.delete_total_times);
@@ -3622,7 +3614,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       };
     }
-    //We have daily totalWork and totalRest values that are iterating up for Pomodoro, but using just PomCycles stats makes more sense now.
+    //We have daily totalWork and totalRest values that are iterating up for Pomodoro, but using PomCycles stats makes more sense for now.
   }
 
   private void iterateTotalTimesForSelectedActivity(long millis) {
@@ -4214,6 +4206,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
+      if (reset_total_times.isEnabled()) {
+        reset_total_times.setEnabled(false);
+        reset_total_times.setAlpha(0.3f);
+      }
       if (fadeInObj != null) fadeInObj.cancel();
       if (fadeOutObj != null) fadeOutObj.cancel();
       switch (mode) {
@@ -4435,7 +4431,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void populateTimerUI() {
 //////////////
-    reset_total_times.setVisibility(View.GONE);
+//    reset_total_times.setVisibility(View.GONE);
 ////////////////
     lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
@@ -4550,6 +4546,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
     reset.setVisibility(View.INVISIBLE);
+    reset_total_times.setEnabled(true);
+    reset_total_times.setAlpha(1.0f);
 
     switch (mode) {
       case 1:
