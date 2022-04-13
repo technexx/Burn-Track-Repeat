@@ -3,6 +3,8 @@ package com.example.tragic.irate.simple.stopwatch.Database;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.List;
+
 @Entity (tableName = "Cycles")
 public class Cycles {
     @PrimaryKey (autoGenerate = true)
@@ -24,6 +26,7 @@ public class Cycles {
     public int tdeeCatPosition;
     public int tdeeSubCatPosition;
     public int tdeeValuePosition;
+    public boolean currentlyTrackingCycle;
 
 //    //Used for ease of viewing database entries.
     public String activityString;
@@ -105,6 +108,14 @@ public class Cycles {
 
     public void setTdeeActivityExists(boolean tdeeActivityExists) {
         this.tdeeActivityExists = tdeeActivityExists;
+    }
+
+    public boolean getCurrentlyTrackingCycle() {
+        return currentlyTrackingCycle;
+    }
+
+    public void setCurrentlyTrackingCycle(boolean currentlyTrackingCycle) {
+        this.currentlyTrackingCycle = currentlyTrackingCycle;
     }
 
     public int getTdeeCatPosition() {

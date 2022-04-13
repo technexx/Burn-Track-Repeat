@@ -1405,7 +1405,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
-        instantiateActiveTdeeBooleanList();
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
 
         setDefaultUserSettings();
@@ -1413,12 +1412,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.notifyDataSetChanged();
       });
     });
-  }
-
-  private void instantiateActiveTdeeBooleanList() {
-//    for (int i=0; i<workoutCyclesArray.size(); i++) {
-//      activeTdeeTrackingBooleanList.add(i, false);
-//    }
   }
 
   private void instantiateCycleAdaptersAndTheirCallbacks() {
@@ -3170,11 +3163,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       typeOfRoundArray.clear();
       workoutTitleArray.clear();
       workoutActivityStringArray.clear();
+      activeTdeeTrackingBooleanList.clear();
       for (int i=0; i<cyclesList.size(); i++) {
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         workoutTitleArray.add(cyclesList.get(i).getTitle());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
+        activeTdeeTrackingBooleanList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
       }
     }
     if (mode==3 || forAllModes) {
@@ -3187,8 +3182,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Ensure activeTdeeTrackingBooleanList gets modified in sync w/ other lists, and we can keep the instantiation of it removed (above, bookmarked).
-  //Todo: We need to add the boolean list to DB, otherwise when sorting Cycles it won't match up.
   private void editCycleArrayLists(int action) {
     if (action == ADDING_CYCLE) {
       if (mode==1) {
@@ -3196,12 +3189,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         typeOfRoundArray.add(roundTypeString);
         workoutCyclesArray.add(workoutString);
         workoutActivityStringArray.add((String) addTDEEActivityTextView.getText());
-        if (addTDEEActivityTextView.getText().equals(getString(R.string.no_activity))) {
+        if (addTDEEActivityTextView.getText().equals(getString(R.string.add_activity))) {
           activeTdeeTrackingBooleanList.add(false);
         } else {
           activeTdeeTrackingBooleanList.add(true);
         }
       }
+      Log.i("testList", "activeTdeeTrackingBooleanList is " + activeTdeeTrackingBooleanList);
       if (mode==3) {
         pomTitleArray.add(cycleTitle);
         pomArray.add(pomString);
@@ -3428,12 +3422,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setTdeeValuePosition(selectedTdeeValuePosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
+        cycles.setCurrentlyTrackingCycle(true);
       } else {
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
         cycles.setTdeeValuePosition(0);
         cycles.setActivityString("No activity assigned!");
+        cycles.setCurrentlyTrackingCycle(false);
       }
       if (!workoutString.equals("")) {
         cycles.setWorkoutRounds(workoutString);
