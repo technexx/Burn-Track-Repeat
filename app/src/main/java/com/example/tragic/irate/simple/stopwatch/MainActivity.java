@@ -517,8 +517,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Reset button should appear on non-active, non-tracking cycles for resetting cycle times.
-  //Todo: Getting some skip over a number (e.g. 2 -> 4) after resetting cycle times during cycle.
+  //Todo: nextRound currently begins whether cycle is paused or not.
+  //Todo: Getting some skip over a number (e.g. 2 -> 4) after resetting cycle times during active cycle (currently set to disabled for active cycle).
   //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
@@ -1987,6 +1987,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (mode==1) {
             totalCycleSetTimeInMillis = 0;
             totalCycleBreakTimeInMillis = 0;
+//            syncResetTotalCycleTimesToTimer();
           }
           if (mode==3) {
             totalCycleWorkTimeInMillis = 0;
@@ -2001,6 +2002,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
       }
     };
+  }
+
+  private void syncResetTotalCycleTimesToTimer() {
+    long remainder = setMillis % 1000;
+    totalCycleSetTimeInMillis += remainder;
   }
 
   private void setDefaultUserSettings() {
@@ -4206,10 +4212,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
-      if (reset_total_times.isEnabled()) {
-        reset_total_times.setEnabled(false);
-        reset_total_times.setAlpha(0.3f);
-      }
+//      if (reset_total_times.isEnabled()) {
+//        reset_total_times.setEnabled(false);
+//        reset_total_times.setAlpha(0.3f);
+//      }
       if (fadeInObj != null) fadeInObj.cancel();
       if (fadeOutObj != null) fadeOutObj.cancel();
       switch (mode) {
@@ -4220,7 +4226,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               reset.setVisibility(View.VISIBLE);
               if (timer != null) timer.cancel();
               if (objectAnimator != null) objectAnimator.pause();
-
+              reset_total_times.setEnabled(true);
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
@@ -4242,6 +4248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               activeCycle = true;
               timerIsPaused = false;
               reset.setVisibility(View.INVISIBLE);
+              reset_total_times.setEnabled(false);
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
@@ -4277,16 +4284,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             if (pausing == PAUSING_TIMER) {
               timerIsPaused = true;
               pomMillisUntilFinished = pomMillis;
+
               if (objectAnimatorPom != null) objectAnimatorPom.pause();
               if (timer != null) timer.cancel();
-              reset.setVisibility(View.VISIBLE);
-            } else if (pausing == RESUMING_TIMER) {
-              if (!activeCycle) activeCycle = true;
 
-              reset.setVisibility(View.INVISIBLE);
-              timerIsPaused = false;
+              reset.setVisibility(View.VISIBLE);
+              reset_total_times.setEnabled(true);
+            } else if (pausing == RESUMING_TIMER) {
               startObjectAnimatorAndTotalCycleTimeCounters();
               startPomTimer();
+
+              activeCycle = true;
+              timerIsPaused = false;
+              reset.setVisibility(View.INVISIBLE);
+              reset_total_times.setEnabled(false);
             }
             AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
           } else {
@@ -4547,7 +4558,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     reset.setVisibility(View.INVISIBLE);
     reset_total_times.setEnabled(true);
-    reset_total_times.setAlpha(1.0f);
+//    reset_total_times.setAlpha(1.0f);
 
     switch (mode) {
       case 1:
