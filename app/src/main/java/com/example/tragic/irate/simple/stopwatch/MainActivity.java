@@ -3581,6 +3581,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
       iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
     }
+
   }
 
   private void iterateTotalTimesForSelectedDay(long millis) {
@@ -4721,5 +4722,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.remove("modeThreeTimerEnded");
     prefEdit.remove("modeThreeTimerDisabled");
     prefEdit.apply();
+  }
+
+  private void logTotalCycleTimes() {
+    Log.i("testTimes", "set time for CYCLE is " + totalCycleSetTimeInMillis);
+  }
+
+  private void logTotalDailyStats() {
+    Log.i("testTimes", "set time for DAY is " + totalSetTimeForCurrentDayInMillis);
+    Log.i("testTimes", "calories for DAY are" + totalCaloriesBurnedForCurrentDay);
+  }
+
+  private void logTotalActivityStats() {
+    Log.i("testTimes", "selected activity time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testTimes", "selected activity calories are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 }
