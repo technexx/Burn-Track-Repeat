@@ -3574,14 +3574,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
-    if (cycleHasActivityAssigned) {
+    if (trackActivityWithinCycle) {
       iterateTotalTimesForSelectedDay(timerRunnableDelay);
       iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
       iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
       iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
     }
-
   }
 
   private void iterateTotalTimesForSelectedDay(long millis) {
