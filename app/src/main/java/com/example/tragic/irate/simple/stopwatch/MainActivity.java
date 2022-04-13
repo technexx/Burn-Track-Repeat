@@ -517,8 +517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Lists are saving correctly in db, but:
-      //Todo: Neither Cycles or Daily are iterating in the textViews.
+  //Todo: Reset button should appear on non-active, non-tracking cycles for resetting cycle times.
   //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
@@ -3573,7 +3572,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
+  private void iterationMethodsForTotalTimesForSelectedCycle() {
+
+  }
+
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
+    iterateTotalTimesForSelectedCycle(timerRunnableDelay);
+
     if (trackActivityWithinCycle) {
       iterateTotalTimesForSelectedDay(timerRunnableDelay);
       iterateTotalTimesForSelectedActivity(timerRunnableDelay);
@@ -3583,16 +3588,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void iterateTotalTimesForSelectedDay(long millis) {
+  private void iterateTotalTimesForSelectedCycle(long millis) {
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1: case 2:
           totalCycleSetTimeInMillis += millis;
-          totalSetTimeForCurrentDayInMillis += millis;
           break;
         case 3: case 4:
           totalCycleBreakTimeInMillis += millis;
-          totalBreakTimeForCurrentDayInMillis += millis;
           break;
       };
     }
@@ -3600,14 +3603,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
           totalCycleWorkTimeInMillis += millis;
-          totalWorkTimeForCurrentDayInMillis += millis;
           break;
         case 1: case 3: case 5: case 7:
           totalCycleRestTimeInMillis += millis;
-          totalRestTimeForCurrentDayInMillis += millis;
           break;
       }
     }
+  }
+
+  private void iterateTotalTimesForSelectedDay(long millis) {
+    if (mode==1) {
+      switch (typeOfRound.get(currentRound)) {
+        case 1: case 2:
+          totalSetTimeForCurrentDayInMillis += millis;
+          break;
+        case 3: case 4:
+          totalBreakTimeForCurrentDayInMillis += millis;
+          break;
+      };
+    }
+    //We have daily totalWork and totalRest values that are iterating up for Pomodoro, but using just PomCycles stats makes more sense now.
   }
 
   private void iterateTotalTimesForSelectedActivity(long millis) {
