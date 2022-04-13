@@ -517,7 +517,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Not selecting activity on add cycle is defaulting to "general biking"
+  //Todo: Lists are saving correctly in db, but:
+      //Todo: Neither Cycles or Daily are iterating in the textViews.
   //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
@@ -1835,6 +1836,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
           }
           runOnUiThread(()->{
+            clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
             savedCycleAdapter.notifyDataSetChanged();
           });
         }
@@ -1846,11 +1848,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
           }
           runOnUiThread(()->{
+            clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
             savedPomCycleAdapter.notifyDataSetChanged();
           });
         }
         runOnUiThread(()-> {
-          clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
           sortPopupWindow.dismiss();
         });
       }
@@ -3345,8 +3347,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void run() {
           displayCycleOrDailyTotals();
 
-          toggleTdeeTextViewSize();
-          //Todo: retrieveActiveTdeeModeBoolean in cycle onClick sets this to true, likely due to initial setup. Should always be false if no activity is assigned.
           toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
           retrieveTotalDailySetAndBreakTimes();

@@ -164,10 +164,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     Log.i("testToggle", "list total on toggle click is " + mActiveTdeeModeBooleanList);
   }
 
-  private float getTdeeModeTextViewAlpha() {
-    if (isTdeeModeActiveForCurrentPosition) return 1.0f; else return 0.3f;
-  }
-
   public void setDoesActivityExistInCycle(boolean doesActivityExist) {
     mDoesActivityExistInCycle = doesActivityExist;
   }
@@ -192,13 +188,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
     workoutHolder.tdeeToggle.setOnClickListener(v-> {
-      mOnTdeeModeToggle.toggleTdeeMode(position);
+      if (!mActiveCycle) {
+        mOnTdeeModeToggle.toggleTdeeMode(position);
+      }
     });
 
-    if (mDoesActivityExistInCycle) {
-      if (position==mPositionToToggle) {
-        workoutHolder.tdeeToggle.setAlpha(getTdeeModeTextViewAlpha());
-      }
+    if (mActiveTdeeModeBooleanList.get(position)) {
+      workoutHolder.tdeeToggle.setAlpha(1.0f);
+    } else {
+    workoutHolder.tdeeToggle.setAlpha(0.3f);
     }
 
     if (mActiveCycle) {
