@@ -510,14 +510,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double metScore;
   Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
-  boolean trackActivityWithinCycle = true;
+  boolean trackActivityWithinCycle;
 
   int timerRunnableDelay = 50;
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Editing a cycle defaults to no activity.
+  //Todo: Not selecting activity on add cycle is defaulting to "general biking"
   //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
   //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
@@ -1416,9 +1416,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateActiveTdeeBooleanList() {
-    for (int i=0; i<workoutCyclesArray.size(); i++) {
-      activeTdeeTrackingBooleanList.add(i, true);
-    }
+//    for (int i=0; i<workoutCyclesArray.size(); i++) {
+//      activeTdeeTrackingBooleanList.add(i, false);
+//    }
   }
 
   private void instantiateCycleAdaptersAndTheirCallbacks() {
@@ -1652,12 +1652,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1){
           cycles.setTotalSetTime(totalCycleSetTimeInMillis);
           cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
+          cycles.setCyclesCompleted(cyclesCompleted);
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
 
         if (mode==3) {
           pomCycles.setTotalWorkTime(totalCycleWorkTimeInMillis);
           pomCycles.setTotalRestTime(totalCycleRestTimeInMillis);
+          pomCycles.setCyclesCompleted(cyclesCompleted);
           cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         }
 
@@ -3185,14 +3187,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Ensure activeTdeeTrackingBooleanList gets modified in sync w/ other lists, and we can keep the instantiation of it removed (above, bookmarked).
+  //Todo: We need to add the boolean list to DB, otherwise when sorting Cycles it won't match up.
   private void editCycleArrayLists(int action) {
     if (action == ADDING_CYCLE) {
       if (mode==1) {
         workoutTitleArray.add(cycleTitle);
         typeOfRoundArray.add(roundTypeString);
         workoutCyclesArray.add(workoutString);
-        activeTdeeTrackingBooleanList.add(activeTdeeTrackingBooleanList.size(), true);
         workoutActivityStringArray.add((String) addTDEEActivityTextView.getText());
+        if (addTDEEActivityTextView.getText().equals(getString(R.string.no_activity))) {
+          activeTdeeTrackingBooleanList.add(false);
+        } else {
+          activeTdeeTrackingBooleanList.add(true);
+        }
       }
       if (mode==3) {
         pomTitleArray.add(cycleTitle);
@@ -3205,6 +3213,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutCyclesArray.set(positionOfSelectedCycle, workoutString);
         typeOfRoundArray.set(positionOfSelectedCycle, roundTypeString);
         workoutActivityStringArray.set(positionOfSelectedCycle, (String) addTDEEActivityTextView.getText());
+        if (addTDEEActivityTextView.getText().equals(getString(R.string.no_activity))) {
+          activeTdeeTrackingBooleanList.set(positionOfSelectedCycle, false);
+        } else {
+          activeTdeeTrackingBooleanList.add(positionOfSelectedCycle, true);
+        }
       }
       if (mode==3) {
         pomTitleArray.set(positionOfSelectedCycle, cycleTitle);
@@ -3339,6 +3352,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           displayCycleOrDailyTotals();
 
           toggleTdeeTextViewSize();
+          //Todo: retrieveActiveTdeeModeBoolean in cycle onClick sets this to true, likely due to initial setup. Should always be false if no activity is assigned.
           toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
           retrieveTotalDailySetAndBreakTimes();
@@ -3549,10 +3563,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     daily_total_time_and_calories_textView.setText(currentTotalDailySetTimeAndCaloriesString());
   }
 
+  private String currentTotalDailySetTimeAndCaloriesString() {
+    return getString(R.string.total_daily_time_and_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
+  }
+
   private void setTotalDailyTimeAndCaloriesForSpecificActivityTextView() {
     if (mode==1 && trackActivityWithinCycle) {
       activityStatsInTimerTextView.setText(currentTdeeStatStringForSpecificActivity());
     }
+  }
+
+  private String currentTdeeStatStringForSpecificActivity() {
+    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
@@ -3632,14 +3654,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
     DecimalFormat df = new DecimalFormat("#.#");
     String truncatedMinutes = df.format(caloriesBurnedPerMinute);
-  }
-
-  private String currentTotalDailySetTimeAndCaloriesString() {
-    return getString(R.string.total_daily_time_and_calories_burned, convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForCurrentDay));
-  }
-
-  private String currentTdeeStatStringForSpecificActivity() {
-    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
   private String getLastDisplayedTotalCaloriesString() {
