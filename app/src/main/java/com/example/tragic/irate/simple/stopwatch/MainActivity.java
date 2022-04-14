@@ -3324,7 +3324,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-      if (trackActivityWithinCycle) {
+      //Todo: This makes sense for new/edited Cycles, since our edit popUp assigns cycleHasActivityAssigned based on the presence of an acitivty. However, when launching a cycle from Main, we don't want some of this executed.
+      if (cycleHasActivityAssigned) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
