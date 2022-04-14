@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> workoutTitle;
   ArrayList<String> workoutTitleArray;
   ArrayList<Boolean> activeTdeeTrackingBooleanList;
+  ArrayList<Boolean> existenceOfActivityInCycleList;
   ArrayList<String> workoutActivityStringArray;
 
   ArrayList<Integer> pomValuesTime;
@@ -516,6 +517,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Editing cycle w/ activity defaults selection to "none" and removed it if moved forward.
+  //Todo: Should we remove toggle option if no activity exists?
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -692,7 +695,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.setPositionToToggle(positionToToggle);
       savedCycleAdapter.notifyDataSetChanged();
     } else {
-      Toast.makeText(getApplicationContext(), "No activity assigned!", Toast.LENGTH_SHORT).show();
+//      Toast.makeText(getApplicationContext(), "No activity assigned!", Toast.LENGTH_SHORT).show();
     }
   }
 
@@ -1401,7 +1404,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateCycleAdaptersAndTheirCallbacks() {
-    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray, activeTdeeTrackingBooleanList, workoutActivityStringArray);
+    savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray, existenceOfActivityInCycleList, activeTdeeTrackingBooleanList, workoutActivityStringArray);
     savedCycleRecycler.setAdapter(savedCycleAdapter);
     savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
     savedCycleAdapter.setTdeeToggle(MainActivity.this);
@@ -1534,6 +1537,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomArray = new ArrayList<>();
     workoutTitleArray = new ArrayList<>();
     activeTdeeTrackingBooleanList = new ArrayList<>();
+    existenceOfActivityInCycleList = new ArrayList<>();
     workoutActivityStringArray = new ArrayList<>();
 
     pomTitleArray = new ArrayList<>();
@@ -1946,6 +1950,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 typeOfRoundArray.clear();
                 workoutTitleArray.clear();
                 activeTdeeTrackingBooleanList.clear();
+                existenceOfActivityInCycleList.clear();
                 workoutActivityStringArray.clear();
                 savedCycleAdapter.notifyDataSetChanged();
               });
@@ -3157,12 +3162,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutTitleArray.clear();
       workoutActivityStringArray.clear();
       activeTdeeTrackingBooleanList.clear();
+      existenceOfActivityInCycleList.clear();
       for (int i=0; i<cyclesList.size(); i++) {
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         workoutTitleArray.add(cyclesList.get(i).getTitle());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         activeTdeeTrackingBooleanList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
+        existenceOfActivityInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
       }
     }
     if (mode==3 || forAllModes) {
@@ -3184,11 +3191,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutActivityStringArray.add((String) addTDEEActivityTextView.getText());
         if (addTDEEActivityTextView.getText().equals(getString(R.string.add_activity))) {
           activeTdeeTrackingBooleanList.add(false);
+          existenceOfActivityInCycleList.add(false);
         } else {
           activeTdeeTrackingBooleanList.add(true);
+          existenceOfActivityInCycleList.add(false);
         }
       }
-      Log.i("testList", "activeTdeeTrackingBooleanList is " + activeTdeeTrackingBooleanList);
       if (mode==3) {
         pomTitleArray.add(cycleTitle);
         pomArray.add(pomString);
@@ -3202,8 +3210,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutActivityStringArray.set(positionOfSelectedCycle, (String) addTDEEActivityTextView.getText());
         if (addTDEEActivityTextView.getText().equals(getString(R.string.no_activity))) {
           activeTdeeTrackingBooleanList.set(positionOfSelectedCycle, false);
+          existenceOfActivityInCycleList.set(positionOfSelectedCycle, false);
         } else {
           activeTdeeTrackingBooleanList.add(positionOfSelectedCycle, true);
+          existenceOfActivityInCycleList.add(positionOfSelectedCycle, true);
         }
       }
       if (mode==3) {
@@ -3219,6 +3229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRoundArray.remove(posToRemove);
           workoutCyclesArray.remove(posToRemove);
           activeTdeeTrackingBooleanList.remove(posToRemove);
+          existenceOfActivityInCycleList.remove(posToRemove);
           workoutActivityStringArray.remove(posToRemove);
           posToRemove = receivedHighlightPositionHolder.get(i);
           if (posToRemove>=1) {

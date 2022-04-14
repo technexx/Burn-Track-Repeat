@@ -48,6 +48,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mWorkoutList;
   ArrayList<String> mRoundType;
   ArrayList<String> mWorkoutTitle;
+  List<Boolean> mExistenceOfActivityInCycleList;
+  List<Boolean> mActiveTdeeModeBooleanList;
   ArrayList<String> mWorkoutActivityString;
 
   onCycleClickListener mOnCycleClickListener;
@@ -75,7 +77,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int BREAK_COLOR;
 
   boolean isTdeeModeActiveForCurrentPosition;
-  List<Boolean> mActiveTdeeModeBooleanList;
 
   int mPositionToToggle;
 
@@ -125,8 +126,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
-  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
-    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
+  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> existenceOfActivityInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
+    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mExistenceOfActivityInCycleList = existenceOfActivityInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
@@ -147,8 +148,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public boolean retrieveActiveTdeeModeBoolean(int positionToCheckForToggle) {
-    Log.i("testToggle", "boolean on selected position is " + mActiveTdeeModeBooleanList.get(positionToCheckForToggle));
-    Log.i("testToggle", "list total on cycle click is " + mActiveTdeeModeBooleanList);
     return mActiveTdeeModeBooleanList.get(positionToCheckForToggle);
   }
 
@@ -160,7 +159,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       isTdeeModeActiveForCurrentPosition = true;
       mActiveTdeeModeBooleanList.set(positionToToggle, true);
     }
-    Log.i("testToggle", "list total on toggle click is " + mActiveTdeeModeBooleanList);
   }
 
   public void setPositionToToggle(int position) {
@@ -201,7 +199,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     }
 
-    workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
+    if (mExistenceOfActivityInCycleList.get(position)) {
+      workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
+    } else {
+      workoutHolder.tdeeToggle.setText("");
+    }
 
     workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.
