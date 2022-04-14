@@ -311,12 +311,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Animation endAnimation;
 
   TextView cycle_title_textView;
-  TextView cycles_completed_textView;
+  TextView cycles_or_laps_completed_textView;
   TextView daily_total_time_and_calories_textView;
   ImageButton new_lap;
   ImageButton next_round;
   ImageButton reset_total_times;
-//  ImageButton toggle_cycle_and_daily_display;
 
   int typeOfTotalTimeToDisplay;
   int TOTAL_CYCLE_TIMES = 0;
@@ -691,13 +690,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void toggleTdeeMode(int positionToToggle) {
+    //Determines whether toggled cycle has an activity assigned.
     if (cyclesList.get(positionToToggle).getTdeeActivityExists()) {
       savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
-      savedCycleAdapter.setDoesActivityExistInCycle(true);
       savedCycleAdapter.setPositionToToggle(positionToToggle);
       savedCycleAdapter.notifyDataSetChanged();
     } else {
-      savedCycleAdapter.setDoesActivityExistInCycle(false);
       Toast.makeText(getApplicationContext(), "No activity assigned!", Toast.LENGTH_SHORT).show();
     }
   }
@@ -1352,7 +1350,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset = timerPopUpView.findViewById(R.id.reset);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
 
-    cycles_completed_textView = timerPopUpView.findViewById(R.id.cycles_completed_textView);
+    cycles_or_laps_completed_textView = timerPopUpView.findViewById(R.id.cycles_or_laps_completed_textView);
     daily_total_time_and_calories_textView = timerPopUpView.findViewById(R.id.daily_total_time_and_calories_textView);
     next_round = timerPopUpView.findViewById(R.id.next_round);
     new_lap = timerPopUpView.findViewById(R.id.new_lap);
@@ -1559,7 +1557,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateLayoutParameterObjects() {
     cycleTitleLayoutParams = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
-    cyclesCompletedLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed_textView.getLayoutParams();
+    cyclesCompletedLayoutParams = (ConstraintLayout.LayoutParams) cycles_or_laps_completed_textView.getLayoutParams();
 
     roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
     roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
@@ -1598,7 +1596,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_break_header.setText(R.string.total_breaks);
     total_set_time.setText("0");
     total_break_time.setText("0");
-    cycles_completed_textView.setText(R.string.cycles_done);
+    cycles_or_laps_completed_textView.setText(R.string.cycles_done);
   }
 
   private void retrieveAndImplementCycleSorting() {
@@ -3326,7 +3324,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-      if (cycleHasActivityAssigned) {
+      if (trackActivityWithinCycle) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
         dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
@@ -3535,9 +3533,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setCyclesCompletedTextView() {
     if (mode!=4) {
-      cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
+      cycles_or_laps_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
     } else {
-      cycles_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
+      cycles_or_laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
     }
   }
 
@@ -4441,12 +4439,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void populateTimerUI() {
-//////////////
-//    reset_total_times.setVisibility(View.GONE);
-////////////////
     lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
-    cycles_completed_textView.setText(R.string.cycles_done);
+    cycles_or_laps_completed_textView.setText(R.string.cycles_done);
     if (cycleTitle.isEmpty()) {
       cycleTitle = date;
     }
@@ -4513,15 +4508,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setVisibility(View.VISIBLE);
         timeLeft.setText(displayTime);
         msTime.setText(displayMs);
-        cycles_completed_textView.setText(R.string.laps_completed);
+        cycles_or_laps_completed_textView.setText(R.string.laps_completed);
         setCyclesCompletedTextView();
+
         total_set_header.setVisibility(View.INVISIBLE);
         total_set_time.setVisibility(View.INVISIBLE);
         total_break_header.setVisibility(View.INVISIBLE);
         total_break_time.setVisibility(View.INVISIBLE);
         lapRecycler.setVisibility(View.VISIBLE);
         next_round.setVisibility(View.INVISIBLE);
+        activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
+        daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
         reset_total_times.setVisibility(View.GONE);
+        cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
         new_lap.setVisibility(View.VISIBLE);
         msTime.setVisibility(View.VISIBLE);
         setInitialTextSizeForRounds(0);
@@ -4648,20 +4647,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
 
       reset_total_times.setVisibility(View.VISIBLE);
-      cycles_completed_textView.setVisibility(View.INVISIBLE);
+      cycles_or_laps_completed_textView.setVisibility(View.INVISIBLE);
     } else {
       typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
 
       reset_total_times.setVisibility(View.INVISIBLE);
-      cycles_completed_textView.setVisibility(View.VISIBLE);
+      cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
     }
 
     toggleViewsForTotalDailyAndCycleTimes();
   }
 
+  //Todo: We need all of these invisible for Stopwatch. Why not just have a separate popUp?
   private void toggleViewsForTotalDailyAndCycleTimes() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-      cycles_completed_textView.setVisibility(View.VISIBLE);
+      cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
       total_break_header.setVisibility(View.VISIBLE);
@@ -4672,7 +4672,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      cycles_completed_textView.setVisibility(View.INVISIBLE);
+      cycles_or_laps_completed_textView.setVisibility(View.INVISIBLE);
       total_set_header.setVisibility(View.INVISIBLE);
       total_set_time.setVisibility(View.INVISIBLE);
       total_break_header.setVisibility(View.INVISIBLE);

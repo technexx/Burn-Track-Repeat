@@ -77,7 +77,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean isTdeeModeActiveForCurrentPosition;
   List<Boolean> mActiveTdeeModeBooleanList;
 
-  boolean mDoesActivityExistInCycle;
   int mPositionToToggle;
 
   public void changeColorSetting(int typeOFRound, int settingNumber) {
@@ -162,10 +161,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       mActiveTdeeModeBooleanList.set(positionToToggle, true);
     }
     Log.i("testToggle", "list total on toggle click is " + mActiveTdeeModeBooleanList);
-  }
-
-  public void setDoesActivityExistInCycle(boolean doesActivityExist) {
-    mDoesActivityExistInCycle = doesActivityExist;
   }
 
   public void setPositionToToggle(int position) {
