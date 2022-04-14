@@ -516,10 +516,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: nextRound currently begins whether cycle is paused or not.
-  //Todo: Getting some skip over a number (e.g. 2 -> 4) after resetting cycle times during active cycle (currently set to disabled for active cycle).
-  //Todo: Exiting out of timer popup in stopwatch crashes as it's using an exclusive mode 1 conditional for splitting a String.
-  //Todo: Re-implement Reset option for total times.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -3324,7 +3320,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-      //Todo: This makes sense for new/edited Cycles, since our edit popUp assigns cycleHasActivityAssigned based on the presence of an acitivty. However, when launching a cycle from Main, we don't want some of this executed.
       if (cycleHasActivityAssigned) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
@@ -4659,7 +4654,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleViewsForTotalDailyAndCycleTimes();
   }
 
-  //Todo: We need all of these invisible for Stopwatch. Why not just have a separate popUp?
   private void toggleViewsForTotalDailyAndCycleTimes() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
       cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
