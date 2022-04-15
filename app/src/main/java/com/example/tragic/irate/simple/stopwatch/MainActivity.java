@@ -1738,6 +1738,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void fabLogic() {
     fab.setEnabled(false);
     buttonToLaunchTimerFromEditPopUp.setEnabled(true);
+    cycleTitle = "";
     cycleNameEdit.getText().clear();
     isNewCycle = true;
 
@@ -3353,7 +3354,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-        dailyStatsAccess.assignActivityFromStatsForEachActivityListForASpecificDay();
+//        dailyStatsAccess.assignActivityFromStatsForEachActivityListForASpecificDay();
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
@@ -3407,7 +3408,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
     } else {
-      //Todo: Here.
       totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
       totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
@@ -3458,6 +3458,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTimeAccessed(System.currentTimeMillis());
         cycles.setItemCount(workoutTime.size());
         if (isNewCycle) {
+          //Todo: cycleTitle is retaining last used value, so not empty, and therefore setting same date. editText only gets passed to cycleTitle if modified.
           if (cycleTitle.isEmpty()) {
             cycleTitle = date;
           }

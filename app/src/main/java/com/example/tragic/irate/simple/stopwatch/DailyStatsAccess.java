@@ -221,6 +221,9 @@ public class DailyStatsAccess {
         statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
+    //Todo: This should be creating a new instance of mStatsForEachActivity. We are fetching an mStatsForEachActivity instance both here and in assignActivityFromStatsForEachActivityListForASpecificDay (below) though.
+
+    //Todo: This is fetching, on a new cycle, an instance of mStatsForEachActivity w/ a primary ID key of 1 instead of iterating up.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (statsForEachActivityListOfAllActivitiesForASpecificDate.size() >= activityPositionInDb+1) {
@@ -241,7 +244,6 @@ public class DailyStatsAccess {
         return idToReturn;
     }
 
-    //Todo: This needs to be set as a new instance of mStatsForEachActivity if we're launching a new Cycle from Main.
     public void assignActivityFromStatsForEachActivityListForASpecificDay() {
         int iteratingId = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
 
