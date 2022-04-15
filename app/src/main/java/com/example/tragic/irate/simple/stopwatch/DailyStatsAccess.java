@@ -241,6 +241,7 @@ public class DailyStatsAccess {
         return idToReturn;
     }
 
+    //Todo: This needs to be set as a new instance of mStatsForEachActivity if we're launching a new Cycle from Main.
     public void assignActivityFromStatsForEachActivityListForASpecificDay() {
         int iteratingId = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
 

@@ -517,6 +517,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Adding different activity in new cycle is using last-used activity's stats. Iterates correctly if we exit + relaunch, but the previous cycle keeps what was added to it.
+  //Todo: Launching new cycle w/ activity defaults to not tracking.
   //Todo: Editing cycle w/ activity defaults selection to "none" and removed it if moved forward.
   //Todo: Should we remove toggle option if no activity exists?
   //Todo: Test all daily saves in fragment.
@@ -3291,15 +3293,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void launchTimerCycle(boolean saveToDB) {
+  private void launchTimerCycle(boolean launchedCycleDoesNotExistInDatabase) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
       return;
     }
-    if (editCyclesPopupWindow.isShowing()) {
-      editCyclesPopupWindow.dismiss();
-    }
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
+
+    int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
     if (mode==1) {
       if (savedCycleAdapter.isCycleActive()) {
@@ -3307,7 +3307,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.notifyDataSetChanged();
       }
     }
-
     if (mode==3) {
       if (savedPomCycleAdapter.isCycleActive()) {
         savedPomCycleAdapter.removeActiveCycleLayout();
@@ -3317,20 +3316,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
+    setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     AsyncTask.execute(()-> {
-      if (isNewCycle || saveToDB) {
+      if (isNewCycle || launchedCycleDoesNotExistInDatabase) {
         saveAddedOrEditedCycleASyncRunnable();
       } else {
-        queryDatabaseAndRetrieveCycleTimesRunnable();
+        getInstancesOfCyclesAndPomCyclesListsFromDatabase();
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+        retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
-      int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+      if (launchedCycleDoesNotExistInDatabase) {
+        if (addTDEEActivityTextView.getText().equals(getString(R.string.add_activity))) {
+          cycleHasActivityAssigned = false;
+          trackActivityWithinCycle = false;
+        } else {
+          cycleHasActivityAssigned = true;
+          trackActivityWithinCycle = true;
+        }
+      } else {
+        cycleHasActivityAssigned = cyclesList.get(positionOfSelectedCycle).getTdeeActivityExists();
+        trackActivityWithinCycle = cyclesList.get(positionOfSelectedCycle).getCurrentlyTrackingCycle();
+      }
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
+      //Todo: This is returning false at all times.
       if (cycleHasActivityAssigned) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
@@ -3349,6 +3363,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void run() {
           displayCycleOrDailyTotals();
 
+          //Todo: This should be set to true when adding/editing cycle w/ activity. It's only set in onCycleClick now. We should set it in the add/edit save runnable.
           toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
           retrieveTotalDailySetAndBreakTimes();
@@ -3358,6 +3373,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           resetTimer();
           populateTimerUI();
 
+          if (editCyclesPopupWindow.isShowing()) {
+            editCyclesPopupWindow.dismiss();
+          }
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
         }
       });
@@ -3389,6 +3407,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
     } else {
+      //Todo: Here.
       totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
       totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
@@ -3482,15 +3501,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
   }
 
-  private void queryDatabaseAndRetrieveCycleTimesRunnable() {
+  private void getInstancesOfCyclesAndPomCyclesListsFromDatabase() {
     if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
     if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-
-    retrieveTotalSetAndBreakAndCompletedCycleValues();
-    retrieveCycleActivityPositionAndMetScore();
   }
 
-  private void retrieveTotalSetAndBreakAndCompletedCycleValues() {
+  private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
     if (mode == 1) {
       cycles = cyclesList.get(positionOfSelectedCycle);
 
@@ -3516,7 +3532,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void retrieveCycleActivityPositionAndMetScore() {
+  private void retrieveCycleActivityPositionAndMetScoreFromCycleList() {
     cycles = cyclesList.get(positionOfSelectedCycle);
 
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
