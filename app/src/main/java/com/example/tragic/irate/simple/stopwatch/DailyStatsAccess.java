@@ -170,20 +170,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-    public void setActivityPositionAndExistenceOfActivityInDatabaseBoolean(int daySelected) {
-        //Retrieves for activities tied to specific date ID, since we only want to check against the activities selected for current day.
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
-
-        activityExistsInDatabaseForSelectedDay = false;
-
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
-                activityPositionInDb = i;
-                activityExistsInDatabaseForSelectedDay = true;
-            }
-        }
-    }
-
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
 
@@ -217,16 +203,30 @@ public class DailyStatsAccess {
         return mOldActivityPositionInDb;
     }
 
-    public void setStatForEachActivityEntityForForSingleDay(int dayToRetrieve) {
+    public void setStatForEachActivityListForForSingleDay(int dayToRetrieve) {
         statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    //Todo: This should be creating a new instance of mStatsForEachActivity. We are fetching an mStatsForEachActivity instance both here and in assignActivityFromStatsForEachActivityListForASpecificDay (below) though.
+    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDay() {
+        return statsForEachActivityListOfAllActivitiesForASpecificDate;
+    }
+
+    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
+        activityPositionInDb = 0;
+        activityExistsInDatabaseForSelectedDay = false;
+
+        for (int i=0; i<getStatForEachActivityListForForSingleDay().size(); i++) {
+            if (mActivityString.equals(getStatForEachActivityListForForSingleDay().get(i).getActivity())) {
+                activityPositionInDb = i;
+                activityExistsInDatabaseForSelectedDay = true;
+            }
+        }
+    }
 
     //Todo: This is fetching, on a new cycle, an instance of mStatsForEachActivity w/ a primary ID key of 1 instead of iterating up.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
-        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size() >= activityPositionInDb+1) {
+        if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInDb);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();

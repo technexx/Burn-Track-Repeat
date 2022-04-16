@@ -1653,7 +1653,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
           dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-          dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
+          dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
           dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         }
 
@@ -2126,7 +2126,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     DayHolder dayHolder = dailyStatsAccess.getDayHolderEntity();
     dailyStatsAccess.deleteDayHolderEntity(dayHolder);
 
-    dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(daySelected);
+    dailyStatsAccess.setStatForEachActivityListForForSingleDay(daySelected);
     StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
     dailyStatsAccess.deleteStatForEachActivityEntity();
 
@@ -3345,11 +3345,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-      //Todo: This is returning false at all times.
       if (cycleHasActivityAssigned) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
-        dailyStatsAccess.setStatForEachActivityEntityForForSingleDay(dayOfYear);
-        dailyStatsAccess.setActivityPositionAndExistenceOfActivityInDatabaseBoolean(dayOfYear);
+        dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
 
@@ -3458,7 +3457,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTimeAccessed(System.currentTimeMillis());
         cycles.setItemCount(workoutTime.size());
         if (isNewCycle) {
-          //Todo: cycleTitle is retaining last used value, so not empty, and therefore setting same date. editText only gets passed to cycleTitle if modified.
           if (cycleTitle.isEmpty()) {
             cycleTitle = date;
           }
