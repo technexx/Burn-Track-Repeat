@@ -517,7 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Toggling not always working.
   //Todo: When first clicking on cycle w/ same activity as previous, it starts from 0. After that, it starts at the last (correct) value iterated.
   //Todo: Launching new cycle w/ activity defaults to not tracking.
   //Todo: Editing cycle w/ activity defaults selection to "none" and removed it if moved forward.
@@ -696,18 +695,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
       savedCycleAdapter.setPositionToToggle(positionToToggle);
       savedCycleAdapter.notifyDataSetChanged();
-
-      toggleTdeeTrackingInDatabaseObject();
-    }
-  }
-
-  private void toggleTdeeTrackingInDatabaseObject() {
-    //We already have the most recent pull of Cycles class.
-    cycles = cyclesList.get(positionOfSelectedCycle);
-    if (cycles.getCurrentlyTrackingCycle()) {
-      cycles.setCurrentlyTrackingCycle(false);
-    } else {
-      cycles.setCurrentlyTrackingCycle(true);
     }
   }
 
@@ -3373,7 +3360,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void run() {
           displayCycleOrDailyTotals();
 
-          //Todo: This should be set to true when adding/editing cycle w/ activity. It's only set in onCycleClick now. We should set it in the add/edit save runnable.
           toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
           retrieveTotalDailySetAndBreakTimes();
