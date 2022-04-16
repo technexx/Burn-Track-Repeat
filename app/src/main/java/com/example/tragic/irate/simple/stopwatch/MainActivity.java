@@ -689,6 +689,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: We aren't changing our Main conditional here.
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     //Determines whether toggled cycle has an activity assigned.
@@ -3292,7 +3293,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void launchTimerCycle(boolean launchedCycleDoesNotExistInDatabase) {
+  private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
       return;
@@ -3318,7 +3319,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     AsyncTask.execute(()-> {
-      if (isNewCycle || launchedCycleDoesNotExistInDatabase) {
+      if (isNewCycle || cycleLaunchedFromEditPopUp) {
         saveAddedOrEditedCycleASyncRunnable();
       } else {
         getInstancesOfCyclesAndPomCyclesListsFromDatabase();
@@ -3326,7 +3327,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
-      if (launchedCycleDoesNotExistInDatabase) {
+      if (cycleLaunchedFromEditPopUp) {
         if (addTDEEActivityTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
           trackActivityWithinCycle = false;
@@ -3335,6 +3336,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           trackActivityWithinCycle = true;
         }
       } else {
+        //Todo: This retrieves status from db and is unmodified by our toggle callback.
         cycleHasActivityAssigned = cyclesList.get(positionOfSelectedCycle).getTdeeActivityExists();
         trackActivityWithinCycle = cyclesList.get(positionOfSelectedCycle).getCurrentlyTrackingCycle();
       }
