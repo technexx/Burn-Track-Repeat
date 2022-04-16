@@ -223,47 +223,25 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: This is fetching, on a new cycle, an instance of mStatsForEachActivity w/ a primary ID key of 1 instead of iterating up.
+    //Todo: Test this. For new day, all unique activities added should be new.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInDb);
+            Log.i("testDB", "activity exists at position " + activityPositionInDb);
+            Log.i("testDB", "StatsForEachActivity List for day " + getCurrentDayOfYear() + " is " + statsForEachActivityListOfAllActivitiesForASpecificDate);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
+            Log.i("testDB", "New StatsForEachActivity created");
         }
-    }
-
-    private long retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay() {
-        long idToReturn = 0;
-
-        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
-            if (statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getActivity().equalsIgnoreCase(mActivityString)) {
-                idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getIteratingIdsForSpecificDay();
-            }
-        }
-        return idToReturn;
-    }
-
-    public void assignActivityFromStatsForEachActivityListForASpecificDay() {
-        int iteratingId = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
-
-        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
-            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(iteratingId);
-        }
-
-        Log.i("testId", "returned ID is " + iteratingId);
-        Log.i("testId", "activity in row w/ returned ID is " + mStatsForEachActivity.getActivity());
     }
 
     public StatsForEachActivity getStatsForEachActivityEntity() {
         return mStatsForEachActivity;
     }
 
-    private long getIteratingIdForSpecificDay() {
-        return mStatsForEachActivity.getIteratingIdsForSpecificDay();
-    }
-
     public void setActivityString(String activityString) {
+        Log.i("testDB", "Activity String set is " + mActivityString);
         this.mActivityString = activityString;
     }
 
@@ -361,4 +339,34 @@ public class DailyStatsAccess {
         Calendar calendar = Calendar.getInstance();
         return calendar.get(Calendar.DAY_OF_YEAR);
     }
+
+
+//
+//    private long retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay() {
+//        long idToReturn = 0;
+//
+//        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
+//            if (statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getActivity().equalsIgnoreCase(mActivityString)) {
+//                idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getIteratingIdsForSpecificDay();
+//            }
+//        }
+//        return idToReturn;
+//    }
+//
+//    //Todo: This is being used to assign a primary ID that mirrors the number of list indices, rather than an auto-generating one that will keep iterating even when rows are deleted.
+//    public void assignActivityFromStatsForEachActivityListForASpecificDay() {
+//        int iteratingId = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
+//
+//        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
+//            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(iteratingId);
+//        }
+//
+//        Log.i("testId", "returned ID is " + iteratingId);
+//        Log.i("testId", "activity in row w/ returned ID is " + mStatsForEachActivity.getActivity());
+//    }
+
+//    private long getIteratingIdForSpecificDay() {
+//        return mStatsForEachActivity.getIteratingIdsForSpecificDay();
+//    }
+
 }

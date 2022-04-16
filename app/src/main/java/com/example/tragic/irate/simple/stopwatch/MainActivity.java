@@ -517,10 +517,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Adding different activity in new cycle is using last-used activity's stats. Iterates correctly if we exit + relaunch, but the previous cycle keeps what was added to it.
+  //Todo: Toggling not always working.
+  //Todo: When first clicking on cycle w/ same activity as previous, it starts from 0. After that, it starts at the last (correct) value iterated.
   //Todo: Launching new cycle w/ activity defaults to not tracking.
   //Todo: Editing cycle w/ activity defaults selection to "none" and removed it if moved forward.
-  //Todo: Should we remove toggle option if no activity exists?
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -696,8 +696,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
       savedCycleAdapter.setPositionToToggle(positionToToggle);
       savedCycleAdapter.notifyDataSetChanged();
-    } else {
-//      Toast.makeText(getApplicationContext(), "No activity assigned!", Toast.LENGTH_SHORT).show();
     }
   }
 

@@ -181,9 +181,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
     workoutHolder.tdeeToggle.setOnClickListener(v-> {
-      if (!mActiveCycle) {
-        mOnTdeeModeToggle.toggleTdeeMode(position);
-      }
+      mOnTdeeModeToggle.toggleTdeeMode(position);
     });
 
     if (mActiveTdeeModeBooleanList.get(position)) {
