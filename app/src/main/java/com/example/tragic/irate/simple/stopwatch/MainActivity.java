@@ -689,7 +689,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: We aren't changing our Main conditional here.
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     //Determines whether toggled cycle has an activity assigned.
@@ -697,6 +696,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
       savedCycleAdapter.setPositionToToggle(positionToToggle);
       savedCycleAdapter.notifyDataSetChanged();
+
+      toggleTdeeTrackingInDatabaseObject();
+    }
+  }
+
+  private void toggleTdeeTrackingInDatabaseObject() {
+    //We already have the most recent pull of Cycles class.
+    cycles = cyclesList.get(positionOfSelectedCycle);
+    if (cycles.getCurrentlyTrackingCycle()) {
+      cycles.setCurrentlyTrackingCycle(false);
+    } else {
+      cycles.setCurrentlyTrackingCycle(true);
     }
   }
 
@@ -3336,16 +3347,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           trackActivityWithinCycle = true;
         }
       } else {
-        //Todo: This retrieves status from db and is unmodified by our toggle callback.
-        cycleHasActivityAssigned = cyclesList.get(positionOfSelectedCycle).getTdeeActivityExists();
-        trackActivityWithinCycle = cyclesList.get(positionOfSelectedCycle).getCurrentlyTrackingCycle();
+        cycleHasActivityAssigned = true;
+        trackActivityWithinCycle = savedCycleAdapter.getPositionToToggle(positionOfSelectedCycle);
       }
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
       dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-      if (cycleHasActivityAssigned) {
+      if (trackActivityWithinCycle) {
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();

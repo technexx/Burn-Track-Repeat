@@ -161,6 +161,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
   }
 
+  public boolean getPositionToToggle(int position) {
+    return mActiveTdeeModeBooleanList.get(position);
+  }
+
   public void setPositionToToggle(int position) {
     this.mPositionToToggle = position;
   }
