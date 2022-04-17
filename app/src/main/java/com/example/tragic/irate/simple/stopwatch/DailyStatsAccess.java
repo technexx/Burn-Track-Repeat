@@ -31,8 +31,8 @@ public class DailyStatsAccess {
 
     boolean activityExistsInDatabaseForSelectedDay;
     String mActivityString;
-    int activityPositionInDb;
-    int mOldActivityPositionInDb;
+    int activityPositionInListForCurrentDay;
+    int mOldactivityPositionInListForCurrentDay;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -192,15 +192,15 @@ public class DailyStatsAccess {
     }
 
     public int getActivityPosition() {
-        return activityPositionInDb;
+        return activityPositionInListForCurrentDay;
     }
 
-    public void setOldActivityPositionInDb(int oldActivityPositionInDb) {
-        this.mOldActivityPositionInDb = oldActivityPositionInDb;
+    public void setOldActivityPositionInListForCurrentDay(int oldactivityPositionInListForCurrentDay) {
+        this.mOldactivityPositionInListForCurrentDay = oldactivityPositionInListForCurrentDay;
     }
 
     public int getOldActivityPosition() {
-        return mOldActivityPositionInDb;
+        return mOldactivityPositionInListForCurrentDay;
     }
 
     public void setStatForEachActivityListForForSingleDay(int dayToRetrieve) {
@@ -212,23 +212,22 @@ public class DailyStatsAccess {
     }
 
     public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
-        activityPositionInDb = 0;
+        activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
 
         for (int i=0; i<getStatForEachActivityListForForSingleDay().size(); i++) {
             if (mActivityString.equals(getStatForEachActivityListForForSingleDay().get(i).getActivity())) {
-                activityPositionInDb = i;
+                activityPositionInListForCurrentDay = i;
                 activityExistsInDatabaseForSelectedDay = true;
             }
         }
     }
 
-    //Todo: Test this. For new day, all unique activities added should be new.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (activityExistsInDatabaseForSelectedDay) {
-            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInDb);
-            Log.i("testAccess", "activity exists at position " + activityPositionInDb);
+            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInListForCurrentDay);
+            Log.i("testAccess", "activity exists at position " + activityPositionInListForCurrentDay);
             Log.i("testAccess", "StatsForEachActivity List for day " + getCurrentDayOfYear() + " is " + statsForEachActivityListOfAllActivitiesForASpecificDate);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();

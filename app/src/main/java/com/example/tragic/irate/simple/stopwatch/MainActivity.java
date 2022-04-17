@@ -517,7 +517,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: When first clicking on cycle w/ same activity as previous, it starts from 0. After that, it starts at the last (correct) value iterated.
+  //Todo: New activity times seem not to save after first timer reset, but do so after.
+  //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
+  //Todo: Remove logging method from sort button.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -1654,6 +1656,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
         }
 
+
         if (cycleHasActivityAssigned) {
           dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
           dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
@@ -1661,16 +1664,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
-          int currentActivityPosition = dailyStatsAccess.getActivityPosition();
-          int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
+          //Todo: If this is updating total daily times (which it is), it should also be updating the specific activity. We may not have a new or correct row referenced.
+          if (trackActivityWithinCycle) {
+            int currentActivityPosition = dailyStatsAccess.getActivityPosition();
+            int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
 
-          if (currentActivityPosition!=oldActivityPosition) {
-            dailyStatsAccess.setOldActivityPositionInDb(currentActivityPosition);
+            if (currentActivityPosition != oldActivityPosition) {
+              dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
+            }
+
+            dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+            dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
           }
-
-          dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-          dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
-          dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
         }
 
         if (!timerIsPaused) {
