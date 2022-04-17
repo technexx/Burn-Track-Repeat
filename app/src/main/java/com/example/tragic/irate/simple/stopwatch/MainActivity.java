@@ -518,8 +518,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   //Todo: When first clicking on cycle w/ same activity as previous, it starts from 0. After that, it starts at the last (correct) value iterated.
-  //Todo: Launching new cycle w/ activity defaults to not tracking.
-  //Todo: Editing cycle w/ activity defaults selection to "none" and removed it if moved forward.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
