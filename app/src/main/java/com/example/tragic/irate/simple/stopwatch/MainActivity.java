@@ -843,6 +843,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
+      logCycleDatabase(true);
+
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
@@ -4760,6 +4762,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.remove("modeThreeTimerEnded");
     prefEdit.remove("modeThreeTimerDisabled");
     prefEdit.apply();
+  }
+
+  private void logCycleDatabase(boolean currentDayOnly) {
+    AsyncTask.execute(()->{
+      int currentDay = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+
+      List<StatsForEachActivity> listOfActivities = new ArrayList<>();
+      if (currentDayOnly) {
+        listOfActivities = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(currentDay);
+      } else {
+        listOfActivities = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+      }
+
+      for (int i=0; i<listOfActivities.size(); i++) {
+        Log.i("testDb", "entry " + i + " is ");
+        Log.i("testDb", "Day ID is " + listOfActivities.get(i).getUniqueIdTiedToTheSelectedActivity());
+        Log.i("testDb", "Activity String is " + listOfActivities.get(i).getActivity());
+        Log.i("testDb", "Set time elapsed for activity is " + listOfActivities.get(i).getTotalSetTimeForEachActivity());
+      }
+
+      if (listOfActivities.size()==0) {
+        Log.i("testDb", "Empty list!");
+      }
+    });
   }
 
   private void logTotalCycleTimes() {
