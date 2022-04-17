@@ -228,11 +228,11 @@ public class DailyStatsAccess {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInDb);
-            Log.i("testDB", "activity exists at position " + activityPositionInDb);
-            Log.i("testDB", "StatsForEachActivity List for day " + getCurrentDayOfYear() + " is " + statsForEachActivityListOfAllActivitiesForASpecificDate);
+            Log.i("testAccess", "activity exists at position " + activityPositionInDb);
+            Log.i("testAccess", "StatsForEachActivity List for day " + getCurrentDayOfYear() + " is " + statsForEachActivityListOfAllActivitiesForASpecificDate);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
-            Log.i("testDB", "New StatsForEachActivity created");
+            Log.i("testAccess", "New StatsForEachActivity created");
         }
     }
 
@@ -241,7 +241,7 @@ public class DailyStatsAccess {
     }
 
     public void setActivityString(String activityString) {
-        Log.i("testDB", "Activity String set is " + mActivityString);
+        Log.i("testAccess", "Activity String set is " + mActivityString);
         this.mActivityString = activityString;
     }
 

@@ -4767,16 +4767,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logCycleDatabase(boolean currentDayOnly) {
     AsyncTask.execute(()->{
       int currentDay = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
+      List<DayHolder> listOfDays = new ArrayList<>();
+
       if (currentDayOnly) {
         listOfActivities = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(currentDay);
+        listOfDays = cyclesDatabase.cyclesDao().loadSingleDay(currentDay);
       } else {
         listOfActivities = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+        listOfDays = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
       }
 
       for (int i=0; i<listOfActivities.size(); i++) {
-        Log.i("testDb", "entry " + i + " is ");
+        Log.i("testDb", "entry position is " + i);
         Log.i("testDb", "Day ID is " + listOfActivities.get(i).getUniqueIdTiedToTheSelectedActivity());
         Log.i("testDb", "Activity String is " + listOfActivities.get(i).getActivity());
         Log.i("testDb", "Set time elapsed for activity is " + listOfActivities.get(i).getTotalSetTimeForEachActivity());
@@ -4785,6 +4788,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (listOfActivities.size()==0) {
         Log.i("testDb", "Empty list!");
       }
+
+      for (int i=0; i<listOfDays.size(); i++) {
+        Log.i("testDb", "For day " + listOfDays.get(i).getDayId() + " total set time is " + listOfDays.get(i).getTotalSetTime());
+      }
+
     });
   }
 
