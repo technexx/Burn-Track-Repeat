@@ -171,7 +171,7 @@ public class DailyStatsAccess {
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
-    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(String activitySelected) {
+    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
 
         if (!activityExistsInDatabaseForSelectedDay) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
@@ -179,7 +179,7 @@ public class DailyStatsAccess {
             //Since a new list with the new day's ID is created every day, this iterating ID will auto reset to 0 each day.
             statsForEachActivity.setIteratingIdsForSpecificDay(statsForEachActivityListOfAllActivitiesForASpecificDate.size());
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
-            statsForEachActivity.setActivity(activitySelected);
+            statsForEachActivity.setActivity(mActivityString);
 
             statsForEachActivity.setTotalSetTimeForEachActivity(0);
             statsForEachActivity.setTotalBreakTimeForEachActivity(0);
@@ -187,7 +187,7 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
 
-            Log.i("testInsert", "StatsForEachActivity inserted with day #" + getCurrentDayOfYear() + " and activity of " + activitySelected);
+            Log.i("testInsert", "StatsForEachActivity inserted with day #" + getCurrentDayOfYear() + " and activity of " + mActivityString);
         }
     }
 
@@ -228,7 +228,6 @@ public class DailyStatsAccess {
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInListForCurrentDay);
             Log.i("testAccess", "activity exists at position " + activityPositionInListForCurrentDay);
-            Log.i("testAccess", "StatsForEachActivity List for day " + getCurrentDayOfYear() + " is " + statsForEachActivityListOfAllActivitiesForASpecificDate);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
             Log.i("testAccess", "New StatsForEachActivity created");
@@ -246,6 +245,10 @@ public class DailyStatsAccess {
 
     public String getActivityString() {
         return mStatsForEachActivity.getActivity();
+    }
+
+    public void setActivityString() {
+
     }
 
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
@@ -272,8 +275,15 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getTotalCaloriesBurnedForEachActivity();
     }
 
+    //Todo: This may not be saving because activity is returning null first time around.
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+
+        String activity = mStatsForEachActivity.getActivity();
+        int activityPosition = getActivityPosition();
+        long setTime = mStatsForEachActivity.getTotalSetTimeForEachActivity();
+
+        Log.i("testUpdate", "activity " + activity + " at position " + activityPosition + " saving with " + setTime + " millis");
     }
 
     public void deleteStatForEachActivityEntity() {

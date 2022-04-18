@@ -517,8 +517,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: New activity times seem not to save after first timer reset, but do so after.
+  //Todo: New activity times seem not to save after first timer reset, but do so after. If de-bugging tho, it does save right away.
   //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
+  //Todo: Highlight deletion can delete wrong cycles.
   //Todo: Remove logging method from sort button.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -1664,7 +1665,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
-          //Todo: If this is updating total daily times (which it is), it should also be updating the specific activity. We may not have a new or correct row referenced.
           if (trackActivityWithinCycle) {
             int currentActivityPosition = dailyStatsAccess.getActivityPosition();
             int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
@@ -3353,7 +3353,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
 
-        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(getTdeeActivityStringFromArrayPosition());
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 //        dailyStatsAccess.assignActivityFromStatsForEachActivityListForASpecificDay();
@@ -4581,7 +4581,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     reset.setVisibility(View.INVISIBLE);
     reset_total_times.setEnabled(true);
-//    reset_total_times.setAlpha(1.0f);
 
     switch (mode) {
       case 1:
@@ -4637,7 +4636,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setInitialTextSizeForRounds(0);
         break;
     }
-    if (mode!=4) populateTimerUI();
+    if (mode!=4) {
+      populateTimerUI();
+    }
     setNotificationValues();
   }
 
