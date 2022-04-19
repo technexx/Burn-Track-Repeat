@@ -32,7 +32,7 @@ public class DailyStatsAccess {
     boolean activityExistsInDatabaseForSelectedDay;
     String mActivityString;
     int activityPositionInListForCurrentDay;
-    int mOldactivityPositionInListForCurrentDay;
+    int mOldActivityPositionInListForCurrentDay;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -151,13 +151,6 @@ public class DailyStatsAccess {
         return mDayHolder.getTotalRestTime();
     }
 
-    public void setCyclesCompletedForModeThree(int cyclesCompleted) {
-        mDayHolder.setCyclesCompletedForModeThree(cyclesCompleted);
-    }
-
-    public int getCyclesCompletedForModeThree() {
-        return mDayHolder.getCyclesCompletedForModeThree();
-    }
     public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
@@ -191,26 +184,6 @@ public class DailyStatsAccess {
         }
     }
 
-    public int getActivityPosition() {
-        return activityPositionInListForCurrentDay;
-    }
-
-    public void setOldActivityPositionInListForCurrentDay(int oldactivityPositionInListForCurrentDay) {
-        this.mOldactivityPositionInListForCurrentDay = oldactivityPositionInListForCurrentDay;
-    }
-
-    public int getOldActivityPosition() {
-        return mOldactivityPositionInListForCurrentDay;
-    }
-
-    public void setStatForEachActivityListForForSingleDay(int dayToRetrieve) {
-        statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
-    }
-
-    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDay() {
-        return statsForEachActivityListOfAllActivitiesForASpecificDate;
-    }
-
     public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
@@ -234,21 +207,49 @@ public class DailyStatsAccess {
         }
     }
 
+    public int getActivityPosition() {
+        return activityPositionInListForCurrentDay;
+    }
+
+    public void setOldActivityPositionInListForCurrentDay(int oldActivityPositionInListForCurrentDay) {
+        this.mOldActivityPositionInListForCurrentDay = oldActivityPositionInListForCurrentDay;
+    }
+
+    public int getOldActivityPosition() {
+        return mOldActivityPositionInListForCurrentDay;
+    }
+
+    public void setStatForEachActivityListForForSingleDay(int dayToRetrieve) {
+        statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
+    }
+
+    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDay() {
+        return statsForEachActivityListOfAllActivitiesForASpecificDate;
+    }
+
     public StatsForEachActivity getStatsForEachActivityEntity() {
         return mStatsForEachActivity;
     }
 
-    public void setActivityString(String activityString) {
+    public void setActivityStringFromSpinner(String activityString) {
         Log.i("testAccess", "Activity String set is " + mActivityString);
         this.mActivityString = activityString;
+    }
+
+    public String getActivityStringFromSpinner() {
+        return mActivityString;
     }
 
     public String getActivityString() {
         return mStatsForEachActivity.getActivity();
     }
 
-    public void setActivityString() {
+    public void setActivityStringForSelectedActivity(String activity) {
+        mStatsForEachActivity.setActivity(activity);
+    }
 
+    public String getActivityStringForSelectedActivity() {
+        return mStatsForEachActivity.getActivity();
     }
 
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
@@ -275,7 +276,6 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getTotalCaloriesBurnedForEachActivity();
     }
 
-    //Todo: This may not be saving because activity is returning null first time around.
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
 
@@ -283,6 +283,7 @@ public class DailyStatsAccess {
         int activityPosition = getActivityPosition();
         long setTime = mStatsForEachActivity.getTotalSetTimeForEachActivity();
 
+        //Todo: Position is always 0, even when it updates correctly after reset.
         Log.i("testUpdate", "activity " + activity + " at position " + activityPosition + " saving with " + setTime + " millis");
     }
 

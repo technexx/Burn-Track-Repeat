@@ -1673,6 +1673,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
             }
 
+            dailyStatsAccess.setActivityStringForSelectedActivity(dailyStatsAccess.getActivityStringFromSpinner());
             dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
             dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
@@ -3349,7 +3350,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
-        dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
+        dailyStatsAccess.setActivityStringFromSpinner(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
 
