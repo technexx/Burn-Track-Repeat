@@ -187,13 +187,27 @@ public class DailyStatsAccess {
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+        testAssign();
+        testPull();
+    }
 
+    //Todo: 0 primary key AND unique ID on first attempt to save. Likely we are 1)Inserting a row and (B)Trying to update a new instance of mStats instead of that row (since that is what are assigning because it is a new entry).
+    private void testAssign() {
         String activity = mStatsForEachActivity.getActivity();
-        int activityPosition = getActivityPosition();
         long setTime = mStatsForEachActivity.getTotalSetTimeForEachActivity();
+        Log.i("testUpdate", "activity " + activity + " saving with " + setTime + " millis");
 
-        //Todo: Position is irrelevant since we're updating an instance of mStats.
-        Log.i("testUpdate", "activity " + activity + " at position " + activityPosition + " saving with " + setTime + " millis");
+        Log.i("testUpdate", "mStats unique ID is " + mStatsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
+        Log.i("testUpdate", "mStats primary key is " + mStatsForEachActivity.getStatsForActivityId());
+    }
+
+    private void testPull() {
+        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+        List<StatsForEachActivity> testList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
+        StatsForEachActivity testStats = testList.get(testList.size()-1);
+
+        long pulledSetTime = testStats.getTotalSetTimeForEachActivity();
+        Log.i("testUpdate", "pulled set time is " + pulledSetTime);
     }
 
     public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
