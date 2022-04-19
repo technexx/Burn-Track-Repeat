@@ -1895,16 +1895,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deletingHighlightedCycleLogic() {
-    for (int i=0; i<receivedHighlightPositions.size(); i++) {
-      positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
-      receivedHighlightPositionHolder.add(positionOfSelectedCycle);
-    }
+    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable());
 
     delete_highlighted_cycle.setEnabled(false);
     fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
-
-    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable());
-
     if (mode==1) savedCycleAdapter.removeHighlight();
     if (mode==3) savedPomCycleAdapter.removeHighlight();
 
@@ -1920,11 +1914,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           return;
         }
 
+        //Todo: After any addition, deletion, or update to Main's cycle class, we should already be calling this to ensure the database and adapter lists are in sync, so should be no need to call it here.
+//        AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
+
+        //Todo: These are ARRAY positions in our recyclerView. Why are we corresponding them to each row's primary id?
+        for (int i=0; i<receivedHighlightPositions.size(); i++) {
+          positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
+          receivedHighlightPositionHolder.add(positionOfSelectedCycle);
+        }
+
         int cycleID = 0;
         List<Integer> tempIdList = new ArrayList<>();
         tempIdList.addAll(receivedHighlightPositionHolder);
 
-        AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
+        Log.i("testDelete", "highlight position holder is " + receivedHighlightPositionHolder);
+        Log.i("testDelete", "tempList is " + tempIdList);
+        Log.i("testDelete", " " + receivedHighlightPositionHolder);
 
         if (mode==1) {
           for (int i=0; i<tempIdList.size(); i++) {
