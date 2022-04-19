@@ -517,7 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: New activity times seem not to save after first timer reset, but do so after. If de-bugging tho, it does save right away.
   //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
   //Todo: Highlight deletion can delete wrong cycles.
   //Todo: Remove logging method from sort button.

@@ -179,35 +179,12 @@ public class DailyStatsAccess {
             statsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
-
-            Log.i("testInsert", "StatsForEachActivity inserted with day #" + getCurrentDayOfYear() + " and activity of " + mActivityString);
         }
     }
 
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
-        testAssign();
-        testPull();
-    }
-
-    //Todo: 0 primary key AND unique ID on first attempt to save. Likely we are 1)Inserting a row and (B)Trying to update a new instance of mStats instead of that row (since that is what are assigning because it is a new entry).
-    private void testAssign() {
-        String activity = mStatsForEachActivity.getActivity();
-        long setTime = mStatsForEachActivity.getTotalSetTimeForEachActivity();
-        Log.i("testUpdate", "activity " + activity + " saving with " + setTime + " millis");
-
-        Log.i("testUpdate", "mStats unique ID is " + mStatsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
-        Log.i("testUpdate", "mStats primary key is " + mStatsForEachActivity.getStatsForActivityId());
-    }
-
-    private void testPull() {
-        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-        List<StatsForEachActivity> testList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
-        StatsForEachActivity testStats = testList.get(testList.size()-1);
-
-        long pulledSetTime = testStats.getTotalSetTimeForEachActivity();
-        Log.i("testUpdate", "pulled set time is " + pulledSetTime);
     }
 
     public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
@@ -226,10 +203,9 @@ public class DailyStatsAccess {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInListForCurrentDay);
-            Log.i("testAccess", "activity exists at position " + activityPositionInListForCurrentDay);
         } else {
-            mStatsForEachActivity = new StatsForEachActivity();
-            Log.i("testAccess", "New StatsForEachActivity created");
+            int mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
+            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(mostRecentEntry);
         }
     }
 
