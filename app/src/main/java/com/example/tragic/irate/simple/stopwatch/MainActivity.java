@@ -1632,8 +1632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
-        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-
         if (mode==1){
           cycles.setTotalSetTime(totalCycleSetTimeInMillis);
           cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
@@ -1648,36 +1646,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         }
 
-        //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
-        if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
-          dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
-          dailyStatsAccess.setOldDayHolderId(dayOfYear);
+        createNewListOfActivitiesIfDayHasChanged();
 
-          dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
-          dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-        }
-
-
-        if (cycleHasActivityAssigned) {
-          dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
-          dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
-          dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
-
-          dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
-
-          if (trackActivityWithinCycle) {
-            int currentActivityPosition = dailyStatsAccess.getActivityPosition();
-            int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
-
-            if (currentActivityPosition != oldActivityPosition) {
-              dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
-            }
-
-            dailyStatsAccess.setActivityStringForSelectedActivity(dailyStatsAccess.getActivityStringFromSpinner());
-            dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-            dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
-            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
-          }
+        if (trackActivityWithinCycle) {
+          setAndUpdateDayHolderValuesInDatabase();
+          setAndUpdateStatsForEachActivityValuesInDatabase();
         }
 
         if (!timerIsPaused) {
@@ -1688,6 +1661,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
   };
+
+  private void createNewListOfActivitiesIfDayHasChanged() {
+    int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
+    if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
+      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
+      dailyStatsAccess.setOldDayHolderId(dayOfYear);
+
+      dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
+      dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+    }
+  }
+
+  private void setAndUpdateDayHolderValuesInDatabase() {
+    dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
+    dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
+    dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
+
+    dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+  }
+
+  private void setAndUpdateStatsForEachActivityValuesInDatabase() {
+    int currentActivityPosition = dailyStatsAccess.getActivityPosition();
+    int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
+
+    if (currentActivityPosition != oldActivityPosition) {
+      dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
+    }
+
+    dailyStatsAccess.setActivityStringForSelectedActivity(dailyStatsAccess.getActivityStringFromSpinner());
+    dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+    dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
+  }
 
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
     globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
@@ -3358,7 +3365,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 //        dailyStatsAccess.assignActivityFromStatsForEachActivityListForASpecificDay();
-
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 

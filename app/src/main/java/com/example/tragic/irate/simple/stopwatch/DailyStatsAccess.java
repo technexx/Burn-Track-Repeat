@@ -184,6 +184,18 @@ public class DailyStatsAccess {
         }
     }
 
+
+    public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+
+        String activity = mStatsForEachActivity.getActivity();
+        int activityPosition = getActivityPosition();
+        long setTime = mStatsForEachActivity.getTotalSetTimeForEachActivity();
+
+        //Todo: Position is irrelevant since we're updating an instance of mStats.
+        Log.i("testUpdate", "activity " + activity + " at position " + activityPosition + " saving with " + setTime + " millis");
+    }
+
     public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
@@ -274,17 +286,6 @@ public class DailyStatsAccess {
 
     public double getTotalCaloriesBurnedForSelectedActivity() {
         return mStatsForEachActivity.getTotalCaloriesBurnedForEachActivity();
-    }
-
-    public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
-        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
-
-        String activity = mStatsForEachActivity.getActivity();
-        int activityPosition = getActivityPosition();
-        long setTime = mStatsForEachActivity.getTotalSetTimeForEachActivity();
-
-        //Todo: Position is always 0, even when it updates correctly after reset.
-        Log.i("testUpdate", "activity " + activity + " at position " + activityPosition + " saving with " + setTime + " millis");
     }
 
     public void deleteStatForEachActivityEntity() {
