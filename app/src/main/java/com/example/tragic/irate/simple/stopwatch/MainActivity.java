@@ -517,9 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
-  //Todo: Highlight deletion can delete wrong cycles.
-  //Todo: Remove logging method from sort button.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -901,13 +898,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignOldCycleValuesToCheckForChanges();
       cycleNameEdit.setText(cycleTitle);
 
-      if (cycleHasActivityAssigned) {
-        addTDEEActivityTextView.setText(cyclesList.get(positionOfSelectedCycle).getActivityString());
-        removeTdeeActivityImageView.setVisibility(View.VISIBLE);
-      } else {
-        addTDEEActivityTextView.setText(getString(R.string.add_activity));
-        removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
-      }
+      toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -1765,6 +1756,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetEditPopUpTimerHeaders();
     editPopUpTimerArray.clear();
     timerValueInEditPopUpTextView.setText("00:00");
+
+    toggleEditPopUpViewsForAddingActivity(false);
   }
 
   private void stopWatchButtonLogic() {
