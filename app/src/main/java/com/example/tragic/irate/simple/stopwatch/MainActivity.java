@@ -517,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Recycler rows + db rows aren't sync'ing up.
+  //Todo: Cycles Activity String and StataForEach Strings do not sync. Both classes save fine otherwise.
   //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
   //Todo: Highlight deletion can delete wrong cycles.
   //Todo: Remove logging method from sort button.
@@ -848,7 +848,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
-      logCycleDatabase(true);
+      logCyclesDatabase();
+      logStatsForEachActivityDatabase(true);
 
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
@@ -866,13 +867,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
-      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
       if (mode==1 && trackActivityWithinCycle) {
         if (isTextViewVisible(daily_total_time_and_calories_textView)) {
           setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
         }
       }
+
+      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -2224,7 +2226,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleAdapter.notifyDataSetChanged();
       }
-      AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     } else {
       if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
       //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
@@ -4783,7 +4784,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
-  private void logCycleDatabase(boolean currentDayOnly) {
+  private void logCyclesDatabase() {
+    AsyncTask.execute(()-> {
+      List<Cycles> allCyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+      for (int i=0; i<allCyclesList.size(); i++) {
+        Log.i("testCycleDb", "Activity String is " + allCyclesList.get(i).getActivityString());
+      }
+    });
+  }
+
+  private void logStatsForEachActivityDatabase(boolean currentDayOnly) {
     AsyncTask.execute(()->{
       int currentDay = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
@@ -4798,18 +4808,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       for (int i=0; i<listOfActivities.size(); i++) {
-        Log.i("testDb", "entry position is " + i);
-        Log.i("testDb", "Day ID is " + listOfActivities.get(i).getUniqueIdTiedToTheSelectedActivity());
-        Log.i("testDb", "Activity String is " + listOfActivities.get(i).getActivity());
-        Log.i("testDb", "Set time elapsed for activity is " + listOfActivities.get(i).getTotalSetTimeForEachActivity());
+        Log.i("testStatsDb", "entry position is " + i);
+        Log.i("testStatsDb", "Day ID is " + listOfActivities.get(i).getUniqueIdTiedToTheSelectedActivity());
+        Log.i("testStatsDb", "Activity String is " + listOfActivities.get(i).getActivity());
+        Log.i("testStatsDb", "Set time elapsed for activity is " + listOfActivities.get(i).getTotalSetTimeForEachActivity());
       }
 
       if (listOfActivities.size()==0) {
-        Log.i("testDb", "Empty list!");
+        Log.i("testStatsDb", "Empty list!");
       }
 
       for (int i=0; i<listOfDays.size(); i++) {
-        Log.i("testDb", "For day " + listOfDays.get(i).getDayId() + " total set time is " + listOfDays.get(i).getTotalSetTime());
+        Log.i("testStatsDb", "For day " + listOfDays.get(i).getDayId() + " total set time is " + listOfDays.get(i).getTotalSetTime());
       }
 
     });
