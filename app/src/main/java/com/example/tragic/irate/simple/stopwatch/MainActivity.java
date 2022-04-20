@@ -517,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Cycles Activity String and StataForEach Strings do not sync. Both classes save fine otherwise.
+  //Todo: Cycle highlight deletions.
   //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
   //Todo: Highlight deletion can delete wrong cycles.
   //Todo: Remove logging method from sort button.
@@ -848,6 +848,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
+      logCyclesArrays();
       logCyclesDatabase();
       logStatsForEachActivityDatabase(true);
 
@@ -1829,6 +1830,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setBackgroundColor(noHighlight);
   }
 
+  //Todo: Array gets set correctly after this is called on cycle launch. CycleList seems to be re-ordering itself AFTER that.
   private Runnable queryAndSortAllCyclesFromDatabaseRunnable() {
     return new Runnable() {
       @Override
@@ -3183,6 +3185,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutActivityStringArray.clear();
       activeTdeeTrackingBooleanList.clear();
       existenceOfActivityInCycleList.clear();
+
       for (int i=0; i<cyclesList.size(); i++) {
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         workoutTitleArray.add(cyclesList.get(i).getTitle());
@@ -3340,7 +3343,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (isNewCycle || cycleLaunchedFromEditPopUp) {
         saveAddedOrEditedCycleASyncRunnable();
       } else {
-        getInstancesOfCyclesAndPomCyclesListsFromDatabase();
+//        getInstancesOfCyclesAndPomCyclesListsFromDatabase();
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
@@ -4782,6 +4785,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.remove("modeThreeTimerEnded");
     prefEdit.remove("modeThreeTimerDisabled");
     prefEdit.apply();
+  }
+
+  private void logCyclesArrays() {
+    Log.i("testCycle", "Activity String List is " + workoutActivityStringArray);
   }
 
   private void logCyclesDatabase() {
