@@ -517,7 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Cycle highlight deletions.
   //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
   //Todo: Highlight deletion can delete wrong cycles.
   //Todo: Remove logging method from sort button.
@@ -733,7 +732,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setEnabled(false);
     }
 
-    logCycleHighlight();
+    logCycleHighlights();
   }
 
   //This callback method works for both round adapters.
@@ -1922,16 +1921,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
-          receivedHighlightPositionHolder.add(i);
+          int valueToAdd = Integer.parseInt(receivedHighlightPositions.get(i));
+          receivedHighlightPositionHolder.add(valueToAdd);
         }
 
         int cycleID = 0;
-//        List<Integer> tempIdList = new ArrayList<>();
-//        tempIdList.addAll(receivedHighlightPositionHolder);
-
-        Log.i("testHighlight", "highlight position holder is " + receivedHighlightPositionHolder);
-        Log.i("testHighlight", " " + receivedHighlightPositionHolder);
-
         if (mode==1) {
           for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
             cycleID = cyclesList.get(i).getId();
@@ -4787,6 +4781,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
+  private void logCycleHighlights() {
+    Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
+  }
+
   private void logCyclesArrays() {
     Log.i("testCycle", "Activity String List is " + workoutActivityStringArray);
   }
@@ -4830,11 +4828,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
     });
-  }
-
-  private void logCycleHighlight() {
-    Log.i("testHighlight", "highlighted list is " + receivedHighlightPositions);
-
   }
 
   private void logTotalCycleTimes() {
