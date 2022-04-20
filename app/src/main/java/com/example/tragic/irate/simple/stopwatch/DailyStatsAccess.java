@@ -170,7 +170,7 @@ public class DailyStatsAccess {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
 
             //Since a new list with the new day's ID is created every day, this iterating ID will auto reset to 0 each day.
-            statsForEachActivity.setIteratingIdsForSpecificDay(statsForEachActivityListOfAllActivitiesForASpecificDate.size());
+//            statsForEachActivity.setIteratingIdsForSpecificDay(statsForEachActivityListOfAllActivitiesForASpecificDate.size());
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
             statsForEachActivity.setActivity(mActivityString);
 
@@ -200,11 +200,19 @@ public class DailyStatsAccess {
     }
 
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
+        //New database pull to account for most recent insertion.
+        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+        setStatForEachActivityListForForSingleDay(dayOfYear);
+
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInListForCurrentDay);
         } else {
-            int mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
+            //Fetches most recent db insertion as a reference to the new row that was just saved.
+            int mostRecentEntry = 0;
+            if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
+                mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
+            }
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(mostRecentEntry);
         }
     }

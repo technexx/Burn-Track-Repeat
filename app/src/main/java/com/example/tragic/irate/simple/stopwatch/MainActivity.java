@@ -517,6 +517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Recycler rows + db rows aren't sync'ing up.
   //Todo: Previous activity Strings still show up when adding new Cycles on edit popUp.
   //Todo: Highlight deletion can delete wrong cycles.
   //Todo: Remove logging method from sort button.
@@ -731,6 +732,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setAlpha(0.4f);
       edit_highlighted_cycle.setEnabled(false);
     }
+
+    logCycleHighlight();
   }
 
   //This callback method works for both round adapters.
@@ -1914,38 +1917,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           return;
         }
 
-        //Todo: After any addition, deletion, or update to Main's cycle class, we should already be calling this to ensure the database and adapter lists are in sync, so should be no need to call it here.
-//        AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
-
-        //Todo: These are ARRAY positions in our recyclerView. Why are we corresponding them to each row's primary id?
         for (int i=0; i<receivedHighlightPositions.size(); i++) {
-          positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(i));
-          receivedHighlightPositionHolder.add(positionOfSelectedCycle);
+          receivedHighlightPositionHolder.add(i);
         }
 
         int cycleID = 0;
-        List<Integer> tempIdList = new ArrayList<>();
-        tempIdList.addAll(receivedHighlightPositionHolder);
+//        List<Integer> tempIdList = new ArrayList<>();
+//        tempIdList.addAll(receivedHighlightPositionHolder);
 
-        Log.i("testDelete", "highlight position holder is " + receivedHighlightPositionHolder);
-        Log.i("testDelete", "tempList is " + tempIdList);
-        Log.i("testDelete", " " + receivedHighlightPositionHolder);
+        Log.i("testHighlight", "highlight position holder is " + receivedHighlightPositionHolder);
+        Log.i("testHighlight", " " + receivedHighlightPositionHolder);
 
         if (mode==1) {
-          for (int i=0; i<tempIdList.size(); i++) {
+          for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
             cycleID = cyclesList.get(i).getId();
             cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
             cyclesDatabase.cyclesDao().deleteCycle(cycles);
           }
         }
         if (mode==3) {
-          for (int i=0; i<tempIdList.size(); i++) {
+          for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
             cycleID = pomCyclesList.get(i).getId();
             pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
             cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
           }
         }
+
+        queryAndSortAllCyclesFromDatabaseRunnable();
+
         runOnUiThread(()->{
+          savedCycleAdapter.notifyDataSetChanged();
           editCycleArrayLists(DELETING_CYCLE);
           replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         });
@@ -3500,7 +3501,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomCycles.setTimeAdded(System.currentTimeMillis());
           pomCycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
-          //Adding to adapter list.
           editCycleArrayLists(ADDING_CYCLE);
         } else {
           pomCycles.setTitle(cycleTitle);
@@ -3509,6 +3509,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     }
+
     AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
     runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
   }
@@ -4812,6 +4813,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
     });
+  }
+
+  private void logCycleHighlight() {
+    Log.i("testHighlight", "highlighted list is " + receivedHighlightPositions);
+
   }
 
   private void logTotalCycleTimes() {
