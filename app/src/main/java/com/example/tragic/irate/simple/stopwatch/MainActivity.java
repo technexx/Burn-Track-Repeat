@@ -906,9 +906,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
       addTDEEActivityTextView.setText(tdeeString);
-
-      Log.i("testFetch", "boolean is " + cycleHasActivityAssigned);
-
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -942,7 +939,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     View.OnClickListener numberPadListener = view -> {
       TextView textButton = (TextView) view;
 
-      if (mode==1) addToEditPopUpTimerArrays(editPopUpTimerArray, textButton);
+      if (mode==1) {
+        addToEditPopUpTimerArrays(editPopUpTimerArray, textButton);
+      }
 
       if (mode==3) {
         if (editHeaderSelected==1) addToEditPopUpTimerArrays(savedEditPopUpArrayForFirstHeaderModeThree, textButton);
