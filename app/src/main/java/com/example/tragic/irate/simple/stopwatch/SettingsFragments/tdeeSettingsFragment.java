@@ -120,15 +120,18 @@ public class tdeeSettingsFragment extends Fragment {
 
         prefEdit.putBoolean("isMetric", isMetric);
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
-        prefEdit.putInt("tdeeAge", getIntegerValueFromSpinner(age_spinner));
-        prefEdit.putInt("tdeeWeight", getIntegerValueFromSpinner(weight_spinner));
-        prefEdit.putInt("tdeeHeight", getIntegerValueFromSpinner(height_spinner));
+        prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
+        prefEdit.putInt("tdeeWeight", getIntegerValueFromFullSpinnerString(weight_spinner));
+        prefEdit.putInt("tdeeHeight", getIntegerValueFromFullSpinnerString(height_spinner));
 
         prefEdit.apply();
+
+        logIntegerConvertedSpinnerValues();
     }
 
-    private Integer getIntegerValueFromSpinner(Spinner spinner) {
-        return (Integer) spinner.getSelectedItem();
+    private int getIntegerValueFromFullSpinnerString(Spinner spinner) {
+        String[] splitStringArray = spinner.getSelectedItem().toString().split(" ");
+        return Integer.parseInt(splitStringArray[0]);
     }
 
     private String getStringValueFromSpinner(Spinner spinner) {
@@ -259,5 +262,12 @@ public class tdeeSettingsFragment extends Fragment {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
         }
+    }
+
+    private void logIntegerConvertedSpinnerValues() {
+        Log.i("testSpinner", "Age spinner is " + getIntegerValueFromFullSpinnerString(age_spinner));
+        Log.i("testSpinner", "Weight spinner is " + getIntegerValueFromFullSpinnerString(weight_spinner));
+        Log.i("testSpinner", "Height spinner is " + getIntegerValueFromFullSpinnerString(height_spinner));
+
     }
 }
