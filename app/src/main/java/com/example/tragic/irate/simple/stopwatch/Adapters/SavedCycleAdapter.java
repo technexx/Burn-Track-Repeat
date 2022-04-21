@@ -48,7 +48,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mWorkoutList;
   ArrayList<String> mRoundType;
   ArrayList<String> mWorkoutTitle;
-  List<Boolean> mExistenceOfActivityInCycleList;
+  List<Boolean> mmTdeeActivityExistsInCycleList;
   List<Boolean> mActiveTdeeModeBooleanList;
   ArrayList<String> mWorkoutActivityString;
 
@@ -126,8 +126,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
-  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> existenceOfActivityInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
-    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mExistenceOfActivityInCycleList = existenceOfActivityInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
+  public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> tdeeActivityExistsInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
+    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mmTdeeActivityExistsInCycleList = tdeeActivityExistsInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
@@ -201,7 +201,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     }
 
-    if (mExistenceOfActivityInCycleList.get(position)) {
+    if (mmTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
     } else {
       workoutHolder.tdeeToggle.setText("");
