@@ -517,7 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Editing problems.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -895,16 +894,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       assignOldCycleValuesToCheckForChanges();
       cycleNameEdit.setText(cycleTitle);
-      positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
-
-      cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
-      toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
-      Log.i("testFetch", "boolean is " + cycleHasActivityAssigned);
 
       editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
       buttonToLaunchTimerFromEditPopUp.setEnabled(true);
       currentlyEditingACycle = true;
       isNewCycle = false;
+
+      positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
+      cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
+      toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
+
+      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
+      addTDEEActivityTextView.setText(tdeeString);
+
+      Log.i("testFetch", "boolean is " + cycleHasActivityAssigned);
+
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -1828,7 +1832,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setBackgroundColor(noHighlight);
   }
 
-  //Todo: Array gets set correctly after this is called on cycle launch. CycleList seems to be re-ordering itself AFTER that.
   private Runnable queryAndSortAllCyclesFromDatabaseRunnable() {
     return new Runnable() {
       @Override
