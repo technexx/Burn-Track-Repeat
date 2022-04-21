@@ -89,12 +89,16 @@ public class tdeeSettingsFragment extends Fragment {
         weight_spinner.setAdapter(weightAdapter);
         height_spinner.setAdapter(heightAdapter);
 
+        imperialSettingButton.setAlpha(1.0f);
+        metricSettingButton.setAlpha(0.5f);
 
         imperialSettingButton.setOnClickListener(v -> {
             isMetric = false;
             clearAndRepopulateWeightAndHeighteSpinnerAdapters();
             clearAndRepopulateWeightAndHeightSpinnerList();
             refreshWeightAndHeightSpinnerAdapters();
+            imperialSettingButton.setAlpha(1.0f);
+            metricSettingButton.setAlpha(0.5f);
         });
 
         metricSettingButton.setOnClickListener(v -> {
@@ -102,6 +106,8 @@ public class tdeeSettingsFragment extends Fragment {
             clearAndRepopulateWeightAndHeighteSpinnerAdapters();
             clearAndRepopulateWeightAndHeightSpinnerList();
             refreshWeightAndHeightSpinnerAdapters();
+            imperialSettingButton.setAlpha(0.5f);
+            metricSettingButton.setAlpha(1.0f);
         });
 
         saveTdeeSettingsButton.setOnClickListener(v -> {
