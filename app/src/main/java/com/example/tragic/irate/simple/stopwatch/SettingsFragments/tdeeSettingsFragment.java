@@ -74,7 +74,7 @@ public class tdeeSettingsFragment extends Fragment {
 
         imperialSettingButton.setText(R.string.imperial);
         metricSettingButton.setText(R.string.metric);
-        saveTdeeSettingsButton.setText(R.string.save);
+        saveTdeeSettingsButton.setText(R.string.update);
 
         genderList = new ArrayList<>();
         ageList = new ArrayList<>();
@@ -114,7 +114,7 @@ public class tdeeSettingsFragment extends Fragment {
             saveSpinnerStatsToSharedPreferences();
 
             bmrTextView.setText(calculatedBMRString());
-            Toast.makeText(getActivity(), "Saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Updated", Toast.LENGTH_SHORT).show();
         });
 
         return root;
@@ -127,19 +127,17 @@ public class tdeeSettingsFragment extends Fragment {
     private void toggleMetricAndImperial(boolean onMetric) {
         if (onMetric) {
             isMetric = true;
-            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
-            clearAndRepopulateWeightAndHeightSpinnerList();
-            refreshWeightAndHeightSpinnerAdapters();
             imperialSettingButton.setAlpha(0.5f);
             metricSettingButton.setAlpha(1.0f);
         } else {
             isMetric = false;
-            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
-            clearAndRepopulateWeightAndHeightSpinnerList();
-            refreshWeightAndHeightSpinnerAdapters();
             imperialSettingButton.setAlpha(1.0f);
             metricSettingButton.setAlpha(0.5f);
         }
+
+        clearAndRepopulateWeightAndHeighteSpinnerAdapters();
+        clearAndRepopulateWeightAndHeightSpinnerList();
+        refreshWeightAndHeightSpinnerAdapters();
     }
 
     private void saveSpinnerStatsToSharedPreferences() {

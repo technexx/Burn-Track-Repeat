@@ -154,6 +154,7 @@
     <string name="add">Add to Custom Calculator</string>
     <string name="about">About</string>
     <string name="save">Save</string>
+    <string name="update">Update</string>
 
     <string name="gender">Gender:</string>
     <string name="age">Age:</string>
