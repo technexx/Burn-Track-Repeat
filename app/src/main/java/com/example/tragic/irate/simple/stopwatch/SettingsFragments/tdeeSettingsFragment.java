@@ -29,6 +29,12 @@ import java.util.List;
 
 public class tdeeSettingsFragment extends Fragment {
 
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor prefEdit;
+
+    Button imperialSettingButton;
+    Button metricSettingButton;
+
     private boolean isMetric;
     Spinner gender_spinner;
     Spinner age_spinner;
@@ -53,14 +59,17 @@ public class tdeeSettingsFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tdee_settings_fragment_layout, container, false);
 
+        sharedPreferences = getActivity().getSharedPreferences("pref", 0);
+        prefEdit = sharedPreferences.edit();
+
         gender_spinner = root.findViewById(R.id.gender_spinner);
         age_spinner = root.findViewById(R.id.age_spinner);
         weight_spinner = root.findViewById(R.id.weight_spinner);
         height_spinner = root.findViewById(R.id.height_spinner);
         bmrTextView = root.findViewById(R.id.bmr);
 
-        Button imperialSettingButton = root.findViewById(R.id.imperial_setting);
-        Button metricSettingButton = root.findViewById(R.id.metric_setting);
+        imperialSettingButton = root.findViewById(R.id.imperial_setting);
+        metricSettingButton = root.findViewById(R.id.metric_setting);
         Button saveTdeeSettingsButton = root.findViewById(R.id.save_tdee_settings_button);
 
         imperialSettingButton.setText(R.string.imperial);
@@ -89,27 +98,17 @@ public class tdeeSettingsFragment extends Fragment {
         weight_spinner.setAdapter(weightAdapter);
         height_spinner.setAdapter(heightAdapter);
 
-        imperialSettingButton.setAlpha(1.0f);
-        metricSettingButton.setAlpha(0.5f);
+        retrieveAndSetSpinnerValues();
 
         imperialSettingButton.setOnClickListener(v -> {
-            isMetric = false;
-            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
-            clearAndRepopulateWeightAndHeightSpinnerList();
-            refreshWeightAndHeightSpinnerAdapters();
-            imperialSettingButton.setAlpha(1.0f);
-            metricSettingButton.setAlpha(0.5f);
+            toggleMetricAndImperial(false);
         });
 
         metricSettingButton.setOnClickListener(v -> {
-            isMetric = true;
-            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
-            clearAndRepopulateWeightAndHeightSpinnerList();
-            refreshWeightAndHeightSpinnerAdapters();
-            imperialSettingButton.setAlpha(0.5f);
-            metricSettingButton.setAlpha(1.0f);
+            toggleMetricAndImperial(true);
         });
 
+        //Todo: BMR should calculate on any spinner selection, not just "Save".
         saveTdeeSettingsButton.setOnClickListener(v -> {
             saveSpinnerStatsToSharedPreferences();
 
@@ -120,19 +119,51 @@ public class tdeeSettingsFragment extends Fragment {
         return root;
     }
 
-    private void saveSpinnerStatsToSharedPreferences() {
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("pref", 0);
-        SharedPreferences.Editor prefEdit = sharedPreferences.edit();
+    private void toggleMetricAndImperial(boolean onMetric) {
+        if (onMetric) {
+            isMetric = true;
+            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
+            clearAndRepopulateWeightAndHeightSpinnerList();
+            refreshWeightAndHeightSpinnerAdapters();
+            imperialSettingButton.setAlpha(0.5f);
+            metricSettingButton.setAlpha(1.0f);
+        } else {
+            isMetric = false;
+            clearAndRepopulateWeightAndHeighteSpinnerAdapters();
+            clearAndRepopulateWeightAndHeightSpinnerList();
+            refreshWeightAndHeightSpinnerAdapters();
+            imperialSettingButton.setAlpha(1.0f);
+            metricSettingButton.setAlpha(0.5f);
+        }
+    }
 
+    private void saveSpinnerStatsToSharedPreferences() {
         prefEdit.putBoolean("isMetric", isMetric);
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
         prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
         prefEdit.putInt("tdeeWeight", getIntegerValueFromFullSpinnerString(weight_spinner));
         prefEdit.putInt("tdeeHeight", getIntegerValueFromFullSpinnerString(height_spinner));
 
-        prefEdit.apply();
+        prefEdit.putInt("genderPosition", gender_spinner.getSelectedItemPosition());
+        prefEdit.putInt("agePosition", age_spinner.getSelectedItemPosition());
+        prefEdit.putInt("weightPosition", weight_spinner.getSelectedItemPosition());
+        prefEdit.putInt("heightPosition", height_spinner.getSelectedItemPosition());
 
-        logIntegerConvertedSpinnerValues();
+        prefEdit.apply();
+    }
+
+    private void retrieveAndSetSpinnerValues() {
+        boolean metricPosition = sharedPreferences.getBoolean("isMetric", false);
+        int genderPosition = sharedPreferences.getInt("genderPosition", 0);
+        int agePosition = sharedPreferences.getInt("agePosition", 0);
+        int weightPosition = sharedPreferences.getInt("weightPosition", 0);
+        int heightPosition = sharedPreferences.getInt("heightPosition", 0);
+
+        gender_spinner.setSelection(genderPosition);
+        age_spinner.setSelection(agePosition);
+        weight_spinner.setSelection(weightPosition);
+        height_spinner.setSelection(heightPosition);
+        toggleMetricAndImperial(metricPosition);
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {
