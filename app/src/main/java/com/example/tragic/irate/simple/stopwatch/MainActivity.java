@@ -517,7 +517,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Tdee BMI settings are saved to SharedPref but not retrieved!
+  //Todo: Got inches in metric and cm in imperial.
+  //Todo: Should have a clearer change w/ daily BMR, especially if switching measuring modes.
   //Todo: Settings for TDEE stuff?
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.

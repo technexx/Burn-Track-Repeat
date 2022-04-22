@@ -109,7 +109,6 @@ public class tdeeSettingsFragment extends Fragment {
             toggleMetricAndImperial(true);
         });
 
-        //Todo: BMR should calculate on any spinner selection, not just "Save". Need listeners on all Spinners AND a conditional for imperial/metric. Other option: "Save" becomes "Update", moved underneath "Daily BMR", and updates on that click.
         saveTdeeSettingsButton.setOnClickListener(v -> {
             saveSpinnerStatsToSharedPreferences();
 
@@ -252,9 +251,9 @@ public class tdeeSettingsFragment extends Fragment {
 
         if (typeOfStat == HEIGHT) {
             if (isMetric) {
-                append = "in";
-            } else {
                 append = "cm";
+            } else {
+                append = "in";
             }
         }
 
