@@ -99,6 +99,7 @@ public class tdeeSettingsFragment extends Fragment {
         height_spinner.setAdapter(heightAdapter);
 
         retrieveAndSetSpinnerValues();
+        bmrTextView.setText(calculatedBMRString());
 
         imperialSettingButton.setOnClickListener(v -> {
             toggleMetricAndImperial(false);
@@ -108,15 +109,19 @@ public class tdeeSettingsFragment extends Fragment {
             toggleMetricAndImperial(true);
         });
 
-        //Todo: BMR should calculate on any spinner selection, not just "Save".
+        //Todo: BMR should calculate on any spinner selection, not just "Save". Need listeners on all Spinners AND a conditional for imperial/metric. Other option: "Save" becomes "Update", moved underneath "Daily BMR", and updates on that click.
         saveTdeeSettingsButton.setOnClickListener(v -> {
             saveSpinnerStatsToSharedPreferences();
 
-            bmrTextView.setText(getString(R.string.bmr_value, String.valueOf(calculateBMR())));
+            bmrTextView.setText(calculatedBMRString());
             Toast.makeText(getActivity(), "Saved", Toast.LENGTH_SHORT).show();
         });
 
         return root;
+    }
+
+    private String calculatedBMRString() {
+        return getString(R.string.bmr_value, String.valueOf(calculateBMR()));
     }
 
     private void toggleMetricAndImperial(boolean onMetric) {
