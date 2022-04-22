@@ -499,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView caloriesBurnedInTdeeAdditionTextView;
   TextView metScoreTextView;
 
-  boolean isMetric;
+  boolean metricMode;
   String userGender;
   int userAge;
   int userWeight;
@@ -517,8 +517,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Got inches in metric and cm in imperial.
-  //Todo: Should have a clearer change w/ daily BMR, especially if switching measuring modes.
+  //Todo: Should have a clearer change w/ daily BMR, especially if switching measuring modes. We need a default value tho so we can't just clear it on switching between modes.
+      //Todo: Right now, spinners retain position, so if we change weight in imperial, it changes the kg positon in metric.
   //Todo: Settings for TDEE stuff?
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -2122,7 +2122,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void retrieveUserStats() {
     SharedPreferences sp = getApplicationContext().getSharedPreferences("pref", 0);
-    isMetric = sp.getBoolean("isMetric", false);
+    metricMode = sp.getBoolean("metricMode", false);
     userGender = sp.getString("tdeeGender", "male");
     userAge = sp.getInt("tdeeAge,", 18);
     userWeight = sp.getInt("tdeeWeight,", 150);
@@ -3678,7 +3678,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private double calculateCaloriesBurnedPerMinute(double metValue) {
     double weightConversion = userWeight;
-    if (!isMetric) weightConversion = weightConversion / 2.205;
+    if (!metricMode) weightConversion = weightConversion / 2.205;
     double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
     return caloriesBurnedPerMinute;
   }
