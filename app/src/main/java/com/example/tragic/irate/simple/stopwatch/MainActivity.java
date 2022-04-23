@@ -311,6 +311,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ObjectAnimator objectAnimatorPom;
   Animation endAnimation;
 
+  TextView tracking_daily_stats_notification_textView;
   TextView cycle_title_textView;
   TextView cycles_or_laps_completed_textView;
   TextView daily_total_time_and_calories_textView;
@@ -1353,6 +1354,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
     reset = timerPopUpView.findViewById(R.id.reset);
+    tracking_daily_stats_notification_textView = timerPopUpView.findViewById(R.id.tracking_daily_stats_notification_textView);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
 
     cycles_or_laps_completed_textView = timerPopUpView.findViewById(R.id.cycles_or_laps_completed_textView);
@@ -1598,6 +1600,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     confirmActivityAddition.setText(R.string.okay);
     timerValueInEditPopUpTextView.setText("00:00");
 
+    tracking_daily_stats_notification_textView.setText(R.string.tracking_daily_stats);
     total_set_header.setText(R.string.total_sets);
     total_break_header.setText(R.string.total_breaks);
     total_set_time.setText("0");
@@ -4693,6 +4696,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
+      tracking_daily_stats_notification_textView.setVisibility(View.INVISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
@@ -4704,6 +4708,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
+      tracking_daily_stats_notification_textView.setVisibility(View.VISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.INVISIBLE);
       total_set_header.setVisibility(View.INVISIBLE);
       total_set_time.setVisibility(View.INVISIBLE);

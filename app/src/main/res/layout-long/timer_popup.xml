@@ -20,10 +20,23 @@
     </TextView>
 
     <TextView
-        android:id="@+id/daily_total_time_and_calories_textView"
+        android:id="@+id/tracking_daily_stats_notification_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/off_white"
+        android:textStyle="bold"
+        android:textSize="22sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/daily_total_time_and_calories_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_notification_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"
