@@ -518,10 +518,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: We added toggle retrieval for active cycle to resume/reset callback, but needs textView size changes, too.
-      //Todo: Should we disable toggle for active cycle?
-  //Todo: Set time iterating up on tracking mode. We want them to be entirely separate.
-  //Todo: Editing title has reset Set time.
+  //Todo: Editing a cycle has created/overwrote another cycle.
+  //Todo: Singular activity times not saving correctly + extra row(s) being created.
+  //Todo: Should we disable toggle for active cycle?
   //Todo: Total set (prolly break too) times not always saving correctly.
   //Todo: Some skipping/missing a number in total times on resetting / restarting timer.
   //Todo: Test all daily saves in fragment.
@@ -2611,19 +2610,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
     }
-
   }
 
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
       progressBar.setProgress(currentProgressBarValue);
       timeLeft.setText(retrieveTimerValueString());
-      displayCycleOrDailyTotals();
-      setCyclesCompletedTextView();
-      toggleTdeeTextViewSize();
 
       trackActivityWithinCycle = savedCycleAdapter.getPositionToToggle(positionOfSelectedCycle);
       toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
+
+      displayCycleOrDailyTotals();
+      setCyclesCompletedTextView();
+      toggleTdeeTextViewSize();
 
       timerIsPaused = true;
       timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -3607,19 +3606,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
-  private void iterationMethodsForTotalTimesForSelectedCycle() {
-
-  }
-
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
-    iterateTotalTimesForSelectedCycle(timerRunnableDelay);
-
     if (trackActivityWithinCycle) {
       iterateTotalTimesForSelectedDay(timerRunnableDelay);
       iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
       iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
       iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+    } else {
+      iterateTotalTimesForSelectedCycle(timerRunnableDelay);
     }
   }
 
