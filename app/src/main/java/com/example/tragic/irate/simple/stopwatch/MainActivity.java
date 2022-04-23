@@ -517,9 +517,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Settings for TDEE stuff?
+  //Todo: Header for "Tracking Daily" within timer popUp for TDEE and/or similar for Cycles?
+        //Todo: Should Cycles reset daily as well? Or have an option to toggle it?
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
+  //Todo: Dot numbers a bit unaligned to the right.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
@@ -1672,6 +1674,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
       dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
+      //Todo: Crashes trying to retrieve 0 index on new day when nothing yet exists. This occurred on (dismissing timer popUp?) even tho this should just execute on app startup.
       dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
     }
   }

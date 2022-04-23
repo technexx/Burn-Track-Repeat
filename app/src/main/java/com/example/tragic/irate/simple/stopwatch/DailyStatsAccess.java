@@ -207,13 +207,13 @@ public class DailyStatsAccess {
         //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInListForCurrentDay);
-        } else {
+        } else if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
             int mostRecentEntry = 0;
-            if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
-                mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
-            }
+            mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(mostRecentEntry);
+        } else {
+            mStatsForEachActivity = new StatsForEachActivity();
         }
     }
 
