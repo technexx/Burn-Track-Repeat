@@ -99,7 +99,6 @@ public class tdeeSettingsFragment extends Fragment {
         height_spinner.setAdapter(heightAdapter);
 
         retrieveAndSetSpinnerValues(false);
-
         bmrTextView.setText(calculatedBMRString());
 
         imperialSettingButton.setOnClickListener(v -> {
@@ -125,18 +124,16 @@ public class tdeeSettingsFragment extends Fragment {
 
     private void toggleMetricAndImperial(boolean selectingMetric) {
         if (selectingMetric!=metricMode) {
-
-            //Saving previous measurement mode.
-            saveSpinnerStatsToSharedPreferences(!selectingMetric);
-
             if (selectingMetric) {
                 metricMode = true;
                 imperialSettingButton.setAlpha(0.5f);
                 metricSettingButton.setAlpha(1.0f);
+                saveSpinnerStatsToSharedPreferences(false);
             } else {
                 metricMode = false;
                 imperialSettingButton.setAlpha(1.0f);
                 metricSettingButton.setAlpha(0.5f);
+                saveSpinnerStatsToSharedPreferences(true);
             }
 
             clearAndRepopulateWeightAndHeightSpinnerAdapters();
@@ -160,8 +157,8 @@ public class tdeeSettingsFragment extends Fragment {
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
         }
 
-        //Todo: Values here do not need separate saves for imperial/metric, because they will be pulled and calculated in Main based on which mode we're on.
         prefEdit.putBoolean("metricMode", metricMode);
+
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
         prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
         prefEdit.putInt("tdeeWeight", getIntegerValueFromFullSpinnerString(weight_spinner));
@@ -171,7 +168,6 @@ public class tdeeSettingsFragment extends Fragment {
     }
 
     private void retrieveAndSetSpinnerValues(boolean selectingMetric) {
-        boolean metricPosition = sharedPreferences.getBoolean("metricMode", false);
         int genderPosition;
         int agePosition;
         int weightPosition;
@@ -193,8 +189,6 @@ public class tdeeSettingsFragment extends Fragment {
         age_spinner.setSelection(agePosition);
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
-
-        toggleMetricAndImperial(metricPosition);
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {
@@ -325,6 +319,7 @@ public class tdeeSettingsFragment extends Fragment {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
         } else {
+            //200 -> 100
             for (int i = 48; i < 100; i++) {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
