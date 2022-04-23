@@ -213,7 +213,7 @@ public class DailyStatsAccess {
             mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(mostRecentEntry);
         } else {
-            mStatsForEachActivity = new StatsForEachActivity();
+//            mStatsForEachActivity = new StatsForEachActivity();
         }
     }
 
