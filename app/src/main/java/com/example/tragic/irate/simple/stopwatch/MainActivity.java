@@ -518,10 +518,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Toggle stopped working once.
+  //Todo: We added toggle retrieval for active cycle to resume/reset callback, but needs textView size changes, too.
+      //Todo: Should we disable toggle for active cycle?
+  //Todo: Set time iterating up on tracking mode. We want them to be entirely separate.
   //Todo: Editing title has reset Set time.
+  //Todo: Total set (prolly break too) times not always saving correctly.
   //Todo: Some skipping/missing a number in total times on resetting / restarting timer.
   //Todo: Test all daily saves in fragment.
+  //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Dot numbers a bit unaligned to the right.
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
@@ -692,14 +696,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void toggleTdeeMode(int positionToToggle) {
-    //Determines whether toggled cycle has an activity assigned.
-    //Todo: Shouldn't need conditional since activity textView disappears if non-existent.
-
-    if (cyclesList.get(positionToToggle).getTdeeActivityExists()) {
-      savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
-      savedCycleAdapter.setPositionToToggle(positionToToggle);
-      savedCycleAdapter.notifyDataSetChanged();
-    }
+    savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
+    savedCycleAdapter.setPositionToToggle(positionToToggle);
+    savedCycleAdapter.notifyDataSetChanged();
   }
 
   @Override
@@ -2622,6 +2621,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       displayCycleOrDailyTotals();
       setCyclesCompletedTextView();
       toggleTdeeTextViewSize();
+
+      trackActivityWithinCycle = savedCycleAdapter.getPositionToToggle(positionOfSelectedCycle);
       toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
       timerIsPaused = true;
