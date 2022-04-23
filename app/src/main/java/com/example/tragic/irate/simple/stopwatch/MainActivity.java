@@ -517,8 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Should have a clearer change w/ daily BMR, especially if switching measuring modes. We need a default value tho so we can't just clear it on switching between modes.
-      //Todo: Right now, spinners retain position, so if we change weight in imperial, it changes the kg positon in metric.
   //Todo: Settings for TDEE stuff?
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.

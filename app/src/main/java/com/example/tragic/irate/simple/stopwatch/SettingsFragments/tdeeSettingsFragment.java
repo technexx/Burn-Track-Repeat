@@ -141,6 +141,7 @@ public class tdeeSettingsFragment extends Fragment {
             refreshWeightAndHeightSpinnerAdapters();
 
             retrieveAndSetSpinnerValues(selectingMetric);
+            bmrTextView.setText(calculatedBMRString());
         }
     }
 
@@ -185,8 +186,8 @@ public class tdeeSettingsFragment extends Fragment {
             heightPosition = sharedPreferences.getInt("weightPositionImperial", 0);
         }
 
-        gender_spinner.setSelection(genderPosition);
-        age_spinner.setSelection(agePosition);
+//        gender_spinner.setSelection(genderPosition);
+//        age_spinner.setSelection(agePosition);
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
     }
