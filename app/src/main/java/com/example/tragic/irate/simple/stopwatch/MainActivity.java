@@ -1681,7 +1681,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
       dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
-      //Todo: Crashes trying to retrieve 0 index on new day when nothing yet exists. This occurred on (dismissing timer popUp?) even tho this should just execute on app startup.
       dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
     }
   }
@@ -1810,6 +1809,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       prefEdit.putInt("sortMode", sortMode);
       prefEdit.putInt("sortModePom", sortModePom);
       prefEdit.apply();
+
+      sortPopupWindow.dismiss();
     };
   }
 
@@ -1868,12 +1869,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       });
     }
-
-    runOnUiThread(()-> {
-      sortPopupWindow.dismiss();
-    });
   }
 
+  //Todo: This is called through queryAndSortAllCyclesFromDatabase(), clearing arrays, and editCycleArrayLists(DELETING_CYCLE) is called within our deleting highlighted cycle method which removes a single array entry.
   private void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
     if (mode==1 || forAllModes) {
       workoutCyclesArray.clear();
@@ -1935,6 +1933,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
+  //Todo: Deleting extra row from recyclerView, but not db.
   private void deletingHighlightedCycleLogic() {
     AsyncTask.execute(()-> {
       deleteHighlightedCycles();
@@ -1975,17 +1974,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    //Todo: This doesn't run! It's just instantiated.
-    queryAndSortAllCyclesFromDatabase();
-
     runOnUiThread(()->{
-      savedCycleAdapter.notifyDataSetChanged();
+      //Todo: Do we even need these array list methods if we're going to re-query every time?
       editCycleArrayLists(DELETING_CYCLE);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
+
+    queryAndSortAllCyclesFromDatabase();
   }
 
-  //Todo: Sync threads on this + parent method.
   private void deleteAllCycles() {
     queryAndSortAllCyclesFromDatabase();
 
