@@ -1114,9 +1114,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_all_confirm.setOnClickListener(v-> {
       if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
-        AsyncTask.execute(deleteAllCyclesASyncRunnable());
+        AsyncTask.execute(()->{
+          deleteAllCycles();
+        });
       } else if (delete_all_text.getText().equals(getString(R.string.delete_total_times))) {
-        AsyncTask.execute(deleteTotalCycleTimesASyncRunnable());
+        AsyncTask.execute(()-> {
+          deleteTotalCycleTimes();
+        });
       }
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
@@ -1127,7 +1131,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void groupAllAppStartInstantiations() {
-
     instantiateGlobalClasses();
     removeAllTimerSharedPreferences();
 
@@ -1800,7 +1803,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       unHighlightSortTextViews();
       highlightSortTextView();
 
-      AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
+      AsyncTask.execute(()-> {
+        queryAndSortAllCyclesFromDatabase();
+      });
 
       prefEdit.putInt("sortMode", sortMode);
       prefEdit.putInt("sortModePom", sortModePom);
@@ -1836,20 +1841,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setBackgroundColor(noHighlight);
   }
 
-  private Runnable queryAndSortAllCyclesFromDatabaseRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        populateCycleListFromSortMode();
-
-        runOnUiThread(()-> {
-          sortPopupWindow.dismiss();
-        });
-      }
-    };
-  }
-
-  private void populateCycleListFromSortMode() {
+  private void queryAndSortAllCyclesFromDatabase() {
     if (mode==1) {
       switch (sortMode) {
         case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
@@ -1876,6 +1868,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       });
     }
+
+    runOnUiThread(()-> {
+      sortPopupWindow.dismiss();
+    });
   }
 
   private void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
@@ -1940,7 +1936,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deletingHighlightedCycleLogic() {
-    AsyncTask.execute(deleteHighlightedCyclesASyncRunnable());
+    AsyncTask.execute(()-> {
+      deleteHighlightedCycles();
+    });
 
     delete_highlighted_cycle.setEnabled(false);
     fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
@@ -1950,113 +1948,98 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
   }
 
-  private Runnable deleteHighlightedCyclesASyncRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
-          runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
-          return;
-        }
+  private void deleteHighlightedCycles() {
+    if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
+      runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
+      return;
+    }
 
-        for (int i=0; i<receivedHighlightPositions.size(); i++) {
-          int valueToAdd = Integer.parseInt(receivedHighlightPositions.get(i));
-          receivedHighlightPositionHolder.add(valueToAdd);
-        }
+    for (int i=0; i<receivedHighlightPositions.size(); i++) {
+      int valueToAdd = Integer.parseInt(receivedHighlightPositions.get(i));
+      receivedHighlightPositionHolder.add(valueToAdd);
+    }
 
-        int cycleID = 0;
-        if (mode==1) {
-          for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
-            cycleID = cyclesList.get(i).getId();
-            cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
-            cyclesDatabase.cyclesDao().deleteCycle(cycles);
-          }
-        }
-        if (mode==3) {
-          for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
-            cycleID = pomCyclesList.get(i).getId();
-            pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
-            cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
-          }
-        }
+    int cycleID = 0;
+    if (mode==1) {
+      for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+        cycleID = cyclesList.get(i).getId();
+        cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
+        cyclesDatabase.cyclesDao().deleteCycle(cycles);
+      }
+    }
+    if (mode==3) {
+      for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+        cycleID = pomCyclesList.get(i).getId();
+        pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
+        cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
+      }
+    }
 
-        queryAndSortAllCyclesFromDatabaseRunnable();
+    //Todo: This doesn't run! It's just instantiated.
+    queryAndSortAllCyclesFromDatabase();
 
+    runOnUiThread(()->{
+      savedCycleAdapter.notifyDataSetChanged();
+      editCycleArrayLists(DELETING_CYCLE);
+      replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+    });
+  }
+
+  //Todo: Sync threads on this + parent method.
+  private void deleteAllCycles() {
+    queryAndSortAllCyclesFromDatabase();
+
+    if (mode==1) {
+      if (cyclesList.size()>0) {
+        cyclesDatabase.cyclesDao().deleteAllCycles();
         runOnUiThread(()->{
+          //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
+          workoutCyclesArray.clear();
+          typeOfRoundArray.clear();
+          workoutTitleArray.clear();
+          tdeeIsBeingTrackedInCycleList.clear();
+          tdeeActivityExistsInCycleList.clear();
+          workoutActivityStringArray.clear();
           savedCycleAdapter.notifyDataSetChanged();
-          editCycleArrayLists(DELETING_CYCLE);
-          replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         });
       }
-    };
-  }
-
-  private Runnable deleteAllCyclesASyncRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        {
-          AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
-          if (mode==1) {
-            if (cyclesList.size()>0) {
-              cyclesDatabase.cyclesDao().deleteAllCycles();
-              runOnUiThread(()->{
-                //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-                workoutCyclesArray.clear();
-                typeOfRoundArray.clear();
-                workoutTitleArray.clear();
-                tdeeIsBeingTrackedInCycleList.clear();
-                tdeeActivityExistsInCycleList.clear();
-                workoutActivityStringArray.clear();
-                savedCycleAdapter.notifyDataSetChanged();
-              });
-            }
-          }
-          if (mode==3) {
-            if (pomCyclesList.size()>0) {
-              cyclesDatabase.cyclesDao().deleteAllPomCycles();
-              runOnUiThread(()->{
-                pomArray.clear();
-                pomTitleArray.clear();
-                savedPomCycleAdapter.notifyDataSetChanged();
-              });
-            }
-          }
-          runOnUiThread(()-> {
-            replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-          });
-        };
-      }
-    };
-  }
-
-  private Runnable deleteTotalCycleTimesASyncRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-        if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
-        if (mode==3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
-
+    }
+    if (mode==3) {
+      if (pomCyclesList.size()>0) {
+        cyclesDatabase.cyclesDao().deleteAllPomCycles();
         runOnUiThread(()->{
-          deleteCyclePopupWindow.dismiss();
-          if (mode==1) {
-            totalCycleSetTimeInMillis = 0;
-            totalCycleBreakTimeInMillis = 0;
-//            syncResetTotalCycleTimesToTimer();
-          }
-          if (mode==3) {
-            totalCycleWorkTimeInMillis = 0;
-            totalCycleRestTimeInMillis = 0;
-          }
-
-          cyclesCompleted = 0;
-
-          total_set_time.setText("0");
-          total_break_time.setText("0");
-          setCyclesCompletedTextView();
+          pomArray.clear();
+          pomTitleArray.clear();
+          savedPomCycleAdapter.notifyDataSetChanged();
         });
       }
-    };
+    }
+    runOnUiThread(()-> {
+      replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+    });
+  };
+
+  private void deleteTotalCycleTimes() {
+    if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
+    if (mode==3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
+
+    runOnUiThread(()->{
+      deleteCyclePopupWindow.dismiss();
+      if (mode==1) {
+        totalCycleSetTimeInMillis = 0;
+        totalCycleBreakTimeInMillis = 0;
+      }
+      if (mode==3) {
+        totalCycleWorkTimeInMillis = 0;
+        totalCycleRestTimeInMillis = 0;
+      }
+
+      cyclesCompleted = 0;
+
+      total_set_time.setText("0");
+      total_break_time.setText("0");
+      setCyclesCompletedTextView();
+    });
   }
 
   private void syncResetTotalCycleTimesToTimer() {
@@ -3528,7 +3511,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    AsyncTask.execute(queryAndSortAllCyclesFromDatabaseRunnable());
+    AsyncTask.execute(()->{
+      queryAndSortAllCyclesFromDatabase();
+    });
     runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
   }
 
