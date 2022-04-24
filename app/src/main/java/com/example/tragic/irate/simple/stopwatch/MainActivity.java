@@ -2617,7 +2617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       progressBar.setProgress(currentProgressBarValue);
       timeLeft.setText(retrieveTimerValueString());
 
-      trackActivityWithinCycle = savedCycleAdapter.getPositionToToggle(positionOfSelectedCycle);
+      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
       toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
       displayCycleOrDailyTotals();
@@ -3339,14 +3339,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     AsyncTask.execute(()-> {
-      if (isNewCycle || cycleLaunchedFromEditPopUp) {
-        saveAddedOrEditedCycleASyncRunnable();
-      } else {
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-        retrieveCycleActivityPositionAndMetScoreFromCycleList();
-      }
-
       if (cycleLaunchedFromEditPopUp) {
+        saveAddedOrEditedCycleASyncRunnable();
+
         if (addTDEEActivityTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
           trackActivityWithinCycle = false;
@@ -3355,8 +3350,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           trackActivityWithinCycle = true;
         }
       } else {
-        cycleHasActivityAssigned = true;
-        trackActivityWithinCycle = savedCycleAdapter.getPositionToToggle(positionOfSelectedCycle);
+        cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
+        trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
+
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+
+        if (cycleHasActivityAssigned) {
+          retrieveCycleActivityPositionAndMetScoreFromCycleList();
+        }
       }
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
@@ -3371,7 +3372,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-//        dailyStatsAccess.assignActivityFromStatsForEachActivityListForASpecificDay();
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 
@@ -3430,6 +3430,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void testHighlightDeletion(int cycleId) {
+    Log.i("testDelete", "cycle ID fetched is " + cycleId + " from cycle position " + positionOfSelectedCycle);
+
+    List<String> tempSetList = new ArrayList<>();
+    for (int i=0; i<cyclesList.size(); i++) {
+      tempSetList.add(cyclesList.get(i).getWorkoutRounds());
+    }
+
+    Log.i("testDelete", "size of fetched cycleList is " + cyclesList.size() + " with entries " + tempSetList);
+  }
+
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
     workoutString = "";
@@ -3445,6 +3456,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles = new Cycles();
       } else if (cyclesList.size()>0) {
         cycleID = cyclesList.get(positionOfSelectedCycle).getId();
+
+        //Todo: 0/0 index exception after deleting a cycle on a new day and then editing + launching cycle in first position.
+            //Todo: Cyclelist contains one more entry than it should after deletion (probably not updated).
+        testHighlightDeletion(cycleID);
+
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
       workoutString = gson.toJson(workoutTime);
