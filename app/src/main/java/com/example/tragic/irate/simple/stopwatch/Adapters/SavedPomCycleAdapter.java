@@ -195,7 +195,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                         //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
                         if (position==tempList.get(j)) {
                             pomHolder.fullView.setBackgroundColor(Color.BLACK);
-                            mPositionList.remove(position);
+                            mPositionList.remove(Integer.valueOf(position));
                             //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
                             changed = true;
                         }

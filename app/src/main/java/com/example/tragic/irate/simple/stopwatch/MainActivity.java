@@ -1879,7 +1879,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This is called through queryAndSortAllCyclesFromDatabase(), clearing arrays, and editCycleArrayLists(DELETING_CYCLE) is called within our deleting highlighted cycle method which removes a single array entry.
   private void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
     if (mode==1 || forAllModes) {
       workoutCyclesArray.clear();
@@ -1941,7 +1940,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
-  //Todo: Highlight holder list is not clearing, and therefore deleting more than 1 position.
   private void deletingHighlightedCycleLogic() {
     AsyncTask.execute(()-> {
       deleteHighlightedCycles();
