@@ -517,11 +517,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Editing a cycle has created/overwrote another cycle.
-  //Todo: Singular activity times not saving correctly + extra row(s) being created.
+  //Todo: Back arrow from highlight mode not working.
+  //Todo: "Reset" option in Main not being removed after adding new cycle.
+  //Todo: "No activity assigned" in edited cycle should be replaced w/ "Add an activity"
+  //Todo: A second off when adding a cycle w/ the same activity as previous (e.g. if biking/total are 12/12, a new cycle w/ biking will show 12/11). Calories are off too but in reverse (cycle has more than total).
   //Todo: Should we disable toggle for active cycle?
-  //Todo: Total set (prolly break too) times not always saving correctly.
-  //Todo: Some skipping/missing a number in total times on resetting / restarting timer.
   //Todo: Test all daily saves in fragment.
   //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -3192,85 +3192,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
-  private void editCycleArrayLists(int action) {
-    if (action == ADDING_CYCLE) {
-      if (mode==1) {
-        workoutTitleArray.add(cycleTitle);
-        typeOfRoundArray.add(roundTypeString);
-        workoutCyclesArray.add(workoutString);
-        workoutActivityStringArray.add((String) addTDEEActivityTextView.getText());
-        if (addTDEEActivityTextView.getText().equals(getString(R.string.add_activity))) {
-          tdeeIsBeingTrackedInCycleList.add(false);
-          tdeeActivityExistsInCycleList.add(false);
-        } else {
-          tdeeIsBeingTrackedInCycleList.add(true);
-          tdeeActivityExistsInCycleList.add(false);
-        }
-      }
-      if (mode==3) {
-        pomTitleArray.add(cycleTitle);
-        pomArray.add(pomString);
-      }
-    }
-    else if (action == EDITING_CYCLE) {
-      if (mode==1) {
-        workoutTitleArray.set(positionOfSelectedCycle, cycleTitle);
-        workoutCyclesArray.set(positionOfSelectedCycle, workoutString);
-        typeOfRoundArray.set(positionOfSelectedCycle, roundTypeString);
-        workoutActivityStringArray.set(positionOfSelectedCycle, (String) addTDEEActivityTextView.getText());
-
-        if (addTDEEActivityTextView.getText().equals(getString(R.string.no_activity))) {
-          tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
-          tdeeActivityExistsInCycleList.set(positionOfSelectedCycle, false);
-        } else {
-          tdeeIsBeingTrackedInCycleList.add(positionOfSelectedCycle, true);
-          tdeeActivityExistsInCycleList.add(positionOfSelectedCycle, true);
-        }
-      }
-      if (mode==3) {
-        pomTitleArray.set(positionOfSelectedCycle, cycleTitle);
-        pomArray.set(positionOfSelectedCycle, pomString);
-      }
-    } else if (action == DELETING_CYCLE) {
-      int posToRemove = receivedHighlightPositions.get(0);
-
-      if (mode==1) {
-        for (int i=0; i<receivedHighlightPositions.size(); i++) {
-          workoutTitleArray.remove(posToRemove);
-          typeOfRoundArray.remove(posToRemove);
-          workoutCyclesArray.remove(posToRemove);
-          tdeeIsBeingTrackedInCycleList.remove(posToRemove);
-          tdeeActivityExistsInCycleList.remove(posToRemove);
-          workoutActivityStringArray.remove(posToRemove);
-          posToRemove = receivedHighlightPositions.get(i);
-          if (posToRemove>=1) {
-            posToRemove--;
-          }
-        }
-      }
-      if (mode==3) {
-        for (int i=0; i<receivedHighlightPositions.size(); i++) {
-          pomTitleArray.remove(posToRemove);
-          pomArray.remove(posToRemove);
-          posToRemove = receivedHighlightPositions.get(i);
-          if (posToRemove>=1) {
-            posToRemove--;
-          }
-        }
-      }
-      receivedHighlightPositions.clear();
-    }
-
-    runOnUiThread(()-> {
-      if (mode==1) {
-        savedCycleAdapter.notifyDataSetChanged();
-      }
-      if (mode==3) {
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
-    });
-  }
-
   private void populateCycleAdapterArrayList() {
     switch (mode) {
       case 1:
@@ -3417,17 +3338,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void testHighlightDeletion(int cycleId) {
-    Log.i("testDelete", "cycle ID fetched is " + cycleId + " from cycle position " + positionOfSelectedCycle);
-
-    List<String> tempSetList = new ArrayList<>();
-    for (int i=0; i<cyclesList.size(); i++) {
-      tempSetList.add(cyclesList.get(i).getWorkoutRounds());
-    }
-
-    Log.i("testDelete", "size of fetched cycleList is " + cyclesList.size() + " with entries " + tempSetList);
-  }
-
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
     workoutString = "";
@@ -3443,11 +3353,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles = new Cycles();
       } else if (cyclesList.size()>0) {
         cycleID = cyclesList.get(positionOfSelectedCycle).getId();
-
-        //Todo: 0/0 index exception after deleting a cycle on a new day and then editing + launching cycle in first position.
-            //Todo: Cyclelist contains one more entry than it should after deletion (probably not updated).
-        testHighlightDeletion(cycleID);
-
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
       workoutString = gson.toJson(workoutTime);
@@ -3483,11 +3388,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycles.setTitle(cycleTitle);
 
           cyclesDatabase.cyclesDao().insertCycle(cycles);
-          editCycleArrayLists(ADDING_CYCLE);
         } else {
           cycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().updateCycles(cycles);
-          editCycleArrayLists(EDITING_CYCLE);
         }
       }
     }
@@ -3506,11 +3409,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomCycles.setTimeAdded(System.currentTimeMillis());
           pomCycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
-          editCycleArrayLists(ADDING_CYCLE);
         } else {
           pomCycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-          editCycleArrayLists(EDITING_CYCLE);
         }
       }
     }
@@ -4786,6 +4687,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.remove("modeThreeTimerEnded");
     prefEdit.remove("modeThreeTimerDisabled");
     prefEdit.apply();
+  }
+
+
+  private void testHighlightDeletion(int cycleId) {
+    Log.i("testDelete", "cycle ID fetched is " + cycleId + " from cycle position " + positionOfSelectedCycle);
+
+    List<String> tempSetList = new ArrayList<>();
+    for (int i=0; i<cyclesList.size(); i++) {
+      tempSetList.add(cyclesList.get(i).getWorkoutRounds());
+    }
+
+    Log.i("testDelete", "size of fetched cycleList is " + cyclesList.size() + " with entries " + tempSetList);
   }
 
   private void logCycleHighlights() {
