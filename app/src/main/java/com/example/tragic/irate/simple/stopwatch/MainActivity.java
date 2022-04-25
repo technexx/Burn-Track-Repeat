@@ -517,7 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Back arrow from highlight mode not working.
   //Todo: "Reset" option in Main not being removed after adding new cycle.
   //Todo: "No activity assigned" in edited cycle should be replaced w/ "Add an activity"
   //Todo: A second off when adding a cycle w/ the same activity as previous (e.g. if biking/total are 12/12, a new cycle w/ biking will show 12/11). Calories are off too but in reverse (cycle has more than total).
@@ -2817,6 +2816,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.clearAnimation();
       appHeader.clearAnimation();
       sortButton.clearAnimation();
+      cancelHighlight.setEnabled(true);
     }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
       edit_highlighted_cycle.startAnimation(fadeIn);
@@ -2827,6 +2827,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortButton.setEnabled(false);
       edit_highlighted_cycle.setEnabled(true);
       delete_highlighted_cycle.setEnabled(true);
+      cancelHighlight.setEnabled(true);
     }
     if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
       edit_highlighted_cycle.startAnimation(fadeOut);
