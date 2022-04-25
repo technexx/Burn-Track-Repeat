@@ -357,7 +357,6 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:text="Add an activity!"
         android:id="@+id/tdee_add_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

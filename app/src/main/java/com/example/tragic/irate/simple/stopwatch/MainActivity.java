@@ -517,8 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: "Reset" option in Main not being removed after adding new cycle.
-  //Todo: "No activity assigned" in edited cycle should be replaced w/ "Add an activity"
   //Todo: A second off when adding a cycle w/ the same activity as previous (e.g. if biking/total are 12/12, a new cycle w/ biking will show 12/11). Calories are off too but in reverse (cycle has more than total).
   //Todo: Should we disable toggle for active cycle?
   //Todo: Test all daily saves in fragment.
@@ -3232,6 +3230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       if (savedCycleAdapter.isCycleActive()) {
+        //Todo
         savedCycleAdapter.removeActiveCycleLayout();
         savedCycleAdapter.notifyDataSetChanged();
       }
@@ -3373,7 +3372,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
         cycles.setTdeeValuePosition(0);
-        cycles.setActivityString("No activity assigned!");
+        cycles.setActivityString(getString(R.string.add_activity));
         cycles.setCurrentlyTrackingCycle(false);
       }
       if (!workoutString.equals("")) {
