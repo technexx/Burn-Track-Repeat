@@ -63,7 +63,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mHighlightDeleted;
   boolean mHighlightMode;
 
-  List<String> mPositionList;
+  List<Integer> mPositionList;
   CharSequence permSpan;
   Spannable span;
   ImageSpan imageSpan;
@@ -102,7 +102,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public interface onHighlightListener {
-    void onCycleHighlight (List<String> listOfPositions, boolean addButtons);
+    void onCycleHighlight (List<Integer> listOfPositions, boolean addButtons);
   }
 
   public void setHighlight(onHighlightListener xOnHighlightListener) {
@@ -224,15 +224,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
       }
       else {
-        ArrayList<String> tempList = new ArrayList<>(mPositionList);
+        ArrayList<Integer> tempList = new ArrayList<>(mPositionList);
         //Iterate through every cycle in list.
         for (int i = 0; i < mWorkoutList.size(); i++) {
           //Using tempList for stable loop since mPositionList changes.
           for (int j = 0; j < tempList.size(); j++) {
             //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
-            if (String.valueOf(position).contains(tempList.get(j))) {
+            if (position==tempList.get(j)) {
               workoutHolder.fullView.setBackgroundColor(Color.BLACK);
-              mPositionList.remove(String.valueOf(position));
+              mPositionList.remove(Integer.valueOf(position));
               //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
               changed = true;
             }
@@ -241,7 +241,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         //If we have not toggled our highlight off above, toggle it on below.
         if (!changed) {
           //Adds the position at its identical index for easy removal access.
-          mPositionList.add(String.valueOf(position));
+          mPositionList.add(position);
           workoutHolder.fullView.setBackgroundColor(Color.GRAY);
         }
         //Callback to send position list (Using Strings to make removing values easier) back to Main.
@@ -252,7 +252,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     workoutHolder.fullView.setOnLongClickListener(v -> {
       if (!mHighlightMode) {
         //Adds position of clicked item to position list.
-        mPositionList.add(String.valueOf(position));
+        mPositionList.add(position);
         //Sets background of list item to gray, to indicate it is selected.
         workoutHolder.fullView.setBackgroundColor(Color.GRAY);
         //Sets highlight mode to true, since at least one item is selected.

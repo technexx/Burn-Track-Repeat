@@ -220,8 +220,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortHolder = 1;
   int positionOfSelectedCycle = 0;
   String cycleTitle = "";
-  List<String> receivedHighlightPositions;
-  List<Integer> receivedHighlightPositionHolder;
+  List<Integer> receivedHighlightPositions;
 
   ImageButton addRoundToCycleButton;
   ImageButton subtractRoundFromCycleButton;
@@ -715,7 +714,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
-  public void onCycleHighlight(List<String> listOfPositions, boolean addButtons) {
+  public void onCycleHighlight(List<Integer> listOfPositions, boolean addButtons) {
     //Receives list of cycle positions highlighted.
     receivedHighlightPositions = listOfPositions;
     //Sets "highlight mode" actionBar buttons to Visible if entering mode (i.e. selecting first item).
@@ -902,7 +901,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       currentlyEditingACycle = true;
       isNewCycle = false;
 
-      positionOfSelectedCycle = Integer.parseInt(receivedHighlightPositions.get(0));
+      positionOfSelectedCycle = (receivedHighlightPositions.get(0));
       cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
       toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
 
@@ -1263,7 +1262,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
     receivedHighlightPositions.clear();
-    receivedHighlightPositionHolder.clear();
   }
 
   private void assignMainLayoutClassesToIds() {
@@ -1554,7 +1552,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     pomTitleArray = new ArrayList<>();
     receivedHighlightPositions = new ArrayList<>();
-    receivedHighlightPositionHolder = new ArrayList<>();
     cyclesList = new ArrayList<>();
     pomCyclesList = new ArrayList<>();
 
@@ -1964,26 +1961,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    for (int i=0; i<receivedHighlightPositions.size(); i++) {
-      int valueToAdd = Integer.parseInt(receivedHighlightPositions.get(i));
-      receivedHighlightPositionHolder.add(valueToAdd);
-    }
-
     int cycleID = 0;
     if (mode==1) {
-      for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+      for (int i=0; i<receivedHighlightPositions.size(); i++) {
         cycleID = cyclesList.get(i).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deleteCycle(cycles);
       }
     }
     if (mode==3) {
-      for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+      for (int i=0; i<receivedHighlightPositions.size(); i++) {
         cycleID = pomCyclesList.get(i).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
       }
     }
+
+    receivedHighlightPositions.clear();
 
     queryAndSortAllCyclesFromDatabase();
     logCycleArrays();
@@ -3237,35 +3231,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomArray.set(positionOfSelectedCycle, pomString);
       }
     } else if (action == DELETING_CYCLE) {
-      int posToRemove = receivedHighlightPositionHolder.get(0);
+      int posToRemove = receivedHighlightPositions.get(0);
 
       if (mode==1) {
-        for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+        for (int i=0; i<receivedHighlightPositions.size(); i++) {
           workoutTitleArray.remove(posToRemove);
           typeOfRoundArray.remove(posToRemove);
           workoutCyclesArray.remove(posToRemove);
           tdeeIsBeingTrackedInCycleList.remove(posToRemove);
           tdeeActivityExistsInCycleList.remove(posToRemove);
           workoutActivityStringArray.remove(posToRemove);
-          posToRemove = receivedHighlightPositionHolder.get(i);
+          posToRemove = receivedHighlightPositions.get(i);
           if (posToRemove>=1) {
             posToRemove--;
           }
         }
       }
       if (mode==3) {
-        for (int i=0; i<receivedHighlightPositionHolder.size(); i++) {
+        for (int i=0; i<receivedHighlightPositions.size(); i++) {
           pomTitleArray.remove(posToRemove);
           pomArray.remove(posToRemove);
-          posToRemove = receivedHighlightPositionHolder.get(i);
+          posToRemove = receivedHighlightPositions.get(i);
           if (posToRemove>=1) {
             posToRemove--;
           }
         }
       }
-
       receivedHighlightPositions.clear();
-      receivedHighlightPositionHolder.clear();
     }
 
     runOnUiThread(()-> {
@@ -4797,7 +4789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logCycleHighlights() {
     Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
-    Log.i("testHighlight", "highlighted holder list is " + receivedHighlightPositionHolder);
   }
 
   private void logCyclesArrays() {
