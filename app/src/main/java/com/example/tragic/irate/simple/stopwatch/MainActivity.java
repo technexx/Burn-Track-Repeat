@@ -1842,6 +1842,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setBackgroundColor(noHighlight);
   }
 
+
+  private void logCycleArrays() {
+    List<String> tempRoundList = new ArrayList<>();
+    for (int i=0; i<cyclesList.size(); i++) {
+      tempRoundList.add(cyclesList.get(i).getWorkoutRounds());
+    }
+    Log.i("testArray", "round arrays in cycleList are " + tempRoundList);
+    Log.i("testArray", "round arrays in adapter list are " + workoutCyclesArray);
+  }
+
   private void queryAndSortAllCyclesFromDatabase() {
     if (mode==1) {
       switch (sortMode) {
@@ -1855,6 +1865,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
         savedCycleAdapter.notifyDataSetChanged();
+        logCycleArrays();
       });
     }
     if (mode==3) {
@@ -1933,7 +1944,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
-  //Todo: Deleting extra row from recyclerView, but not db.
+  //Todo: Highlight holder list is not clearing, and therefore deleting more than 1 position.
   private void deletingHighlightedCycleLogic() {
     AsyncTask.execute(()-> {
       deleteHighlightedCycles();
@@ -1974,13 +1985,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
+    queryAndSortAllCyclesFromDatabase();
+    logCycleArrays();
+    logCycleHighlights();
+
     runOnUiThread(()->{
       //Todo: Do we even need these array list methods if we're going to re-query every time?
-      editCycleArrayLists(DELETING_CYCLE);
+//      editCycleArrayLists(DELETING_CYCLE);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
-
-    queryAndSortAllCyclesFromDatabase();
   }
 
   private void deleteAllCycles() {
@@ -3210,6 +3223,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutCyclesArray.set(positionOfSelectedCycle, workoutString);
         typeOfRoundArray.set(positionOfSelectedCycle, roundTypeString);
         workoutActivityStringArray.set(positionOfSelectedCycle, (String) addTDEEActivityTextView.getText());
+
         if (addTDEEActivityTextView.getText().equals(getString(R.string.no_activity))) {
           tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
           tdeeActivityExistsInCycleList.set(positionOfSelectedCycle, false);
@@ -4783,6 +4797,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logCycleHighlights() {
     Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
+    Log.i("testHighlight", "highlighted holder list is " + receivedHighlightPositionHolder);
   }
 
   private void logCyclesArrays() {
