@@ -732,6 +732,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setAlpha(0.4f);
       edit_highlighted_cycle.setEnabled(false);
     }
+
+    logCycleHighlights();
+    logCycleHighlightsRoundValues();
   }
 
   //This callback method works for both round adapters.
@@ -1962,14 +1965,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int cycleID = 0;
     if (mode==1) {
       for (int i=0; i<receivedHighlightPositions.size(); i++) {
-        cycleID = cyclesList.get(i).getId();
+        cycleID = cyclesList.get(receivedHighlightPositions.get(i)).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deleteCycle(cycles);
       }
     }
     if (mode==3) {
       for (int i=0; i<receivedHighlightPositions.size(); i++) {
-        cycleID = pomCyclesList.get(i).getId();
+        cycleID = pomCyclesList.get(receivedHighlightPositions.get(i)).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
       }
@@ -4787,6 +4790,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logCycleHighlights() {
     Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
+  }
+
+  private void logCycleHighlightsRoundValues() {
+    for (int i=0; i<receivedHighlightPositions.size(); i++) {
+      Log.i("testHighlight", "workout rounds for highlighted cycles are " + workoutCyclesArray.get(receivedHighlightPositions.get(i)));
+    }
   }
 
   private void logCyclesArrays() {
