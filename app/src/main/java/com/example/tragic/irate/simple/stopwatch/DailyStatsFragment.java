@@ -55,10 +55,12 @@ public class DailyStatsFragment extends Fragment {
         instantiateRecyclerViewAndItsAdapter();
         queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dailyStatsAccess.getCurrentDayOfYear());
 
+        calendar = Calendar.getInstance(TimeZone.getDefault());
+        daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                calendar = Calendar.getInstance(TimeZone.getDefault());
                 calendar.set(year, month, dayOfMonth);
 
                 daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
