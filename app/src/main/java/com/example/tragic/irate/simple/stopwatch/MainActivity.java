@@ -517,8 +517,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: A second off when adding a cycle w/ the same activity as previous (e.g. if biking/total are 12/12, a new cycle w/ biking will show 12/11). Calories are off too but in reverse (cycle has more than total).
+  //Todo: Calories are off a bit in reverse (cycle has more than total).
   //Todo: Should we disable toggle for active cycle?
+  //Todo: Test first additions of "new" day.
   //Todo: Test all daily saves in fragment.
   //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -3301,6 +3302,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editCyclesPopupWindow.dismiss();
           }
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+
+          roundDownAllTotalTimeValuesToEnsureSyncing();
         }
       });
     });

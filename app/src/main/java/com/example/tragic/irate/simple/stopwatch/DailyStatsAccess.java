@@ -348,35 +348,4 @@ public class DailyStatsAccess {
         Calendar calendar = Calendar.getInstance();
         return calendar.get(Calendar.DAY_OF_YEAR);
     }
-
-
-//
-//    private long retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay() {
-//        long idToReturn = 0;
-//
-//        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
-//            if (statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getActivity().equalsIgnoreCase(mActivityString)) {
-//                idToReturn = statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getIteratingIdsForSpecificDay();
-//            }
-//        }
-//        return idToReturn;
-//    }
-//
-//    //////// This is being used to assign a primary ID that mirrors the number of list indices, rather than an auto-generating one that will keep iterating even when rows are deleted.
-
-//    public void assignActivityFromStatsForEachActivityListForASpecificDay() {
-//        int iteratingId = (int) retrievePrimaryIDForActivityFromStatsForEachActivityListForASpecificDay();
-//
-//        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
-//            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(iteratingId);
-//        }
-//
-//        Log.i("testId", "returned ID is " + iteratingId);
-//        Log.i("testId", "activity in row w/ returned ID is " + mStatsForEachActivity.getActivity());
-//    }
-
-//    private long getIteratingIdForSpecificDay() {
-//        return mStatsForEachActivity.getIteratingIdsForSpecificDay();
-//    }
-
 }
