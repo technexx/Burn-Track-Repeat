@@ -864,11 +864,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
 
-      if (mode==1 && trackActivityWithinCycle) {
-        if (isTextViewVisible(daily_total_time_and_calories_textView)) {
-          setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
-        }
-      }
+//   Removed this. Designed to round down to avoid db/display becoming unsync'd but we've solved that previously.
+//      if (mode==1 && trackActivityWithinCycle) {
+////        if (isTextViewVisible(daily_total_time_and_calories_textView)) {
+////          setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
+////        }
+//      }
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
@@ -1963,14 +1964,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
       }
     }
-
     receivedHighlightPositions.clear();
 
     queryAndSortAllCyclesFromDatabase();
 
     runOnUiThread(()->{
-      //Todo: Do we even need these array list methods if we're going to re-query every time?
-//      editCycleArrayLists(DELETING_CYCLE);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
   }
@@ -3217,7 +3215,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       if (savedCycleAdapter.isCycleActive()) {
-        //Todo
         savedCycleAdapter.removeActiveCycleLayout();
         savedCycleAdapter.notifyDataSetChanged();
       }
