@@ -3572,6 +3572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Todo: All calorie retrieval methods should be in DailyStatsAccess.
   private void iterateTotalCaloriesForSelectedDay(long millis) {
     totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
   }

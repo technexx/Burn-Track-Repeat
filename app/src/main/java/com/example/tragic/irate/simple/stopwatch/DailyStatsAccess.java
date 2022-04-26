@@ -99,10 +99,6 @@ public class DailyStatsAccess {
         this.mOldDayHolderId = oldId;
     }
 
-    public long getDayIdFromDayHolder() {
-        return mDayHolder.getDayId();
-    }
-
     public void setTotalSetTimeFromDayHolder(long totalSetTime) {
         mDayHolder.setTotalSetTime(totalSetTime);
     }
@@ -127,24 +123,8 @@ public class DailyStatsAccess {
         return mDayHolder.getTotalCaloriesBurned();
     }
 
-    public void setCyclesCompletedForModeOne(int cyclesCompleted) {
-        mDayHolder.setCyclesCompletedForModeOne(cyclesCompleted);
-    }
-
-    public int getCyclesCompletedForModeOne() {
-        return mDayHolder.getCyclesCompletedForModeOne();
-    }
-
-    public void setTotalWorkTimeFromDayHolder(long totalWorkTime) {
-        mDayHolder.setTotalWorkTime(totalWorkTime);
-    }
-
     public long getTotalWorkTimeFromDayHolder() {
         return mDayHolder.getTotalWorkTime();
-    }
-
-    public void setTotalRestTimeFromDayHolder(long totalRestTime) {
-        mDayHolder.setTotalRestTime(totalRestTime);
     }
 
     public long getTotalRestTimeFromDayHolder() {
@@ -242,16 +222,11 @@ public class DailyStatsAccess {
     }
 
     public void setActivityStringFromSpinner(String activityString) {
-        Log.i("testAccess", "Activity String set is " + mActivityString);
         this.mActivityString = activityString;
     }
 
     public String getActivityStringFromSpinner() {
         return mActivityString;
-    }
-
-    public String getActivityString() {
-        return mStatsForEachActivity.getActivity();
     }
 
     public void setActivityStringForSelectedActivity(String activity) {
@@ -268,14 +243,6 @@ public class DailyStatsAccess {
 
     public long getTotalSetTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalSetTimeForEachActivity();
-    }
-
-    public void setTotalBreakTimeForSelectedActivity(long totalBreakTime) {
-        mStatsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTime);
-    }
-
-    public long getTotalBreakTimeForSelectedActivity() {
-        return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
     }
 
     public void setTotalCaloriesBurnedForSelectedActivity(double totalCaloriesBurned) {
