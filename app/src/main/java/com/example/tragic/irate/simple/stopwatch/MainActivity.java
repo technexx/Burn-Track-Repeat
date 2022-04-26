@@ -517,9 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Calories are off a bit in reverse (cycle has more than total).
-  //Todo: Should we disable toggle for active cycle?
-  //Todo: Test first additions of "new" day.
   //Todo: Test all daily saves in fragment.
   //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -863,13 +860,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       setViewsAndColorsToPreventTearingInEditPopUp(false);
-
-//   Removed this. Designed to round down to avoid db/display becoming unsync'd but we've solved that previously.
-//      if (mode==1 && trackActivityWithinCycle) {
-////        if (isTextViewVisible(daily_total_time_and_calories_textView)) {
-////          setTotalCaloriesBurnedForCurrentDayValueToLastDisplayedTextView();
-////        }
-//      }
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
@@ -1658,8 +1648,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (trackActivityWithinCycle) {
           setAndUpdateDayHolderValuesInDatabase();
           setAndUpdateStatsForEachActivityValuesInDatabase();
-
-          logCalorieSavedValues();
         }
 
         if (!timerIsPaused) {
@@ -3498,27 +3486,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
-  private void logCalorieIterations() {
-    Log.i("testCalories", "total for day are " + totalCaloriesBurnedForCurrentDay);
-    Log.i("testCalories", "total for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
-
-    double calorieTotalFromActivities = 0;
-    for (int i=0; i<dailyStatsAccess.getStatForEachActivityListForForSingleDay().size(); i++) {
-      calorieTotalFromActivities += dailyStatsAccess.getStatForEachActivityListForForSingleDay().get(i).getTotalCaloriesBurnedForEachActivity();
-    }
-
-    double calorieTotalFromDatabase = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
-
-    //Values here not updated until set to entity on a save.
-//    Log.i("testCalories", "total calories from DayHolder pulled from entity are " + calorieTotalFromDatabase);
-//    Log.i("testCalories", "total calories ADDED from each activity pulled from entity are " + calorieTotalFromActivities);
-  }
-
-  private void logCalorieSavedValues() {
-    Log.i("testCalories", "total SAVED for day are " + totalCaloriesBurnedForCurrentDay);
-    Log.i("testCalories", "total SAVED for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
-  }
-
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
     if (trackActivityWithinCycle) {
       iterateTotalTimesForSelectedDay(timerRunnableDelay);
@@ -4771,5 +4738,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void logTotalActivityStats() {
     Log.i("testTimes", "selected activity time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
     Log.i("testTimes", "selected activity calories are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
+  }
+
+  private void logCalorieIterations() {
+    Log.i("testCalories", "total for day are " + totalCaloriesBurnedForCurrentDay);
+    Log.i("testCalories", "total for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 }
