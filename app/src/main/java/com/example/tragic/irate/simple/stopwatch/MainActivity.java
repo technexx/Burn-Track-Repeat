@@ -847,9 +847,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
-      logCyclesDatabase();
-      logStatsForEachActivityDatabase(true);
-
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
@@ -1660,6 +1657,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (trackActivityWithinCycle) {
           setAndUpdateDayHolderValuesInDatabase();
           setAndUpdateStatsForEachActivityValuesInDatabase();
+
+          logCalorieSavedValues();
         }
 
         if (!timerIsPaused) {
@@ -1840,16 +1839,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setBackgroundColor(noHighlight);
   }
 
-
-  private void logCycleArrays() {
-    List<String> tempRoundList = new ArrayList<>();
-    for (int i=0; i<cyclesList.size(); i++) {
-      tempRoundList.add(cyclesList.get(i).getWorkoutRounds());
-    }
-    Log.i("testArray", "round arrays in cycleList are " + tempRoundList);
-    Log.i("testArray", "round arrays in adapter list are " + workoutCyclesArray);
-  }
-
   private void queryAndSortAllCyclesFromDatabase() {
     if (mode==1) {
       switch (sortMode) {
@@ -1863,7 +1852,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
         savedCycleAdapter.notifyDataSetChanged();
-        logCycleArrays();
       });
     }
     if (mode==3) {
@@ -1979,8 +1967,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     receivedHighlightPositions.clear();
 
     queryAndSortAllCyclesFromDatabase();
-    logCycleArrays();
-    logCycleHighlights();
 
     runOnUiThread(()->{
       //Todo: Do we even need these array list methods if we're going to re-query every time?
@@ -3515,6 +3501,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
+  private void logCalorieIterations() {
+    Log.i("testCalories", "total for day are " + totalCaloriesBurnedForCurrentDay);
+    Log.i("testCalories", "total for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
+    double calorieTotalFromActivities = 0;
+    for (int i=0; i<dailyStatsAccess.getStatForEachActivityListForForSingleDay().size(); i++) {
+      calorieTotalFromActivities += dailyStatsAccess.getStatForEachActivityListForForSingleDay().get(i).getTotalCaloriesBurnedForEachActivity();
+    }
+
+    double calorieTotalFromDatabase = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
+
+    //Values here not updated until set to entity on a save.
+//    Log.i("testCalories", "total calories from DayHolder pulled from entity are " + calorieTotalFromDatabase);
+//    Log.i("testCalories", "total calories ADDED from each activity pulled from entity are " + calorieTotalFromActivities);
+  }
+
+  private void logCalorieSavedValues() {
+    Log.i("testCalories", "total SAVED for day are " + totalCaloriesBurnedForCurrentDay);
+    Log.i("testCalories", "total SAVED for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
+  }
+
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
     if (trackActivityWithinCycle) {
       iterateTotalTimesForSelectedDay(timerRunnableDelay);
@@ -3522,6 +3529,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
       iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
+
+      logCalorieIterations();
     } else {
       iterateTotalTimesForSelectedCycle(timerRunnableDelay);
     }
@@ -3572,7 +3581,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: All calorie retrieval methods should be in DailyStatsAccess.
   private void iterateTotalCaloriesForSelectedDay(long millis) {
     totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
   }
@@ -4713,10 +4721,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     for (int i=0; i<receivedHighlightPositions.size(); i++) {
       Log.i("testHighlight", "workout rounds for highlighted cycles are " + workoutCyclesArray.get(receivedHighlightPositions.get(i)));
     }
-  }
-
-  private void logCyclesArrays() {
-    Log.i("testCycle", "Activity String List is " + workoutActivityStringArray);
   }
 
   private void logCyclesDatabase() {

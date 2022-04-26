@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -87,7 +88,8 @@ public class DailyStatsFragment extends Fragment {
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayToPopulate);
-            dailyStatsAccess.queryStatsForEachActivityForSelectedDay(dayToPopulate);
+            dailyStatsAccess.setStatsForEachActivityListForSelectedDay(dayToPopulate);
+            dailyStatsAccess.setStatsForEachActivityInstanceFromList();
 
             getActivity().runOnUiThread(()-> {
                 populateDailyTotalTimesAndCaloriesTextViews();

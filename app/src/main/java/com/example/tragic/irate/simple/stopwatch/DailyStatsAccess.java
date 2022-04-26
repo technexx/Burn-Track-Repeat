@@ -136,11 +136,15 @@ public class DailyStatsAccess {
     }
 
     public void deleteDayHolderEntity(DayHolder dayHolder) {
-        cyclesDatabase.cyclesDao().deleteDayHolder(dayHolder);
+        if (getDayHolderEntity()!=null) {
+            cyclesDatabase.cyclesDao().deleteDayHolder(dayHolder);
+        }
     }
 
     public void deleteAllDayHolderEntries() {
-        cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
+        if (getDayHolderEntity()!=null) {
+            cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
+        }
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -233,10 +237,6 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setActivity(activity);
     }
 
-    public String getActivityStringForSelectedActivity() {
-        return mStatsForEachActivity.getActivity();
-    }
-
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(totalSetTime);
     }
@@ -254,16 +254,33 @@ public class DailyStatsAccess {
     }
 
     public void deleteStatForEachActivityEntity() {
-        cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
+        if (getStatsForEachActivityEntity()!=null) {
+            cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
+        }
     }
 
     public void deleteAllStatsForEachActivityEntries() {
-        cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
+        if (getStatsForEachActivityEntity()!=null) {
+            cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
+        }
     }
 
     //////////////////Daily Stats Fragment Methods/////////////////////////////////////////////
-    public void queryStatsForEachActivityForSelectedDay(int daySelected) {
-        statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
+    public void setStatsForEachActivityListForSelectedDay(int daySelected) {
+        if (cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected).size()!= 0) {
+            statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
+        } else {
+            statsForEachActivityListOfAllActivitiesForASpecificDate = new ArrayList<>();
+        }
+    }
+
+    //Global list should be fine since it's re-queried when accessing a Cycle, but keep this in mind.
+    public void setStatsForEachActivityInstanceFromList() {
+        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
+            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(0);
+        } else {
+            mStatsForEachActivity = new StatsForEachActivity();
+        }
     }
 
     public void clearArrayListsOfActivitiesAndTheirStats() {
