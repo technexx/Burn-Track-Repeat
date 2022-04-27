@@ -495,7 +495,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int selectedTdeeCategoryPosition;
   int selectedTdeeSubCategoryPosition;
-  int selectedTdeeValuePosition;
 
   TextView caloriesBurnedInTdeeAdditionTextView;
   TextView metScoreTextView;
@@ -518,7 +517,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Main category spinner crash w/ index exception.
   //Todo: Test all daily saves in fragment.
   //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -3338,7 +3336,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeActivityExists(true);
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
-        cycles.setTdeeValuePosition(selectedTdeeValuePosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
         cycles.setCurrentlyTrackingCycle(true);
       } else {
@@ -3432,7 +3429,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
-    selectedTdeeValuePosition = cycles.getTdeeValuePosition();
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
   }
@@ -4618,10 +4614,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void tdeeCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
+
     tdeeSubCategoryAdapter.clear();
     tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
 
     tdee_sub_category_spinner.setSelection(0);
+    selectedTdeeSubCategoryPosition = 0;
 
     setMetScoreTextViewInAddTdeePopUp();
     setCaloriesBurnedTextViewInAddTdeePopUp();
@@ -4630,29 +4628,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void tdeeSubCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
     selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
-    selectedTdeeValuePosition = selectedTdeeSubCategoryPosition;
 
     setMetScoreTextViewInAddTdeePopUp();
     setCaloriesBurnedTextViewInAddTdeePopUp();
   }
 
-  private double retrieveMetScoreFromSubCategoryPosition() {
-    logSpinnerPositions();
-
-    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
-    double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
-    return preRoundedMet;
-  }
-
-  //Todo: When selectedTdeeValuePosition retains a previous value higher than new subValueList, index exception occurs.
-  private void logSpinnerPositions() {
-    Log.i("testSpinner", "Index position sought within array is " + selectedTdeeValuePosition);
-    Log.i("testSpinner", "Sub value list is " + Arrays.toString(tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition)));
-  }
-
   private void setMetScoreTextViewInAddTdeePopUp() {
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, String.valueOf(metScore)));
+  }
+
+  private double retrieveMetScoreFromSubCategoryPosition() {
+    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
+    double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
+    return preRoundedMet;
   }
 
   private void setCaloriesBurnedTextViewInAddTdeePopUp() {
