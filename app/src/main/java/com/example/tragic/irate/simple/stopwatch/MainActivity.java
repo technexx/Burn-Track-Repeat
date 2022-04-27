@@ -517,6 +517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Add calories burned per minute and/or hour to activity selection.
   //Todo: Test all daily saves in fragment.
   //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -1707,7 +1708,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         tdeeCategorySpinnerTouchActions();
-        setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
       }
 
       @Override
@@ -1719,7 +1719,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         tdeeSubCategorySpinnerTouchActions();
-        setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView();
       }
 
       @Override
@@ -3571,12 +3570,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private String formatCalorieString(double calories) {
     DecimalFormat df = new DecimalFormat("#.##");
     return df.format(calories);
-  }
-
-  private void setNumberOfCaloriesBurnedPerMinuteInActivityAdditionPopUpTextView() {
-    double caloriesBurnedPerMinute = calculateCaloriesBurnedPerMinute(metScore);
-    DecimalFormat df = new DecimalFormat("#.#");
-    String truncatedMinutes = df.format(caloriesBurnedPerMinute);
   }
 
   private String getLastDisplayedTotalCaloriesString() {
