@@ -96,6 +96,7 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -4637,9 +4638,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private double retrieveMetScoreFromSubCategoryPosition() {
+    logSpinnerPositions();
     String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
     return preRoundedMet;
+  }
+
+  private void logSpinnerPositions() {
+    Log.i("testSpinner", "Position sought is " + selectedTdeeCategoryPosition);
+    Log.i("testSpinner", "Sub value list is " + Arrays.toString(tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition)));
   }
 
   private void setMetScoreTextViewInAddTdeePopUp() {
