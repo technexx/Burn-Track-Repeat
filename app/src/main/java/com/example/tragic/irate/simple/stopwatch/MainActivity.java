@@ -4629,7 +4629,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void tdeeSubCategorySpinnerTouchActions() {
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
-
     selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
     selectedTdeeValuePosition = selectedTdeeSubCategoryPosition;
 
@@ -4639,13 +4638,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private double retrieveMetScoreFromSubCategoryPosition() {
     logSpinnerPositions();
+
     String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeValuePosition]);
     return preRoundedMet;
   }
 
+  //Todo: When selectedTdeeValuePosition retains a previous value higher than new subValueList, index exception occurs.
   private void logSpinnerPositions() {
-    Log.i("testSpinner", "Position sought is " + selectedTdeeCategoryPosition);
+    Log.i("testSpinner", "Index position sought within array is " + selectedTdeeValuePosition);
     Log.i("testSpinner", "Sub value list is " + Arrays.toString(tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition)));
   }
 
