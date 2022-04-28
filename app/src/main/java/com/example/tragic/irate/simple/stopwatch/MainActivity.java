@@ -517,7 +517,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Add weekly/monthly time+calorie totals.
+  //Todo: Add weekly/monthly/yearly time+calorie totals.
+      //Todo: Should we allow date range selection?
+  //Todo: Add optional calories burned for "all other time" not spent on specified activities (for a complete daily total);
   //Todo: Will eventually need a stats reset at end of year.
   //Todo: Test all daily saves in fragment.
   //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
@@ -526,6 +528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
+  //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc.
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
@@ -1665,7 +1668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
     //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
-      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderInstanceFromSingleDay(dayOfYear);
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
       dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
@@ -2133,7 +2136,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void deleteDailyStatsForSelectedDay() {
     int daySelected = dailyStatsFragment.getDaySelectedFromCalendar();
 
-    dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(daySelected);
+    dailyStatsAccess.assignDayHolderInstanceFromSingleDay(daySelected);
     DayHolder dayHolder = dailyStatsAccess.getDayHolderEntity();
     dailyStatsAccess.deleteDayHolderEntity(dayHolder);
 
@@ -3241,7 +3244,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
-      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderInstanceFromSingleDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
@@ -3287,7 +3290,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCaloriesBurnedForCurrentDay = 0;
     } else {
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-      dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderInstanceFromSingleDay(dayOfYear);
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();

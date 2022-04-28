@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,11 +45,20 @@ public class DailyStatsFragment extends Fragment {
     TextView dailyStatsTotalBreakTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
 
+    ImageButton dailyWeeklyMonthlySwitchButton;
+    int currentStatDurationMode;
+    int DAILY_STATS = 0;
+    int WEEKLY_STATS = 1;
+    int MONTHLY_STATS = 2;
+    int YEARLY_STATS = 3;
+
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
         calendarView = mRoot.findViewById(R.id.stats_calendar);
+        dailyWeeklyMonthlySwitchButton = mRoot.findViewById(R.id.daily_weekly_monthly_switcher);
+
         dailyStatsAccess = new DailyStatsAccess(getActivity());
 
         instantiateTextViewsAndMiscClasses();
@@ -65,6 +75,9 @@ public class DailyStatsFragment extends Fragment {
 
                 daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
                 queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelectedFromCalendar);
+
+                Log.i("testDate", "day of month is " + calendar.get(Calendar.DAY_OF_MONTH));
+                Log.i("testDate", "day of week is " + calendar.get(Calendar.DAY_OF_WEEK));
             }
         });
 
@@ -89,7 +102,7 @@ public class DailyStatsFragment extends Fragment {
 
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
-            dailyStatsAccess.assignDayHolderEntityRowFromSingleDay(dayToPopulate);
+            dailyStatsAccess.assignDayHolderInstanceFromSingleDay(dayToPopulate);
             dailyStatsAccess.setStatsForEachActivityListForSelectedDay(dayToPopulate);
             dailyStatsAccess.setStatsForEachActivityInstanceFromList();
 
@@ -111,6 +124,23 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
         dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
         dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned),formatCalorieString(totalCaloriesBurned)));
+    }
+
+    private void switchStatDurationMode() {
+        if (currentStatDurationMode<3) {
+            currentStatDurationMode++;
+        } else {
+            currentStatDurationMode=0;
+        }
+    }
+
+    private void setStatDurationModeViews(int mode) {
+        if (mode==DAILY_STATS) {
+            dailyStatsAccess.assignDayHolderInstanceFromSingleDay(daySelectedFromCalendar);
+        }
+        if (mode==WEEKLY_STATS) {
+            dailyStatsAccess.assignDayHolderInstanceFromWeek(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_WEEK));
+        }
     }
 
     private void instantiateTextViewsAndMiscClasses() {

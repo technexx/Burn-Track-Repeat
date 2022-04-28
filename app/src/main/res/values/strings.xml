@@ -74,7 +74,10 @@
     <string name="pomodoro_mode">Pomodoro Mode</string>
 
     <string name="daily_stats_string">%1$s\n%2$s</string>
-    <string name="day_total_header">Daily Totals</string>
+    <string name="day_total_header">Daily Total</string>
+    <string name="weekly_total_header">Weekly Total</string>
+    <string name="monthly_total_header">Monthly Total</string>
+    <string name="yearly_total_header">Yearly Total</string>
     <string name="daily_set_time">Sets:</string>
     <string name="daily_break_time">Breaks:</string>
     <string name="daily_calories_burned">Calories:</string>

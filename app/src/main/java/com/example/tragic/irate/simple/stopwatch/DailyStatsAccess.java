@@ -78,7 +78,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void assignDayHolderEntityRowFromSingleDay(int dayToRetrieve) {
+    public void assignDayHolderInstanceFromSingleDay(int dayToRetrieve) {
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         if (dayHolderList.size()>0) {
             this.mDayHolder = dayHolderList.get(0);
@@ -86,6 +86,21 @@ public class DailyStatsAccess {
             this.mDayHolder = new DayHolder();
         }
     }
+
+    public void assignDayHolderInstanceFromWeek(int dayOfMonth, int dayOfWeek) {
+        int daysInWeek;
+        List<Integer> daysOfWeekList = new ArrayList<>();
+
+        if (dayOfMonth<=6) {
+            daysInWeek = 7 - (dayOfWeek - dayOfMonth);
+        } else {
+            daysInWeek = 7;
+        }
+
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadWeek();
+    }
+
+
 
     public DayHolder getDayHolderEntity() {
         return mDayHolder;
