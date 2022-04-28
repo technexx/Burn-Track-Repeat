@@ -25,9 +25,6 @@ CyclesDao {
     @Query("SELECT * from DayHolder WHERE daySelectedId IN (:listIDs)")
     List<DayHolder> loadWeek(List<Integer> listIDs);
 
-//    @Query("SELECT * FROM user WHERE region IN (:regions)")
-//    public List<User> loadUsersFromRegions(List<String> regions);
-
     @Update
     void updateDayHolder(DayHolder dayHolder);
 

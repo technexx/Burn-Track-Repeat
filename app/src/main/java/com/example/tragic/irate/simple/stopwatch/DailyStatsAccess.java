@@ -89,25 +89,37 @@ public class DailyStatsAccess {
 
     public void assignDayHolderInstanceFromWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
         int daysInWeek = 7;
+        int firstDayInYearToAdd = 0;
         List<Integer> daysOfWeekList = new ArrayList<>();
 
         if (dayOfMonth<=7) {
             daysInWeek = 7 - (dayOfWeek - dayOfMonth);
+            firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
+        } else {
+            firstDayInYearToAdd = (dayOfYear) - (dayOfWeek-1);
         }
 
-        int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
-        for (int i=0; i<50; i++) {
-            daysOfWeekList.add(firstDayInYearToAdd + i);
+        for (int i=0; i<daysInWeek; i++) {
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
+                daysOfWeekList.add(firstDayInYearToAdd + i);
+            }
         }
 
-        //Todo: This is because there are no entries/rows for our previous dates!
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadWeek(daysOfWeekList);
+        Log.i("testFetch", "dayOfWeek returned is " + dayOfWeek);
+        Log.i("testFetch", "dayOfMonth returned is " + dayOfMonth);
+        Log.i("testFetch", "dayOfYear returned is " + dayOfYear);
+        Log.i("testFetch", "firstDayInYearToAdd returned is " + firstDayInYearToAdd);
         Log.i("testFetch", "daysOfWeek list is " + daysOfWeekList);
-        Log.i("testFetch", "dayHolder list is " + dayHolderList);
 
-        mDayHolder = dayHolderList.get(0);
 
-        Log.i("testFetch", "mDayHolder instance ids are " + mDayHolder.getDayId());
+        if (daysOfWeekList.size()>0) {
+            List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadWeek(daysOfWeekList);
+            mDayHolder = dayHolderList.get(0);
+            Log.i("testFetch", "dayHolder list is " + dayHolderList);
+            Log.i("testFetch", "mDayHolder instance ids are " + mDayHolder.getDayId());
+        } else {
+            mDayHolder = new DayHolder();
+        }
     }
 
     public DayHolder getDayHolderEntity() {
