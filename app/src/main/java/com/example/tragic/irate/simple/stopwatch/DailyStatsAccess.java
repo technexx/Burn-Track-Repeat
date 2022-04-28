@@ -87,17 +87,22 @@ public class DailyStatsAccess {
         }
     }
 
-    public void assignDayHolderInstanceFromWeek(int dayOfMonth, int dayOfWeek) {
-        int daysInWeek;
+    public void assignDayHolderInstanceFromWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
+        int daysInWeek = 7;
         List<Integer> daysOfWeekList = new ArrayList<>();
 
         if (dayOfMonth<=6) {
             daysInWeek = 7 - (dayOfWeek - dayOfMonth);
-        } else {
-            daysInWeek = 7;
         }
 
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadWeek();
+        int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
+
+        for (int i=0; i<daysInWeek; i++) {
+            daysOfWeekList.add(firstDayInYearToAdd + i);
+        }
+
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadWeek(daysOfWeekList);
+        mDayHolder = dayHolderList.get(0);
     }
 
 
