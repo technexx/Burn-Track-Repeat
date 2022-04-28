@@ -96,14 +96,17 @@ public class DailyStatsAccess {
         }
 
         int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
-        for (int i=0; i<daysInWeek; i++) {
+        for (int i=0; i<50; i++) {
             daysOfWeekList.add(firstDayInYearToAdd + i);
         }
 
+        //Todo: This is because there are no entries/rows for our previous dates!
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadWeek(daysOfWeekList);
+        Log.i("testFetch", "daysOfWeek list is " + daysOfWeekList);
+        Log.i("testFetch", "dayHolder list is " + dayHolderList);
+
         mDayHolder = dayHolderList.get(0);
 
-        Log.i("testFetch", "dayHolder list is " + dayHolderList);
         Log.i("testFetch", "mDayHolder instance ids are " + mDayHolder.getDayId());
     }
 
