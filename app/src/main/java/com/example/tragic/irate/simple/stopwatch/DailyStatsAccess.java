@@ -135,11 +135,28 @@ public class DailyStatsAccess {
         if (daysOfMonthList.size()>0) {
             List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
             mDayHolder = dayHolderList.get(0);
-            Log.i("testFetch", "dayHolder list is " + dayHolderList);
-            Log.i("testFetch", "mDayHolder instance ids are " + mDayHolder.getDayId());
         } else {
             mDayHolder = new DayHolder();
         }
+    }
+
+    public void assignDayHolderInstanceFromYear(int daysInYear, int dayOfYear) {
+        List<Integer> daysOfYearList = new ArrayList<>();
+
+        for (int i=0; i<daysInYear; i++) {
+            if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
+                daysOfYearList.add(i+1);
+            }
+        }
+
+        if (daysOfYearList.size()>0) {
+            List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
+            mDayHolder = dayHolderList.get(0);
+        } else {
+            mDayHolder = new DayHolder();
+        }
+
+        Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
     }
 
     public DayHolder getDayHolderEntity() {
