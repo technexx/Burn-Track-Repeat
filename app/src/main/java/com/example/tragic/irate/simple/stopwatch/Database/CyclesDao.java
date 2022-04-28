@@ -23,7 +23,7 @@ CyclesDao {
     List<DayHolder> loadSingleDay(long listID);
 
     @Query("SELECT * from DayHolder WHERE daySelectedId IN (:listIDs)")
-    List<DayHolder> loadWeek(List<Integer> listIDs);
+    List<DayHolder> loadMultipleDays(List<Integer> listIDs);
 
     @Update
     void updateDayHolder(DayHolder dayHolder);
