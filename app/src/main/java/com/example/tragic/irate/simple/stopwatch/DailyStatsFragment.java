@@ -76,6 +76,9 @@ public class DailyStatsFragment extends Fragment {
                 daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
                 queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelectedFromCalendar);
 
+                AsyncTask.execute(()-> {
+                    setStatDurationModeViews(WEEKLY_STATS);
+                });
                 Log.i("testDate", "day of week is " + calendar.get(Calendar.DAY_OF_WEEK));
                 Log.i("testDate", "day of month is " + calendar.get(Calendar.DAY_OF_MONTH));
                 Log.i("testDate", "day of year is " + calendar.get(Calendar.DAY_OF_YEAR));
@@ -140,7 +143,7 @@ public class DailyStatsFragment extends Fragment {
             dailyStatsAccess.assignDayHolderInstanceFromSingleDay(daySelectedFromCalendar);
         }
         if (mode==WEEKLY_STATS) {
-            dailyStatsAccess.assignDayHolderInstanceFromWeek(calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_WEEK), Calendar.DAY_OF_YEAR);
+            dailyStatsAccess.assignDayHolderInstanceFromWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
         }
     }
 

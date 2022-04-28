@@ -91,21 +91,21 @@ public class DailyStatsAccess {
         int daysInWeek = 7;
         List<Integer> daysOfWeekList = new ArrayList<>();
 
-        if (dayOfMonth<=6) {
+        if (dayOfMonth<=7) {
             daysInWeek = 7 - (dayOfWeek - dayOfMonth);
         }
 
         int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
-
         for (int i=0; i<daysInWeek; i++) {
             daysOfWeekList.add(firstDayInYearToAdd + i);
         }
 
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadWeek(daysOfWeekList);
         mDayHolder = dayHolderList.get(0);
+
+        Log.i("testFetch", "dayHolder list is " + dayHolderList);
+        Log.i("testFetch", "mDayHolder instance ids are " + mDayHolder.getDayId());
     }
-
-
 
     public DayHolder getDayHolderEntity() {
         return mDayHolder;
