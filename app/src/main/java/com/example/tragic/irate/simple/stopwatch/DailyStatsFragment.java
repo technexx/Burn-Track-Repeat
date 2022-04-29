@@ -76,7 +76,7 @@ public class DailyStatsFragment extends Fragment {
                 queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelectedFromCalendar);
 
                 AsyncTask.execute(()-> {
-                    assignDayHolderInstanceForChosenDurationOfDays(currentStatDurationMode);
+                    assignDayHolderListForChosenDurationOfDays(currentStatDurationMode);
                 });
             }
         });
@@ -84,7 +84,7 @@ public class DailyStatsFragment extends Fragment {
         dailyWeeklyMonthlySwitchButton.setOnClickListener(v-> {
             AsyncTask.execute(()-> {
                 iterateThroughStatDurationModeVariables();
-                assignDayHolderInstanceForChosenDurationOfDays(currentStatDurationMode);
+                assignDayHolderListForChosenDurationOfDays(currentStatDurationMode);
 
                 getActivity().runOnUiThread(()-> {
                     setStatDurationTextView(currentStatDurationMode);
@@ -115,8 +115,7 @@ public class DailyStatsFragment extends Fragment {
 
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
-            assignDayHolderInstanceForChosenDurationOfDays(currentStatDurationMode);
-
+            assignDayHolderListForChosenDurationOfDays(currentStatDurationMode);
 
             dailyStatsAccess.setStatsForEachActivityListForSelectedDay(dayToPopulate);
             dailyStatsAccess.setStatsForEachActivityInstanceFromList();
@@ -132,9 +131,9 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void populateDayHolderTotalTimesAndCaloriesTextViews() {
-        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolder());
-        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolder());
-        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
+        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
+        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
+        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         statsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
         statsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
@@ -149,7 +148,7 @@ public class DailyStatsFragment extends Fragment {
         }
     }
 
-    private void assignDayHolderInstanceForChosenDurationOfDays(int mode) {
+    private void assignDayHolderListForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             dailyStatsAccess.assignDayHolderInstanceFromSingleDay(daySelectedFromCalendar);
         }

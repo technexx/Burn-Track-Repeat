@@ -82,6 +82,7 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: We should probably just fetch everything from a list instance of entity instance.
     public void assignDayHolderInstanceFromSingleDay(int dayToRetrieve) {
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         if (dayHolderList.size()>0) {
@@ -113,6 +114,8 @@ public class DailyStatsAccess {
 
         if (daysOfWeekList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
+        } else {
+            mDayHolderList = new ArrayList<>();
         }
 
         Log.i("testWeek", "DayHolder list for week is " + mDayHolderList);
@@ -131,6 +134,8 @@ public class DailyStatsAccess {
 
         if (daysOfMonthList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
+        } else {
+            mDayHolderList = new ArrayList<>();
         }
 
         Log.i("testMonth", "day of month is " + dayOfMonth);
@@ -149,6 +154,8 @@ public class DailyStatsAccess {
 
         if (daysOfYearList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
+        } else {
+            mDayHolderList = new ArrayList<>();
         }
 
         Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
