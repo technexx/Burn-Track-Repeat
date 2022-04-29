@@ -89,6 +89,8 @@ public class DailyStatsAccess {
 
     public void assignDayHolderInstanceFromWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
+        List<DayHolder> dayHolderList = new ArrayList<>();
+
         int daysInWeek = 7;
         int firstDayInYearToAdd = 0;
 
@@ -105,27 +107,29 @@ public class DailyStatsAccess {
             }
         }
 
-        Log.i("testFetch", "dayOfWeek returned is " + dayOfWeek);
-        Log.i("testFetch", "dayOfMonth returned is " + dayOfMonth);
-        Log.i("testFetch", "dayOfYear returned is " + dayOfYear);
-        Log.i("testFetch", "firstDayInYearToAdd returned is " + firstDayInYearToAdd);
-        Log.i("testFetch", "daysOfWeek list is " + daysOfWeekList);
+        Log.i("testWeek", "dayOfWeek returned is " + dayOfWeek);
+        Log.i("testWeek", "dayOfMonth returned is " + dayOfMonth);
+        Log.i("testWeek", "dayOfYear returned is " + dayOfYear);
+        Log.i("testWeek", "firstDayInYearToAdd returned is " + firstDayInYearToAdd);
+        Log.i("testWeek", "daysOfWeek list is " + daysOfWeekList);
 
 
         if (daysOfWeekList.size()>0) {
-            List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
+            dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
             mDayHolder = dayHolderList.get(0);
-            Log.i("testFetch", "dayHolder list is " + dayHolderList);
-            Log.i("testFetch", "mDayHolder instance ids are " + mDayHolder.getDayId());
         } else {
             mDayHolder = new DayHolder();
         }
+
+        Log.i("testWeek", "DayHolder list for week is " + dayHolderList);
+        Log.i("testWeek", "mDayHolder instance ids are " + mDayHolder.getDayId());
     }
 
     public void assignDayHolderInstanceFromMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
         List<Integer> daysOfMonthList = new ArrayList<>();
-        int firstDayInYearToAdd = dayOfYear - dayOfMonth;
+        List<DayHolder> dayHolderList = new ArrayList<>();
 
+        int firstDayInYearToAdd = dayOfYear - dayOfMonth;
         for (int i=0; i<numberOfDaysInMonth; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
                 daysOfMonthList.add(firstDayInYearToAdd + 1);
@@ -133,15 +137,20 @@ public class DailyStatsAccess {
         }
 
         if (daysOfMonthList.size()>0) {
-            List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
+            dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
             mDayHolder = dayHolderList.get(0);
         } else {
             mDayHolder = new DayHolder();
         }
+
+        Log.i("testMonth", "day of month is " + dayOfMonth);
+        Log.i("testMonth", "day of year is " + dayOfYear);
+        Log.i("testMonth", "DayHolder list for month is " + dayHolderList);
     }
 
     public void assignDayHolderInstanceFromYear(int daysInYear, int dayOfYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
+        List<DayHolder> dayHolderList = new ArrayList<>();
 
         for (int i=0; i<daysInYear; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
@@ -150,13 +159,16 @@ public class DailyStatsAccess {
         }
 
         if (daysOfYearList.size()>0) {
-            List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
+            dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
             mDayHolder = dayHolderList.get(0);
         } else {
             mDayHolder = new DayHolder();
         }
 
         Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
+        Log.i("testYear", "DayHolder list for year is " + dayHolderList);
+
+
     }
 
     public DayHolder getDayHolderEntity() {
