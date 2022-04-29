@@ -34,9 +34,13 @@ public class DailyStatsAccess {
     int activityPositionInListForCurrentDay;
     int mOldActivityPositionInListForCurrentDay;
 
+    List<DayHolder> mDayHolderList;
+    List<StatsForEachActivity> mStatsForEachActivityList;
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
+        instantiateEntityLists();
         instantiateArrayListsOfActivitiesAndTheirStats();
     }
 
@@ -88,9 +92,8 @@ public class DailyStatsAccess {
         Log.i("testFetch", "Daily fetched!");
     }
 
-    public void assignDayHolderInstanceFromWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
+    public void setDayHolderListForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
-        List<DayHolder> dayHolderList = new ArrayList<>();
 
         int daysInWeek = 7;
         int firstDayInYearToAdd = 0;
@@ -108,28 +111,16 @@ public class DailyStatsAccess {
             }
         }
 
-        Log.i("testWeek", "dayOfWeek returned is " + dayOfWeek);
-        Log.i("testWeek", "dayOfMonth returned is " + dayOfMonth);
-        Log.i("testWeek", "dayOfYear returned is " + dayOfYear);
-        Log.i("testWeek", "firstDayInYearToAdd returned is " + firstDayInYearToAdd);
-        Log.i("testWeek", "daysOfWeek list is " + daysOfWeekList);
-
         if (daysOfWeekList.size()>0) {
-            //Todo: Why are we just not getting the values from list positions themselves?
-            dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
-            mDayHolder = dayHolderList.get(0);
-        } else {
-            mDayHolder = new DayHolder();
+            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
         }
 
-        Log.i("testWeek", "DayHolder list for week is " + dayHolderList);
+        Log.i("testWeek", "DayHolder list for week is " + mDayHolderList);
         Log.i("testWeek", "mDayHolder instance ids are " + mDayHolder.getDayId());
-        Log.i("testFetch", "Weekly fetched!");
     }
 
-    public void assignDayHolderInstanceFromMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
+    public void setDayHolderListForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
         List<Integer> daysOfMonthList = new ArrayList<>();
-        List<DayHolder> dayHolderList = new ArrayList<>();
 
         int firstDayInYearToAdd = dayOfYear - dayOfMonth;
         for (int i=0; i<numberOfDaysInMonth; i++) {
@@ -139,21 +130,16 @@ public class DailyStatsAccess {
         }
 
         if (daysOfMonthList.size()>0) {
-            dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
-            mDayHolder = dayHolderList.get(0);
-        } else {
-            mDayHolder = new DayHolder();
+            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
         }
 
         Log.i("testMonth", "day of month is " + dayOfMonth);
         Log.i("testMonth", "day of year is " + dayOfYear);
-        Log.i("testMonth", "DayHolder list for month is " + dayHolderList);
-        Log.i("testFetch", "Monthly fetched!");
+        Log.i("testMonth", "DayHolder list for month is " + mDayHolderList);
     }
 
-    public void assignDayHolderInstanceFromYear(int daysInYear, int dayOfYear) {
+    public void setDayHolderListForYear(int daysInYear, int dayOfYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
-        List<DayHolder> dayHolderList = new ArrayList<>();
 
         for (int i=0; i<daysInYear; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
@@ -162,40 +148,36 @@ public class DailyStatsAccess {
         }
 
         if (daysOfYearList.size()>0) {
-            dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
-            mDayHolder = dayHolderList.get(0);
-        } else {
-            mDayHolder = new DayHolder();
+            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
         }
 
         Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
-        Log.i("testYear", "DayHolder list for year is " + dayHolderList);
-        Log.i("testFetch", "Yearly fetched!");
+        Log.i("testYear", "DayHolder list for year is " + mDayHolderList);
     }
 
-    public long getTotalSetTimeForSelectedDuration(List<DayHolder> dayHolderList) {
+    public long getTotalSetTimeFromDayHolderList() {
         long valueToReturn = 0;
 
-        for (int i=0; i<dayHolderList.size(); i++) {
-            valueToReturn += dayHolderList.get(i).getTotalSetTime();
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            valueToReturn += mDayHolderList.get(i).getTotalSetTime();
         }
         return valueToReturn;
     }
 
-    public long getTotalBreakTimeForSelectedDuration(List<DayHolder> dayHolderList) {
+    public long getTotalBreakTimeFromDayHolderList() {
         long valueToReturn = 0;
 
-        for (int i=0; i<dayHolderList.size(); i++) {
-            valueToReturn += dayHolderList.get(i).getTotalBreakTime();
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            valueToReturn += mDayHolderList.get(i).getTotalBreakTime();
         }
         return valueToReturn;
     }
 
-    public long getTotalCaloriesBurnedForSelectedDuration(List<DayHolder> dayHolderList) {
+    public long getTotalCaloriesBurnedFromDayHolderList() {
         long valueToReturn = 0;
 
-        for (int i=0; i<dayHolderList.size(); i++) {
-            valueToReturn += dayHolderList.get(i).getTotalCaloriesBurned();
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            valueToReturn += mDayHolderList.get(i).getTotalCaloriesBurned();
         }
         return valueToReturn;
     }
@@ -432,6 +414,11 @@ public class DailyStatsAccess {
         for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
             totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getTotalCaloriesBurnedForEachActivity());
         }
+    }
+
+    private void instantiateEntityLists() {
+        mDayHolderList = new ArrayList<>();
+        mStatsForEachActivityList = new ArrayList<>();
     }
 
     private void instantiateArrayListsOfActivitiesAndTheirStats() {
