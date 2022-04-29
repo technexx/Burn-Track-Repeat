@@ -115,7 +115,6 @@ public class DailyStatsFragment extends Fragment {
 
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
-//            dailyStatsAccess.assignDayHolderInstanceFromSingleDay(dayToPopulate);
             assignDayHolderInstanceForChosenDurationOfDays(currentStatDurationMode);
 
 
@@ -150,6 +149,7 @@ public class DailyStatsFragment extends Fragment {
         }
     }
 
+    //Todo: For all DayHolder instances we need the cumulative Ids of days in duration.
     private void assignDayHolderInstanceForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             dailyStatsAccess.assignDayHolderInstanceFromSingleDay(daySelectedFromCalendar);

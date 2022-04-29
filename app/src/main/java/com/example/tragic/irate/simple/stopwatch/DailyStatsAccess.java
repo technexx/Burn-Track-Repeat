@@ -114,8 +114,8 @@ public class DailyStatsAccess {
         Log.i("testWeek", "firstDayInYearToAdd returned is " + firstDayInYearToAdd);
         Log.i("testWeek", "daysOfWeek list is " + daysOfWeekList);
 
-
         if (daysOfWeekList.size()>0) {
+            //Todo: Why are we just not getting the values from list positions themselves?
             dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
             mDayHolder = dayHolderList.get(0);
         } else {
@@ -171,6 +171,33 @@ public class DailyStatsAccess {
         Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
         Log.i("testYear", "DayHolder list for year is " + dayHolderList);
         Log.i("testFetch", "Yearly fetched!");
+    }
+
+    public long getTotalSetTimeForSelectedDuration(List<DayHolder> dayHolderList) {
+        long valueToReturn = 0;
+
+        for (int i=0; i<dayHolderList.size(); i++) {
+            valueToReturn += dayHolderList.get(i).getTotalSetTime();
+        }
+        return valueToReturn;
+    }
+
+    public long getTotalBreakTimeForSelectedDuration(List<DayHolder> dayHolderList) {
+        long valueToReturn = 0;
+
+        for (int i=0; i<dayHolderList.size(); i++) {
+            valueToReturn += dayHolderList.get(i).getTotalBreakTime();
+        }
+        return valueToReturn;
+    }
+
+    public long getTotalCaloriesBurnedForSelectedDuration(List<DayHolder> dayHolderList) {
+        long valueToReturn = 0;
+
+        for (int i=0; i<dayHolderList.size(); i++) {
+            valueToReturn += dayHolderList.get(i).getTotalCaloriesBurned();
+        }
+        return valueToReturn;
     }
 
     public DayHolder getDayHolderEntity() {
