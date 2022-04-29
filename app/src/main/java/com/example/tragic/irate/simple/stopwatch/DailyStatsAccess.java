@@ -85,6 +85,7 @@ public class DailyStatsAccess {
         } else {
             this.mDayHolder = new DayHolder();
         }
+        Log.i("testFetch", "Daily fetched!");
     }
 
     public void assignDayHolderInstanceFromWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
@@ -123,6 +124,7 @@ public class DailyStatsAccess {
 
         Log.i("testWeek", "DayHolder list for week is " + dayHolderList);
         Log.i("testWeek", "mDayHolder instance ids are " + mDayHolder.getDayId());
+        Log.i("testFetch", "Weekly fetched!");
     }
 
     public void assignDayHolderInstanceFromMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -146,6 +148,7 @@ public class DailyStatsAccess {
         Log.i("testMonth", "day of month is " + dayOfMonth);
         Log.i("testMonth", "day of year is " + dayOfYear);
         Log.i("testMonth", "DayHolder list for month is " + dayHolderList);
+        Log.i("testFetch", "Monthly fetched!");
     }
 
     public void assignDayHolderInstanceFromYear(int daysInYear, int dayOfYear) {
@@ -167,8 +170,7 @@ public class DailyStatsAccess {
 
         Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
         Log.i("testYear", "DayHolder list for year is " + dayHolderList);
-
-
+        Log.i("testFetch", "Yearly fetched!");
     }
 
     public DayHolder getDayHolderEntity() {

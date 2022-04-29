@@ -41,9 +41,10 @@ public class DailyStatsFragment extends Fragment {
     DailyStatsAdapter dailyStatsAdapter;
     RecyclerView dailyStatsRecyclerView;
 
-    TextView dailyStatsTotalSetTimeTextView;
-    TextView dailyStatsTotalBreakTimeTextView;
-    TextView dailyStatsTotalCaloriesBurnedTextView;
+    TextView totalStatsHeaderTextView;
+    TextView statsTotalSetTimeTextView;
+    TextView statsTotalBreakTimeTextView;
+    TextView statsTotalCaloriesBurnedTextView;
 
     ImageButton dailyWeeklyMonthlySwitchButton;
     int currentStatDurationMode;
@@ -57,8 +58,6 @@ public class DailyStatsFragment extends Fragment {
         mRoot = root;
 
         calendarView = mRoot.findViewById(R.id.stats_calendar);
-        dailyWeeklyMonthlySwitchButton = mRoot.findViewById(R.id.daily_weekly_monthly_switcher);
-
         dailyStatsAccess = new DailyStatsAccess(getActivity());
 
         instantiateTextViewsAndMiscClasses();
@@ -77,12 +76,21 @@ public class DailyStatsFragment extends Fragment {
                 queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelectedFromCalendar);
 
                 AsyncTask.execute(()-> {
-                    setStatDurationModeViews(YEARLY_STATS);
+                    assignDayHolderInstanceForChosenDurationOfDays(currentStatDurationMode);
                 });
-                Log.i("testDate", "day of week is " + calendar.get(Calendar.DAY_OF_WEEK));
-                Log.i("testDate", "day of month is " + calendar.get(Calendar.DAY_OF_MONTH));
-                Log.i("testDate", "day of year is " + calendar.get(Calendar.DAY_OF_YEAR));
             }
+        });
+
+        dailyWeeklyMonthlySwitchButton.setOnClickListener(v-> {
+            AsyncTask.execute(()-> {
+                iterateThroughStatDurationModeVariables();
+                assignDayHolderInstanceForChosenDurationOfDays(currentStatDurationMode);
+
+                getActivity().runOnUiThread(()-> {
+                    setStatDurationTextView(currentStatDurationMode);
+                });
+            });
+
         });
 
         return root;
@@ -125,12 +133,12 @@ public class DailyStatsFragment extends Fragment {
         String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolder());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
 
-        dailyStatsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
-        dailyStatsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
-        dailyStatsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned),formatCalorieString(totalCaloriesBurned)));
+        statsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
+        statsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
+        statsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned),formatCalorieString(totalCaloriesBurned)));
     }
 
-    private void switchStatDurationMode() {
+    private void iterateThroughStatDurationModeVariables() {
         if (currentStatDurationMode<3) {
             currentStatDurationMode++;
         } else {
@@ -138,7 +146,7 @@ public class DailyStatsFragment extends Fragment {
         }
     }
 
-    private void setStatDurationModeViews(int mode) {
+    private void assignDayHolderInstanceForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             dailyStatsAccess.assignDayHolderInstanceFromSingleDay(daySelectedFromCalendar);
         }
@@ -153,10 +161,27 @@ public class DailyStatsFragment extends Fragment {
         }
     }
 
+    private void setStatDurationTextView(int mode) {
+        if (mode==DAILY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.day_total_header);
+        }
+        if (mode==WEEKLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.weekly_total_header);
+        }
+        if (mode==MONTHLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.monthly_total_header);
+        }
+        if (mode==YEARLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.yearly_total_header);
+        }
+    }
+
     private void instantiateTextViewsAndMiscClasses() {
-        dailyStatsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
-        dailyStatsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
-        dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_daily_time_and_calories_burned_textView);
+        totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
+        statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
+        statsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
+        statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_daily_time_and_calories_burned_textView);
+        dailyWeeklyMonthlySwitchButton = mRoot.findViewById(R.id.daily_weekly_monthly_switcher);
     }
 
     private String formatCalorieString(double calories) {

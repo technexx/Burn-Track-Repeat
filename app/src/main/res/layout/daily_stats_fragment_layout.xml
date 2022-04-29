@@ -15,7 +15,7 @@
     </CalendarView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/daily_stats_total_header_layout"
+        android:id="@+id/stats_total_header_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/stats_calendar"
@@ -23,7 +23,7 @@
         android:background="@drawable/daily_total_stats_border">
 
         <TextView
-            android:id="@+id/daily_stats_header"
+            android:id="@+id/total_stats_header"
             android:text="@string/day_total_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/daily_stats_header"
+            app:layout_constraintStart_toEndOf="@id/total_stats_header"
             android:layout_marginStart="12dp"
             android:src="@drawable/double_arrow"
             android:backgroundTint="@color/dark_grey">
@@ -49,7 +49,7 @@
             android:id="@+id/daily_stats_total_set_time_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/daily_stats_header"
+            app:layout_constraintTop_toBottomOf="@id/total_stats_header"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/daily_stats_total_break_time_textView"
             android:layout_marginTop="10dp"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@id/daily_stats_total_set_time_textView"
             app:layout_constraintEnd_toEndOf="@id/daily_stats_total_daily_time_and_calories_burned_textView"
-            app:layout_constraintTop_toBottomOf="@id/daily_stats_header"
+            app:layout_constraintTop_toBottomOf="@id/total_stats_header"
             android:layout_marginTop="10dp"
             android:gravity="center">
         </TextView>
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@id/daily_stats_total_break_time_textView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/daily_stats_header"
+            app:layout_constraintTop_toBottomOf="@id/total_stats_header"
             android:layout_marginTop="10dp"
             android:gravity="center">
         </TextView>
@@ -85,7 +85,7 @@
         android:layout_height="280dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_header_layout"
+        app:layout_constraintTop_toBottomOf="@id/stats_total_header_layout"
         android:layout_marginTop="4dp">
     </androidx.recyclerview.widget.RecyclerView>
 
