@@ -134,7 +134,7 @@ public class DailyStatsAccess {
         int firstDayInYearToAdd = dayOfYear - dayOfMonth;
         for (int i=0; i<numberOfDaysInMonth; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
-                daysOfMonthList.add(firstDayInYearToAdd + 1);
+                daysOfMonthList.add(firstDayInYearToAdd + i);
             }
         }
 
