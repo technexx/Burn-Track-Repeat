@@ -115,8 +115,10 @@ public class DailyStatsFragment extends Fragment {
 
     public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
         AsyncTask.execute(()-> {
+            //Todo: Should move this and rename parent method as specific to StatsForEachActivity queries.
             assignDayHolderListForChosenDurationOfDays(currentStatDurationMode);
 
+            //Todo: This type of access is incompatible w/ our stat queries since it only and always fetches a single day.
             dailyStatsAccess.setStatsForEachActivityListForSelectedDay(dayToPopulate);
             dailyStatsAccess.setStatsForEachActivityInstanceFromList();
 
@@ -124,6 +126,7 @@ public class DailyStatsFragment extends Fragment {
                 populateDayHolderTotalTimesAndCaloriesTextViews();
 
                 dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
+                //Todo: This should be adding ours values if our lists are correctly populated.
                 dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
                 dailyStatsAdapter.notifyDataSetChanged();
             });

@@ -194,16 +194,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    public void setDayHolderEntityFromList(List<DayHolder> dayHolderList) {
-        for (int i=0; i<dayHolderList.size(); i++) {
-            //Todo: May be better to get full DayHolder instance and then use selective DAO access to delete desired rows.
-        }
-    }
-
-    public DayHolder getDayHolderEntity() {
-        return mDayHolder;
-    }
-
     public long getOldDayHolderId() {
         return mOldDayHolderId;
     }
@@ -376,8 +366,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: This will cause conflict if we access it from DailyStatsFragment stats (weekly, monthly, or yearly) while timer is active. In that case, the values we want to save to the single row (activity) we're on while apply to all rows accessed from the fragment.
-    //Global list should be fine since it's re-queried when accessing a Cycle, but keep this in mind.
     public void setStatsForEachActivityInstanceFromList() {
         if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(0);
