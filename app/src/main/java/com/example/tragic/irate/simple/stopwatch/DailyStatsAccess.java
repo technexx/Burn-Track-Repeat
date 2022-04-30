@@ -82,17 +82,13 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: Possible conflict if accessing stats while running timer, if we're using globally accessed db entities for both.
-    //Todo: It's fine now since we're only instantiating mDayHolder/mStats
+    public void assignDayHolderInstanceForSelectedDay(int daySelected) {
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
+        mDayHolder = dayHolderList.get(0);
+    }
+
     public void setDayHolderListForSingleDay(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-
-        if (dayHolderList.size()>0) {
-            this.mDayHolder = dayHolderList.get(0);
-        } else {
-            this.mDayHolder = new DayHolder();
-        }
     }
 
     public void setDayHolderListForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
@@ -121,7 +117,6 @@ public class DailyStatsAccess {
         }
 
         Log.i("testWeek", "DayHolder list for week is " + mDayHolderList);
-        Log.i("testWeek", "mDayHolder instance ids are " + mDayHolder.getDayId());
     }
 
     public void setDayHolderListForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -373,7 +368,7 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: This will cause conflict if we DailyStatsFragment stats (weekly, monthly, or yearly) while timer is active. In that case, the values we want to save to the single row (activity) we're on while apply to all rows accessed from the fragment.
+    //Todo: This will cause conflict if we access it from DailyStatsFragment stats (weekly, monthly, or yearly) while timer is active. In that case, the values we want to save to the single row (activity) we're on while apply to all rows accessed from the fragment.
     //Global list should be fine since it's re-queried when accessing a Cycle, but keep this in mind.
     public void setStatsForEachActivityInstanceFromList() {
         if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {

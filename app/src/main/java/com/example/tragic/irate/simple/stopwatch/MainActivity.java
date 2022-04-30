@@ -1668,7 +1668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
     //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
-      dailyStatsAccess.setDayHolderListForSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
       dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
@@ -3239,7 +3239,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
-      dailyStatsAccess.setDayHolderListForSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
@@ -3285,7 +3285,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCaloriesBurnedForCurrentDay = 0;
     } else {
       int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-      dailyStatsAccess.setDayHolderListForSingleDay(dayOfYear);
+      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
