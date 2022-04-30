@@ -82,15 +82,18 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: We should probably just fetch everything from a list instance of entity instance.
-    public void assignDayHolderInstanceFromSingleDay(int dayToRetrieve) {
+    //Todo: We should probably just fetch everything from a list instead of entity instance, BUT we need an instance of entity to write/update to database. But we can also just fetch that from list.
+    public void setDayHolderListForSingleDay(int dayToRetrieve) {
+        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+
+        //Todo: mDayHolder as an assumed single day (row) object gets accessed by a bunch of stuff in Main (i.e. for total times, calories, etc. to display for current day we're on WITHIN timers.
+        //Todo: Also need to reference a list of SINGLE day at moment if we're going to access it through here.
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         if (dayHolderList.size()>0) {
             this.mDayHolder = dayHolderList.get(0);
         } else {
             this.mDayHolder = new DayHolder();
         }
-        Log.i("testFetch", "Daily fetched!");
     }
 
     public void setDayHolderListForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
@@ -189,6 +192,12 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
+    public void setDayHolderEntityFromList(List<DayHolder> dayHolderList) {
+        for (int i=0; i<dayHolderList.size(); i++) {
+            //Todo: May be better to get full DayHolder instance and then use selective DAO access to delete desired rows.
+        }
+    }
+
     public DayHolder getDayHolderEntity() {
         return mDayHolder;
     }
@@ -237,16 +246,12 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
 
-    public void deleteDayHolderEntity(DayHolder dayHolder) {
-        if (getDayHolderEntity()!=null) {
-            cyclesDatabase.cyclesDao().deleteDayHolder(dayHolder);
-        }
+    public void deleteDayHolderEntity(int daySelected) {
+        cyclesDatabase.cyclesDao().deleteSingleDay(daySelected);
     }
 
     public void deleteAllDayHolderEntries() {
-        if (getDayHolderEntity()!=null) {
-            cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
-        }
+        cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -298,8 +303,6 @@ public class DailyStatsAccess {
             int mostRecentEntry = 0;
             mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(mostRecentEntry);
-        } else {
-//            mStatsForEachActivity = new StatsForEachActivity();
         }
     }
 
@@ -355,16 +358,13 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getTotalCaloriesBurnedForEachActivity();
     }
 
-    public void deleteStatForEachActivityEntity() {
-        if (getStatsForEachActivityEntity()!=null) {
-            cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
-        }
+    public void deleteStatForEachActivityEntity(long dayToDelete) {
+        cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(dayToDelete);
     }
 
     public void deleteAllStatsForEachActivityEntries() {
-        if (getStatsForEachActivityEntity()!=null) {
-            cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
-        }
+        cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
+
     }
 
     //////////////////Daily Stats Fragment Methods/////////////////////////////////////////////

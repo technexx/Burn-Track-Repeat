@@ -150,7 +150,7 @@ public class DailyStatsFragment extends Fragment {
 
     private void assignDayHolderListForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
-            dailyStatsAccess.assignDayHolderInstanceFromSingleDay(daySelectedFromCalendar);
+            dailyStatsAccess.setDayHolderListForSingleDay(daySelectedFromCalendar);
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setDayHolderListForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));

@@ -15,6 +15,14 @@ import java.util.List;
 @Dao
 public interface
 CyclesDao {
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertDay(DayHolder dayHolder);
+
+    @Update
+    void updateDayHolder(DayHolder dayHolder);
+
+    @Query("DELETE from DayHolder")
+    void deleteAllDayHolderEntries();
 
     @Query("SELECT * from DayHolder")
     List<DayHolder> loadAllDayHolderRows();
@@ -25,23 +33,14 @@ CyclesDao {
     @Query("SELECT * from DayHolder WHERE daySelectedId IN (:listIDs)")
     List<DayHolder> loadMultipleDays(List<Integer> listIDs);
 
-    @Update
-    void updateDayHolder(DayHolder dayHolder);
+    //Todo: These two work w/ out a declared DayHolder instance.
+    @Query("DELETE from DayHolder WHERE daySelectedId IS:listID")
+    void deleteSingleDay (long listID);
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertDay(DayHolder dayHolder);
+    @Query("DELETE from DayHolder WHERE daySelectedId IN (:listIDs)")
+    void deleteMultipleDays(List<Integer> listIDs);
 
-    @Delete
-    void deleteDayHolder(DayHolder dayHolder);
 
-    @Query("DELETE from DayHolder")
-    void deleteAllDayHolderEntries();
-
-    @Query("SELECT * from StatsForEachActivity")
-    List<StatsForEachActivity> loadAllActivitiesForAllDays();
-
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
-    List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
@@ -51,6 +50,18 @@ CyclesDao {
 
     @Delete
     void deleteStatsForEachActivity(StatsForEachActivity statsForEachActivity);
+
+    @Query("SELECT * from StatsForEachActivity")
+    List<StatsForEachActivity> loadAllActivitiesForAllDays();
+
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
+    List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
+
+    @Query("DELETE from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:listID")
+    void deleteActivityStatsForSingleDay (long listID);
+
+    @Query("DELETE from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:listIDs)")
+    void deleteActivityStatsForMultipleDays (List<Integer> listIDs);
 
     @Query("DELETE from StatsForEachActivity")
     void deleteAllStatsForEachActivityEntries();
