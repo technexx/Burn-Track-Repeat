@@ -55,6 +55,9 @@ CyclesDao {
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
 
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs)")
+    List<StatsForEachActivity> loadActivitiesForMultipleDays(List<Integer> uniqueIDs);
+
     @Query("DELETE from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:listID")
     void deleteActivityStatsForSingleDay (long listID);
 

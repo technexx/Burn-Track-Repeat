@@ -87,8 +87,10 @@ public class DailyStatsAccess {
         mDayHolder = dayHolderList.get(0);
     }
 
+    //Todo: Rename these methods if we're using them for both lists.
     public void setDayHolderListForSingleDay(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+        mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
     public void setDayHolderListForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
@@ -112,8 +114,10 @@ public class DailyStatsAccess {
 
         if (daysOfWeekList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
+            mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfWeekList);
         } else {
             mDayHolderList = new ArrayList<>();
+            mStatsForEachActivityList = new ArrayList<>();
         }
 
         Log.i("testWeek", "DayHolder list for week is " + mDayHolderList);
@@ -131,8 +135,10 @@ public class DailyStatsAccess {
 
         if (daysOfMonthList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
+            mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfMonthList);
         } else {
             mDayHolderList = new ArrayList<>();
+            mStatsForEachActivityList = new ArrayList<>();
         }
 
         Log.i("testMonth", "day of month is " + dayOfMonth);
@@ -151,8 +157,10 @@ public class DailyStatsAccess {
 
         if (daysOfYearList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
+            mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfYearList);
         } else {
             mDayHolderList = new ArrayList<>();
+            mStatsForEachActivityList = new ArrayList<>();
         }
 
         Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
