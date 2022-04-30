@@ -4116,10 +4116,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
-//      if (reset_total_times.isEnabled()) {
-//        reset_total_times.setEnabled(false);
-//        reset_total_times.setAlpha(0.3f);
-//      }
       if (fadeInObj != null) fadeInObj.cancel();
       if (fadeOutObj != null) fadeOutObj.cancel();
       switch (mode) {

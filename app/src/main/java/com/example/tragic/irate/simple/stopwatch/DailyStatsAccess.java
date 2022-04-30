@@ -82,13 +82,12 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: We should probably just fetch everything from a list instead of entity instance, BUT we need an instance of entity to write/update to database. But we can also just fetch that from list.
+    //Todo: Possible conflict if accessing stats while running timer, if we're using globally accessed db entities for both.
+    //Todo: It's fine now since we're only instantiating mDayHolder/mStats
     public void setDayHolderListForSingleDay(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-
-        //Todo: mDayHolder as an assumed single day (row) object gets accessed by a bunch of stuff in Main (i.e. for total times, calories, etc. to display for current day we're on WITHIN timers.
-        //Todo: Also need to reference a list of SINGLE day at moment if we're going to access it through here.
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+
         if (dayHolderList.size()>0) {
             this.mDayHolder = dayHolderList.get(0);
         } else {
@@ -106,7 +105,7 @@ public class DailyStatsAccess {
             daysInWeek = 7 - (dayOfWeek - dayOfMonth);
             firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
         } else {
-            firstDayInYearToAdd = (dayOfYear) - (dayOfWeek-1);
+            firstDayInYearToAdd = dayOfYear - (dayOfWeek-1);
         }
 
         for (int i=0; i<daysInWeek; i++) {
@@ -295,13 +294,11 @@ public class DailyStatsAccess {
         int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
         setStatForEachActivityListForForSingleDay(dayOfYear);
 
-        //If activity exists, retrieve an instance of StatForEachActivity for its position. If not, create a new entity instance.
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInListForCurrentDay);
         } else if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
-            int mostRecentEntry = 0;
-            mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
+            int mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(mostRecentEntry);
         }
     }
@@ -376,6 +373,7 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: This will cause conflict if we DailyStatsFragment stats (weekly, monthly, or yearly) while timer is active. In that case, the values we want to save to the single row (activity) we're on while apply to all rows accessed from the fragment.
     //Global list should be fine since it's re-queried when accessing a Cycle, but keep this in mind.
     public void setStatsForEachActivityInstanceFromList() {
         if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
