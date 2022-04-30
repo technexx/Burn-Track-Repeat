@@ -122,7 +122,7 @@ public class DailyStatsAccess {
     public void setDayHolderListForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
         List<Integer> daysOfMonthList = new ArrayList<>();
 
-        int firstDayInYearToAdd = dayOfYear - dayOfMonth;
+        int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
         for (int i=0; i<numberOfDaysInMonth; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
                 daysOfMonthList.add(firstDayInYearToAdd + i);

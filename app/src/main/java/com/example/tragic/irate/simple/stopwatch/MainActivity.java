@@ -517,6 +517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Add StatsForEachActivity retrieval for week/month/year.
   //Todo: Add back arrow imagebutton for stat duration selection.
       //Todo: Should we allow date range selection?
   //Todo: Add optional calories burned for "all other time" not spent on specified activities (for a complete daily total);
