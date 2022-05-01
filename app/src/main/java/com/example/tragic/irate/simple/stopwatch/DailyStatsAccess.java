@@ -356,14 +356,14 @@ public class DailyStatsAccess {
 
     }
 
-    public void clearArrayListsOfActivitiesAndTheirStats() {
+    public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDay.clear();
         totalSetTimeListForEachActivityForSelectedDay.clear();
         totalBreakTimeListForEachActivityForSelectedDay.clear();
         totalCaloriesBurnedForEachActivityForSelectedDay.clear();
     }
 
-    public void populatePojoListsForDailyActivityStatsForSelectedDay() {
+    public void populateStatsForEachActivityArrayLists() {
         assignTotalActivitiesListForOnSelectedDayToList();
         assignTotalSetTimeForEachActivityOnSelectedDayToList();
         assignTotalBreakTimeForEachActivityOnSelectedDayToList();

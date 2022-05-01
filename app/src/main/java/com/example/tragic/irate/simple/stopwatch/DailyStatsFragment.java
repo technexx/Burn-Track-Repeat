@@ -90,7 +90,7 @@ public class DailyStatsFragment extends Fragment {
 
                 getActivity().runOnUiThread(()-> {
                     setStatDurationTextView(currentStatDurationMode);
-                    populateDayHolderTotalTimesAndCaloriesTextViews();
+                    populateDayHolderStatsTextViews();
                 });
             });
 
@@ -158,16 +158,16 @@ public class DailyStatsFragment extends Fragment {
             setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
 
             getActivity().runOnUiThread(()-> {
-                populateDayHolderTotalTimesAndCaloriesTextViews();
+                populateDayHolderStatsTextViews();
 
-                dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
-                dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
+                dailyStatsAccess.clearStatsForEachActivityArrayLists();
+                dailyStatsAccess.populateStatsForEachActivityArrayLists();
                 dailyStatsAdapter.notifyDataSetChanged();
             });
         });
     }
 
-    private void populateDayHolderTotalTimesAndCaloriesTextViews() {
+    private void populateDayHolderStatsTextViews() {
         String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
