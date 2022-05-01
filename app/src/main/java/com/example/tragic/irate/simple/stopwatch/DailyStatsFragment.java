@@ -62,21 +62,23 @@ public class DailyStatsFragment extends Fragment {
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
-        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(dailyStatsAccess.getCurrentDayOfYear());
 
         calendar = Calendar.getInstance(TimeZone.getDefault());
         daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
+
+//        dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDay(daySelectedFromCalendar);
+        queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView();
 
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 calendar.set(year, month, dayOfMonth);
-
                 daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
-                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(daySelectedFromCalendar);
+
+                queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView();
 
                 AsyncTask.execute(()-> {
-                    assignDayHolderListForChosenDurationOfDays(currentStatDurationMode);
+                    setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
                 });
             }
         });
@@ -84,7 +86,7 @@ public class DailyStatsFragment extends Fragment {
         dailyWeeklyMonthlySwitchButton.setOnClickListener(v-> {
             AsyncTask.execute(()-> {
                 iterateThroughStatDurationModeVariables();
-                assignDayHolderListForChosenDurationOfDays(currentStatDurationMode);
+                setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
 
                 getActivity().runOnUiThread(()-> {
                     setStatDurationTextView(currentStatDurationMode);
@@ -113,36 +115,6 @@ public class DailyStatsFragment extends Fragment {
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView(int dayToPopulate) {
-        AsyncTask.execute(()-> {
-            //Todo: Should move this and rename parent method as specific to StatsForEachActivity queries.
-            assignDayHolderListForChosenDurationOfDays(currentStatDurationMode);
-
-            //Todo: This type of access is incompatible w/ our stat queries since it only and always fetches a single day.
-            dailyStatsAccess.setStatsForEachActivityListForSelectedDay(dayToPopulate);
-            dailyStatsAccess.setStatsForEachActivityInstanceFromList();
-
-            getActivity().runOnUiThread(()-> {
-                populateDayHolderTotalTimesAndCaloriesTextViews();
-
-                dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
-                //Todo: This should be adding ours values if our lists are correctly populated.
-                dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
-                dailyStatsAdapter.notifyDataSetChanged();
-            });
-        });
-    }
-
-    private void populateDayHolderTotalTimesAndCaloriesTextViews() {
-        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
-        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
-        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
-
-        statsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
-        statsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
-        statsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned),formatCalorieString(totalCaloriesBurned)));
-    }
-
     private void iterateThroughStatDurationModeVariables() {
         if (currentStatDurationMode<3) {
             currentStatDurationMode++;
@@ -151,18 +123,18 @@ public class DailyStatsFragment extends Fragment {
         }
     }
 
-    private void assignDayHolderListForChosenDurationOfDays(int mode) {
+    private void setDayAndStatListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
-            dailyStatsAccess.setDayHolderListForSingleDay(daySelectedFromCalendar);
+            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDay(daySelectedFromCalendar);
         }
         if (mode==WEEKLY_STATS) {
-            dailyStatsAccess.setDayHolderListForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==MONTHLY_STATS) {
-            dailyStatsAccess.setDayHolderListForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setDayHolderListForYear(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), calendar.get(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForYear(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), calendar.get(Calendar.DAY_OF_YEAR));
         }
     }
 
@@ -179,6 +151,30 @@ public class DailyStatsFragment extends Fragment {
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
         }
+    }
+
+    public void queryDatabaseAndPopulatePojoListsAndUpdateRecyclerView() {
+        AsyncTask.execute(()-> {
+            setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
+
+            getActivity().runOnUiThread(()-> {
+                populateDayHolderTotalTimesAndCaloriesTextViews();
+
+                dailyStatsAccess.clearArrayListsOfActivitiesAndTheirStats();
+                dailyStatsAccess.populatePojoListsForDailyActivityStatsForSelectedDay();
+                dailyStatsAdapter.notifyDataSetChanged();
+            });
+        });
+    }
+
+    private void populateDayHolderTotalTimesAndCaloriesTextViews() {
+        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
+        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
+        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
+
+        statsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
+        statsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
+        statsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned),formatCalorieString(totalCaloriesBurned)));
     }
 
     private void instantiateTextViewsAndMiscClasses() {

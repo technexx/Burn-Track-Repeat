@@ -87,13 +87,12 @@ public class DailyStatsAccess {
         mDayHolder = dayHolderList.get(0);
     }
 
-    //Todo: Rename these methods if we're using them for both lists.
-    public void setDayHolderListForSingleDay(int dayToRetrieve) {
+    public void setDayHolderAndStatForEachActivityListsForSelectedDay(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    public void setDayHolderListForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
+    public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
 
         int daysInWeek = 7;
@@ -123,7 +122,7 @@ public class DailyStatsAccess {
         Log.i("testWeek", "DayHolder list for week is " + mDayHolderList);
     }
 
-    public void setDayHolderListForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
+    public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
         List<Integer> daysOfMonthList = new ArrayList<>();
 
         int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
@@ -146,7 +145,7 @@ public class DailyStatsAccess {
         Log.i("testMonth", "DayHolder list for month is " + mDayHolderList);
     }
 
-    public void setDayHolderListForYear(int daysInYear, int dayOfYear) {
+    public void setAllDayAndStatListsForYear(int daysInYear, int dayOfYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
 
         for (int i=0; i<daysInYear; i++) {
@@ -357,23 +356,6 @@ public class DailyStatsAccess {
 
     }
 
-    //////////////////Daily Stats Fragment Methods/////////////////////////////////////////////
-    public void setStatsForEachActivityListForSelectedDay(int daySelected) {
-        if (cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected).size()!= 0) {
-            statsForEachActivityListOfAllActivitiesForASpecificDate = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
-        } else {
-            statsForEachActivityListOfAllActivitiesForASpecificDate = new ArrayList<>();
-        }
-    }
-
-    public void setStatsForEachActivityInstanceFromList() {
-        if (statsForEachActivityListOfAllActivitiesForASpecificDate.size()>0) {
-            mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(0);
-        } else {
-            mStatsForEachActivity = new StatsForEachActivity();
-        }
-    }
-
     public void clearArrayListsOfActivitiesAndTheirStats() {
         totalActivitiesListForSelectedDay.clear();
         totalSetTimeListForEachActivityForSelectedDay.clear();
@@ -389,26 +371,26 @@ public class DailyStatsAccess {
     }
 
     private void assignTotalActivitiesListForOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
-            totalActivitiesListForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getActivity());
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            totalActivitiesListForSelectedDay.add(mStatsForEachActivityList.get(i).getActivity());
         }
     }
 
     private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
-            totalSetTimeListForEachActivityForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getTotalSetTimeForEachActivity());
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            totalSetTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
         }
     }
 
     private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
-            totalBreakTimeListForEachActivityForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getTotalBreakTimeForEachActivity());
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            totalBreakTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
         }
     }
 
     private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<statsForEachActivityListOfAllActivitiesForASpecificDate.size(); i++) {
-            totalCaloriesBurnedForEachActivityForSelectedDay.add(statsForEachActivityListOfAllActivitiesForASpecificDate.get(i).getTotalCaloriesBurnedForEachActivity());
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            totalCaloriesBurnedForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
         }
     }
 
