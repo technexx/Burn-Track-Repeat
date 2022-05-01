@@ -35,13 +35,24 @@
         </TextView>
 
         <ImageButton
-            android:id="@+id/daily_weekly_monthly_switcher"
+            android:id="@+id/stat_duration_switcher_button_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/total_stats_header"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/double_arrow_left"
+            android:backgroundTint="@color/dark_grey">
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/stat_duration_switcher_button_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/total_stats_header"
             android:layout_marginStart="12dp"
-            android:src="@drawable/double_arrow"
+            android:src="@drawable/double_arrow_right"
             android:backgroundTint="@color/dark_grey">
         </ImageButton>
 

@@ -33,7 +33,6 @@ import java.util.TimeZone;
 public class DailyStatsFragment extends Fragment {
 
     View mRoot;
-    Calendar calendar;
     CalendarView calendarView;
     int daySelectedFromCalendar;
 
@@ -46,7 +45,8 @@ public class DailyStatsFragment extends Fragment {
     TextView statsTotalBreakTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
 
-    ImageButton dailyWeeklyMonthlySwitchButton;
+    ImageButton statDurationSwitcherButtonLeft;
+    ImageButton statDurationSwitcherButtonRight;
     int currentStatDurationMode;
     int DAILY_STATS = 0;
     int WEEKLY_STATS = 1;
@@ -77,7 +77,7 @@ public class DailyStatsFragment extends Fragment {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 AsyncTask.execute(()-> {
-                    calendar = Calendar.getInstance(TimeZone.getDefault());
+                    Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(year, month, dayOfMonth);
                     daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
 
@@ -90,7 +90,11 @@ public class DailyStatsFragment extends Fragment {
             }
         });
 
-        dailyWeeklyMonthlySwitchButton.setOnClickListener(v-> {
+        statDurationSwitcherButtonLeft.setOnClickListener(v-> {
+
+        });
+
+        statDurationSwitcherButtonRight.setOnClickListener(v-> {
             AsyncTask.execute(()-> {
                 iterateThroughStatDurationModeVariables();
                 setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
@@ -120,6 +124,8 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void setDayAndStatListsForChosenDurationOfDays(int mode) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDay(daySelectedFromCalendar);
         }
@@ -192,7 +198,8 @@ public class DailyStatsFragment extends Fragment {
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         statsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_daily_time_and_calories_burned_textView);
-        dailyWeeklyMonthlySwitchButton = mRoot.findViewById(R.id.daily_weekly_monthly_switcher);
+        statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
+        statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
