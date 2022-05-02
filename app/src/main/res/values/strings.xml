@@ -225,7 +225,7 @@
         <item>Biking - 14 to 15.9 mph  </item>
         <item>Biking - 16 to 19 mph  </item>
         <item>Biking - over 20 mph  </item>
-        <item>Unicycling </item>
+        <item>Unicycling</item>
     </string-array>
 
     <string-array name="conditioning">

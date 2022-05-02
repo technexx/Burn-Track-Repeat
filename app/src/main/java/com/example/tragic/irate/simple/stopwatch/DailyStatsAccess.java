@@ -176,12 +176,14 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    public long getTotalCaloriesBurnedFromDayHolderList() {
-        long valueToReturn = 0;
+    //Todo: We get the decimal value returned here.
+    public double getTotalCaloriesBurnedFromDayHolderList() {
+        double valueToReturn = 0;
 
         for (int i=0; i<mDayHolderList.size(); i++) {
             valueToReturn += mDayHolderList.get(i).getTotalCaloriesBurned();
         }
+
         return valueToReturn;
     }
 
