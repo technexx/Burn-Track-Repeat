@@ -36,6 +36,7 @@ public class DailyStatsAccess {
 
     List<DayHolder> mDayHolderList;
     List<StatsForEachActivity> mStatsForEachActivityList;
+    int duplicateStringPosition;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -349,17 +350,17 @@ public class DailyStatsAccess {
                 totalCaloriesBurnedListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
             } else {
                 //Todo: Value needs to be set @ position it's duplicated at. Iterated position (i) will always be out of index range.
-                totalSetTimeListForEachActivityForSelectedDay.set(i, combinedSetTimeFromExistingAndRepeatingPositions(i));
-                totalBreakTimeListForEachActivityForSelectedDay.set(i, combinedBreakTimeFromExistingAndRepeatingPositions(i));
-                totalCaloriesBurnedListForEachActivityForSelectedDay.set(i, combinedCaloriesFromExistingAndRepeatingPositions(i));
+                totalSetTimeListForEachActivityForSelectedDay.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
+                totalBreakTimeListForEachActivityForSelectedDay.set(duplicateStringPosition, combinedBreakTimeFromExistingAndRepeatingPositions(i));
+                totalCaloriesBurnedListForEachActivityForSelectedDay.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
             }
         }
     }
 
-    //Todo: We should return the position that gets duplicated, and use -1 as a default (false).
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
         for (int i=0; i<totalActivitiesListForSelectedDay.size(); i++) {
             if (totalActivitiesListForSelectedDay.get(i).equalsIgnoreCase(stringToCheck)) {
+                duplicateStringPosition = i;
                 return true;
             }
         }
@@ -368,46 +369,39 @@ public class DailyStatsAccess {
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
         long iteratingValue = mStatsForEachActivityList.get(position).getTotalSetTimeForEachActivity();
-        long presentValue =  totalSetTimeListForEachActivityForSelectedDay.get(position);
+        long presentValue =  totalSetTimeListForEachActivityForSelectedDay.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
 
     private long combinedBreakTimeFromExistingAndRepeatingPositions(int position) {
         long iteratingValue = mStatsForEachActivityList.get(position).getTotalBreakTimeForEachActivity();
-        long presentValue =  totalBreakTimeListForEachActivityForSelectedDay.get(position);
+        long presentValue =  totalBreakTimeListForEachActivityForSelectedDay.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
 
     private double combinedCaloriesFromExistingAndRepeatingPositions(int position) {
         double iteratingValue = mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity();
-        double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDay.get(position);
+        double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDay.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
 
-
-//    private void assignTotalActivitiesListForSelectedDayToList() {
+//    private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
 //        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            totalActivitiesListForSelectedDay.add(mStatsForEachActivityList.get(i).getActivity());
+//            totalSetTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
 //        }
 //    }
-
-    private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            totalSetTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
-        }
-    }
-
-    private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            totalBreakTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
-        }
-    }
-
-    private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            totalCaloriesBurnedListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
-        }
-    }
+//
+//    private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
+//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//            totalBreakTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+//        }
+//    }
+//
+//    private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
+//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//            totalCaloriesBurnedListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+//        }
+//    }
 
     public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDay.clear();
@@ -418,9 +412,9 @@ public class DailyStatsAccess {
 
     public void populateStatsForEachActivityArrayLists() {
         assignTotalActivitiesListForSelectedDayToList();
-        assignTotalSetTimeForEachActivityOnSelectedDayToList();
-        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
-        assignTotalCaloriesForEachActivityOnSelectedDayToList();
+//        assignTotalSetTimeForEachActivityOnSelectedDayToList();
+//        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
+//        assignTotalCaloriesForEachActivityOnSelectedDayToList();
     }
 
     private void instantiateEntityLists() {

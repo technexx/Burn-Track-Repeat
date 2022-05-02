@@ -107,6 +107,8 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
+        calendar = Calendar.getInstance(TimeZone.getDefault());
+
         AsyncTask.execute(()-> {
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
             setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
