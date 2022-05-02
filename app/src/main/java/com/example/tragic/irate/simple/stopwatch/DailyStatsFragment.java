@@ -33,6 +33,7 @@ import java.util.TimeZone;
 public class DailyStatsFragment extends Fragment {
 
     View mRoot;
+    Calendar calendar;
     CalendarView calendarView;
     int daySelectedFromCalendar;
 
@@ -81,7 +82,7 @@ public class DailyStatsFragment extends Fragment {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 AsyncTask.execute(()-> {
-                    Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+                    calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(year, month, dayOfMonth);
                     daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
 
@@ -135,8 +136,6 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void setDayAndStatListsForChosenDurationOfDays(int mode) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
-
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDay(daySelectedFromCalendar);
         }
