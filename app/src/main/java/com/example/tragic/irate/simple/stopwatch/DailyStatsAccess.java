@@ -341,7 +341,7 @@ public class DailyStatsAccess {
 
     }
 
-    private void assignTotalActivitiesListForSelectedDayToList() {
+    public void setTotalActivityStatsForSelectedDaysToLists() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
                 totalActivitiesListForSelectedDay.add(mStatsForEachActivityList.get(i).getActivity());
@@ -384,36 +384,11 @@ public class DailyStatsAccess {
         return iteratingValue + presentValue;
     }
 
-//    private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
-//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            totalSetTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
-//        }
-//    }
-//
-//    private void assignTotalBreakTimeForEachActivityOnSelectedDayToList() {
-//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            totalBreakTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
-//        }
-//    }
-//
-//    private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
-//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            totalCaloriesBurnedListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
-//        }
-//    }
-
     public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDay.clear();
         totalSetTimeListForEachActivityForSelectedDay.clear();
         totalBreakTimeListForEachActivityForSelectedDay.clear();
         totalCaloriesBurnedListForEachActivityForSelectedDay.clear();
-    }
-
-    public void populateStatsForEachActivityArrayLists() {
-        assignTotalActivitiesListForSelectedDayToList();
-//        assignTotalSetTimeForEachActivityOnSelectedDayToList();
-//        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
-//        assignTotalCaloriesForEachActivityOnSelectedDayToList();
     }
 
     private void instantiateEntityLists() {

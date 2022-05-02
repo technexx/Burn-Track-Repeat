@@ -173,7 +173,7 @@ public class DailyStatsFragment extends Fragment {
                 setDayHolderStatsTextViews();
 
                 dailyStatsAccess.clearStatsForEachActivityArrayLists();
-                dailyStatsAccess.populateStatsForEachActivityArrayLists();
+                dailyStatsAccess.setTotalActivityStatsForSelectedDaysToLists();
                 dailyStatsAdapter.notifyDataSetChanged();
             });
         });
