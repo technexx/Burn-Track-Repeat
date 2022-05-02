@@ -27,7 +27,7 @@ public class DailyStatsAccess {
     List<String> totalActivitiesListForSelectedDay;
     List<Long> totalSetTimeListForEachActivityForSelectedDay;
     List<Long> totalBreakTimeListForEachActivityForSelectedDay;
-    List<Double> totalCaloriesBurnedForEachActivityForSelectedDay;
+    List<Double> totalCaloriesBurnedListForEachActivityForSelectedDay;
 
     boolean activityExistsInDatabaseForSelectedDay;
     String mActivityString;
@@ -118,8 +118,6 @@ public class DailyStatsAccess {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
         }
-
-        Log.i("testWeek", "DayHolder list for week is " + mDayHolderList);
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -139,10 +137,6 @@ public class DailyStatsAccess {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
         }
-
-        Log.i("testMonth", "day of month is " + dayOfMonth);
-        Log.i("testMonth", "day of year is " + dayOfYear);
-        Log.i("testMonth", "DayHolder list for month is " + mDayHolderList);
     }
 
     public void setAllDayAndStatListsForYear(int daysInYear, int dayOfYear) {
@@ -161,9 +155,6 @@ public class DailyStatsAccess {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
         }
-
-        Log.i("testYear", "days in year are " + daysInYear + " and day OF year is " + dayOfYear);
-        Log.i("testYear", "DayHolder list for year is " + mDayHolderList);
     }
 
     public long getTotalSetTimeFromDayHolderList() {
@@ -251,8 +242,6 @@ public class DailyStatsAccess {
         if (!activityExistsInDatabaseForSelectedDay) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
 
-            //Since a new list with the new day's ID is created every day, this iterating ID will auto reset to 0 each day.
-//            statsForEachActivity.setIteratingIdsForSpecificDay(statsForEachActivityListOfAllActivitiesForASpecificDate.size());
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
             statsForEachActivity.setActivity(mActivityString);
 
@@ -263,7 +252,6 @@ public class DailyStatsAccess {
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
         }
     }
-
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
@@ -315,10 +303,6 @@ public class DailyStatsAccess {
         return statsForEachActivityListOfAllActivitiesForASpecificDate;
     }
 
-    public StatsForEachActivity getStatsForEachActivityEntity() {
-        return mStatsForEachActivity;
-    }
-
     public void setActivityStringFromSpinner(String activityString) {
         this.mActivityString = activityString;
     }
@@ -356,25 +340,56 @@ public class DailyStatsAccess {
 
     }
 
-    public void clearStatsForEachActivityArrayLists() {
-        totalActivitiesListForSelectedDay.clear();
-        totalSetTimeListForEachActivityForSelectedDay.clear();
-        totalBreakTimeListForEachActivityForSelectedDay.clear();
-        totalCaloriesBurnedForEachActivityForSelectedDay.clear();
-    }
-
-    public void populateStatsForEachActivityArrayLists() {
-        assignTotalActivitiesListForOnSelectedDayToList();
-        assignTotalSetTimeForEachActivityOnSelectedDayToList();
-        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
-        assignTotalCaloriesForEachActivityOnSelectedDayToList();
-    }
-
-    private void assignTotalActivitiesListForOnSelectedDayToList() {
+    private void assignTotalActivitiesListForSelectedDayToList() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            totalActivitiesListForSelectedDay.add(mStatsForEachActivityList.get(i).getActivity());
+            if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
+                totalActivitiesListForSelectedDay.add(mStatsForEachActivityList.get(i).getActivity());
+                totalSetTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+                totalBreakTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
+                totalCaloriesBurnedListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+            } else {
+                //Todo: Value needs to be set @ position it's duplicated at. Iterated position (i) will always be out of index range.
+                totalSetTimeListForEachActivityForSelectedDay.set(i, combinedSetTimeFromExistingAndRepeatingPositions(i));
+                totalBreakTimeListForEachActivityForSelectedDay.set(i, combinedBreakTimeFromExistingAndRepeatingPositions(i));
+                totalCaloriesBurnedListForEachActivityForSelectedDay.set(i, combinedCaloriesFromExistingAndRepeatingPositions(i));
+            }
         }
     }
+
+    //Todo: We should return the position that gets duplicated, and use -1 as a default (false).
+    private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
+        for (int i=0; i<totalActivitiesListForSelectedDay.size(); i++) {
+            if (totalActivitiesListForSelectedDay.get(i).equalsIgnoreCase(stringToCheck)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
+        long iteratingValue = mStatsForEachActivityList.get(position).getTotalSetTimeForEachActivity();
+        long presentValue =  totalSetTimeListForEachActivityForSelectedDay.get(position);
+        return iteratingValue + presentValue;
+    }
+
+    private long combinedBreakTimeFromExistingAndRepeatingPositions(int position) {
+        long iteratingValue = mStatsForEachActivityList.get(position).getTotalBreakTimeForEachActivity();
+        long presentValue =  totalBreakTimeListForEachActivityForSelectedDay.get(position);
+        return iteratingValue + presentValue;
+    }
+
+    private double combinedCaloriesFromExistingAndRepeatingPositions(int position) {
+        double iteratingValue = mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity();
+        double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDay.get(position);
+        return iteratingValue + presentValue;
+    }
+
+
+//    private void assignTotalActivitiesListForSelectedDayToList() {
+//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//            totalActivitiesListForSelectedDay.add(mStatsForEachActivityList.get(i).getActivity());
+//        }
+//    }
 
     private void assignTotalSetTimeForEachActivityOnSelectedDayToList() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
@@ -390,8 +405,22 @@ public class DailyStatsAccess {
 
     private void assignTotalCaloriesForEachActivityOnSelectedDayToList() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            totalCaloriesBurnedForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+            totalCaloriesBurnedListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
         }
+    }
+
+    public void clearStatsForEachActivityArrayLists() {
+        totalActivitiesListForSelectedDay.clear();
+        totalSetTimeListForEachActivityForSelectedDay.clear();
+        totalBreakTimeListForEachActivityForSelectedDay.clear();
+        totalCaloriesBurnedListForEachActivityForSelectedDay.clear();
+    }
+
+    public void populateStatsForEachActivityArrayLists() {
+        assignTotalActivitiesListForSelectedDayToList();
+        assignTotalSetTimeForEachActivityOnSelectedDayToList();
+        assignTotalBreakTimeForEachActivityOnSelectedDayToList();
+        assignTotalCaloriesForEachActivityOnSelectedDayToList();
     }
 
     private void instantiateEntityLists() {
@@ -403,7 +432,7 @@ public class DailyStatsAccess {
         totalActivitiesListForSelectedDay = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDay = new ArrayList<>();
         totalBreakTimeListForEachActivityForSelectedDay = new ArrayList<>();
-        totalCaloriesBurnedForEachActivityForSelectedDay = new ArrayList<>();
+        totalCaloriesBurnedListForEachActivityForSelectedDay = new ArrayList<>();
     }
 
     public int getCurrentDayOfYear() {
