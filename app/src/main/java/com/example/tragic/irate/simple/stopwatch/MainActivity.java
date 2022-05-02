@@ -518,8 +518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   //Todo: Total activity calories round down on lots of small bits in StatsFragment (e.g. total of 3 can have 0.2, 0.1, etc. add up to 3.8).
-  //Todo: Add back arrow imagebutton for stat duration selection.
-      //Todo: Should we allow date range selection?
+  //Todo: Should we allow date range selection?
   //Todo: Add optional calories burned for "all other time" not spent on specified activities (for a complete daily total);
   //Todo: Since we access entire database on yearly query, should we just retain the global list and pull from there to avoid re-querying for values we already have?
   //Todo: Will eventually need a stats reset at end of year.

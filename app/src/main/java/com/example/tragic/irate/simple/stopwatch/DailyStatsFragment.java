@@ -47,11 +47,15 @@ public class DailyStatsFragment extends Fragment {
 
     ImageButton statDurationSwitcherButtonLeft;
     ImageButton statDurationSwitcherButtonRight;
+
     int currentStatDurationMode;
     int DAILY_STATS = 0;
     int WEEKLY_STATS = 1;
     int MONTHLY_STATS = 2;
     int YEARLY_STATS = 3;
+
+    int ITERATING_STATS_UP = 0;
+    int ITERATING_STATS_DOWN = 1;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
@@ -91,35 +95,42 @@ public class DailyStatsFragment extends Fragment {
         });
 
         statDurationSwitcherButtonLeft.setOnClickListener(v-> {
-
+            statDurationSwitchModeLogic(ITERATING_STATS_DOWN);
         });
 
         statDurationSwitcherButtonRight.setOnClickListener(v-> {
-            AsyncTask.execute(()-> {
-                iterateThroughStatDurationModeVariables();
-                setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
-
-                getActivity().runOnUiThread(()-> {
-                    setStatDurationTextView(currentStatDurationMode);
-                    populateListsAndTextViewsFromEntityListsInDatabase();
-
-                });
-            });
-
+            statDurationSwitchModeLogic(ITERATING_STATS_UP);
         });
 
         return root;
     }
 
-    public int getDaySelectedFromCalendar() {
-        return daySelectedFromCalendar;
+    private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
+        AsyncTask.execute(()-> {
+            iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
+            setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
+
+            getActivity().runOnUiThread(()-> {
+                setStatDurationTextView(currentStatDurationMode);
+                populateListsAndTextViewsFromEntityListsInDatabase();
+
+            });
+        });
     }
 
-    private void iterateThroughStatDurationModeVariables() {
-        if (currentStatDurationMode<3) {
-            currentStatDurationMode++;
-        } else {
-            currentStatDurationMode=0;
+    public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
+        if (directionOfIteration==ITERATING_STATS_UP) {
+            if (currentStatDurationMode<3) {
+                currentStatDurationMode++;
+            } else {
+                currentStatDurationMode=0;
+            }
+        } else if (directionOfIteration==ITERATING_STATS_DOWN) {
+            if (currentStatDurationMode>0) {
+                currentStatDurationMode--;
+            } else {
+                currentStatDurationMode=3;
+            }
         }
     }
 
@@ -177,6 +188,10 @@ public class DailyStatsFragment extends Fragment {
         statsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
         statsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
         statsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned),formatCalorieString(totalCaloriesBurned)));
+    }
+
+    public int getDaySelectedFromCalendar() {
+        return daySelectedFromCalendar;
     }
 
     private String convertSeconds(long totalSeconds) {
