@@ -62,6 +62,7 @@ public class DailyStatsFragment extends Fragment {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
+        calendar = Calendar.getInstance(TimeZone.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
         dailyStatsAccess = new DailyStatsAccess(getActivity());
 
@@ -107,11 +108,8 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
-        calendar = Calendar.getInstance(TimeZone.getDefault());
-
         AsyncTask.execute(()-> {
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
-            setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextView(currentStatDurationMode);

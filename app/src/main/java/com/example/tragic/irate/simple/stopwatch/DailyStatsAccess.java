@@ -349,7 +349,6 @@ public class DailyStatsAccess {
                 totalBreakTimeListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalBreakTimeForEachActivity());
                 totalCaloriesBurnedListForEachActivityForSelectedDay.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
             } else {
-                //Todo: Value needs to be set @ position it's duplicated at. Iterated position (i) will always be out of index range.
                 totalSetTimeListForEachActivityForSelectedDay.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                 totalBreakTimeListForEachActivityForSelectedDay.set(duplicateStringPosition, combinedBreakTimeFromExistingAndRepeatingPositions(i));
                 totalCaloriesBurnedListForEachActivityForSelectedDay.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
