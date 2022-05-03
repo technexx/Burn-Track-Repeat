@@ -176,7 +176,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Todo: We get the decimal value returned here.
     public double getTotalCaloriesBurnedFromDayHolderList() {
         double valueToReturn = 0;
 
