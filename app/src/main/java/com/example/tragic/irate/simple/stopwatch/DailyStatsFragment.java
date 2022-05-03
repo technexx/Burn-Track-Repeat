@@ -30,7 +30,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-public class DailyStatsFragment extends Fragment {
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeRowIsSelected{
 
     View mRoot;
     Calendar calendar;
@@ -106,7 +106,7 @@ public class DailyStatsFragment extends Fragment {
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
-
+            toggleEditModeInStatsAdapter();
         });
 
         return root;
@@ -198,7 +198,14 @@ public class DailyStatsFragment extends Fragment {
         return daySelectedFromCalendar;
     }
 
+    private void toggleEditModeInStatsAdapter() {
+        dailyStatsAdapter.toggleEditMode();
+    }
 
+    @Override
+    public void tdeeRowSelection(int position) {
+
+    }
 
     private String convertSeconds(long totalSeconds) {
         DecimalFormat df = new DecimalFormat("00");
@@ -215,6 +222,7 @@ public class DailyStatsFragment extends Fragment {
     }
 
     private void instantiateTextViewsAndMiscClasses() {
+
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         statsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
@@ -225,6 +233,7 @@ public class DailyStatsFragment extends Fragment {
 
     private void instantiateRecyclerViewAndItsAdapter() {
         dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDay);
+        dailyStatsAdapter.getSelectedTdeeRowPosition(DailyStatsFragment.this);
 
         dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());

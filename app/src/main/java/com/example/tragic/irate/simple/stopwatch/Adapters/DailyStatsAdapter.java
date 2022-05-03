@@ -29,6 +29,19 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     List<Double> mCaloriesBurned;
     LongToStringConverters longToStringConverters = new LongToStringConverters();
 
+    boolean mEditModeIsActive;
+    int mPositionSelected;
+
+    tdeeRowIsSelected mTdeeRowIsSelected;
+
+    public interface tdeeRowIsSelected {
+        void tdeeRowSelection (int position);
+    }
+
+    public void getSelectedTdeeRowPosition(tdeeRowIsSelected xTdeeRowIsSelected) {
+        this.mTdeeRowIsSelected = xTdeeRowIsSelected;
+    }
+
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
     }
@@ -45,6 +58,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
+
+        activityViewHolder.fullView.setOnClickListener(v-> {
+            mTdeeRowIsSelected.tdeeRowSelection(position);
+        });
 
         if (position==0) {
             activityViewHolder.activity.setText(mContext.getString(R.string.activity_text_header));
@@ -67,15 +84,22 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.breakTime.setTypeface(Typeface.DEFAULT);
             activityViewHolder.caloriesBurned.setTypeface(Typeface.DEFAULT);
 
-            activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-//            activityViewHolder.fullView.setBackgroundColor(mContext.getResources().getColor(R.color.test_grey));
-
+            if (mEditModeIsActive) {
+                activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+            } else {
+                activityViewHolder.fullView.setBackground(null);
+            }
         }
     }
 
     @Override
     public int getItemCount() {
         return mActivities.size()+1;
+    }
+
+    public void toggleEditMode() {
+        mEditModeIsActive = !mEditModeIsActive;
+        notifyDataSetChanged();
     }
 
     public class ActivityViewHolder extends RecyclerView.ViewHolder {
