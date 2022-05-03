@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CalendarView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -57,6 +58,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View tdeeEditView;
     View tdeeEditPopUpAnchor;
     PopupWindow tdeeEditPopUpWindow;
+    TextView tdeeEditActivityTextView;
+    EditText tdeeSetTimeEditText;
+    EditText tdeeBreakTimeEditText;
+    TextView tdeeEditCaloriesTextView;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
@@ -211,6 +216,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    private String getActivityStringFromSelectedPosition(int position) {
+        return dailyStatsAccess.totalActivitiesListForSelectedDuration.get(position);
+    }
+
+    private long getActivitySetTimeFromSelectedPosition(int position) {
+        return dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration.get(position);
+    }
+
+    private long getActivityBreakTimeFromSelectedPosition(int position) {
+        return dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDuration.get(position);
+    }
+
+    private double getActivityCaloriesFromSelectedPosition(int position) {
+        return dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration.get(position);
+    }
+
     private String convertSeconds(long totalSeconds) {
         DecimalFormat df = new DecimalFormat("00");
         long minutes;
@@ -237,10 +258,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_daily_time_and_calories_burned_textView);
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
+
+        tdeeEditActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
+        tdeeSetTimeEditText = tdeeEditView.findViewById(R.id.set_time_editText);
+        tdeeBreakTimeEditText = tdeeEditView.findViewById(R.id.break_time_editText);
+        tdeeEditCaloriesTextView = tdeeEditView.findViewById(R.id.calories_string_in_edit_popUp);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
-        dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDay, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDay, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDay);
+        dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDuration, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration);
         dailyStatsAdapter.getSelectedTdeeRowPosition(DailyStatsFragment.this);
 
         dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
