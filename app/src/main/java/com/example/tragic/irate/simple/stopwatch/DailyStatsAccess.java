@@ -140,7 +140,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setAllDayAndStatListsForYear(int daysInYear, int dayOfYear) {
+    public void setAllDayAndStatListsForYear(int daysInYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
 
         for (int i=0; i<daysInYear; i++) {

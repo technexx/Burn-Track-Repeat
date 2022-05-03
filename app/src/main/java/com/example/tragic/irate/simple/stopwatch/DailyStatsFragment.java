@@ -65,6 +65,7 @@ public class DailyStatsFragment extends Fragment {
         calendar = Calendar.getInstance(TimeZone.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
         dailyStatsAccess = new DailyStatsAccess(getActivity());
+        ImageButton editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
@@ -102,6 +103,10 @@ public class DailyStatsFragment extends Fragment {
 
         statDurationSwitcherButtonRight.setOnClickListener(v-> {
             statDurationSwitchModeLogic(ITERATING_STATS_UP);
+        });
+
+        editTdeeStatsButton.setOnClickListener(v-> {
+
         });
 
         return root;
@@ -146,7 +151,7 @@ public class DailyStatsFragment extends Fragment {
             dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYear(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), calendar.get(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForYear(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
         }
     }
 
@@ -192,6 +197,8 @@ public class DailyStatsFragment extends Fragment {
     public int getDaySelectedFromCalendar() {
         return daySelectedFromCalendar;
     }
+
+
 
     private String convertSeconds(long totalSeconds) {
         DecimalFormat df = new DecimalFormat("00");

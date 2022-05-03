@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
@@ -64,6 +66,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTime.setTypeface(Typeface.DEFAULT);
             activityViewHolder.breakTime.setTypeface(Typeface.DEFAULT);
             activityViewHolder.caloriesBurned.setTypeface(Typeface.DEFAULT);
+
+            activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+//            activityViewHolder.fullView.setBackgroundColor(mContext.getResources().getColor(R.color.test_grey));
+
         }
     }
 
@@ -77,6 +83,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         TextView setTime;
         TextView breakTime;
         TextView caloriesBurned;
+        View fullView;
 
         public ActivityViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,6 +91,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             setTime = itemView.findViewById(R.id.set_time_in_daily_stats);
             breakTime = itemView.findViewById(R.id.break_time_in_daily_stats);
             caloriesBurned = itemView.findViewById(R.id.calories_burned_in_daily_stats);
+            fullView = itemView;
         }
     }
 

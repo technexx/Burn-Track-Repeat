@@ -100,4 +100,14 @@
         android:layout_marginTop="4dp">
     </androidx.recyclerview.widget.RecyclerView>
 
+    <ImageButton
+        android:id="@+id/edit_tdee_stats_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/edit_icon"
+        android:backgroundTint="@color/dark_grey">
+    </ImageButton>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

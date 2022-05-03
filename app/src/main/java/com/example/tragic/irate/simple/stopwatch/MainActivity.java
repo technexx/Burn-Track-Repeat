@@ -517,10 +517,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total);
-  //Todo: Since we access entire database on yearly query, should we just retain the global list and pull from there to avoid re-querying for values we already have?
+  //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
+  //Todo: Option to add/modify activities/times/calories?
   //Todo: Will eventually need a stats reset at end of year.
-  //Todo: Have duration mode switcher for Timer too?
+  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
+
   //Todo: Test all daily saves in fragment.
   //Todo: Optimize tdee toggle + callbacks. May be a bit laggy.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
@@ -530,6 +531,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test all notifications.
   //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc.
 
+  //Todo: Since we access entire database on yearly query, should we just retain the global list and pull from there to avoid re-querying for values we already have.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
