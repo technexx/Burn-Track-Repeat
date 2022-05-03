@@ -1,33 +1,29 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.WindowManager;
 import android.widget.CalendarView;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
 
 public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeRowIsSelected{
@@ -57,6 +53,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     int ITERATING_STATS_UP = 0;
     int ITERATING_STATS_DOWN = 1;
+
+    View tdeeEditView;
+    View tdeeEditPopUpAnchor;
+    PopupWindow tdeeEditPopUpWindow;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
@@ -204,7 +204,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void tdeeRowSelection(int position) {
-
+        if (tdeeEditPopUpWindow.isShowing()) {
+            tdeeEditPopUpWindow.dismiss();
+        } else {
+            tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchor, 0, -100, Gravity.TOP);
+        }
     }
 
     private String convertSeconds(long totalSeconds) {
@@ -222,6 +226,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateTextViewsAndMiscClasses() {
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        tdeeEditView = inflater.inflate(R.layout.tdee_stats_edit_view, null);
+        tdeeEditPopUpAnchor = mRoot.findViewById(R.id.tdee_edit_popUp_anchor);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(280), true);
 
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
@@ -247,5 +255,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private String formatCalorieString(double calories) {
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(calories);
+    }
+
+    private int dpConv(float pixels) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
     }
 }

@@ -100,6 +100,16 @@
         android:layout_marginTop="4dp">
     </androidx.recyclerview.widget.RecyclerView>
 
+    <View
+        android:id="@+id/tdee_edit_popUp_anchor"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/edit_tdee_stats_button"
+        android:layout_marginTop="4dp">
+    </View>
+
     <ImageButton
         android:id="@+id/edit_tdee_stats_button"
         android:layout_width="wrap_content"

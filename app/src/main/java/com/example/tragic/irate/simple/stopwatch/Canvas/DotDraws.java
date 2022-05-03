@@ -491,6 +491,7 @@ public class DotDraws extends View {
   public void fadeDot(boolean fadeText) {
     mPaint.setAlpha(mAlpha);
     if (fadeText) mPaintText.setAlpha(mAlpha);
+
     mSendAlpha.sendAlphaValue(mAlpha);
     if (mAlpha >=255) {
       mAlpha = 255;
