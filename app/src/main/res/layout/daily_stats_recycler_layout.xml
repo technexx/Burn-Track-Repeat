@@ -6,6 +6,7 @@
     style="@style/StatFragmentTheme"
     android:layout_gravity="center">
 
+    <!--Stat views (except activity) constrained from END because width of activity String is variable-->
     <TextView
         android:id="@+id/activity_in_daily_stats"
         android:layout_width="wrap_content"
