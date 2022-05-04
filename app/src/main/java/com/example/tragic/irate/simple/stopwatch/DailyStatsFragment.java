@@ -262,7 +262,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         tdeeEditView = inflater.inflate(R.layout.tdee_stats_edit_view, null);
         tdeeEditPopUpAnchor = mRoot.findViewById(R.id.tdee_edit_popUp_anchor);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(280), true);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(140), true);
 
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);

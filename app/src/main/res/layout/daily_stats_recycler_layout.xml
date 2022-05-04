@@ -16,6 +16,8 @@
         android:maxWidth="140dp"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:textSize="16sp">
     </TextView>
 
@@ -28,6 +30,8 @@
         app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats"
         android:layout_marginEnd="6dp"
         android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:gravity="center">
     </TextView>
 
@@ -40,6 +44,8 @@
         app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats"
         android:layout_marginEnd="6dp"
         android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:gravity="center">
     </TextView>
 
@@ -51,6 +57,8 @@
         app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats"
         app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats"
         android:layout_marginEnd="2dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:textSize="16sp"
         android:gravity="center">
     </TextView>

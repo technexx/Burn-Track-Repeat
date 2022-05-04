@@ -7,14 +7,14 @@
 
     <TextView
         android:id="@+id/activity_string_in_edit_popUp"
-        android:layout_width="wrap_content"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
         android:textSize="22sp"
-        android:textColor="@color/off_white">
+        android:textColor="@color/black">
     </TextView>
 
     <EditText
