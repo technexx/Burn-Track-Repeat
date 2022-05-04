@@ -60,7 +60,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
         activityViewHolder.fullView.setOnClickListener(v-> {
-            mTdeeRowIsSelected.tdeeRowSelection(position);
+            //Start at 1 because of header, and return 0 for it because that's our first list position.
+            if (position>0) {
+                mTdeeRowIsSelected.tdeeRowSelection(position-1);
+            }
         });
 
         if (position==0) {

@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -33,6 +34,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Calendar calendar;
     CalendarView calendarView;
     int daySelectedFromCalendar;
+    LongToStringConverters longToStringConverters;
 
     DailyStatsAccess dailyStatsAccess;
     DailyStatsAdapter dailyStatsAdapter;
@@ -212,8 +214,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (tdeeEditPopUpWindow.isShowing()) {
             tdeeEditPopUpWindow.dismiss();
         } else {
-            tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchor, 0, -100, Gravity.TOP);
+            tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchor, 0, dpConv(-40), Gravity.TOP);
+            setTdeeEditValuesToTextViews(position);
         }
+    }
+
+    private void setTdeeEditValuesToTextViews(int position) {
+        tdeeEditActivityTextView.setText(getActivityStringFromSelectedPosition(position));
+        tdeeSetTimeEditText.setText(longToStringConverters.convertSeconds(getActivitySetTimeFromSelectedPosition(position)));
+        tdeeBreakTimeEditText.setText(longToStringConverters.convertSeconds(getActivityBreakTimeFromSelectedPosition(position)));
+        tdeeEditCaloriesTextView.setText(formatCalorieString(getActivityCaloriesFromSelectedPosition(position)));
     }
 
     private String getActivityStringFromSelectedPosition(int position) {
@@ -247,6 +257,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateTextViewsAndMiscClasses() {
+        longToStringConverters = new LongToStringConverters();
+
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         tdeeEditView = inflater.inflate(R.layout.tdee_stats_edit_view, null);
         tdeeEditPopUpAnchor = mRoot.findViewById(R.id.tdee_edit_popUp_anchor);
