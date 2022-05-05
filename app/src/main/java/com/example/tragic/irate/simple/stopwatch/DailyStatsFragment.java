@@ -126,7 +126,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextView(currentStatDurationMode);
                 populateListsAndTextViewsFromEntityListsInDatabase();
-
+                dailyStatsAdapter.turnOffEditMode();
             });
         });
     }
@@ -212,29 +212,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     @Override
     public void tdeeEditItemSelected(int position) {
 
-    }
-
-    private void setTdeeEditValuesToTextViews(int position) {
-        tdeeEditActivityTextView.setText(getActivityStringFromSelectedPosition(position));
-        tdeeSetTimeEditText.setText(longToStringConverters.convertSeconds(getActivitySetTimeFromSelectedPosition(position)));
-        tdeeBreakTimeEditText.setText(longToStringConverters.convertSeconds(getActivityBreakTimeFromSelectedPosition(position)));
-        tdeeEditCaloriesTextView.setText(formatCalorieString(getActivityCaloriesFromSelectedPosition(position)));
-    }
-
-    private String getActivityStringFromSelectedPosition(int position) {
-        return dailyStatsAccess.totalActivitiesListForSelectedDuration.get(position);
-    }
-
-    private long getActivitySetTimeFromSelectedPosition(int position) {
-        return dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration.get(position);
-    }
-
-    private long getActivityBreakTimeFromSelectedPosition(int position) {
-        return dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDuration.get(position);
-    }
-
-    private double getActivityCaloriesFromSelectedPosition(int position) {
-        return dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration.get(position);
     }
 
     private String convertSeconds(long totalSeconds) {

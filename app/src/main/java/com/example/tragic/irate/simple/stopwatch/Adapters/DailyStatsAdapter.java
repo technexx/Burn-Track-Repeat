@@ -111,6 +111,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         return mActivities.size()+1;
     }
 
+    public void turnOffEditMode() {
+        if (mEditModeIsActive) mEditModeIsActive = false;
+    }
+
     public void toggleEditMode() {
         mEditModeIsActive = !mEditModeIsActive;
         notifyDataSetChanged();
