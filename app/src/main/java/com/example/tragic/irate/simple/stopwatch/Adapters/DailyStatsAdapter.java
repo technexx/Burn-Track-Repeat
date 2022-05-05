@@ -34,14 +34,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     boolean mEditModeIsActive;
     int mPositionSelected;
 
-    tdeeRowIsSelected mTdeeRowIsSelected;
+    tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
 
-    public interface tdeeRowIsSelected {
-        void tdeeRowSelection (int position);
+    public interface tdeeEditedItemIsSelected {
+        void tdeeEditItemSelected (int position);
     }
 
-    public void getSelectedTdeeRowPosition(tdeeRowIsSelected xTdeeRowIsSelected) {
-        this.mTdeeRowIsSelected = xTdeeRowIsSelected;
+    public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
+        this.mTdeeEditedItemIsSelected = xTdeeEditedItemIsSelected;
     }
 
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {

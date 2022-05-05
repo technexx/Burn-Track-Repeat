@@ -28,7 +28,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeRowIsSelected{
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected{
 
     View mRoot;
     Calendar calendar;
@@ -210,13 +210,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void tdeeRowSelection(int position) {
-        if (tdeeEditPopUpWindow.isShowing()) {
-            tdeeEditPopUpWindow.dismiss();
-        } else {
-            tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchor, 0, dpConv(-40), Gravity.TOP);
-            setTdeeEditValuesToTextViews(position);
-        }
+    public void tdeeEditItemSelected(int position) {
+
     }
 
     private void setTdeeEditValuesToTextViews(int position) {
@@ -279,7 +274,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateRecyclerViewAndItsAdapter() {
         dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDuration, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration);
-        dailyStatsAdapter.getSelectedTdeeRowPosition(DailyStatsFragment.this);
+        dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
 
         dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
