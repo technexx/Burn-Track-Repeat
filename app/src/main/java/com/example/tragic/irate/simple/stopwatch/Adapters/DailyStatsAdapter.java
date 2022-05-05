@@ -54,13 +54,12 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
 
-        mActivityViewHolder = new ActivityViewHolder(view);
-
-        return mActivityViewHolder;
+        return mActivityViewHolder = new ActivityViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
+        mActivityViewHolder = holder;
 
         mActivityViewHolder.setTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive) {
@@ -80,6 +79,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             mActivityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mActivityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mActivityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+
+            Log.i("testPos", "activity at position 0 is " + mActivityViewHolder.activityTextView.getText());
         } else {
             mActivityViewHolder.activityTextView.setText(mActivities.get(position-1));
             mActivityViewHolder.setTimeTextView.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
@@ -96,6 +97,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             } else {
                 mActivityViewHolder.fullView.setBackground(null);
             }
+
+            Log.i("testPos", "background is " + mActivityViewHolder.fullView.getBackground());
+            Log.i("testPos", "activity at position " + position  + " is " + mActivityViewHolder.activityTextView.getText());
         }
 
         mActivityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);

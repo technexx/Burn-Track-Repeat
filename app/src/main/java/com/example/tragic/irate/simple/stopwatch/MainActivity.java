@@ -517,6 +517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Daily Stats Fragment does not have focus (clicking in certain spots will launch timers from Main).
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: Will eventually need a stats reset at end of year.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.

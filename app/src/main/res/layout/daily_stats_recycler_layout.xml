@@ -27,8 +27,7 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats_textView"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="6dp"
         android:textSize="16sp"
         android:paddingTop="4dp"
@@ -36,14 +35,12 @@
         android:gravity="center">
     </TextView>
 
-
     <TextView
         android:id="@+id/break_time_in_daily_stats_textView"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_textView"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="6dp"
         android:textSize="16sp"
         android:paddingTop="4dp"
@@ -56,8 +53,7 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="2dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
@@ -69,10 +65,9 @@
         android:id="@+id/set_time_in_daily_stats_editText"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats_textView"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
-        android:layout_marginEnd="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="140dp"
         android:textSize="16sp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
@@ -84,25 +79,14 @@
         android:id="@+id/break_time_in_daily_stats_editText"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_textView"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
-        android:layout_marginEnd="6dp"
+        app:layout_constraintStart_toEndOf="@id/set_time_in_daily_stats_editText"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="20dp"
         android:textSize="16sp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
         android:gravity="center"
         android:inputType="number">
     </EditText>
-
-    <View
-        android:id="@+id/divider_view"
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats_textView"
-        android:layout_marginStart="4dp"
-        android:background="@color/black">
-    </View>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
