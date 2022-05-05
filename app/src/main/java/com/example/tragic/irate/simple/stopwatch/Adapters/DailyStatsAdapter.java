@@ -24,7 +24,7 @@ import java.util.List;
 
 public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.ActivityViewHolder> {
     Context mContext;
-    ActivityViewHolder mActivityViewHolder;
+    ActivityViewHolder holder;
     List<String> mActivities;
     List<Long> mSetTimes;
     List<Long> mBreakTimes;
@@ -54,56 +54,57 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
 
-        return mActivityViewHolder = new ActivityViewHolder(view);
+        return holder = new ActivityViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
-        mActivityViewHolder = holder;
+        ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
-        mActivityViewHolder.setTimeTextView.setOnClickListener(v-> {
+        activityViewHolder.setTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive) {
                 if (position>0) {
-                    toggleTextViewsAndEditTextForSetTime();
+                    if (activityViewHolder.setTimeTextView.isShown()) {
+                        activityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
+                        activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
+                    }
+                    if (activityViewHolder.breakTimeEditText.isShown()) {
+                        activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
+                    }
                 }
             }
         });
 
         if (position==0) {
-            mActivityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
-            mActivityViewHolder.setTimeTextView.setText(mContext.getString(R.string.set_time_text_header));
-            mActivityViewHolder.breakTimeTextView.setText(mContext.getString(R.string.break_time_text_header));
-            mActivityViewHolder.caloriesBurnedTextView.setText(mContext.getString(R.string.calories_burned_text_header));
+            activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
+            activityViewHolder.setTimeTextView.setText(mContext.getString(R.string.set_time_text_header));
+            activityViewHolder.breakTimeTextView.setText(mContext.getString(R.string.break_time_text_header));
+            activityViewHolder.caloriesBurnedTextView.setText(mContext.getString(R.string.calories_burned_text_header));
 
-            mActivityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mActivityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mActivityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mActivityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
-
-            Log.i("testPos", "activity at position 0 is " + mActivityViewHolder.activityTextView.getText());
+            activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
         } else {
-            mActivityViewHolder.activityTextView.setText(mActivities.get(position-1));
-            mActivityViewHolder.setTimeTextView.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
-            mActivityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSeconds(mBreakTimes.get(position-1)));
-            mActivityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+            activityViewHolder.activityTextView.setText(mActivities.get(position-1));
+            activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
+            activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSeconds(mBreakTimes.get(position-1)));
+            activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
 
-            mActivityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
-            mActivityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
-            mActivityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
-            mActivityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+            activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
+            activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
+            activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
+            activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
             if (mEditModeIsActive) {
-                mActivityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
             } else {
-                mActivityViewHolder.fullView.setBackground(null);
+                activityViewHolder.fullView.setBackground(null);
             }
-
-            Log.i("testPos", "background is " + mActivityViewHolder.fullView.getBackground());
-            Log.i("testPos", "activity at position " + position  + " is " + mActivityViewHolder.activityTextView.getText());
         }
 
-        mActivityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
-        mActivityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
+        activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
+        activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -118,16 +119,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     public void toggleEditMode() {
         mEditModeIsActive = !mEditModeIsActive;
         notifyDataSetChanged();
-    }
-
-    public void toggleTextViewsAndEditTextForSetTime() {
-        if (mActivityViewHolder.setTimeTextView.isShown()) {
-            mActivityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
-            mActivityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
-        }
-        if (mActivityViewHolder.breakTimeEditText.isShown()) {
-            mActivityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
-        }
     }
 
     public class ActivityViewHolder extends RecyclerView.ViewHolder {
