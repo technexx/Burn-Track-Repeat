@@ -73,6 +73,7 @@
     <string name="workout_mode">Workout Mode</string>
     <string name="pomodoro_mode">Pomodoro Mode</string>
 
+    <string name="total">Total:</string>
     <string name="daily_stats_string">%1$s\n%2$s</string>
     <string name="day_total_header">Daily Total</string>
     <string name="weekly_total_header">Weekly Total</string>

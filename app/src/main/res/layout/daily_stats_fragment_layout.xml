@@ -5,20 +5,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/StatFragmentTheme">
 
-    <CalendarView
-        android:id="@+id/stats_calendar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-    </CalendarView>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stats_total_header_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/stats_calendar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/daily_total_stats_border">
 
@@ -27,10 +18,11 @@
             android:text="@string/day_total_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="@id/daily_stats_total_break_time_textView"
-            app:layout_constraintEnd_toEndOf="@id/daily_stats_total_break_time_textView"
-            android:layout_marginTop="6dp"
+            app:layout_constraintTop_toTopOf="@id/stat_duration_switcher_button_left"
+            app:layout_constraintBottom_toBottomOf="@id/stat_duration_switcher_button_left"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="0dp"
             android:textStyle="bold">
         </TextView>
 
@@ -38,7 +30,8 @@
             android:id="@+id/stat_duration_switcher_button_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/edit_tdee_stats_button"
+            app:layout_constraintBottom_toBottomOf="@id/edit_tdee_stats_button"
             app:layout_constraintEnd_toStartOf="@id/total_stats_header"
             android:layout_marginEnd="12dp"
             android:src="@drawable/double_arrow_left"
@@ -49,45 +42,23 @@
             android:id="@+id/stat_duration_switcher_button_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/total_stats_header"
+            app:layout_constraintTop_toTopOf="@id/edit_tdee_stats_button"
+            app:layout_constraintBottom_toBottomOf="@id/edit_tdee_stats_button"            app:layout_constraintStart_toEndOf="@id/total_stats_header"
             android:layout_marginStart="12dp"
             android:src="@drawable/double_arrow_right"
             android:backgroundTint="@color/dark_grey">
         </ImageButton>
 
-        <TextView
-            android:id="@+id/daily_stats_total_set_time_textView"
+        <ImageButton
+            android:id="@+id/edit_tdee_stats_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/total_stats_header"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/daily_stats_total_break_time_textView"
-            android:layout_marginTop="10dp"
-            android:gravity="center">
-        </TextView>
-
-        <TextView
-            android:id="@+id/daily_stats_total_break_time_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/daily_stats_total_set_time_textView"
-            app:layout_constraintEnd_toEndOf="@id/daily_stats_total_daily_time_and_calories_burned_textView"
-            app:layout_constraintTop_toBottomOf="@id/total_stats_header"
-            android:layout_marginTop="10dp"
-            android:gravity="center">
-        </TextView>
-
-        <TextView
-            android:id="@+id/daily_stats_total_daily_time_and_calories_burned_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/daily_stats_total_break_time_textView"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_stats_header"
-            android:layout_marginTop="10dp"
-            android:gravity="center">
-        </TextView>
+            android:src="@drawable/edit_icon"
+            android:backgroundTint="@color/dark_grey">
+        </ImageButton>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -100,24 +71,74 @@
         android:layout_marginTop="4dp">
     </androidx.recyclerview.widget.RecyclerView>
 
+    <TextView
+        android:id="@+id/total_stats_TextView"
+        android:text="@string/total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        android:layout_marginStart="2dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/daily_stats_total_set_time_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/daily_stats_total_break_time_textView"
+        android:gravity="center">
+    </TextView>
+
+    <TextView
+        android:id="@+id/daily_stats_total_break_time_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/daily_stats_total_set_time_textView"
+        app:layout_constraintEnd_toEndOf="@id/daily_stats_total_daily_time_and_calories_burned_textView"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        android:gravity="center">
+    </TextView>
+
+    <TextView
+        android:id="@+id/daily_stats_total_daily_time_and_calories_burned_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/daily_stats_total_break_time_textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        android:gravity="center">
+    </TextView>
+
+    <View
+        android:id="@+id/recycler_and_calendar_divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/stats_calendar"
+        app:layout_constraintTop_toBottomOf="@id/daily_stats_total_set_time_textView"
+        android:layout_marginTop="24dp"
+        android:background="@color/black">
+    </View>
+
+    <CalendarView
+        android:id="@+id/stats_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+    </CalendarView>
+
     <View
         android:id="@+id/tdee_edit_popUp_anchor"
         android:layout_width="1dp"
         android:layout_height="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/edit_tdee_stats_button"
+        app:layout_constraintBottom_toTopOf="@id/stats_calendar"
         android:layout_marginTop="4dp">
     </View>
-
-    <ImageButton
-        android:id="@+id/edit_tdee_stats_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/edit_icon"
-        android:backgroundTint="@color/dark_grey">
-    </ImageButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

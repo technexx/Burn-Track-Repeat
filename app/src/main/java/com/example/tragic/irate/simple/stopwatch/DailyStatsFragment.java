@@ -196,9 +196,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
-        statsTotalSetTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_set_time), totalSetTime));
-        statsTotalBreakTimeTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_break_time), totalBreakTime));
-        statsTotalCaloriesBurnedTextView.setText(getString(R.string.daily_stats_string, getString(R.string.daily_calories_burned),formatCalorieString(totalCaloriesBurned)));
+        statsTotalSetTimeTextView.setText(totalSetTime);
+        statsTotalBreakTimeTextView.setText(totalBreakTime);
+        statsTotalCaloriesBurnedTextView.setText(formatCalorieString(totalCaloriesBurned));
     }
 
     public int getDaySelectedFromCalendar() {

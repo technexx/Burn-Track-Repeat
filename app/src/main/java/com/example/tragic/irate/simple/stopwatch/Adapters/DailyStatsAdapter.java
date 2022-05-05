@@ -61,6 +61,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
         activityViewHolder.fullView.setOnClickListener(v-> {
             //Start at 1 because of header, and return 0 for it because that's our first list position.
+            //Todo: If we use "Total" as a final row, this must also be modified so we won't click out of list index.
             if (mEditModeIsActive) {
                 if (position>0) {
                     mTdeeRowIsSelected.tdeeRowSelection(position-1);
