@@ -79,12 +79,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
                 activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
             }
         } else {
-            if (activityViewHolder.setTimeEditText.getVisibility() == View.VISIBLE) {
-                activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
-            }
-            if (activityViewHolder.breakTimeEditText.getVisibility() == View.VISIBLE) {
-                activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
-            }
+            activityViewHolder.setTimeTextView.setVisibility(View.VISIBLE);
+            activityViewHolder.breakTimeTextView.setVisibility(View.VISIBLE);
+            activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
+            activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
         }
 
         if (position==0) {
