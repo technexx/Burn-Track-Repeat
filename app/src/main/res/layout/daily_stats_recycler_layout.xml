@@ -8,7 +8,7 @@
 
     <!--Stat views (except activity) constrained from END because width of activity String is variable-->
     <TextView
-        android:id="@+id/activity_in_daily_stats"
+        android:id="@+id/activity_in_daily_stats_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,12 +23,27 @@
     </TextView>
 
     <TextView
-        android:id="@+id/set_time_in_daily_stats"
+        android:id="@+id/set_time_in_daily_stats_textView"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats"
+        app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats_textView"
+        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
+        android:layout_marginEnd="6dp"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:gravity="center">
+    </TextView>
+
+
+    <TextView
+        android:id="@+id/break_time_in_daily_stats_textView"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_textView"
+        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
         android:layout_marginEnd="6dp"
         android:textSize="16sp"
         android:paddingTop="4dp"
@@ -37,26 +52,12 @@
     </TextView>
 
     <TextView
-        android:id="@+id/break_time_in_daily_stats"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats"
-        android:layout_marginEnd="6dp"
-        android:textSize="16sp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:gravity="center">
-    </TextView>
-
-    <TextView
-        android:id="@+id/calories_burned_in_daily_stats"
+        android:id="@+id/calories_burned_in_daily_stats_textView"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats"
-        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats"
+        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
         android:layout_marginEnd="2dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
@@ -64,12 +65,40 @@
         android:gravity="center">
     </TextView>
 
+    <EditText
+        android:id="@+id/set_time_in_daily_stats_editText"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/break_time_in_daily_stats_textView"
+        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
+        android:layout_marginEnd="6dp"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:gravity="center">
+    </EditText>
+
+    <EditText
+        android:id="@+id/break_time_in_daily_stats_editText"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_textView"
+        app:layout_constraintTop_toTopOf="@id/activity_in_daily_stats_textView"
+        app:layout_constraintBottom_toBottomOf="@id/activity_in_daily_stats_textView"
+        android:layout_marginEnd="6dp"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:gravity="center">
+    </EditText>
+
     <View
         android:id="@+id/divider_view"
         android:layout_width="2dp"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats"
+        app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats_textView"
         android:layout_marginStart="4dp"
         android:background="@color/black">
     </View>
