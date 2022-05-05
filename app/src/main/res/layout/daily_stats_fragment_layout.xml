@@ -74,40 +74,55 @@
     <TextView
         android:id="@+id/total_stats_TextView"
         android:text="@string/total"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
-        android:layout_marginStart="2dp">
+        android:layout_marginStart="2dp"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:textStyle="bold">
     </TextView>
 
     <TextView
         android:id="@+id/daily_stats_total_set_time_textView"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/daily_stats_total_break_time_textView"
+        android:layout_marginEnd="6dp"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textStyle="bold"
         android:gravity="center">
     </TextView>
 
     <TextView
         android:id="@+id/daily_stats_total_break_time_textView"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/daily_stats_total_set_time_textView"
-        app:layout_constraintEnd_toEndOf="@id/daily_stats_total_daily_time_and_calories_burned_textView"
+        app:layout_constraintEnd_toStartOf="@id/daily_stats_total_calories_burned_textView"
         app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        android:layout_marginEnd="6dp"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textStyle="bold"
         android:gravity="center">
     </TextView>
 
     <TextView
-        android:id="@+id/daily_stats_total_daily_time_and_calories_burned_textView"
-        android:layout_width="wrap_content"
+        android:id="@+id/daily_stats_total_calories_burned_textView"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/daily_stats_total_break_time_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/daily_stats_recyclerView"
+        android:layout_marginEnd="2dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
         android:gravity="center">
     </TextView>
 
