@@ -32,7 +32,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     LongToStringConverters longToStringConverters = new LongToStringConverters();
 
     boolean mEditModeIsActive;
-    int mPositionSelected;
+    int mPositionSelectedToEdit;
 
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
 
@@ -64,16 +64,28 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         activityViewHolder.setTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive) {
                 if (position>0) {
-                    if (activityViewHolder.setTimeTextView.isShown()) {
-                        activityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
-                        activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
-                    }
-                    if (activityViewHolder.breakTimeEditText.isShown()) {
-                        activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
-                    }
+                    mPositionSelectedToEdit = position;
+                    notifyDataSetChanged();
                 }
             }
         });
+
+        activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
+        activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
+
+        if (position==mPositionSelectedToEdit) {
+            if (activityViewHolder.setTimeTextView.getVisibility() == View.VISIBLE) {
+                activityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
+                activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (activityViewHolder.setTimeEditText.getVisibility() == View.VISIBLE) {
+                activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
+            }
+            if (activityViewHolder.breakTimeEditText.getVisibility() == View.VISIBLE) {
+                activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
+            }
+        }
 
         if (position==0) {
             activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
@@ -102,9 +114,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
                 activityViewHolder.fullView.setBackground(null);
             }
         }
-
-        activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
-        activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
     }
 
     @Override
