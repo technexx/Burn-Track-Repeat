@@ -62,19 +62,19 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
         activityViewHolder.setTimeTextView.setOnClickListener(v-> {
-            if (mEditModeIsActive) {
-                if (position>0) {
-                    mPositionSelectedToEdit = position;
-                    notifyDataSetChanged();
-                }
-            }
+            toggleTextAndEditViewsOnClick(position);
+        });
+
+        activityViewHolder.breakTimeTextView.setOnClickListener(v-> {
+            toggleTextAndEditViewsOnClick(position);
         });
 
         activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
         activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
 
+        //Todo: Need different views for different clicks.
         if (position==mPositionSelectedToEdit) {
-            if (activityViewHolder.setTimeTextView.getVisibility() == View.VISIBLE) {
+            if (activityViewHolder.setTimeTextView.getVisibility()==View.VISIBLE) {
                 activityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
                 activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
             }
@@ -126,6 +126,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     public void toggleEditMode() {
         mEditModeIsActive = !mEditModeIsActive;
         notifyDataSetChanged();
+    }
+
+    private void toggleTextAndEditViewsOnClick(int position) {
+        if (mEditModeIsActive) {
+            if (position>0) {
+                mPositionSelectedToEdit = position;
+                notifyDataSetChanged();
+            }
+        }
     }
 
     public class ActivityViewHolder extends RecyclerView.ViewHolder {
