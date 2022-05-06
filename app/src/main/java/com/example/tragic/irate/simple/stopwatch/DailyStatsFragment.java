@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -213,8 +214,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void tdeeEditItemSelected(int typeOfEdit, int position) {
-
+    public void tdeeEditItemSelected(int typeOfEdit, int position, String receivedValue) {
+        Log.i("testEdit", "type of edit is " + typeOfEdit + " and position is " + position + " and received value is " + receivedValue);
     }
 
     private String convertSeconds(long totalSeconds) {

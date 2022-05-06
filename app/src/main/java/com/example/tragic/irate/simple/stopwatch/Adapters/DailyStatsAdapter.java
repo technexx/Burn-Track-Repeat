@@ -43,7 +43,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     int EDITING_BREAKS = 1;
 
     public interface tdeeEditedItemIsSelected {
-        void tdeeEditItemSelected (int typeOfEdit, int position);
+        void tdeeEditItemSelected (int typeOfEdit, int position, String editedValue);
     }
 
     public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
@@ -93,8 +93,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId== EditorInfo.IME_ACTION_DONE){
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position);
-                    Toast.makeText(mContext, "Done!", Toast.LENGTH_SHORT).show();
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position, activityViewHolder.setTimeEditText.getText().toString());
                 }
                 return false;
             }
@@ -104,8 +103,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId== EditorInfo.IME_ACTION_DONE){
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position);
-                    Toast.makeText(mContext, "Done!", Toast.LENGTH_SHORT).show();
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position, activityViewHolder.breakTimeEditText.getText().toString());
                 }
                 return false;
             }
