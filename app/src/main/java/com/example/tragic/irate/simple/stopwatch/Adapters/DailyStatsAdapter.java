@@ -61,27 +61,33 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
+        //Todo: If view is set as invisible, this onClick won't work.
         activityViewHolder.setTimeTextView.setOnClickListener(v-> {
             toggleTextAndEditViewsOnClick(position);
+
+            if (position==mPositionSelectedToEdit) {
+                activityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
+                activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
+                activityViewHolder.breakTimeTextView.setVisibility(View.VISIBLE);
+                activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
+            }
         });
 
         activityViewHolder.breakTimeTextView.setOnClickListener(v-> {
             toggleTextAndEditViewsOnClick(position);
+
+            if (position==mPositionSelectedToEdit) {
+                activityViewHolder.setTimeTextView.setVisibility(View.VISIBLE);
+                activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
+                activityViewHolder.breakTimeTextView.setVisibility(View.INVISIBLE);
+                activityViewHolder.breakTimeEditText.setVisibility(View.VISIBLE);
+            }
         });
 
-        activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
-        activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
-
-        //Todo: Need different views for different clicks.
-        if (position==mPositionSelectedToEdit) {
-            if (activityViewHolder.setTimeTextView.getVisibility()==View.VISIBLE) {
-                activityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
-                activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
-            }
-        } else {
+        if (position!=mPositionSelectedToEdit || !mEditModeIsActive) {
             activityViewHolder.setTimeTextView.setVisibility(View.VISIBLE);
-            activityViewHolder.breakTimeTextView.setVisibility(View.VISIBLE);
             activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
+            activityViewHolder.breakTimeTextView.setVisibility(View.VISIBLE);
             activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
         }
 
