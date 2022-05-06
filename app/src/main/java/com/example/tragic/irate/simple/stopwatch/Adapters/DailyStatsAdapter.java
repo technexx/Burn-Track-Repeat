@@ -39,6 +39,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
 
+    int EDITING_SETS = 0;
+    int EDITING_BREAKS = 1;
+
     public interface tdeeEditedItemIsSelected {
         void tdeeEditItemSelected (int typeOfEdit, int position);
     }
@@ -90,6 +93,18 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId== EditorInfo.IME_ACTION_DONE){
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position);
+                    Toast.makeText(mContext, "Done!", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+        });
+
+        activityViewHolder.breakTimeEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId== EditorInfo.IME_ACTION_DONE){
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position);
                     Toast.makeText(mContext, "Done!", Toast.LENGTH_SHORT).show();
                 }
                 return false;
