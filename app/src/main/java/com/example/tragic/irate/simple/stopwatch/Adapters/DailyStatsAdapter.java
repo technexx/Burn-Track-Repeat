@@ -61,7 +61,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
-        //Todo: If view is set as invisible, this onClick won't work.
         activityViewHolder.setTimeTextView.setOnClickListener(v-> {
             toggleTextAndEditViewsOnClick(position);
 
@@ -106,6 +105,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
             activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSeconds(mBreakTimes.get(position-1)));
             activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+
+            activityViewHolder.setTimeEditText.setText(activityViewHolder.setTimeTextView.getText());
+            activityViewHolder.breakTimeEditText.setText(activityViewHolder.breakTimeTextView.getText());
 
             activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
