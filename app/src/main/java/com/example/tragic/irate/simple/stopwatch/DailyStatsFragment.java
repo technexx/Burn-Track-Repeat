@@ -28,7 +28,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected{
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected {
 
     View mRoot;
     Calendar calendar;
@@ -56,6 +56,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     int ITERATING_STATS_UP = 0;
     int ITERATING_STATS_DOWN = 1;
+
+    int EDITING_SETS = 0;
+    int EDITING_BREAKS = 1;
 
     View tdeeEditView;
     View tdeeEditPopUpAnchor;
@@ -210,7 +213,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void tdeeEditItemSelected(int position) {
+    public void tdeeEditItemSelected(int typeOfEdit, int position) {
 
     }
 

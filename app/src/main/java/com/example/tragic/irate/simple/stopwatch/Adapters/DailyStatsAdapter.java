@@ -4,11 +4,14 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -37,7 +40,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
 
     public interface tdeeEditedItemIsSelected {
-        void tdeeEditItemSelected (int position);
+        void tdeeEditItemSelected (int typeOfEdit, int position);
     }
 
     public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
@@ -83,6 +86,16 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             }
         });
 
+        activityViewHolder.setTimeEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId== EditorInfo.IME_ACTION_DONE){
+                    Toast.makeText(mContext, "Done!", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+        });
+
         if (position!=mPositionSelectedToEdit || !mEditModeIsActive) {
             activityViewHolder.setTimeTextView.setVisibility(View.VISIBLE);
             activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
@@ -113,12 +126,12 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+        }
 
-            if (mEditModeIsActive) {
-                activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-            } else {
-                activityViewHolder.fullView.setBackground(null);
-            }
+        if (mEditModeIsActive) {
+            activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+        } else {
+            activityViewHolder.fullView.setBackground(null);
         }
     }
 
