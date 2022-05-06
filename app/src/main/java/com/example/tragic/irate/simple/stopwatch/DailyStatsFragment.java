@@ -58,9 +58,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int ITERATING_STATS_UP = 0;
     int ITERATING_STATS_DOWN = 1;
 
-    int EDITING_SETS = 0;
-    int EDITING_BREAKS = 1;
-
     View tdeeEditView;
     View tdeeEditPopUpAnchor;
     PopupWindow tdeeEditPopUpWindow;
@@ -68,6 +65,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText tdeeSetTimeEditText;
     EditText tdeeBreakTimeEditText;
     TextView tdeeEditCaloriesTextView;
+
+    View recyclerAndTotalStatsDivider;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
@@ -196,8 +195,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayHolderStatsTextViews() {
-        String totalSetTime = convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
-        String totalBreakTime = convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
+        String totalSetTime = longToStringConverters.convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
+        String totalBreakTime = longToStringConverters.convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         statsTotalSetTimeTextView.setText(totalSetTime);
@@ -213,23 +212,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAdapter.toggleEditMode();
     }
 
+    //Todo: We'll need to create and account for hours/minutes (e.g. 18:20:45). Should even account for 100+ hours for yearly stats.
+    //Todo: Better option may be a guided hours:minute:second popUp thing. Would also eliminate lining up editTexts/textViews.
     @Override
-    public void tdeeEditItemSelected(int typeOfEdit, int position, String receivedValue) {
-        Log.i("testEdit", "type of edit is " + typeOfEdit + " and position is " + position + " and received value is " + receivedValue);
-    }
-
-    private String convertSeconds(long totalSeconds) {
-        DecimalFormat df = new DecimalFormat("00");
-        long minutes;
-        long remainingSeconds;
-        totalSeconds = totalSeconds/1000;
-
-        if (totalSeconds >=60) {
-            minutes = totalSeconds/60;
-            remainingSeconds = totalSeconds % 60;
-            return (minutes + ":" + df.format(remainingSeconds));
-        } else if (totalSeconds >=10) return "0:" + totalSeconds;
-        else return "0:0" + totalSeconds;
+    public void tdeeEditItemSelected(int typeOfEdit, int position, String receivedStringValue) {
+        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider);
+        Log.i("testEdit", "type of edit is " + typeOfEdit + " and position is " + position + " and received value is " + receivedStringValue);
     }
 
     private void instantiateTextViewsAndMiscClasses() {
@@ -251,6 +239,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeSetTimeEditText = tdeeEditView.findViewById(R.id.set_time_editText);
         tdeeBreakTimeEditText = tdeeEditView.findViewById(R.id.break_time_editText);
         tdeeEditCaloriesTextView = tdeeEditView.findViewById(R.id.calories_string_in_edit_popUp);
+
+        recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {

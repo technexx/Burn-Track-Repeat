@@ -61,4 +61,15 @@ public class LongToStringConverters {
             }
         }
     }
+
+    public int convertStringToSecondsValue(String timerString) {
+        int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+        int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+        if (totalSeconds>60) {
+            totalSeconds = totalSeconds%60;
+            totalMinutes +=1;
+        }
+        int totalTime = (totalMinutes*60) + totalSeconds;
+        return totalTime;
+    }
 }
