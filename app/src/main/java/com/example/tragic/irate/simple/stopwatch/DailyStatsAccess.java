@@ -384,6 +384,22 @@ public class DailyStatsAccess {
         return iteratingValue + presentValue;
     }
 
+    public List<String> getTotalActivitiesListForSelectedDuration() {
+        return totalActivitiesListForSelectedDuration;
+    }
+
+    public List<Long> getTotalSetTimeListForEachActivityForSelectedDuration() {
+        return totalSetTimeListForEachActivityForSelectedDuration;
+    }
+
+    public List<Long> getTotalBreakTimeListForEachActivityForSelectedDuration() {
+        return totalBreakTimeListForEachActivityForSelectedDuration;
+    }
+
+    public List<Double> getTotalCaloriesBurnedListForEachActivityForSelectedDuration() {
+        return totalCaloriesBurnedListForEachActivityForSelectedDuration;
+    }
+
     public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDuration.clear();
         totalSetTimeListForEachActivityForSelectedDuration.clear();
