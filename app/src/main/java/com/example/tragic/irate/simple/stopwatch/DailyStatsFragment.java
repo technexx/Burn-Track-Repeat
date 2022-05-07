@@ -215,9 +215,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     //Todo: We'll need to create and account for hours/minutes (e.g. 18:20:45). Should even account for 100+ hours for yearly stats.
     //Todo: Better option may be a guided hours:minute:second popUp thing. Would also eliminate lining up editTexts/textViews.
     @Override
-    public void tdeeEditItemSelected(int typeOfEdit, int position, String receivedStringValue) {
+    public void tdeeEditItemSelected(int typeOfEdit, int position) {
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider);
-        Log.i("testEdit", "type of edit is " + typeOfEdit + " and position is " + position + " and received value is " + receivedStringValue);
+        Log.i("testEdit", "type of edit is " + typeOfEdit + " and position is " + position);
     }
 
     private void instantiateTextViewsAndMiscClasses() {

@@ -43,7 +43,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     int EDITING_BREAKS = 1;
 
     public interface tdeeEditedItemIsSelected {
-        void tdeeEditItemSelected (int typeOfEdit, int position, String editedValue);
+        void tdeeEditItemSelected (int typeOfEdit, int position);
     }
 
     public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
@@ -68,53 +68,12 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
         activityViewHolder.setTimeTextView.setOnClickListener(v-> {
-            toggleTextAndEditViewsOnClick(position);
-
-            if (position==mPositionSelectedToEdit) {
-                activityViewHolder.setTimeTextView.setVisibility(View.INVISIBLE);
-                activityViewHolder.setTimeEditText.setVisibility(View.VISIBLE);
-                activityViewHolder.breakTimeTextView.setVisibility(View.VISIBLE);
-                activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
-            }
+            mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position);
         });
 
         activityViewHolder.breakTimeTextView.setOnClickListener(v-> {
-            toggleTextAndEditViewsOnClick(position);
-
-            if (position==mPositionSelectedToEdit) {
-                activityViewHolder.setTimeTextView.setVisibility(View.VISIBLE);
-                activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
-                activityViewHolder.breakTimeTextView.setVisibility(View.INVISIBLE);
-                activityViewHolder.breakTimeEditText.setVisibility(View.VISIBLE);
-            }
+            mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position);
         });
-
-        activityViewHolder.setTimeEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId== EditorInfo.IME_ACTION_DONE){
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position, activityViewHolder.setTimeEditText.getText().toString());
-                }
-                return false;
-            }
-        });
-
-        activityViewHolder.breakTimeEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId== EditorInfo.IME_ACTION_DONE){
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position, activityViewHolder.breakTimeEditText.getText().toString());
-                }
-                return false;
-            }
-        });
-
-        if (position!=mPositionSelectedToEdit || !mEditModeIsActive) {
-            activityViewHolder.setTimeTextView.setVisibility(View.VISIBLE);
-            activityViewHolder.setTimeEditText.setVisibility(View.INVISIBLE);
-            activityViewHolder.breakTimeTextView.setVisibility(View.VISIBLE);
-            activityViewHolder.breakTimeEditText.setVisibility(View.INVISIBLE);
-        }
 
         if (position==0) {
             activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
@@ -131,9 +90,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
             activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSeconds(mBreakTimes.get(position-1)));
             activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
-
-            activityViewHolder.setTimeEditText.setText(activityViewHolder.setTimeTextView.getText());
-            activityViewHolder.breakTimeEditText.setText(activityViewHolder.breakTimeTextView.getText());
 
             activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
@@ -177,9 +133,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         TextView breakTimeTextView;
         TextView caloriesBurnedTextView;
 
-        EditText setTimeEditText;
-        EditText breakTimeEditText;
-
         View fullView;
 
         public ActivityViewHolder(@NonNull View itemView) {
@@ -188,9 +141,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
             breakTimeTextView = itemView.findViewById(R.id.break_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
-
-            setTimeEditText = itemView.findViewById(R.id.set_time_in_daily_stats_editText);
-            breakTimeEditText = itemView.findViewById(R.id.break_time_in_daily_stats_editText);
 
             fullView = itemView;
         }

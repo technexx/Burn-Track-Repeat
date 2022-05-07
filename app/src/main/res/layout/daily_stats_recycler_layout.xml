@@ -61,32 +61,4 @@
         android:gravity="center">
     </TextView>
 
-    <EditText
-        android:id="@+id/set_time_in_daily_stats_editText"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="140dp"
-        android:textSize="16sp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:gravity="center"
-        android:inputType="number">
-    </EditText>
-
-    <EditText
-        android:id="@+id/break_time_in_daily_stats_editText"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/set_time_in_daily_stats_editText"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="20dp"
-        android:textSize="16sp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:gravity="center"
-        android:inputType="number">
-    </EditText>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
