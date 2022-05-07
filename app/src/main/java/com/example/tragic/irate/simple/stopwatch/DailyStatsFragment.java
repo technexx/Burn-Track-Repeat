@@ -64,9 +64,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     PopupWindow tdeeEditPopUpWindow;
     TextView tdeeEditPopUpActivityTextView;
-    EditText tdeeEditPopUpSetTimeEditText;
-    EditText tdeeEditPopUpBreakTimeEditText;
-    TextView tdeeEditPopUpCaloriesTextView;
+    EditText tdeeEditText;
 
     View recyclerAndTotalStatsDivider;
 
@@ -216,19 +214,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     //Todo: We'll need to create and account for hours/minutes (e.g. 18:20:45). Should even account for 100+ hours for yearly stats.
     @Override
-    public void tdeeEditItemSelected(int position) {
+    public void tdeeEditItemSelected(int typeOfEdit, int position) {
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
-        long longSetTime = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
-        long longBreakTime = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
-        double totalCalories = dailyStatsAccess.getTotalCaloriesBurnedListForEachActivityForSelectedDuration().get(position);
+        long timeToEditLongValue;
 
-        String setTime = longToStringConverters.convertSeconds(longSetTime);
-        String breakTime = longToStringConverters.convertSeconds(longBreakTime);
+        if (typeOfEdit==0) {
+            timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
+        } else {
+            timeToEditLongValue = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
+        }
+
+        String timeToEditString = longToStringConverters.convertSeconds(timeToEditLongValue);
 
         tdeeEditPopUpActivityTextView.setText(activityString);
-        tdeeEditPopUpSetTimeEditText.setText(String.valueOf(setTime));
-        tdeeEditPopUpBreakTimeEditText.setText(String.valueOf(breakTime));
-        tdeeEditPopUpCaloriesTextView.setText(formatCalorieToString(totalCalories));
+        tdeeEditText.setText(String.valueOf(timeToEditString));
 
         tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
     }
@@ -250,9 +249,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
 
         tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
-        tdeeEditPopUpSetTimeEditText = tdeeEditView.findViewById(R.id.set_time_editText);
-        tdeeEditPopUpBreakTimeEditText = tdeeEditView.findViewById(R.id.break_time_editText);
-        tdeeEditPopUpCaloriesTextView = tdeeEditView.findViewById(R.id.calories_string_in_edit_popUp);
+        tdeeEditText = tdeeEditView.findViewById(R.id.tdee_editText);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
