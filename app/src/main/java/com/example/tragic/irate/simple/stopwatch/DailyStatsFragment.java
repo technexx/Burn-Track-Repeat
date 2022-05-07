@@ -63,10 +63,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View tdeeEditPopUpAnchorHigh;
 
     PopupWindow tdeeEditPopUpWindow;
-    TextView tdeeEditActivityTextView;
-    EditText tdeeSetTimeEditText;
-    EditText tdeeBreakTimeEditText;
-    TextView tdeeEditCaloriesTextView;
+    TextView tdeeEditPopUpActivityTextView;
+    EditText tdeeEditPopUpSetTimeEditText;
+    EditText tdeeEditPopUpBreakTimeEditText;
+    TextView tdeeEditPopUpCaloriesTextView;
 
     View recyclerAndTotalStatsDivider;
 
@@ -217,6 +217,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     //Todo: We'll need to create and account for hours/minutes (e.g. 18:20:45). Should even account for 100+ hours for yearly stats.
     @Override
     public void tdeeEditItemSelected(int position) {
+        String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
+        long setTime = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
+        long breakTime = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
+        double totalCalories = dailyStatsAccess.getTotalCaloriesBurnedListForEachActivityForSelectedDuration().get(position);
+
+        tdeeEditPopUpActivityTextView.setText(activityString);
+        tdeeEditPopUpSetTimeEditText.setText(String.valueOf(setTime));
+        tdeeEditPopUpBreakTimeEditText.setText(String.valueOf(breakTime));
+        tdeeEditPopUpCaloriesTextView.setText(String.valueOf(totalCalories));
+
         tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
     }
 
@@ -236,11 +246,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
 
-        //Todo: These are for our popUp.
-        tdeeEditActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
-        tdeeSetTimeEditText = tdeeEditView.findViewById(R.id.set_time_editText);
-        tdeeBreakTimeEditText = tdeeEditView.findViewById(R.id.break_time_editText);
-        tdeeEditCaloriesTextView = tdeeEditView.findViewById(R.id.calories_string_in_edit_popUp);
+        tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
+        tdeeEditPopUpSetTimeEditText = tdeeEditView.findViewById(R.id.set_time_editText);
+        tdeeEditPopUpBreakTimeEditText = tdeeEditView.findViewById(R.id.break_time_editText);
+        tdeeEditPopUpCaloriesTextView = tdeeEditView.findViewById(R.id.calories_string_in_edit_popUp);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
