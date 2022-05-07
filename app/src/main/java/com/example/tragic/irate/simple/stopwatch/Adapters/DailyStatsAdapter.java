@@ -39,11 +39,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
 
-    int EDITING_SETS = 0;
-    int EDITING_BREAKS = 1;
-
     public interface tdeeEditedItemIsSelected {
-        void tdeeEditItemSelected (int typeOfEdit, int position);
+        void tdeeEditItemSelected (int position);
     }
 
     public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
@@ -67,12 +64,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
-        activityViewHolder.setTimeTextView.setOnClickListener(v-> {
-            mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position);
-        });
-
-        activityViewHolder.breakTimeTextView.setOnClickListener(v-> {
-            mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position);
+        activityViewHolder.fullView.setOnClickListener(v-> {
+            if (mEditModeIsActive && position>0) {
+                mTdeeEditedItemIsSelected.tdeeEditItemSelected(position-1);
+            }
         });
 
         if (position==0) {

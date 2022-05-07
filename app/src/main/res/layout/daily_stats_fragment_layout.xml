@@ -13,6 +13,16 @@
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/daily_total_stats_border">
 
+        <View
+            android:id="@+id/tdee_edit_popUp_anchor_high"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="@id/stat_duration_switcher_button_left"
+            app:layout_constraintBottom_toBottomOf="@id/stat_duration_switcher_button_left"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+        </View>
+
         <TextView
             android:id="@+id/total_stats_header"
             android:text="@string/day_total_header"
@@ -149,7 +159,7 @@
     </CalendarView>
 
     <View
-        android:id="@+id/tdee_edit_popUp_anchor"
+        android:id="@+id/tdee_edit_popUp_anchor_low"
         android:layout_width="1dp"
         android:layout_height="1dp"
         app:layout_constraintStart_toStartOf="parent"

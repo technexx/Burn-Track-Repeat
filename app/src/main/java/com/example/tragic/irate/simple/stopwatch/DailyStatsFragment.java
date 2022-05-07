@@ -59,7 +59,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int ITERATING_STATS_DOWN = 1;
 
     View tdeeEditView;
-    View tdeeEditPopUpAnchor;
+    View tdeeEditPopUpAnchorLow;
+    View tdeeEditPopUpAnchorHigh;
+
     PopupWindow tdeeEditPopUpWindow;
     TextView tdeeEditActivityTextView;
     EditText tdeeSetTimeEditText;
@@ -213,11 +215,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     //Todo: We'll need to create and account for hours/minutes (e.g. 18:20:45). Should even account for 100+ hours for yearly stats.
-    //Todo: Better option may be a guided hours:minute:second popUp thing. Would also eliminate lining up editTexts/textViews.
     @Override
-    public void tdeeEditItemSelected(int typeOfEdit, int position) {
-        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider);
-        Log.i("testEdit", "type of edit is " + typeOfEdit + " and position is " + position);
+    public void tdeeEditItemSelected(int position) {
+        tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
     }
 
     private void instantiateTextViewsAndMiscClasses() {
@@ -225,7 +225,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         tdeeEditView = inflater.inflate(R.layout.tdee_stats_edit_view, null);
-        tdeeEditPopUpAnchor = mRoot.findViewById(R.id.tdee_edit_popUp_anchor);
+        tdeeEditPopUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
+        tdeeEditPopUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(140), true);
 
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
@@ -235,6 +236,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
 
+        //Todo: These are for our popUp.
         tdeeEditActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
         tdeeSetTimeEditText = tdeeEditView.findViewById(R.id.set_time_editText);
         tdeeBreakTimeEditText = tdeeEditView.findViewById(R.id.break_time_editText);
