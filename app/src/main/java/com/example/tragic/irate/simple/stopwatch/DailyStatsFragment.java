@@ -203,7 +203,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         statsTotalSetTimeTextView.setText(totalSetTime);
         statsTotalBreakTimeTextView.setText(totalBreakTime);
-        statsTotalCaloriesBurnedTextView.setText(formatCalorieString(totalCaloriesBurned));
+        statsTotalCaloriesBurnedTextView.setText(formatCalorieToString(totalCaloriesBurned));
     }
 
     public int getDaySelectedFromCalendar() {
@@ -218,14 +218,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     @Override
     public void tdeeEditItemSelected(int position) {
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
-        long setTime = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
-        long breakTime = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
+        long longSetTime = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
+        long longBreakTime = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
         double totalCalories = dailyStatsAccess.getTotalCaloriesBurnedListForEachActivityForSelectedDuration().get(position);
+
+        String setTime = longToStringConverters.convertSeconds(longSetTime);
+        String breakTime = longToStringConverters.convertSeconds(longBreakTime);
 
         tdeeEditPopUpActivityTextView.setText(activityString);
         tdeeEditPopUpSetTimeEditText.setText(String.valueOf(setTime));
         tdeeEditPopUpBreakTimeEditText.setText(String.valueOf(breakTime));
-        tdeeEditPopUpCaloriesTextView.setText(String.valueOf(totalCalories));
+        tdeeEditPopUpCaloriesTextView.setText(formatCalorieToString(totalCalories));
 
         tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
     }
@@ -267,7 +270,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    private String formatCalorieString(double calories) {
+    private String formatCalorieToString(double calories) {
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(calories);
     }
