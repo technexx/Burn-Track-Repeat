@@ -98,12 +98,12 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
-        }
 
-        if (mEditModeIsActive) {
-            activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-        } else {
-            activityViewHolder.fullView.setBackground(null);
+            if (mEditModeIsActive) {
+                activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+            } else {
+                activityViewHolder.fullView.setBackground(null);
+            }
         }
     }
 
