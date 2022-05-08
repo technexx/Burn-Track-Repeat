@@ -62,11 +62,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View tdeeEditPopUpAnchorLow;
     View tdeeEditPopUpAnchorHigh;
 
+    ImageButton editTdeeStatsButton;
     PopupWindow tdeeEditPopUpWindow;
     TextView tdeeEditPopUpActivityTextView;
     EditText tdeeEditTextHours;
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
+    ImageButton confirmEditWithinPopUpButton;
 
     View recyclerAndTotalStatsDivider;
 
@@ -77,7 +79,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calendar = Calendar.getInstance(TimeZone.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
         dailyStatsAccess = new DailyStatsAccess(getActivity());
-        ImageButton editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
+        editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
@@ -86,7 +88,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
 
             getActivity().runOnUiThread(()-> {
-                setStatDurationTextView(currentStatDurationMode);
+                setStatDurationTextViewAndEditButton(currentStatDurationMode);
                 populateListsAndTextViewsFromEntityListsInDatabase();
 
             });
@@ -121,6 +123,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             toggleEditModeInStatsAdapter();
         });
 
+        confirmEditWithinPopUpButton.setOnClickListener(v-> {
+
+        });
+
         return root;
     }
 
@@ -129,7 +135,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
 
             getActivity().runOnUiThread(()-> {
-                setStatDurationTextView(currentStatDurationMode);
+                setStatDurationTextViewAndEditButton(currentStatDurationMode);
                 populateListsAndTextViewsFromEntityListsInDatabase();
                 dailyStatsAdapter.turnOffEditMode();
             });
@@ -167,9 +173,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setStatDurationTextView(int mode) {
+    private void setStatDurationTextViewAndEditButton(int mode) {
+        toggleEditStatsButton(false);
+
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
+            toggleEditStatsButton(true);
         }
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
@@ -179,6 +188,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
+        }
+    }
+
+    private void toggleEditStatsButton(boolean buttonIsEnabled) {
+        if (buttonIsEnabled) {
+            editTdeeStatsButton.setEnabled(true);
+            editTdeeStatsButton.setAlpha(1.0f);
+        } else {
+            editTdeeStatsButton.setEnabled(false);
+            editTdeeStatsButton.setAlpha(0.3f);
         }
     }
 
@@ -246,6 +265,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //Todo: We should limit editing stats to SINGLE DAYS only, otherwise there is no way to distribute the added/subtracted time.
+
     private void instantiateTextViewsAndMiscClasses() {
         longToStringConverters = new LongToStringConverters();
 
@@ -266,6 +287,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
+        confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_stats_edit);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
