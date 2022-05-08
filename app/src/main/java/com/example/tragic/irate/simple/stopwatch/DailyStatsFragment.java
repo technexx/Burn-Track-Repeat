@@ -214,7 +214,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAdapter.toggleEditMode();
     }
 
-    //Todo: We'll need to create and account for hours/minutes (e.g. 18:20:45). Should even account for 100+ hours for yearly stats.
     @Override
     public void tdeeEditItemSelected(int typeOfEdit, int position) {
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
@@ -227,21 +226,25 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         tdeeEditPopUpActivityTextView.setText(activityString);
+        setTdeeEditTexts(timeToEditLongValue);
 
         tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
     }
 
-    private void setTdeeEditTexts() {
+    private void setTdeeEditTexts(long valueToSet) {
+        String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
+        String[] splitString = stringToSet.split(":");
 
+        if (splitString.length==3) {
+            tdeeEditTextHours.setText(splitString[0]);
+            tdeeEditTextMinutes.setText(splitString[1]);
+            tdeeEditTextSeconds.setText(splitString[2]);
+        } else {
+            tdeeEditTextHours.setText(R.string.double_zeros);
+            tdeeEditTextMinutes.setText(splitString[0]);
+            tdeeEditTextSeconds.setText(splitString[1]);
+        }
     }
-
-//    private String getTotalTdeeStringToEdit() {
-//
-//    }
-//
-//    private String getTdeeEditHoursString() {
-//
-//    }
 
     private void instantiateTextViewsAndMiscClasses() {
         longToStringConverters = new LongToStringConverters();

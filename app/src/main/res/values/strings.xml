@@ -83,6 +83,9 @@
     <string name="daily_break_time">Breaks:</string>
     <string name="daily_calories_burned">Calories:</string>
 
+    <string name="double_zeros">"00"</string>
+    <string name="colon">":"</string>
+
     <string name="activity_text_header"><u>Activity</u></string>
     <string name="set_time_text_header"><u>Sets</u></string>
     <string name="break_time_text_header"><u>Breaks</u></string>
