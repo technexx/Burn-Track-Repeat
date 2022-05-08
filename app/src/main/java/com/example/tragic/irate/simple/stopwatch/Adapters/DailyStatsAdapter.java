@@ -90,8 +90,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
         } else {
             activityViewHolder.activityTextView.setText(mActivities.get(position-1));
-            activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSeconds(mSetTimes.get(position+-1)));
-            activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSeconds(mBreakTimes.get(position-1)));
+            activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position+-1)));
+            activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
             activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
 
             activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);

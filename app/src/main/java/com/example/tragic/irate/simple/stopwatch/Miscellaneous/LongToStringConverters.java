@@ -15,61 +15,44 @@ public class LongToStringConverters {
         this.mTypeOfConversion = typeOfConversion;
     }
 
-    public String convertSeconds(long totalSeconds) {
-        DecimalFormat df = new DecimalFormat("00");
-        long minutes;
-        long remainingSeconds;
-        totalSeconds = totalSeconds/1000;
+    public String convertSecondsForStatDisplay(long seconds) {
+        DecimalFormat dfOneZero = new DecimalFormat("0");
+        DecimalFormat dfTwoZeros = new DecimalFormat("00");
 
-        if (totalSeconds >=60) {
-            minutes = totalSeconds/60;
-            remainingSeconds = totalSeconds % 60;
-            return (minutes + ":" + df.format(remainingSeconds));
-        } else if (totalSeconds >=10) return "0:" + totalSeconds;
-        else return "0:0" + totalSeconds;
-    }
+        seconds = seconds/1000;
+        long minutes = 0;
+        long hours = 0;
 
-    public String convertSecondsTwo(long totalSeconds) {
-        DecimalFormat df = new DecimalFormat("00");
-        long minutes;
-        long remainingSeconds;
-        totalSeconds = totalSeconds/1000;
+        if (seconds >=60) {
+            minutes = seconds / 60;
+        }
 
-        if (totalSeconds >=60) {
-            minutes = totalSeconds/60;
-            remainingSeconds = totalSeconds % 60;
-            return (minutes + ":" + df.format(remainingSeconds));
+        if (minutes>=60) {
+            hours = minutes/60;
+        }
+
+        if (hours==0) {
+            return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds);
         } else {
-            if (mTypeOfConversion==PRIMARY_CONVERSION) {
-                if (totalSeconds >=10) {
-                    return "0:" + totalSeconds;
-                } else {
-                    return "0:0" + totalSeconds;
-                }
-            }
-            else if (mTypeOfConversion==TOTAL_SECONDS_CONVERSION) {
-                return String.valueOf(totalSeconds);
-            }
-            else if (mTypeOfConversion==TOTAL_SECONDS_CONVERSION_WITH_MINIMUM) {
-                if (totalSeconds != 5) {
-                    return String.valueOf(totalSeconds);
-                } else {
-                    return "5";
-                }
-            } else {
-                return String.valueOf(totalSeconds);
-            }
+            return dfOneZero.format(hours) + ":" + dfTwoZeros.format(minutes) + ":" + dfTwoZeros.format(seconds);
         }
     }
 
-    public int convertStringToSecondsValue(String timerString) {
-        int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-        int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-        if (totalSeconds>60) {
-            totalSeconds = totalSeconds%60;
-            totalMinutes +=1;
+    public String convertSecondsForEditPopUp(long seconds) {
+        DecimalFormat df = new DecimalFormat("00");
+
+        seconds = seconds/1000;
+        long minutes = 0;
+        long hours = 0;
+
+        if (seconds >=60) {
+            minutes = seconds / 60;
         }
-        int totalTime = (totalMinutes*60) + totalSeconds;
-        return totalTime;
+
+        if (minutes>=60) {
+            hours = minutes/60;
+        }
+
+        return df.format(hours) + ":" + df.format(minutes) + ":" + df.format(seconds);
     }
 }

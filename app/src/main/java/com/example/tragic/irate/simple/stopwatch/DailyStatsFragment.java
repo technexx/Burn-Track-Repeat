@@ -64,7 +64,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     PopupWindow tdeeEditPopUpWindow;
     TextView tdeeEditPopUpActivityTextView;
-    EditText tdeeEditText;
+    EditText tdeeEditTextHours;
+    EditText tdeeEditTextMinutes;
+    EditText tdeeEditTextSeconds;
 
     View recyclerAndTotalStatsDivider;
 
@@ -195,8 +197,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayHolderStatsTextViews() {
-        String totalSetTime = longToStringConverters.convertSeconds(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
-        String totalBreakTime = longToStringConverters.convertSeconds(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
+        String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
+        String totalBreakTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         statsTotalSetTimeTextView.setText(totalSetTime);
@@ -224,13 +226,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             timeToEditLongValue = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
         }
 
-        String timeToEditString = longToStringConverters.convertSeconds(timeToEditLongValue);
-
         tdeeEditPopUpActivityTextView.setText(activityString);
-        tdeeEditText.setText(String.valueOf(timeToEditString));
 
         tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
     }
+
+    private void setTdeeEditTexts() {
+
+    }
+
+//    private String getTotalTdeeStringToEdit() {
+//
+//    }
+//
+//    private String getTdeeEditHoursString() {
+//
+//    }
 
     private void instantiateTextViewsAndMiscClasses() {
         longToStringConverters = new LongToStringConverters();
@@ -249,7 +260,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
 
         tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
-        tdeeEditText = tdeeEditView.findViewById(R.id.tdee_editText);
+        tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
+        tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
+        tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }

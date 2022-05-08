@@ -19,19 +19,53 @@
     </TextView>
 
     <EditText
-        android:id="@+id/tdee_editText"
+        android:id="@+id/tdee_editText_hours"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/activity_string_in_edit_popUp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tdee_editText_minutes"
+        android:textSize="24sp"
+        android:textColor="@color/white"
+        android:background="@null"
+        android:textCursorDrawable="@drawable/edit_text_cursor"
+        android:singleLine="true"
+        android:maxLength="3"
+        android:gravity="center">
+    </EditText>
+
+    <EditText
+        android:id="@+id/tdee_editText_minutes"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/activity_string_in_edit_popUp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tdee_editText_hours"
+        app:layout_constraintEnd_toStartOf="@id/tdee_editText_seconds"
+        android:textSize="24sp"
+        android:textColor="@color/white"
+        android:background="@null"
+        android:textCursorDrawable="@drawable/edit_text_cursor"
+        android:singleLine="true"
+        android:maxLength="2"
+        android:gravity="center">
+    </EditText>
+
+    <EditText
+        android:id="@+id/tdee_editText_seconds"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/activity_string_in_edit_popUp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tdee_editText_minutes"
         app:layout_constraintEnd_toEndOf="parent"
         android:textSize="24sp"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:singleLine="true"
-        android:maxLength="8"
+        android:maxLength="2"
         android:gravity="center">
     </EditText>
 
