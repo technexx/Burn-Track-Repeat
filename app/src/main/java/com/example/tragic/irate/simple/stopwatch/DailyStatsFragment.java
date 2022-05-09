@@ -4,6 +4,7 @@ import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -26,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.NumberFilter;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -324,6 +326,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         long minutes = Long.parseLong(tdeeEditTextMinutes.getText().toString());
         long seconds = Long.parseLong(tdeeEditTextSeconds.getText().toString());
 
+        if (seconds >= 60) {
+            minutes = seconds / 60;
+            seconds = seconds % 60;
+        }
+
         minutes += hours*60;
         seconds += minutes*60;
 
@@ -363,6 +370,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_stats_edit);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+
+        tdeeEditTextHours.setFilters((new InputFilter[] {new NumberFilter(0, 999)} ));
+        tdeeEditTextMinutes.setFilters((new InputFilter[] {new NumberFilter(0, 59)} ));
+        tdeeEditTextSeconds.setFilters((new InputFilter[] {new NumberFilter(0, 59)} ));
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {

@@ -2,6 +2,8 @@ package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 
 import android.util.Log;
 
+import com.google.gson.internal.$Gson$Preconditions;
+
 import java.text.DecimalFormat;
 
 public class LongToStringConverters {
@@ -61,5 +63,12 @@ public class LongToStringConverters {
         Log.i("testTime", "minutes are " + minutes);
 
         return df.format(hours) + ":" + df.format(minutes) + ":" + df.format(seconds);
+    }
+
+    public long getConvertedSeconds(long seconds) {
+        if (seconds >=60) {
+            seconds = seconds % 60;
+        }
+        return seconds;
     }
 }
