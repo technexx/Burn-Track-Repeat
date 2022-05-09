@@ -131,7 +131,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmEditWithinPopUpButton.setOnClickListener(v-> {
-
+            updateDatabaseWithEditedStats();
         });
 
         return root;
@@ -276,18 +276,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private long getMillisValueToSaveFromEditTextString() {
-        long hours = Long.parseLong(tdeeEditTextHours.getText().toString());
-        long minutes = Long.parseLong(tdeeEditTextMinutes.getText().toString());
-        long seconds = Long.parseLong(tdeeEditTextSeconds.getText().toString());
-
-        minutes += hours*60;
-        seconds += minutes*60;
-
-        return seconds*1000;
-    }
-
-    //Todo: Total times in DayHolder do not aggregate StatsForEachActivity stuff, but rather keep track independently.
     private void updateDatabaseWithEditedStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
@@ -303,6 +291,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 long dayHolderSetValueToEdit = dailyStatsAccess.getTotalSetTimeFromDayHolder();
                 long editValueToSubtract = getDifferenceToSubtractBetweenOldValueAndEditedValue(oldStatValue, newStatValue);
                 dailyStatsAccess.setTotalSetTimeFromDayHolder(dayHolderSetValueToEdit - editValueToSubtract);
+
+                Log.i("testEdit", "Old set value is " + oldStatValue);
+                Log.i("testEdit", "New set value is " + newStatValue);
+
+                Log.i("testEdit", "DayHolder value is " + dayHolderSetValueToEdit);
+                Log.i("testEdit", "DayHolder value to subtract is " + editValueToSubtract);
+                Log.i("testEdit", "New DayHolder set value is " + (dayHolderSetValueToEdit - editValueToSubtract));
+
             } else if (typeOfStatToEdit==EDITING_BREAKS) {
                 oldStatValue = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
                 dailyStatsAccess.setTotalBreakTimeForSelectedActivity(newStatValue);
@@ -314,7 +310,30 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
         });
+    }
+
+    private long getMillisValueToSaveFromEditTextString() {
+        setEditTextToZerosIfEmpty(tdeeEditTextHours);
+        setEditTextToZerosIfEmpty(tdeeEditTextMinutes);
+        setEditTextToZerosIfEmpty(tdeeEditTextSeconds);
+
+        long hours = Long.parseLong(tdeeEditTextHours.getText().toString());
+        long minutes = Long.parseLong(tdeeEditTextMinutes.getText().toString());
+        long seconds = Long.parseLong(tdeeEditTextSeconds.getText().toString());
+
+        minutes += hours*60;
+        seconds += minutes*60;
+
+        return seconds*1000;
+    }
+
+    private void setEditTextToZerosIfEmpty (EditText editText) {
+        if (editText.getText().toString().equals("")) {
+            editText.setText(R.string.double_zeros);
+        }
     }
 
     private long getDifferenceToSubtractBetweenOldValueAndEditedValue(long oldValue, long newValue) {

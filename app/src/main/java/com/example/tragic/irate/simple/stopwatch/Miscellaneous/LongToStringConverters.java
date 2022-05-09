@@ -1,5 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 
+import android.util.Log;
+
 import java.text.DecimalFormat;
 
 public class LongToStringConverters {
@@ -47,11 +49,16 @@ public class LongToStringConverters {
 
         if (seconds >=60) {
             minutes = seconds / 60;
+            seconds = seconds % 60;
         }
 
         if (minutes>=60) {
             hours = minutes/60;
+            minutes = minutes % 60;
         }
+
+        Log.i("testTime", "seconds are " + seconds);
+        Log.i("testTime", "minutes are " + minutes);
 
         return df.format(hours) + ":" + df.format(minutes) + ":" + df.format(seconds);
     }
