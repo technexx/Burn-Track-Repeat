@@ -287,17 +287,38 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return seconds*1000;
     }
 
+    //Todo: Total times in DayHolder do not aggregate StatsForEachActivity stuff, but rather keep track independently.
     private void updateDatabaseWithEditedStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityInstanceForEditing(mPositionToEdit);
-        });
 
-        if (typeOfStatToEdit==EDITING_SETS) {
-            dailyStatsAccess.setTotalSetTimeForSelectedActivity(getMillisValueToSaveFromEditTextString());
-        } else if (typeOfStatToEdit==EDITING_BREAKS) {
-            dailyStatsAccess.setTotalBreakTimeForSelectedActivity(getMillisValueToSaveFromEditTextString());
-        }
+            long oldStatValue;
+            long newStatValue = getMillisValueToSaveFromEditTextString();
+
+            if (typeOfStatToEdit==EDITING_SETS) {
+                oldStatValue = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
+                dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
+
+                long dayHolderSetValueToEdit = dailyStatsAccess.getTotalSetTimeFromDayHolder();
+                long editValueToSubtract = getDifferenceToSubtractBetweenOldValueAndEditedValue(oldStatValue, newStatValue);
+                dailyStatsAccess.setTotalSetTimeFromDayHolder(dayHolderSetValueToEdit - editValueToSubtract);
+            } else if (typeOfStatToEdit==EDITING_BREAKS) {
+                oldStatValue = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
+                dailyStatsAccess.setTotalBreakTimeForSelectedActivity(newStatValue);
+
+                long dayHolderBreakValueToEdit = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
+                long editValueToSubtract = getDifferenceToSubtractBetweenOldValueAndEditedValue(oldStatValue, newStatValue);
+                dailyStatsAccess.setTotalBreakTimeFromDayHolder(dayHolderBreakValueToEdit - editValueToSubtract);
+            }
+
+            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
+        });
+    }
+
+    private long getDifferenceToSubtractBetweenOldValueAndEditedValue(long oldValue, long newValue) {
+        return oldValue - newValue;
     }
 
     private void instantiateTextViewsAndMiscClasses() {

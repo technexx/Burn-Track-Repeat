@@ -356,6 +356,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double totalCaloriesBurnedForCurrentDay;
 
   long totalSetTimeForSpecificActivityForCurrentDayInMillis;
+  long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
   double totalCaloriesBurnedForSpecificActivityForCurrentDay;
 
   String timeLeftValueHolder;
@@ -1690,6 +1691,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsAccess.setActivityStringForSelectedActivity(dailyStatsAccess.getActivityStringFromSpinner());
     dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    dailyStatsAccess.setTotalBreakTimeForSelectedActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
     dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
   }
@@ -3297,12 +3299,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (!cycleHasActivityAssigned) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
+      totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
     } else {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
+      totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
       totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
       totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+      totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     }
   }
 
@@ -3534,6 +3539,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1: case 2:
         totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
         break;
+      case 3: case 4:
+        totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
+        break;
     };
   }
 
@@ -3595,6 +3603,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
@@ -4730,7 +4739,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void logTotalActivityStats() {
-    Log.i("testTimes", "selected activity time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testTimes", "selected activity set time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testTimes", "selected activity break time is " + totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     Log.i("testTimes", "selected activity calories are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 

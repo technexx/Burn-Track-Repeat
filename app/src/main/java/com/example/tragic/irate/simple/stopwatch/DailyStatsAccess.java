@@ -143,6 +143,7 @@ public class DailyStatsAccess {
     public void setAllDayAndStatListsForYear(int daysInYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
 
+        //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
                 daysOfYearList.add(i+1);
@@ -273,8 +274,6 @@ public class DailyStatsAccess {
     }
 
     //Todo: statsForEachActivityListOfAllActivitiesForASpecificDate's size will contain all activities for that day (uniqueID). We need to assign an mStats instance that plucks from the position our "to update" activity is at.
-
-    //Todo: We should already have a position from our popUp selection to assign here, tho we should probably use a separate method + variable to avoid overlap and confusion.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(int daySelected) {
         //New database pull to account for most recent insertion.
         setStatForEachActivityListForForSingleDay(daySelected);
@@ -330,6 +329,14 @@ public class DailyStatsAccess {
 
     public long getTotalSetTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalSetTimeForEachActivity();
+    }
+
+    public void setTotalBreakTimeForSelectedActivity(long totalBreakTime) {
+        mStatsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTime);
+    }
+
+    public long getTotalBreakTimeForSelectedActivity() {
+        return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
     }
 
     public void setTotalCaloriesBurnedForSelectedActivity(double totalCaloriesBurned) {
