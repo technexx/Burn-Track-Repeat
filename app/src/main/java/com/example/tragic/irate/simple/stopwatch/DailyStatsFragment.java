@@ -1,5 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -69,6 +71,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
     ImageButton confirmEditWithinPopUpButton;
+
+    int typeOfStatToEdit;
+    int mPositionToEdit;
+    int EDITING_SETS = 0;
+    int EDITING_BREAKS = 1;
 
     View recyclerAndTotalStatsDivider;
 
@@ -235,13 +242,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void tdeeEditItemSelected(int typeOfEdit, int position) {
+        this.mPositionToEdit = position;
+
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
         long timeToEditLongValue;
 
         if (typeOfEdit==0) {
             timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
+            typeOfStatToEdit = EDITING_SETS;
         } else {
             timeToEditLongValue = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
+            typeOfStatToEdit = EDITING_BREAKS;
         }
 
         tdeeEditPopUpActivityTextView.setText(activityString);
@@ -265,7 +276,29 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: We should limit editing stats to SINGLE DAYS only, otherwise there is no way to distribute the added/subtracted time.
+    private long getMillisValueToSaveFromEditTextString() {
+        long hours = Long.parseLong(tdeeEditTextHours.getText().toString());
+        long minutes = Long.parseLong(tdeeEditTextMinutes.getText().toString());
+        long seconds = Long.parseLong(tdeeEditTextSeconds.getText().toString());
+
+        minutes += hours*60;
+        seconds += minutes*60;
+
+        return seconds*1000;
+    }
+
+    private void updateDatabaseWithEditedStats() {
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
+            dailyStatsAccess.assignStatsForEachActivityInstanceForEditing(mPositionToEdit);
+        });
+
+        if (typeOfStatToEdit==EDITING_SETS) {
+            dailyStatsAccess.setTotalSetTimeForSelectedActivity(getMillisValueToSaveFromEditTextString());
+        } else if (typeOfStatToEdit==EDITING_BREAKS) {
+            dailyStatsAccess.setTotalBreakTimeForSelectedActivity(getMillisValueToSaveFromEditTextString());
+        }
+    }
 
     private void instantiateTextViewsAndMiscClasses() {
         longToStringConverters = new LongToStringConverters();

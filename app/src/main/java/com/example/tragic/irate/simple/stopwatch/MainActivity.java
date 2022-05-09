@@ -1668,7 +1668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
       dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
-      dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+      dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
     }
   }
 
@@ -3245,7 +3245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
 
-        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 

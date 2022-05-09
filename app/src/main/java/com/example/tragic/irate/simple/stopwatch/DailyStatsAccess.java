@@ -263,6 +263,7 @@ public class DailyStatsAccess {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
 
+        //This only returns true once, when our activity matches one in the database.
         for (int i=0; i<getStatForEachActivityListForForSingleDay().size(); i++) {
             if (mActivityString.equals(getStatForEachActivityListForForSingleDay().get(i).getActivity())) {
                 activityPositionInListForCurrentDay = i;
@@ -271,10 +272,12 @@ public class DailyStatsAccess {
         }
     }
 
-    public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
+    //Todo: statsForEachActivityListOfAllActivitiesForASpecificDate's size will contain all activities for that day (uniqueID). We need to assign an mStats instance that plucks from the position our "to update" activity is at.
+
+    //Todo: We should already have a position from our popUp selection to assign here, tho we should probably use a separate method + variable to avoid overlap and confusion.
+    public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(int daySelected) {
         //New database pull to account for most recent insertion.
-        int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
-        setStatForEachActivityListForForSingleDay(dayOfYear);
+        setStatForEachActivityListForForSingleDay(daySelected);
 
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(activityPositionInListForCurrentDay);
@@ -283,6 +286,10 @@ public class DailyStatsAccess {
             int mostRecentEntry = statsForEachActivityListOfAllActivitiesForASpecificDate.size()-1;
             mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(mostRecentEntry);
         }
+    }
+
+    public void assignStatsForEachActivityInstanceForEditing(int position) {
+        mStatsForEachActivity = statsForEachActivityListOfAllActivitiesForASpecificDate.get(position);
     }
 
     public int getActivityPosition() {
@@ -331,6 +338,10 @@ public class DailyStatsAccess {
 
     public double getTotalCaloriesBurnedForSelectedActivity() {
         return mStatsForEachActivity.getTotalCaloriesBurnedForEachActivity();
+    }
+
+    public long getUniqueIdTiedToSpecificDayFromStatsForEachActivity() {
+        return mStatsForEachActivity.getUniqueIdTiedToTheSelectedActivity();
     }
 
     public void deleteStatForEachActivityEntity(long dayToDelete) {
