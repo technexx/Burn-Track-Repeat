@@ -68,6 +68,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
         activityViewHolder.setTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive && position>0) {
+                activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
+                activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
                 mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position-1);
             }
         });
@@ -75,8 +77,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         activityViewHolder.breakTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive && position>0) {
                 mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position-1);
+                activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
+                activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
             }
         });
+
+
+        activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+        activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
         if (position==0) {
             activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
@@ -119,15 +127,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     public void toggleEditMode() {
         mEditModeIsActive = !mEditModeIsActive;
         notifyDataSetChanged();
-    }
-
-    private void toggleTextAndEditViewsOnClick(int position) {
-        if (mEditModeIsActive) {
-            if (position>0) {
-                mPositionSelectedToEdit = position;
-                notifyDataSetChanged();
-            }
-        }
     }
 
     public class ActivityViewHolder extends RecyclerView.ViewHolder {

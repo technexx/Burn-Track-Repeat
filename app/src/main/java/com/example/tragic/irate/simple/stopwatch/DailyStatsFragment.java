@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -142,7 +143,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             tdeeEditPopUpWindow.dismiss();
             Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
-
         return root;
     }
 
@@ -438,6 +438,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_stats_edit);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+
+        tdeeEditPopUpWindow.setOnDismissListener(()-> {
+            dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
+        });
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
