@@ -321,7 +321,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 Log.i("testCal", "old dayHolder cals are " + oldCaloriesFromDayHolder);
                 Log.i("testCal", "dayHolder cals to subtract are " + caloriesToSubtractForDayHolder);
-                Log.i("testCal", "new dayHolder cals are " + (oldCaloriesFromActivity - caloriesToSubtractForDayHolder));
+                Log.i("testCal", "new dayHolder cals are " + (oldCaloriesFromDayHolder - caloriesToSubtractForDayHolder));
             } else if (typeOfStatToEdit==EDITING_BREAKS) {
                 oldStatValue = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
 
