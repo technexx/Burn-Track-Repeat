@@ -337,7 +337,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             hours +=1;
         }
 
-        long totalSeconds = (hours*3600) + (minutes*60) + seconds;
+        long totalSeconds = ((hours*3600) + (minutes*60) + seconds) * 1000;
 
         return totalSeconds;
     }
