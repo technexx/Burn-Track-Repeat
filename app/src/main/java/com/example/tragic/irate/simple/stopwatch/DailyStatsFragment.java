@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -138,6 +139,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmEditWithinPopUpButton.setOnClickListener(v-> {
             updateDatabaseWithEditedStats();
+            tdeeEditPopUpWindow.dismiss();
+            Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
 
         return root;
