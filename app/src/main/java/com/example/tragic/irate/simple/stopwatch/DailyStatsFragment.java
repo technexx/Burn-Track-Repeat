@@ -33,7 +33,7 @@ import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected {
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition {
 
     View mRoot;
     Calendar calendar;
@@ -251,6 +251,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
+    public void onAddingActivity(int position) {
+
+    }
+
+    @Override
     public void tdeeEditItemSelected(int typeOfEdit, int position) {
         this.mPositionToEdit = position;
 
@@ -448,7 +453,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateRecyclerViewAndItsAdapter() {
         dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDuration, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration);
+
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
+        dailyStatsAdapter.addActivityToDailyStats(DailyStatsFragment.this);
 
         dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());

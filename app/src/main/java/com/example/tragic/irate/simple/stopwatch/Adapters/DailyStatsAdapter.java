@@ -43,6 +43,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     int EDITING_BREAKS = 1;
 
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
+    tdeeActivityAddition mTdeeActivityAddition;
 
     public interface tdeeEditedItemIsSelected {
         void tdeeEditItemSelected (int typeOfEdit, int position);
@@ -50,6 +51,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
         this.mTdeeEditedItemIsSelected = xTdeeEditedItemIsSelected;
+    }
+
+    public interface tdeeActivityAddition {
+        void onAddingActivity(int position);
+    }
+
+    public void addActivityToDailyStats(tdeeActivityAddition xTdeeActivityAddition) {
+        this.mTdeeActivityAddition = xTdeeActivityAddition;
     }
 
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
@@ -122,6 +131,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
                     activityViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
                 } else {
                     activityViewHolder.addActivity.setVisibility(View.VISIBLE);
+                    activityViewHolder.addActivity.setOnClickListener(v-> {
+                        mTdeeActivityAddition.onAddingActivity(position);
+                    });
                 }
             }
         }
