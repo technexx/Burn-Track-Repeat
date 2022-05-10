@@ -94,6 +94,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
             activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
 
+            Log.i("testFetchedTimes", "fetched set time is " + mSetTimes.get(position-1));
             activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);

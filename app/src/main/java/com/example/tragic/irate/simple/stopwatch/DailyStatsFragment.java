@@ -92,6 +92,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
+        setNumberFilterOnEditTexts();
 
         AsyncTask.execute(()-> {
             setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
@@ -327,14 +328,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         long seconds = Long.parseLong(tdeeEditTextSeconds.getText().toString());
 
         if (seconds >= 60) {
-            minutes = seconds / 60;
             seconds = seconds % 60;
+            minutes +=1;
         }
 
-        minutes += hours*60;
-        seconds += minutes*60;
+        if (minutes >= 60) {
+            minutes = minutes %60;
+            hours +=1;
+        }
 
-        return seconds*1000;
+        long totalSeconds = (hours*3600) + (minutes*60) + seconds;
+
+        return totalSeconds;
     }
 
     private void setEditTextToZerosIfEmpty (EditText editText) {
@@ -345,6 +350,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private long getDifferenceToSubtractBetweenOldValueAndEditedValue(long oldValue, long newValue) {
         return oldValue - newValue;
+    }
+
+    private void setNumberFilterOnEditTexts() {
+        tdeeEditTextHours.setFilters((new InputFilter[] {new NumberFilter(0, 999)} ));
+        tdeeEditTextMinutes.setFilters((new InputFilter[] {new NumberFilter(0, 59)} ));
+        tdeeEditTextSeconds.setFilters((new InputFilter[] {new NumberFilter(0, 59)} ));
     }
 
     private void instantiateTextViewsAndMiscClasses() {
@@ -370,10 +381,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_stats_edit);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-
-        tdeeEditTextHours.setFilters((new InputFilter[] {new NumberFilter(0, 999)} ));
-        tdeeEditTextMinutes.setFilters((new InputFilter[] {new NumberFilter(0, 59)} ));
-        tdeeEditTextSeconds.setFilters((new InputFilter[] {new NumberFilter(0, 59)} ));
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {

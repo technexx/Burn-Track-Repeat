@@ -19,6 +19,7 @@ public class LongToStringConverters {
         this.mTypeOfConversion = typeOfConversion;
     }
 
+    //Todo: 99 seconds displays as 1:99 using this.
     public String convertSecondsForStatDisplay(long seconds) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
@@ -29,10 +30,12 @@ public class LongToStringConverters {
 
         if (seconds >=60) {
             minutes = seconds / 60;
+            seconds = seconds % 60;
         }
 
         if (minutes>=60) {
             hours = minutes/60;
+            minutes = minutes % 60;
         }
 
         if (hours==0) {
@@ -61,6 +64,7 @@ public class LongToStringConverters {
 
         Log.i("testTime", "seconds are " + seconds);
         Log.i("testTime", "minutes are " + minutes);
+        Log.i("testTime", "hours are " + hours);
 
         return df.format(hours) + ":" + df.format(minutes) + ":" + df.format(seconds);
     }
