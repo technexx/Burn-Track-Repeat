@@ -19,24 +19,24 @@ public class DailyStatsAccess {
     CalendarValues calendarValues = new CalendarValues();
 
     DayHolder mDayHolder;
-    long mOldDayHolderId;
-
-    List<StatsForEachActivity> statsForEachActivityListForTimerAccess;
     StatsForEachActivity mStatsForEachActivity;
+    List<DayHolder> mDayHolderList;
+    List<StatsForEachActivity> statsForEachActivityListForTimerAccess;
+    List<StatsForEachActivity> mStatsForEachActivityListForFragmentAccess;
 
     List<String> totalActivitiesListForSelectedDuration;
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
     List<Long> totalBreakTimeListForEachActivityForSelectedDuration;
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
 
+    long mOldDayHolderId;
     boolean activityExistsInDatabaseForSelectedDay;
     String mActivityString;
     int activityPositionInListForCurrentDay;
     int mOldActivityPositionInListForCurrentDay;
-
-    List<DayHolder> mDayHolderList;
-    List<StatsForEachActivity> mStatsForEachActivityListForFragmentAccess;
     int duplicateStringPosition;
+
+
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;

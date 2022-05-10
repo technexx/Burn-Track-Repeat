@@ -76,7 +76,6 @@ public class TDEEChosenActivitySpinnerValues {
     }
 
     private void populateSubCategoryLists() {
-
         bicycling = mContext.getResources().getStringArray(R.array.bicycling);
         conditioning = mContext.getResources().getStringArray(R.array.conditioning);
         dancing = mContext.getResources().getStringArray(R.array.dancing);

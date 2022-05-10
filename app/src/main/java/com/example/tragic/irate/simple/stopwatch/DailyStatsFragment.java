@@ -41,6 +41,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Calendar calendar;
     CalendarView calendarView;
     int daySelectedFromCalendar;
+    TDEEChosenActivitySpinnerValues tdeeChosenActivitySpinnerValues;
     LongToStringConverters longToStringConverters;
 
     DailyStatsAccess dailyStatsAccess;
@@ -291,26 +292,43 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (typeOfStatToEdit==EDITING_SETS) {
                 oldStatValue = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
-                dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
 
                 long dayHolderSetValueToEdit = dailyStatsAccess.getTotalSetTimeFromDayHolder();
-                long editValueToSubtract = getDifferenceToSubtractBetweenOldValueAndEditedValue(oldStatValue, newStatValue);
-                dailyStatsAccess.setTotalSetTimeFromDayHolder(dayHolderSetValueToEdit - editValueToSubtract);
+                long setTimeToSubtractForActivity = getDifferenceToSubtractBetweenOldAndEditedTimes(oldStatValue, newStatValue);
 
-                Log.i("testEdit", "Old set value is " + oldStatValue);
-                Log.i("testEdit", "New set value is " + newStatValue);
+                double oldCaloriesFromActivity = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
+                double caloricMultiplier = getCaloricMultiplierForSeconds(oldCaloriesFromActivity, oldStatValue/1000);
+                double newCaloriesForActivity = ((double) newStatValue/1000) * caloricMultiplier;
 
-                Log.i("testEdit", "DayHolder value is " + dayHolderSetValueToEdit);
-                Log.i("testEdit", "DayHolder value to subtract is " + editValueToSubtract);
-                Log.i("testEdit", "New DayHolder set value is " + (dayHolderSetValueToEdit - editValueToSubtract));
+                double oldCaloriesFromDayHolder = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
+                double caloriesToSubtractForDayHolder = getDifferenceToSubtractBetweenOldAndEditedCalories(oldCaloriesFromActivity, newCaloriesForActivity);
 
+                dailyStatsAccess.setTotalSetTimeFromDayHolder(dayHolderSetValueToEdit - setTimeToSubtractForActivity);
+                dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
+                dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
+                dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(oldCaloriesFromDayHolder - caloriesToSubtractForDayHolder);
+
+                Log.i("testCal", "old activity time is " + oldStatValue/1000);
+                Log.i("testCal", "new activity time is " + newStatValue/1000);
+
+                Log.i("testCal", "old dayHolder time is " + dayHolderSetValueToEdit/1000);
+                Log.i("testCal", "dayHolder value to subtract is " + setTimeToSubtractForActivity/1000);
+                Log.i("testCal", "new dayHolder time is " + (dayHolderSetValueToEdit - setTimeToSubtractForActivity)/1000);
+
+                Log.i("testCal", "activity cals are " + oldCaloriesFromActivity);
+                Log.i("testCal", "cal multiplier is " + caloricMultiplier);
+                Log.i("testCal", "new activity cals are " + newCaloriesForActivity);
+
+                Log.i("testCal", "old dayHolder cals are " + oldCaloriesFromDayHolder);
+                Log.i("testCal", "dayHolder cals to subtract are " + caloriesToSubtractForDayHolder);
+                Log.i("testCal", "new dayHolder cals are " + (oldCaloriesFromActivity - caloriesToSubtractForDayHolder));
             } else if (typeOfStatToEdit==EDITING_BREAKS) {
                 oldStatValue = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
-                dailyStatsAccess.setTotalBreakTimeForSelectedActivity(newStatValue);
 
                 long dayHolderBreakValueToEdit = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
-                long editValueToSubtract = getDifferenceToSubtractBetweenOldValueAndEditedValue(oldStatValue, newStatValue);
+                long editValueToSubtract = getDifferenceToSubtractBetweenOldAndEditedTimes(oldStatValue, newStatValue);
                 dailyStatsAccess.setTotalBreakTimeFromDayHolder(dayHolderBreakValueToEdit - editValueToSubtract);
+                dailyStatsAccess.setTotalBreakTimeForSelectedActivity(newStatValue);
             }
 
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
@@ -319,7 +337,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             populateListsAndTextViewsFromEntityListsInDatabase();
         });
     }
-    //Todo: Saves correctly w/ out filters (rounds as below), but may be a bit unclear to user. Should we add a textWatcher to round the values within popUp as they're typed?
+
+    private double getCaloricMultiplierForSeconds(double calories, long timeElapsed) {
+        return calories/timeElapsed;
+    }
+
     private long getMillisValueToSaveFromEditTextString() {
         setEditTextToZerosIfEmpty(tdeeEditTextHours);
         setEditTextToZerosIfEmpty(tdeeEditTextMinutes);
@@ -340,7 +362,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         long totalSeconds = ((hours*3600) + (minutes*60) + seconds) * 1000;
-
         return totalSeconds;
     }
 
@@ -350,7 +371,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private long getDifferenceToSubtractBetweenOldValueAndEditedValue(long oldValue, long newValue) {
+    private long getDifferenceToSubtractBetweenOldAndEditedTimes(long oldValue, long newValue) {
+        return oldValue - newValue;
+    }
+
+    private double getDifferenceToSubtractBetweenOldAndEditedCalories(double oldValue, double newValue) {
         return oldValue - newValue;
     }
 
@@ -387,6 +412,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateTextViewsAndMiscClasses() {
+        tdeeChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getActivity());
         longToStringConverters = new LongToStringConverters();
 
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
