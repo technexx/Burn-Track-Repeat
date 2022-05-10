@@ -113,6 +113,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendar.set(year, month, dayOfMonth);
                     daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
 
+                    dailyStatsAdapter.turnOffEditMode();
+                    dailyStatsAdapter.getItemCount();
+
                     setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
 
                     getActivity().runOnUiThread(()-> {
@@ -149,7 +152,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextViewAndEditButton(currentStatDurationMode);
                 populateListsAndTextViewsFromEntityListsInDatabase();
+
                 dailyStatsAdapter.turnOffEditMode();
+                dailyStatsAdapter.getItemCount();
             });
         });
     }

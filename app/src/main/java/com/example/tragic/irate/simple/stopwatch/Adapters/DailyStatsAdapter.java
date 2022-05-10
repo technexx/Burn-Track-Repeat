@@ -30,6 +30,8 @@ import java.util.List;
 public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.ActivityViewHolder> {
     Context mContext;
     ActivityViewHolder holder;
+    int mItemCount;
+
     List<String> mActivities;
     List<Long> mSetTimes;
     List<Long> mBreakTimes;
@@ -104,28 +106,23 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
-            if (!mEditModeIsActive) {
+            //Todo: Need to update list size on date switch for this to work.
+            if (mItemCount==mActivities.size()+1) {
                 activityViewHolder.activityTextView.setText(mActivities.get(position-1));
                 activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
                 activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
                 activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+
                 activityViewHolder.setTimeTextView.setBackground(null);
                 activityViewHolder.breakTimeTextView.setBackground(null);
-
                 activityViewHolder.addActivity.setVisibility(View.GONE);
             } else {
-                if (position < mActivities.size()+1) {
-                    activityViewHolder.activityTextView.setText(mActivities.get(position-1));
-                    activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
-                    activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
-                    activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
-
+                if (position < (mItemCount-1)) {
                     activityViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
                     activityViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
                 } else {
                     activityViewHolder.addActivity.setVisibility(View.VISIBLE);
                 }
-
             }
         }
     }
@@ -133,10 +130,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     @Override
     public int getItemCount() {
         if (!mEditModeIsActive) {
-            return mActivities.size()+1;
+            mItemCount = mActivities.size()+1;
         } else {
-            return mActivities.size()+2;
+            mItemCount = mActivities.size()+2;
         }
+        return mItemCount;
     }
 
     public void turnOffEditMode() {
