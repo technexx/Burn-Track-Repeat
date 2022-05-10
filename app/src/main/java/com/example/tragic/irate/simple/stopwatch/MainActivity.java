@@ -518,6 +518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Option to add activity + times to Stats.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: Sort activities alphabetically by default.
   //Todo: Will eventually need a stats reset at end of year.

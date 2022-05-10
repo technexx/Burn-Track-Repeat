@@ -4,7 +4,9 @@ import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -92,7 +94,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
-        setNumberFilterOnEditTexts();
+        setValueCappingTextWatcherOnEditTexts();
 
         AsyncTask.execute(()-> {
             setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
@@ -317,7 +319,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             populateListsAndTextViewsFromEntityListsInDatabase();
         });
     }
-
+    //Todo: Saves correctly w/ out filters (rounds as below), but may be a bit unclear to user. Should we add a textWatcher to round the values within popUp as they're typed?
     private long getMillisValueToSaveFromEditTextString() {
         setEditTextToZerosIfEmpty(tdeeEditTextHours);
         setEditTextToZerosIfEmpty(tdeeEditTextMinutes);
@@ -350,6 +352,32 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private long getDifferenceToSubtractBetweenOldValueAndEditedValue(long oldValue, long newValue) {
         return oldValue - newValue;
+    }
+
+    private TextWatcher editTextWatcher(EditText editText) {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!editText.getText().toString().equals("")) {
+                    if (Long.parseLong(editText.getText().toString()) >60) {
+                        editText.setText("59");
+                    }
+                }
+            }
+        };
+    }
+
+    private void setValueCappingTextWatcherOnEditTexts() {
+        tdeeEditTextMinutes.addTextChangedListener(editTextWatcher(tdeeEditTextMinutes));
+        tdeeEditTextSeconds.addTextChangedListener(editTextWatcher(tdeeEditTextSeconds));
     }
 
     private void setNumberFilterOnEditTexts() {
