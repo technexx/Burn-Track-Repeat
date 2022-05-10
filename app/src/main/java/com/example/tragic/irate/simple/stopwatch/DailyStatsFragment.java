@@ -1,6 +1,5 @@
 package com.example.tragic.irate.simple.stopwatch;
 
-import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -419,7 +415,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         longToStringConverters = new LongToStringConverters();
 
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        tdeeEditView = inflater.inflate(R.layout.tdee_stats_edit_view, null);
+        tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_view, null);
         tdeeEditPopUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
         tdeeEditPopUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(140), true);

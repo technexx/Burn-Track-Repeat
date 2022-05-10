@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,6 +86,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
         activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+        activityViewHolder.addActivity.setVisibility(View.GONE);
 
         if (position==0) {
             activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
@@ -108,9 +110,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
             if (mEditModeIsActive) {
-                activityViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                activityViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                activityViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
             } else {
-                activityViewHolder.fullView.setBackground(null);
+                activityViewHolder.setTimeTextView.setBackground(null);
+                activityViewHolder.breakTimeTextView.setBackground(null);
             }
         }
     }
@@ -134,6 +138,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         TextView setTimeTextView;
         TextView breakTimeTextView;
         TextView caloriesBurnedTextView;
+        ImageButton addActivity;
 
         View fullView;
 
@@ -143,6 +148,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
             breakTimeTextView = itemView.findViewById(R.id.break_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
+            addActivity = itemView.findViewById(R.id.add_activity_in_edit_stats);
 
             fullView = itemView;
         }
