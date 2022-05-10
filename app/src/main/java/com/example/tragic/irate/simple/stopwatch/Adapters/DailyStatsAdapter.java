@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -36,7 +37,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     LongToStringConverters longToStringConverters = new LongToStringConverters();
 
     boolean mEditModeIsActive;
-    int mPositionSelectedToEdit;
     int EDITING_SETS = 0;
     int EDITING_BREAKS = 1;
 
@@ -99,29 +99,44 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
         } else {
-            activityViewHolder.activityTextView.setText(mActivities.get(position-1));
-            activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position+-1)));
-            activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
-            activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
-
             activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
-            if (mEditModeIsActive) {
-                activityViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-                activityViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-            } else {
+            if (!mEditModeIsActive) {
+                activityViewHolder.activityTextView.setText(mActivities.get(position-1));
+                activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
+                activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
+                activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
                 activityViewHolder.setTimeTextView.setBackground(null);
                 activityViewHolder.breakTimeTextView.setBackground(null);
+
+                activityViewHolder.addActivity.setVisibility(View.GONE);
+            } else {
+                if (position < mActivities.size()+1) {
+                    activityViewHolder.activityTextView.setText(mActivities.get(position-1));
+                    activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
+                    activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
+                    activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+
+                    activityViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                    activityViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                } else {
+                    activityViewHolder.addActivity.setVisibility(View.VISIBLE);
+                }
+
             }
         }
     }
 
     @Override
     public int getItemCount() {
-        return mActivities.size()+1;
+        if (!mEditModeIsActive) {
+            return mActivities.size()+1;
+        } else {
+            return mActivities.size()+2;
+        }
     }
 
     public void turnOffEditMode() {
