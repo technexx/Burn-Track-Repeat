@@ -523,18 +523,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return caloriesBurnedPerMinute;
     }
 
-    private void instantiateEditPopUpViews() {
-        tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_view, null);
-        tdeeEditPopUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
-        tdeeEditPopUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(140), true);
-
-        tdeeEditPopUpWindow.setOnDismissListener(()-> {
-            dailyStatsAdapter.turnOffEditMode();
-            dailyStatsAdapter.notifyDataSetChanged();
-        });
-    }
-
     private void instantiateAddPopUpViews() {
         addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
         addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
@@ -558,6 +546,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
     }
 
+    private void instantiateEditPopUpViews() {
+        tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_view, null);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(140), true);
+
+        tdeeEditPopUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
+        tdeeEditPopUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);
+        tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
+        tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
+        tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
+        tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
+        confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_stats_edit);
+
+        tdeeEditPopUpWindow.setOnDismissListener(()-> {
+            dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
+        });
+    }
+
     private void instantiateTextViewsAndMiscClasses() {
         tdeeChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getActivity());
         longToStringConverters = new LongToStringConverters();
@@ -569,12 +575,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
-
-        tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
-        tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
-        tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
-        tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
-        confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_stats_edit);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
