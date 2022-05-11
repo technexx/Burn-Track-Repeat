@@ -489,8 +489,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Spinner tdee_category_spinner;
   Spinner tdee_sub_category_spinner;
-  Spinner tdeeMinutesDurationSpinner;
-  Spinner tdeeSecondsDurationSpinner;
   ArrayAdapter tdeeCategoryAdapter;
   ArrayAdapter tdeeSubCategoryAdapter;
 
@@ -499,6 +497,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView caloriesBurnedInTdeeAdditionTextView;
   TextView metScoreTextView;
+  Button confirmActivityAddition;
 
   boolean metricMode;
   String userGender;
@@ -509,7 +508,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int tdeeMinutesDuration;
   int tdeeSecondsDuration;
   double metScore;
-  Button confirmActivityAddition;
   boolean cycleHasActivityAssigned;
   boolean trackActivityWithinCycle;
 
@@ -4610,11 +4608,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
     String[] subCategoryList = subCategoryArray.get(selectedTdeeCategoryPosition);
     return (String) subCategoryList[selectedTdeeSubCategoryPosition];
-  }
-
-  private void setTdeeSubCategorySpinnerListFromRetrievedDatabaseValues() {
-    tdeeSubCategoryAdapter.clear();
-    tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
   }
 
   private void tdeeCategorySpinnerTouchActions() {
