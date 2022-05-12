@@ -163,6 +163,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             statDurationSwitchModeLogic(ITERATING_STATS_UP);
         });
 
+        confirmActivityAddition.setOnClickListener(v-> {
+        });
+
         editTdeeStatsButton.setOnClickListener(v-> {
             toggleEditModeInStatsAdapter();
         });
@@ -445,6 +448,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addTDEEPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
     }
 
+    private void addActivityToStats() {
+        //Todo: Insert w/ 0 stats and use edit to fill times.
+        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+        dailyStatsAccess.setActivityStringFromSpinner(activityToAdd);
+        //We already have our lists for the day instantiated.
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
+        //Todo: Show a toast if activity already exists.
+        //Todo: Query database (don't just refresh adapter lists, since we'll need to select a row to edit) and refresh adapter.
+
+    }
+
     private void setTdeeSpinnerListeners() {
         tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -532,10 +547,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
         tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
         confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+
         metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
         caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
 
-
+        confirmActivityAddition.setText(R.string.okay);
         metScoreTextView.setTextSize(22);
     }
 

@@ -239,6 +239,19 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
+    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
+        activityPositionInListForCurrentDay = 0;
+        activityExistsInDatabaseForSelectedDay = false;
+
+        //This only returns true once, when our activity matches one in the database.
+        for (int i=0; i<getStatForEachActivityListForForSingleDay().size(); i++) {
+            if (mActivityString.equals(getStatForEachActivityListForForSingleDay().get(i).getActivity())) {
+                activityPositionInListForCurrentDay = i;
+                activityExistsInDatabaseForSelectedDay = true;
+            }
+        }
+    }
+
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
 
@@ -258,19 +271,6 @@ public class DailyStatsAccess {
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
-    }
-
-    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
-        activityPositionInListForCurrentDay = 0;
-        activityExistsInDatabaseForSelectedDay = false;
-
-        //This only returns true once, when our activity matches one in the database.
-        for (int i=0; i<getStatForEachActivityListForForSingleDay().size(); i++) {
-            if (mActivityString.equals(getStatForEachActivityListForForSingleDay().get(i).getActivity())) {
-                activityPositionInListForCurrentDay = i;
-                activityExistsInDatabaseForSelectedDay = true;
-            }
-        }
     }
 
     // statsForEachActivityListForTimerAccess's size will contain all activities for that day (uniqueID). Retrieving a specific activity is based on its position within that list.
@@ -319,7 +319,7 @@ public class DailyStatsAccess {
         return mActivityString;
     }
 
-    public void setActivityStringForSelectedActivity(String activity) {
+    public void setActivityStringForSelectedActivityInStatsForEachActivityEntity(String activity) {
         mStatsForEachActivity.setActivity(activity);
     }
 
