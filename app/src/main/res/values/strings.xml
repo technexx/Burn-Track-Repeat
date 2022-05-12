@@ -139,6 +139,7 @@
 
     <string name="add_activity">Add an activity!</string>
     <string name="met_score">MET Score: \n%1$s</string>
+    <string name="met_score_single_line">MET Score: %1$s</string>
     <string name="calories_burned">Calories Burned: %1$s</string>
     <string name="calories_burned_per_minute">Calories Burned Per Minute: %1$s</string>
     <string name="calories_burned_per_hour">Calories Burned Per Hour: %1$s</string>

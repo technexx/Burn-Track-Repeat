@@ -115,7 +115,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
-            //Todo: Need to update list size on date switch for this to work.
             if (mItemCount==mActivities.size()+1) {
                 activityViewHolder.activityTextView.setText(mActivities.get(position-1));
                 activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));

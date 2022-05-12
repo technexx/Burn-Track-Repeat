@@ -72,8 +72,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int ITERATING_STATS_DOWN = 1;
 
     View tdeeEditView;
-    View tdeeEditPopUpAnchorLow;
-    View tdeeEditPopUpAnchorHigh;
+    View popUpAnchorBottom;
+    View popUpAnchorLow;
+    View popUpAnchorHigh;
     View recyclerAndTotalStatsDivider;
 
     ImageButton editTdeeStatsButton;
@@ -297,7 +298,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpActivityTextView.setText(activityString);
         setTdeeEditTexts(timeToEditLongValue);
 
-        tdeeEditPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
+        tdeeEditPopUpWindow.showAsDropDown(popUpAnchorLow, 0, 0);
     }
 
     private void setTdeeEditTexts(long valueToSet) {
@@ -441,7 +442,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingActivity(int position) {
-        addTDEEPopUpWindow.showAsDropDown(tdeeEditPopUpAnchorLow, 0, 0);
+        addTDEEPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
     }
 
     private void setTdeeSpinnerListeners() {
@@ -491,7 +492,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setMetScoreTextViewInAddTdeePopUp() {
         metScore = retrieveMetScoreFromSubCategoryPosition();
-        metScoreTextView.setText(getString(R.string.met_score, String.valueOf(metScore)));
+        metScoreTextView.setText(getString(R.string.met_score_single_line, String.valueOf(metScore)));
     }
 
     private double retrieveMetScoreFromSubCategoryPosition() {
@@ -525,7 +526,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateAddPopUpViews() {
         addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
-        addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+        addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(340), true);
         addTDEEPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
         tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
@@ -533,6 +534,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
         metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
         caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
+
+
+        metScoreTextView.setTextSize(22);
     }
 
     private void instantiateActivityAdditionSpinnersAndAdapters() {
@@ -548,10 +552,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_view, null);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpConv(140), true);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(140), true);
 
-        tdeeEditPopUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
-        tdeeEditPopUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);
+        popUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
+        popUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);
+        popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
         tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
@@ -599,7 +604,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return df.format(calories);
     }
 
-    private int dpConv(float pixels) {
+    private int dpToPxConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+    }
+
+    private int dpToSpConv(float pixels) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
     }
 }

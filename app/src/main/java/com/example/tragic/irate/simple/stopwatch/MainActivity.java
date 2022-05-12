@@ -516,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: "Addition" row also populates previous duration stats if switched from a duration with more rows.
   //Todo: Option to add or delete activity + times to Stats.
       //Todo: "X" at end of row for deletion, "+" at beginning of next empty row for addition.
   //Todo: Option for custom activity/custom met score?
