@@ -523,6 +523,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: Sort activities alphabetically by default.
   //Todo: Will eventually need a stats reset at end of year.
+  //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
   //Todo: Test all daily saves in fragment.
