@@ -484,7 +484,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TDEEChosenActivitySpinnerValues tDEEChosenActivitySpinnerValues;
   TextView addTDEEActivityTextView;
   ImageView removeTdeeActivityImageView;
-  PopupWindow addTDEEPopUpWindow;
+  PopupWindow tdeeAddPopUpWindow;
   View addTDEEPopUpView;
 
   Spinner tdee_category_spinner;
@@ -516,9 +516,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Add is using current day and not selected day.
   //Todo: "Addition" row also populates previous duration stats if switched from a duration with more rows.
-  //Todo: Option to add or delete activity + times to Stats.
-      //Todo: "X" at end of row for deletion, "+" at beginning of next empty row for addition.
+  //Todo: Option delete activity + times to Stats.
+      //Todo: "X" at end of row for deletion.
+  //Todo: Should be unable to select/edit future dates.
   //Todo: Option for custom activity/custom met score?
   //Todo: Date range for stats?
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
@@ -828,11 +830,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEActivityTextView.setOnClickListener(v-> {
       View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
 
-      addTDEEPopUpWindow.showAsDropDown(testView);
+      tdeeAddPopUpWindow.showAsDropDown(testView);
     });
 
     confirmActivityAddition.setOnClickListener(v-> {
-      addTDEEPopUpWindow.dismiss();
+      tdeeAddPopUpWindow.dismiss();
       toggleEditPopUpViewsForAddingActivity(true);
     });
 
@@ -1509,7 +1511,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+    tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -1517,7 +1519,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-    addTDEEPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    tdeeAddPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
   }
 
   private void instantiateArrayLists() {
@@ -3247,9 +3249,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (trackActivityWithinCycle) {
         dailyStatsAccess.setActivityStringFromSpinner(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatForEachActivityListForForSingleDayForTimerAccess());
 
-        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();

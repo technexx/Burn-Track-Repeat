@@ -90,7 +90,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int EDITING_SETS = 0;
     int EDITING_BREAKS = 1;
 
-    PopupWindow addTDEEPopUpWindow;
+    PopupWindow tdeeAddPopUpWindow;
     View addTDEEPopUpView;
 
     Spinner tdee_category_spinner;
@@ -127,10 +127,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         AsyncTask.execute(()-> {
             setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
+            populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextViewAndEditButton(currentStatDurationMode);
-                populateListsAndTextViewsFromEntityListsInDatabase();
 
             });
         });
@@ -147,10 +147,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAdapter.getItemCount();
 
                     setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
-
-                    getActivity().runOnUiThread(()-> {
-                        populateListsAndTextViewsFromEntityListsInDatabase();
-                    });
+                    populateListsAndTextViewsFromEntityListsInDatabase();
                 });
             }
         });
@@ -165,7 +162,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityAddition.setOnClickListener(v-> {
             addActivityToStats();
-            addTDEEPopUpWindow.dismiss();
+            tdeeAddPopUpWindow.dismiss();
             Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
 
@@ -184,10 +181,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
         AsyncTask.execute(()-> {
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
+            populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextViewAndEditButton(currentStatDurationMode);
-                populateListsAndTextViewsFromEntityListsInDatabase();
 
                 dailyStatsAdapter.turnOffEditMode();
                 dailyStatsAdapter.getItemCount();
@@ -255,16 +252,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
-        AsyncTask.execute(()-> {
-            setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
+        setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
 
-            getActivity().runOnUiThread(()-> {
-                setDayHolderStatsTextViews();
+        getActivity().runOnUiThread(()-> {
+            setDayHolderStatsTextViews();
 
-                dailyStatsAccess.clearStatsForEachActivityArrayLists();
-                dailyStatsAccess.setTotalActivityStatsForSelectedDaysToLists();
-                dailyStatsAdapter.notifyDataSetChanged();
-            });
+            dailyStatsAccess.clearStatsForEachActivityArrayLists();
+            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToLists();
+            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
@@ -433,17 +428,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingActivity(int position) {
-        addTDEEPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
+        tdeeAddPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
     }
 
     private void addActivityToStats() {
-        //Todo: Insert w/ 0 stats and use edit to fill times.
-        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
-        dailyStatsAccess.setActivityStringFromSpinner(activityToAdd);
-        //Wrong list. We need the one for Fragment access.
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
-        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
-        populateListsAndTextViewsFromEntityListsInDatabase();
+        AsyncTask.execute(()-> {
+            String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+            dailyStatsAccess.setActivityStringFromSpinner(activityToAdd);
+            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
+            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
+            populateListsAndTextViewsFromEntityListsInDatabase();
+        });
         //Todo: Show a toast if activity already exists.
     }
 
@@ -528,8 +523,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateAddPopUpViews() {
         addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
-        addTDEEPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(340), true);
-        addTDEEPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+        tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(340), true);
+        tdeeAddPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
         tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
         tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
@@ -540,6 +535,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityAddition.setText(R.string.okay);
         metScoreTextView.setTextSize(22);
+
+        tdeeAddPopUpWindow.setOnDismissListener(()-> {
+            dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
+        });
     }
 
     private void instantiateActivityAdditionSpinnersAndAdapters() {

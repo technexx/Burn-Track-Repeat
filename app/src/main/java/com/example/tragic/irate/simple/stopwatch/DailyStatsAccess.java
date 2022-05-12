@@ -22,7 +22,7 @@ public class DailyStatsAccess {
     StatsForEachActivity mStatsForEachActivity;
     List<DayHolder> mDayHolderList;
     List<StatsForEachActivity> statsForEachActivityListForTimerAccess;
-    List<StatsForEachActivity> mStatsForEachActivityListForFragmentAccess;
+    List<StatsForEachActivity> statsForEachActivityListForFragmentAccess;
 
     List<String> totalActivitiesListForSelectedDuration;
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
@@ -90,7 +90,7 @@ public class DailyStatsAccess {
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-        mStatsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
+        statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
@@ -114,10 +114,10 @@ public class DailyStatsAccess {
 
         if (daysOfWeekList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
-            mStatsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfWeekList);
+            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfWeekList);
         } else {
             mDayHolderList = new ArrayList<>();
-            mStatsForEachActivityListForFragmentAccess = new ArrayList<>();
+            statsForEachActivityListForFragmentAccess = new ArrayList<>();
         }
     }
 
@@ -133,10 +133,10 @@ public class DailyStatsAccess {
 
         if (daysOfMonthList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
-            mStatsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfMonthList);
+            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfMonthList);
         } else {
             mDayHolderList = new ArrayList<>();
-            mStatsForEachActivityListForFragmentAccess = new ArrayList<>();
+            statsForEachActivityListForFragmentAccess = new ArrayList<>();
         }
     }
 
@@ -152,10 +152,10 @@ public class DailyStatsAccess {
 
         if (daysOfYearList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
-            mStatsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfYearList);
+            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfYearList);
         } else {
             mDayHolderList = new ArrayList<>();
-            mStatsForEachActivityListForFragmentAccess = new ArrayList<>();
+            statsForEachActivityListForFragmentAccess = new ArrayList<>();
         }
     }
 
@@ -240,13 +240,13 @@ public class DailyStatsAccess {
     }
 
 
-    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
+    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(List<StatsForEachActivity> statsForEachActivityList) {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
 
         //This only returns true once, when our activity matches one in the database.
-        for (int i=0; i<getStatForEachActivityListForForSingleDay().size(); i++) {
-            if (mActivityString.equals(getStatForEachActivityListForForSingleDay().get(i).getActivity())) {
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
                 activityPositionInListForCurrentDay = i;
                 activityExistsInDatabaseForSelectedDay = true;
             }
@@ -254,12 +254,12 @@ public class DailyStatsAccess {
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
-    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay() {
+    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
 
         if (!activityExistsInDatabaseForSelectedDay) {
             StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
 
-            statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(getCurrentDayOfYear());
+            statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
             statsForEachActivity.setActivity(mActivityString);
 
             statsForEachActivity.setTotalSetTimeForEachActivity(0);
@@ -289,7 +289,11 @@ public class DailyStatsAccess {
     }
 
     public void assignStatsForEachActivityInstanceForEditing(int position) {
-        mStatsForEachActivity = mStatsForEachActivityListForFragmentAccess.get(position);
+        mStatsForEachActivity = statsForEachActivityListForFragmentAccess.get(position);
+    }
+
+    public List<StatsForEachActivity> getStatsForEachActivityListForFragmentAccess() {
+        return statsForEachActivityListForFragmentAccess;
     }
 
     public int getActivityPosition() {
@@ -308,7 +312,7 @@ public class DailyStatsAccess {
         statsForEachActivityListForTimerAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDay() {
+    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDayForTimerAccess() {
         return statsForEachActivityListForTimerAccess;
     }
 
@@ -361,13 +365,13 @@ public class DailyStatsAccess {
     }
 
     public void setTotalActivityStatsForSelectedDaysToLists() {
-        for (int i=0; i<mStatsForEachActivityListForFragmentAccess.size(); i++) {
-            if (mStatsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
-                if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityListForFragmentAccess.get(i).getActivity())) {
-                    totalActivitiesListForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getActivity());
-                    totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalSetTimeForEachActivity());
-                    totalBreakTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalBreakTimeForEachActivity());
-                    totalCaloriesBurnedListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalCaloriesBurnedForEachActivity());
+        for (int i=0; i<statsForEachActivityListForFragmentAccess.size(); i++) {
+            if (statsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
+                if (!doesTotalActivitiesListContainSelectedString(statsForEachActivityListForFragmentAccess.get(i).getActivity())) {
+                    totalActivitiesListForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getActivity());
+                    totalSetTimeListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalSetTimeForEachActivity());
+                    totalBreakTimeListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalBreakTimeForEachActivity());
+                    totalCaloriesBurnedListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalCaloriesBurnedForEachActivity());
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                     totalBreakTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedBreakTimeFromExistingAndRepeatingPositions(i));
@@ -388,19 +392,19 @@ public class DailyStatsAccess {
     }
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
-        long iteratingValue = mStatsForEachActivityListForFragmentAccess.get(position).getTotalSetTimeForEachActivity();
+        long iteratingValue = statsForEachActivityListForFragmentAccess.get(position).getTotalSetTimeForEachActivity();
         long presentValue =  totalSetTimeListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
 
     private long combinedBreakTimeFromExistingAndRepeatingPositions(int position) {
-        long iteratingValue = mStatsForEachActivityListForFragmentAccess.get(position).getTotalBreakTimeForEachActivity();
+        long iteratingValue = statsForEachActivityListForFragmentAccess.get(position).getTotalBreakTimeForEachActivity();
         long presentValue =  totalBreakTimeListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
 
     private double combinedCaloriesFromExistingAndRepeatingPositions(int position) {
-        double iteratingValue = mStatsForEachActivityListForFragmentAccess.get(position).getTotalCaloriesBurnedForEachActivity();
+        double iteratingValue = statsForEachActivityListForFragmentAccess.get(position).getTotalCaloriesBurnedForEachActivity();
         double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
@@ -430,7 +434,7 @@ public class DailyStatsAccess {
 
     private void instantiateEntityLists() {
         mDayHolderList = new ArrayList<>();
-        mStatsForEachActivityListForFragmentAccess = new ArrayList<>();
+        statsForEachActivityListForFragmentAccess = new ArrayList<>();
     }
 
     private void instantiateArrayListsOfActivitiesAndTheirStats() {
