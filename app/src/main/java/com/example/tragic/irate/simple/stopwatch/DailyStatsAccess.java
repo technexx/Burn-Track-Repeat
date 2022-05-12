@@ -361,15 +361,17 @@ public class DailyStatsAccess {
 
     public void setTotalActivityStatsForSelectedDaysToLists() {
         for (int i=0; i<mStatsForEachActivityListForFragmentAccess.size(); i++) {
-            if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityListForFragmentAccess.get(i).getActivity())) {
-                totalActivitiesListForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getActivity());
-                totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalSetTimeForEachActivity());
-                totalBreakTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalBreakTimeForEachActivity());
-                totalCaloriesBurnedListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalCaloriesBurnedForEachActivity());
-            } else {
-                totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
-                totalBreakTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedBreakTimeFromExistingAndRepeatingPositions(i));
-                totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
+            if (mStatsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
+                if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityListForFragmentAccess.get(i).getActivity())) {
+                    totalActivitiesListForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getActivity());
+                    totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalSetTimeForEachActivity());
+                    totalBreakTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalBreakTimeForEachActivity());
+                    totalCaloriesBurnedListForEachActivityForSelectedDuration.add(mStatsForEachActivityListForFragmentAccess.get(i).getTotalCaloriesBurnedForEachActivity());
+                } else {
+                    totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
+                    totalBreakTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedBreakTimeFromExistingAndRepeatingPositions(i));
+                    totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
+                }
             }
         }
     }
