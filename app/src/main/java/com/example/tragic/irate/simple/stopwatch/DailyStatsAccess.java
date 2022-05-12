@@ -253,6 +253,10 @@ public class DailyStatsAccess {
         }
     }
 
+    public boolean getActivityExistsInDatabaseForSelectedDay () {
+        return activityExistsInDatabaseForSelectedDay;
+    }
+
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
 

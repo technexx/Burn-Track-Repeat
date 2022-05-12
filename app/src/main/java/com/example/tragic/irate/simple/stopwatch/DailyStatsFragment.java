@@ -165,7 +165,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmActivityAddition.setOnClickListener(v-> {
             addActivityToStats();
             tdeeAddPopUpWindow.dismiss();
-            Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
@@ -175,7 +174,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmEditWithinPopUpButton.setOnClickListener(v-> {
             updateDatabaseWithEditedStats();
             tdeeEditPopUpWindow.dismiss();
-            Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
         return root;
     }
@@ -357,6 +355,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
 
             populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+            });
         });
     }
 
@@ -440,8 +442,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
             populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                if (dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
+                    Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
-        //Todo: Show a toast if activity already exists.
     }
 
     private void setTdeeSpinnerListeners() {
