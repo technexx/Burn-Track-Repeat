@@ -164,6 +164,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityAddition.setOnClickListener(v-> {
+            addActivityToStats();
+            addTDEEPopUpWindow.dismiss();
+            Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
@@ -210,7 +213,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setDayAndStatListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
-            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDay(daySelectedFromCalendar);
+            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
@@ -344,21 +347,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
                 dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
                 dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(oldCaloriesFromDayHolder - caloriesToSubtractForDayHolder);
-
-                Log.i("testCal", "old activity time is " + oldStatValue/1000);
-                Log.i("testCal", "new activity time is " + newStatValue/1000);
-
-                Log.i("testCal", "old dayHolder time is " + dayHolderSetValueToEdit/1000);
-                Log.i("testCal", "dayHolder value to subtract is " + setTimeToSubtractForActivity/1000);
-                Log.i("testCal", "new dayHolder time is " + (dayHolderSetValueToEdit - setTimeToSubtractForActivity)/1000);
-
-                Log.i("testCal", "activity cals are " + oldCaloriesFromActivity);
-                Log.i("testCal", "cal multiplier is " + caloricMultiplier);
-                Log.i("testCal", "new activity cals are " + newCaloriesForActivity);
-
-                Log.i("testCal", "old dayHolder cals are " + oldCaloriesFromDayHolder);
-                Log.i("testCal", "dayHolder cals to subtract are " + caloriesToSubtractForDayHolder);
-                Log.i("testCal", "new dayHolder cals are " + (oldCaloriesFromDayHolder - caloriesToSubtractForDayHolder));
             } else if (typeOfStatToEdit==EDITING_BREAKS) {
                 oldStatValue = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
 
@@ -452,12 +440,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         //Todo: Insert w/ 0 stats and use edit to fill times.
         String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
         dailyStatsAccess.setActivityStringFromSpinner(activityToAdd);
-        //We already have our lists for the day instantiated.
+        //Wrong list. We need the one for Fragment access.
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay();
+        populateListsAndTextViewsFromEntityListsInDatabase();
         //Todo: Show a toast if activity already exists.
-        //Todo: Query database (don't just refresh adapter lists, since we'll need to select a row to edit) and refresh adapter.
-
     }
 
     private void setTdeeSpinnerListeners() {
@@ -626,5 +613,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private int dpToSpConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+    }
+
+    private void testEditing() {
+//        Log.i("testCal", "old activity time is " + oldStatValue/1000);
+//        Log.i("testCal", "new activity time is " + newStatValue/1000);
+//
+//        Log.i("testCal", "old dayHolder time is " + dayHolderSetValueToEdit/1000);
+//        Log.i("testCal", "dayHolder value to subtract is " + setTimeToSubtractForActivity/1000);
+//        Log.i("testCal", "new dayHolder time is " + (dayHolderSetValueToEdit - setTimeToSubtractForActivity)/1000);
+//
+//        Log.i("testCal", "activity cals are " + oldCaloriesFromActivity);
+//        Log.i("testCal", "cal multiplier is " + caloricMultiplier);
+//        Log.i("testCal", "new activity cals are " + newCaloriesForActivity);
+//
+//        Log.i("testCal", "old dayHolder cals are " + oldCaloriesFromDayHolder);
+//        Log.i("testCal", "dayHolder cals to subtract are " + caloriesToSubtractForDayHolder);
+//        Log.i("testCal", "new dayHolder cals are " + (oldCaloriesFromDayHolder - caloriesToSubtractForDayHolder));
     }
 }
