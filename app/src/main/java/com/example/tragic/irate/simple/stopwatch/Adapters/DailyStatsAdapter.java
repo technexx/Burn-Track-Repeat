@@ -44,6 +44,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
     tdeeActivityAddition mTdeeActivityAddition;
+    tdeeActivityDeletion mTdeeActivityDeletion;
 
     public interface tdeeEditedItemIsSelected {
         void tdeeEditItemSelected (int typeOfEdit, int position);
@@ -59,6 +60,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     public void addActivityToDailyStats(tdeeActivityAddition xTdeeActivityAddition) {
         this.mTdeeActivityAddition = xTdeeActivityAddition;
+    }
+
+    public interface tdeeActivityDeletion {
+        void onDeletingActivity(int position);
+    }
+
+    public void deleteActivityFromDailyStats(tdeeActivityDeletion xTdeeActivityDeletion) {
+        this.mTdeeActivityDeletion = xTdeeActivityDeletion;
     }
 
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {

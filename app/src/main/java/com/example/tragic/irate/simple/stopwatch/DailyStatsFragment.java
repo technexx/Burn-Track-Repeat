@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition {
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion {
 
     View mRoot;
     Calendar calendar;
@@ -429,7 +429,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextSeconds.addTextChangedListener(editTextWatcher(tdeeEditTextSeconds));
     }
 
-
     @Override
     public void onAddingActivity(int position) {
         tdeeAddPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
@@ -451,6 +450,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 }
             });
         });
+    }
+
+    @Override
+    public void onDeletingActivity(int position) {
+
+    }
+
+    private void deleteActivityFromStats() {
+
     }
 
     private void setTdeeSpinnerListeners() {
@@ -601,6 +609,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
         dailyStatsAdapter.addActivityToDailyStats(DailyStatsFragment.this);
+        dailyStatsAdapter.deleteActivityFromDailyStats(DailyStatsFragment.this);
 
         dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
