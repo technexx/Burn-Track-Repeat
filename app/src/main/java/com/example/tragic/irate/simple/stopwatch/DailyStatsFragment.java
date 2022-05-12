@@ -126,6 +126,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setValueCappingTextWatcherOnEditTexts();
 
         AsyncTask.execute(()-> {
+            daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
+
             setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -538,7 +540,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeAddPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
-            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
@@ -568,7 +569,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
-            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 

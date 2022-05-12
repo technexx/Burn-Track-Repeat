@@ -516,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Add is using current day and not selected day.
+  //Todo: Adding activity should have option to enter time (without manually bringing up edit).
   //Todo: "Addition" row also populates previous duration stats if switched from a duration with more rows.
   //Todo: Option delete activity + times to Stats.
       //Todo: "X" at end of row for deletion.
