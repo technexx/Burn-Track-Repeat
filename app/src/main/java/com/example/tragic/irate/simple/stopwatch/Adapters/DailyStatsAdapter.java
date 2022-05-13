@@ -107,13 +107,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         activityViewHolder.addActivity.setVisibility(View.GONE);
 
-
-        //Todo: In edit mode, last position bound must not retrieved by a list (since it will exceed the list bounds by 1).
-//        activityViewHolder.activityTextView.setText("");
-//        activityViewHolder.setTimeTextView.setText("");
-//        activityViewHolder.breakTimeTextView.setText("");
-//        activityViewHolder.caloriesBurnedTextView.setText("");
-
         if (position==0) {
             activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
             activityViewHolder.setTimeTextView.setText(mContext.getString(R.string.set_time_text_header));
@@ -157,7 +150,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     @Override
     public int getItemCount() {
-        return mActivities.size() + 1;
+        return mItemCount = mActivities.size()+1;
     }
 
     public void turnOffEditMode() {
