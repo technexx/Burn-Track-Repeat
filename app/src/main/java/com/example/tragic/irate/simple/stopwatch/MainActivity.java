@@ -516,16 +516,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: First activity in list disappears when addition row in edit mode is added.
   //Todo: Adding activity should have option to enter time (without manually bringing up edit).
-  //Todo: "Addition" row also populates previous duration stats if switched from a duration with more rows.
   //Todo: Option delete activity + times to Stats.
       //Todo: "X" at end of row for deletion.
   //Todo: Should be unable to select/edit future dates.
+  //Todo: Sort activities alphabetically. Some unwanted auto-sorting on addition right now.
   //Todo: Option for custom activity/custom met score?
+  //Todo: Possible issue w/ stat addition plus sign appearing on populated row in previous months.
   //Todo: Date range for stats?
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
-  //Todo: Sort activities alphabetically by default.
   //Todo: Will eventually need a stats reset at end of year.
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
