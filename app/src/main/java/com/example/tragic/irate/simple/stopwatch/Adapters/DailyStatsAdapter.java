@@ -103,6 +103,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             }
         });
 
+        activityViewHolder.setTimeTextView.setBackground(null);
+        activityViewHolder.breakTimeTextView.setBackground(null);
         activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         activityViewHolder.addActivity.setVisibility(View.GONE);
@@ -131,8 +133,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             }
 
             if (!mEditModeIsActive) {
-                activityViewHolder.setTimeTextView.setBackground(null);
-                activityViewHolder.breakTimeTextView.setBackground(null);
                 activityViewHolder.addActivity.setVisibility(View.GONE);
             } else {
                 if (position < mActivities.size()) {
