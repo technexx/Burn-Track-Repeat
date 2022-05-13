@@ -103,10 +103,16 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             }
         });
 
-
         activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         activityViewHolder.addActivity.setVisibility(View.GONE);
+
+
+        //Todo: In edit mode, last position bound must not retrieved by a list (since it will exceed the list bounds by 1).
+//        activityViewHolder.activityTextView.setText("");
+//        activityViewHolder.setTimeTextView.setText("");
+//        activityViewHolder.breakTimeTextView.setText("");
+//        activityViewHolder.caloriesBurnedTextView.setText("");
 
         if (position==0) {
             activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
@@ -119,25 +125,27 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
         } else {
-            activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
-            activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
-            activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
-            activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+            if (position < mActivities.size()) {
+                activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
+                activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
+                activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
+                activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
-            if (mItemCount==mActivities.size()+1) {
                 activityViewHolder.activityTextView.setText(mActivities.get(position-1));
                 activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
                 activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
                 activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+            }
 
+            if (!mEditModeIsActive) {
                 activityViewHolder.setTimeTextView.setBackground(null);
                 activityViewHolder.breakTimeTextView.setBackground(null);
                 activityViewHolder.addActivity.setVisibility(View.GONE);
             } else {
-                if (position < (mItemCount-1)) {
+                if (position < mActivities.size()) {
                     activityViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
                     activityViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-                } else {
+                } else if (position < mItemCount){
                     activityViewHolder.addActivity.setVisibility(View.VISIBLE);
                     activityViewHolder.addActivity.setOnClickListener(v-> {
                         mTdeeActivityAddition.onAddingActivity(position);
@@ -149,12 +157,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     @Override
     public int getItemCount() {
-        if (!mEditModeIsActive) {
-            mItemCount = mActivities.size()+1;
-        } else {
-            mItemCount = mActivities.size()+2;
-        }
-        return mItemCount;
+        return mActivities.size() + 1;
     }
 
     public void turnOffEditMode() {
