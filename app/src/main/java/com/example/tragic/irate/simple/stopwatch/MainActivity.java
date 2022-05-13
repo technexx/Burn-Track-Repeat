@@ -516,9 +516,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Adding activity should have option to enter time (without manually bringing up edit).
   //Todo: Option delete activity + times to Stats.
-      //Todo: "X" at end of row for deletion.
+  //Todo: "X" at end of row for deletion.
+  //Todo: Adding activity should have option to enter time (without manually bringing up edit).
   //Todo: Should be unable to select/edit future dates.
   //Todo: Sort activities alphabetically. Some unwanted auto-sorting on addition right now.
   //Todo: Option for custom activity/custom met score?
