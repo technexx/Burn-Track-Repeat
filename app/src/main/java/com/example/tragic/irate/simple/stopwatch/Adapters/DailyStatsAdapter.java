@@ -30,13 +30,16 @@ import java.util.List;
 public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.ActivityViewHolder> {
     Context mContext;
     ActivityViewHolder mHolder;
-    int mItemCount;
+    LongToStringConverters longToStringConverters = new LongToStringConverters();
 
     List<String> mActivities;
     List<Long> mSetTimes;
     List<Long> mBreakTimes;
     List<Double> mCaloriesBurned;
-    LongToStringConverters longToStringConverters = new LongToStringConverters();
+    int mItemCount;
+
+    int REGULAR_TEXT = 0;
+    int BOLD_TEXT = 1;
 
     boolean mEditModeIsActive;
     int EDITING_SETS = 0;
@@ -98,9 +101,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
         mHolder.breakTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive && position>0) {
-                mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position-1);
                 mHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
                 mHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+                mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position-1);
             }
         });
 
@@ -111,21 +114,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         mHolder.addActivity.setVisibility(View.GONE);
 
         if (position==0) {
+            setViewTextStyles(BOLD_TEXT);
+
             mHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
             mHolder.setTimeTextView.setText(mContext.getString(R.string.set_time_text_header));
             mHolder.breakTimeTextView.setText(mContext.getString(R.string.break_time_text_header));
             mHolder.caloriesBurnedTextView.setText(mContext.getString(R.string.calories_burned_text_header));
-
-            mHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
         } else {
             if (position < mActivities.size()) {
-                mHolder.activityTextView.setTypeface(Typeface.DEFAULT);
-                mHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
-                mHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
-                mHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+                setViewTextStyles(REGULAR_TEXT);
 
                 mHolder.activityTextView.setText(mActivities.get(position-1));
                 mHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
@@ -133,19 +130,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
                 mHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
             }
 
-            if (!mEditModeIsActive) {
-                mHolder.addActivity.setVisibility(View.GONE);
-            } else {
-                if (position < mActivities.size()) {
-                    mHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-                    mHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-                } else if (position < mItemCount){
-                    mHolder.addActivity.setVisibility(View.VISIBLE);
-                    mHolder.addActivity.setOnClickListener(v-> {
-                        mTdeeActivityAddition.onAddingActivity(position);
-                    });
-                }
-            }
+            setEditModeViews(position);
         }
     }
 
@@ -162,6 +147,37 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         mEditModeIsActive = !mEditModeIsActive;
         notifyDataSetChanged();
     }
+
+    private void setViewTextStyles(int boldText) {
+        if (boldText==BOLD_TEXT) {
+            mHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+        } else {
+            mHolder.activityTextView.setTypeface(Typeface.DEFAULT);
+            mHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
+            mHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
+            mHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+        }
+    }
+
+    private void setEditModeViews(int position) {
+        if (!mEditModeIsActive) {
+            mHolder.addActivity.setVisibility(View.GONE);
+        } else {
+            if (position < mActivities.size()) {
+                mHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                mHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+            } else if (position < mItemCount){
+                mHolder.addActivity.setVisibility(View.VISIBLE);
+                mHolder.addActivity.setOnClickListener(v-> {
+                    mTdeeActivityAddition.onAddingActivity(position);
+                });
+            }
+        }
+    }
+
 
     public class ActivityViewHolder extends RecyclerView.ViewHolder {
         TextView activityTextView;
