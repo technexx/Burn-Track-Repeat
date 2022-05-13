@@ -29,7 +29,7 @@ import java.util.List;
 
 public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.ActivityViewHolder> {
     Context mContext;
-    ActivityViewHolder holder;
+    ActivityViewHolder mHolder;
     int mItemCount;
 
     List<String> mActivities;
@@ -80,67 +80,68 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
 
-        return holder = new ActivityViewHolder(view);
+        return mHolder = new ActivityViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ActivityViewHolder holder, int position) {
         ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
+        mHolder = activityViewHolder;
 
-        activityViewHolder.setTimeTextView.setOnClickListener(v-> {
+        mHolder.setTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive && position>0) {
-                activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
-                activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+                mHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
+                mHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
                 mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position-1);
             }
         });
 
-        activityViewHolder.breakTimeTextView.setOnClickListener(v-> {
+        mHolder.breakTimeTextView.setOnClickListener(v-> {
             if (mEditModeIsActive && position>0) {
                 mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position-1);
-                activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
-                activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+                mHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
+                mHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
             }
         });
 
-        activityViewHolder.setTimeTextView.setBackground(null);
-        activityViewHolder.breakTimeTextView.setBackground(null);
-        activityViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-        activityViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-        activityViewHolder.addActivity.setVisibility(View.GONE);
+        mHolder.setTimeTextView.setBackground(null);
+        mHolder.breakTimeTextView.setBackground(null);
+        mHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+        mHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+        mHolder.addActivity.setVisibility(View.GONE);
 
         if (position==0) {
-            activityViewHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
-            activityViewHolder.setTimeTextView.setText(mContext.getString(R.string.set_time_text_header));
-            activityViewHolder.breakTimeTextView.setText(mContext.getString(R.string.break_time_text_header));
-            activityViewHolder.caloriesBurnedTextView.setText(mContext.getString(R.string.calories_burned_text_header));
+            mHolder.activityTextView.setText(mContext.getString(R.string.activity_text_header));
+            mHolder.setTimeTextView.setText(mContext.getString(R.string.set_time_text_header));
+            mHolder.breakTimeTextView.setText(mContext.getString(R.string.break_time_text_header));
+            mHolder.caloriesBurnedTextView.setText(mContext.getString(R.string.calories_burned_text_header));
 
-            activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
         } else {
             if (position < mActivities.size()) {
-                activityViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
-                activityViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
-                activityViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
-                activityViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+                mHolder.activityTextView.setTypeface(Typeface.DEFAULT);
+                mHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
+                mHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
+                mHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
-                activityViewHolder.activityTextView.setText(mActivities.get(position-1));
-                activityViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
-                activityViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
-                activityViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+                mHolder.activityTextView.setText(mActivities.get(position-1));
+                mHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
+                mHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
+                mHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
             }
 
             if (!mEditModeIsActive) {
-                activityViewHolder.addActivity.setVisibility(View.GONE);
+                mHolder.addActivity.setVisibility(View.GONE);
             } else {
                 if (position < mActivities.size()) {
-                    activityViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-                    activityViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                    mHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                    mHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
                 } else if (position < mItemCount){
-                    activityViewHolder.addActivity.setVisibility(View.VISIBLE);
-                    activityViewHolder.addActivity.setOnClickListener(v-> {
+                    mHolder.addActivity.setVisibility(View.VISIBLE);
+                    mHolder.addActivity.setOnClickListener(v-> {
                         mTdeeActivityAddition.onAddingActivity(position);
                     });
                 }
