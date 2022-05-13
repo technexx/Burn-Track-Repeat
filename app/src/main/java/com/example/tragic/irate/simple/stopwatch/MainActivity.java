@@ -516,8 +516,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Option delete activity + times to Stats.
   //Todo: "X" at end of row for deletion.
+  //Todo: Extra row still appears as blank when edit mode is off.
+  //Todo: Edit mode should dismiss when leaving Stats Fragment.
   //Todo: Adding activity should have option to enter time (without manually bringing up edit).
   //Todo: Should be unable to select/edit future dates.
   //Todo: Sort activities alphabetically. Some unwanted auto-sorting on addition right now.

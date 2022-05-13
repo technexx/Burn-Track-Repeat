@@ -107,6 +107,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             }
         });
 
+        mHolder.breakTimeTextView.setVisibility(View.GONE);
+
         mHolder.setTimeTextView.setBackground(null);
         mHolder.breakTimeTextView.setBackground(null);
         mHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
