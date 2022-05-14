@@ -34,6 +34,8 @@
 
     <style name="StatFragmentTheme">
         <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">20sp</item>
+        <item name="fontFamily">@font/roboto</item>
     </style>
 
     <style name="MyCalendarViewStyle" parent="android:Widget.Material.Light.CalendarView">
@@ -42,5 +44,7 @@
         <item name="android:weekNumberColor">@color/red</item>
     </style>
 
+    <style name="EditStatsRecyclerViewStyle">
+    </style>
 
 </resources>

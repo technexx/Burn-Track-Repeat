@@ -25,15 +25,14 @@
 
         <TextView
             android:id="@+id/total_stats_header"
-            android:text="@string/day_total_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/stat_duration_switcher_button_left"
+            android:text="@string/day_total_header"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/stat_duration_switcher_button_left"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="0dp"
-            android:textStyle="bold">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/stat_duration_switcher_button_left">
         </TextView>
 
         <ImageButton

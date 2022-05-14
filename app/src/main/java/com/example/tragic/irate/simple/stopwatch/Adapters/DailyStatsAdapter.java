@@ -114,6 +114,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         mHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         mHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         mHolder.addActivity.setVisibility(View.GONE);
+        mHolder.deleteActivity.setVisibility(View.INVISIBLE);
 
         if (position==0) {
             setHolderViewTextStyles(BOLD_TEXT);
@@ -162,16 +163,23 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             if (position < mActivities.size()) {
                 mHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
                 mHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+                mHolder.deleteActivity.setVisibility(View.VISIBLE);
             } else if (position < mItemCount){
                 mHolder.addActivity.setVisibility(View.VISIBLE);
+
                 mHolder.addActivity.setOnClickListener(v-> {
                     mTdeeActivityAddition.onAddingActivity(position);
+                });
+
+                mHolder.deleteActivity.setOnClickListener(v-> {
+                    mTdeeActivityDeletion.onDeletingActivity(position);
                 });
             }
         }
     }
-    private void setHolderViewTextStyles(int boldText) {
-        if (boldText==BOLD_TEXT) {
+    private void setHolderViewTextStyles(int textStyle) {
+        if (textStyle==BOLD_TEXT) {
+            mHolder.activityTextView.setTextSize(18);
             mHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -189,7 +197,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         TextView setTimeTextView;
         TextView breakTimeTextView;
         TextView caloriesBurnedTextView;
+
         ImageButton addActivity;
+        ImageButton deleteActivity;
 
         View fullView;
 
@@ -199,7 +209,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
             breakTimeTextView = itemView.findViewById(R.id.break_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
+
             addActivity = itemView.findViewById(R.id.add_activity_in_edit_stats);
+            deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
 
             fullView = itemView;
         }

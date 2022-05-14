@@ -516,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: "X" at end of row for deletion.
+  //Todo: Header repeats at end of rows sometimes in edit mode.
   //Todo: Extra row still appears as blank when edit mode is off.
   //Todo: Edit mode should dismiss when leaving Stats Fragment.
   //Todo: Adding activity should have option to enter time (without manually bringing up edit).

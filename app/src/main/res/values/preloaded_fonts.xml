@@ -4,6 +4,10 @@
         <item>@font/archivo_narrow</item>
         <item>@font/archivo_narrow_bold</item>
         <item>@font/hammersmith_one</item>
+        <item>@font/montez</item>
+        <item>@font/montserrat_alternates_thin</item>
+        <item>@font/open_sans</item>
+        <item>@font/roboto</item>
         <item>@font/roboto_medium</item>
     </array>
 </resources>
