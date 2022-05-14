@@ -458,6 +458,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void deleteActivityFromStats() {
+        AsyncTask.execute(() -> {
+            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
+            dailyStatsAccess.assignStatsForEachActivityInstanceForEditing(mPositionToEdit);
+            dailyStatsAccess.deleteStatsForEachActivityEntity();
+            populateListsAndTextViewsFromEntityListsInDatabase();
+        });
+    }
+
+    private void toggleDeletionConfirmation() {
 
     }
 

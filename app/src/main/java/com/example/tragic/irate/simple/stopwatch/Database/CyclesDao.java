@@ -39,7 +39,6 @@ CyclesDao {
     @Query("DELETE from DayHolder WHERE daySelectedId IN (:listIDs)")
     void deleteMultipleDays(List<Integer> listIDs);
 
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
 

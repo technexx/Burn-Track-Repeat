@@ -9,9 +9,11 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +47,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     int EDITING_SETS = 0;
     int EDITING_BREAKS = 1;
 
+    PopupWindow confirmPopUp;
+    boolean deletionConfirmationIsVisible;
+
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
     tdeeActivityAddition mTdeeActivityAddition;
     tdeeActivityDeletion mTdeeActivityDeletion;
@@ -75,6 +80,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
 
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
+
+//        LayoutInflater inflater = (LayoutInflater) mContext.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
     }
 
     @NonNull
@@ -82,6 +90,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
     public ActivityViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
+
+//        View addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
+//        confirmPopUp = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 
         return mHolder = new ActivityViewHolder(view);
     }
@@ -141,6 +152,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<DailyStatsAdapter.Ac
         mEditModeIsActive = !mEditModeIsActive;
         notifyDataSetChanged();
     }
+
 
     private void setHolderTextViews(int position) {
         if (position==0) {

@@ -2142,7 +2142,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int daySelected = dailyStatsFragment.getDaySelectedFromCalendar();
 
     dailyStatsAccess.deleteDayHolderEntity(daySelected);
-    dailyStatsAccess.deleteStatForEachActivityEntity(daySelected);
+    dailyStatsAccess.deleteStatForEachActivityEntityForSelectedDay(daySelected);
 
     refreshDailyStats();
   }

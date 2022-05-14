@@ -356,11 +356,11 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getTotalCaloriesBurnedForEachActivity();
     }
 
-    public long getUniqueIdTiedToSpecificDayFromStatsForEachActivity() {
-        return mStatsForEachActivity.getUniqueIdTiedToTheSelectedActivity();
+    public void deleteStatsForEachActivityEntity() {
+        cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
     }
 
-    public void deleteStatForEachActivityEntity(long dayToDelete) {
+    public void deleteStatForEachActivityEntityForSelectedDay(long dayToDelete) {
         cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(dayToDelete);
     }
 
