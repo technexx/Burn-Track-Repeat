@@ -99,27 +99,22 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         if (viewType==HEADER_VIEW) {
             view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
-            HeaderViewHolder headerViewHolder = new HeaderViewHolder(view);
-            return headerViewHolder;
+            return new HeaderViewHolder(view);
         } else if (viewType==FOOTER_VIEW) {
             view = inflater.inflate(R.layout.daily_stats_recycler_footer_layout, parent, false);
+            return new FootViewHolder(view);
         }
 
         view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
-        MainViewHolder mainViewHolder = new MainViewHolder(view);
-        return mainViewHolder;
+        return new MainViewHolder(view);
 
 //        View addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
 //        confirmPopUp = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     }
 
-
     //Todo: ViewHolder will only return number of positions IN LIST.
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
-        int viewType = getItemViewType(position);
-
         if (holder instanceof HeaderViewHolder) {
             mHeaderViewHolder = (HeaderViewHolder) holder;
 
@@ -174,7 +169,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public int getItemViewType(int position) {
         if (position==0) {
             return HEADER_VIEW;
-        } else if (position < mItemCount){
+        } else if (position < mActivities.size() || !mEditModeIsActive){
             return MAIN_VIEW;
         } else {
             return FOOTER_VIEW;
@@ -198,6 +193,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void populateMainRowViews(int position) {
+//        if (mEditModeIsActive) {
+//            if (position==mActivities.size()) {
+//                return;
+//            }
+//        }
         mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
         mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
         mMainViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
