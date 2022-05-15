@@ -236,7 +236,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mHeaderViewHolder.caloriesBurnedHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
             mHeaderViewHolder.breakTimeHeaderTextView.setVisibility(View.GONE);
-            mHeaderViewHolder.deleteActivity.setVisibility(View.GONE);
+            mHeaderViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
         } else if (textStyle==REGULAR_TEXT){
             mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
