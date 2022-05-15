@@ -118,41 +118,34 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-        if (holder instanceof HeaderViewHolder) {
-            HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
-            mHeaderViewHolder = headerViewHolder;
+        int viewType = getItemViewType(position);
 
-            mHeaderViewHolder.activityHeaderTextView.setText(R.string.activity_text_header);
-            mHeaderViewHolder.setTimeHeaderTextView.setText(R.string.set_time_text_header);
-            mHeaderViewHolder.breakTimeHeaderTextView.setText(R.string.break_time_text_header);
-            mHeaderViewHolder.caloriesBurnedHeaderTextView.setText(R.string.calories_burned_text_header);
+        if (holder instanceof HeaderViewHolder) {
+            mHeaderViewHolder = (HeaderViewHolder) holder;
+
+            populateHeaderRowViews();
             setHolderViewTextStyles(BOLD_TEXT);
         } else if (holder instanceof MainViewHolder) {
-            MainViewHolder mainViewHolder = (MainViewHolder) holder;
-            mMainViewHolder = mainViewHolder;
+            mMainViewHolder = (MainViewHolder) holder;
 
+            populateMainRowViews(position);
             setDefaultMainHolderViewsAndBackgrounds();
             setMainHolderEditModeViews();
             setHolderViewTextStyles(REGULAR_TEXT);
 
-            mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
-            mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
-            mMainViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
-            mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
-
             mMainViewHolder.setTimeTextView.setOnClickListener(v-> {
-                if (mEditModeIsActive && position>0) {
+                if (mEditModeIsActive) {
                     mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
                     mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position);
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position-1);
                 }
             });
 
             mMainViewHolder.breakTimeTextView.setOnClickListener(v-> {
-                if (mEditModeIsActive && position>0) {
+                if (mEditModeIsActive) {
                     mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
                     mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position);
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position-1);
                 }
             });
 
@@ -170,7 +163,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemCount() {
-        //Todo: Change itemCount by 1 if editMode is active.
         if (!mEditModeIsActive) {
             return mItemCount = mActivities.size()+1;
         } else {
@@ -198,6 +190,20 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyDataSetChanged();
     }
 
+    private void populateHeaderRowViews() {
+        mHeaderViewHolder.activityHeaderTextView.setText(R.string.activity_text_header);
+        mHeaderViewHolder.setTimeHeaderTextView.setText(R.string.set_time_text_header);
+        mHeaderViewHolder.breakTimeHeaderTextView.setText(R.string.break_time_text_header);
+        mHeaderViewHolder.caloriesBurnedHeaderTextView.setText(R.string.calories_burned_text_header);
+    }
+
+    private void populateMainRowViews(int position) {
+        mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
+        mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
+        mMainViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
+        mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+    }
+
     private void setDefaultMainHolderViewsAndBackgrounds() {
         mMainViewHolder.breakTimeTextView.setVisibility(View.GONE);
         mMainViewHolder.setTimeTextView.setBackground(null);
@@ -218,6 +224,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void setHolderViewTextStyles(int textStyle) {
         if (textStyle==BOLD_TEXT) {
             mHeaderViewHolder.activityHeaderTextView.setTextSize(18);
+            mHeaderViewHolder.activityHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.setTimeHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.breakTimeHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.caloriesBurnedHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
