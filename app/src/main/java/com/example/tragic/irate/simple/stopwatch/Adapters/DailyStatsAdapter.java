@@ -161,11 +161,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (!mEditModeIsActive) {
             return mItemCount = mActivities.size()+1;
         } else {
-            //Todo: We need an extra row if we're using the footer. Issue is w/ positional retrieval. We should debug row by row to see what we're getting @ +2.
-
-            // 0  1 2 3 4
-            // 0  1 2 3 4  5
-
             return mItemCount = mActivities.size()+2;
         }
     }

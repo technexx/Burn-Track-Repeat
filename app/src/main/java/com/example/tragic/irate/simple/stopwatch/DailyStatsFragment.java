@@ -566,6 +566,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeAddPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
@@ -595,6 +596,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
