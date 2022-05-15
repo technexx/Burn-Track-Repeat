@@ -161,7 +161,12 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (!mEditModeIsActive) {
             return mItemCount = mActivities.size()+1;
         } else {
-            return mItemCount = mActivities.size()+1;
+            //Todo: We need an extra row if we're using the footer. Issue is w/ positional retrieval. We should debug row by row to see what we're getting @ +2.
+
+            // 0  1 2 3 4
+            // 0  1 2 3 4  5
+
+            return mItemCount = mActivities.size()+2;
         }
     }
 
@@ -169,7 +174,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public int getItemViewType(int position) {
         if (position==0) {
             return HEADER_VIEW;
-        } else if (position < mActivities.size() || !mEditModeIsActive){
+            //<= because header takes up first position and doesn't pull from list.
+        } else if (position <= mActivities.size() || !mEditModeIsActive){
             return MAIN_VIEW;
         } else {
             return FOOTER_VIEW;
@@ -193,11 +199,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void populateMainRowViews(int position) {
-//        if (mEditModeIsActive) {
-//            if (position==mActivities.size()) {
-//                return;
-//            }
-//        }
+        //Returns on last row in edit mode so we don't try to pull textViews from footer.
+        if (position==mItemCount-1 && mEditModeIsActive) {
+            return;
+        }
         mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
         mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
         mMainViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
