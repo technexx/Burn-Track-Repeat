@@ -112,7 +112,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 //        confirmPopUp = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     }
 
-    //Todo: ViewHolder will only return number of positions IN LIST.
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
@@ -128,7 +127,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             setMainHolderEditModeViews();
             setHolderViewTextStyles(REGULAR_TEXT);
 
+            //mMainViewHolder instance set on onClick is set on first adapter population. It does NOT get refreshed with views in adapter, which is why we need new instances if we're going to use it as a global.
             mMainViewHolder.setTimeTextView.setOnClickListener(v-> {
+                mMainViewHolder = (MainViewHolder) holder;
+
                 if (mEditModeIsActive) {
                     mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
                     mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
@@ -137,6 +139,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
 
             mMainViewHolder.breakTimeTextView.setOnClickListener(v-> {
+                mMainViewHolder = (MainViewHolder) holder;
+
                 if (mEditModeIsActive) {
                     mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
                     mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
@@ -145,6 +149,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
 
             mMainViewHolder.deleteActivity.setOnClickListener(v-> {
+                mMainViewHolder = (MainViewHolder) holder;
+
                 mTdeeActivityDeletion.onDeletingActivity(position);
             });
         } else if (holder instanceof FootViewHolder) {
