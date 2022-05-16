@@ -97,6 +97,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View deletePopUpView = inflater.inflate(R.layout.delete_tdee_popup, null);
         confirmDeletionPopUpWindow = new PopupWindow(deletePopUpView, 250, WindowManager.LayoutParams.WRAP_CONTENT, true);
+        confirmDeletionPopUpWindow.setAnimationStyle(R.style.SlideFromRightAnimation);
 
         confirmActivityDeletionButton = deletePopUpView.findViewById(R.id.confirm_activity_delete);
         cancelActivityDeletionButton = deletePopUpView.findViewById(R.id.cancel_activity_delete);
