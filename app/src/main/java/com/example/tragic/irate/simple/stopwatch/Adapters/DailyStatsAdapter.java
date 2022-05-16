@@ -55,11 +55,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     int EDITING_BREAKS = 1;
 
     PopupWindow confirmDeletionPopUpWindow;
-    boolean deletionConfirmationIsVisible;
 
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
     tdeeActivityAddition mTdeeActivityAddition;
     tdeeActivityDeletion mTdeeActivityDeletion;
+
+    ImageButton confirmActivityDeletionButton;
+    ImageButton cancelActivityDeletionButton;
 
     public interface tdeeEditedItemIsSelected {
         void tdeeEditItemSelected (int typeOfEdit, int position);
@@ -89,6 +91,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
 
         instantiateDeletePopUp();
+    }
+
+    public void instantiateDeletePopUp() {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View deletePopUpView = inflater.inflate(R.layout.delete_tdee_popup, null);
+        confirmDeletionPopUpWindow = new PopupWindow(deletePopUpView, 275, WindowManager.LayoutParams.WRAP_CONTENT, true);
+
+        confirmActivityDeletionButton = deletePopUpView.findViewById(R.id.confirm_activity_delete);
+        cancelActivityDeletionButton = deletePopUpView.findViewById(R.id.cancel_activity_delete);
     }
 
     @NonNull
@@ -147,13 +158,17 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             mMainViewHolder.deleteActivity.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
-//                mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
-//                mMainViewHolder.deleteActivityConfirm.setVisibility(View.VISIBLE);
-//                mMainViewHolder.deleteActivityCancel.setVisibility(View.VISIBLE);
-
-//                mTdeeActivityDeletion.onDeletingActivity(position);
 
                 confirmDeletionPopUpWindow.showAsDropDown(mMainViewHolder.endConstraint, 0, -15, Gravity.CENTER);
+            });
+
+            confirmActivityDeletionButton.setOnClickListener(v-> {
+                mTdeeActivityDeletion.onDeletingActivity(position-1);
+                confirmDeletionPopUpWindow.dismiss();
+            });
+
+            cancelActivityDeletionButton.setOnClickListener(v-> {
+                confirmDeletionPopUpWindow.dismiss();
             });
         } else if (holder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
@@ -162,13 +177,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mTdeeActivityAddition.onAddingActivity(position);
             });
         }
-    }
-
-    //Todo: May want to set all this (for view's sake) within clicked position, if it's not setting correctly.
-    public void instantiateDeletePopUp() {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View deletePopUpView = inflater.inflate(R.layout.delete_tdee_popup, null);
-        confirmDeletionPopUpWindow = new PopupWindow(deletePopUpView, 250, WindowManager.LayoutParams.WRAP_CONTENT, true);
     }
 
     @Override

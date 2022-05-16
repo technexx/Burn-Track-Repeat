@@ -292,7 +292,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void assignStatsForEachActivityInstanceForEditing(int position) {
+    public void assignStatsForEachActivityEntityForEditing(int position) {
         mStatsForEachActivity = statsForEachActivityListForFragmentAccess.get(position);
     }
 

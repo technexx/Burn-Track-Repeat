@@ -320,7 +320,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void updateDatabaseWithEditedStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            dailyStatsAccess.assignStatsForEachActivityInstanceForEditing(mPositionToEdit);
+            dailyStatsAccess.assignStatsForEachActivityEntityForEditing(mPositionToEdit);
 
             long oldStatValue;
             long newStatValue = getMillisValueToSaveFromEditTextString();
@@ -454,20 +454,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onDeletingActivity(int position) {
-
-    }
-
-    private void deleteActivityFromStats() {
         AsyncTask.execute(() -> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            dailyStatsAccess.assignStatsForEachActivityInstanceForEditing(mPositionToEdit);
+            dailyStatsAccess.assignStatsForEachActivityEntityForEditing(position);
             dailyStatsAccess.deleteStatsForEachActivityEntity();
             populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+            });
         });
-    }
-
-    private void toggleDeletionConfirmation() {
-
     }
 
     private void setTdeeSpinnerListeners() {
