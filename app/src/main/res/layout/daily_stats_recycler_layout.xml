@@ -46,7 +46,6 @@
         android:id="@+id/calories_burned_in_daily_stats_textView"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
         android:gravity="center"
         app:layout_constraintEnd_toStartOf="@id/delete_activity_in_edit_stats"
         app:layout_constraintTop_toTopOf="parent"
@@ -65,18 +64,26 @@
         android:layout_marginEnd="4dp">
     </ImageButton>
 
-<!--    <com.google.android.material.button.MaterialButton-->
-<!--        android:id="@+id/confirm_activity_delete"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        android:textColor="@color/white"-->
-<!--        app:cornerRadius="4dp"-->
-<!--        app:rippleColor="#33AAAAAA"-->
-<!--        app:strokeColor="@color/white"-->
-<!--        app:strokeWidth="1dp">-->
-<!--    </com.google.android.material.button.MaterialButton>-->
+    <ImageButton
+        android:id="@+id/confirm_activity_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/cancel_activity_delete"
+        android:backgroundTint="@color/dark_grey"
+        android:src="@drawable/check_16">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/cancel_activity_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/dark_grey"
+        android:src="@drawable/cancel_x">
+    </ImageButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

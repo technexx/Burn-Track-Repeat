@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +54,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     int EDITING_SETS = 0;
     int EDITING_BREAKS = 1;
 
-    PopupWindow confirmPopUp;
+    PopupWindow confirmDeletionPopUpWindow;
     boolean deletionConfirmationIsVisible;
 
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
@@ -87,8 +88,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
 
-//        LayoutInflater inflater = (LayoutInflater) mContext.getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        instantiateDeleteActivityPopUp();
+    }
 
+    public void instantiateDeleteActivityPopUp() {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View addTDEEPopUpView = inflater.inflate(R.layout.delete_tdee_popup, null);
+        confirmDeletionPopUpWindow = new PopupWindow(addTDEEPopUpView, 100, 100, true);
     }
 
     @NonNull
@@ -98,7 +104,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         View view;
 
         if (viewType==HEADER_VIEW) {
-            view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
+            view = inflater.inflate(R.layout.daily_stats_recycler_header_layout, parent, false);
             return new HeaderViewHolder(view);
         } else if (viewType==FOOTER_VIEW) {
             view = inflater.inflate(R.layout.daily_stats_recycler_footer_layout, parent, false);
@@ -107,9 +113,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
         return new MainViewHolder(view);
-
-//        View addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
-//        confirmPopUp = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     }
 
     @Override
@@ -150,8 +153,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             mMainViewHolder.deleteActivity.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
-
-                mTdeeActivityDeletion.onDeletingActivity(position);
+                //Todo: Should slide/animate something from the clicked row instead.
+                mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
+                mMainViewHolder.deleteActivityConfirm.setVisibility(View.VISIBLE);
+                mMainViewHolder.deleteActivityCancel.setVisibility(View.VISIBLE);
+//                mTdeeActivityDeletion.onDeletingActivity(position);
             });
         } else if (holder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
@@ -217,7 +223,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
+        //Todo: It's visible in HEADER viewHolder because header uses the same layout. Should just use sep. layout.
         mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
+        mMainViewHolder.deleteActivityConfirm.setVisibility(View.GONE);
+        mMainViewHolder.deleteActivityCancel.setVisibility(View.GONE);
     }
 
     private void setMainHolderEditModeViews() {
@@ -235,8 +244,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mHeaderViewHolder.breakTimeHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.caloriesBurnedHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-            mHeaderViewHolder.breakTimeHeaderTextView.setVisibility(View.GONE);
-            mHeaderViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
+            mHeaderViewHolder.breakTimeHeaderTextView.setVisibility(View.INVISIBLE);
         } else if (textStyle==REGULAR_TEXT){
             mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
@@ -250,15 +258,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         TextView setTimeHeaderTextView;;
         TextView breakTimeHeaderTextView;
         TextView caloriesBurnedHeaderTextView;
-        ImageButton deleteActivity;
 
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);
-            activityHeaderTextView =  itemView.findViewById(R.id.activity_in_daily_stats_textView);
-            setTimeHeaderTextView =  itemView.findViewById(R.id.set_time_in_daily_stats_textView);
-            breakTimeHeaderTextView =  itemView.findViewById(R.id.break_time_in_daily_stats_textView);
-            caloriesBurnedHeaderTextView =  itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
-            deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
+            activityHeaderTextView =  itemView.findViewById(R.id.activity_in_daily_stats_header);
+            setTimeHeaderTextView =  itemView.findViewById(R.id.set_time_in_daily_stats_header);
+            breakTimeHeaderTextView =  itemView.findViewById(R.id.break_time_in_daily_stats_header);
+            caloriesBurnedHeaderTextView =  itemView.findViewById(R.id.calories_burned_in_daily_stats_header);
         }
     }
 
@@ -269,6 +275,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         TextView caloriesBurnedTextView;
 
         ImageButton deleteActivity;
+        ImageButton deleteActivityConfirm;
+        ImageButton deleteActivityCancel;
 
         View fullView;
 
@@ -280,6 +288,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
 
             deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
+            deleteActivityConfirm = itemView.findViewById(R.id.confirm_activity_delete);
+            deleteActivityCancel = itemView.findViewById(R.id.cancel_activity_delete);
 
             fullView = itemView;
         }
