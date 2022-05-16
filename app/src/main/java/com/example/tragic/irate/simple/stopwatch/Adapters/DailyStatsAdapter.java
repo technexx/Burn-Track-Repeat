@@ -88,13 +88,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
 
-        instantiateDeleteActivityPopUp();
-    }
-
-    public void instantiateDeleteActivityPopUp() {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View addTDEEPopUpView = inflater.inflate(R.layout.delete_tdee_popup, null);
-        confirmDeletionPopUpWindow = new PopupWindow(addTDEEPopUpView, 100, 100, true);
+        instantiateDeletePopUp();
     }
 
     @NonNull
@@ -153,11 +147,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             mMainViewHolder.deleteActivity.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
-                //Todo: Should slide/animate something from the clicked row instead.
-                mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
-                mMainViewHolder.deleteActivityConfirm.setVisibility(View.VISIBLE);
-                mMainViewHolder.deleteActivityCancel.setVisibility(View.VISIBLE);
+//                mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
+//                mMainViewHolder.deleteActivityConfirm.setVisibility(View.VISIBLE);
+//                mMainViewHolder.deleteActivityCancel.setVisibility(View.VISIBLE);
+
 //                mTdeeActivityDeletion.onDeletingActivity(position);
+
+                confirmDeletionPopUpWindow.showAsDropDown(mMainViewHolder.endConstraint, 0, -15, Gravity.CENTER);
             });
         } else if (holder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
@@ -166,6 +162,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mTdeeActivityAddition.onAddingActivity(position);
             });
         }
+    }
+
+    //Todo: May want to set all this (for view's sake) within clicked position, if it's not setting correctly.
+    public void instantiateDeletePopUp() {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View deletePopUpView = inflater.inflate(R.layout.delete_tdee_popup, null);
+        confirmDeletionPopUpWindow = new PopupWindow(deletePopUpView, 250, WindowManager.LayoutParams.WRAP_CONTENT, true);
     }
 
     @Override
@@ -188,6 +191,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             return FOOTER_VIEW;
         }
     }
+
+
 
     public void turnOffEditMode() {
         if (mEditModeIsActive) mEditModeIsActive = false;
@@ -223,7 +228,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
-        //Todo: It's visible in HEADER viewHolder because header uses the same layout. Should just use sep. layout.
         mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
         mMainViewHolder.deleteActivityConfirm.setVisibility(View.GONE);
         mMainViewHolder.deleteActivityCancel.setVisibility(View.GONE);
@@ -279,6 +283,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ImageButton deleteActivityCancel;
 
         View fullView;
+        View endConstraint;
 
         public MainViewHolder (@NonNull View itemView) {
             super(itemView);
@@ -292,6 +297,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             deleteActivityCancel = itemView.findViewById(R.id.cancel_activity_delete);
 
             fullView = itemView;
+            endConstraint = itemView.findViewById(R.id.end_constraint);
         }
     }
 
