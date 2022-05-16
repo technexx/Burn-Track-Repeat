@@ -516,14 +516,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Header repeats at end of rows sometimes in edit mode.
-  //Todo: Extra row still appears as blank when edit mode is off.
-  //Todo: Edit mode should dismiss when leaving Stats Fragment.
   //Todo: Adding activity should have option to enter time (without manually bringing up edit).
   //Todo: Should be unable to select/edit future dates.
   //Todo: Sort activities alphabetically. Some unwanted auto-sorting on addition right now.
-  //Todo: Option for custom activity/custom met score?
-  //Todo: Possible issue w/ stat addition plus sign appearing on populated row in previous months.
+  //Todo: Option to minimize calendar for full page of recyclerView (or have separate fragments. we'd only need the selected date from calendar passed into other fragment).
   //Todo: Date range for stats?
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: Will eventually need a stats reset at end of year.
