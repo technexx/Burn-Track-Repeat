@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.AsyncNotedAppOp;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -517,7 +518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Same set time shown for 2 sep. activities.
+  //Todo: Total daily time not saving correctly when editing activity
   //Todo: Add animations to stat mod buttons.
   //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Should be unable to select/edit future dates.
@@ -1675,7 +1676,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-      dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
+      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
       dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
     }
   }
@@ -2578,20 +2579,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: This is where we're not retrieving the saved edit values.
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
+      timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
       timeLeft.setText(retrieveTimerValueString());
 
       trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
       toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
-      displayCycleOrDailyTotals();
-      setCyclesCompletedTextView();
-      toggleTdeeTextViewSize();
+      AsyncTask.execute(()-> {
+       dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+       dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
+       assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
 
-      timerIsPaused = true;
-      timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+       runOnUiThread(()->{
+         displayCycleOrDailyTotals();
+         setCyclesCompletedTextView();
+         toggleTdeeTextViewSize();
+         timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+       });
+      });
     } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode==1) {
         savedCycleAdapter.removeActiveCycleLayout();
@@ -3252,14 +3261,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
+        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setLocalMetScoreVariable(metScore);
-        dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
-
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatForEachActivityListForForSingleDayForTimerAccess());
-
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();

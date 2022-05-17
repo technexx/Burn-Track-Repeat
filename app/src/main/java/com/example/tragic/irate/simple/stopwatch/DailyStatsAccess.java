@@ -141,7 +141,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setAllDayAndStatListsForYear(int daysInYear) {
+    public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
 
         //If days exists in database, add it to list of days in year list.
@@ -283,7 +283,7 @@ public class DailyStatsAccess {
     //statsForEachActivityListForTimerAccess's size will contain all activities for that day (uniqueID). Retrieving a specific activity is based on its position within that list.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(int daySelected) {
         //New database pull to account for most recent insertion.
-        setStatForEachActivityListForForSingleDay(daySelected);
+        setStatForEachActivityListForForSingleDayFromDatabase(daySelected);
 
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListForTimerAccess.get(activityPositionInListForCurrentDay);
@@ -316,7 +316,7 @@ public class DailyStatsAccess {
         return mOldActivityPositionInListForCurrentDay;
     }
 
-    public void setStatForEachActivityListForForSingleDay(int dayToRetrieve) {
+    public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         statsForEachActivityListForTimerAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
