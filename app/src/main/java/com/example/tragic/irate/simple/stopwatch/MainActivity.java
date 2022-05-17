@@ -516,11 +516,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Adding activity should have option to enter time (without manually bringing up edit).
+  //Todo: BUG: Crashing on editing set time of recently added activity.
+  //Todo: Total calories showing 0 in stats fragment.
+  //Todo: Check creation of first activity on untouched day. May not add since the DayHolder row hasn't been created yet.
+  //Todo: Add animations to stat mod buttons.
+  //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Should be unable to select/edit future dates.
   //Todo: Sort activities alphabetically. Some unwanted auto-sorting on addition right now.
   //Todo: Option to minimize calendar for full page of recyclerView (or have separate fragments. we'd only need the selected date from calendar passed into other fragment).
   //Todo: Date range for stats?
+  //Todo: Adding activity may have option to enter time (without manually bringing up edit).
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: Will eventually need a stats reset at end of year.
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
