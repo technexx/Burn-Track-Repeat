@@ -262,17 +262,17 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
 
         if (!activityExistsInDatabaseForSelectedDay) {
-            StatsForEachActivity statsForEachActivity = new StatsForEachActivity();
+            mStatsForEachActivity = new StatsForEachActivity();
 
-            statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
-            statsForEachActivity.setActivity(mActivityString);
-            statsForEachActivity.setMetScore(mMetScore);
+            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+            mStatsForEachActivity.setActivity(mActivityString);
+            mStatsForEachActivity.setMetScore(mMetScore);
 
-            statsForEachActivity.setTotalSetTimeForEachActivity(0);
-            statsForEachActivity.setTotalBreakTimeForEachActivity(0);
-            statsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
+            mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
+            mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
+            mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
-            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(statsForEachActivity);
+            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
         }
     }
 
@@ -291,6 +291,8 @@ public class DailyStatsAccess {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
             int mostRecentEntry = statsForEachActivityListForTimerAccess.size()-1;
             mStatsForEachActivity = statsForEachActivityListForTimerAccess.get(mostRecentEntry);
+        } else {
+            mStatsForEachActivity = new StatsForEachActivity();
         }
     }
 
@@ -322,7 +324,7 @@ public class DailyStatsAccess {
         return statsForEachActivityListForTimerAccess;
     }
 
-    public void setActivityStringFromSpinner(String activityString) {
+    public void setLocalActivityStringVariable(String activityString) {
         this.mActivityString = activityString;
     }
 
@@ -350,8 +352,8 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
     }
 
-    public void setMetScoreForSelectedActivity(double metScore) {
-        mStatsForEachActivity.setMetScore(metScore);
+    public void setLocalMetScoreVariable(double metScore) {
+        this.mMetScore = metScore;
     }
 
     public double getMetScoreForSelectedActivity() {

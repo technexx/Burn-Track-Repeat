@@ -317,7 +317,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: DayHolder and Stats activity totals not syncing for times.
     private void updateDatabaseWithEditedStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
@@ -342,15 +341,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
                 dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
                 dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(newTotalCaloriesForDayHolder);
-            } else if (typeOfStatToEdit==EDITING_BREAKS) {
-//                oldStatValue = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
-//
-//                long dayHolderBreakValueToEdit = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
-//                long editValueToSubtract = getDifferenceToSubtractBetweenOldAndEditedTimes(oldStatValue, newStatValue);
-//                dailyStatsAccess.setTotalBreakTimeFromDayHolder(dayHolderBreakValueToEdit - editValueToSubtract);
-//                dailyStatsAccess.setTotalBreakTimeForSelectedActivity(newStatValue);
             }
-
 
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
@@ -396,10 +387,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return oldValue - newValue;
     }
 
-    private double getDifferenceToSubtractBetweenOldAndEditedCalories(double oldValue, double newValue) {
-        return oldValue - newValue;
-    }
-
     private TextWatcher editTextWatcher(EditText editText) {
         return new TextWatcher() {
             @Override
@@ -413,7 +400,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void afterTextChanged(Editable s) {
                 if (!editText.getText().toString().equals("")) {
-                    if (Long.parseLong(editText.getText().toString()) >60) {
+                    if (Long.parseLong(editText.getText().toString()) >=60) {
                         editText.setText("59");
                     }
                 }
@@ -434,8 +421,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void addActivityToStats() {
         AsyncTask.execute(()-> {
             String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
-            dailyStatsAccess.setActivityStringFromSpinner(activityToAdd);
-            dailyStatsAccess.setMetScoreForSelectedActivity(retrieveMetScoreFromSubCategoryPosition());
+
+            dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
+            dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
             dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
             populateListsAndTextViewsFromEntityListsInDatabase();

@@ -510,15 +510,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double metScore;
   boolean cycleHasActivityAssigned;
   boolean trackActivityWithinCycle;
+  int dayOfYear;
 
   int timerRunnableDelay = 50;
   String timerTextViewStringOne = "";
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: BUG: Crashing on editing set time of recently added activity.
-  //Todo: Total calories showing 0 in stats fragment.
-  //Todo: Check creation of first activity on untouched day. May not add since the DayHolder row hasn't been created yet.
+  //Todo: Same set time shown for 2 sep. activities.
   //Todo: Add animations to stat mod buttons.
   //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Should be unable to select/edit future dates.
@@ -1670,7 +1669,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   };
 
   private void createNewListOfActivitiesIfDayHasChanged() {
-    int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
     //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
@@ -1681,10 +1680,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: If we don't get another entity instance and we've edited a different day in Daily Stats Fragment, these values (and StatsForEachActivity) will not save correctly. Prolly easier to just set it as we do when launching the timer.
-
-  //Todo: Consider a separate class for Fragment / Timer access.
   private void setAndUpdateDayHolderValuesInDatabase() {
+    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+
     dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
     dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
     dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
@@ -1700,10 +1698,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
     }
 
+    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
+
     dailyStatsAccess.setActivityStringForSelectedActivityInStatsForEachActivityEntity(dailyStatsAccess.getActivityStringFromSpinner());
     dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     dailyStatsAccess.setTotalBreakTimeForSelectedActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
     dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
   }
 
@@ -3206,7 +3207,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    makeCycleAdapterVisible = true;
+    timerPopUpIsVisible = true;
+    setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     if (mode==1) {
       if (savedCycleAdapter.isCycleActive()) {
@@ -3220,10 +3224,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       }
     }
-
-    makeCycleAdapterVisible = true;
-    timerPopUpIsVisible = true;
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     AsyncTask.execute(()-> {
       if (cycleLaunchedFromEditPopUp) {
@@ -3252,16 +3252,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
       if (trackActivityWithinCycle) {
-        dailyStatsAccess.setActivityStringFromSpinner(getTdeeActivityStringFromArrayPosition());
-        //Todo: No mStats entity instantiated for this.
-        dailyStatsAccess.setMetScoreForSelectedActivity(metScore);
+        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
 
+        dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
+        dailyStatsAccess.setLocalMetScoreVariable(metScore);
         dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
+
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatForEachActivityListForForSingleDayForTimerAccess());
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
 
-        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 
@@ -3296,7 +3296,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForCurrentDayInMillis = 0;
       totalCaloriesBurnedForCurrentDay = 0;
     } else {
-      int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+      dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
@@ -3309,7 +3309,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
-    int dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
 
     if (!cycleHasActivityAssigned) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
@@ -4709,13 +4709,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logStatsForEachActivityDatabase(boolean currentDayOnly) {
     AsyncTask.execute(()->{
-      int currentDay = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+      dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
       List<DayHolder> listOfDays = new ArrayList<>();
 
       if (currentDayOnly) {
-        listOfActivities = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(currentDay);
-        listOfDays = cyclesDatabase.cyclesDao().loadSingleDay(currentDay);
+        listOfActivities = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
+        listOfDays = cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear);
       } else {
         listOfActivities = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
         listOfDays = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
