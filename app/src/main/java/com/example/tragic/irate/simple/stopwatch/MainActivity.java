@@ -2578,7 +2578,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This is where we're not retrieving the saved edit values.
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
       timerIsPaused = true;
@@ -2600,6 +2599,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
          displayCycleOrDailyTotals();
          setCyclesCompletedTextView();
          toggleTdeeTextViewSize();
+         setTotalDailyTimeAndCaloriesForSpecificActivityTextView();
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
       });
