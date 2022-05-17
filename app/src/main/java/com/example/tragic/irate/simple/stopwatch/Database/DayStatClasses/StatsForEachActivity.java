@@ -15,6 +15,7 @@ public class StatsForEachActivity {
     String activity;
     long totalSetTimeForEachActivity;
     long totalBreakTimeForEachActivity;
+    double metScore;
     double totalCaloriesBurnedForEachActivity;
 
     public long getStatsForActivityId() {
@@ -63,6 +64,14 @@ public class StatsForEachActivity {
 
     public void setTotalBreakTimeForEachActivity(long totalBreakTimeForEachActivity) {
         this.totalBreakTimeForEachActivity = totalBreakTimeForEachActivity;
+    }
+
+    public double getMetScore() {
+        return metScore;
+    }
+
+    public void setMetScore(double metScore) {
+        this.metScore = metScore;
     }
 
     public double getTotalCaloriesBurnedForEachActivity() {

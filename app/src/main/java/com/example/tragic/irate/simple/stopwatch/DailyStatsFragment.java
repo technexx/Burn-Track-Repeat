@@ -441,6 +441,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
             dailyStatsAccess.setActivityStringFromSpinner(activityToAdd);
+            dailyStatsAccess.setMetScoreForSelectedActivity(retrieveMetScoreFromSubCategoryPosition());
             dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
             populateListsAndTextViewsFromEntityListsInDatabase();

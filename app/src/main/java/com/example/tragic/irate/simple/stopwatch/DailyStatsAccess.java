@@ -32,6 +32,7 @@ public class DailyStatsAccess {
     long mOldDayHolderId;
     boolean activityExistsInDatabaseForSelectedDay;
     String mActivityString;
+    double mMetScore;
     int activityPositionInListForCurrentDay;
     int mOldActivityPositionInListForCurrentDay;
     int duplicateStringPosition;
@@ -265,6 +266,7 @@ public class DailyStatsAccess {
 
             statsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
             statsForEachActivity.setActivity(mActivityString);
+            statsForEachActivity.setMetScore(mMetScore);
 
             statsForEachActivity.setTotalSetTimeForEachActivity(0);
             statsForEachActivity.setTotalBreakTimeForEachActivity(0);
@@ -346,6 +348,14 @@ public class DailyStatsAccess {
 
     public long getTotalBreakTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
+    }
+
+    public void setMetScoreForSelectedActivity(double metScore) {
+        mStatsForEachActivity.setMetScore(metScore);
+    }
+
+    public double getMetScoreForSelectedActivity() {
+        return mStatsForEachActivity.getMetScore();
     }
 
     public void setTotalCaloriesBurnedForSelectedActivity(double totalCaloriesBurned) {

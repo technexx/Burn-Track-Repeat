@@ -3250,6 +3250,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (trackActivityWithinCycle) {
         dailyStatsAccess.setActivityStringFromSpinner(getTdeeActivityStringFromArrayPosition());
+        dailyStatsAccess.setMetScoreForSelectedActivity(metScore);
+
         dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatForEachActivityListForForSingleDayForTimerAccess());
 
