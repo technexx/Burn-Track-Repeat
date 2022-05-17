@@ -331,19 +331,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 long dayHolderSetValueToEdit = dailyStatsAccess.getTotalSetTimeFromDayHolder();
                 long setTimeToSubtractForActivity = getDifferenceToSubtractBetweenOldAndEditedTimes(oldStatValue, newStatValue);
+                long newDayHolderSetValue = dayHolderSetValueToEdit - setTimeToSubtractForActivity;
 
-                double oldCaloriesFromActivity = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
-                //Todo: 0/0 is undefined/null. Also, formula will be incorrect every time starting at 0 because multiplier will also be 0.
-                double caloricMultiplier = getCaloricMultiplierForSeconds(oldCaloriesFromActivity, (oldStatValue/1000));
-                double newCaloriesForActivity = ((double) newStatValue/1000) * caloricMultiplier;
+                double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
+                double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
+                double newTotalCaloriesForDayHolder = ((double) (newDayHolderSetValue/1000) * caloriesBurnedPerSecond);
+                double newCaloriesForActivity = ((double) (newStatValue/1000) * caloriesBurnedPerSecond);
 
-                double oldCaloriesFromDayHolder = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
-                double caloriesToSubtractForDayHolder = getDifferenceToSubtractBetweenOldAndEditedCalories(oldCaloriesFromActivity, newCaloriesForActivity);
-
-                dailyStatsAccess.setTotalSetTimeFromDayHolder(dayHolderSetValueToEdit - setTimeToSubtractForActivity);
+                dailyStatsAccess.setTotalSetTimeFromDayHolder(newDayHolderSetValue);
                 dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
                 dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
-                dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(oldCaloriesFromDayHolder - caloriesToSubtractForDayHolder);
+                dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(newTotalCaloriesForDayHolder);
             } else if (typeOfStatToEdit==EDITING_BREAKS) {
 //                oldStatValue = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
 //
@@ -363,10 +361,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
             });
         });
-    }
-
-    private double getCaloricMultiplierForSeconds(double calories, long timeElapsed) {
-        return calories/timeElapsed;
     }
 
     private long getMillisValueToSaveFromEditTextString() {
@@ -547,6 +541,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (!metricMode) weightConversion = weightConversion / 2.205;
         double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
         return caloriesBurnedPerMinute;
+    }
+
+    private double calculateCaloriesBurnedPerSecond(double metValue) {
+        return calculateCaloriesBurnedPerMinute(metValue) / 60;
     }
 
     private void instantiateAddPopUpViews() {

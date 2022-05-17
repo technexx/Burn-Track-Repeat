@@ -31,13 +31,13 @@ public class DailyStatsAccess {
 
     long mOldDayHolderId;
     boolean activityExistsInDatabaseForSelectedDay;
-    String mActivityString;
-    double mMetScore;
+
     int activityPositionInListForCurrentDay;
     int mOldActivityPositionInListForCurrentDay;
     int duplicateStringPosition;
 
-
+    String mActivityString;
+    double mMetScore;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;

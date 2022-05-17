@@ -1681,6 +1681,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: If we don't get another entity instance and we've edited a different day in Daily Stats Fragment, these values (and StatsForEachActivity) will not save correctly. Prolly easier to just set it as we do when launching the timer.
+
+  //Todo: Consider a separate class for Fragment / Timer access.
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
     dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
@@ -3250,6 +3253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (trackActivityWithinCycle) {
         dailyStatsAccess.setActivityStringFromSpinner(getTdeeActivityStringFromArrayPosition());
+        //Todo: No mStats entity instantiated for this.
         dailyStatsAccess.setMetScoreForSelectedActivity(metScore);
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDay(dayOfYear);
