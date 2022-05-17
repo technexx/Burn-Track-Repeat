@@ -71,22 +71,26 @@ public class DailyStatsAccess {
         if (!checkIfDayAlreadyExistsInDatabase(daySelected)) {
             String date = calendarValues.getDateString();
 
-            DayHolder dayHolder = new DayHolder();
+            mDayHolder = new DayHolder();
 
-            dayHolder.setDayId(daySelected);
-            dayHolder.setDate(date);
+            mDayHolder.setDayId(daySelected);
+            mDayHolder.setDate(date);
 
-            dayHolder.setTotalSetTime(0);
-            dayHolder.setTotalBreakTime(0);
-            dayHolder.setTotalCaloriesBurned(0);
+            mDayHolder.setTotalSetTime(0);
+            mDayHolder.setTotalBreakTime(0);
+            mDayHolder.setTotalCaloriesBurned(0);
 
-            cyclesDatabase.cyclesDao().insertDay(dayHolder);
+            cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         }
     }
 
     public void assignDayHolderInstanceForSelectedDay(int daySelected) {
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
-        mDayHolder = dayHolderList.get(0);
+        if (dayHolderList.size()>0) {
+            mDayHolder = dayHolderList.get(0);
+        } else {
+            mDayHolder = new DayHolder();
+        }
     }
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
@@ -195,6 +199,10 @@ public class DailyStatsAccess {
     public void setOldDayHolderId(int oldId) {
         this.mOldDayHolderId = oldId;
     }
+
+//    public void setDayHolderListForForSingleDayFromDatabase(int dayToRetrieve) {
+//        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+//    }
 
     public void setTotalSetTimeFromDayHolder(long totalSetTime) {
         mDayHolder.setTotalSetTime(totalSetTime);

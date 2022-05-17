@@ -518,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Total daily time not saving correctly when editing activity
   //Todo: Add animations to stat mod buttons.
   //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Should be unable to select/edit future dates.
@@ -2590,6 +2589,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
+        dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+        assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
+
        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
        assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
@@ -3256,19 +3258,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
-      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
-      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-      assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
-
       if (trackActivityWithinCycle) {
+        dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+        assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
+        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
+
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setLocalMetScoreVariable(metScore);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatForEachActivityListForForSingleDayForTimerAccess());
-        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
 
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 
