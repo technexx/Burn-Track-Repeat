@@ -518,6 +518,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Total stats can be 1 sec behind individual after editing.
   //Todo: Add animations to stat mod buttons.
   //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Should be unable to select/edit future dates.

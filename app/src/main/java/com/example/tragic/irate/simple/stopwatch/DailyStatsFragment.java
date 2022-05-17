@@ -322,14 +322,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForEditing(mPositionToEdit);
 
-            long oldStatValue;
+            long statValueToEdit;
             long newStatValue = getMillisValueToSaveFromEditTextString();
 
             if (typeOfStatToEdit==EDITING_SETS) {
-                oldStatValue = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
+                statValueToEdit = roundDownMillisValuesToThousandths(dailyStatsAccess.getTotalSetTimeForSelectedActivity());
 
-                long dayHolderSetValueToEdit = dailyStatsAccess.getTotalSetTimeFromDayHolder();
-                long setTimeToSubtractForActivity = getDifferenceToSubtractBetweenOldAndEditedTimes(oldStatValue, newStatValue);
+                long dayHolderSetValueToEdit = roundDownMillisValuesToThousandths(dailyStatsAccess.getTotalSetTimeFromDayHolder());
+                long setTimeToSubtractForActivity = getDifferenceToSubtractBetweenOldAndEditedTimes(statValueToEdit, newStatValue);
                 long newDayHolderSetValue = dayHolderSetValueToEdit - setTimeToSubtractForActivity;
 
                 double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
@@ -620,6 +620,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private String formatCalorieToString(double calories) {
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(calories);
+    }
+
+    private long roundDownMillisValuesToThousandths(long millisToRound) {
+        return millisToRound - (millisToRound%1000);
     }
 
     private int dpToPxConv(float pixels) {
