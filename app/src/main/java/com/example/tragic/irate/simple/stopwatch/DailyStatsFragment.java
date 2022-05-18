@@ -87,10 +87,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText tdeeEditTextSeconds;
     ImageButton confirmEditWithinPopUpButton;
 
-    int typeOfStatToEdit;
     int mPositionToEdit;
-    int EDITING_SETS = 0;
-    int EDITING_BREAKS = 1;
 
     PopupWindow tdeeAddPopUpWindow;
     View addTDEEPopUpView;
@@ -290,15 +287,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         this.mPositionToEdit = position;
 
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
-        long timeToEditLongValue;
-
-        if (typeOfEdit==0) {
-            timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
-            typeOfStatToEdit = EDITING_SETS;
-        } else {
-            timeToEditLongValue = dailyStatsAccess.getTotalBreakTimeListForEachActivityForSelectedDuration().get(position);
-            typeOfStatToEdit = EDITING_BREAKS;
-        }
+        long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 
         tdeeEditPopUpActivityTextView.setText(activityString);
         setTdeeEditTexts(timeToEditLongValue);
@@ -329,23 +318,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long statValueToEdit;
             long newStatValue = getMillisValueToSaveFromEditTextString();
 
-            if (typeOfStatToEdit==EDITING_SETS) {
-                statValueToEdit = roundDownMillisValuesToThousandths(dailyStatsAccess.getTotalSetTimeForSelectedActivity());
+            statValueToEdit = roundDownMillisValuesToThousandths(dailyStatsAccess.getTotalSetTimeForSelectedActivity());
 
-                long dayHolderSetValueToEdit = roundDownMillisValuesToThousandths(dailyStatsAccess.getTotalSetTimeFromDayHolder());
-                long setTimeToSubtractForActivity = getDifferenceToSubtractBetweenOldAndEditedTimes(statValueToEdit, newStatValue);
-                long newDayHolderSetValue = dayHolderSetValueToEdit - setTimeToSubtractForActivity;
+            long dayHolderSetValueToEdit = roundDownMillisValuesToThousandths(dailyStatsAccess.getTotalSetTimeFromDayHolder());
+            long setTimeToSubtractForActivity = getDifferenceToSubtractBetweenOldAndEditedTimes(statValueToEdit, newStatValue);
+            long newDayHolderSetValue = dayHolderSetValueToEdit - setTimeToSubtractForActivity;
 
-                double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
-                double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-                double newTotalCaloriesForDayHolder = ((double) (newDayHolderSetValue/1000) * caloriesBurnedPerSecond);
-                double newCaloriesForActivity = ((double) (newStatValue/1000) * caloriesBurnedPerSecond);
+            double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
+            double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
+            double newTotalCaloriesForDayHolder = ((double) (newDayHolderSetValue/1000) * caloriesBurnedPerSecond);
+            double newCaloriesForActivity = ((double) (newStatValue/1000) * caloriesBurnedPerSecond);
 
-                dailyStatsAccess.setTotalSetTimeFromDayHolder(newDayHolderSetValue);
-                dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
-                dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
-                dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(newTotalCaloriesForDayHolder);
-            }
+            dailyStatsAccess.setTotalSetTimeFromDayHolder(newDayHolderSetValue);
+            dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
+            dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
+            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(newTotalCaloriesForDayHolder);
 
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
@@ -436,11 +423,26 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 if (dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
                     Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+                    populateEditPopUpWithNewRow();
                 }
-                tdeeAddPopUpWindow.dismiss();
             });
         });
+    }
+
+    private void populateEditPopUpWithNewRow() {
+        replaceAddPopUpWithEditPopUp();
+
+        mPositionToEdit = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().size()-1;
+
+        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+
+        tdeeEditPopUpActivityTextView.setText(activityToAdd);
+        setTdeeEditTexts(0);
+    }
+
+    private void replaceAddPopUpWithEditPopUp() {
+        tdeeAddPopUpWindow.dismiss();
+        tdeeEditPopUpWindow.showAsDropDown(popUpAnchorLow, 0, 0);
     }
 
     @Override
