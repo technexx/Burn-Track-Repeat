@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -238,14 +239,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
         mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
-        mMainViewHolder.deleteActivityConfirm.setVisibility(View.GONE);
-        mMainViewHolder.deleteActivityCancel.setVisibility(View.GONE);
     }
 
     private void setMainHolderEditModeViews() {
         if (mEditModeIsActive) {
             mMainViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
             mMainViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
+            mMainViewHolder.deleteActivity.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_right));
             mMainViewHolder.deleteActivity.setVisibility(View.VISIBLE);
         }
     }
@@ -288,8 +288,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         TextView caloriesBurnedTextView;
 
         ImageButton deleteActivity;
-        ImageButton deleteActivityConfirm;
-        ImageButton deleteActivityCancel;
 
         View fullView;
         View endConstraint;
@@ -302,8 +300,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
 
             deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
-            deleteActivityConfirm = itemView.findViewById(R.id.confirm_activity_delete);
-            deleteActivityCancel = itemView.findViewById(R.id.cancel_activity_delete);
 
             fullView = itemView;
             endConstraint = itemView.findViewById(R.id.end_constraint);

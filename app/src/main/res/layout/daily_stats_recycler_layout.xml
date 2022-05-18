@@ -66,28 +66,6 @@
         android:layout_marginEnd="4dp">
     </ImageButton>
 
-    <ImageButton
-        android:id="@+id/confirm_activity_delete"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/cancel_activity_delete"
-        android:backgroundTint="@color/dark_grey"
-        android:src="@drawable/green_checkmark">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/cancel_activity_delete"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/dark_grey"
-        android:src="@drawable/red_x">
-    </ImageButton>
-
     <View
         android:id="@+id/end_constraint"
         android:layout_width="1dp"
