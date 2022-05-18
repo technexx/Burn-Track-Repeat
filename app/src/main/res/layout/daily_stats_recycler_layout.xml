@@ -32,18 +32,6 @@
     </TextView>
 
     <TextView
-        android:id="@+id/break_time_in_daily_stats_textView"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="6dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:gravity="center">
-    </TextView>
-
-    <TextView
         android:id="@+id/calories_burned_in_daily_stats_textView"
         android:layout_width="70dp"
         android:layout_height="wrap_content"

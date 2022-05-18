@@ -199,8 +199,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-
-
     public void turnOffEditMode() {
         if (mEditModeIsActive) mEditModeIsActive = false;
     }
@@ -213,7 +211,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void populateHeaderRowViews() {
         mHeaderViewHolder.activityHeaderTextView.setText(R.string.activity_text_header);
         mHeaderViewHolder.setTimeHeaderTextView.setText(R.string.set_time_text_header);
-        mHeaderViewHolder.breakTimeHeaderTextView.setText(R.string.break_time_text_header);
         mHeaderViewHolder.caloriesBurnedHeaderTextView.setText(R.string.calories_burned_text_header);
     }
 
@@ -224,25 +221,19 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
         mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
         mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mSetTimes.get(position-1)));
-        mMainViewHolder.breakTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(mBreakTimes.get(position-1)));
         mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
     }
 
     private void setDefaultMainHolderViewsAndBackgrounds() {
-        mMainViewHolder.breakTimeTextView.setVisibility(View.GONE);
         mMainViewHolder.fullView.setBackground(null);
-
-        mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
+        mMainViewHolder.deleteActivity.startAnimation(slideOutFromRight);
     }
 
     private void setMainHolderEditModeViews() {
         if (mEditModeIsActive) {
             //Todo: Should animate background shift. Might do a loop using alpha values (0->255).
             mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
-//            mMainViewHolder.fullView.startAnimation(fadeIn);
-
             mMainViewHolder.deleteActivity.startAnimation(slideInFromRight);
-            mMainViewHolder.deleteActivity.setVisibility(View.VISIBLE);
         }
     }
     private void setHolderViewTextStyles(int textStyle) {
@@ -250,14 +241,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mHeaderViewHolder.activityHeaderTextView.setTextSize(18);
             mHeaderViewHolder.activityHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.setTimeHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mHeaderViewHolder.breakTimeHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.caloriesBurnedHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-            mHeaderViewHolder.breakTimeHeaderTextView.setVisibility(View.INVISIBLE);
         } else if (textStyle==REGULAR_TEXT){
             mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
         }
     }
@@ -267,13 +255,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         slideInFromRight.setDuration(200);
 
         slideOutFromRight = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_right);
-        slideInFromRight.setDuration(200);
+        slideOutFromRight.setDuration(200);
+        slideOutFromRight.setFillAfter(true);
 
         slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
         slideInFromLeft.setDuration(200);
 
         slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
         slideOutFromLeft.setDuration(200);
+        slideOutFromLeft.setFillAfter(true);
 
         fadeIn =  AnimationUtils.loadAnimation(mContext, R.anim.fade_in_anim);
         fadeIn.setDuration(400);
@@ -284,14 +274,12 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView activityHeaderTextView;
         TextView setTimeHeaderTextView;;
-        TextView breakTimeHeaderTextView;
         TextView caloriesBurnedHeaderTextView;
 
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);
             activityHeaderTextView =  itemView.findViewById(R.id.activity_in_daily_stats_header);
             setTimeHeaderTextView =  itemView.findViewById(R.id.set_time_in_daily_stats_header);
-            breakTimeHeaderTextView =  itemView.findViewById(R.id.break_time_in_daily_stats_header);
             caloriesBurnedHeaderTextView =  itemView.findViewById(R.id.calories_burned_in_daily_stats_header);
         }
     }
@@ -299,9 +287,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public class MainViewHolder extends RecyclerView.ViewHolder {
         TextView activityTextView;
         TextView setTimeTextView;
-        TextView breakTimeTextView;
         TextView caloriesBurnedTextView;
-
         ImageButton deleteActivity;
 
         View fullView;
@@ -311,9 +297,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             super(itemView);
             activityTextView = itemView.findViewById(R.id.activity_in_daily_stats_textView);
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
-            breakTimeTextView = itemView.findViewById(R.id.break_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
-
             deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
 
             fullView = itemView;
