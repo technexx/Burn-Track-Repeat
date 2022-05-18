@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -64,6 +65,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     ImageButton confirmActivityDeletionButton;
     ImageButton cancelActivityDeletionButton;
 
+    Animation slideInFromLeft;
+    Animation slideOutFromLeft;
+    Animation slideInFromRight;
+    Animation slideOutFromRight;
+    Animation fadeIn;
+    Animation fadeOut;
+
     public interface tdeeEditedItemIsSelected {
         void tdeeEditItemSelected (int typeOfEdit, int position);
     }
@@ -92,6 +100,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
 
         instantiateDeletePopUp();
+        setAnimations();
     }
 
     public void instantiateDeletePopUp() {
@@ -126,7 +135,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
             mHeaderViewHolder = (HeaderViewHolder) holder;
-
             populateHeaderRowViews();
             setHolderViewTextStyles(BOLD_TEXT);
         } else if (holder instanceof MainViewHolder) {
@@ -138,29 +146,16 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             setHolderViewTextStyles(REGULAR_TEXT);
 
             //mMainViewHolder instance set on onClick is set on first adapter population. It does NOT get refreshed with views in adapter, which is why we need new instances if we're going to use it as a global.
-            mMainViewHolder.setTimeTextView.setOnClickListener(v-> {
+            mMainViewHolder.fullView.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
 
                 if (mEditModeIsActive) {
-                    mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
-                    mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
                     mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position-1);
-                }
-            });
-
-            mMainViewHolder.breakTimeTextView.setOnClickListener(v-> {
-                mMainViewHolder = (MainViewHolder) holder;
-
-                if (mEditModeIsActive) {
-                    mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.teal_200));
-                    mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_BREAKS, position-1);
                 }
             });
 
             mMainViewHolder.deleteActivity.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
-
                 confirmDeletionPopUpWindow.showAsDropDown(mMainViewHolder.endConstraint, 0, 0, Gravity.CENTER);
             });
 
@@ -174,6 +169,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
         } else if (holder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
+
+            footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
                 mTdeeActivityAddition.onAddingActivity(position);
@@ -233,19 +230,18 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private void setDefaultMainHolderViewsAndBackgrounds() {
         mMainViewHolder.breakTimeTextView.setVisibility(View.GONE);
-        mMainViewHolder.setTimeTextView.setBackground(null);
-        mMainViewHolder.breakTimeTextView.setBackground(null);
-        mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-        mMainViewHolder.breakTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+        mMainViewHolder.fullView.setBackground(null);
 
         mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
     }
 
     private void setMainHolderEditModeViews() {
         if (mEditModeIsActive) {
-            mMainViewHolder.setTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-            mMainViewHolder.breakTimeTextView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.tdee_edit_border));
-            mMainViewHolder.deleteActivity.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_right));
+            //Todo: Should animate background shift. Might do a loop using alpha values (0->255).
+            mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+//            mMainViewHolder.fullView.startAnimation(fadeIn);
+
+            mMainViewHolder.deleteActivity.startAnimation(slideInFromRight);
             mMainViewHolder.deleteActivity.setVisibility(View.VISIBLE);
         }
     }
@@ -264,6 +260,25 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.breakTimeTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
         }
+    }
+
+    private void setAnimations() {
+        slideInFromRight = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_right);
+        slideInFromRight.setDuration(200);
+
+        slideOutFromRight = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_right);
+        slideInFromRight.setDuration(200);
+
+        slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
+        slideInFromLeft.setDuration(200);
+
+        slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
+        slideOutFromLeft.setDuration(200);
+
+        fadeIn =  AnimationUtils.loadAnimation(mContext, R.anim.fade_in_anim);
+        fadeIn.setDuration(400);
+        fadeOut =  AnimationUtils.loadAnimation(mContext, R.anim.fade_out_anim);
+        fadeOut.setDuration(400);
     }
 
     public class HeaderViewHolder extends RecyclerView.ViewHolder {

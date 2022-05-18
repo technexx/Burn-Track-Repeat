@@ -518,9 +518,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Add animations to stat mod buttons.
+  //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
+  //Todo: Weekly/Monthly etc. total will be blank even w/ added activities if their value is 0.
   //Todo: Should change color of calendar days with at least one stat row.
-  //Todo: Should be unable to select/edit future dates.
   //Todo: Sort activities alphabetically. Some unwanted auto-sorting on addition right now.
   //Todo: Option to minimize calendar for full page of recyclerView (or have separate fragments. we'd only need the selected date from calendar passed into other fragment).
   //Todo: Date range for stats?
