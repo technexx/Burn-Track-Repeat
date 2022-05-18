@@ -169,7 +169,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityAddition.setOnClickListener(v-> {
             addActivityToStats();
-            tdeeAddPopUpWindow.dismiss();
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
@@ -439,6 +438,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 } else {
                     Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
                 }
+                tdeeAddPopUpWindow.dismiss();
             });
         });
     }
