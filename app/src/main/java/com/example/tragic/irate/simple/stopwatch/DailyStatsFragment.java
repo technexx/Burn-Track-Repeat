@@ -112,6 +112,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         calendar = Calendar.getInstance(TimeZone.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
+        calendarView.setMaxDate(calendarView.getDate());
+
         dailyStatsAccess = new DailyStatsAccess(getActivity());
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
