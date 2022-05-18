@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -149,6 +151,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     dailyStatsAdapter.turnOffEditMode();
                     dailyStatsAdapter.getItemCount();
+
 
                     setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
                     populateListsAndTextViewsFromEntityListsInDatabase();
@@ -540,7 +543,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void instantiateAddPopUpViews() {
         addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
         tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(340), true);
-        tdeeAddPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+        tdeeAddPopUpWindow.setAnimationStyle(R.style.SlideBottomAnimation);
 
         tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
         tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
@@ -572,6 +575,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void instantiateEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_view, null);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(140), true);
+        tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         popUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
         popUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);

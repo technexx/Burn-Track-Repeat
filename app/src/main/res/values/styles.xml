@@ -23,13 +23,23 @@
         <item name="android:windowExitAnimation">@anim/slide_out_from_left</item>
     </style>
 
+    <style name="SlideFromLeftAnimationShort">
+        <item name="android:windowEnterAnimation">@anim/slide_in_from_left_short</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_from_left_short</item>
+    </style>
+
     <style name="SlideFromRightAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in_from_right</item>
         <item name="android:windowExitAnimation">@anim/slide_out_from_right</item>    </style>
 
     <style name="SlideTopAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in_from_top</item>
-        <item name="android:windowExitAnimation">@anim/slide_out_from_top</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_from_top_without_exit</item>
+    </style>
+
+    <style name="SlideBottomAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_from_bottom</item>
     </style>
 
     <style name="EditButtonTextColor">

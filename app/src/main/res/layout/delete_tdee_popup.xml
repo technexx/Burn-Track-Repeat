@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:backgroundTint="@color/dark_grey"
-    android:background="@drawable/rounded_corners"
+    android:background="@drawable/tdee_edit_border"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageButton
