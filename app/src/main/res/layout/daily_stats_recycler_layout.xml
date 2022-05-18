@@ -48,9 +48,10 @@
         android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        app:layout_constraintEnd_toStartOf="@id/delete_activity_in_edit_stats"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="28dp">
     </TextView>
 
     <ImageButton

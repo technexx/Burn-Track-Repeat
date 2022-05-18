@@ -83,11 +83,10 @@
     <TextView
         android:id="@+id/total_stats_textView"
         android:text="@string/total"
-        android:layout_width="80dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-        android:layout_marginStart="2dp"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
         android:textStyle="bold">
@@ -98,9 +97,10 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-        app:layout_constraintEnd_toStartOf="@id/daily_stats_total_break_time_textView"
-        android:layout_marginEnd="6dp"
+        app:layout_constraintStart_toEndOf="@id/total_stats_textView"
+        android:layout_marginEnd="40dp"
         android:paddingBottom="6dp"
+        android:gravity="center"
         android:textStyle="bold">
     </TextView>
 
@@ -121,8 +121,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-        android:layout_marginEnd="2dp"
         android:paddingBottom="6dp"
+        android:gravity="center"
+        android:layout_marginEnd="28dp"
         android:textStyle="bold">
     </TextView>
 

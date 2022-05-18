@@ -594,6 +594,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         statsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
+        statsTotalBreakTimeTextView.setVisibility(View.INVISIBLE);
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
