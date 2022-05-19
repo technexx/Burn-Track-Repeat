@@ -407,11 +407,11 @@ public class DailyStatsAccess {
         }
     }
 
-    public long getTotalSetTimeForDayHolderForSelectedDuration() {
+    public long getTotalSetTimeFromDailyTotalOfActivities() {
         return totalSetTimeForSelectedDay;
     }
 
-    public void setTotalSetTimeForDayHolderForSelectedDuration() {
+    public void setTotalSetTimeFromDailyTotalOfActivities() {
         long valueToReturn = 0;
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
@@ -421,11 +421,11 @@ public class DailyStatsAccess {
         totalSetTimeForSelectedDay = valueToReturn;
     }
 
-    public double getTotalCaloriesForDayHolderForSelectedDuration() {
+    public double getTotalCaloriesFromDailyTotalOfActivities() {
         return totalCaloriesForSelectedDay;
     }
 
-    public void setTotalCaloriesForDayHolderForSelectedDuration() {
+    public void setTotalCaloriesFromDailyTotalOfActivities() {
         double valueToReturn = 0;
 
         for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
