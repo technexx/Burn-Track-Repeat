@@ -149,7 +149,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAdapter.turnOffEditMode();
                     dailyStatsAdapter.getItemCount();
 
-
                     setDayAndStatListsForChosenDurationOfDays(currentStatDurationMode);
                     populateListsAndTextViewsFromEntityListsInDatabase();
                 });
@@ -451,6 +450,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForEditing(position);
             dailyStatsAccess.deleteStatsForEachActivityEntity();
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+//            long activitySetTimeRemoved = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().get(position).getTotalSetTimeForEachActivity();
+//            double activityCaloriesRemoved = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().get(position).getTotalCaloriesBurnedForEachActivity();
+//            long retrievedDayHolderTime = dailyStatsAccess.getDayHolderList().get(position).getTotalSetTime();
+//            double retrievedDayHolderCalories = dailyStatsAccess.getDayHolderList().get(position).getTotalCaloriesBurned();
+
+
+            dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeForDayHolderForSelectedDuration());
+            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(dailyStatsAccess.getTotalCaloriesForDayHolderForSelectedDuration());
+            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {

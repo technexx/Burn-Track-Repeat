@@ -72,6 +72,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     Animation fadeIn;
     Animation fadeOut;
 
+    boolean animateButtonSliding;
+
     public interface tdeeEditedItemIsSelected {
         void tdeeEditItemSelected (int typeOfEdit, int position);
     }
@@ -200,11 +202,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public void turnOffEditMode() {
-        if (mEditModeIsActive) mEditModeIsActive = false;
+        if (mEditModeIsActive) {
+            mEditModeIsActive = false;
+            animateButtonSliding = false;
+        }
     }
 
     public void toggleEditMode() {
         mEditModeIsActive = !mEditModeIsActive;
+        animateButtonSliding= true;
         notifyDataSetChanged();
     }
 
@@ -226,12 +232,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private void setDefaultMainHolderViewsAndBackgrounds() {
         mMainViewHolder.fullView.setBackground(null);
-        mMainViewHolder.deleteActivity.startAnimation(slideOutFromRight);
+        if (animateButtonSliding) {
+            mMainViewHolder.deleteActivity.startAnimation(slideOutFromRight);
+        } else {
+            mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void setMainHolderEditModeViews() {
         if (mEditModeIsActive) {
-            //Todo: Should animate background shift. Might do a loop using alpha values (0->255).
             mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
             mMainViewHolder.deleteActivity.startAnimation(slideInFromRight);
         }
@@ -253,6 +262,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void setAnimations() {
         slideInFromRight = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_right);
         slideInFromRight.setDuration(200);
+        slideInFromRight.setFillAfter(true);
 
         slideOutFromRight = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_right);
         slideOutFromRight.setDuration(200);
@@ -260,6 +270,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
         slideInFromLeft.setDuration(200);
+        slideInFromLeft.setFillAfter(true);
 
         slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
         slideOutFromLeft.setDuration(200);

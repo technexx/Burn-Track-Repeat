@@ -42,8 +42,8 @@ public class DailyStatsAccess {
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
-        instantiateEntityLists();
-        instantiateArrayListsOfActivitiesAndTheirStats();
+        instantiateEntitiesAndTheirLists();
+        instantiateArrayListsOfTotalStatsForSelectedDurations();
     }
 
     private void instantiateDailyStatsDatabase() {
@@ -91,6 +91,10 @@ public class DailyStatsAccess {
         } else {
             mDayHolder = new DayHolder();
         }
+    }
+
+    public List<DayHolder> getDayHolderList() {
+        return mDayHolderList;
     }
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
@@ -199,10 +203,6 @@ public class DailyStatsAccess {
     public void setOldDayHolderId(int oldId) {
         this.mOldDayHolderId = oldId;
     }
-
-//    public void setDayHolderListForForSingleDayFromDatabase(int dayToRetrieve) {
-//        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-//    }
 
     public void setTotalSetTimeFromDayHolder(long totalSetTime) {
         mDayHolder.setTotalSetTime(totalSetTime);
@@ -405,6 +405,24 @@ public class DailyStatsAccess {
         }
     }
 
+    public long getTotalSetTimeForDayHolderForSelectedDuration() {
+        long valueToReturn = 0;
+
+        for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
+            valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+        }
+        return valueToReturn;
+    }
+
+    public long getTotalCaloriesForDayHolderForSelectedDuration() {
+        long valueToReturn = 0;
+
+        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
+            valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
+        }
+        return valueToReturn;
+    }
+
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
         for (int i=0; i<totalActivitiesListForSelectedDuration.size(); i++) {
             if (totalActivitiesListForSelectedDuration.get(i).equalsIgnoreCase(stringToCheck)) {
@@ -441,13 +459,6 @@ public class DailyStatsAccess {
         return totalSetTimeListForEachActivityForSelectedDuration;
     }
 
-    public List<Long> getTotalBreakTimeListForEachActivityForSelectedDuration() {
-        return totalBreakTimeListForEachActivityForSelectedDuration;
-    }
-
-    public List<Double> getTotalCaloriesBurnedListForEachActivityForSelectedDuration() {
-        return totalCaloriesBurnedListForEachActivityForSelectedDuration;
-    }
 
     public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDuration.clear();
@@ -456,20 +467,17 @@ public class DailyStatsAccess {
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
-    private void instantiateEntityLists() {
+    private void instantiateEntitiesAndTheirLists() {
+        mDayHolder = new DayHolder();
+        mStatsForEachActivity = new StatsForEachActivity();
         mDayHolderList = new ArrayList<>();
         statsForEachActivityListForFragmentAccess = new ArrayList<>();
     }
 
-    private void instantiateArrayListsOfActivitiesAndTheirStats() {
+    private void instantiateArrayListsOfTotalStatsForSelectedDurations() {
         totalActivitiesListForSelectedDuration = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDuration = new ArrayList<>();
         totalBreakTimeListForEachActivityForSelectedDuration = new ArrayList<>();
         totalCaloriesBurnedListForEachActivityForSelectedDuration = new ArrayList<>();
-    }
-
-    public int getCurrentDayOfYear() {
-        Calendar calendar = Calendar.getInstance();
-        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 }

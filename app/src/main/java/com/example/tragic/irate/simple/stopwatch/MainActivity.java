@@ -518,13 +518,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Total calories are off on addition, and both totals off on deletion.
+  //Todo: Delete activity button overlaps calories. Should round all calories to whole numbers for space's sake.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
   //Todo: Add confirm popUp to deleting stat days and all stats.
   //Todo: Slide out animations occur when switching dates.
-  //Todo: Weekly/Monthly etc. total will be blank even w/ added activities if their value is 0.
   //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Delete confirm popUp for stats may be better w/ out popUp. Use two buttons in separate layout (within xml file) and slide an animation on that.
-  //Todo: Sort activities alphabetically. Some unwanted auto-sorting on addition right now.
+  //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
   //Todo: Option to minimize calendar for full page of recyclerView (or have separate fragments. we'd only need the selected date from calendar passed into other fragment).
   //Todo: Date range for stats?
   //Todo: Adding activity may have option to enter time (without manually bringing up edit).
