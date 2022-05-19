@@ -258,7 +258,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setDayHolderStatsTextViews();
 
             dailyStatsAccess.clearStatsForEachActivityArrayLists();
+
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToLists();
+            dailyStatsAccess.setTotalSetTimeForDayHolderForSelectedDuration();
+            dailyStatsAccess.setTotalCaloriesForDayHolderForSelectedDuration();
+
             dailyStatsAdapter.notifyDataSetChanged();
         });
     }
@@ -427,10 +431,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateEditPopUpWithNewRow();
                 }
             });
-
-            long totalSetTimeForActivities = dailyStatsAccess.getTotalSetTimeForDayHolderForSelectedDuration();
-            Log.i("testTime", "value is " + totalSetTimeForActivities/1000);
         });
+    }
+
+    private void updateDayHolderTimesFromActivityTimesTotal() {
+
     }
 
     private void populateEditPopUpWithNewRow() {

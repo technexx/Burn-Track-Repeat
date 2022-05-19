@@ -28,6 +28,8 @@ public class DailyStatsAccess {
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
     List<Long> totalBreakTimeListForEachActivityForSelectedDuration;
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
+    long totalSetTimeForSelectedDay;
+    double totalCaloriesForSelectedDay;
 
     long mOldDayHolderId;
     boolean activityExistsInDatabaseForSelectedDay;
@@ -406,21 +408,31 @@ public class DailyStatsAccess {
     }
 
     public long getTotalSetTimeForDayHolderForSelectedDuration() {
+        return totalSetTimeForSelectedDay;
+    }
+
+    public void setTotalSetTimeForDayHolderForSelectedDuration() {
         long valueToReturn = 0;
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
         }
-        return valueToReturn;
+
+        totalSetTimeForSelectedDay = valueToReturn;
     }
 
-    public long getTotalCaloriesForDayHolderForSelectedDuration() {
-        long valueToReturn = 0;
+    public double getTotalCaloriesForDayHolderForSelectedDuration() {
+        return totalCaloriesForSelectedDay;
+    }
+
+    public void setTotalCaloriesForDayHolderForSelectedDuration() {
+        double valueToReturn = 0;
 
         for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
         }
-        return valueToReturn;
+
+        totalCaloriesForSelectedDay = valueToReturn;
     }
 
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
