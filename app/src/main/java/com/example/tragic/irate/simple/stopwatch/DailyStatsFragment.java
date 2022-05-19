@@ -286,6 +286,33 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
+    public void onAddingActivity(int position) {
+        tdeeAddPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
+    }
+
+    private void addActivityToStats() {
+        AsyncTask.execute(()-> {
+            String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+
+            dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
+            dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
+            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
+            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
+
+            setDayAndStatListsForChosenDurationOfDays(DAILY_STATS);
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                if (dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
+                    Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
+                } else {
+                    populateEditPopUpWithNewRow();
+                }
+            });
+        });
+    }
+
+    @Override
     public void tdeeEditItemSelected(int typeOfEdit, int position) {
         this.mPositionToEdit = position;
 
@@ -296,21 +323,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setTdeeEditTexts(timeToEditLongValue);
 
         tdeeEditPopUpWindow.showAsDropDown(popUpAnchorLow, 0, 0);
-    }
-
-    private void setTdeeEditTexts(long valueToSet) {
-        String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
-        String[] splitString = stringToSet.split(":");
-
-        if (splitString.length==3) {
-            tdeeEditTextHours.setText(splitString[0]);
-            tdeeEditTextMinutes.setText(splitString[1]);
-            tdeeEditTextSeconds.setText(splitString[2]);
-        } else {
-            tdeeEditTextHours.setText(R.string.double_zeros);
-            tdeeEditTextMinutes.setText(splitString[0]);
-            tdeeEditTextSeconds.setText(splitString[1]);
-        }
     }
 
     private void updateDatabaseWithEditedStats() {
@@ -336,6 +348,25 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    @Override
+    public void onDeletingActivity(int position) {
+        AsyncTask.execute(() -> {
+            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
+            dailyStatsAccess.assignStatsForEachActivityEntityForEditing(position);
+            dailyStatsAccess.deleteStatsForEachActivityEntity();
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeFromDailyTotalOfActivities());
+            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(dailyStatsAccess.getTotalCaloriesFromDailyTotalOfActivities());
+            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
     private void setTotalDayHolderValuesFromAggregateActivitiesList() {
         dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
         dailyStatsAccess.setTotalActivityStatsForSelectedDaysToLists();
@@ -347,6 +378,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeFromDailyTotalOfActivities());
         dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(dailyStatsAccess.getTotalCaloriesFromDailyTotalOfActivities());
         dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+    }
+
+    private void setTdeeEditTexts(long valueToSet) {
+        String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
+        String[] splitString = stringToSet.split(":");
+
+        if (splitString.length==3) {
+            tdeeEditTextHours.setText(splitString[0]);
+            tdeeEditTextMinutes.setText(splitString[1]);
+            tdeeEditTextSeconds.setText(splitString[2]);
+        } else {
+            tdeeEditTextHours.setText(R.string.double_zeros);
+            tdeeEditTextMinutes.setText(splitString[0]);
+            tdeeEditTextSeconds.setText(splitString[1]);
+        }
     }
 
     private long getMillisValueToSaveFromEditTextString() {
@@ -378,7 +424,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-
     private TextWatcher editTextWatcher(EditText editText) {
         return new TextWatcher() {
             @Override
@@ -405,33 +450,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextSeconds.addTextChangedListener(editTextWatcher(tdeeEditTextSeconds));
     }
 
-    @Override
-    public void onAddingActivity(int position) {
-        tdeeAddPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
-    }
-
-    private void addActivityToStats() {
-        AsyncTask.execute(()-> {
-            String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
-
-            dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
-            dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
-            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
-            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
-
-            setDayAndStatListsForChosenDurationOfDays(DAILY_STATS);
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            getActivity().runOnUiThread(()-> {
-                if (dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
-                    Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
-                } else {
-                    populateEditPopUpWithNewRow();
-                }
-            });
-        });
-    }
-
     private void populateEditPopUpWithNewRow() {
         replaceAddPopUpWithEditPopUp();
 
@@ -446,25 +464,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void replaceAddPopUpWithEditPopUp() {
         tdeeAddPopUpWindow.dismiss();
         tdeeEditPopUpWindow.showAsDropDown(popUpAnchorLow, 0, 0);
-    }
-
-    @Override
-    public void onDeletingActivity(int position) {
-        AsyncTask.execute(() -> {
-            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            dailyStatsAccess.assignStatsForEachActivityEntityForEditing(position);
-            dailyStatsAccess.deleteStatsForEachActivityEntity();
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeFromDailyTotalOfActivities());
-            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(dailyStatsAccess.getTotalCaloriesFromDailyTotalOfActivities());
-            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            getActivity().runOnUiThread(()-> {
-                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-            });
-        });
     }
 
     private void setTdeeSpinnerListeners() {
