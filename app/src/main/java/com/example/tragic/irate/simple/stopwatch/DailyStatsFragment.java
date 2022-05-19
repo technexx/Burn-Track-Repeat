@@ -416,6 +416,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
             dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
+
+            setDayAndStatListsForChosenDurationOfDays(DAILY_STATS);
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
@@ -425,6 +427,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateEditPopUpWithNewRow();
                 }
             });
+
+            long totalSetTimeForActivities = dailyStatsAccess.getTotalSetTimeForDayHolderForSelectedDuration();
+            Log.i("testTime", "value is " + totalSetTimeForActivities/1000);
         });
     }
 
@@ -451,12 +456,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.assignStatsForEachActivityEntityForEditing(position);
             dailyStatsAccess.deleteStatsForEachActivityEntity();
             populateListsAndTextViewsFromEntityListsInDatabase();
-
-//            long activitySetTimeRemoved = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().get(position).getTotalSetTimeForEachActivity();
-//            double activityCaloriesRemoved = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().get(position).getTotalCaloriesBurnedForEachActivity();
-//            long retrievedDayHolderTime = dailyStatsAccess.getDayHolderList().get(position).getTotalSetTime();
-//            double retrievedDayHolderCalories = dailyStatsAccess.getDayHolderList().get(position).getTotalCaloriesBurned();
-
 
             dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeForDayHolderForSelectedDuration());
             dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(dailyStatsAccess.getTotalCaloriesForDayHolderForSelectedDuration());

@@ -50,9 +50,9 @@ public class LongToStringConverters {
             minutes = minutes % 60;
         }
 
-        Log.i("testTime", "seconds are " + seconds);
-        Log.i("testTime", "minutes are " + minutes);
-        Log.i("testTime", "hours are " + hours);
+//        Log.i("testTime", "seconds are " + seconds);
+//        Log.i("testTime", "minutes are " + minutes);
+//        Log.i("testTime", "hours are " + hours);
 
         return df.format(hours) + ":" + df.format(minutes) + ":" + df.format(seconds);
     }
