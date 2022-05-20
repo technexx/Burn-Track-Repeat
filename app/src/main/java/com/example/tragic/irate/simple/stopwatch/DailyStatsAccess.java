@@ -407,7 +407,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: These are returning 0.
     public long getTotalSetTimeVariableForDayHolder() {
         return totalSetTimeForSelectedDay;
     }

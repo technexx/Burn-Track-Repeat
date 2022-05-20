@@ -306,6 +306,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (!dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
                 setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(DAILY_STATS);
+                dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
                 mPositionToEdit = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().size()-1;
 
                 getActivity().runOnUiThread(()-> {
@@ -338,7 +339,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpWindow.showAsDropDown(popUpAnchorLow, 0, 0);
     }
 
-    //Todo: Only thing that changes is insert/update dao call.
     private void updateDatabaseWithStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
