@@ -215,23 +215,29 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         View recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
         ConstraintLayout.LayoutParams recyclerAndTotalStatsDividerLayoutParams = (ConstraintLayout.LayoutParams) recyclerAndTotalStatsDivider.getLayoutParams();
 
+        ConstraintLayout totalStatsHeaderLayout = mRoot.findViewById(R.id.stats_total_header_layout);
+        ConstraintLayout.LayoutParams totalStatsHeaderLayoutParams = (ConstraintLayout.LayoutParams) totalStatsHeaderLayout.getLayoutParams();
+
         if (!calendarIsMinimized) {
-            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
             dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
-            dailyStatsRecyclerViewLayoutParams.topToBottom = R.id.stats_total_header_layout;
+            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             recyclerAndTotalStatsDividerLayoutParams.bottomToTop = R.id.daily_stats_total_calories_burned_textView;
             recyclerAndTotalStatsDividerLayoutParams.topToBottom = R.id.daily_stats_recyclerView;
+            recyclerAndTotalStatsDividerLayoutParams.topMargin = dpToPxConv(16);
+
+            totalStatsHeaderLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsHeaderLayoutParams.topToTop = R.id.daily_stats_fragment_parent_layout;
+            totalStatsHeaderLayoutParams.startToStart = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsHeaderLayoutParams.startToStart = R.id.daily_stats_fragment_parent_layout;
         } else {
             dailyStatsRecyclerViewLayoutParams.height = 0;
-            dailyStatsRecyclerViewLayoutParams.topToBottom = R.id.stats_total_header_layout;
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
-
-            recyclerAndTotalStatsDividerLayoutParams.reset();
         }
 
         dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
         recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
+        totalStatsHeaderLayout.setLayoutParams(totalStatsHeaderLayoutParams);
     }
 
     private void instantiateAnimations() {
