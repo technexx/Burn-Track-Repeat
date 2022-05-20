@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -84,7 +85,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View popUpAnchorBottom;
     View popUpAnchorLow;
     View popUpAnchorHigh;
-    View recyclerAndTotalStatsDivider;
 
     ImageButton editTdeeStatsButton;
     PopupWindow tdeeEditPopUpWindow;
@@ -197,14 +197,41 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void calendarMinimizationLogic() {
         toggleCalendarMinimizationState();
+        toggleCalendarMinimizationLayouts();
 
         if (!calendarIsMinimized) {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
             calendarView.startAnimation(slideInFromBottom);
+
         } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
             calendarView.startAnimation(slideOutToBottom);
         }
+    }
+
+    private void toggleCalendarMinimizationLayouts() {
+        ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
+
+        View recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+        ConstraintLayout.LayoutParams recyclerAndTotalStatsDividerLayoutParams = (ConstraintLayout.LayoutParams) recyclerAndTotalStatsDivider.getLayoutParams();
+
+        if (!calendarIsMinimized) {
+            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
+            dailyStatsRecyclerViewLayoutParams.topToBottom = R.id.stats_total_header_layout;
+
+            recyclerAndTotalStatsDividerLayoutParams.bottomToTop = R.id.daily_stats_total_calories_burned_textView;
+            recyclerAndTotalStatsDividerLayoutParams.topToBottom = R.id.daily_stats_recyclerView;
+        } else {
+            dailyStatsRecyclerViewLayoutParams.height = 0;
+            dailyStatsRecyclerViewLayoutParams.topToBottom = R.id.stats_total_header_layout;
+            dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
+
+            recyclerAndTotalStatsDividerLayoutParams.reset();
+        }
+
+        dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
+        recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
     }
 
     private void instantiateAnimations() {
@@ -657,8 +684,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
-
-        recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
@@ -677,15 +702,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    private long roundDownMillisValuesToThousandths(long millisToRound) {
-        return millisToRound - (millisToRound%1000);
-    }
-
     private int dpToPxConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
-    }
-
-    private int dpToSpConv(float pixels) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
     }
 }
