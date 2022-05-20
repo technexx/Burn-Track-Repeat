@@ -158,6 +158,16 @@
         app:layout_constraintEnd_toEndOf="parent">
     </CalendarView>
 
+    <ImageButton
+        android:id="@+id/minimize_calendarView_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/arrow_down_2"
+        android:background="@color/dark_grey">
+    </ImageButton>
+
     <View
         android:id="@+id/tdee_edit_popUp_anchor_low"
         android:layout_width="1dp"

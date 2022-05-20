@@ -518,9 +518,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Use animation to slide out calendar. Switch button src arrows on press.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
   //Todo: Add confirm popUp to deleting stat days and all stats.
-  //Todo: Slide out animations occur when switching dates.
   //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Delete confirm popUp for stats may be better w/ out popUp. Use two buttons in separate layout (within xml file) and slide an animation on that.
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.

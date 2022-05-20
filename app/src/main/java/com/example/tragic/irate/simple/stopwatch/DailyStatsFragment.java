@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -64,6 +66,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ImageButton statDurationSwitcherButtonLeft;
     ImageButton statDurationSwitcherButtonRight;
 
+    ImageButton minimizeCalendarButton;
+    boolean calendarIsMinimized;
+    Animation slideOutToBottom;
+    Animation slideInFromBottom;
+
     int currentStatDurationMode;
     int DAILY_STATS = 0;
     int WEEKLY_STATS = 1;
@@ -72,9 +79,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     int ITERATING_STATS_UP = 0;
     int ITERATING_STATS_DOWN = 1;
-
-    int INSERTING_STATS = 0;
-    int UPDATING_STATS = 1;
 
     View tdeeEditView;
     View popUpAnchorBottom;
@@ -121,6 +125,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
+        instantiateAnimations();
 
         instantiateEditPopUpViews();
         instantiateAddPopUpViews();
@@ -171,14 +176,44 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
-            toggleEditModeInStatsAdapter();
+            dailyStatsAdapter.toggleEditMode();
         });
 
         confirmEditWithinPopUpButton.setOnClickListener(v-> {
             updateDatabaseWithStats();
             tdeeEditPopUpWindow.dismiss();
         });
+
+        minimizeCalendarButton.setOnClickListener(v-> {
+            calendarMinimizationLogic();
+        });
+
         return root;
+    }
+
+    private void toggleCalendarMinimizationState() {
+        calendarIsMinimized = !calendarIsMinimized;
+    }
+
+    private void calendarMinimizationLogic() {
+        toggleCalendarMinimizationState();
+
+        if (!calendarIsMinimized) {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
+            calendarView.startAnimation(slideInFromBottom);
+        } else {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
+            calendarView.startAnimation(slideOutToBottom);
+        }
+    }
+
+    private void instantiateAnimations() {
+        slideOutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_from_bottom);
+        slideOutToBottom.setDuration(200);
+        slideOutToBottom.setFillAfter(true);
+        slideInFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
+        slideInFromBottom.setDuration(200);
+        slideInFromBottom.setFillAfter(true);
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
@@ -266,10 +301,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public int getDaySelectedFromCalendar() {
         return daySelectedFromCalendar;
-    }
-
-    private void toggleEditModeInStatsAdapter() {
-        dailyStatsAdapter.toggleEditMode();
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
@@ -625,6 +656,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
+        minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
 
         recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
