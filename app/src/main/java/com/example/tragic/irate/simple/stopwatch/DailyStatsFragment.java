@@ -261,7 +261,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         statsTotalSetTimeTextView.setText(totalSetTime);
         statsTotalBreakTimeTextView.setText(totalBreakTime);
-        statsTotalCaloriesBurnedTextView.setText(formatCalorieToString(totalCaloriesBurned));
+        statsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
     }
 
     public int getDaySelectedFromCalendar() {
@@ -320,10 +320,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 });
             }
         });
-    }
-
-    private void addActivityToDayHolder() {
-
     }
 
     @Override
@@ -544,6 +540,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return df.format(calories);
     }
 
+    private String formatCalorieStringWithoutDecimals(double calories) {
+        DecimalFormat df = new DecimalFormat("#");
+        return df.format(calories);
+    }
+
+
     private double calculateCaloriesBurnedPerMinute(double metValue) {
         SharedPreferences sp = getContext().getSharedPreferences("pref", 0);
         boolean metricMode = sp.getBoolean("metricMode", false);
@@ -643,11 +645,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    private String formatCalorieToString(double calories) {
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(calories);
-    }
-
     private long roundDownMillisValuesToThousandths(long millisToRound) {
         return millisToRound - (millisToRound%1000);
     }
@@ -658,22 +655,5 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private int dpToSpConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
-    }
-
-    private void testEditing() {
-//        Log.i("testCal", "old activity time is " + oldStatValue/1000);
-//        Log.i("testCal", "new activity time is " + newStatValue/1000);
-//
-//        Log.i("testCal", "old dayHolder time is " + dayHolderSetValueToEdit/1000);
-//        Log.i("testCal", "dayHolder value to subtract is " + setTimeToSubtractForActivity/1000);
-//        Log.i("testCal", "new dayHolder time is " + (dayHolderSetValueToEdit - setTimeToSubtractForActivity)/1000);
-//
-//        Log.i("testCal", "activity cals are " + oldCaloriesFromActivity);
-//        Log.i("testCal", "cal multiplier is " + caloricMultiplier);
-//        Log.i("testCal", "new activity cals are " + newCaloriesForActivity);
-//
-//        Log.i("testCal", "old dayHolder cals are " + oldCaloriesFromDayHolder);
-//        Log.i("testCal", "dayHolder cals to subtract are " + caloriesToSubtractForDayHolder);
-//        Log.i("testCal", "new dayHolder cals are " + (oldCaloriesFromDayHolder - caloriesToSubtractForDayHolder));
     }
 }

@@ -518,8 +518,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Total calories are off on addition, and both totals off on deletion.
-  //Todo: Delete activity button overlaps calories. Should round all calories to whole numbers for space's sake.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
   //Todo: Add confirm popUp to deleting stat days and all stats.
   //Todo: Slide out animations occur when switching dates.

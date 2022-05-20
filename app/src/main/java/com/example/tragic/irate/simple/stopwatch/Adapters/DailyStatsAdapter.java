@@ -326,7 +326,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private String formatCalorieString(double calories) {
-        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat df = new DecimalFormat("#");
         return df.format(calories);
     }
 }
