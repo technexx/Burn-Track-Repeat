@@ -390,7 +390,7 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
     }
 
-    public void setTotalActivityStatsForSelectedDaysToLists() {
+    public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         for (int i=0; i<statsForEachActivityListForFragmentAccess.size(); i++) {
             if (statsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(statsForEachActivityListForFragmentAccess.get(i).getActivity())) {
@@ -407,11 +407,12 @@ public class DailyStatsAccess {
         }
     }
 
-    public long getTotalSetTimeFromDailyTotalOfActivities() {
+    //Todo: These are returning 0.
+    public long getTotalSetTimeVariableForDayHolder() {
         return totalSetTimeForSelectedDay;
     }
 
-    public void setTotalSetTimeFromDailyTotalOfActivities() {
+    public void setTotalSetTimeVariableForDayHolder() {
         long valueToReturn = 0;
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
@@ -421,11 +422,11 @@ public class DailyStatsAccess {
         totalSetTimeForSelectedDay = valueToReturn;
     }
 
-    public double getTotalCaloriesFromDailyTotalOfActivities() {
+    public double getTotalCaloriesVariableForDayHolder() {
         return totalCaloriesForSelectedDay;
     }
 
-    public void setTotalCaloriesFromDailyTotalOfActivities() {
+    public void setTotalCaloriesVariableForDayHolder() {
         double valueToReturn = 0;
 
         for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
