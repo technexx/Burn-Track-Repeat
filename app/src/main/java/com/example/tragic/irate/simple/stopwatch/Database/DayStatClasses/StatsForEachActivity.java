@@ -18,22 +18,6 @@ public class StatsForEachActivity {
     double metScore;
     double totalCaloriesBurnedForEachActivity;
 
-    public long getStatsForActivityId() {
-        return statsForActivityId;
-    }
-
-    public void setStatsForActivityId(long statsForActivityId) {
-        this.statsForActivityId = statsForActivityId;
-    }
-
-    public long getIteratingIdsForSpecificDay() {
-        return iteratingIdsForSpecificDay;
-    }
-
-    public void setIteratingIdsForSpecificDay(long iteratingIdsForSpecificDay) {
-        this.iteratingIdsForSpecificDay = iteratingIdsForSpecificDay;
-    }
-
     public long getUniqueIdTiedToTheSelectedActivity() {
         return uniqueIdTiedToTheSelectedActivity;
     }

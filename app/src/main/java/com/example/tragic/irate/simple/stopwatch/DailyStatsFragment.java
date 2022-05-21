@@ -322,7 +322,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setDayHolderStatsTextViews() {
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
-        String totalBreakTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalBreakTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         statsTotalSetTimeTextView.setText(totalSetTime);
@@ -687,7 +686,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
-        dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDuration, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalBreakTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration);
+        dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDuration, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration);
 
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
         dailyStatsAdapter.addActivityToDailyStats(DailyStatsFragment.this);

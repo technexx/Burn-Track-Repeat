@@ -40,10 +40,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     List<String> mActivities;
     List<Long> mSetTimes;
-    List<Long> mBreakTimes;
     List<Double> mCaloriesBurned;
     int mItemCount;
-    int mPosition;
 
     int HEADER_VIEW = 0;
     int MAIN_VIEW = 1;
@@ -54,7 +52,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     boolean mEditModeIsActive;
     int EDITING_SETS = 0;
-    int EDITING_BREAKS = 1;
 
     PopupWindow confirmDeletionPopUpWindow;
 
@@ -98,8 +95,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.mTdeeActivityDeletion = xTdeeActivityDeletion;
     }
 
-    public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Long> breakTimes, List<Double> caloriesBurned) {
-        this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mBreakTimes = breakTimes; this.mCaloriesBurned = caloriesBurned;
+    public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Double> caloriesBurned) {
+        this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mCaloriesBurned = caloriesBurned;
 
         instantiateDeletePopUp();
         setAnimations();

@@ -26,7 +26,6 @@ public class DailyStatsAccess {
 
     List<String> totalActivitiesListForSelectedDuration;
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
-    List<Long> totalBreakTimeListForEachActivityForSelectedDuration;
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
@@ -390,17 +389,23 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
     }
 
+    private void clearStatValueAdapterArrayLists() {
+        totalActivitiesListForSelectedDuration.clear();
+        totalSetTimeListForEachActivityForSelectedDuration.clear();
+        totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
+    }
+
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
+        clearStatsForEachActivityArrayLists();
+
         for (int i=0; i<statsForEachActivityListForFragmentAccess.size(); i++) {
             if (statsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(statsForEachActivityListForFragmentAccess.get(i).getActivity())) {
                     totalActivitiesListForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getActivity());
                     totalSetTimeListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalSetTimeForEachActivity());
-                    totalBreakTimeListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalBreakTimeForEachActivity());
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalCaloriesBurnedForEachActivity());
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
-                    totalBreakTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedBreakTimeFromExistingAndRepeatingPositions(i));
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
                 }
             }
@@ -451,12 +456,6 @@ public class DailyStatsAccess {
         return iteratingValue + presentValue;
     }
 
-    private long combinedBreakTimeFromExistingAndRepeatingPositions(int position) {
-        long iteratingValue = statsForEachActivityListForFragmentAccess.get(position).getTotalBreakTimeForEachActivity();
-        long presentValue =  totalBreakTimeListForEachActivityForSelectedDuration.get(duplicateStringPosition);
-        return iteratingValue + presentValue;
-    }
-
     private double combinedCaloriesFromExistingAndRepeatingPositions(int position) {
         double iteratingValue = statsForEachActivityListForFragmentAccess.get(position).getTotalCaloriesBurnedForEachActivity();
         double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDuration.get(duplicateStringPosition);
@@ -475,7 +474,6 @@ public class DailyStatsAccess {
     public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDuration.clear();
         totalSetTimeListForEachActivityForSelectedDuration.clear();
-        totalBreakTimeListForEachActivityForSelectedDuration.clear();
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
@@ -489,7 +487,6 @@ public class DailyStatsAccess {
     private void instantiateArrayListsOfTotalStatsForSelectedDurations() {
         totalActivitiesListForSelectedDuration = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDuration = new ArrayList<>();
-        totalBreakTimeListForEachActivityForSelectedDuration = new ArrayList<>();
         totalCaloriesBurnedListForEachActivityForSelectedDuration = new ArrayList<>();
     }
 }

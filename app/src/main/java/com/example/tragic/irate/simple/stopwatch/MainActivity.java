@@ -518,6 +518,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: 3X value of activities added to DayHolder.
+      //Todo: Dayholder not updating after row deletion.
+  //Todo: "X" appears next to last row AFTER a scroll to it (not in edit mode).
+      //Todo: "X" animation also occurs after deleting row and while switching to a date with rows.
+  //Todo: X/checkmark popUp for deleting rows doesn't expand with wider rows.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Add confirm popUp to deleting stat days and all stats.
