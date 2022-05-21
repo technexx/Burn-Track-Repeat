@@ -199,10 +199,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public void turnOffEditMode() {
-        if (mEditModeIsActive) {
-            mEditModeIsActive = false;
-            animateButtonSliding = false;
-        }
+        mEditModeIsActive = false;
+        animateButtonSliding = false;
     }
 
     public void toggleEditMode() {

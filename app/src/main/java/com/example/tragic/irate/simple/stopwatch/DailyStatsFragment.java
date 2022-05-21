@@ -433,6 +433,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.deleteStatsForEachActivityEntity();
 
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
+            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+            dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
+            dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
 
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
             dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
