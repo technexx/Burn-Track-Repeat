@@ -2,13 +2,10 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -37,10 +33,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.NumberFilter;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -218,6 +212,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         ConstraintLayout totalStatsHeaderLayout = mRoot.findViewById(R.id.stats_total_header_layout);
         ConstraintLayout.LayoutParams totalStatsHeaderLayoutParams = (ConstraintLayout.LayoutParams) totalStatsHeaderLayout.getLayoutParams();
 
+        ConstraintLayout totalStatsValuesTextViewsLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
+
         if (!calendarIsMinimized) {
             dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
@@ -230,6 +226,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalStatsHeaderLayoutParams.topToTop = R.id.daily_stats_fragment_parent_layout;
             totalStatsHeaderLayoutParams.startToStart = ConstraintLayout.LayoutParams.UNSET;
             totalStatsHeaderLayoutParams.startToStart = R.id.daily_stats_fragment_parent_layout;
+
+            totalStatsValuesTextViewsLayout.startAnimation(slideInFromBottom);
+
         } else {
             dailyStatsRecyclerViewLayoutParams.height = 0;
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
@@ -238,12 +237,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
         recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
         totalStatsHeaderLayout.setLayoutParams(totalStatsHeaderLayoutParams);
-
-        statsTotalSetTimeTextView.startAnimation(slideInFromBottom);
     }
 
     private void instantiateAnimations() {
-        slideOutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_from_bottom);
+        slideOutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom);
         slideOutToBottom.setDuration(200);
         slideOutToBottom.setFillAfter(true);
         slideInFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
