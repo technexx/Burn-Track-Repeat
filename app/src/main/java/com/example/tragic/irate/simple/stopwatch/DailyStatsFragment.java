@@ -449,7 +449,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-
     private void setTdeeEditTexts(long valueToSet) {
         String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
         String[] splitString = stringToSet.split(":");
