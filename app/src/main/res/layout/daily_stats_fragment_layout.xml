@@ -81,6 +81,16 @@
         android:layout_marginTop="4dp">
     </androidx.recyclerview.widget.RecyclerView>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/total_stats_textView_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/total_stats_textView"
         android:text="@string/total"
@@ -102,17 +112,6 @@
         android:layout_marginEnd="40dp"
         android:paddingBottom="6dp"
         android:gravity="center"
-        android:textStyle="bold">
-    </TextView>
-
-    <TextView
-        android:id="@+id/daily_stats_total_break_time_textView"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/daily_stats_total_calories_burned_textView"
-        app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-        android:layout_marginEnd="6dp"
-        android:paddingBottom="6dp"
         android:textStyle="bold">
     </TextView>
 

@@ -61,7 +61,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     TextView totalStatsHeaderTextView;
     TextView statsTotalSetTimeTextView;
-    TextView statsTotalBreakTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
 
     ImageButton statDurationSwitcherButtonLeft;
@@ -209,6 +208,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //Todo: Set animation on total stats views.
     private void toggleCalendarMinimizationLayouts() {
         ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
@@ -238,6 +238,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
         recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
         totalStatsHeaderLayout.setLayoutParams(totalStatsHeaderLayoutParams);
+
+        statsTotalSetTimeTextView.startAnimation(slideInFromBottom);
     }
 
     private void instantiateAnimations() {
@@ -328,7 +330,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         statsTotalSetTimeTextView.setText(totalSetTime);
-        statsTotalBreakTimeTextView.setText(totalBreakTime);
         statsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
     }
 
@@ -684,8 +685,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
-        statsTotalBreakTimeTextView = mRoot.findViewById(R.id.daily_stats_total_break_time_textView);
-        statsTotalBreakTimeTextView.setVisibility(View.INVISIBLE);
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
