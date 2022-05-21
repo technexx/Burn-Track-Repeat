@@ -202,7 +202,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: Set animation on total stats views.
     private void toggleCalendarMinimizationLayouts() {
         ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
@@ -378,7 +377,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             } else {
                 getActivity().runOnUiThread(()->{
                     Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
-
                 });
             }
         });
