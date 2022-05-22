@@ -277,17 +277,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         TextView activityTextView;
         TextView setTimeTextView;
         TextView caloriesBurnedTextView;
-//        ImageButton deleteActivity;
 
         View fullView;
-        View endConstraint;
 
         public MainViewHolder (@NonNull View itemView) {
             super(itemView);
             activityTextView = itemView.findViewById(R.id.activity_in_daily_stats_textView);
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
-//            deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
 
             fullView = itemView;
         }
