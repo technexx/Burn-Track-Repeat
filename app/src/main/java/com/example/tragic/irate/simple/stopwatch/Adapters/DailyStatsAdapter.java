@@ -144,7 +144,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 if (mEditModeIsActive) {
                     mTdeeEditedItemIsSelected.tdeeEditItemSelected(position-1);
                     toggleRowSelectionForEditing();
-                    toggleHighlightOfSelectedRow(position-1);
                 }
             });
 
@@ -166,11 +165,21 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
     }
 
-    private void toggleHighlightOfSelectedRow(int position) {
-        if (!mRowIsSelectedForEditing) {
-            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_grey));
-        } else {
-            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.test_grey));
+//    private void toggleHighlightOfSelectedRow(int position) {
+//        if (!mRowIsSelectedForEditing) {
+//            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_grey));
+//        } else {
+//            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.test_grey));
+//        }
+//    }
+
+    private void setDefaultMainHolderViewsAndBackgrounds() {
+        mMainViewHolder.fullView.setBackground(null);
+    }
+
+    private void setMainHolderEditModeViews() {
+        if (mEditModeIsActive) {
+            mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
         }
     }
 
@@ -222,15 +231,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
     }
 
-    private void setDefaultMainHolderViewsAndBackgrounds() {
-        mMainViewHolder.fullView.setBackground(null);
-    }
-
-    private void setMainHolderEditModeViews() {
-        if (mEditModeIsActive) {
-            mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
-        }
-    }
     private void setHolderViewTextStyles(int textStyle) {
         if (textStyle==BOLD_TEXT) {
             mHeaderViewHolder.activityHeaderTextView.setTextSize(18);
