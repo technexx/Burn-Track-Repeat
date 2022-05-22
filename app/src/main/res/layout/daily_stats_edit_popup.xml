@@ -97,12 +97,22 @@
     </EditText>
 
     <ImageButton
-        android:id="@+id/confirm_stats_edit"
+        android:id="@+id/confirm_activity_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:src="@drawable/edit_confirm_checkmark"
+        android:backgroundTint="@color/Gray">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/confirm_activity_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/trash_can_two"
         android:backgroundTint="@color/Gray">
     </ImageButton>
 

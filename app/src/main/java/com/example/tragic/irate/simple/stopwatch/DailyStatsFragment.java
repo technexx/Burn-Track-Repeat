@@ -87,6 +87,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
     ImageButton confirmEditWithinPopUpButton;
+    ImageButton confirmDeletionWithinEditPopUpButton;
 
     int mPositionToEdit;
 
@@ -176,6 +177,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmEditWithinPopUpButton.setOnClickListener(v-> {
             updateDatabaseWithStats();
             tdeeEditPopUpWindow.dismiss();
+        });
+
+        confirmDeletionWithinEditPopUpButton.setOnClickListener(v-> {
+            onDeletingActivity(mPositionToEdit);
         });
 
         minimizeCalendarButton.setOnClickListener(v-> {
@@ -384,6 +389,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void tdeeEditItemSelected(int position) {
+        this.mPositionToEdit = position;
         launchEditPopUp(position);
     }
 
@@ -449,6 +455,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
+                tdeeEditPopUpWindow.dismiss();
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
             });
         });
@@ -671,7 +678,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
-        confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_stats_edit);
+        confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit);
+        confirmDeletionWithinEditPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_delete);
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();

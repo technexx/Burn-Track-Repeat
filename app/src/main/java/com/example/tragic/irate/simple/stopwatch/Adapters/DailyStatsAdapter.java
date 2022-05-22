@@ -165,14 +165,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
     }
 
-//    private void toggleHighlightOfSelectedRow(int position) {
-//        if (!mRowIsSelectedForEditing) {
-//            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_grey));
-//        } else {
-//            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.test_grey));
-//        }
-//    }
-
     private void setDefaultMainHolderViewsAndBackgrounds() {
         mMainViewHolder.fullView.setBackground(null);
     }
