@@ -54,6 +54,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     DailyStatsAdapter dailyStatsAdapter;
     RecyclerView dailyStatsRecyclerView;
 
+    View recyclerAndTotalStatsDivider;
+
     TextView totalStatsHeaderTextView;
     TextView statsTotalSetTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
@@ -400,8 +402,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpActivityTextView.setText(activityString);
         setTdeeEditTexts(timeToEditLongValue);
 
-        View recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
@@ -542,7 +542,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void replaceAddPopUpWithEditPopUp() {
         tdeeAddPopUpWindow.dismiss();
-        tdeeEditPopUpWindow.showAsDropDown(popUpAnchorLow, 0, 0);
+        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
     private void setTdeeSpinnerListeners() {
@@ -698,6 +698,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
+        recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {

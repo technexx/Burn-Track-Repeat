@@ -518,13 +518,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Have all editing (including deletion) as an option in the edit popUp.
+  //Todo: Add confirmation to delete within edit popUp.
   //Todo: DayHolder calories can be one less than StatsForEach total.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Add confirm popUp to deleting stat days and all stats.
   //Todo: Should change color of calendar days with at least one stat row.
-  //Todo: Delete confirm popUp for stats may be better w/ out popUp. Use two buttons in separate layout (within xml file) and slide an animation on that.
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
   //Todo: Option to minimize calendar for full page of recyclerView (or have separate fragments. we'd only need the selected date from calendar passed into other fragment).
   //Todo: Date range for stats?
