@@ -148,16 +148,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 }
             });
 
-            mMainViewHolder.deleteActivity.setOnClickListener(v-> {
-                mMainViewHolder = (MainViewHolder) holder;
-                confirmDeletionPopUpWindow.showAsDropDown(mMainViewHolder.endConstraint, 0, 0, Gravity.CENTER);
-            });
-
-            confirmActivityDeletionButton.setOnClickListener(v-> {
-                mTdeeActivityDeletion.onDeletingActivity(position-1);
-                confirmDeletionPopUpWindow.dismiss();
-            });
-
             cancelActivityDeletionButton.setOnClickListener(v-> {
                 confirmDeletionPopUpWindow.dismiss();
             });
@@ -234,17 +224,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private void setDefaultMainHolderViewsAndBackgrounds() {
         mMainViewHolder.fullView.setBackground(null);
-        if (animateButtonSliding) {
-            mMainViewHolder.deleteActivity.startAnimation(slideOutFromRight);
-        } else {
-            mMainViewHolder.deleteActivity.setVisibility(View.INVISIBLE);
-        }
     }
 
     private void setMainHolderEditModeViews() {
         if (mEditModeIsActive) {
             mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
-            mMainViewHolder.deleteActivity.startAnimation(slideInFromRight);
         }
     }
     private void setHolderViewTextStyles(int textStyle) {
@@ -301,7 +285,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         TextView activityTextView;
         TextView setTimeTextView;
         TextView caloriesBurnedTextView;
-        ImageButton deleteActivity;
+//        ImageButton deleteActivity;
 
         View fullView;
         View endConstraint;
@@ -311,10 +295,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             activityTextView = itemView.findViewById(R.id.activity_in_daily_stats_textView);
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
-            deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
+//            deleteActivity = itemView.findViewById(R.id.delete_activity_in_edit_stats);
 
             fullView = itemView;
-            endConstraint = itemView.findViewById(R.id.end_constraint);
         }
     }
 
