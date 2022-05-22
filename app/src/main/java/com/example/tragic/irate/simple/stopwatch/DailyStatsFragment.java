@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -384,7 +385,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     @Override
     public void tdeeEditItemSelected(int position) {
         //Todo: PopUp edit for edit and delete.
-        this.mPositionToEdit = position;
+        launchEditPopUp(position);
     }
 
     private void launchEditPopUp(int position) {
@@ -394,7 +395,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpActivityTextView.setText(activityString);
         setTdeeEditTexts(timeToEditLongValue);
 
-        tdeeEditPopUpWindow.showAsDropDown(popUpAnchorLow, 0, 0);
+        View recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+
+        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
     private void updateDatabaseWithStats() {
@@ -658,8 +661,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateEditPopUpViews() {
-        tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_view, null);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(140), true);
+        tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(200), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         popUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);

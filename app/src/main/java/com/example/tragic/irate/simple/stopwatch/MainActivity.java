@@ -519,6 +519,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   //Todo: Have all editing (including deletion) as an option in the edit popUp.
+  //Todo: DayHolder calories can be one less than StatsForEach total.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Add confirm popUp to deleting stat days and all stats.
