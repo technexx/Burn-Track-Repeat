@@ -519,6 +519,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   //Todo: X's disappearing on edit when scrolling. This is because they are set on animations, not view attachments in onBindView, so they do not get populated w/ the rest of the views.
+      //Todo: We should just opt for an "X" w/ row selection. Looks cleaner, too.
   //Todo: X/checkmark popUp for deleting rows doesn't expand with wider rows.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.

@@ -382,9 +382,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void tdeeEditItemSelected(int typeOfEdit, int position) {
+    public void tdeeEditItemSelected(int position) {
         this.mPositionToEdit = position;
+    }
 
+    private void launchEditPopUp(int position) {
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 

@@ -1,31 +1,24 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.R;
 
@@ -51,7 +44,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     int BOLD_TEXT = 1;
 
     boolean mEditModeIsActive;
-    int EDITING_SETS = 0;
+    boolean mRowIsSelectedForEditing;
 
     PopupWindow confirmDeletionPopUpWindow;
 
@@ -72,7 +65,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     boolean animateButtonSliding;
 
     public interface tdeeEditedItemIsSelected {
-        void tdeeEditItemSelected (int typeOfEdit, int position);
+        void tdeeEditItemSelected (int position);
     }
 
     public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
@@ -149,7 +142,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mMainViewHolder = (MainViewHolder) holder;
 
                 if (mEditModeIsActive) {
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(EDITING_SETS, position-1);
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(position-1);
+                    toggleRowSelectionForEditing();
+                    toggleHighlightOfSelectedRow(position-1);
                 }
             });
 
@@ -174,6 +169,18 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             footViewHolder.addActivity.setOnClickListener(v-> {
                 mTdeeActivityAddition.onAddingActivity(position);
             });
+        }
+    }
+
+    private void toggleRowSelectionForEditing() {
+        mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
+    }
+
+    private void toggleHighlightOfSelectedRow(int position) {
+        if (!mRowIsSelectedForEditing) {
+            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_grey));
+        } else {
+            mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.test_grey));
         }
     }
 
