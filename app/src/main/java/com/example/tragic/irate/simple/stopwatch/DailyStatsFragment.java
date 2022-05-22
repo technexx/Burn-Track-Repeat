@@ -384,7 +384,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void tdeeEditItemSelected(int position) {
-        //Todo: PopUp edit for edit and delete.
         launchEditPopUp(position);
     }
 
