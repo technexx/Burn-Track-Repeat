@@ -91,18 +91,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mCaloriesBurned = caloriesBurned;
 
-        instantiateDeletePopUp();
         setAnimations();
-    }
-
-    public void instantiateDeletePopUp() {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View deletePopUpView = inflater.inflate(R.layout.delete_tdee_popup, null);
-        confirmDeletionPopUpWindow = new PopupWindow(deletePopUpView, 250, WindowManager.LayoutParams.WRAP_CONTENT, true);
-        confirmDeletionPopUpWindow.setAnimationStyle(R.style.SlideFromRightAnimation);
-
-        confirmActivityDeletionButton = deletePopUpView.findViewById(R.id.confirm_activity_delete);
-        cancelActivityDeletionButton = deletePopUpView.findViewById(R.id.cancel_activity_delete);
     }
 
     @NonNull
@@ -127,6 +116,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
             mHeaderViewHolder = (HeaderViewHolder) holder;
+
             populateHeaderRowViews();
             setHolderViewTextStyles(BOLD_TEXT);
         } else if (holder instanceof MainViewHolder) {

@@ -679,7 +679,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
         confirmEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit);
-        confirmDeletionWithinEditPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_delete);
+        confirmDeletionWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
