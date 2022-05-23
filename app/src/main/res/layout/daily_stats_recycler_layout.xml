@@ -35,10 +35,10 @@
         android:id="@+id/calories_burned_in_daily_stats_textView"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
         android:layout_marginEnd="8dp">
     </TextView>
 
