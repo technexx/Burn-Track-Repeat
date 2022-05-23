@@ -637,6 +637,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
+        caloriesToRound += 1;
         DecimalFormat df = new DecimalFormat("#");
         String truncatedCalorieString = df.format(caloriesToRound);
 

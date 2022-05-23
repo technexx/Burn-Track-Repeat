@@ -518,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: DayHolder calories can be one less than StatsForEach total.
   //Todo: Total stats alignment off vs columns of activity values.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
@@ -3639,6 +3638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
+    caloriesToRound += 1;
     DecimalFormat df = new DecimalFormat("#");
     String truncatedCalorieString = df.format(caloriesToRound);
 
