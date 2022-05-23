@@ -56,8 +56,8 @@
 
     <TextView
         android:text="@string/tdee_track"
-        android:id="@+id/tdee_toggle"
-        android:layout_width="wrap_content"
+        android:id="@+id/activity_string_textView_for_tracking_cycles"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/custom_name_header"
         app:layout_constraintBottom_toBottomOf="@id/saved_custom_set_view"
@@ -66,7 +66,7 @@
         android:textColor="@color/white"
         android:layout_marginEnd="10dp"
         android:textSize="14sp"
-        android:maxWidth="100dp">
+        android:gravity="start">
     </TextView>
 
     <View
@@ -75,6 +75,6 @@
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/saved_custom_set_view"
-        app:layout_constraintEnd_toStartOf="@id/tdee_toggle">
+        app:layout_constraintEnd_toStartOf="@id/activity_string_textView_for_tracking_cycles">
     </View>
 </androidx.constraintlayout.widget.ConstraintLayout>

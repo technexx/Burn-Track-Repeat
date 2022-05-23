@@ -390,7 +390,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
-      tdeeToggle = itemView.findViewById(R.id.tdee_toggle);
+      tdeeToggle = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
     }
   }
 

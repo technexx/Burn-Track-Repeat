@@ -518,8 +518,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Add confirmation to delete within edit popUp.
   //Todo: DayHolder calories can be one less than StatsForEach total.
+  //Todo: Total stats alignment off vs columns of activity values.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Add confirm popUp to deleting stat days and all stats.
@@ -527,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
   //Todo: Option to minimize calendar for full page of recyclerView (or have separate fragments. we'd only need the selected date from calendar passed into other fragment).
   //Todo: Date range for stats?
-  //Todo: Adding activity may have option to enter time (without manually bringing up edit).
+  //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: Will eventually need a stats reset at end of year.
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
@@ -3315,8 +3315,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
 
-      totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
-      totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
+//      totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
+//      totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
     }
   }
 
@@ -3332,8 +3332,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
       totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
-      totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+//      totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+//      totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     }
   }
 
@@ -3432,8 +3432,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCycleSetTimeInMillis = cycles.getTotalSetTime();
       totalCycleBreakTimeInMillis = cycles.getTotalBreakTime();
 
-      totalCycleSetTimeInMillis = roundDownMillisValuesToSyncTimerDisplays(totalCycleSetTimeInMillis);
-      totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimerDisplays(totalCycleBreakTimeInMillis);
+//      totalCycleSetTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleSetTimeInMillis);
+//      totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleBreakTimeInMillis);
 
       cyclesCompleted = cycles.getCyclesCompleted();
     }
@@ -3444,8 +3444,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCycleWorkTimeInMillis = pomCycles.getTotalWorkTime();
       totalCycleRestTimeInMillis = pomCycles.getTotalRestTime();
 
-      totalCycleWorkTimeInMillis = roundDownMillisValuesToSyncTimerDisplays(totalCycleWorkTimeInMillis);
-      totalCycleRestTimeInMillis = roundDownMillisValuesToSyncTimerDisplays(totalCycleSetTimeInMillis);
+//      totalCycleWorkTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleWorkTimeInMillis);
+//      totalCycleRestTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleSetTimeInMillis);
 
       cyclesCompleted = pomCycles.getCyclesCompleted();
     }
@@ -3623,17 +3623,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void roundDownAllTotalTimeValuesToEnsureSyncing() {
-    totalCycleSetTimeInMillis = roundDownMillisValuesToSyncTimerDisplays(totalCycleSetTimeInMillis);
-    totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimerDisplays(totalCycleBreakTimeInMillis);
-    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForCurrentDayInMillis);
-    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForCurrentDayInMillis);
+    totalCycleSetTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleSetTimeInMillis);
+    totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleBreakTimeInMillis);
+    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
+    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
+    totalCaloriesBurnedForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForCurrentDay);
 
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimerDisplays(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 
-  private long roundDownMillisValuesToSyncTimerDisplays(long millisToRound) {
+  private long roundDownMillisValuesToSyncTimers(long millisToRound) {
     return millisToRound - (millisToRound%1000);
+  }
+
+  private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
+    DecimalFormat df = new DecimalFormat("#");
+    String truncatedCalorieString = df.format(caloriesToRound);
+
+    return Double.parseDouble(truncatedCalorieString);
   }
 
   private long dividedMillisForTimerDisplay(long millis) {

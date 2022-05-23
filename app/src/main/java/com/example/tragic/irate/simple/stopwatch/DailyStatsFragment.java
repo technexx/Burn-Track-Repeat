@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -414,6 +415,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
             double newCaloriesForActivity = ((double) (newStatValue/1000) * caloriesBurnedPerSecond);
+            newCaloriesForActivity = roundDownDoubleValuesToSyncCalories(newCaloriesForActivity);
 
             dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
             dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
@@ -632,6 +634,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private double calculateCaloriesBurnedPerSecond(double metValue) {
         return calculateCaloriesBurnedPerMinute(metValue) / 60;
+    }
+
+    private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
+        DecimalFormat df = new DecimalFormat("#");
+        String truncatedCalorieString = df.format(caloriesToRound);
+
+        return Double.parseDouble(truncatedCalorieString);
     }
 
     private void instantiateAddPopUpViews() {

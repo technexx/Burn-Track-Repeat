@@ -389,12 +389,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
     }
 
-    private void clearStatValueAdapterArrayLists() {
-        totalActivitiesListForSelectedDuration.clear();
-        totalSetTimeListForEachActivityForSelectedDuration.clear();
-        totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
-    }
-
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
@@ -410,6 +404,12 @@ public class DailyStatsAccess {
                 }
             }
         }
+    }
+
+    private void clearStatValueAdapterArrayLists() {
+        totalActivitiesListForSelectedDuration.clear();
+        totalSetTimeListForEachActivityForSelectedDuration.clear();
+        totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
     public long getTotalSetTimeVariableForDayHolder() {
@@ -430,6 +430,7 @@ public class DailyStatsAccess {
         return totalCaloriesForSelectedDay;
     }
 
+    //Todo: This is what we need to round. Should do it in the same place as time values.
     public void setTotalCaloriesVariableForDayHolder() {
         double valueToReturn = 0;
 
