@@ -19,14 +19,15 @@
     <string name="overtime">- %1$s</string>
 
     <string name="confirm_cycle_reset">Confirm Reset</string>
-    <string name="confirm_single_delete">Are you sure?</string>
+    <string name="delete_cycles_times_and_completed_cycles">Delete time and cycle totals?</string>
     <string name="delete_all_cycles">Are you sure? This will delete all cycles!</string>
-    <string name="delete_total_times">Delete time and cycle totals?</string>
-    <string name="delete_total_laps">Reset lap count?</string>
+    <string name="delete_single_day_from_stats">Delete stats from this day?</string>
+    <string name="delete_all_stats">Delete stats from all days?\nThis cannot be undone!</string>
 
     <string name="lap">New Lap</string>
     <string name="clear_laps">Clear Laps</string>
     <string name="laps_completed">Laps Completed: %1$s</string>
+    <string name="delete_total_laps">Reset lap count?</string>
 
     <string name="delete_highlighted_cycles">Save</string>
     <string name="update_cycles">Update</string>

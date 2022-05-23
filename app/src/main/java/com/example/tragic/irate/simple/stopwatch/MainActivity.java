@@ -620,15 +620,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case R.id.delete_single_day_from_daily_stats:
-        AsyncTask.execute(()-> {
-          deleteDailyStatsForSelectedDay();
-        });
+        delete_all_text.setText(R.string.delete_single_day_from_stats);
+        deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         break;
       case R.id.delete_all_days_from_daily_stats:
-        AsyncTask.execute(()-> {
-          deleteDailyStatsForAllDays();
-        });
-        break;
+        delete_all_text.setText(R.string.delete_all_stats);
+        deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
     }
     return super.onOptionsItemSelected(item);
   }
@@ -1106,21 +1103,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     reset_total_times.setOnClickListener(v -> {
-      delete_all_text.setText(R.string.delete_total_times);
+      delete_all_text.setText(R.string.delete_cycles_times_and_completed_cycles);
       deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER_HORIZONTAL, 0, -100);
     });
 
     delete_all_confirm.setOnClickListener(v-> {
-      if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
-        AsyncTask.execute(()->{
+      AsyncTask.execute(()-> {
+        if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
           deleteAllCycles();
-        });
-      } else if (delete_all_text.getText().equals(getString(R.string.delete_total_times))) {
-        AsyncTask.execute(()-> {
+
+        } else if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
+
+        } else if (delete_all_text.getText().equals(getString(R.string.delete_single_day_from_stats))) {
+          deleteDailyStatsForSelectedDay();
+
+        } else if (delete_all_text.getText().equals(getString(R.string.delete_all_stats))) {
+          deleteDailyStatsForAllDays();
+        }
+
+        runOnUiThread(()-> {
+          if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
+          Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
         });
-      }
-      if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
+      });
     });
 
     delete_all_cancel.setOnClickListener(v -> {
