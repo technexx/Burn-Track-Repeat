@@ -171,6 +171,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAdapter.turnOffEditMode();
                     dailyStatsAdapter.getItemCount();
 
+                    dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
+
                     setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
                     populateListsAndTextViewsFromEntityListsInDatabase();
                 });
@@ -210,8 +212,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-        //Todo: Lists are already updated by the time we call them here, so values will always match.
-        dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
+        //Todo: Since we have to change date to increase/decrease list size (except for "delete all"), we should just put the check inside of that, and call coloredOccupiedDates() automatically after "delete all".
 
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
