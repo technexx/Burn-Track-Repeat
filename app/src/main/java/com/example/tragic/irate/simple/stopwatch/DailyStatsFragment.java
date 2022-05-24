@@ -132,7 +132,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         calendar = Calendar.getInstance(TimeZone.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
-//        calendarView.setMaxDate(calendarView.getDate());
 
         dailyStatsAccess = new DailyStatsAccess(getActivity());
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
@@ -257,78 +256,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         public void decorate(DayViewFacade view) {
             view.setSelectionDrawable(drawable);
         }
-    }
-
-    private void toggleCalendarMinimizationState() {
-        calendarIsMinimized = !calendarIsMinimized;
-    }
-
-    private void calendarMinimizationLogic() {
-        toggleCalendarMinimizationState();
-        toggleCalendarMinimizationLayouts();
-
-        if (!calendarIsMinimized) {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
-            calendarView.startAnimation(slideInFromBottom);
-
-        } else {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
-            calendarView.startAnimation(slideOutToBottom);
-        }
-    }
-
-    private void toggleCalendarMinimizationLayouts() {
-        ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
-
-        View recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-        ConstraintLayout.LayoutParams recyclerAndTotalStatsDividerLayoutParams = (ConstraintLayout.LayoutParams) recyclerAndTotalStatsDivider.getLayoutParams();
-
-        ConstraintLayout totalStatsHeaderLayout = mRoot.findViewById(R.id.stats_total_header_layout);
-        ConstraintLayout.LayoutParams totalStatsHeaderLayoutParams = (ConstraintLayout.LayoutParams) totalStatsHeaderLayout.getLayoutParams();
-
-        ConstraintLayout totalStatsValuesTextViewsLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
-        ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewsLayout.getLayoutParams();
-
-        if (!calendarIsMinimized) {
-            dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
-            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            recyclerAndTotalStatsDividerLayoutParams.bottomToTop = R.id.daily_stats_total_calories_burned_textView;
-            recyclerAndTotalStatsDividerLayoutParams.topMargin = dpToPxConv(16);
-
-            totalStatsHeaderLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsHeaderLayoutParams.topToTop = R.id.daily_stats_fragment_parent_layout;
-            totalStatsHeaderLayoutParams.startToStart = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsHeaderLayoutParams.startToStart = R.id.daily_stats_fragment_parent_layout;
-
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
-            totalStatsValuesTextViewsLayout.startAnimation(slideInFromBottom);
-        } else {
-            dailyStatsRecyclerViewLayoutParams.height = 0;
-            dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
-
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            totalStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
-        }
-
-        dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
-        recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
-        totalStatsHeaderLayout.setLayoutParams(totalStatsHeaderLayoutParams);
-        totalStatsValuesTextViewsLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
-    }
-
-    private void instantiateAnimations() {
-        slideOutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom);
-        slideOutToBottom.setDuration(200);
-        slideOutToBottom.setFillAfter(true);
-        slideInFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
-        slideInFromBottom.setDuration(200);
-        slideInFromBottom.setFillAfter(true);
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
@@ -695,7 +622,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return df.format(calories);
     }
 
-
     private double calculateCaloriesBurnedPerMinute(double metValue) {
         SharedPreferences sp = getContext().getSharedPreferences("pref", 0);
         boolean metricMode = sp.getBoolean("metricMode", false);
@@ -717,6 +643,70 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String truncatedCalorieString = df.format(caloriesToRound);
 
         return Double.parseDouble(truncatedCalorieString);
+    }
+
+
+    private void toggleCalendarMinimizationState() {
+        calendarIsMinimized = !calendarIsMinimized;
+    }
+
+    private void calendarMinimizationLogic() {
+        toggleCalendarMinimizationState();
+        toggleCalendarMinimizationLayouts();
+
+        if (!calendarIsMinimized) {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
+            calendarView.startAnimation(slideInFromBottom);
+
+        } else {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
+            calendarView.startAnimation(slideOutToBottom);
+        }
+    }
+
+    private void toggleCalendarMinimizationLayouts() {
+        ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
+
+        View recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+        ConstraintLayout.LayoutParams recyclerAndTotalStatsDividerLayoutParams = (ConstraintLayout.LayoutParams) recyclerAndTotalStatsDivider.getLayoutParams();
+
+        ConstraintLayout totalStatsHeaderLayout = mRoot.findViewById(R.id.stats_total_header_layout);
+        ConstraintLayout.LayoutParams totalStatsHeaderLayoutParams = (ConstraintLayout.LayoutParams) totalStatsHeaderLayout.getLayoutParams();
+
+        ConstraintLayout totalStatsValuesTextViewsLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
+        ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewsLayout.getLayoutParams();
+
+        if (!calendarIsMinimized) {
+            dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
+            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            recyclerAndTotalStatsDividerLayoutParams.bottomToTop = R.id.daily_stats_total_calories_burned_textView;
+            recyclerAndTotalStatsDividerLayoutParams.topMargin = dpToPxConv(16);
+
+            totalStatsHeaderLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsHeaderLayoutParams.topToTop = R.id.daily_stats_fragment_parent_layout;
+            totalStatsHeaderLayoutParams.startToStart = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsHeaderLayoutParams.startToStart = R.id.daily_stats_fragment_parent_layout;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
+            totalStatsValuesTextViewsLayout.startAnimation(slideInFromBottom);
+        } else {
+            dailyStatsRecyclerViewLayoutParams.height = 0;
+            dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
+        }
+
+        dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
+        recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
+        totalStatsHeaderLayout.setLayoutParams(totalStatsHeaderLayoutParams);
+        totalStatsValuesTextViewsLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
     }
 
     private void instantiateAddPopUpViews() {
@@ -802,6 +792,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    private void instantiateAnimations() {
+        slideOutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom);
+        slideOutToBottom.setDuration(200);
+        slideOutToBottom.setFillAfter(true);
+        slideInFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
+        slideInFromBottom.setDuration(200);
+        slideInFromBottom.setFillAfter(true);
     }
 
     private int dpToPxConv(float pixels) {

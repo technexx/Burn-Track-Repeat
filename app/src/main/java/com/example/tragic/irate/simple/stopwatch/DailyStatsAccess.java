@@ -12,6 +12,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsFo
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class DailyStatsAccess {
     Context mContext;
@@ -406,8 +407,8 @@ public class DailyStatsAccess {
 
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
-        setOldStatsForEachActivityListSizeVariable();
 
+        //Todo: Lists here are already set, so it does no good to set an old size.
         for (int i=0; i<statsForEachActivityListForFragmentAccess.size(); i++) {
             if (statsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(statsForEachActivityListForFragmentAccess.get(i).getActivity())) {
@@ -430,8 +431,31 @@ public class DailyStatsAccess {
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
-    private void setOldStatsForEachActivityListSizeVariable() {
-        oldStatsForEachActivityListSize = statsForEachActivityListForFragmentAccess.size();
+    public void setOldStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+        int numberOfOccupiedDays = 0;
+
+        List<Integer> daysOfYearList = new ArrayList<>();
+
+        for (int i=0; i<daysInYear; i++) {
+            if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
+                daysOfYearList.add(i+1);
+            }
+        }
+
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfYearList);
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            if (statsForEachActivityList.get(i).getActivity()!=null) {
+                numberOfOccupiedDays++;
+            }
+        }
+
+        setOldStatsForEachActivityListSizeVariable(numberOfOccupiedDays);
+    }
+
+    private void setOldStatsForEachActivityListSizeVariable(int valueToSet) {
+        oldStatsForEachActivityListSize = valueToSet;
     }
 
     public int getOldStatsForEachActivityListSizeVariable() {
