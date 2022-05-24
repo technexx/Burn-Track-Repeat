@@ -146,14 +146,14 @@
         </View>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <CalendarView
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/stats_calendar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-    </CalendarView>
+    </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
     <ImageButton
         android:id="@+id/minimize_calendarView_button"

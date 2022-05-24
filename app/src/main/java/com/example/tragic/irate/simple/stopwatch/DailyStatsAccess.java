@@ -169,6 +169,19 @@ public class DailyStatsAccess {
         }
     }
 
+    public List<Integer> getActivityListForCalendarColoring() {
+        Calendar calendar = Calendar.getInstance();
+        int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+        List<Integer> listToPopulate = new ArrayList<>();
+
+        for (int i=0; i<daysInYear; i++) {
+            if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
+                listToPopulate.add(i+1);
+            }
+        }
+        return listToPopulate;
+    }
+
     public long getTotalSetTimeFromDayHolderList() {
         long valueToReturn = 0;
 

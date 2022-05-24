@@ -1,7 +1,10 @@
 package com.example.tragic.irate.simple.stopwatch;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -28,6 +31,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,16 +40,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
+
 import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
+import java.util.Date;
 
 public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion {
 
     View mRoot;
     Calendar calendar;
-    CalendarView calendarView;
+    com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
     int daySelectedFromCalendar;
+    CurrentDayDecorator currentDayDecorator;
 
     TDEEChosenActivitySpinnerValues tdeeChosenActivitySpinnerValues;
     LongToStringConverters longToStringConverters;
@@ -116,7 +132,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         calendar = Calendar.getInstance(TimeZone.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
-        calendarView.setMaxDate(calendarView.getDate());
+//        calendarView.setMaxDate(calendarView.getDate());
 
         dailyStatsAccess = new DailyStatsAccess(getActivity());
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
@@ -144,12 +160,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             });
         });
 
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                AsyncTask.execute(()-> {
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                AsyncTask.execute(()->{
                     calendar = Calendar.getInstance(TimeZone.getDefault());
-                    calendar.set(year, month, dayOfMonth);
+                    calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
                     daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
 
                     dailyStatsAdapter.turnOffEditMode();
@@ -157,6 +173,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
                     populateListsAndTextViewsFromEntityListsInDatabase();
+
+                    colorOccupiedDates();
+
+//                    Date testDate = calendar.getTime();
+//                    Log.i("testDate", "date object is " + calendar.getTime());
                 });
             }
         });
@@ -191,6 +212,49 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    private void colorOccupiedDates() {
+        CurrentDayDecorator currentDayDecorator = new CurrentDayDecorator(getContext());
+
+        List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
+
+        for (int i=0; i<occupiedDayList.size(); i++) {
+            calendar.set(Calendar.DAY_OF_YEAR, occupiedDayList.get(i));
+            currentDayDecorator.setDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
+            getActivity().runOnUiThread(()->{
+                calendarView.addDecorator(currentDayDecorator);
+            });
+        }
+
+    }
+
+    public class CurrentDayDecorator implements DayViewDecorator {
+        Drawable drawable;
+        int mYear;
+        int mMonth;
+        int mDay;
+        CalendarDay mCurrentDay;
+
+        public CurrentDayDecorator(Context context) {
+            drawable = ContextCompat.getDrawable(context, R.drawable.green_checkmark);
+        }
+
+        public void setDate(int year, int month, int day) {
+            this.mYear = year; this.mMonth = month; this.mDay = day;
+            mCurrentDay = CalendarDay.from(mYear, mMonth, mDay);
+        }
+
+        @Override
+        public boolean shouldDecorate(CalendarDay day) {
+            return day.equals(mCurrentDay);
+        }
+
+        @Override
+        public void decorate(DayViewFacade view) {
+            view.setSelectionDrawable(drawable);
+        }
     }
 
     private void toggleCalendarMinimizationState() {
@@ -709,6 +773,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+
+        currentDayDecorator = new CurrentDayDecorator(getContext());
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
