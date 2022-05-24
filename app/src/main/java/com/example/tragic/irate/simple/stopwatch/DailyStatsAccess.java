@@ -23,6 +23,8 @@ public class DailyStatsAccess {
     List<DayHolder> mDayHolderList;
     List<StatsForEachActivity> statsForEachActivityListForTimerAccess;
     List<StatsForEachActivity> statsForEachActivityListForFragmentAccess;
+    int oldStatsForEachActivityListSize;
+    int newStatsForEachActivityListSize;
 
     List<String> totalActivitiesListForSelectedDuration;
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
@@ -404,6 +406,7 @@ public class DailyStatsAccess {
 
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
+        setOldStatsForEachActivityListSizeVariable();
 
         for (int i=0; i<statsForEachActivityListForFragmentAccess.size(); i++) {
             if (statsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
@@ -417,12 +420,30 @@ public class DailyStatsAccess {
                 }
             }
         }
+
+        setNewStatsForEachActivityListSizeVariable();
     }
 
     private void clearStatValueAdapterArrayLists() {
         totalActivitiesListForSelectedDuration.clear();
         totalSetTimeListForEachActivityForSelectedDuration.clear();
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
+    }
+
+    private void setOldStatsForEachActivityListSizeVariable() {
+        oldStatsForEachActivityListSize = statsForEachActivityListForFragmentAccess.size();
+    }
+
+    public int getOldStatsForEachActivityListSizeVariable() {
+        return oldStatsForEachActivityListSize;
+    }
+
+    private void setNewStatsForEachActivityListSizeVariable() {
+        newStatsForEachActivityListSize = statsForEachActivityListForFragmentAccess.size();
+    }
+
+    public int getNewStatsForEachActivityListSizeVariable() {
+        return newStatsForEachActivityListSize;
     }
 
     public long getTotalSetTimeVariableForDayHolder() {
@@ -443,7 +464,6 @@ public class DailyStatsAccess {
         return totalCaloriesForSelectedDay;
     }
 
-    //Todo: This is what we need to round. Should do it in the same place as time values.
     public void setTotalCaloriesVariableForDayHolder() {
         double valueToReturn = 0;
 

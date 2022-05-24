@@ -174,10 +174,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
-                    colorOccupiedDates();
-
-//                    Date testDate = calendar.getTime();
-//                    Log.i("testDate", "date object is " + calendar.getTime());
+                    if (hasNumberOfOccupiedDatesChanged()) {
+                        colorOccupiedDates();
+                    }
                 });
             }
         });
@@ -212,6 +211,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    private boolean hasNumberOfOccupiedDatesChanged() {
+        int oldValue = dailyStatsAccess.getOldStatsForEachActivityListSizeVariable();
+        int newValue = dailyStatsAccess.getNewStatsForEachActivityListSizeVariable();
+        return (oldValue != newValue);
     }
 
     private void colorOccupiedDates() {
@@ -289,7 +294,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             recyclerAndTotalStatsDividerLayoutParams.bottomToTop = R.id.daily_stats_total_calories_burned_textView;
-//            recyclerAndTotalStatsDividerLayoutParams.topToBottom = R.id.daily_stats_recyclerView;
             recyclerAndTotalStatsDividerLayoutParams.topMargin = dpToPxConv(16);
 
             totalStatsHeaderLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
@@ -310,7 +314,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             totalStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
-//            totalStatsValuesTextViewsLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
         }
 
         dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
