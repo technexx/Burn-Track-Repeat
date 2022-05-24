@@ -215,19 +215,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void colorOccupiedDates() {
-        CurrentDayDecorator currentDayDecorator = new CurrentDayDecorator(getContext());
-
         List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
 
         for (int i=0; i<occupiedDayList.size(); i++) {
             calendar.set(Calendar.DAY_OF_YEAR, occupiedDayList.get(i));
             currentDayDecorator.setDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+            currentDayDecorator.setDayToColor();
 
             getActivity().runOnUiThread(()->{
                 calendarView.addDecorator(currentDayDecorator);
             });
         }
-
     }
 
     public class CurrentDayDecorator implements DayViewDecorator {
@@ -235,7 +233,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         int mYear;
         int mMonth;
         int mDay;
-        CalendarDay mCurrentDay;
+        CalendarDay mDayToColor;
 
         public CurrentDayDecorator(Context context) {
             drawable = ContextCompat.getDrawable(context, R.drawable.green_checkmark);
@@ -243,12 +241,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         public void setDate(int year, int month, int day) {
             this.mYear = year; this.mMonth = month; this.mDay = day;
-            mCurrentDay = CalendarDay.from(mYear, mMonth, mDay);
+        }
+
+        public void setDayToColor() {
+            mDayToColor = CalendarDay.from(mYear, mMonth, mDay);
         }
 
         @Override
         public boolean shouldDecorate(CalendarDay day) {
-            return day.equals(mCurrentDay);
+            return day.equals(mDayToColor);
         }
 
         @Override
