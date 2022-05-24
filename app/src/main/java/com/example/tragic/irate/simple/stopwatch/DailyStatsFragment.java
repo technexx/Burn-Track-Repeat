@@ -216,13 +216,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void colorOccupiedDates() {
         List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
+        List<CalendarDay> calendarDayList = new ArrayList<>();
 
         for (int i=0; i<occupiedDayList.size(); i++) {
             calendar.set(Calendar.DAY_OF_YEAR, occupiedDayList.get(i));
-            currentDayDecorator.setDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-            currentDayDecorator.setDayToColor();
+
+            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
 
             getActivity().runOnUiThread(()->{
+                currentDayDecorator.setCalendarDayList(calendarDayList);
                 calendarView.addDecorator(currentDayDecorator);
             });
         }
@@ -230,26 +232,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public class CurrentDayDecorator implements DayViewDecorator {
         Drawable drawable;
-        int mYear;
-        int mMonth;
-        int mDay;
-        CalendarDay mDayToColor;
+        List<CalendarDay> mCalendarDayList;
 
         public CurrentDayDecorator(Context context) {
             drawable = ContextCompat.getDrawable(context, R.drawable.green_checkmark);
+            mCalendarDayList = new ArrayList<>();
         }
 
-        public void setDate(int year, int month, int day) {
-            this.mYear = year; this.mMonth = month; this.mDay = day;
-        }
-
-        public void setDayToColor() {
-            mDayToColor = CalendarDay.from(mYear, mMonth, mDay);
+        public void setCalendarDayList(List<CalendarDay> calendarDayList) {
+            this.mCalendarDayList = calendarDayList;
         }
 
         @Override
         public boolean shouldDecorate(CalendarDay day) {
-            return day.equals(mDayToColor);
+            return mCalendarDayList.contains(day);
         }
 
         @Override
