@@ -408,7 +408,6 @@ public class DailyStatsAccess {
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
-        //Todo: Lists here are already set, so it does no good to set an old size.
         for (int i=0; i<statsForEachActivityListForFragmentAccess.size(); i++) {
             if (statsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(statsForEachActivityListForFragmentAccess.get(i).getActivity())) {
@@ -421,8 +420,6 @@ public class DailyStatsAccess {
                 }
             }
         }
-
-        setNewStatsForEachActivityListSizeVariable();
     }
 
     private void clearStatValueAdapterArrayLists() {
@@ -431,7 +428,7 @@ public class DailyStatsAccess {
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
-    public void setOldStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
+    public int returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
         int numberOfOccupiedDays = 0;
@@ -451,10 +448,10 @@ public class DailyStatsAccess {
             }
         }
 
-        setOldStatsForEachActivityListSizeVariable(numberOfOccupiedDays);
+        return numberOfOccupiedDays;
     }
 
-    private void setOldStatsForEachActivityListSizeVariable(int valueToSet) {
+    public void setOldStatsForEachActivityListSizeVariable(int valueToSet) {
         oldStatsForEachActivityListSize = valueToSet;
     }
 
@@ -462,8 +459,8 @@ public class DailyStatsAccess {
         return oldStatsForEachActivityListSize;
     }
 
-    private void setNewStatsForEachActivityListSizeVariable() {
-        newStatsForEachActivityListSize = statsForEachActivityListForFragmentAccess.size();
+    public void setNewStatsForEachActivityListSizeVariable(int valueToSet) {
+        newStatsForEachActivityListSize = valueToSet;
     }
 
     public int getNewStatsForEachActivityListSizeVariable() {

@@ -152,6 +152,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(DAILY_STATS);
             populateListsAndTextViewsFromEntityListsInDatabase();
+            colorOccupiedDates();
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextViewAndEditButton(currentStatDurationMode);
@@ -172,10 +173,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
                     populateListsAndTextViewsFromEntityListsInDatabase();
-
-                    if (hasNumberOfOccupiedDatesChanged()) {
-                        colorOccupiedDates();
-                    }
                 });
             }
         });
@@ -212,26 +209,34 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
+    private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
+        //Todo: Lists are already updated by the time we call them here, so values will always match.
+        dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
+
+        if (mode==DAILY_STATS) {
+            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
+        }
+        if (mode==WEEKLY_STATS) {
+            dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+        }
+        if (mode==MONTHLY_STATS) {
+            dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+        }
+        if (mode==YEARLY_STATS) {
+            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
+        }
+
+        dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
+
+        if (hasNumberOfOccupiedDatesChanged()) {
+            colorOccupiedDates();
+        }
+    }
+
     private boolean hasNumberOfOccupiedDatesChanged() {
         int oldValue = dailyStatsAccess.getOldStatsForEachActivityListSizeVariable();
         int newValue = dailyStatsAccess.getNewStatsForEachActivityListSizeVariable();
         return (oldValue != newValue);
-    }
-
-    private void colorOccupiedDates() {
-        List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
-        List<CalendarDay> calendarDayList = new ArrayList<>();
-
-        for (int i=0; i<occupiedDayList.size(); i++) {
-            calendar.set(Calendar.DAY_OF_YEAR, occupiedDayList.get(i));
-
-            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
-
-            getActivity().runOnUiThread(()->{
-                currentDayDecorator.setCalendarDayList(calendarDayList);
-                calendarView.addDecorator(currentDayDecorator);
-            });
-        }
     }
 
     private class CurrentDayDecorator implements DayViewDecorator {
@@ -257,6 +262,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             view.setSelectionDrawable(drawable);
         }
     }
+    private void colorOccupiedDates() {
+        List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+
+        for (int i=0; i<occupiedDayList.size(); i++) {
+            calendar.set(Calendar.DAY_OF_YEAR, occupiedDayList.get(i));
+
+            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
+
+            getActivity().runOnUiThread(()->{
+                currentDayDecorator.setCalendarDayList(calendarDayList);
+                calendarView.addDecorator(currentDayDecorator);
+            });
+        }
+    }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
         AsyncTask.execute(()-> {
@@ -270,37 +290,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAdapter.getItemCount();
             });
         });
-    }
-
-    public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
-        if (directionOfIteration==ITERATING_STATS_UP) {
-            if (currentStatDurationMode<3) {
-                currentStatDurationMode++;
-            } else {
-                currentStatDurationMode=0;
-            }
-        } else if (directionOfIteration==ITERATING_STATS_DOWN) {
-            if (currentStatDurationMode>0) {
-                currentStatDurationMode--;
-            } else {
-                currentStatDurationMode=3;
-            }
-        }
-    }
-
-    private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-        if (mode==DAILY_STATS) {
-            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
-        }
-        if (mode==WEEKLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
-        }
-        if (mode==MONTHLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
-        }
-        if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
-        }
     }
 
     private void setStatDurationTextViewAndEditButton(int mode) {
@@ -318,6 +307,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
+        }
+    }
+
+    public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
+        if (directionOfIteration==ITERATING_STATS_UP) {
+            if (currentStatDurationMode<3) {
+                currentStatDurationMode++;
+            } else {
+                currentStatDurationMode=0;
+            }
+        } else if (directionOfIteration==ITERATING_STATS_DOWN) {
+            if (currentStatDurationMode>0) {
+                currentStatDurationMode--;
+            } else {
+                currentStatDurationMode=3;
+            }
         }
     }
 
