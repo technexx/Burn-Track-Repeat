@@ -43,9 +43,11 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion {
@@ -123,12 +125,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
-        calendar = Calendar.getInstance(TimeZone.getDefault());
-        calendarView = mRoot.findViewById(R.id.stats_calendar);
-
         dailyStatsAccess = new DailyStatsAccess(getActivity());
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
+        instantiateCalendarObjects();
         instantiateTextViewsAndMiscClasses();
         instantiateRecyclerViewAndItsAdapter();
         instantiateAnimations();
@@ -143,7 +143,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
 
-//            setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(DAILY_STATS);
             populateListsAndTextViewsFromEntityListsInDatabase();
             colorOccupiedDates();
 
@@ -704,6 +703,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
         totalStatsHeaderLayout.setLayoutParams(totalStatsHeaderLayoutParams);
         totalStatsValuesTextViewsLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
+    }
+
+    private void instantiateCalendarObjects() {
+        calendar = Calendar.getInstance(TimeZone.getDefault());
+        calendarView = mRoot.findViewById(R.id.stats_calendar);
+
+        CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+        calendarView.setSelectedDate(calendarDay);
     }
 
     private void instantiateAddPopUpViews() {

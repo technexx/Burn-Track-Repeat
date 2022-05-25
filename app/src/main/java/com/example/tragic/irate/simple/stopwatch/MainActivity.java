@@ -519,14 +519,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Week should be actual week, and not row on calendar. Should be option in custom API for this.
+  //Todo: Date range for stats?
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Add confirm popUp to deleting stat days and all stats.
   //Todo: Should change color of calendar days with at least one stat row.
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
   //Todo: Option to minimize calendar for full page of recyclerView (or have separate fragments. we'd only need the selected date from calendar passed into other fragment).
-  //Todo: Date range for stats?
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: Will eventually need a stats reset at end of year.
