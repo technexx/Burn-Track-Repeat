@@ -155,7 +155,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:mcv_tileHeight="40dp"
         app:mcv_tileWidth="50dp"
-        app:mcv_showOtherDates="other_months">
+        app:mcv_showOtherDates="other_months"
+        app:mcv_dateTextAppearance="@style/CustomTextAppearance">
     </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
     <ImageButton

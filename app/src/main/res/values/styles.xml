@@ -52,13 +52,8 @@
         <item name="fontFamily">@font/roboto</item>
     </style>
 
-    <style name="MyCalendarViewStyle" parent="android:Widget.Material.Light.CalendarView">
-        <item name="android:headerBackground">@color/test_grey</item>
-        <item name="android:calendarTextColor">@color/red</item>
-        <item name="android:weekNumberColor">@color/red</item>
-    </style>
-
-    <style name="EditStatsRecyclerViewStyle">
+    <style name="CustomTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
+        <item name="android:textColor">@drawable/calendar_view_date_text_color</item>
     </style>
 
 </resources>
