@@ -30,8 +30,10 @@
     <color name="greyed_red">#B71C1C</color>
     <color name="test_black">#212121</color>
     <color name="off_white">#BDBDBD</color>
+    <color name="off_white_2">#E0E0E0</color>
     <color name="light_white">#FAFAFA</color>
     <color name="purple">#8E24AA</color>
     <color name="test_highlight">#607D8B</color>
     <color name="test_highlight_2">#546E7A</color>
+    <color name="blue_green">#009688</color>
 </resources>

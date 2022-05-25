@@ -2,15 +2,13 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -47,11 +45,9 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 
 import java.text.DecimalFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 
@@ -255,7 +251,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         List<CalendarDay> mCalendarDayList;
 
         public CurrentDayDecorator(Context context) {
-            greenCircleDrawable = ContextCompat.getDrawable(context, R.drawable.green_circle);
+            greenCircleDrawable = ContextCompat.getDrawable(context, R.drawable.blue_green_circle);
             mCalendarDayList = new ArrayList<>();
         }
 
@@ -270,7 +266,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         @Override
         public void decorate(DayViewFacade dayViewFacade) {
-            dayViewFacade.setBackgroundDrawable(greenCircleDrawable);
+//            dayViewFacade.setBackgroundDrawable(greenCircleDrawable);
+            dayViewFacade.addSpan (new ForegroundColorSpan(getResources().getColor(R.color.green)));
         }
     }
 
