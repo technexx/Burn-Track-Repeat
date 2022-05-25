@@ -1,7 +1,5 @@
 package com.example.tragic.irate.simple.stopwatch;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -9,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,7 +18,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
@@ -47,13 +43,10 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 
 import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.Date;
 
 public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion {
 
@@ -240,13 +233,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private class CurrentDayDecorator implements DayViewDecorator {
-        Drawable drawable;
-        Drawable testDrawable;
+        Drawable greenCircleDrawable;
         List<CalendarDay> mCalendarDayList;
 
         public CurrentDayDecorator(Context context) {
-            drawable = ContextCompat.getDrawable(context, R.drawable.green_checkmark);
-            testDrawable = ContextCompat.getDrawable(context, R.drawable.test_circle);
+            greenCircleDrawable = ContextCompat.getDrawable(context, R.drawable.green_circle);
             mCalendarDayList = new ArrayList<>();
         }
 
@@ -261,7 +252,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         @Override
         public void decorate(DayViewFacade dayViewFacade) {
-            dayViewFacade.setBackgroundDrawable(testDrawable);
+            dayViewFacade.setBackgroundDrawable(greenCircleDrawable);
         }
     }
 
