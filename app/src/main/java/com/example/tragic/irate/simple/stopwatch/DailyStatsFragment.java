@@ -143,7 +143,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
 
-            setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(DAILY_STATS);
+//            setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(DAILY_STATS);
             populateListsAndTextViewsFromEntityListsInDatabase();
             colorOccupiedDates();
 
@@ -203,6 +203,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    public void populateListsAndTextViewsFromEntityListsInDatabase() {
+        setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
+
+        getActivity().runOnUiThread(()-> {
+            dailyStatsAccess.clearStatsForEachActivityArrayLists();
+
+            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+            dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
+            dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
+
+            dailyStatsAdapter.notifyDataSetChanged();
+
+            setDayHolderStatsTextViews();
+        });
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
@@ -342,22 +358,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return daySelectedFromCalendar;
     }
 
-    public void populateListsAndTextViewsFromEntityListsInDatabase() {
-        setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
-
-        getActivity().runOnUiThread(()-> {
-            dailyStatsAccess.clearStatsForEachActivityArrayLists();
-
-            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
-            dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
-
-            dailyStatsAdapter.notifyDataSetChanged();
-
-            setDayHolderStatsTextViews();
-        });
-    }
-
     @Override
     public void onAddingActivity(int position) {
         tdeeAddPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
@@ -375,8 +375,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
 
             if (!dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
-                setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(DAILY_STATS);
-                dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+                populateListsAndTextViewsFromEntityListsInDatabase();
+//                dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
                 mPositionToEdit = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().size()-1;
 
                 getActivity().runOnUiThread(()-> {

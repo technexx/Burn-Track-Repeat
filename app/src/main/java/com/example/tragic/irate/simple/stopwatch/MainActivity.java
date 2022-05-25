@@ -2141,8 +2141,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .commit();
       sortButton.setVisibility(View.INVISIBLE);
       setTypeOFMenu(DAILY_SETTINGS_MENU);
-    } else {
-//      refreshDailyStats();
     }
   }
 
