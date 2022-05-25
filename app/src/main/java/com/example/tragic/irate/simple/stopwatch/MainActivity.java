@@ -2147,6 +2147,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void refreshDailyStats() {
     int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+    dailyStatsFragment.colorOccupiedDates();
   }
 
   private void deleteDailyStatsForSelectedDay() {

@@ -178,10 +178,11 @@ public class DailyStatsAccess {
         List<Integer> listToPopulate = new ArrayList<>();
 
         for (int i=0; i<daysInYear; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
+            if (cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(i+1).size()!=0) {
                 listToPopulate.add(i+1);
             }
         }
+        Log.i("testList", "list is " + listToPopulate);
         return listToPopulate;
     }
 

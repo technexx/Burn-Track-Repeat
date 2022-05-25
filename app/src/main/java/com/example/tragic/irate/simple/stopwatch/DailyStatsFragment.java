@@ -167,8 +167,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
 
                     populateListsAndTextViewsFromEntityListsInDatabase();
-                    //This calls in populateListsxxx() above.
-//                    setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
                 });
             }
         });
@@ -272,7 +270,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void colorOccupiedDates() {
+    public void colorOccupiedDates() {
         List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
         List<CalendarDay> calendarDayList = new ArrayList<>();
 
