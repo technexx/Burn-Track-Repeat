@@ -173,8 +173,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
 
-                    setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
                     populateListsAndTextViewsFromEntityListsInDatabase();
+                    //This calls in populateListsxxx() above.
+//                    setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
                 });
             }
         });
@@ -212,8 +213,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-        //Todo: Since we have to change date to increase/decrease list size (except for "delete all"), we should just put the check inside of that, and call coloredOccupiedDates() automatically after "delete all".
-
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
         }
@@ -242,10 +241,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private class CurrentDayDecorator implements DayViewDecorator {
         Drawable drawable;
+        Drawable testDrawable;
         List<CalendarDay> mCalendarDayList;
 
         public CurrentDayDecorator(Context context) {
             drawable = ContextCompat.getDrawable(context, R.drawable.green_checkmark);
+            testDrawable = ContextCompat.getDrawable(context, R.drawable.test_circle);
             mCalendarDayList = new ArrayList<>();
         }
 
@@ -259,10 +260,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         @Override
-        public void decorate(DayViewFacade view) {
-            view.setSelectionDrawable(drawable);
+        public void decorate(DayViewFacade dayViewFacade) {
+            dayViewFacade.setBackgroundDrawable(testDrawable);
         }
     }
+
     private void colorOccupiedDates() {
         List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
         List<CalendarDay> calendarDayList = new ArrayList<>();
