@@ -101,6 +101,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
@@ -1204,7 +1205,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-    calendar = Calendar.getInstance();
+    calendar = Calendar.getInstance(TimeZone.getDefault());
     calendarValues = new CalendarValues();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
   }
@@ -3347,7 +3348,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundTypeString = "";
     pomString = "";
 
-    calendar = Calendar.getInstance();
+    calendar = Calendar.getInstance(TimeZone.getDefault());
     date = simpleDateFormat.format(calendar.getTime());
 
     int cycleID;

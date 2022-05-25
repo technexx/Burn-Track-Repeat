@@ -153,7 +153,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:mcv_tileSize="45dp">
+        app:mcv_tileHeight="40dp"
+        app:mcv_tileWidth="50dp"
+        app:mcv_showOtherDates="other_months">
     </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
     <ImageButton

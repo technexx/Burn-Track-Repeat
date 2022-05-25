@@ -13,7 +13,7 @@ public class CalendarValues {
     int dayOfYearSelected;
 
     public CalendarValues(){
-        calendar = Calendar.getInstance();
+        calendar = Calendar.getInstance(TimeZone.getDefault());
         this.dayOfYearSelected = calendar.get(Calendar.DAY_OF_YEAR);
     }
 

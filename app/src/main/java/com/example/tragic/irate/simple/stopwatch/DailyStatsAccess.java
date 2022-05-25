@@ -106,24 +106,19 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfMonth, int dayOfYear) {
+    public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
 
-        int daysInWeek = 7;
-        int firstDayInYearToAdd = 0;
+        int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
 
-        if (dayOfMonth<=7) {
-            daysInWeek = 7 - (dayOfWeek - dayOfMonth);
-            firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
-        } else {
-            firstDayInYearToAdd = dayOfYear - (dayOfWeek-1);
-        }
-
-        for (int i=0; i<daysInWeek; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
-                daysOfWeekList.add(firstDayInYearToAdd + i);
+        for (int i=0; i<7; i++) {
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfYearToUse + i).size()!=0) {
+                daysOfWeekList.add(firstDayOfYearToUse + i);
             }
         }
+
+        Log.i("testWeek", "day selected is " + dayOfYear);
+        Log.i("testWeek", "first day to use is " + firstDayOfYearToUse);
 
         if (daysOfWeekList.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
