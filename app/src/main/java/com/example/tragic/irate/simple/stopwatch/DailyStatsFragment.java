@@ -40,6 +40,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHold
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
@@ -223,7 +224,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-        dailyStatsAccess.clearSelectedDurationLists();
+        dailyStatsAccess.clearDaysInSelectedDurationList();
 
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
@@ -245,12 +246,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private boolean hasNumberOfOccupiedDatesChanged() {
-        int oldValue = dailyStatsAccess.getOldStatsForEachActivityListSizeVariable();
-        int newValue = dailyStatsAccess.getNewStatsForEachActivityListSizeVariable();
-        return (oldValue != newValue);
-    }
-
     private void colorSelectedDurationDates() {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         List<CalendarDay> calendarDayList = new ArrayList<>();
@@ -267,6 +262,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             durationDayDecorator.setCalendarDayList(calendarDayList);
             calendarView.addDecorator(durationDayDecorator);
         });
+    }
+
+    private boolean hasNumberOfOccupiedDatesChanged() {
+        int oldValue = dailyStatsAccess.getOldStatsForEachActivityListSizeVariable();
+        int newValue = dailyStatsAccess.getNewStatsForEachActivityListSizeVariable();
+        return (oldValue != newValue);
     }
 
     private class DurationDayDecorator implements DayViewDecorator {
@@ -757,6 +758,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
         calendarView.setSelectedDate(calendarDay);
+        calendarView.state().edit()
+//                .setMinimumDate(CalendarDay.from(2016, 4, 3))
+                .setMaximumDate(calendarDay)
+                .setCalendarDisplayMode(CalendarMode.MONTHS)
+                .commit();
     }
 
     private void instantiateAddPopUpViews() {

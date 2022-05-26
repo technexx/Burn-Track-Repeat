@@ -108,7 +108,6 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    //Todo: Need to clear list before adding if it's singular global.
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
         int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
@@ -187,7 +186,7 @@ public class DailyStatsAccess {
         return listToPopulate;
     }
 
-    public void clearSelectedDurationLists() {
+    public void clearDaysInSelectedDurationList() {
         daysInSelectedDurationList.clear();
     }
 
