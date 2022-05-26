@@ -43,9 +43,7 @@ public class DailyStatsAccess {
     String mActivityString;
     double mMetScore;
 
-    List<Integer> daysInWeekDurationList = new ArrayList<>();
-    List<Integer> daysInMonthDurationList = new ArrayList<>();
-    List<Integer> daysInYearDurationList = new ArrayList<>();
+    List<Integer> daysInSelectedDurationList = new ArrayList<>();
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -110,13 +108,13 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
+    //Todo: Need to clear list before adding if it's singular global.
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
-
         int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
 
         for (int i=0; i<7; i++) {
-            daysInWeekDurationList.add(firstDayOfYearToUse + i);
+            daysInSelectedDurationList.add(firstDayOfYearToUse + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfYearToUse + i).size()!=0) {
                 daysOfWeekList.add(firstDayOfYearToUse + i);
             }
@@ -140,7 +138,7 @@ public class DailyStatsAccess {
         int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
-            daysInMonthDurationList.add(firstDayInYearToAdd + i);
+            daysInSelectedDurationList.add(firstDayInYearToAdd + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
                 daysOfMonthList.add(firstDayInYearToAdd + i);
             }
@@ -160,7 +158,7 @@ public class DailyStatsAccess {
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
-            daysInYearDurationList.add(i+1);
+            daysInSelectedDurationList.add(i+1);
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
                 daysOfYearList.add(i+1);
             }
@@ -189,16 +187,12 @@ public class DailyStatsAccess {
         return listToPopulate;
     }
 
-    public List<Integer> getDaysInWeekDurationList() {
-        return daysInWeekDurationList;
+    public void clearSelectedDurationLists() {
+        daysInSelectedDurationList.clear();
     }
 
-    public List<Integer> getDaysInMonthDurationList() {
-        return daysInMonthDurationList;
-    }
-
-    public List<Integer> getDaysInYearDurationList() {
-        return daysInYearDurationList;
+    public List<Integer> getDaysInSelectedDurationList() {
+        return daysInSelectedDurationList;
     }
 
     public long getTotalSetTimeFromDayHolderList() {
