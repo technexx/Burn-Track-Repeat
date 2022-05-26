@@ -8,10 +8,12 @@ import android.util.Log;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class DailyStatsAccess {
@@ -99,10 +101,6 @@ public class DailyStatsAccess {
         }
     }
 
-    public List<DayHolder> getDayHolderList() {
-        return mDayHolderList;
-    }
-
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
@@ -119,16 +117,7 @@ public class DailyStatsAccess {
             }
         }
 
-        Log.i("testWeek", "day selected is " + dayOfYear);
-        Log.i("testWeek", "first day to use is " + firstDayOfYearToUse);
-
-        if (daysOfWeekList.size()>0) {
-            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfWeekList);
-            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfWeekList);
-        } else {
-            mDayHolderList = new ArrayList<>();
-            statsForEachActivityListForFragmentAccess = new ArrayList<>();
-        }
+        populateDayHolderAndStatsForEachActivityLists(daysOfWeekList);
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -143,13 +132,7 @@ public class DailyStatsAccess {
             }
         }
 
-        if (daysOfMonthList.size()>0) {
-            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfMonthList);
-            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfMonthList);
-        } else {
-            mDayHolderList = new ArrayList<>();
-            statsForEachActivityListForFragmentAccess = new ArrayList<>();
-        }
+        populateDayHolderAndStatsForEachActivityLists(daysOfMonthList);
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
@@ -163,9 +146,37 @@ public class DailyStatsAccess {
             }
         }
 
-        if (daysOfYearList.size()>0) {
-            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysOfYearList);
-            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfYearList);
+        populateDayHolderAndStatsForEachActivityLists(daysOfYearList);
+    }
+
+    public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList) {
+        List<Integer> nonNullDayList = new ArrayList<>();
+
+        for (int i=0; i<calendarDayList.size(); i++) {
+            int dayOfYear = getDayOfYearFromCalendarDayObject(calendarDayList.get(i).getYear(), calendarDayList.get(i).getMonth(), calendarDayList.get(i).getDay());
+            daysInSelectedDurationList.add(dayOfYear);
+
+            if (cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear).size()!=0) {
+                nonNullDayList.add(dayOfYear);
+            }
+        }
+
+        Log.i("testRange", "Full integer range is " + daysInSelectedDurationList);
+        Log.i("testRange", "Non-null integer range is " + nonNullDayList);
+
+        populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
+    }
+
+    private int getDayOfYearFromCalendarDayObject(int year, int month, int day){
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.set(year, month-1, day);
+        return calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
+        if (integerListOfSelectedDays.size()>0) {
+            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
+            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(integerListOfSelectedDays);
         } else {
             mDayHolderList = new ArrayList<>();
             statsForEachActivityListForFragmentAccess = new ArrayList<>();
@@ -440,7 +451,7 @@ public class DailyStatsAccess {
     public int returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
-        int numberOfOccupiedDays = 0;
+        int numberOfDaysWithAtLeastOneActivity = 0;
 
         List<Integer> daysOfYearList = new ArrayList<>();
 
@@ -453,11 +464,11 @@ public class DailyStatsAccess {
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfYearList);
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             if (statsForEachActivityList.get(i).getActivity()!=null) {
-                numberOfOccupiedDays++;
+                numberOfDaysWithAtLeastOneActivity++;
             }
         }
 
-        return numberOfOccupiedDays;
+        return numberOfDaysWithAtLeastOneActivity;
     }
 
     public void setOldStatsForEachActivityListSizeVariable(int valueToSet) {

@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -45,6 +46,7 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
+import com.prolificinteractive.materialcalendarview.OnRangeSelectedListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -63,7 +65,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     DurationDayDecorator durationDayDecorator;
 
     int daySelectedFromCalendar;
-    int aggregateDayId;
 
     TDEEChosenActivitySpinnerValues tdeeChosenActivitySpinnerValues;
     LongToStringConverters longToStringConverters;
@@ -92,6 +93,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int WEEKLY_STATS = 1;
     int MONTHLY_STATS = 2;
     int YEARLY_STATS = 3;
+    int CUSTOM_STATS = 4;
+    List<CalendarDay> customCalendarDayList = new ArrayList<>();
 
     int ITERATING_STATS_UP = 0;
     int ITERATING_STATS_DOWN = 1;
@@ -151,7 +154,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
 
             populateListsAndTextViewsFromEntityListsInDatabase();
-            colorOccupiedDates();
+            colorDaysWithAtLeastOneActivity();
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextViewAndEditButton(currentStatDurationMode);
@@ -174,6 +177,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     populateListsAndTextViewsFromEntityListsInDatabase();
                 });
+            }
+        });
+
+        calendarView.setOnRangeSelectedListener(new OnRangeSelectedListener() {
+            @Override
+            public void onRangeSelected(@NonNull MaterialCalendarView widget, @NonNull List<CalendarDay> dates) {
+                AsyncTask.execute(()->{
+                    calendar = Calendar.getInstance(TimeZone.getDefault());
+                    customCalendarDayList = dates;
+                    populateListsAndTextViewsFromEntityListsInDatabase();
+                });
+
             }
         });
 
@@ -247,97 +262,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==YEARLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
         }
+        if (mode==CUSTOM_STATS) {
+            dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList);
+            Log.i("testRange", "CalenderDay range is " + customCalendarDayList);
+        }
 
         dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
 
-        if (hasNumberOfOccupiedDatesChanged()) {
-            colorOccupiedDates();
+        if (hasNumberOfDaysWithAtLeastOneActivityChanged()) {
+            colorDaysWithAtLeastOneActivity();
         }
     }
 
-    private void colorSelectedDurationDates() {
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        List<CalendarDay> calendarDayList = new ArrayList<>();
-        List<Integer> listToHighlight = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
-
-        for (int i=0; i<listToHighlight.size(); i++) {
-            int dayToAdd = (listToHighlight.get(i));
-            calendar.set(Calendar.DAY_OF_YEAR, dayToAdd);
-
-            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
-        }
-
-        getActivity().runOnUiThread(()->{
-            durationDayDecorator.setCalendarDayList(calendarDayList);
-            calendarView.addDecorator(durationDayDecorator);
-        });
-    }
-
-    private boolean hasNumberOfOccupiedDatesChanged() {
+    private boolean hasNumberOfDaysWithAtLeastOneActivityChanged() {
         int oldValue = dailyStatsAccess.getOldStatsForEachActivityListSizeVariable();
         int newValue = dailyStatsAccess.getNewStatsForEachActivityListSizeVariable();
         return (oldValue != newValue);
-    }
-
-    private class DurationDayDecorator implements DayViewDecorator {
-        List<CalendarDay> mCalendarDayList;
-        Drawable greenCircleDrawable;
-
-        public void setCalendarDayList(List<CalendarDay> calendarDayList) {
-            this.mCalendarDayList = calendarDayList;
-        }
-
-        public DurationDayDecorator(Context context) {
-            greenCircleDrawable = ContextCompat.getDrawable(context, R.drawable.blue_green_circle);
-        }
-
-        @Override
-        public boolean shouldDecorate(CalendarDay day) {
-            return mCalendarDayList.contains(day);
-        }
-
-        @Override
-        public void decorate(DayViewFacade view) {
-            view.setBackgroundDrawable(greenCircleDrawable);
-        }
-    }
-
-    private class CurrentDayDecorator implements DayViewDecorator {
-        List<CalendarDay> mCalendarDayList;
-
-        public CurrentDayDecorator(Context context) {
-            mCalendarDayList = new ArrayList<>();
-        }
-
-        public void setCalendarDayList(List<CalendarDay> calendarDayList) {
-            this.mCalendarDayList = calendarDayList;
-        }
-
-        @Override
-        public boolean shouldDecorate(CalendarDay day) {
-            return mCalendarDayList.contains(day);
-        }
-
-        @Override
-        public void decorate(DayViewFacade dayViewFacade) {
-            dayViewFacade.addSpan(new ForegroundColorSpan(getResources().getColor(R.color.green)));
-        }
-    }
-
-    public void colorOccupiedDates() {
-        List<Integer> occupiedDayList = dailyStatsAccess.getActivityListForCalendarColoring();
-        List<CalendarDay> calendarDayList = new ArrayList<>();
-
-        for (int i=0; i<occupiedDayList.size(); i++) {
-            calendar.set(Calendar.DAY_OF_YEAR, occupiedDayList.get(i));
-
-            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
-        }
-
-        getActivity().runOnUiThread(()->{
-            currentDayDecorator.setCalendarDayList(calendarDayList);
-            calendarView.addDecorator(currentDayDecorator);
-        });
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
@@ -371,11 +311,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
         }
+        if (mode==CUSTOM_STATS) {
+            totalStatsHeaderTextView.setText(R.string.custom_total_header);
+        }
+
+        if (mode==CUSTOM_STATS) {
+            calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+        } else {
+            calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+        }
     }
 
     public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
         if (directionOfIteration==ITERATING_STATS_UP) {
-            if (currentStatDurationMode<3) {
+            if (currentStatDurationMode<4) {
                 currentStatDurationMode++;
             } else {
                 currentStatDurationMode=0;
@@ -384,7 +333,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (currentStatDurationMode>0) {
                 currentStatDurationMode--;
             } else {
-                currentStatDurationMode=3;
+                currentStatDurationMode=4;
             }
         }
     }
@@ -398,6 +347,86 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             editTdeeStatsButton.setAlpha(0.3f);
         }
     }
+
+    private class CurrentDayDecorator implements DayViewDecorator {
+        List<CalendarDay> mCalendarDayList;
+
+        public CurrentDayDecorator(Context context) {
+            mCalendarDayList = new ArrayList<>();
+        }
+
+        public void setCalendarDayList(List<CalendarDay> calendarDayList) {
+            this.mCalendarDayList = calendarDayList;
+        }
+
+        @Override
+        public boolean shouldDecorate(CalendarDay day) {
+            return mCalendarDayList.contains(day);
+        }
+
+        @Override
+        public void decorate(DayViewFacade dayViewFacade) {
+            dayViewFacade.addSpan(new ForegroundColorSpan(getResources().getColor(R.color.green)));
+        }
+    }
+
+    private class DurationDayDecorator implements DayViewDecorator {
+        List<CalendarDay> mCalendarDayList;
+        Drawable greenCircleDrawable;
+
+        public void setCalendarDayList(List<CalendarDay> calendarDayList) {
+            this.mCalendarDayList = calendarDayList;
+        }
+
+        public DurationDayDecorator(Context context) {
+            greenCircleDrawable = ContextCompat.getDrawable(context, R.drawable.blue_green_circle);
+        }
+
+        @Override
+        public boolean shouldDecorate(CalendarDay day) {
+            return mCalendarDayList.contains(day);
+        }
+
+        @Override
+        public void decorate(DayViewFacade view) {
+            view.setBackgroundDrawable(greenCircleDrawable);
+        }
+    }
+
+    public void colorDaysWithAtLeastOneActivity() {
+        List<Integer> daysWithAtLeastOneActivityList = dailyStatsAccess.getActivityListForCalendarColoring();
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+
+        for (int i=0; i<daysWithAtLeastOneActivityList.size(); i++) {
+            calendar.set(Calendar.DAY_OF_YEAR, daysWithAtLeastOneActivityList.get(i));
+
+            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
+        }
+
+        getActivity().runOnUiThread(()->{
+            currentDayDecorator.setCalendarDayList(calendarDayList);
+            calendarView.addDecorator(currentDayDecorator);
+        });
+    }
+
+    private void colorSelectedDurationDates() {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+        List<Integer> listToHighlight = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
+
+        for (int i=0; i<listToHighlight.size(); i++) {
+            int dayToAdd = (listToHighlight.get(i));
+            calendar.set(Calendar.DAY_OF_YEAR, dayToAdd);
+
+            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
+        }
+
+        getActivity().runOnUiThread(()->{
+            durationDayDecorator.setCalendarDayList(calendarDayList);
+            calendarView.addDecorator(durationDayDecorator);
+        });
+    }
+
 
     private void setDayHolderStatsTextViews() {
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
