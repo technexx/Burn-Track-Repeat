@@ -148,7 +148,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setValueCappingTextWatcherOnEditTexts();
 
         AsyncTask.execute(()-> {
-            daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
+            daySelectedFromCalendar = aggregateDayIdFromCalendar();
 
             populateListsAndTextViewsFromEntityListsInDatabase();
             colorOccupiedDates();
@@ -165,7 +165,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 AsyncTask.execute(()->{
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
-                    daySelectedFromCalendar = calendar.get(Calendar.DAY_OF_YEAR);
+                    daySelectedFromCalendar = aggregateDayIdFromCalendar();
 
                     dailyStatsAdapter.turnOffEditMode();
                     dailyStatsAdapter.getItemCount();
@@ -212,8 +212,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private int aggregateDayIdFromCalendar() {
         int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
         int year = calendar.get(Calendar.YEAR);
-        int dayIdAdditionModifier = (year - 2022) * 365;
-        return currentDay + dayIdAdditionModifier;
+        int additionModifier = (year - 2022) * 365;
+        return currentDay + additionModifier;
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
