@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -48,6 +49,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 
@@ -58,6 +60,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
     int daySelectedFromCalendar;
     CurrentDayDecorator currentDayDecorator;
+    DurationDayDecorator durationDayDecorator;
 
     TDEEChosenActivitySpinnerValues tdeeChosenActivitySpinnerValues;
     LongToStringConverters longToStringConverters;
@@ -246,12 +249,65 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return (oldValue != newValue);
     }
 
-    private class CurrentDayDecorator implements DayViewDecorator {
+    private class DurationDayDecorator implements DayViewDecorator {
+        List<CalendarDay> mCalendarDayList;
         Drawable greenCircleDrawable;
+
+        public void setCalendarDayList(List<CalendarDay> calendarDayList) {
+            this.mCalendarDayList = calendarDayList;
+        }
+
+        public DurationDayDecorator(Context context) {
+            greenCircleDrawable = ContextCompat.getDrawable(context, R.drawable.blue_green_circle);
+        }
+
+        @Override
+        public boolean shouldDecorate(CalendarDay day) {
+            return mCalendarDayList.contains(day);
+        }
+
+        @Override
+        public void decorate(DayViewFacade view) {
+            view.setBackgroundDrawable(greenCircleDrawable);
+        }
+    }
+
+    private void colorSelectedDurationDates() {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+        List<Integer> listToHighlight = new ArrayList<>();
+
+        if (currentStatDurationMode==DAILY_STATS) {
+            listToHighlight.add(daySelectedFromCalendar);
+        }
+        if (currentStatDurationMode==WEEKLY_STATS) {
+            listToHighlight = dailyStatsAccess.getDaysInWeekDurationList();
+        }
+        if (currentStatDurationMode==MONTHLY_STATS) {
+            listToHighlight = dailyStatsAccess.getDaysInMonthDurationList();
+        }
+        if (currentStatDurationMode==YEARLY_STATS) {
+            listToHighlight = dailyStatsAccess.getDaysInMonthDurationList();
+//            listToHighlight = dailyStatsAccess.getDaysInYearDurationList();
+        }
+
+        for (int i=0; i<listToHighlight.size(); i++) {
+            int dayToAdd = (listToHighlight.get(i));
+            calendar.set(Calendar.DAY_OF_YEAR, dayToAdd);
+
+            calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
+
+            getActivity().runOnUiThread(()->{
+                durationDayDecorator.setCalendarDayList(calendarDayList);
+                calendarView.addDecorator(durationDayDecorator);
+            });
+        }
+    }
+
+    private class CurrentDayDecorator implements DayViewDecorator {
         List<CalendarDay> mCalendarDayList;
 
         public CurrentDayDecorator(Context context) {
-            greenCircleDrawable = ContextCompat.getDrawable(context, R.drawable.blue_green_circle);
             mCalendarDayList = new ArrayList<>();
         }
 
@@ -266,8 +322,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         @Override
         public void decorate(DayViewFacade dayViewFacade) {
-//            dayViewFacade.setBackgroundDrawable(greenCircleDrawable);
-            dayViewFacade.addSpan (new ForegroundColorSpan(getResources().getColor(R.color.green)));
+            dayViewFacade.addSpan(new ForegroundColorSpan(getResources().getColor(R.color.green)));
         }
     }
 
@@ -297,6 +352,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 dailyStatsAdapter.turnOffEditMode();
                 dailyStatsAdapter.getItemCount();
+                colorSelectedDurationDates();
             });
         });
     }
@@ -782,6 +838,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
 
         currentDayDecorator = new CurrentDayDecorator(getContext());
+        durationDayDecorator = new DurationDayDecorator(getContext());
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {

@@ -43,6 +43,10 @@ public class DailyStatsAccess {
     String mActivityString;
     double mMetScore;
 
+    List<Integer> daysInWeekDurationList = new ArrayList<>();
+    List<Integer> daysInMonthDurationList = new ArrayList<>();
+    List<Integer> daysInYearDurationList = new ArrayList<>();
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
@@ -112,6 +116,7 @@ public class DailyStatsAccess {
         int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
 
         for (int i=0; i<7; i++) {
+            daysInWeekDurationList.add(firstDayOfYearToUse + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfYearToUse + i).size()!=0) {
                 daysOfWeekList.add(firstDayOfYearToUse + i);
             }
@@ -133,7 +138,9 @@ public class DailyStatsAccess {
         List<Integer> daysOfMonthList = new ArrayList<>();
 
         int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
+
         for (int i=0; i<numberOfDaysInMonth; i++) {
+            daysInMonthDurationList.add(firstDayInYearToAdd + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
                 daysOfMonthList.add(firstDayInYearToAdd + i);
             }
@@ -153,6 +160,7 @@ public class DailyStatsAccess {
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
+            daysInYearDurationList.add(i+1);
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
                 daysOfYearList.add(i+1);
             }
@@ -179,6 +187,18 @@ public class DailyStatsAccess {
         }
         Log.i("testList", "list is " + listToPopulate);
         return listToPopulate;
+    }
+
+    public List<Integer> getDaysInWeekDurationList() {
+        return daysInWeekDurationList;
+    }
+
+    public List<Integer> getDaysInMonthDurationList() {
+        return daysInMonthDurationList;
+    }
+
+    public List<Integer> getDaysInYearDurationList() {
+        return daysInYearDurationList;
     }
 
     public long getTotalSetTimeFromDayHolderList() {
