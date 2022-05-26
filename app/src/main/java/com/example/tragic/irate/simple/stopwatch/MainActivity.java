@@ -519,7 +519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Resolve multiple years w/ uniqueIDs. For single year, non-capped minimum date will b0rk our uniqueIDs since they are bound from 1-365/6.
   //Todo: Date range for stats?
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.

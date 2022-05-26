@@ -769,9 +769,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calendarView.setSelectedDate(calendarDay);
 
         calendarView.state().edit()
-//                .setMinimumDate(CalendarDay.from(2016, 4, 3))
+                .setMinimumDate(CalendarDay.from(2022, 1, 1))
                 .setMaximumDate(calendarDay)
-                .setCalendarDisplayMode(CalendarMode.MONTHS)
                 .commit();
     }
 
