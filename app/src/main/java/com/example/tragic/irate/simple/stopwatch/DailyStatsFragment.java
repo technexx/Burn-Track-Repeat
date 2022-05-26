@@ -296,12 +296,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendar.set(Calendar.DAY_OF_YEAR, dayToAdd);
 
             calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
-
-            getActivity().runOnUiThread(()->{
-                durationDayDecorator.setCalendarDayList(calendarDayList);
-                calendarView.addDecorator(durationDayDecorator);
-            });
         }
+
+        getActivity().runOnUiThread(()->{
+            durationDayDecorator.setCalendarDayList(calendarDayList);
+            calendarView.addDecorator(durationDayDecorator);
+        });
     }
 
     private class CurrentDayDecorator implements DayViewDecorator {
@@ -334,12 +334,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendar.set(Calendar.DAY_OF_YEAR, occupiedDayList.get(i));
 
             calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
-
-            getActivity().runOnUiThread(()->{
-                currentDayDecorator.setCalendarDayList(calendarDayList);
-                calendarView.addDecorator(currentDayDecorator);
-            });
         }
+
+        getActivity().runOnUiThread(()->{
+            currentDayDecorator.setCalendarDayList(calendarDayList);
+            calendarView.addDecorator(currentDayDecorator);
+        });
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
