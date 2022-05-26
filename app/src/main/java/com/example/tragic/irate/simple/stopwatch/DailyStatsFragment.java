@@ -59,9 +59,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View mRoot;
     Calendar calendar;
     com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
-    int daySelectedFromCalendar;
     CurrentDayDecorator currentDayDecorator;
     DurationDayDecorator durationDayDecorator;
+
+    int daySelectedFromCalendar;
+    int aggregateDayId;
 
     TDEEChosenActivitySpinnerValues tdeeChosenActivitySpinnerValues;
     LongToStringConverters longToStringConverters;
@@ -205,6 +207,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    private int aggregateDayIdFromCalendar() {
+        int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
+        int year = calendar.get(Calendar.YEAR);
+        int dayIdAdditionModifier = (year - 2022) * 365;
+        return currentDay + dayIdAdditionModifier;
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
@@ -758,6 +767,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
         calendarView.setSelectedDate(calendarDay);
+
         calendarView.state().edit()
 //                .setMinimumDate(CalendarDay.from(2016, 4, 3))
                 .setMaximumDate(calendarDay)
