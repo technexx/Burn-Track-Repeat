@@ -2,7 +2,11 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.StateListDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -54,7 +58,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
 
 public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion {
 
@@ -224,13 +227,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    private int aggregateDayIdFromCalendar() {
-        int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
-        int year = calendar.get(Calendar.YEAR);
-        int additionModifier = (year - 2022) * 365;
-        return currentDay + additionModifier;
-    }
-
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
@@ -348,6 +344,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    private int aggregateDayIdFromCalendar() {
+        int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
+        int year = calendar.get(Calendar.YEAR);
+        int additionModifier = (year - 2022) * 365;
+        return currentDay + additionModifier;
+    }
+
+    private static Drawable generateCircleDrawable(final int color) {
+        ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+        drawable.getPaint().setColor(color);
+        return drawable;
+    }
+
     private class CurrentDayDecorator implements DayViewDecorator {
         List<CalendarDay> mCalendarDayList;
 
@@ -389,7 +398,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         @Override
         public void decorate(DayViewFacade view) {
-            view.setBackgroundDrawable(greenCircleDrawable);
+            view.addSpan((new ForegroundColorSpan(getResources().getColor(R.color.black))));
+            view.setBackgroundDrawable(generateCircleDrawable(getResources().getColor(R.color.light_grey)));
         }
     }
 
