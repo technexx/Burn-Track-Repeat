@@ -198,11 +198,8 @@ public class DailyStatsAccess {
     }
 
     public void clearDaysInSelectedDurationList() {
-        Log.i("testDuration", "list clearing!");
         daysInSelectedDurationList.clear();
     }
-    //Todo: What might be happening is new list is getting cleared before population is complete.
-    //Todo: Needs to be set as a new arrayList!
     public void setOldDaysInSelectedDurationList(List<Integer> listToAdd) {
         oldDaysInSelectedDurationList = new ArrayList<>(listToAdd);
     }
