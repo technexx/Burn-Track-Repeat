@@ -182,6 +182,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
 
                     populateListsAndTextViewsFromEntityListsInDatabase();
+                    colorSelectedDurationDates();
                 });
             }
         });
@@ -193,6 +194,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     customCalendarDayList = dates;
                     populateListsAndTextViewsFromEntityListsInDatabase();
+                    colorSelectedDurationDates();
                 });
 
             }
@@ -247,8 +249,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-        colorSelectedDurationDates();
-
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
         }
@@ -282,6 +282,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
             populateListsAndTextViewsFromEntityListsInDatabase();
+            colorSelectedDurationDates();
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationTextViewAndEditButton(currentStatDurationMode);
@@ -369,6 +370,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void colorSelectedDurationDates() {
+        Log.i("testDuration", "same list exists is " + areListsOfDayDurationsTheSame());
         Log.i("testDuration", "new list is " + dailyStatsAccess.getDaysInSelectedDurationList());
         Log.i("testDuration", "old list is " + dailyStatsAccess.getOldDaysInSelectedDurationList());
 
@@ -394,7 +396,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private boolean areListsOfDayDurationsTheSame() {
-        return dailyStatsAccess.getOldDaysInSelectedDurationList() == dailyStatsAccess.getDaysInSelectedDurationList();
+        return dailyStatsAccess.getOldDaysInSelectedDurationList().equals(dailyStatsAccess.getDaysInSelectedDurationList());
     }
 
     private void setDayHolderStatsTextViews() {
