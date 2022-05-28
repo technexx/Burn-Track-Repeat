@@ -374,11 +374,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         Log.i("testDuration", "new list is " + dailyStatsAccess.getDaysInSelectedDurationList());
         Log.i("testDuration", "old list is " + dailyStatsAccess.getOldDaysInSelectedDurationList());
 
-        if (!areListsOfDayDurationsTheSame()) {
-            Calendar calendar = Calendar.getInstance(Locale.getDefault());
-            List<CalendarDay> calendarDayList = new ArrayList<>();
-            List<Integer> listOfDaysToHighlight = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+        List<Integer> listOfDaysToHighlight = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
 
+        if (!areListsOfDayDurationsTheSame()) {
             for (int i=0; i<listOfDaysToHighlight.size(); i++) {
                 int dayToAdd = (listOfDaysToHighlight.get(i));
                 calendar.set(Calendar.DAY_OF_YEAR, dayToAdd);
@@ -389,10 +389,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 calendarDurationSelectedDecorator.setCalendarDayList(calendarDayList);
                 calendarView.addDecorator(calendarDurationSelectedDecorator);
             });
-
-            dailyStatsAccess.setOldDaysInSelectedDurationList(listOfDaysToHighlight);
-            dailyStatsAccess.clearDaysInSelectedDurationList();
         }
+
+        dailyStatsAccess.setOldDaysInSelectedDurationList(listOfDaysToHighlight);
+        dailyStatsAccess.clearDaysInSelectedDurationList();
     }
 
     private boolean areListsOfDayDurationsTheSame() {
