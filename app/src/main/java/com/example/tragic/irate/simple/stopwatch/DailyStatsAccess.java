@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
@@ -45,13 +46,16 @@ public class DailyStatsAccess {
     String mActivityString;
     double mMetScore;
 
-    List<Integer> daysInSelectedDurationList = new ArrayList<>();
+    List<Integer> daysInSelectedDurationList;
+    List<Integer> oldDaysInSelectedDurationList;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
         instantiateEntitiesAndTheirLists();
         instantiateArrayListsOfTotalStatsForSelectedDurations();
+        daysInSelectedDurationList = new ArrayList<>();
+        oldDaysInSelectedDurationList = new ArrayList<>();
     }
 
     private void instantiateDailyStatsDatabase() {
@@ -111,7 +115,7 @@ public class DailyStatsAccess {
         int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
 
         for (int i=0; i<7; i++) {
-            daysInSelectedDurationList.add(firstDayOfYearToUse + i);
+            setDaysInSelectedDurationList(firstDayOfYearToUse + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfYearToUse + i).size()!=0) {
                 daysOfWeekList.add(firstDayOfYearToUse + i);
             }
@@ -126,7 +130,7 @@ public class DailyStatsAccess {
         int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
-            daysInSelectedDurationList.add(firstDayInYearToAdd + i);
+            setDaysInSelectedDurationList(firstDayInYearToAdd + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
                 daysOfMonthList.add(firstDayInYearToAdd + i);
             }
@@ -140,7 +144,7 @@ public class DailyStatsAccess {
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
-            daysInSelectedDurationList.add(i+1);
+            setDaysInSelectedDurationList(i+1);
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
                 daysOfYearList.add(i+1);
             }
@@ -154,15 +158,12 @@ public class DailyStatsAccess {
 
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayOfYear = getDayOfYearFromCalendarDayObject(calendarDayList.get(i).getYear(), calendarDayList.get(i).getMonth(), calendarDayList.get(i).getDay());
-            daysInSelectedDurationList.add(dayOfYear);
+            setDaysInSelectedDurationList(dayOfYear);
 
             if (cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear).size()!=0) {
                 nonNullDayList.add(dayOfYear);
             }
         }
-
-        Log.i("testRange", "Full integer range is " + daysInSelectedDurationList);
-        Log.i("testRange", "Non-null integer range is " + nonNullDayList);
 
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
@@ -193,12 +194,25 @@ public class DailyStatsAccess {
                 listToPopulate.add(i+1);
             }
         }
-        Log.i("testList", "list is " + listToPopulate);
         return listToPopulate;
     }
 
     public void clearDaysInSelectedDurationList() {
+        Log.i("testDuration", "list clearing!");
         daysInSelectedDurationList.clear();
+    }
+    //Todo: What might be happening is new list is getting cleared before population is complete.
+    //Todo: Needs to be set as a new arrayList!
+    public void setOldDaysInSelectedDurationList(List<Integer> listToAdd) {
+        oldDaysInSelectedDurationList = new ArrayList<>(listToAdd);
+    }
+
+    public List<Integer> getOldDaysInSelectedDurationList() {
+        return oldDaysInSelectedDurationList;
+    }
+
+    public void setDaysInSelectedDurationList(int dayToAdd) {
+        daysInSelectedDurationList.add(dayToAdd);
     }
 
     public List<Integer> getDaysInSelectedDurationList() {
@@ -210,15 +224,6 @@ public class DailyStatsAccess {
 
         for (int i=0; i<mDayHolderList.size(); i++) {
             valueToReturn += mDayHolderList.get(i).getTotalSetTime();
-        }
-        return valueToReturn;
-    }
-
-    public long getTotalBreakTimeFromDayHolderList() {
-        long valueToReturn = 0;
-
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            valueToReturn += mDayHolderList.get(i).getTotalBreakTime();
         }
         return valueToReturn;
     }

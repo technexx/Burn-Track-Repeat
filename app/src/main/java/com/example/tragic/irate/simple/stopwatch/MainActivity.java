@@ -820,7 +820,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
-    cycleNameEdit.addTextChangedListener(cycleNameEditTextWatcher());
 
     addTDEEActivityTextView.setOnClickListener(v-> {
       View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
@@ -1742,21 +1741,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onNothingSelected(AdapterView<?> parent) {
       }
     });
-  }
-
-  private TextWatcher cycleNameEditTextWatcher() {
-    return new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
-      @Override
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-      }
-      @Override
-      public void afterTextChanged(Editable s) {
-        cycleTitle = cycleNameEdit.getText().toString();
-      }
-    };
   }
 
   private void fabLogic() {
@@ -3280,7 +3264,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         @Override
         public void run() {
           displayCycleOrDailyTotals();
-
           toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
           retrieveTotalDailySetAndBreakTimes();
@@ -3295,6 +3278,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
 
+          cycleTitle = cycleNameEdit.getText().toString();
           roundDownAllTotalTimeValuesToEnsureSyncing();
         }
       });
