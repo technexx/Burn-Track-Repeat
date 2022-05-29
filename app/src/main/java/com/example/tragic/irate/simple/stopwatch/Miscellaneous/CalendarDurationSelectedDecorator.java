@@ -38,6 +38,7 @@ public class CalendarDurationSelectedDecorator implements DayViewDecorator {
         testDrawable = AppCompatResources.getDrawable(mContext, R.drawable.circle_stopwatch);
     }
 
+    //Todo: This list is 0 after going from Weekly -> Select Day - > Back to Weekly.
     @Override
     public boolean shouldDecorate(CalendarDay day) {
         return mCalendarDayList.contains(day);
@@ -45,7 +46,6 @@ public class CalendarDurationSelectedDecorator implements DayViewDecorator {
 
     @Override
     public void decorate(DayViewFacade view) {
-        //Todo: This is where we'll set green/black conditional.
         view.addSpan((new ForegroundColorSpan(mContext.getResources().getColor(R.color.black))));
         view.setBackgroundDrawable(circleDrawable);
     }

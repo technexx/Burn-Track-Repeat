@@ -241,6 +241,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         populateListsAndTextViewsFromEntityListsInDatabase();
 
+        //When clicking outside the duration (e.g. another week in weekly), switches highlight to that duration.
         if (currentStatDurationMode == 1 || currentStatDurationMode == 2 || currentStatDurationMode == 3) {
             colorSelectedDurationDates();
         }
@@ -252,6 +253,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (listOfDaysInCurrentDuration.contains(daySelectedFromCalendar)) {
                 currentStatDurationMode = DAILY_STATS;
+                //Todo: Don't want to be calling this twice. Whole method should go into dateChangeLogic.
                 populateListsAndTextViewsFromEntityListsInDatabase();
 
                 getActivity().runOnUiThread(()-> {
@@ -332,6 +334,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendarView.setSelectionColor(ContextCompat.getColor(getActivity(), R.color.off_white));
             calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
+        //Todo: This is called even when clicking on date within week duration, so our old/new lists are the same. We'll need to (A) populate our daily duration list with its single date and (B) fix this calling twice.
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
             calendarView.setSelectionColor(ContextCompat.getColor(getActivity(), R.color.dark_grey));
@@ -407,6 +410,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         List<CalendarDay> calendarDayList = new ArrayList<>();
         List<Integer> listOfDaysToHighlight = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
 
+        //Todo: This is returning true, so our list doesn't populate (it's outside the loop), so it returns as a 0.
         if (!areListsOfDayDurationsTheSame()) {
             for (int i=0; i<listOfDaysToHighlight.size(); i++) {
                 int dayToAdd = (listOfDaysToHighlight.get(i));
