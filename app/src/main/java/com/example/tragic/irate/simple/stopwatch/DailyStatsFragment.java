@@ -252,7 +252,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (listOfDaysInCurrentDuration.contains(daySelectedFromCalendar)) {
                 currentStatDurationMode = DAILY_STATS;
-                setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
+                populateListsAndTextViewsFromEntityListsInDatabase();
 
                 getActivity().runOnUiThread(()-> {
                     setStatDurationViews(currentStatDurationMode);
