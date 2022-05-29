@@ -38,7 +38,6 @@ public class CalendarDurationSelectedDecorator implements DayViewDecorator {
         testDrawable = AppCompatResources.getDrawable(mContext, R.drawable.circle_stopwatch);
     }
 
-    //Todo: This list is 0 after going from Weekly -> Select Day - > Back to Weekly.
     @Override
     public boolean shouldDecorate(CalendarDay day) {
         return mCalendarDayList.contains(day);
