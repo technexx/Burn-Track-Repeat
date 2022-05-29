@@ -40,7 +40,6 @@ public class CalendarDurationSelectedDecorator implements DayViewDecorator {
 
     @Override
     public boolean shouldDecorate(CalendarDay day) {
-        Log.i("testColor", "Calling decoration method!");
         return mCalendarDayList.contains(day);
     }
 

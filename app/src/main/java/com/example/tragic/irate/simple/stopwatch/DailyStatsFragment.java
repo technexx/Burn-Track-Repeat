@@ -177,19 +177,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
 
-                    daySelectedFromCalendar = aggregateDayIdFromCalendar();
-                    daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-
-                    dailyStatsAdapter.turnOffEditMode();
-                    dailyStatsAdapter.getItemCount();
-
-                    dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
-
-                    populateListsAndTextViewsFromEntityListsInDatabase();
-
-                    if (currentStatDurationMode == 1 || currentStatDurationMode == 2 || currentStatDurationMode == 3) {
-                        colorSelectedDurationDates();
-                    }
+                    setDaySelectedObjectsFromSelectedCalendarDate();
+                    calendarDateChangeLogic();
+                    returnToDailyDurationIfSelectingDateWithinLongerDurationList();
                 });
             }
         });
@@ -201,7 +191,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     customCalendarDayList = dates;
                     populateListsAndTextViewsFromEntityListsInDatabase();
-//                    colorSelectedDurationDates();
                 });
 
             }
@@ -237,6 +226,39 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    private void setDaySelectedObjectsFromSelectedCalendarDate() {
+        daySelectedFromCalendar = aggregateDayIdFromCalendar();
+        daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+    private void calendarDateChangeLogic() {
+        dailyStatsAdapter.turnOffEditMode();
+        dailyStatsAdapter.getItemCount();
+
+        dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
+
+        populateListsAndTextViewsFromEntityListsInDatabase();
+
+        if (currentStatDurationMode == 1 || currentStatDurationMode == 2 || currentStatDurationMode == 3) {
+            colorSelectedDurationDates();
+        }
+    }
+
+    private void returnToDailyDurationIfSelectingDateWithinLongerDurationList() {
+        if (currentStatDurationMode == 1 || currentStatDurationMode == 2 || currentStatDurationMode == 3) {
+            List<Integer> listOfDaysInCurrentDuration = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
+
+            if (listOfDaysInCurrentDuration.contains(daySelectedFromCalendar)) {
+                currentStatDurationMode = DAILY_STATS;
+                setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
+
+                getActivity().runOnUiThread(()-> {
+                    setStatDurationViews(currentStatDurationMode);
+                });
+            }
+        }
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
