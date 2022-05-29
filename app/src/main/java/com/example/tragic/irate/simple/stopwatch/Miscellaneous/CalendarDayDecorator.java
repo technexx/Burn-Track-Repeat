@@ -13,20 +13,20 @@ import java.util.List;
 
 public class CalendarDayDecorator implements DayViewDecorator {
     Context mContext;
-    List<CalendarDay> mCalendarDayList;
+    List<CalendarDay> mCalendarDayListWithAtLeastOneActivity;
 
     public CalendarDayDecorator(Context context) {
         this.mContext = context;
-        mCalendarDayList = new ArrayList<>();
+        mCalendarDayListWithAtLeastOneActivity = new ArrayList<>();
     }
 
     public void setCalendarDayList(List<CalendarDay> calendarDayList) {
-        this.mCalendarDayList = calendarDayList;
+        this.mCalendarDayListWithAtLeastOneActivity = calendarDayList;
     }
 
     @Override
     public boolean shouldDecorate(CalendarDay day) {
-        return mCalendarDayList.contains(day);
+        return mCalendarDayListWithAtLeastOneActivity.contains(day);
     }
 
     @Override
