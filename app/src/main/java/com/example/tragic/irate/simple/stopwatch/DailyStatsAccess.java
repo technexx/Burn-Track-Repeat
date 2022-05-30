@@ -117,10 +117,11 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    //Todo: firstDay will b0rk for multiple years since our first day is always 0. Need to begin w/ aggregate ID for week/month/year. Daily uses aggregateID already.
+    //Todo: firstDay will b0rk for multiple years since our first day is always 0. Need to begin w/ aggregate ID for week/month/year. Daily uses aggregateID already. But we'll also need to set the calendar values received to current year (because current month/year max can vary for leap year).
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
         int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
+        firstDayOfYearToUse += valueToAddToStartingDurationDayForFutureYears();
 
         for (int i=0; i<7; i++) {
             setDaysInSelectedDurationList(firstDayOfYearToUse + i);
@@ -136,6 +137,7 @@ public class DailyStatsAccess {
         List<Integer> daysOfMonthList = new ArrayList<>();
 
         int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
+        firstDayInYearToAdd += valueToAddToStartingDurationDayForFutureYears();
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
             setDaysInSelectedDurationList(firstDayInYearToAdd + i);
@@ -149,11 +151,12 @@ public class DailyStatsAccess {
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, int aggregateDayID) {
         List<Integer> daysOfYearList = new ArrayList<>();
-        int firstDayInYearToAdd =
+        int firstDayInYearToAdd = 1;
+        firstDayInYearToAdd += valueToAddToStartingDurationDayForFutureYears()
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
-            setDaysInSelectedDurationList(i+1);
+            setDaysInSelectedDurationList(firstDayInYearToAdd + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
                 daysOfYearList.add(i+1);
             }
@@ -217,6 +220,22 @@ public class DailyStatsAccess {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(year, month-1, day);
         return calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private int valueToAddToStartingDurationDayForFutureYears() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+
+        int year = calendar.get(Calendar.YEAR);
+        int numberOfYearsAfter2022 = year - 2022;
+        int totalValueToReturn = 0;
+
+        for (int i=0; i<numberOfYearsAfter2022; i++) {
+            calendar.set(2022+(i+1), 1, 1);
+            int numberOfDaysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+            totalValueToReturn += numberOfDaysInYear;
+        }
+
+        return totalValueToReturn;
     }
 
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
