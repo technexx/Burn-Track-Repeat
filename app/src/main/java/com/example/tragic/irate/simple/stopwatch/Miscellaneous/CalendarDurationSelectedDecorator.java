@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.text.Spannable;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.animation.Animation;
@@ -24,7 +26,6 @@ public class CalendarDurationSelectedDecorator implements DayViewDecorator {
     List<CalendarDay> mCalendarDayList;
 
     Drawable circleDrawable;
-    Drawable testDrawable;
     Animation decorationAnimation;
 
     public void setCalendarDayList(List<CalendarDay> calendarDayList) {
@@ -35,7 +36,6 @@ public class CalendarDurationSelectedDecorator implements DayViewDecorator {
         this.mContext = context;
         instantiateAnimations();
         circleDrawable = generateCircleDrawable(mContext.getResources().getColor(R.color.light_grey));
-        testDrawable = AppCompatResources.getDrawable(mContext, R.drawable.circle_stopwatch);
     }
 
     @Override
@@ -46,7 +46,8 @@ public class CalendarDurationSelectedDecorator implements DayViewDecorator {
     @Override
     public void decorate(DayViewFacade view) {
         view.addSpan((new ForegroundColorSpan(mContext.getResources().getColor(R.color.black))));
-        view.setBackgroundDrawable(circleDrawable);
+        view.addSpan(new BackgroundColorSpan(mContext.getResources().getColor(R.color.blue)));
+//        view.setBackgroundDrawable(circleDrawable);
     }
 
     private static Drawable generateCircleDrawable(final int color) {

@@ -48,6 +48,8 @@ public class DailyStatsAccess {
 
     List<Integer> daysInSelectedDurationList;
     List<Integer> oldDaysInSelectedDurationList;
+    int firstDayInRangeForSelectedDuration;
+    int lastDayInRangeForSelectedDuration;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -169,7 +171,7 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
 
-    private int getDayOfYearFromCalendarDayObject(int year, int month, int day){
+    public int getDayOfYearFromCalendarDayObject(int year, int month, int day){
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(year, month-1, day);
         return calendar.get(Calendar.DAY_OF_YEAR);
@@ -196,6 +198,21 @@ public class DailyStatsAccess {
             }
         }
         return listToPopulate;
+    }
+
+    public CalendarDay getFirstCalendarDayObjectInRangeForSelectedDuration() {
+        return firstDayInRangeForSelectedDuration = getDaysInSelectedDurationList().get(0);
+    }
+
+    public CalendarDay getCalendarDayObjectFromIntegerDate(int date) {
+
+    }
+
+    public CalendarDay getLastCalendarDayObjectInRangeForSelectedDuration() {
+        Calendar calendar = Calendar.getInstance();
+
+        CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
     }
 
     public void clearDaysInSelectedDurationList() {

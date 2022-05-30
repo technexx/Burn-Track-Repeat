@@ -177,9 +177,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
 
-                    setDaySelectedObjectsFromSelectedCalendarDate();
+                    //Todo: Can get the CalendarDate object above, w/ the +/- logic used in StatsAccess.
+                    daySelectedFromCalendar = aggregateDayIdFromCalendar();
+                    daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
                     calendarDateChangeLogic();
-                    returnToDailyDurationIfSelectingDateWithinLongerDurationList();
+                    populateListsAndTextViewsFromEntityListsInDatabase();
                 });
             }
         });
@@ -228,25 +231,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    private void setDaySelectedObjectsFromSelectedCalendarDate() {
-        daySelectedFromCalendar = aggregateDayIdFromCalendar();
-        daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-    }
-
     private void calendarDateChangeLogic() {
         dailyStatsAdapter.turnOffEditMode();
         dailyStatsAdapter.getItemCount();
 
         dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
-
-        if (areWeSelectingADateWhileInALongerDurationMode()) {
-            returnToDailyDurationIfSelectingDateWithinLongerDurationList();
-        } else {
-            populateListsAndTextViewsFromEntityListsInDatabase();
-            if (currentStatDurationMode == 1 || currentStatDurationMode == 2 || currentStatDurationMode == 3) {
-                colorSelectedDurationDates();
-            }
-        }
+        populateListsAndTextViewsFromEntityListsInDatabase();
     }
 
     private void returnToDailyDurationIfSelectingDateWithinLongerDurationList() {
@@ -254,9 +244,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             currentStatDurationMode = DAILY_STATS;
             populateListsAndTextViewsFromEntityListsInDatabase();
-            //Todo: Seems a natural delay of the API. We solved it when switching duration modes by setting the date background color to same as calendar.
-            //Todo: Wrong highlighting bug may be due to list not clearing BEFORE we call it to decorate.
-            colorSelectedDurationDates();
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationViews(currentStatDurationMode);
@@ -267,7 +254,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private boolean areWeSelectingADateWhileInALongerDurationMode() {
         if (currentStatDurationMode == 1 || currentStatDurationMode == 2 || currentStatDurationMode == 3) {
             List<Integer> listOfDaysInCurrentDuration = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
-
             return listOfDaysInCurrentDuration.contains(daySelectedFromCalendar);
         } else {
             return false;
@@ -326,7 +312,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
             populateListsAndTextViewsFromEntityListsInDatabase();
-            colorSelectedDurationDates();
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationViews(currentStatDurationMode);
@@ -340,6 +325,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setStatDurationViews(int mode) {
         toggleEditStatsButton(false);
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+
+        CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
@@ -407,7 +394,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         for (int i=0; i<daysWithAtLeastOneActivityList.size(); i++) {
             calendar.set(Calendar.DAY_OF_YEAR, daysWithAtLeastOneActivityList.get(i));
-
             calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
         }
 
@@ -415,30 +401,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendarDayDecorator.setCalendarDayList(calendarDayList);
             calendarView.addDecorator(calendarDayDecorator);
         });
-    }
-
-    private void colorSelectedDurationDates() {
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        List<CalendarDay> calendarDayList = new ArrayList<>();
-        List<Integer> listOfDaysToHighlight = new ArrayList<>(dailyStatsAccess.getDaysInSelectedDurationList());
-
-        if (!areListsOfDayDurationsTheSame()) {
-            for (int i=0; i<listOfDaysToHighlight.size(); i++) {
-                int dayToAdd = (listOfDaysToHighlight.get(i));
-                calendar.set(Calendar.DAY_OF_YEAR, dayToAdd);
-                calendarDayList.add(CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)));
-            }
-        }
-
-        getActivity().runOnUiThread(()->{
-            calendarDurationSelectedDecorator.setCalendarDayList(calendarDayList);
-            calendarView.addDecorator(calendarDurationSelectedDecorator);
-
-            dailyStatsAccess.setOldDaysInSelectedDurationList(listOfDaysToHighlight);
-            dailyStatsAccess.clearDaysInSelectedDurationList();
-        });
-
-
     }
 
     private boolean areListsOfDayDurationsTheSame() {
