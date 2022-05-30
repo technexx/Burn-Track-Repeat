@@ -177,12 +177,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
 
-                    //Todo: Can get the CalendarDate object above, w/ the +/- logic used in StatsAccess.
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
                     daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
 
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
+
+                    Log.i("testDuration", "day selected var is " + daySelectedFromCalendar);
+                    Log.i("testDuration", "day selected as calendar object is " + daySelectedAsACalendarDayObject);
                 });
             }
         });
@@ -191,6 +193,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void onRangeSelected(@NonNull MaterialCalendarView widget, @NonNull List<CalendarDay> dates) {
                 AsyncTask.execute(()->{
+                    //Todo: We should switch to multiple selection mode on duration change, and use this listener to pass in our list, same as custom.
+                    //Todo: We don't need an aggregate ID. We only need the dayOfYear as it is set in our calendar object.
+                    Log.i("testDuration", "day selected var is " + daySelectedFromCalendar);
+
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     customCalendarDayList = dates;
                     populateListsAndTextViewsFromEntityListsInDatabase();

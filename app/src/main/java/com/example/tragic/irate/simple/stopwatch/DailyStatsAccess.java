@@ -48,8 +48,6 @@ public class DailyStatsAccess {
 
     List<Integer> daysInSelectedDurationList;
     List<Integer> oldDaysInSelectedDurationList;
-    int firstDayInRangeForSelectedDuration;
-    int lastDayInRangeForSelectedDuration;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -160,7 +158,7 @@ public class DailyStatsAccess {
         List<Integer> nonNullDayList = new ArrayList<>();
 
         for (int i=0; i<calendarDayList.size(); i++) {
-            int dayOfYear = getDayOfYearFromCalendarDayObject(calendarDayList.get(i).getYear(), calendarDayList.get(i).getMonth(), calendarDayList.get(i).getDay());
+            int dayOfYear = getDayOfYearFromCalendarDayList(calendarDayList.get(i).getYear(), calendarDayList.get(i).getMonth(), calendarDayList.get(i).getDay());
             setDaysInSelectedDurationList(dayOfYear);
 
             if (cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear).size()!=0) {
@@ -171,7 +169,17 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
 
-    public int getDayOfYearFromCalendarDayObject(int year, int month, int day){
+    private void populateCalendarDayListWithSelectedDurationDays(int lengthOfDuration) {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+
+        for (int i=0; i<lengthOfDuration; i++) {
+            CalendarDay objectToAdd = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+            calendarDayList.add(objectToAdd);
+        }
+    }
+
+    public int getDayOfYearFromCalendarDayList(int year, int month, int day){
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(year, month-1, day);
         return calendar.get(Calendar.DAY_OF_YEAR);
@@ -198,21 +206,6 @@ public class DailyStatsAccess {
             }
         }
         return listToPopulate;
-    }
-
-    public CalendarDay getFirstCalendarDayObjectInRangeForSelectedDuration() {
-        return firstDayInRangeForSelectedDuration = getDaysInSelectedDurationList().get(0);
-    }
-
-    public CalendarDay getCalendarDayObjectFromIntegerDate(int date) {
-
-    }
-
-    public CalendarDay getLastCalendarDayObjectInRangeForSelectedDuration() {
-        Calendar calendar = Calendar.getInstance();
-
-        CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-
     }
 
     public void clearDaysInSelectedDurationList() {
