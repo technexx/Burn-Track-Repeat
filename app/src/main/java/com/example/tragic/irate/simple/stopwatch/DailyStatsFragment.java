@@ -293,7 +293,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), aggregateDayIdFromCalendar());
         }
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList);

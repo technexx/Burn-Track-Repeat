@@ -11,6 +11,8 @@ import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHold
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
+import org.threeten.bp.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -48,6 +50,10 @@ public class DailyStatsAccess {
 
     List<Integer> daysInSelectedDurationList;
     List<Integer> oldDaysInSelectedDurationList;
+
+    int WEEKLY_DURATION = 0;
+    int MONTHLY_DURATION = 1;
+    int YEARLY_DURATION = 2;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -111,6 +117,7 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
+    //Todo: firstDay will b0rk for multiple years since our first day is always 0. Need to begin w/ aggregate ID for week/month/year. Daily uses aggregateID already.
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
         int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
@@ -140,8 +147,9 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(daysOfMonthList);
     }
 
-    public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
+    public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, int aggregateDayID) {
         List<Integer> daysOfYearList = new ArrayList<>();
+        int firstDayInYearToAdd =
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
@@ -173,9 +181,35 @@ public class DailyStatsAccess {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         List<CalendarDay> calendarDayList = new ArrayList<>();
 
+        calendar.set(selectedCalendarDay.getYear(), selectedCalendarDay.getMonth()-1, selectedCalendarDay.getDay());
+
+        LocalDate localDate = selectedCalendarDay.getDate();
+        int firstDayInYearToAdd = localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
+
         for (int i=0; i<lengthOfDuration; i++) {
             CalendarDay objectToAdd = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
             calendarDayList.add(objectToAdd);
+        }
+    }
+
+
+
+    private int getFirstDayOfYearToAddForSelectedDuration(CalendarDay selectedCalendarDay, int duration) {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+
+        calendar.set(selectedCalendarDay.getYear(), selectedCalendarDay.getMonth()-1, selectedCalendarDay.getDay());
+
+        LocalDate localDate = selectedCalendarDay.getDate();
+
+        if (duration==WEEKLY_DURATION) {
+            return localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
+        }
+        if (duration==MONTHLY_DURATION) {
+            return localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
+        }
+        if (duration==YEARLY_DURATION) {
+
         }
     }
 
