@@ -173,8 +173,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                //Todo: We really only need to take the CalendarDay object above and +/- around it for duration.
-                        //Todo: We can get its DayOfYear, and then +/- a millis value of 24 hours.
                 AsyncTask.execute(()->{
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());

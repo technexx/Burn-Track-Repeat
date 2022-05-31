@@ -180,8 +180,10 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
 
-    //Todo: JUST DO DAILY AND CUSTOM! Why do we need weekly w/ Custom option?
+    //Todo: JUST DO DAILY AND CUSTOM! Why do we need weekly w/ Custom option? It's more confusing, if anything.
     private void populateCalendarDayListWithSelectedDurationDays(Calendar calendar, int duration) {
+        CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
         int lengthOfDuration = 0;
 
         if (duration==WEEKLY_DURATION) {
@@ -194,19 +196,20 @@ public class DailyStatsAccess {
             lengthOfDuration = calendar.getMaximum(Calendar.DAY_OF_YEAR);
         }
 
-        //Todo: Issue is when a month changes. Can we get a calendarDay or localDate object from just the day of year?
-        CalendarDay startDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+        int firstDayOfDuration = getFirstDayOfYearToAddForSelectedDuration(calendarDay, lengthOfDuration);
+        calendar.set(Calendar.DAY_OF_YEAR, firstDayOfDuration);
+        CalendarDay firstCalendarDay = getCalendarDayObjectFromCalendar(calendar);
 
-        //Todo: Get month/day from dayOfYear, then input that into Calendar.From(). We only need the first and last dates of duration, nothing between.
-        LocalDate localDate = startDay.getDate();
-        int dayOfYearToStart = localDate.getDayOfYear();
-        int dayOfYearToEnd = dayOfYearToStart += lengthOfDuration;
+        int lastDayOfDuration = firstDayOfDuration += (lengthOfDuration-1);
+        calendar.set(Calendar.DAY_OF_YEAR, lastDayOfDuration);
+        CalendarDay lastCalendarDay = getCalendarDayObjectFromCalendar(calendar);
+
+
     }
 
     private int getFirstDayOfYearToAddForSelectedDuration(CalendarDay selectedCalendarDay, int duration) {
         int valueToReturn = 1;
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        List<CalendarDay> calendarDayList = new ArrayList<>();
 
         calendar.set(selectedCalendarDay.getYear(), selectedCalendarDay.getMonth()-1, selectedCalendarDay.getDay());
         LocalDate localDate = selectedCalendarDay.getDate();
@@ -222,6 +225,10 @@ public class DailyStatsAccess {
         }
 
         return valueToReturn;
+    }
+
+    CalendarDay getCalendarDayObjectFromCalendar(Calendar calendar) {
+        return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     public int getDayOfYearFromCalendarDayList(int year, int month, int day){
