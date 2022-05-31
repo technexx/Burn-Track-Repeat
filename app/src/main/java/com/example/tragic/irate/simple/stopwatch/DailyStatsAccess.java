@@ -152,7 +152,7 @@ public class DailyStatsAccess {
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, int aggregateDayID) {
         List<Integer> daysOfYearList = new ArrayList<>();
         int firstDayInYearToAdd = 1;
-        firstDayInYearToAdd += valueToAddToStartingDurationDayForFutureYears()
+        firstDayInYearToAdd += valueToAddToStartingDurationDayForFutureYears();
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
@@ -180,40 +180,48 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
 
-    private void populateCalendarDayListWithSelectedDurationDays(int lengthOfDuration) {
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        List<CalendarDay> calendarDayList = new ArrayList<>();
+    //Todo: JUST DO DAILY AND CUSTOM! Why do we need weekly w/ Custom option?
+    private void populateCalendarDayListWithSelectedDurationDays(Calendar calendar, int duration) {
+        int lengthOfDuration = 0;
 
-        calendar.set(selectedCalendarDay.getYear(), selectedCalendarDay.getMonth()-1, selectedCalendarDay.getDay());
-
-        LocalDate localDate = selectedCalendarDay.getDate();
-        int firstDayInYearToAdd = localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
-
-        for (int i=0; i<lengthOfDuration; i++) {
-            CalendarDay objectToAdd = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-            calendarDayList.add(objectToAdd);
+        if (duration==WEEKLY_DURATION) {
+            lengthOfDuration = 7;
         }
+        if (duration==MONTHLY_DURATION) {
+            lengthOfDuration = calendar.getMaximum(Calendar.DAY_OF_MONTH);
+        }
+        if (duration==YEARLY_DURATION) {
+            lengthOfDuration = calendar.getMaximum(Calendar.DAY_OF_YEAR);
+        }
+
+        //Todo: Issue is when a month changes. Can we get a calendarDay or localDate object from just the day of year?
+        CalendarDay startDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+
+        //Todo: Get month/day from dayOfYear, then input that into Calendar.From(). We only need the first and last dates of duration, nothing between.
+        LocalDate localDate = startDay.getDate();
+        int dayOfYearToStart = localDate.getDayOfYear();
+        int dayOfYearToEnd = dayOfYearToStart += lengthOfDuration;
     }
 
-
-
     private int getFirstDayOfYearToAddForSelectedDuration(CalendarDay selectedCalendarDay, int duration) {
+        int valueToReturn = 1;
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         List<CalendarDay> calendarDayList = new ArrayList<>();
 
         calendar.set(selectedCalendarDay.getYear(), selectedCalendarDay.getMonth()-1, selectedCalendarDay.getDay());
-
         LocalDate localDate = selectedCalendarDay.getDate();
 
         if (duration==WEEKLY_DURATION) {
-            return localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
+            valueToReturn = localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
         }
         if (duration==MONTHLY_DURATION) {
-            return localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
+            valueToReturn = localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
         }
         if (duration==YEARLY_DURATION) {
-
+            valueToReturn = 1;
         }
+
+        return valueToReturn;
     }
 
     public int getDayOfYearFromCalendarDayList(int year, int month, int day){

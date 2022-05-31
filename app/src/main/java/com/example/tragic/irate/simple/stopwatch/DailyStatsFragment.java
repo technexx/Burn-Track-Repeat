@@ -173,6 +173,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                //Todo: We really only need to take the CalendarDay object above and +/- around it for duration.
+                        //Todo: We can get its DayOfYear, and then +/- a millis value of 24 hours.
                 AsyncTask.execute(()->{
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
@@ -193,15 +195,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void onRangeSelected(@NonNull MaterialCalendarView widget, @NonNull List<CalendarDay> dates) {
                 AsyncTask.execute(()->{
-                    //Todo: We should switch to multiple selection mode on duration change, and use this listener to pass in our list, same as custom.
-                    //Todo: We don't need an aggregate ID. We only need the dayOfYear as it is set in our calendar object.
                     Log.i("testDuration", "day selected var is " + daySelectedFromCalendar);
 
                     calendar = Calendar.getInstance(TimeZone.getDefault());
                     customCalendarDayList = dates;
                     populateListsAndTextViewsFromEntityListsInDatabase();
                 });
-
             }
         });
 
