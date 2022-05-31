@@ -183,22 +183,22 @@ public class DailyStatsAccess {
     }
 
     //Todo: JUST DO DAILY AND CUSTOM! Why do we need weekly w/ Custom option? It's more confusing, if anything.
-    public void populateCalendarDayListWithSelectedDurationDays(Calendar calendar, int duration) {
+    public void populateCalendarDayListWithSelectedDurationDays(Calendar calendar, int typeOfDuration) {
         CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
 
         int lengthOfDuration = 0;
 
-        if (duration==WEEKLY_DURATION) {
+        if (typeOfDuration==WEEKLY_DURATION) {
             lengthOfDuration = 7;
         }
-        if (duration==MONTHLY_DURATION) {
+        if (typeOfDuration==MONTHLY_DURATION) {
             lengthOfDuration = calendar.getMaximum(Calendar.DAY_OF_MONTH);
         }
-        if (duration==YEARLY_DURATION) {
+        if (typeOfDuration==YEARLY_DURATION) {
             lengthOfDuration = calendar.getMaximum(Calendar.DAY_OF_YEAR);
         }
 
-        int firstDayOfDuration = getFirstDayOfYearToAddForSelectedDuration(calendarDay, lengthOfDuration);
+        int firstDayOfDuration = getFirstDayOfYearToAddForSelectedDuration(calendarDay, typeOfDuration);
         calendar.set(Calendar.DAY_OF_YEAR, firstDayOfDuration);
         firstCalendarDayInDuration = getCalendarDayObjectFromCalendar(calendar);
 
@@ -207,20 +207,20 @@ public class DailyStatsAccess {
         lastCalendarDayInDuration = getCalendarDayObjectFromCalendar(calendar);
     }
 
-    private int getFirstDayOfYearToAddForSelectedDuration(CalendarDay selectedCalendarDay, int duration) {
+    private int getFirstDayOfYearToAddForSelectedDuration(CalendarDay selectedCalendarDay, int typeOfDuration) {
         int valueToReturn = 1;
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
 
         calendar.set(selectedCalendarDay.getYear(), selectedCalendarDay.getMonth()-1, selectedCalendarDay.getDay());
         LocalDate localDate = selectedCalendarDay.getDate();
 
-        if (duration==WEEKLY_DURATION) {
+        if (typeOfDuration==WEEKLY_DURATION) {
+            valueToReturn = localDate.getDayOfYear() - (localDate.getDayOfWeek().getValue());
+        }
+        if (typeOfDuration==MONTHLY_DURATION) {
             valueToReturn = localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
         }
-        if (duration==MONTHLY_DURATION) {
-            valueToReturn = localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
-        }
-        if (duration==YEARLY_DURATION) {
+        if (typeOfDuration==YEARLY_DURATION) {
             valueToReturn = 1;
         }
 

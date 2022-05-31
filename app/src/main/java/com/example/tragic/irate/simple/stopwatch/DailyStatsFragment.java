@@ -308,31 +308,29 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalStatsHeaderTextView.setText(R.string.day_total_header);
             toggleEditStatsButton(true);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-            calendarView.setSelectionColor(ContextCompat.getColor(getActivity(), R.color.off_white));
             calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
+
+            calendarView.setEnabled(false);
+
         }
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
-            calendarView.setSelectionColor(ContextCompat.getColor(getActivity(), R.color.dark_grey));
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
             dailyStatsAccess.populateCalendarDayListWithSelectedDurationDays(calendar, WEEKLY_STATS);
         }
         if (mode==MONTHLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.monthly_total_header);
-            calendarView.setSelectionColor(ContextCompat.getColor(getActivity(), R.color.dark_grey));
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
             dailyStatsAccess.populateCalendarDayListWithSelectedDurationDays(calendar, MONTHLY_STATS);
         }
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
-            calendarView.setSelectionColor(ContextCompat.getColor(getActivity(), R.color.dark_grey));
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
             dailyStatsAccess.populateCalendarDayListWithSelectedDurationDays(calendar, YEARLY_STATS);
         }
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
-            calendarView.setSelectionColor(ContextCompat.getColor(getActivity(), R.color.off_white));
 
             calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
