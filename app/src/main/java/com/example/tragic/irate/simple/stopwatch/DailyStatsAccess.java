@@ -51,12 +51,6 @@ public class DailyStatsAccess {
     List<Integer> daysInSelectedDurationList;
     List<Integer> oldDaysInSelectedDurationList;
 
-    int WEEKLY_DURATION = 1;
-    int MONTHLY_DURATION = 2;
-    int YEARLY_DURATION = 3;
-    CalendarDay firstCalendarDayInDuration;
-    CalendarDay lastCalendarDayInDuration;
-
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
@@ -119,7 +113,6 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    //Todo: firstDay will b0rk for multiple years since our first day is always 0. Need to begin w/ aggregate ID for week/month/year. Daily uses aggregateID already. But we'll also need to set the calendar values received to current year (because current month/year max can vary for leap year).
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
         int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
@@ -180,63 +173,6 @@ public class DailyStatsAccess {
         }
 
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
-    }
-
-    //Todo: JUST DO DAILY AND CUSTOM! Why do we need weekly w/ Custom option? It's more confusing, if anything.
-    public void populateCalendarDayListWithSelectedDurationDays(Calendar calendar, int typeOfDuration) {
-        CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-
-        int lengthOfDuration = 0;
-
-        if (typeOfDuration==WEEKLY_DURATION) {
-            lengthOfDuration = 7;
-        }
-        if (typeOfDuration==MONTHLY_DURATION) {
-            lengthOfDuration = calendar.getMaximum(Calendar.DAY_OF_MONTH);
-        }
-        if (typeOfDuration==YEARLY_DURATION) {
-            lengthOfDuration = calendar.getMaximum(Calendar.DAY_OF_YEAR);
-        }
-
-        int firstDayOfDuration = getFirstDayOfYearToAddForSelectedDuration(calendarDay, typeOfDuration);
-        calendar.set(Calendar.DAY_OF_YEAR, firstDayOfDuration);
-        firstCalendarDayInDuration = getCalendarDayObjectFromCalendar(calendar);
-
-        int lastDayOfDuration = firstDayOfDuration += (lengthOfDuration-1);
-        calendar.set(Calendar.DAY_OF_YEAR, lastDayOfDuration);
-        lastCalendarDayInDuration = getCalendarDayObjectFromCalendar(calendar);
-    }
-
-    private int getFirstDayOfYearToAddForSelectedDuration(CalendarDay selectedCalendarDay, int typeOfDuration) {
-        int valueToReturn = 1;
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-
-        calendar.set(selectedCalendarDay.getYear(), selectedCalendarDay.getMonth()-1, selectedCalendarDay.getDay());
-        LocalDate localDate = selectedCalendarDay.getDate();
-
-        if (typeOfDuration==WEEKLY_DURATION) {
-            valueToReturn = localDate.getDayOfYear() - (localDate.getDayOfWeek().getValue());
-        }
-        if (typeOfDuration==MONTHLY_DURATION) {
-            valueToReturn = localDate.getDayOfYear() - (localDate.getDayOfMonth()-1);
-        }
-        if (typeOfDuration==YEARLY_DURATION) {
-            valueToReturn = 1;
-        }
-
-        return valueToReturn;
-    }
-
-    public CalendarDay getFirstCalendarDayInDuration() {
-        return firstCalendarDayInDuration;
-    }
-
-    public CalendarDay getLastCalendarDayInDuration() {
-        return lastCalendarDayInDuration;
-    }
-
-    CalendarDay getCalendarDayObjectFromCalendar(Calendar calendar) {
-        return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     public int getDayOfYearFromCalendarDayList(int year, int month, int day){
