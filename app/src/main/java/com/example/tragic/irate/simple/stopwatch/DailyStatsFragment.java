@@ -264,7 +264,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), aggregateDayIdFromCalendar());
+            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
         }
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList);
@@ -284,8 +284,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
-        dailyStatsAccess.clearDaysInSelectedDurationList();
-
         AsyncTask.execute(()-> {
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -697,18 +695,28 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     //Todo: Should we make layoutParams global so they don't get reassigned every call?
     private void toggleDurationTextViewLayouts(boolean isTextViewVisible) {
-        ConstraintLayout.LayoutParams statsHeaderLayout = (ConstraintLayout.LayoutParams) totalStatsDurationLayout.getLayoutParams();
         ConstraintLayout.LayoutParams statsDurationTextView = (ConstraintLayout.LayoutParams) totalStatsHeaderTextView.getLayoutParams();
         ConstraintLayout.LayoutParams leftArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonLeft.getLayoutParams();
         ConstraintLayout.LayoutParams rightArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonRight.getLayoutParams();
 
-
         if (isTextViewVisible) {
             statsDurationTextView.topToTop = R.id.stats_total_header_layout;
             statsDurationTextView.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+//            leftArrowLayout.topToTop = R.id.stats_total_header_layout;
+//            leftArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+//
+//            rightArrowLayout.topToTop = R.id.stats_total_header_layout;
+//            rightArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
         } else {
             statsDurationTextView.topToTop = R.id.stat_duration_switcher_button_left;
             statsDurationTextView.bottomToBottom = R.id.stat_duration_switcher_button_left;
+
+//            rightArrowLayout.topToTop = R.id.edit_tdee_stats_button;
+//            rightArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
+//
+//            leftArrowLayout.topToTop = R.id.edit_tdee_stats_button;
+//            leftArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
         }
     }
 

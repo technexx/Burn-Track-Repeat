@@ -38,6 +38,9 @@ public class DailyStatsAccess {
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
 
+    String mFirstDayInDurationDateString;
+    String mLastDayInDurationDateString;
+
     long mOldDayHolderId;
     boolean activityExistsInDatabaseForSelectedDay;
 
@@ -48,16 +51,11 @@ public class DailyStatsAccess {
     String mActivityString;
     double mMetScore;
 
-    List<Integer> daysInSelectedDurationList;
-    List<Integer> oldDaysInSelectedDurationList;
-
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
         instantiateEntitiesAndTheirLists();
         instantiateArrayListsOfTotalStatsForSelectedDurations();
-        daysInSelectedDurationList = new ArrayList<>();
-        oldDaysInSelectedDurationList = new ArrayList<>();
     }
 
     private void instantiateDailyStatsDatabase() {
@@ -109,7 +107,6 @@ public class DailyStatsAccess {
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-        setDaysInSelectedDurationList(dayToRetrieve);
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
@@ -119,7 +116,6 @@ public class DailyStatsAccess {
         firstDayOfYearToUse += valueToAddToStartingDurationDayForFutureYears();
 
         for (int i=0; i<7; i++) {
-            setDaysInSelectedDurationList(firstDayOfYearToUse + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfYearToUse + i).size()!=0) {
                 daysOfWeekList.add(firstDayOfYearToUse + i);
             }
@@ -135,7 +131,6 @@ public class DailyStatsAccess {
         firstDayInYearToAdd += valueToAddToStartingDurationDayForFutureYears();
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
-            setDaysInSelectedDurationList(firstDayInYearToAdd + i);
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
                 daysOfMonthList.add(firstDayInYearToAdd + i);
             }
@@ -144,16 +139,14 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(daysOfMonthList);
     }
 
-    public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, int aggregateDayID) {
+    public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
-        int firstDayInYearToAdd = 1;
-        firstDayInYearToAdd += valueToAddToStartingDurationDayForFutureYears();
+        int firstDayInYearToAdd = 1 + valueToAddToStartingDurationDayForFutureYears();
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
-            setDaysInSelectedDurationList(firstDayInYearToAdd + i);
-            if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
-                daysOfYearList.add(i+1);
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd+i).size()!=0) {
+                daysOfYearList.add(firstDayInYearToAdd+i);
             }
         }
 
@@ -165,7 +158,6 @@ public class DailyStatsAccess {
 
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayOfYear = getDayOfYearFromCalendarDayList(calendarDayList.get(i).getYear(), calendarDayList.get(i).getMonth(), calendarDayList.get(i).getDay());
-            setDaysInSelectedDurationList(dayOfYear);
 
             if (cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear).size()!=0) {
                 nonNullDayList.add(dayOfYear);
@@ -174,6 +166,8 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
+
+    private void setFirstDayInDurationDateString()
 
     public int getDayOfYearFromCalendarDayList(int year, int month, int day){
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
@@ -218,25 +212,6 @@ public class DailyStatsAccess {
             }
         }
         return listToPopulate;
-    }
-
-    public void clearDaysInSelectedDurationList() {
-        daysInSelectedDurationList.clear();
-    }
-    public void setOldDaysInSelectedDurationList(List<Integer> listToAdd) {
-        oldDaysInSelectedDurationList = new ArrayList<>(listToAdd);
-    }
-
-    public List<Integer> getOldDaysInSelectedDurationList() {
-        return oldDaysInSelectedDurationList;
-    }
-
-    public void setDaysInSelectedDurationList(int dayToAdd) {
-        daysInSelectedDurationList.add(dayToAdd);
-    }
-
-    public List<Integer> getDaysInSelectedDurationList() {
-        return daysInSelectedDurationList;
     }
 
     public long getTotalSetTimeFromDayHolderList() {
