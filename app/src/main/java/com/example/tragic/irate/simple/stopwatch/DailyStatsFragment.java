@@ -83,9 +83,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     View recyclerAndTotalStatsDivider;
 
+    ConstraintLayout totalStatsDurationLayout;
     TextView totalStatsHeaderTextView;
     TextView statsTotalSetTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
+    TextView durationRangeTextView;
 
     ImageButton statDurationSwitcherButtonLeft;
     ImageButton statDurationSwitcherButtonRight;
@@ -108,8 +110,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     View tdeeEditView;
     View popUpAnchorBottom;
-    View popUpAnchorLow;
-    View popUpAnchorHigh;
 
     ImageButton editTdeeStatsButton;
     PopupWindow tdeeEditPopUpWindow;
@@ -229,8 +229,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-
-
     private void calendarDateChangeLogic() {
         dailyStatsAdapter.turnOffEditMode();
         dailyStatsAdapter.getItemCount();
@@ -304,6 +302,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setStatDurationViews(int mode) {
         toggleEditStatsButton(false);
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+        durationRangeTextView.setVisibility(View.GONE);
+        toggleDurationTextViewLayouts(false);
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
@@ -312,12 +312,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
+            durationRangeTextView.setVisibility(View.VISIBLE);
+            toggleDurationTextViewLayouts(true);
         }
         if (mode==MONTHLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.monthly_total_header);
+            durationRangeTextView.setVisibility(View.VISIBLE);
+            toggleDurationTextViewLayouts(true);
         }
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
+            durationRangeTextView.setVisibility(View.VISIBLE);
+            toggleDurationTextViewLayouts(true);
         }
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
@@ -372,10 +378,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendarDayDecorator.setCalendarDayList(calendarDayList);
             calendarView.addDecorator(calendarDayDecorator);
         });
-    }
-
-    private boolean areListsOfDayDurationsTheSame() {
-        return dailyStatsAccess.getOldDaysInSelectedDurationList().equals(dailyStatsAccess.getDaysInSelectedDurationList());
     }
 
     private void setDayHolderStatsTextViews() {
@@ -693,6 +695,23 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //Todo: Should we make layoutParams global so they don't get reassigned every call?
+    private void toggleDurationTextViewLayouts(boolean isTextViewVisible) {
+        ConstraintLayout.LayoutParams statsHeaderLayout = (ConstraintLayout.LayoutParams) totalStatsDurationLayout.getLayoutParams();
+        ConstraintLayout.LayoutParams statsDurationTextView = (ConstraintLayout.LayoutParams) totalStatsHeaderTextView.getLayoutParams();
+        ConstraintLayout.LayoutParams leftArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonLeft.getLayoutParams();
+        ConstraintLayout.LayoutParams rightArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonRight.getLayoutParams();
+
+
+        if (isTextViewVisible) {
+            statsDurationTextView.topToTop = R.id.stats_total_header_layout;
+            statsDurationTextView.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+        } else {
+            statsDurationTextView.topToTop = R.id.stat_duration_switcher_button_left;
+            statsDurationTextView.bottomToBottom = R.id.stat_duration_switcher_button_left;
+        }
+    }
+
     private void toggleCalendarMinimizationLayouts() {
         ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
@@ -788,8 +807,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(200), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
-        popUpAnchorHigh = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_high);
-        popUpAnchorLow = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_low);
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
         tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
@@ -809,7 +826,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         longToStringConverters = new LongToStringConverters();
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        totalStatsDurationLayout = mRoot.findViewById(R.id.stats_total_header_layout);
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
+        durationRangeTextView = mRoot.findViewById(R.id.duration_range_textView);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
@@ -819,6 +838,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
+
+        durationRangeTextView.setVisibility(View.GONE);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {

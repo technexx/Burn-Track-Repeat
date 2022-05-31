@@ -14,26 +14,16 @@
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/daily_total_stats_border">
 
-        <View
-            android:id="@+id/tdee_edit_popUp_anchor_high"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="@id/stat_duration_switcher_button_left"
-            app:layout_constraintBottom_toBottomOf="@id/stat_duration_switcher_button_left"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-        </View>
-
         <TextView
             android:id="@+id/total_stats_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/day_total_header"
             android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/stat_duration_switcher_button_left"
             app:layout_constraintBottom_toBottomOf="@id/stat_duration_switcher_button_left"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/stat_duration_switcher_button_left">
+            app:layout_constraintEnd_toEndOf="parent">
         </TextView>
 
         <ImageButton
@@ -53,7 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="@id/edit_tdee_stats_button"
-            app:layout_constraintBottom_toBottomOf="@id/edit_tdee_stats_button"            app:layout_constraintStart_toEndOf="@id/total_stats_header"
+            app:layout_constraintBottom_toBottomOf="@id/edit_tdee_stats_button"
+            app:layout_constraintStart_toEndOf="@id/total_stats_header"
             android:layout_marginStart="12dp"
             android:src="@drawable/double_arrow_right"
             android:backgroundTint="@color/dark_grey">
@@ -68,6 +59,19 @@
             android:src="@drawable/edit_icon"
             android:backgroundTint="@color/dark_grey">
         </ImageButton>
+
+        <TextView
+            android:id="@+id/duration_range_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="6dp"
+            android:layout_margin="6dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="16sp"
+            android:text="Test!">
+        </TextView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -169,16 +173,6 @@
         android:src="@drawable/arrow_down_2"
         android:background="@color/dark_grey">
     </ImageButton>
-
-    <View
-        android:id="@+id/tdee_edit_popUp_anchor_low"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/stats_calendar"
-        android:layout_marginTop="4dp">
-    </View>
 
     <View
         android:id="@+id/tdee_edit_popUp_anchor_bottom"
