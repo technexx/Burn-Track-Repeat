@@ -51,9 +51,11 @@ public class DailyStatsAccess {
     List<Integer> daysInSelectedDurationList;
     List<Integer> oldDaysInSelectedDurationList;
 
-    int WEEKLY_DURATION = 0;
-    int MONTHLY_DURATION = 1;
-    int YEARLY_DURATION = 2;
+    int WEEKLY_DURATION = 1;
+    int MONTHLY_DURATION = 2;
+    int YEARLY_DURATION = 3;
+    CalendarDay firstCalendarDayInDuration;
+    CalendarDay lastCalendarDayInDuration;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -181,7 +183,7 @@ public class DailyStatsAccess {
     }
 
     //Todo: JUST DO DAILY AND CUSTOM! Why do we need weekly w/ Custom option? It's more confusing, if anything.
-    private void populateCalendarDayListWithSelectedDurationDays(Calendar calendar, int duration) {
+    public void populateCalendarDayListWithSelectedDurationDays(Calendar calendar, int duration) {
         CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
 
         int lengthOfDuration = 0;
@@ -198,13 +200,11 @@ public class DailyStatsAccess {
 
         int firstDayOfDuration = getFirstDayOfYearToAddForSelectedDuration(calendarDay, lengthOfDuration);
         calendar.set(Calendar.DAY_OF_YEAR, firstDayOfDuration);
-        CalendarDay firstCalendarDay = getCalendarDayObjectFromCalendar(calendar);
+        firstCalendarDayInDuration = getCalendarDayObjectFromCalendar(calendar);
 
         int lastDayOfDuration = firstDayOfDuration += (lengthOfDuration-1);
         calendar.set(Calendar.DAY_OF_YEAR, lastDayOfDuration);
-        CalendarDay lastCalendarDay = getCalendarDayObjectFromCalendar(calendar);
-
-
+        lastCalendarDayInDuration = getCalendarDayObjectFromCalendar(calendar);
     }
 
     private int getFirstDayOfYearToAddForSelectedDuration(CalendarDay selectedCalendarDay, int duration) {
@@ -225,6 +225,14 @@ public class DailyStatsAccess {
         }
 
         return valueToReturn;
+    }
+
+    public CalendarDay getFirstCalendarDayInDuration() {
+        return firstCalendarDayInDuration;
+    }
+
+    public CalendarDay getLastCalendarDayInDuration() {
+        return lastCalendarDayInDuration;
     }
 
     CalendarDay getCalendarDayObjectFromCalendar(Calendar calendar) {
