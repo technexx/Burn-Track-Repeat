@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
@@ -117,6 +118,12 @@ public class DailyStatsAccess {
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         setFirstDayInDurationDateInteger(firstDayOfDuration);
+        setLastDayInDurationInteger(firstDayOfDuration + 6);
+        CalendarDay firstCalendarDay = convertDayOfYearToCalendarDay(mFirstDayInDurationInteger);
+        CalendarDay lastCalendarDay = convertDayOfYearToCalendarDay(mLastDayInDurationInteger);
+
+        Log.i("testCal", "first is " + firstCalendarDay);
+        Log.i("testCal", "last is " + lastCalendarDay);
 
         for (int i=0; i<7; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
@@ -209,12 +216,11 @@ public class DailyStatsAccess {
         return mLastDayInDurationInteger;
     }
 
-    private Date convertDayOfYearToDateString(int day) {
+    private CalendarDay convertDayOfYearToCalendarDay(int day) {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(Calendar.DAY_OF_YEAR, day);
-        return calendar.getTime();
+        return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.DATE));
     }
-
 
     public int getDayOfYearFromCalendarDayList(int year, int month, int day){
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
