@@ -128,9 +128,6 @@ public class DailyStatsAccess {
         setFirstDayInDurationAsString(firstDayInDuration);
         setLastDayInDurationAsString(lastDayInDuration);
 
-        Log.i("testCal", "first is " + firstDayInDuration);
-        Log.i("testCal", "last is " + lastDayInDuration);
-
         for (int i=0; i<7; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
                 daysOfWeekList.add(firstAggregatedDayOfYearToUse + i);

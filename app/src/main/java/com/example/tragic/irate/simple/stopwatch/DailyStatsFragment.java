@@ -177,7 +177,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 AsyncTask.execute(()->{
                     calendar = Calendar.getInstance(Locale.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
+                    Log.i("testCalendar", "onChanged calendar day of year is " + calendar.get(Calendar.DAY_OF_YEAR));
 
+                    //Todo: This retrieves the wrong dayOfYear as well!
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
                     daySelectedAsACalendarDayObject = date;
 
@@ -185,6 +187,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
+
+                    Log.i("testCalendar", "daySelectedFromCalendar variable is " + calendar.get(Calendar.DAY_OF_YEAR));
+
 
                     getActivity().runOnUiThread(()-> {
                         convertAndSetDateRangeStringOnTextView();
@@ -785,12 +790,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calendarView = mRoot.findViewById(R.id.stats_calendar);
 
         CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-        calendarView.setSelectedDate(calendarDay);
+        Log.i("testCalendar", "Instantiation calendar day of year is " + calendar.get(Calendar.DAY_OF_YEAR));
 
         calendarView.state().edit()
                 .setMinimumDate(CalendarDay.from(2022, 1, 1))
                 .setMaximumDate(calendarDay)
                 .commit();
+
+        calendarView.setSelectedDate(calendarDay);
     }
 
     private void instantiateAddPopUpViews() {
