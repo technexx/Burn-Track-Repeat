@@ -723,20 +723,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             statsDurationTextView.topToTop = R.id.stats_total_header_layout;
             statsDurationTextView.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
-//            leftArrowLayout.topToTop = R.id.stats_total_header_layout;
-//            leftArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-//
-//            rightArrowLayout.topToTop = R.id.stats_total_header_layout;
-//            rightArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            leftArrowLayout.topToTop = R.id.stats_total_header_layout;
+            leftArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            rightArrowLayout.topToTop = R.id.stats_total_header_layout;
+            rightArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
         } else {
             statsDurationTextView.topToTop = R.id.stat_duration_switcher_button_left;
             statsDurationTextView.bottomToBottom = R.id.stat_duration_switcher_button_left;
 
-//            rightArrowLayout.topToTop = R.id.edit_tdee_stats_button;
-//            rightArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
-//
-//            leftArrowLayout.topToTop = R.id.edit_tdee_stats_button;
-//            leftArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
+            rightArrowLayout.topToTop = R.id.edit_tdee_stats_button;
+            rightArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
+
+            leftArrowLayout.topToTop = R.id.edit_tdee_stats_button;
+            leftArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
         }
     }
 
