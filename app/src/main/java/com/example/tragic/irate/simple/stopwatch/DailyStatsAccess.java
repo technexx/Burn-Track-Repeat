@@ -132,7 +132,7 @@ public class DailyStatsAccess {
         List<Integer> daysOfMonthList = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfMonth-1);
-        int lastDayOfDuration = numberOfDaysInMonth;
+        int lastDayOfDuration = firstDayOfDuration + (numberOfDaysInMonth-1);
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
