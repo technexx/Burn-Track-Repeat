@@ -58,6 +58,7 @@ import com.prolificinteractive.materialcalendarview.OnRangeSelectedListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -310,7 +311,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
             toggleEditStatsButton(true);
-//            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
@@ -330,8 +330,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
-//            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
+
+        convertAndSetDateRangeStringOnTextView();
+    }
+
+    private void convertAndSetDateRangeStringOnTextView() {
+        String firstDay = dailyStatsAccess.getFirstDayInDurationAsString();
+        String lastDay = String.valueOf(dailyStatsAccess.getLastDayInDurationAsString());
+
+//        String firstDate = String.valueOf(dailyStatsAccess.getFirstDayInDurationAsDate());
+//        firstDate = firstDate.replace("CalendarDay", "");
+//        firstDate = firstDate.replace("{", "");
+
+        durationRangeTextView.setText(getString(R.string.date_duration_textView, firstDay, lastDay));
     }
 
     public void iterateThroughStatDurationModeVariables(int directionOfIteration) {

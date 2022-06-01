@@ -11,6 +11,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import org.threeten.bp.LocalDate;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,8 +40,8 @@ public class DailyStatsAccess {
     CalendarDay calendarDayObjectFromDateChangedListener;
     int mFirstDayInDurationInteger;
     int mLastDayInDurationInteger;
-    String mFirstDayInDurationDateString;
-    String mLastDayInDurationDateString;
+    String mFirstDayInDurationAsString;
+    String mLastDayInDurationAsString;
 
     long mOldDayHolderId;
     boolean activityExistsInDatabaseForSelectedDay;
@@ -111,6 +112,7 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
+    //Todo: Add for month/year as well.
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
 
@@ -119,11 +121,15 @@ public class DailyStatsAccess {
 
         setFirstDayInDurationDateInteger(firstDayOfDuration);
         setLastDayInDurationInteger(firstDayOfDuration + 6);
-        CalendarDay firstCalendarDay = convertDayOfYearToCalendarDay(mFirstDayInDurationInteger);
-        CalendarDay lastCalendarDay = convertDayOfYearToCalendarDay(mLastDayInDurationInteger);
 
-        Log.i("testCal", "first is " + firstCalendarDay);
-        Log.i("testCal", "last is " + lastCalendarDay);
+        String firstDayInDuration = convertDayOfYearToFormattedString(mFirstDayInDurationInteger);
+        String lastDayInDuration = convertDayOfYearToFormattedString(mLastDayInDurationInteger);
+
+        setFirstDayInDurationAsString(firstDayInDuration);
+        setLastDayInDurationAsString(lastDayInDuration);
+
+        Log.i("testCal", "first is " + firstDayInDuration);
+        Log.i("testCal", "last is " + lastDayInDuration);
 
         for (int i=0; i<7; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
@@ -200,26 +206,32 @@ public class DailyStatsAccess {
         this.mFirstDayInDurationInteger = dayNumber;
     }
 
-    public int getFirstDayInDurationDateInteger() {
-        return mFirstDayInDurationInteger;
-    }
-
-    private void setFirstDayInDurationString() {
-
-    }
-
     private void setLastDayInDurationInteger(Integer dayNumber) {
         this.mLastDayInDurationInteger = dayNumber;
     }
 
-    public int getLastDayInDurationDateInteger() {
-        return mLastDayInDurationInteger;
+    private void setFirstDayInDurationAsString(String day) {
+        this.mFirstDayInDurationAsString = day;
     }
 
-    private CalendarDay convertDayOfYearToCalendarDay(int day) {
+    public String getFirstDayInDurationAsString() {
+        return mFirstDayInDurationAsString;
+    }
+
+    private void setLastDayInDurationAsString(String day) {
+        this.mLastDayInDurationAsString = day;
+    }
+
+    public String getLastDayInDurationAsString() {
+        return mLastDayInDurationAsString;
+    }
+
+    private String convertDayOfYearToFormattedString(int day) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(Calendar.DAY_OF_YEAR, day);
-        return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)+1, calendar.get(Calendar.DATE));
+        Date date = calendar.getTime();
+        return simpleDateFormat.format(date);
     }
 
     public int getDayOfYearFromCalendarDayList(int year, int month, int day){

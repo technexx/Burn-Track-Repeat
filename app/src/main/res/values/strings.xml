@@ -84,6 +84,7 @@
     <string name="daily_set_time">Sets:</string>
     <string name="daily_break_time">Breaks:</string>
     <string name="daily_calories_burned">Calories:</string>
+    <string name="date_duration_textView">%1$s - %2$s</string>
 
     <string name="double_zeros">"00"</string>
     <string name="colon">":"</string>
