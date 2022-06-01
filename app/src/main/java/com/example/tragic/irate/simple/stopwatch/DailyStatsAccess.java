@@ -1,10 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.util.Log;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
@@ -15,9 +12,9 @@ import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class DailyStatsAccess {
     Context mContext;
@@ -38,6 +35,9 @@ public class DailyStatsAccess {
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
 
+    CalendarDay calendarDayObjectFromDateChangedListener;
+    int mFirstDayInDurationInteger;
+    int mLastDayInDurationInteger;
     String mFirstDayInDurationDateString;
     String mLastDayInDurationDateString;
 
@@ -112,12 +112,15 @@ public class DailyStatsAccess {
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
-        int firstDayOfYearToUse = dayOfYear - (dayOfWeek - 1);
-        firstDayOfYearToUse += valueToAddToStartingDurationDayForFutureYears();
+
+        int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
+        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
+
+        setFirstDayInDurationDateInteger(firstDayOfDuration);
 
         for (int i=0; i<7; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfYearToUse + i).size()!=0) {
-                daysOfWeekList.add(firstDayOfYearToUse + i);
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
+                daysOfWeekList.add(firstAggregatedDayOfYearToUse + i);
             }
         }
 
@@ -127,12 +130,14 @@ public class DailyStatsAccess {
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
         List<Integer> daysOfMonthList = new ArrayList<>();
 
-        int firstDayInYearToAdd = dayOfYear - (dayOfMonth-1);
-        firstDayInYearToAdd += valueToAddToStartingDurationDayForFutureYears();
+        int firstDayOfDuration = dayOfYear - (dayOfMonth-1);
+        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
+
+        setFirstDayInDurationDateInteger(firstDayOfDuration);
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd + i).size()!=0) {
-                daysOfMonthList.add(firstDayInYearToAdd + i);
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
+                daysOfMonthList.add(firstAggregatedDayOfYearToUse + i);
             }
         }
 
@@ -141,12 +146,16 @@ public class DailyStatsAccess {
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
         List<Integer> daysOfYearList = new ArrayList<>();
-        int firstDayInYearToAdd = 1 + valueToAddToStartingDurationDayForFutureYears();
+
+        int firstDayOfDuration = 1;
+        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
+
+        setFirstDayInDurationDateInteger(firstDayOfDuration);
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayInYearToAdd+i).size()!=0) {
-                daysOfYearList.add(firstDayInYearToAdd+i);
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
+                daysOfYearList.add(firstAggregatedDayOfYearToUse+i);
             }
         }
 
@@ -167,7 +176,45 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
 
-    private void setFirstDayInDurationDateString()
+    public void setCalendarDaySelectedFromDateChangeListener(CalendarDay calendarDay) {
+        this.calendarDayObjectFromDateChangedListener = calendarDay;
+    }
+
+    private CalendarDay getCalendarDaySelectedFromDateChangeListener() {
+        return calendarDayObjectFromDateChangedListener;
+    }
+
+    private int getDayOfYearFromCalendarDay(CalendarDay calendarDay) {
+        LocalDate localDate = calendarDay.getDate();
+        return localDate.getDayOfYear();
+    }
+
+    private void setFirstDayInDurationDateInteger(Integer dayNumber) {
+        this.mFirstDayInDurationInteger = dayNumber;
+    }
+
+    public int getFirstDayInDurationDateInteger() {
+        return mFirstDayInDurationInteger;
+    }
+
+    private void setFirstDayInDurationString() {
+
+    }
+
+    private void setLastDayInDurationInteger(Integer dayNumber) {
+        this.mLastDayInDurationInteger = dayNumber;
+    }
+
+    public int getLastDayInDurationDateInteger() {
+        return mLastDayInDurationInteger;
+    }
+
+    private Date convertDayOfYearToDateString(int day) {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.set(Calendar.DAY_OF_YEAR, day);
+        return calendar.getTime();
+    }
+
 
     public int getDayOfYearFromCalendarDayList(int year, int month, int day){
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
@@ -176,7 +223,7 @@ public class DailyStatsAccess {
     }
 
     private int valueToAddToStartingDurationDayForFutureYears() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
 
         int year = calendar.get(Calendar.YEAR);
         int numberOfYearsAfter2022 = year - 2022;
@@ -449,7 +496,7 @@ public class DailyStatsAccess {
     }
 
     public int returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
-        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
         int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
         int numberOfDaysWithAtLeastOneActivity = 0;
 

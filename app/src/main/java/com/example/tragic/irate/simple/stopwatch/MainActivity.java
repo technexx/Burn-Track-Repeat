@@ -1200,7 +1200,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-    calendar = Calendar.getInstance(TimeZone.getDefault());
+    calendar = Calendar.getInstance(Locale.getDefault());
     calendarValues = new CalendarValues();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
   }
@@ -3328,7 +3328,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundTypeString = "";
     pomString = "";
 
-    calendar = Calendar.getInstance(TimeZone.getDefault());
+    calendar = Calendar.getInstance(Locale.getDefault());
     date = simpleDateFormat.format(calendar.getTime());
 
     int cycleID;

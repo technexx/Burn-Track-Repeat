@@ -174,11 +174,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 AsyncTask.execute(()->{
-                    calendar = Calendar.getInstance(TimeZone.getDefault());
+                    calendar = Calendar.getInstance(Locale.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
 
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
-                    daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+                    daySelectedAsACalendarDayObject = date;
+
+                    dailyStatsAccess.setCalendarDaySelectedFromDateChangeListener(daySelectedAsACalendarDayObject);
 
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
@@ -190,7 +192,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void onRangeSelected(@NonNull MaterialCalendarView widget, @NonNull List<CalendarDay> dates) {
                 AsyncTask.execute(()->{
-                    calendar = Calendar.getInstance(TimeZone.getDefault());
+                    calendar = Calendar.getInstance(Locale.getDefault());
                     customCalendarDayList = dates;
                     populateListsAndTextViewsFromEntityListsInDatabase();
                 });
@@ -299,14 +301,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setStatDurationViews(int mode) {
         toggleEditStatsButton(false);
+        toggleDurationTextViewLayouts(false);
+
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
         durationRangeTextView.setVisibility(View.GONE);
-        toggleDurationTextViewLayouts(false);
+        dailyStatsAccess.setCalendarDaySelectedFromDateChangeListener(daySelectedAsACalendarDayObject);
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
             toggleEditStatsButton(true);
-            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
+//            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
@@ -326,7 +330,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
-            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
+//            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
     }
 
@@ -766,7 +770,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalendarObjects() {
-        calendar = Calendar.getInstance(TimeZone.getDefault());
+        calendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
 
         CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
