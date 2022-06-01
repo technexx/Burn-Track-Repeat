@@ -185,6 +185,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
+
+                    getActivity().runOnUiThread(()-> {
+                        convertAndSetDateRangeStringOnTextView();
+                    });
                 });
             }
         });
@@ -338,11 +342,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void convertAndSetDateRangeStringOnTextView() {
         String firstDay = dailyStatsAccess.getFirstDayInDurationAsString();
         String lastDay = String.valueOf(dailyStatsAccess.getLastDayInDurationAsString());
-
-//        String firstDate = String.valueOf(dailyStatsAccess.getFirstDayInDurationAsDate());
-//        firstDate = firstDate.replace("CalendarDay", "");
-//        firstDate = firstDate.replace("{", "");
-
         durationRangeTextView.setText(getString(R.string.date_duration_textView, firstDay, lastDay));
     }
 

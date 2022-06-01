@@ -193,15 +193,6 @@ public class DailyStatsAccess {
         this.calendarDayObjectFromDateChangedListener = calendarDay;
     }
 
-    private CalendarDay getCalendarDaySelectedFromDateChangeListener() {
-        return calendarDayObjectFromDateChangedListener;
-    }
-
-    private int getDayOfYearFromCalendarDay(CalendarDay calendarDay) {
-        LocalDate localDate = calendarDay.getDate();
-        return localDate.getDayOfYear();
-    }
-
     private void setFirstDayInDurationDateInteger(Integer dayNumber) {
         this.mFirstDayInDurationInteger = dayNumber;
     }
