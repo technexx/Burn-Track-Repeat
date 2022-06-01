@@ -38,8 +38,6 @@ public class DailyStatsAccess {
     double totalCaloriesForSelectedDay;
 
     CalendarDay calendarDayObjectFromDateChangedListener;
-    int mFirstDayInDurationInteger;
-    int mLastDayInDurationInteger;
     String mFirstDayInDurationAsString;
     String mLastDayInDurationAsString;
 
@@ -112,21 +110,14 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
     }
 
-    //Todo: Add for month/year as well.
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
+        int lastDayOfDuration = firstDayOfDuration + 6;
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
-        setFirstDayInDurationDateInteger(firstDayOfDuration);
-        setLastDayInDurationInteger(firstDayOfDuration + 6);
-
-        String firstDayInDuration = convertDayOfYearToFormattedString(mFirstDayInDurationInteger);
-        String lastDayInDuration = convertDayOfYearToFormattedString(mLastDayInDurationInteger);
-
-        setFirstDayInDurationAsString(firstDayInDuration);
-        setLastDayInDurationAsString(lastDayInDuration);
+        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         for (int i=0; i<7; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
@@ -141,9 +132,10 @@ public class DailyStatsAccess {
         List<Integer> daysOfMonthList = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfMonth-1);
+        int lastDayOfDuration = numberOfDaysInMonth;
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
-        setFirstDayInDurationDateInteger(firstDayOfDuration);
+        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
@@ -158,9 +150,10 @@ public class DailyStatsAccess {
         List<Integer> daysOfYearList = new ArrayList<>();
 
         int firstDayOfDuration = 1;
+        int lastDayOfDuration = daysInYear;
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
-        setFirstDayInDurationDateInteger(firstDayOfDuration);
+        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
@@ -186,16 +179,16 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
     }
 
+    private void convertToStringAndSetFirstAndLastDurationDays(int firstDay,  int lastDay) {
+        String firstDayString = convertDayOfYearToFormattedString(firstDay);
+        String lastDayString = convertDayOfYearToFormattedString(lastDay);
+
+        setFirstDayInDurationAsString(firstDayString);
+        setLastDayInDurationAsString(lastDayString);
+    }
+
     public void setCalendarDaySelectedFromDateChangeListener(CalendarDay calendarDay) {
         this.calendarDayObjectFromDateChangedListener = calendarDay;
-    }
-
-    private void setFirstDayInDurationDateInteger(Integer dayNumber) {
-        this.mFirstDayInDurationInteger = dayNumber;
-    }
-
-    private void setLastDayInDurationInteger(Integer dayNumber) {
-        this.mLastDayInDurationInteger = dayNumber;
     }
 
     private void setFirstDayInDurationAsString(String day) {
