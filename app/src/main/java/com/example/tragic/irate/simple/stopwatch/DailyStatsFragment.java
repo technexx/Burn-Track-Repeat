@@ -353,8 +353,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
-
-        convertAndSetDateRangeStringOnTextView();
     }
 
     private void setSingleDateStringOnTextView() {
@@ -888,7 +886,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
 
-        durationRangeTextView.setVisibility(View.GONE);
+//        durationRangeTextView.setVisibility(View.GONE);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
