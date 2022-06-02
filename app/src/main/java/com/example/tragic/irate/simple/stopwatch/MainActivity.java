@@ -520,6 +520,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   //Todo: Delete selected days in ranged mode? (e.g. option to delete any selected day).
+      //Todo: Toast pops up even w/ empty days on deletion at moment.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
@@ -1111,8 +1112,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
 
+          //Todo: Removed single delete here.
         } else if (delete_all_text.getText().equals(getString(R.string.delete_single_day_from_stats))) {
-          deleteDailyStatsForSelectedDay();
+          deleteDailyStatsForMultipleDays();
 
         } else if (delete_all_text.getText().equals(getString(R.string.delete_all_stats))) {
           deleteDailyStatsForAllDays();
@@ -2138,6 +2140,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.deleteStatForEachActivityEntityForSelectedDay(daySelected);
 
     refreshDailyStats();
+  }
+
+  private void deleteDailyStatsForMultipleDays() {
+    List<DayHolder> dayHolderList = dailyStatsAccess.getDayHolderList();
+    List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
+
+    List<StatsForEachActivity> statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess();
+    List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
+
+    for (int i=0; i<dayHolderList.size(); i++) {
+      longListOfDayIdsToToDelete.add(dayHolderList.get(i).getDayId());
+    }
+
+    for (int i=0; i<statsForEachActivityList.size(); i++) {
+      longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getStatsForActivityId());
+    }
+
+    dailyStatsAccess.deleteMultipleDayHolderEntries(longListOfDayIdsToToDelete);
+    dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
   }
 
   private void deleteDailyStatsForAllDays() {

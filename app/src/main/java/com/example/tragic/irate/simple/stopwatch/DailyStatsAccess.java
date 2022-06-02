@@ -114,6 +114,24 @@ public class DailyStatsAccess {
         convertToStringAndSetSingleDay(dayToRetrieve);
     }
 
+    private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
+        if (integerListOfSelectedDays.size()>0) {
+            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
+            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(integerListOfSelectedDays);
+        } else {
+            mDayHolderList = new ArrayList<>();
+            statsForEachActivityListForFragmentAccess = new ArrayList<>();
+        }
+    }
+
+    public List<DayHolder> getDayHolderList() {
+        return mDayHolderList;
+    }
+
+    public List<StatsForEachActivity> getStatsForEachActivityListForFragmentAccess() {
+        return statsForEachActivityListForFragmentAccess;
+    }
+
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> daysOfWeekList = new ArrayList<>();
 
@@ -191,7 +209,7 @@ public class DailyStatsAccess {
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
 
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfDuration+firstAggregatedDayOfYearToUse).size()!=0) {
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
                 nonNullDayList.add(dayFromList);
             }
         }
@@ -268,16 +286,6 @@ public class DailyStatsAccess {
         }
 
         return totalValueToReturn;
-    }
-
-    private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
-        if (integerListOfSelectedDays.size()>0) {
-            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
-            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(integerListOfSelectedDays);
-        } else {
-            mDayHolderList = new ArrayList<>();
-            statsForEachActivityListForFragmentAccess = new ArrayList<>();
-        }
     }
 
     public List<Integer> getActivityListForCalendarColoring() {
@@ -360,6 +368,10 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteSingleDay(daySelected);
     }
 
+    public void deleteMultipleDayHolderEntries(List<Long> listOfEntries) {
+        cyclesDatabase.cyclesDao().deleteMultipleDays(listOfEntries);
+    }
+
     public void deleteAllDayHolderEntries() {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
@@ -422,10 +434,6 @@ public class DailyStatsAccess {
 
     public void assignStatsForEachActivityEntityForEditing(int position) {
         mStatsForEachActivity = statsForEachActivityListForFragmentAccess.get(position);
-    }
-
-    public List<StatsForEachActivity> getStatsForEachActivityListForFragmentAccess() {
-        return statsForEachActivityListForFragmentAccess;
     }
 
     public int getActivityPosition() {
@@ -498,6 +506,10 @@ public class DailyStatsAccess {
 
     public void deleteStatForEachActivityEntityForSelectedDay(long dayToDelete) {
         cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(dayToDelete);
+    }
+
+    public void deleteMultipleStatsForEachActivityEntries(List<Long> listOfEntries) {
+        cyclesDatabase.cyclesDao().deleteActivityStatsForMultipleDays(listOfEntries);
     }
 
     public void deleteAllStatsForEachActivityEntries() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/delete_single_day_from_daily_stats"
-        android:title="Delete Selected Day">
+        android:title="Delete Selected">
     </item>
     <item android:id="@+id/delete_all_days_from_daily_stats"
         android:title="Delete All Days">

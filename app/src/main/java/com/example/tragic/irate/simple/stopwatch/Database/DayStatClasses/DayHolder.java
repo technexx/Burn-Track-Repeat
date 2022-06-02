@@ -28,16 +28,16 @@ public class DayHolder {
         return daySelectedId;
     }
 
+    public void setDayId(long dayId) {
+        this.daySelectedId = dayId;
+    }
+
     public long getUniqueIdTiedToYear() {
         return uniqueIdTiedToYear;
     }
 
     public void setUniqueIdTiedToYear(long uniqueIdTiedToYear) {
         this.uniqueIdTiedToYear = uniqueIdTiedToYear;
-    }
-
-    public void setDayId(long dayId) {
-        this.daySelectedId = dayId;
     }
 
     public String getDate() {
