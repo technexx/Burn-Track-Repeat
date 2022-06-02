@@ -315,41 +315,31 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setStatDurationViews(int mode) {
         toggleEditStatsButton(false);
-        toggleDurationTextViewLayouts(false);
 
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-//        durationRangeTextView.setVisibility(View.GONE);
         dailyStatsAccess.setCalendarDaySelectedFromDateChangeListener(daySelectedAsACalendarDayObject);
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
             toggleEditStatsButton(true);
             setSingleDateStringOnTextView();
-            toggleDurationTextViewLayouts(true);
         }
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
-            durationRangeTextView.setVisibility(View.VISIBLE);
             convertAndSetDateRangeStringOnTextView();
-            toggleDurationTextViewLayouts(true);
         }
         if (mode==MONTHLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.monthly_total_header);
-            durationRangeTextView.setVisibility(View.VISIBLE);
             convertAndSetDateRangeStringOnTextView();
-            toggleDurationTextViewLayouts(true);
         }
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
-            durationRangeTextView.setVisibility(View.VISIBLE);
             convertAndSetDateRangeStringOnTextView();
-            toggleDurationTextViewLayouts(true);
         }
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
             convertAndSetDateRangeStringOnTextView();
-            toggleDurationTextViewLayouts(true);
 
             calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
@@ -731,33 +721,33 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+//    private void toggleDurationTextViewLayouts(boolean isTextViewVisible) {
+//        ConstraintLayout.LayoutParams statsDurationTextView = (ConstraintLayout.LayoutParams) totalStatsHeaderTextView.getLayoutParams();
+//        ConstraintLayout.LayoutParams leftArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonLeft.getLayoutParams();
+//        ConstraintLayout.LayoutParams rightArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonRight.getLayoutParams();
+//
+//        if (isTextViewVisible) {
+//            statsDurationTextView.topToTop = R.id.stats_total_header_layout;
+//            statsDurationTextView.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+//
+//            leftArrowLayout.topToTop = R.id.stats_total_header_layout;
+//            leftArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+//
+//            rightArrowLayout.topToTop = R.id.stats_total_header_layout;
+//            rightArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+//        } else {
+//            statsDurationTextView.topToTop = R.id.stat_duration_switcher_button_left;
+//            statsDurationTextView.bottomToBottom = R.id.stat_duration_switcher_button_left;
+//
+//            rightArrowLayout.topToTop = R.id.edit_tdee_stats_button;
+//            rightArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
+//
+//            leftArrowLayout.topToTop = R.id.edit_tdee_stats_button;
+//            leftArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
+//        }
+//    }
+
     //Todo: Should we make layoutParams global so they don't get reassigned every call?
-    private void toggleDurationTextViewLayouts(boolean isTextViewVisible) {
-        ConstraintLayout.LayoutParams statsDurationTextView = (ConstraintLayout.LayoutParams) totalStatsHeaderTextView.getLayoutParams();
-        ConstraintLayout.LayoutParams leftArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonLeft.getLayoutParams();
-        ConstraintLayout.LayoutParams rightArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonRight.getLayoutParams();
-
-        if (isTextViewVisible) {
-            statsDurationTextView.topToTop = R.id.stats_total_header_layout;
-            statsDurationTextView.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            leftArrowLayout.topToTop = R.id.stats_total_header_layout;
-            leftArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            rightArrowLayout.topToTop = R.id.stats_total_header_layout;
-            rightArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-        } else {
-            statsDurationTextView.topToTop = R.id.stat_duration_switcher_button_left;
-            statsDurationTextView.bottomToBottom = R.id.stat_duration_switcher_button_left;
-
-            rightArrowLayout.topToTop = R.id.edit_tdee_stats_button;
-            rightArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
-
-            leftArrowLayout.topToTop = R.id.edit_tdee_stats_button;
-            leftArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
-        }
-    }
-
     private void toggleCalendarMinimizationLayouts() {
         ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
@@ -885,8 +875,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
-
-//        durationRangeTextView.setVisibility(View.GONE);
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {
