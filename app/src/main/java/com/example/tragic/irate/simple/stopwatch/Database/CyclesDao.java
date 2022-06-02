@@ -27,6 +27,9 @@ CyclesDao {
     @Query("SELECT * from DayHolder")
     List<DayHolder> loadAllDayHolderRows();
 
+    @Query("SELECT * from DayHolder WHERE uniqueIdTiedToYear IS:yearID")
+    List<DayHolder> loadFourDigitYearForDayHolder(long yearID);
+
     @Query("SELECT * from DayHolder WHERE daySelectedId IS:listID")
     List<DayHolder> loadSingleDay(long listID);
 
@@ -50,6 +53,9 @@ CyclesDao {
 
     @Query("SELECT * from StatsForEachActivity")
     List<StatsForEachActivity> loadAllActivitiesForAllDays();
+
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IS:yearID")
+    List<StatsForEachActivity> loadFourDigitYearForStatsForEachActivity(long yearID);
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);

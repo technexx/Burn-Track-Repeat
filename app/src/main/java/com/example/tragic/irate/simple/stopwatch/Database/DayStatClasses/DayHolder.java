@@ -11,6 +11,7 @@ public class DayHolder {
 
     @PrimaryKey
     public long daySelectedId;
+    public long uniqueIdTiedToYear;
     String date;
 
     long totalSetTime;
@@ -25,6 +26,14 @@ public class DayHolder {
 
     public long getDayId() {
         return daySelectedId;
+    }
+
+    public long getUniqueIdTiedToYear() {
+        return uniqueIdTiedToYear;
+    }
+
+    public void setUniqueIdTiedToYear(long uniqueIdTiedToYear) {
+        this.uniqueIdTiedToYear = uniqueIdTiedToYear;
     }
 
     public void setDayId(long dayId) {

@@ -8,8 +8,7 @@ import androidx.room.PrimaryKey;
 public class StatsForEachActivity {
     @PrimaryKey (autoGenerate = true)
     public long statsForActivityId;
-
-    public long iteratingIdsForSpecificDay;
+    public long uniqueIdTiedToYear;
     public long uniqueIdTiedToTheSelectedActivity;
 
     String activity;
@@ -17,6 +16,14 @@ public class StatsForEachActivity {
     long totalBreakTimeForEachActivity;
     double metScore;
     double totalCaloriesBurnedForEachActivity;
+
+    public long getUniqueIdTiedToYear() {
+        return uniqueIdTiedToYear;
+    }
+
+    public void setUniqueIdTiedToYear(long uniqueIdTiedToYear) {
+        this.uniqueIdTiedToYear = uniqueIdTiedToYear;
+    }
 
     public long getUniqueIdTiedToTheSelectedActivity() {
         return uniqueIdTiedToTheSelectedActivity;

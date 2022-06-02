@@ -519,6 +519,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+  //Todo: Delete selected days in ranged mode? (e.g. option to delete any selected day).
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
@@ -999,7 +1000,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    ////--EditCycles Menu Item onClicks START--////
     buttonToLaunchTimerFromEditPopUp.setOnClickListener(v-> {
       launchTimerCycle(true);
     });
@@ -1678,7 +1678,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
       dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
     }
   }
@@ -1719,6 +1718,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
   }
+
+
 
   private void setTdeeSpinnerListeners() {
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
