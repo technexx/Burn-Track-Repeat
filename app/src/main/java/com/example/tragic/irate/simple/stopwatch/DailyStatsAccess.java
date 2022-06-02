@@ -38,6 +38,7 @@ public class DailyStatsAccess {
     double totalCaloriesForSelectedDay;
 
     CalendarDay calendarDayObjectFromDateChangedListener;
+    String mSingleDayAsString;
     String mFirstDayInDurationAsString;
     String mLastDayInDurationAsString;
 
@@ -98,6 +99,7 @@ public class DailyStatsAccess {
 
     public void assignDayHolderInstanceForSelectedDay(int daySelected) {
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
+
         if (dayHolderList.size()>0) {
             mDayHolder = dayHolderList.get(0);
         } else {
@@ -108,6 +110,8 @@ public class DailyStatsAccess {
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
+
+        convertToStringAndSetSingleDay(dayToRetrieve);
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -165,18 +169,39 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(daysOfYearList);
     }
 
-    public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList) {
+    public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
         List<Integer> nonNullDayList = new ArrayList<>();
+        int firstDayOfDuration = dayOfYear;
+        int lastDayOfDuration = dayOfYear;
+        int firstAggregatedDayOfYearToUse = dayOfYear + valueToAddToStartingDurationDayForFutureYears();
+
+        if (calendarDayList.size()>0) {
+            firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
+            lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
+            firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
+
+            convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
+        }
+
+        Log.i("testDur", "first day is " + firstDayOfDuration);
+        Log.i("testDur", "last day is " + lastDayOfDuration);
+
+        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         for (int i=0; i<calendarDayList.size(); i++) {
-            int dayOfYear = getDayOfYearFromCalendarDayList(calendarDayList.get(i).getYear(), calendarDayList.get(i).getMonth(), calendarDayList.get(i).getDay());
+            int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
 
-            if (cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear).size()!=0) {
-                nonNullDayList.add(dayOfYear);
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstDayOfDuration+firstAggregatedDayOfYearToUse).size()!=0) {
+                nonNullDayList.add(dayFromList);
             }
         }
 
         populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
+    }
+
+    private void convertToStringAndSetSingleDay(int day) {
+        String dayToSet = convertDayOfYearToFormattedString(day);
+        setSingleDayAsString(dayToSet);
     }
 
     private void convertToStringAndSetFirstAndLastDurationDays(int firstDay,  int lastDay) {
@@ -189,6 +214,14 @@ public class DailyStatsAccess {
 
     public void setCalendarDaySelectedFromDateChangeListener(CalendarDay calendarDay) {
         this.calendarDayObjectFromDateChangedListener = calendarDay;
+    }
+
+    private void setSingleDayAsString(String day) {
+        this.mSingleDayAsString = day;
+    }
+
+    public String getSingleDayAsString() {
+        return mSingleDayAsString;
     }
 
     private void setFirstDayInDurationAsString(String day) {
@@ -215,9 +248,9 @@ public class DailyStatsAccess {
         return simpleDateFormat.format(date);
     }
 
-    public int getDayOfYearFromCalendarDayList(int year, int month, int day){
+    public int getDayOfYearFromCalendarDayList(CalendarDay calendarDay){
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        calendar.set(year, month-1, day);
+        calendar.set(calendarDay.getYear(), calendarDay.getMonth()-1, calendarDay.getDay());
         return calendar.get(Calendar.DAY_OF_YEAR);
     }
 

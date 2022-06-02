@@ -187,7 +187,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
                     getActivity().runOnUiThread(()-> {
-                        convertAndSetDateRangeStringOnTextView();
+                        if (currentStatDurationMode==DAILY_STATS) {
+                            setSingleDateStringOnTextView();
+                        } else {
+                            convertAndSetDateRangeStringOnTextView();
+                        }
                     });
                 });
             }
@@ -201,6 +205,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     customCalendarDayList = dates;
                     populateListsAndTextViewsFromEntityListsInDatabase();
+
+                    getActivity().runOnUiThread(()-> {
+                        convertAndSetDateRangeStringOnTextView();
+                    });
                 });
             }
         });
@@ -262,8 +270,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-//        Calendar testCalendar = Calendar.getInstance(Locale.getDefault());
-
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
         }
@@ -277,7 +283,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
         }
         if (mode==CUSTOM_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList);
+            dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
         }
 
         dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
@@ -312,34 +318,48 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         toggleDurationTextViewLayouts(false);
 
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-        durationRangeTextView.setVisibility(View.GONE);
+//        durationRangeTextView.setVisibility(View.GONE);
         dailyStatsAccess.setCalendarDaySelectedFromDateChangeListener(daySelectedAsACalendarDayObject);
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
             toggleEditStatsButton(true);
+            setSingleDateStringOnTextView();
+            toggleDurationTextViewLayouts(true);
         }
         if (mode==WEEKLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.weekly_total_header);
             durationRangeTextView.setVisibility(View.VISIBLE);
+            convertAndSetDateRangeStringOnTextView();
             toggleDurationTextViewLayouts(true);
         }
         if (mode==MONTHLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.monthly_total_header);
             durationRangeTextView.setVisibility(View.VISIBLE);
+            convertAndSetDateRangeStringOnTextView();
             toggleDurationTextViewLayouts(true);
         }
         if (mode==YEARLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.yearly_total_header);
             durationRangeTextView.setVisibility(View.VISIBLE);
+            convertAndSetDateRangeStringOnTextView();
             toggleDurationTextViewLayouts(true);
         }
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+            convertAndSetDateRangeStringOnTextView();
+            toggleDurationTextViewLayouts(true);
+
+            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
 
         convertAndSetDateRangeStringOnTextView();
+    }
+
+    private void setSingleDateStringOnTextView() {
+        String dayToSet = dailyStatsAccess.getSingleDayAsString();
+        durationRangeTextView.setText(dayToSet);
     }
 
     private void convertAndSetDateRangeStringOnTextView() {
