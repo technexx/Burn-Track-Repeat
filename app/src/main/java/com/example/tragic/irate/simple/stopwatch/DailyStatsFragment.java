@@ -181,8 +181,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
                     daySelectedAsACalendarDayObject = date;
 
-                    dailyStatsAccess.setCalendarDaySelectedFromDateChangeListener(daySelectedAsACalendarDayObject);
-
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -202,8 +200,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             public void onRangeSelected(@NonNull MaterialCalendarView widget, @NonNull List<CalendarDay> dates) {
                 AsyncTask.execute(()->{
                     calendar = Calendar.getInstance(Locale.getDefault());
-
                     customCalendarDayList = dates;
+                    daySelectedAsACalendarDayObject = dates.get(0);
+
+                    calendar.set(daySelectedAsACalendarDayObject.getYear(), daySelectedAsACalendarDayObject.getMonth()-1, daySelectedAsACalendarDayObject.getDay());
+
+                    daySelectedFromCalendar = aggregateDayIdFromCalendar();
+
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
                     getActivity().runOnUiThread(()-> {
@@ -317,7 +320,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         toggleEditStatsButton(false);
 
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-        dailyStatsAccess.setCalendarDaySelectedFromDateChangeListener(daySelectedAsACalendarDayObject);
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
@@ -340,9 +342,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
             convertAndSetDateRangeStringOnTextView();
-
-            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
         }
+
+        calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
     }
 
     private void setSingleDateStringOnTextView() {

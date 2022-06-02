@@ -37,7 +37,6 @@ public class DailyStatsAccess {
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
 
-    CalendarDay calendarDayObjectFromDateChangedListener;
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
     String mLastDayInDurationAsString;
@@ -228,10 +227,6 @@ public class DailyStatsAccess {
 
         setFirstDayInDurationAsString(firstDayString);
         setLastDayInDurationAsString(lastDayString);
-    }
-
-    public void setCalendarDaySelectedFromDateChangeListener(CalendarDay calendarDay) {
-        this.calendarDayObjectFromDateChangedListener = calendarDay;
     }
 
     private void setSingleDayAsString(String day) {
