@@ -519,7 +519,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Switching from range -> daily keep selection at last date in range, but switching back to range moved date to first date in that earlier range.
+  //Todo: setAllDayAndStatListsForCustomDatesFromDatabase() uses DayHolder list to check for list sizes, but if we're adding activities to Stats, that doesn't create a DayHolder entry for that day!
+  //Todo: populateDayHolderAndStatsForEachActivityLists() being called twice on date selection.
+      //Todo: May also be the cause of our animation blip.
+  //Todo: Should allow edit button in every case except a selected range, instead of just in Daily mode.
+  //Todo: Passing in wrong date to newly created list method (For daily).
   //Todo: Animation blip on duration mode change.
   //Todo: Toast pops up even w/ empty days on deletion at moment.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -2144,10 +2148,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteDailyStatsForMultipleDays() {
-    List<DayHolder> dayHolderList = dailyStatsAccess.getDayHolderList();
+    List<DayHolder> dayHolderList = dailyStatsFragment.getDayHolderList();
     List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
 
-    List<StatsForEachActivity> statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess();
+    List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
     List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
 
     for (int i=0; i<dayHolderList.size(); i++) {

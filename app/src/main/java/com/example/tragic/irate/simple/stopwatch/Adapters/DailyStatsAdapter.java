@@ -19,6 +19,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tragic.irate.simple.stopwatch.DailyStatsAccess;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.R;
 
@@ -46,14 +47,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     boolean mEditModeIsActive;
     boolean mRowIsSelectedForEditing;
 
-    PopupWindow confirmDeletionPopUpWindow;
-
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
     tdeeActivityAddition mTdeeActivityAddition;
     tdeeActivityDeletion mTdeeActivityDeletion;
-
-    ImageButton confirmActivityDeletionButton;
-    ImageButton cancelActivityDeletionButton;
 
     Animation slideInFromLeft;
     Animation slideOutFromLeft;
@@ -90,7 +86,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mCaloriesBurned = caloriesBurned;
-
         setAnimations();
     }
 

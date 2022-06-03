@@ -43,6 +43,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
+import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDurationSelectedDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
@@ -104,7 +105,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int MONTHLY_STATS = 2;
     int YEARLY_STATS = 3;
     int CUSTOM_STATS = 4;
-    List<CalendarDay> customCalendarDayList = new ArrayList<>();
+    List<CalendarDay> customCalendarDayList;
+    List<DayHolder> dayHolderList;
+    List<StatsForEachActivity> statsForEachActivityList;
 
     int ITERATING_STATS_UP = 0;
     int ITERATING_STATS_DOWN = 1;
@@ -143,7 +146,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
-        dailyStatsAccess = new DailyStatsAccess(getActivity());
+        dailyStatsAccess = new DailyStatsAccess(getContext().getApplicationContext());
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
         instantiateCalendarObjects();
@@ -167,7 +170,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationViews(currentStatDurationMode);
-
             });
         });
 
@@ -287,6 +289,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
+            setListsOfDayHolderAndStatsPrimaryIds();
         }
 
         dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
@@ -294,6 +297,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (hasNumberOfDaysWithAtLeastOneActivityChanged()) {
             colorDaysWithAtLeastOneActivity();
         }
+    }
+
+    private void setListsOfDayHolderAndStatsPrimaryIds() {
+        dayHolderList = dailyStatsAccess.getDayHolderList();
+        statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess();
+    }
+
+    public List<DayHolder> getDayHolderList() {
+        return dayHolderList;
+    }
+
+    public List<StatsForEachActivity> getStatsForEachActivityList() {
+        return statsForEachActivityList;
     }
 
     private boolean hasNumberOfDaysWithAtLeastOneActivityChanged() {
@@ -723,32 +739,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-//    private void toggleDurationTextViewLayouts(boolean isTextViewVisible) {
-//        ConstraintLayout.LayoutParams statsDurationTextView = (ConstraintLayout.LayoutParams) totalStatsHeaderTextView.getLayoutParams();
-//        ConstraintLayout.LayoutParams leftArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonLeft.getLayoutParams();
-//        ConstraintLayout.LayoutParams rightArrowLayout = (ConstraintLayout.LayoutParams) statDurationSwitcherButtonRight.getLayoutParams();
-//
-//        if (isTextViewVisible) {
-//            statsDurationTextView.topToTop = R.id.stats_total_header_layout;
-//            statsDurationTextView.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-//
-//            leftArrowLayout.topToTop = R.id.stats_total_header_layout;
-//            leftArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-//
-//            rightArrowLayout.topToTop = R.id.stats_total_header_layout;
-//            rightArrowLayout.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-//        } else {
-//            statsDurationTextView.topToTop = R.id.stat_duration_switcher_button_left;
-//            statsDurationTextView.bottomToBottom = R.id.stat_duration_switcher_button_left;
-//
-//            rightArrowLayout.topToTop = R.id.edit_tdee_stats_button;
-//            rightArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
-//
-//            leftArrowLayout.topToTop = R.id.edit_tdee_stats_button;
-//            leftArrowLayout.bottomToBottom = R.id.edit_tdee_stats_button;
-//        }
-//    }
-
     //Todo: Should we make layoutParams global so they don't get reassigned every call?
     private void toggleCalendarMinimizationLayouts() {
         ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
@@ -877,6 +867,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
+
+        customCalendarDayList = new ArrayList<>();
+
+        dayHolderList = new ArrayList<>();
+        statsForEachActivityList = new ArrayList<>();
     }
 
     private void instantiateRecyclerViewAndItsAdapter() {

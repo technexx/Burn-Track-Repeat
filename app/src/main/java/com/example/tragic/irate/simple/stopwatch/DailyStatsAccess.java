@@ -121,6 +121,9 @@ public class DailyStatsAccess {
             mDayHolderList = new ArrayList<>();
             statsForEachActivityListForFragmentAccess = new ArrayList<>();
         }
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            Log.i("testDate", "dayholder list dates are " + mDayHolderList.get(i).getDate());
+        }
     }
 
     public List<DayHolder> getDayHolderList() {
@@ -132,7 +135,7 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
-        List<Integer> daysOfWeekList = new ArrayList<>();
+        List<Integer> populatedDaysOfWeekList = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
@@ -142,15 +145,15 @@ public class DailyStatsAccess {
 
         for (int i=0; i<7; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
-                daysOfWeekList.add(firstAggregatedDayOfYearToUse + i);
+                populatedDaysOfWeekList.add(firstAggregatedDayOfYearToUse + i);
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(daysOfWeekList);
+        populateDayHolderAndStatsForEachActivityLists(populatedDaysOfWeekList);
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
-        List<Integer> daysOfMonthList = new ArrayList<>();
+        List<Integer> populatedDaysOfMonthList = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfMonth-1);
         int lastDayOfDuration = firstDayOfDuration + (numberOfDaysInMonth-1);
@@ -160,15 +163,15 @@ public class DailyStatsAccess {
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
-                daysOfMonthList.add(firstAggregatedDayOfYearToUse + i);
+                populatedDaysOfMonthList.add(firstAggregatedDayOfYearToUse + i);
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(daysOfMonthList);
+        populateDayHolderAndStatsForEachActivityLists(populatedDaysOfMonthList);
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
-        List<Integer> daysOfYearList = new ArrayList<>();
+        List<Integer> populatedDaysOfYearList = new ArrayList<>();
 
         int firstDayOfDuration = 1;
         int lastDayOfDuration = daysInYear;
@@ -179,15 +182,15 @@ public class DailyStatsAccess {
         //If days exists in database, add it to list of days in year list.
         for (int i=0; i<daysInYear; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
-                daysOfYearList.add(firstAggregatedDayOfYearToUse+i);
+                populatedDaysOfYearList.add(firstAggregatedDayOfYearToUse+i);
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(daysOfYearList);
+        populateDayHolderAndStatsForEachActivityLists(populatedDaysOfYearList);
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
-        List<Integer> nonNullDayList = new ArrayList<>();
+        List<Integer> populatedCustomDayList = new ArrayList<>();
         int firstDayOfDuration = dayOfYear;
         int lastDayOfDuration = dayOfYear;
         int firstAggregatedDayOfYearToUse = dayOfYear + valueToAddToStartingDurationDayForFutureYears();
@@ -200,20 +203,18 @@ public class DailyStatsAccess {
             convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
         }
 
-        Log.i("testDur", "first day is " + firstDayOfDuration);
-        Log.i("testDur", "last day is " + lastDayOfDuration);
-
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
 
+            //Todo: This checks DayHolder size. B0rked if that's 0 while StatsForEach is populated.
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
-                nonNullDayList.add(dayFromList);
+                populatedCustomDayList.add(dayFromList);
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(nonNullDayList);
+        populateDayHolderAndStatsForEachActivityLists(populatedCustomDayList);
     }
 
     private void convertToStringAndSetSingleDay(int day) {

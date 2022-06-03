@@ -162,9 +162,6 @@ public class DotDraws extends View {
   public void receivePhoneDimensions(int height, int width) {
     mPhoneHeight = height / getResources().getDisplayMetrics().scaledDensity;
     mPhoneWidth = width / getResources().getDisplayMetrics().scaledDensity;
-
-    Log.i("testSize", "converted width value is " + mPhoneHeight);
-    Log.i("testSize", "converted height value is " + mPhoneWidth);
   }
 
   @Override
