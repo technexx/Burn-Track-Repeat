@@ -188,13 +188,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
                     getActivity().runOnUiThread(()-> {
-                        if (currentStatDurationMode==DAILY_STATS) {
-                            setSingleDateStringOnTextView();
-                        } else {
-                            convertAndSetDateRangeStringOnTextView();
-                        }
+                        setDurationRangeTextView();
+                        setSelectionDayIfSelectingSingleDayFromCustomDuration();
+                        enableEditButtonIfDisabled();
                     });
                 });
+                Log.i("testListener", "onDateSelected called!");
             }
         });
 
@@ -213,9 +212,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
                     getActivity().runOnUiThread(()-> {
+                        disableEditButtonIfMoreThanOneDateSelected(dates);
                         convertAndSetDateRangeStringOnTextView();
                     });
                 });
+                Log.i("testListener", "onRangeSelected called!");
             }
         });
 
@@ -251,11 +252,37 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
+    private void setDurationRangeTextView() {
+        if (currentStatDurationMode==DAILY_STATS) {
+            setSingleDateStringOnTextView();
+        } else {
+            convertAndSetDateRangeStringOnTextView();
+        }
+    }
+
     private void calendarDateChangeLogic() {
         dailyStatsAdapter.turnOffEditMode();
         dailyStatsAdapter.getItemCount();
 
         dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
+    }
+
+    private void disableEditButtonIfMoreThanOneDateSelected(List<CalendarDay> calendarDayList) {
+        if (calendarDayList.size()>1) {
+            toggleEditStatsButton(false);
+        }
+    }
+
+    private void enableEditButtonIfDisabled() {
+        if (!editTdeeStatsButton.isEnabled()) {
+            toggleEditStatsButton(true);
+        }
+    }
+
+    private void setSelectionDayIfSelectingSingleDayFromCustomDuration() {
+        if (currentStatDurationMode==CUSTOM_STATS) {
+            calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
+        }
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
@@ -333,13 +360,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setStatDurationViews(int mode) {
-        toggleEditStatsButton(false);
+        toggleEditStatsButton(true);
 
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
-            toggleEditStatsButton(true);
             setSingleDateStringOnTextView();
         }
         if (mode==WEEKLY_STATS) {

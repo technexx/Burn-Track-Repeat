@@ -519,9 +519,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Should grey out deletion option day is empty.
-  //Todo: Should allow edit button in every case except a selected range, instead of just in Daily mode.
-  //Todo: Passing in wrong date to newly created list method (For daily).
+  //Todo: Should grey out deletion option if day is empty.
   //Todo: Animation blip on duration mode change.
   //Todo: Toast pops up even w/ empty days on deletion at moment.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
