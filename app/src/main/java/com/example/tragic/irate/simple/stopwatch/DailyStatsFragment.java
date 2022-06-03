@@ -256,7 +256,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAdapter.getItemCount();
 
         dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
-        populateListsAndTextViewsFromEntityListsInDatabase();
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {

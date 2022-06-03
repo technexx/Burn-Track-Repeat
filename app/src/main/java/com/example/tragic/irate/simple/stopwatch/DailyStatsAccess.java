@@ -208,7 +208,6 @@ public class DailyStatsAccess {
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
 
-            //Todo: This checks DayHolder size. B0rked if that's 0 while StatsForEach is populated.
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
                 populatedCustomDayList.add(dayFromList);
             }

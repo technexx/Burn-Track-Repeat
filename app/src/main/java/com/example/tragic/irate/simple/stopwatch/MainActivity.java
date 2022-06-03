@@ -519,8 +519,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: populateDayHolderAndStatsForEachActivityLists() being called twice on date selection.
-      //Todo: May also be the cause of our animation blip.
+  //Todo: Should grey out deletion option day is empty.
   //Todo: Should allow edit button in every case except a selected range, instead of just in Daily mode.
   //Todo: Passing in wrong date to newly created list method (For daily).
   //Todo: Animation blip on duration mode change.
