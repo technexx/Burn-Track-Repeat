@@ -82,12 +82,6 @@
         android:textSize="14sp">
     </TextView>
 
-    <com.example.tragic.irate.simple.stopwatch.Canvas.BlankCanvas
-        android:id="@+id/blank_canvas"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </com.example.tragic.irate.simple.stopwatch.Canvas.BlankCanvas>
-
     <FrameLayout
         android:id="@+id/settings_fragment_frameLayout"
         android:layout_width="match_parent"

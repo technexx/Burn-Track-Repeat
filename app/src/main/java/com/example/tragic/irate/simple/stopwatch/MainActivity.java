@@ -3,7 +3,6 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.AsyncNotedAppOp;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -26,8 +25,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -36,7 +33,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -75,7 +71,6 @@ import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapterTwo;
 import com.example.tragic.irate.simple.stopwatch.Adapters.LapAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedCycleAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedPomCycleAdapter;
-import com.example.tragic.irate.simple.stopwatch.Canvas.BlankCanvas;
 import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
 import com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas;
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
@@ -83,7 +78,6 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.OnSwipeTouchListener;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
@@ -97,11 +91,9 @@ import com.google.gson.Gson;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
 
@@ -121,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View savedCyclesTabView;
   View mainView;
   View actionBarView;
-  BlankCanvas blankCanvas;
   Calendar calendar;
   CalendarValues calendarValues;
   SimpleDateFormat simpleDateFormat;
@@ -129,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ImageButton fab;
   ImageButton stopwatch;
-//  ImageView sortCheckMark;
   TextView emptyCycleList;
 
   CyclesDatabase cyclesDatabase;
@@ -1279,7 +1269,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
-    blankCanvas = findViewById(R.id.blank_canvas);
 
     appHeader = findViewById(R.id.app_header);
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
@@ -1581,7 +1570,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setDefaultLayoutVisibilities() {
-    blankCanvas.setVisibility(View.GONE);
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -4420,7 +4408,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setVisibility(View.VISIBLE);
     new_lap.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
-    blankCanvas.setVisibility(View.GONE);
     addTDEEActivityTextView.setVisibility(View.VISIBLE);
     cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
     cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
