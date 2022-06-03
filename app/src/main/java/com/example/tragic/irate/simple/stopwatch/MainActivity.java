@@ -519,7 +519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: setAllDayAndStatListsForCustomDatesFromDatabase() uses DayHolder list to check for list sizes, but if we're adding activities to Stats, that doesn't create a DayHolder entry for that day!
   //Todo: populateDayHolderAndStatsForEachActivityLists() being called twice on date selection.
       //Todo: May also be the cause of our animation blip.
   //Todo: Should allow edit button in every case except a selected range, instead of just in Daily mode.
@@ -2132,12 +2131,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void refreshDailyStats() {
-    int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-    dailyStatsFragment.colorDaysWithAtLeastOneActivity();
-  }
-
   private void deleteDailyStatsForSelectedDay() {
     int daySelected = dailyStatsFragment.getDaySelectedFromCalendar();
 
@@ -2159,17 +2152,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     for (int i=0; i<statsForEachActivityList.size(); i++) {
-      longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getStatsForActivityId());
+      longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
     }
 
     dailyStatsAccess.deleteMultipleDayHolderEntries(longListOfDayIdsToToDelete);
     dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
+
+    refreshDailyStats();
   }
 
   private void deleteDailyStatsForAllDays() {
     dailyStatsAccess.deleteAllDayHolderEntries();
     dailyStatsAccess.deleteAllStatsForEachActivityEntries();
     refreshDailyStats();
+  }
+
+
+  private void refreshDailyStats() {
+    int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+    dailyStatsFragment.colorDaysWithAtLeastOneActivity();
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {

@@ -42,6 +42,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
+import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorator;
@@ -449,10 +450,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
             dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
 
-            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
-
             if (!dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
+                dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
+                dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
+
                 populateListsAndTextViewsFromEntityListsInDatabase();
                 mPositionToEdit = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().size()-1;
 
@@ -460,12 +461,30 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAdapter.notifyDataSetChanged();
                     populateEditPopUpWithNewRow();
                 });
+
+
             } else {
                 getActivity().runOnUiThread(()->{
                     Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
                 });
             }
+
+            queryAndLogDayAndStatsDatabaseRows();
         });
+    }
+
+    private void queryAndLogDayAndStatsDatabaseRows() {
+        CyclesDatabase cyclesDatabase = CyclesDatabase.getDatabase(getContext().getApplicationContext());
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+
+        for (int i=0; i<dayHolderList.size(); i++) {
+            Log.i("testRows", "DayHolder Id rows are " + dayHolderList.get(i).getDayId());
+        }
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            Log.i("testRows", "StatsForEachActivity Id rows are " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
+        }
     }
 
     @Override
