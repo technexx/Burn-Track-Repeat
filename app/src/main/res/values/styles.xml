@@ -48,11 +48,15 @@
 
     <style name="StatFragmentTheme">
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="fontFamily">@font/roboto</item>
     </style>
 
-    <style name="CustomTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
+    <style name="StatRecyclerViewHeader">
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="CalendarDateTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
         <item name="android:textColor">@drawable/calendar_view_date_text_color</item>
     </style>
 

@@ -12,7 +12,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
         android:paddingStart="6dp"
-        android:paddingEnd="6dp">
+        android:paddingEnd="6dp"
+        android:textSize="22sp">
     </TextView>
 
     <TextView

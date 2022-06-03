@@ -207,7 +207,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private void setHolderViewTextStyles(int textStyle) {
         if (textStyle==BOLD_TEXT) {
-            mHeaderViewHolder.activityHeaderTextView.setTextSize(18);
             mHeaderViewHolder.activityHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.setTimeHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.caloriesBurnedHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
