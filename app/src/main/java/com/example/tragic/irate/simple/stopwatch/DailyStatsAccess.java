@@ -251,7 +251,7 @@ public class DailyStatsAccess {
     }
 
     private String convertDayOfYearToFormattedString(int day) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(Calendar.DAY_OF_YEAR, day);
         Date date = calendar.getTime();

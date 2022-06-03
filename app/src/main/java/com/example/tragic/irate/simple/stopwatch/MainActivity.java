@@ -519,9 +519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Animation blip on duration mode change.
-  //Todo: Toast pops up even w/ empty days on deletion at moment.
-  //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
       //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
@@ -531,6 +528,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
+  //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Dot numbers a bit unaligned to the right.
@@ -539,7 +537,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test all notifications.
   //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc.
 
-  //Todo: Since we access entire database on yearly query, should we just retain the global list and pull from there to avoid re-querying for values we already have.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
