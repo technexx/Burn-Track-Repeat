@@ -52,12 +52,19 @@
         <item name="fontFamily">@font/roboto</item>
     </style>
 
-    <style name="StatRecyclerViewHeader">
-        <item name="android:textSize">24sp</item>
+    <style name="CalendarHeader">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/test_blue</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CalendarWeekDayHeader">
+        <item name="android:textSize">17sp</item>
     </style>
 
     <style name="CalendarDateTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
         <item name="android:textColor">@drawable/calendar_view_date_text_color</item>
+        <item name="android:textSize">15sp</item>
     </style>
 
 </resources>
