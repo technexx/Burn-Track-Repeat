@@ -121,9 +121,6 @@ public class DailyStatsAccess {
             mDayHolderList = new ArrayList<>();
             statsForEachActivityListForFragmentAccess = new ArrayList<>();
         }
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            Log.i("testDate", "dayholder list dates are " + mDayHolderList.get(i).getDate());
-        }
     }
 
     public List<DayHolder> getDayHolderList() {

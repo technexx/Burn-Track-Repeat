@@ -519,7 +519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Should grey out deletion option if day is empty.
   //Todo: Animation blip on duration mode change.
   //Todo: Toast pops up even w/ empty days on deletion at moment.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -1957,6 +1956,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
       }
     }
+
     receivedHighlightPositions.clear();
 
     queryAndSortAllCyclesFromDatabase();
@@ -2139,9 +2139,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void deleteDailyStatsForMultipleDays() {
     List<DayHolder> dayHolderList = dailyStatsFragment.getDayHolderList();
-    List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
-
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
+
+    if (areAllDaysEmptyOfActivities(statsForEachActivityList)) {
+      runOnUiThread(()-> {
+        Toast.makeText(getApplicationContext(), "Nothing to delete!", Toast.LENGTH_SHORT).show();
+        return;
+      });
+    }
+
+    List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
     List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
 
     for (int i=0; i<dayHolderList.size(); i++) {
@@ -2156,6 +2163,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
 
     refreshDailyStats();
+  }
+
+  private boolean areAllDaysEmptyOfActivities(List<StatsForEachActivity> statsForEachActivityList) {
+    List<String> listOfActivities = new ArrayList<>();
+
+    for (int i=0; i<statsForEachActivityList.size(); i++) {
+      listOfActivities.add(statsForEachActivityList.get(i).getActivity());
+    }
+
+    return listOfActivities.size()==0;
   }
 
   private void deleteDailyStatsForAllDays() {
