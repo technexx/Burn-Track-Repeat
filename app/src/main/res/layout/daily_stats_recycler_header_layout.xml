@@ -13,7 +13,7 @@
         android:layout_marginStart="2dp"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
-        android:textSize="22sp">
+        android:textSize="20sp">
     </TextView>
 
     <TextView
@@ -23,7 +23,8 @@
         app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats_header"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="40dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:textSize="20sp">
     </TextView>
 
     <TextView
@@ -33,7 +34,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="8dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:textSize="20sp">
     </TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

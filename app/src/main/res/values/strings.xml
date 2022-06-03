@@ -90,7 +90,7 @@
     <string name="colon">":"</string>
 
     <string name="activity_text_header"><u>Activity</u></string>
-    <string name="set_time_text_header"><u>Sets</u></string>
+    <string name="set_time_text_header"><u>Time</u></string>
     <string name="break_time_text_header"><u>Breaks</u></string>
     <string name="calories_burned_text_header"><u>Calories</u></string>
 
