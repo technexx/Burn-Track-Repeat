@@ -49,11 +49,6 @@ public class LongToStringConverters {
             hours = minutes/60;
             minutes = minutes % 60;
         }
-
-//        Log.i("testTime", "seconds are " + seconds);
-//        Log.i("testTime", "minutes are " + minutes);
-//        Log.i("testTime", "hours are " + hours);
-
         return df.format(hours) + ":" + df.format(minutes) + ":" + df.format(seconds);
     }
 }

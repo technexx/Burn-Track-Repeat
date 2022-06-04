@@ -161,6 +161,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setTdeeSpinnerListeners();
 
         setValueCappingTextWatcherOnEditTexts();
+        setTextWatchersOnEditTexts();
 
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
@@ -598,6 +599,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             tdeeEditTextMinutes.setText(splitString[0]);
             tdeeEditTextSeconds.setText(splitString[1]);
         }
+
+        setEditTextsToEmptyIfAtZero(tdeeEditTextHours);
+        setEditTextsToEmptyIfAtZero(tdeeEditTextMinutes);
+        setEditTextsToEmptyIfAtZero(tdeeEditTextSeconds);
+    }
+
+    private void setEditTextsToEmptyIfAtZero(EditText editText) {
+        if (editText.getText().toString().equals("00")) {
+            editText.setText("");
+        }
     }
 
     private long getMillisValueToSaveFromEditTextString() {
@@ -663,6 +674,35 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpActivityTextView.setText(activityToAdd);
         setTdeeEditTexts(0);
     }
+
+    private TextWatcher alphaChangeIfEditTextValueIsZeroTextWatcher(EditText editText) {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (editText.getText().toString().equals("")) {
+                    editText.setAlpha(0.3f);
+                } else {
+                    editText.setAlpha(1.0f);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        };
+    }
+
+    private void setTextWatchersOnEditTexts() {
+        tdeeEditTextHours.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextHours));
+        tdeeEditTextMinutes.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextMinutes));
+        tdeeEditTextSeconds.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextSeconds));
+    }
+
+
 
     private void replaceAddPopUpWithEditPopUp() {
         tdeeAddPopUpWindow.dismiss();

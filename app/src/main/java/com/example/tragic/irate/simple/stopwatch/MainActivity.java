@@ -509,8 +509,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Stat BG should be black. Can contrast w/ lighter colors. Or have dark/light modes. OR light mode default since this is a workout app.
-      //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
+  //Todo: "Nothing to delete" toast when trying to delete day.
+  //Todo: Stat edits should have "00" as hint and not actual numbers since that precludes typing until they're deleted.
+  //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
   //Todo: Test dates from future years.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
@@ -1099,7 +1100,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
 
-          //Todo: Removed single delete here.
         } else if (delete_all_text.getText().equals(getString(R.string.delete_single_day_from_stats))) {
           deleteDailyStatsForMultipleDays();
 
