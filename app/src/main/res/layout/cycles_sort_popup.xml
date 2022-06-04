@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rounded_corners"
+    android:backgroundTint="@color/Gray"
+    android:paddingBottom="10dp"
+    android:id="@+id/sort_layout">
+
+    <TextView
+        android:text="Added: Most Recent"
+        android:id="@+id/sort_most_recent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Added: Least Recent"
+        android:id="@+id/sort_least_recent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_most_recent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Title: A - Z"
+        android:id="@+id/sort_title_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_least_recent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Title: Z - A"
+        android:id="@+id/sort_title_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_title_start"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Round Count: Most"
+        android:id="@+id/sort_number_high"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_title_end"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Round Count: Least"
+        android:id="@+id/sort_number_low"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_number_high"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:textSize="16sp">
+    </TextView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   View deleteCyclePopupView;
   View sortCyclePopupView;
+  View sortStatsPopupView;
   View savedCyclePopupView;
   View editCyclesPopupView;
   View settingsPopupView;
@@ -512,7 +513,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
+  int SORTING_CYCLES = 0;
+  int SORTING_STATS = 1;
+
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
   //Todo: Test dates from future years.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
@@ -1120,6 +1123,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  private void toggleSortMenuViewBetweenCyclesAndStats(int typeOfSort) {
+    if (typeOfSort==SORTING_CYCLES) {
+      sortPopupWindow.setContentView(sortCyclePopupView);
+    }
+    if (typeOfSort==SORTING_STATS) {
+      sortPopupWindow.setContentView(sortStatsPopupView);
+    }
+  }
+
   private void groupAllAppStartInstantiations() {
     instantiateGlobalClasses();
     removeAllTimerSharedPreferences();
@@ -1491,7 +1503,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
-    sortCyclePopupView = inflater.inflate(R.layout.sort_popup, null);
+    sortCyclePopupView = inflater.inflate(R.layout.cycles_sort_popup, null);
+    sortStatsPopupView = inflater.inflate(R.layout.stats_sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
     addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
@@ -2108,7 +2121,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
               .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
               .commit();
-      sortButton.setVisibility(View.INVISIBLE);
+//      sortButton.setVisibility(View.INVISIBLE);
       setTypeOFMenu(DAILY_SETTINGS_MENU);
     }
   }

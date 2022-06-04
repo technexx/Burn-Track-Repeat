@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/rounded_corners"
-    android:backgroundTint="@color/Gray"
-    android:paddingBottom="10dp"
-    android:id="@+id/sort_layout">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:text="Added: Most Recent"
@@ -33,8 +29,8 @@
     </TextView>
 
     <TextView
-        android:text="Title: A - Z"
-        android:id="@+id/sort_title_start"
+        android:text="Activity Name: A - Z"
+        android:id="@+id/sort_activity_name_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_least_recent"
@@ -45,11 +41,11 @@
     </TextView>
 
     <TextView
-        android:text="Title: Z - A"
-        android:id="@+id/sort_title_end"
+        android:text="Activity Name: Z - A"
+        android:id="@+id/sort_activity_name_end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_title_start"
+        app:layout_constraintTop_toBottomOf="@id/sort_activity_name_start"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
         android:layout_marginTop="10dp"
@@ -57,11 +53,35 @@
     </TextView>
 
     <TextView
-        android:text="Round Count: Most"
-        android:id="@+id/sort_number_high"
+        android:text="Time: Most"
+        android:id="@+id/sort_most_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_title_end"
+        app:layout_constraintTop_toBottomOf="@id/sort_activity_name_end"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Time: Least"
+        android:id="@+id/sort_least_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_most_time"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Calories: Most"
+        android:id="@+id/sort_calories_most"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_least_time"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
@@ -69,26 +89,16 @@
     </TextView>
 
     <TextView
-        android:text="Round Count: Least"
-        android:id="@+id/sort_number_low"
+        android:text="Calories: Least"
+        android:id="@+id/sort_calories_least"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_number_high"
+        app:layout_constraintTop_toBottomOf="@id/sort_calories_most"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"
         android:textSize="16sp">
     </TextView>
-
-<!--    <ImageView-->
-<!--        android:id="@+id/sortCheckMark"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toEndOf="@id/sort_most_recent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        android:layout_marginStart="14dp"-->
-<!--        android:src="@drawable/check_16">-->
-<!--    </ImageView>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
