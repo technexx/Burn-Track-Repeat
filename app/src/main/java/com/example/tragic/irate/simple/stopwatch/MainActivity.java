@@ -577,11 +577,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
+    //Back to Main focus. Fragment dismissed and Frame Layout visibiltiy removed.
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
       mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
-      sortButton.setVisibility(View.VISIBLE);
+
       setTypeOFMenu(DEFAULT_MENU);
+      toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
@@ -2121,8 +2123,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
               .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
               .commit();
-//      sortButton.setVisibility(View.INVISIBLE);
       setTypeOFMenu(DAILY_SETTINGS_MENU);
+
+      toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
     }
   }
 
