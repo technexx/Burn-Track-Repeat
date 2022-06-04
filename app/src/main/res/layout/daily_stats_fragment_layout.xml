@@ -159,7 +159,9 @@
         app:mcv_selectionColor="@color/off_white"
         app:mcv_dateTextAppearance="@style/CalendarDateTextAppearance"
         app:mcv_headerTextAppearance="@style/CalendarHeader"
-        app:mcv_weekDayTextAppearance="@style/CalendarWeekDayHeader">
+        app:mcv_weekDayTextAppearance="@style/CalendarWeekDayHeader"
+        app:mcv_leftArrowMask="@drawable/calendar_left_arrow"
+        app:mcv_rightArrowMask="@drawable/calendar_right_arrow">
     </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
     <ImageButton

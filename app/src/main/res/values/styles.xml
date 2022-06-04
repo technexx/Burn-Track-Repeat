@@ -48,8 +48,7 @@
 
     <style name="StatFragmentTheme">
 <!--        <item name="backgroundColor">@color/black</item>-->
-        <!--backgroundTint hits the backgrounds of our ImageViews!-->
-<!--        <item name="backgroundTint">@color/black</item>-->
+        <!-- backgroundTint hits the backgrounds of our ImageViews !-->
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">24sp</item>
         <item name="fontFamily">@font/roboto</item>
@@ -59,6 +58,9 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/test_blue</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CalendarArrows">
     </style>
 
     <style name="CalendarWeekDayHeader">
