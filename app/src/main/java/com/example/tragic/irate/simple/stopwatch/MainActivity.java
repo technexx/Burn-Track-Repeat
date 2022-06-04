@@ -509,8 +509,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String timerTextViewStringTwo = "";
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
-  //Todo: "Nothing to delete" toast when trying to delete day.
-  //Todo: Stat edits should have "00" as hint and not actual numbers since that precludes typing until they're deleted.
   //Todo: Changing colors of stat total or other closely positioned values will help differentiate them.
   //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
   //Todo: Test dates from future years.
@@ -1101,7 +1099,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           deleteTotalCycleTimes();
 
         } else if (delete_all_text.getText().equals(getString(R.string.delete_single_day_from_stats))) {
-          deleteDailyStatsForMultipleDays();
+          deleteDailyStatsForSelectedDays();
 
         } else if (delete_all_text.getText().equals(getString(R.string.delete_all_stats))) {
           deleteDailyStatsForAllDays();
@@ -2113,16 +2111,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void deleteDailyStatsForSelectedDay() {
-    int daySelected = dailyStatsFragment.getDaySelectedFromCalendar();
-
-    dailyStatsAccess.deleteDayHolderEntity(daySelected);
-    dailyStatsAccess.deleteStatForEachActivityEntityForSelectedDay(daySelected);
-
-    refreshDailyStats();
-  }
-
-  private void deleteDailyStatsForMultipleDays() {
+  private void deleteDailyStatsForSelectedDays() {
     List<DayHolder> dayHolderList = dailyStatsFragment.getDayHolderList();
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
 
@@ -2166,11 +2155,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     refreshDailyStats();
   }
 
-
   private void refreshDailyStats() {
-    int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-    dailyStatsFragment.colorDaysWithAtLeastOneActivity();
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
