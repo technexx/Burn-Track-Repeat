@@ -1,15 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.Drawable;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +8,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tragic.irate.simple.stopwatch.ChangeSettingsValues;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

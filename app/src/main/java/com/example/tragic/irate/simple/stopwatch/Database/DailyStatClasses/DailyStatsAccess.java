@@ -1,15 +1,13 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.DayHolder;
-import com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses.StatsForEachActivity;
+import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
+import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
-
-import org.threeten.bp.LocalDate;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

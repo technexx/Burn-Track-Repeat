@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 
 import android.content.Context;
 
@@ -10,9 +10,9 @@ import java.util.List;
 public class TDEEChosenActivitySpinnerValues {
 
     Context mContext;
-    ArrayList<String> category_list;
-    ArrayList<String[]> subCategoryListOfStringArrays;
-    ArrayList<String[]> subValueListOfStringArrays;
+    public ArrayList<String> category_list;
+    public ArrayList<String[]> subCategoryListOfStringArrays;
+    public ArrayList<String[]> subValueListOfStringArrays;
 
     String[] bicycling;
     String[] conditioning;

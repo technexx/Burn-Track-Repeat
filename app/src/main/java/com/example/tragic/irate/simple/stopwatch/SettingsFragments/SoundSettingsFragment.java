@@ -8,7 +8,6 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreference;
 
-import com.example.tragic.irate.simple.stopwatch.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.R;
 
 public class SoundSettingsFragment extends PreferenceFragmentCompat {

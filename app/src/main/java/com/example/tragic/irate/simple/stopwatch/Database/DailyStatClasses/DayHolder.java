@@ -1,10 +1,7 @@
-package com.example.tragic.irate.simple.stopwatch.Database.DayStatClasses;
+package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-
-import java.util.List;
 
 @Entity(tableName = "DayHolder")
 public class DayHolder {

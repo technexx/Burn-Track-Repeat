@@ -1,4 +1,4 @@
-package com.example.tragic.irate.simple.stopwatch;
+package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
