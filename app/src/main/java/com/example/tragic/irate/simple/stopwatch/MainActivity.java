@@ -87,6 +87,7 @@ import com.example.tragic.irate.simple.stopwatch.SettingsFragments.tdeeSettingsF
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -114,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View mainView;
   View actionBarView;
   Calendar calendar;
-  CalendarValues calendarValues;
   SimpleDateFormat simpleDateFormat;
   String date = "";
 
@@ -1186,8 +1186,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-    calendar = Calendar.getInstance(Locale.getDefault());
-    calendarValues = new CalendarValues();
     simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
   }
 
@@ -1657,7 +1655,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   };
 
   private void createNewListOfActivitiesIfDayHasChanged() {
-    dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
@@ -3219,7 +3218,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
     setViewsAndColorsToPreventTearingInEditPopUp(true);
@@ -3306,7 +3306,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForCurrentDayInMillis = 0;
       totalCaloriesBurnedForCurrentDay = 0;
     } else {
-      dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+      calendar = Calendar.getInstance(Locale.getDefault());
+      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
@@ -3319,7 +3320,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
-    dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
     if (!cycleHasActivityAssigned) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
@@ -4728,7 +4730,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logStatsForEachActivityDatabase(boolean currentDayOnly) {
     AsyncTask.execute(()->{
-      dayOfYear = calendarValues.calendar.get(Calendar.DAY_OF_YEAR);
+      Calendar calendar = Calendar.getInstance(Locale.getDefault());
+      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
       List<DayHolder> listOfDays = new ArrayList<>();
 

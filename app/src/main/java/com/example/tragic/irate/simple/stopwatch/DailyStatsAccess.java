@@ -21,7 +21,6 @@ import java.util.Locale;
 public class DailyStatsAccess {
     Context mContext;
     CyclesDatabase cyclesDatabase;
-    CalendarValues calendarValues = new CalendarValues();
 
     DayHolder mDayHolder;
     StatsForEachActivity mStatsForEachActivity;
@@ -81,7 +80,7 @@ public class DailyStatsAccess {
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
         if (!checkIfDayAlreadyExistsInDatabase(daySelected)) {
-            String date = calendarValues.getDateString();
+            String date = getDateString();
 
             mDayHolder = new DayHolder();
 
@@ -94,6 +93,12 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         }
+    }
+
+    private String getDateString() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        return simpleDateFormat.format(calendar.getTime());
     }
 
     public void assignDayHolderInstanceForSelectedDay(int daySelected) {
