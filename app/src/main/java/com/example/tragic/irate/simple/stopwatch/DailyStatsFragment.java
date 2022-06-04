@@ -194,7 +194,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         enableEditButtonIfDisabled();
                     });
                 });
-                Log.i("testListener", "onDateSelected called!");
+                Log.i("testCall", "onDateSelected called!");
             }
         });
 
@@ -217,7 +217,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         convertAndSetDateRangeStringOnTextView();
                     });
                 });
-                Log.i("testListener", "onRangeSelected called!");
+                Log.i("testCall", "onRangeSelected called!");
             }
         });
 
@@ -317,9 +317,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
-            setListsOfDayHolderAndStatsPrimaryIds();
         }
 
+        setListsOfDayHolderAndStatsPrimaryIds();
         dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
 
         if (hasNumberOfDaysWithAtLeastOneActivityChanged()) {
@@ -330,6 +330,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setListsOfDayHolderAndStatsPrimaryIds() {
         dayHolderList = dailyStatsAccess.getDayHolderList();
         statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess();
+        Log.i("testList", "stats list in Fragment setter is " + statsForEachActivityList.size());
     }
 
     public List<DayHolder> getDayHolderList() {
@@ -337,6 +338,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public List<StatsForEachActivity> getStatsForEachActivityList() {
+        Log.i("testList", "stats list in Fragment getter is " + statsForEachActivityList.size());
         return statsForEachActivityList;
     }
 

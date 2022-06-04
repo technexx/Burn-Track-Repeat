@@ -111,6 +111,8 @@ public class DailyStatsAccess {
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToRetrieve);
 
         convertToStringAndSetSingleDay(dayToRetrieve);
+
+        Log.i("testList", "stats list in single day query is " + statsForEachActivityListForFragmentAccess.size());
     }
 
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
@@ -121,6 +123,7 @@ public class DailyStatsAccess {
             mDayHolderList = new ArrayList<>();
             statsForEachActivityListForFragmentAccess = new ArrayList<>();
         }
+        Log.i("testList", "stats list in multiple day query is " + statsForEachActivityListForFragmentAccess.size());
     }
 
     public List<DayHolder> getDayHolderList() {
