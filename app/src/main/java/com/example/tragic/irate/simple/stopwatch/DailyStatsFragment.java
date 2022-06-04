@@ -612,13 +612,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private long getMillisValueToSaveFromEditTextString() {
-        setEditTextToZerosIfEmpty(tdeeEditTextHours);
-        setEditTextToZerosIfEmpty(tdeeEditTextMinutes);
-        setEditTextToZerosIfEmpty(tdeeEditTextSeconds);
-
-        long hours = Long.parseLong(tdeeEditTextHours.getText().toString());
-        long minutes = Long.parseLong(tdeeEditTextMinutes.getText().toString());
-        long seconds = Long.parseLong(tdeeEditTextSeconds.getText().toString());
+        long hours = setLongValueOfEditTextStrings(tdeeEditTextHours);
+        long minutes = setLongValueOfEditTextStrings(tdeeEditTextMinutes);
+        long seconds = setLongValueOfEditTextStrings(tdeeEditTextSeconds);
 
         if (seconds >= 60) {
             seconds = seconds % 60;
@@ -634,10 +630,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return totalSeconds;
     }
 
-    private void setEditTextToZerosIfEmpty (EditText editText) {
-        if (editText.getText().toString().equals("")) {
-            editText.setText(R.string.double_zeros);
+    private long setLongValueOfEditTextStrings(EditText editText) {
+        long valueToReturn;
+
+        if (!editText.getText().toString().equals("")) {
+            valueToReturn = Long.parseLong(editText.getText().toString());
+        } else {
+            valueToReturn = 0;
         }
+
+        return valueToReturn;
+    }
+
+    private void setValueCappingTextWatcherOnEditTexts() {
+        tdeeEditTextMinutes.addTextChangedListener(editTextWatcher(tdeeEditTextMinutes));
+        tdeeEditTextSeconds.addTextChangedListener(editTextWatcher(tdeeEditTextSeconds));
     }
 
     private TextWatcher editTextWatcher(EditText editText) {
@@ -661,18 +668,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         };
     }
 
-    private void setValueCappingTextWatcherOnEditTexts() {
-        tdeeEditTextMinutes.addTextChangedListener(editTextWatcher(tdeeEditTextMinutes));
-        tdeeEditTextSeconds.addTextChangedListener(editTextWatcher(tdeeEditTextSeconds));
-    }
-
-    private void populateEditPopUpWithNewRow() {
-        replaceAddPopUpWithEditPopUp();
-
-        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
-
-        tdeeEditPopUpActivityTextView.setText(activityToAdd);
-        setTdeeEditTexts(0);
+    private void setTextWatchersOnEditTexts() {
+        tdeeEditTextHours.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextHours));
+        tdeeEditTextMinutes.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextMinutes));
+        tdeeEditTextSeconds.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextSeconds));
     }
 
     private TextWatcher alphaChangeIfEditTextValueIsZeroTextWatcher(EditText editText) {
@@ -696,19 +695,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         };
     }
 
-    private void setTextWatchersOnEditTexts() {
-        tdeeEditTextHours.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextHours));
-        tdeeEditTextMinutes.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextMinutes));
-        tdeeEditTextSeconds.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextSeconds));
-    }
-
-
-
     private void replaceAddPopUpWithEditPopUp() {
         tdeeAddPopUpWindow.dismiss();
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
+    private void populateEditPopUpWithNewRow() {
+        replaceAddPopUpWithEditPopUp();
+
+        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+
+        tdeeEditPopUpActivityTextView.setText(activityToAdd);
+        setTdeeEditTexts(0);
+    }
     private void setTdeeSpinnerListeners() {
         tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
