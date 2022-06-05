@@ -1906,6 +1906,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         highlightSelectedSortTextViewForStats(sortStatsByLeastCaloriesTextView);
       }
 
+      //Todo: setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase() database query OVERRIDES our sort. We need queries of each duration's uniqueID WITH the desired sort type.
       AsyncTask.execute(()-> {
         queryAndSortAllStatsFromDatabase(sortModeForStats);
         dailyStatsFragment.refreshStatsForEachActivityListsOnAdapter();
