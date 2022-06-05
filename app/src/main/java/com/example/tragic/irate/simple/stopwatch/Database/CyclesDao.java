@@ -51,9 +51,6 @@ CyclesDao {
     @Delete
     void deleteStatsForEachActivity(StatsForEachActivity statsForEachActivity);
 
-    @Query("SELECT * from StatsForEachActivity")
-    List<StatsForEachActivity> loadAllActivitiesForAllDays();
-
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IS:yearID")
     List<StatsForEachActivity> loadFourDigitYearForStatsForEachActivity(long yearID);
 
@@ -62,6 +59,27 @@ CyclesDao {
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs)")
     List<StatsForEachActivity> loadActivitiesForMultipleDays(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from StatsForEachActivity")
+    List<StatsForEachActivity> loadAllActivitiesForAllDays();
+
+    @Query("SELECT * from StatsForEachActivity ORDER by activity DESC")
+    List<StatsForEachActivity> loadActivitiesByAToZTitle();
+
+    @Query("SELECT * from StatsForEachActivity ORDER by activity ASC")
+    List<StatsForEachActivity> loadActivitiesByZToATitle();
+
+    @Query("SELECT * from StatsForEachActivity ORDER by totalSetTimeForEachActivity DESC")
+    List<StatsForEachActivity> loadActivitiesByMostTimeElapsed();
+
+    @Query("SELECT * from StatsForEachActivity ORDER by totalSetTimeForEachActivity ASC")
+    List<StatsForEachActivity> loadActivitiesByLeastTimeElapsed();
+
+    @Query("SELECT * from StatsForEachActivity ORDER by totalCaloriesBurnedForEachActivity DESC")
+    List<StatsForEachActivity> loadActivitiesByMostCaloriesBurned();
+
+    @Query("SELECT * from StatsForEachActivity ORDER by totalCaloriesBurnedForEachActivity ASC")
+    List<StatsForEachActivity> loadActivitiesByLeastCaloriesBurned();
 
     @Query("DELETE from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:listID")
     void deleteActivityStatsForSingleDay (long listID);

@@ -6,35 +6,11 @@
     android:background="@color/black">
 
     <TextView
-        android:text="Added: Most Recent"
-        android:id="@+id/sort_most_recent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
-        android:textSize="16sp">
-    </TextView>
-
-    <TextView
-        android:text="Added: Least Recent"
-        android:id="@+id/sort_least_recent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_most_recent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="4dp"
-        android:textSize="16sp">
-    </TextView>
-
-    <TextView
         android:text="Activity Name: A - Z"
         android:id="@+id/sort_activity_name_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_least_recent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
         android:layout_marginTop="10dp"

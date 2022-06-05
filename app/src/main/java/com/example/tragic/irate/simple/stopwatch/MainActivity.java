@@ -516,7 +516,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Sort activities options (same as cycles). Some unwanted auto-sorting on addition right now.
+  //Todo:
+  //Todo: Consider a centered popUp w/ dot selected sorting (like old notepad app) for Stats and possibly Cycles.
   //Todo: Test dates from future years.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
