@@ -1908,8 +1908,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(()-> {
         queryAndSortAllStatsFromDatabase(sortModeForStats);
+        dailyStatsFragment.refreshStatsForEachActivityListsOnAdapter();
+
         runOnUiThread(()-> {
-          dailyStatsFragment.refreshStatsForEachActivityListsOnAdapter();
           sortPopupWindow.dismiss();
         });
       });

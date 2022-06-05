@@ -289,8 +289,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public void refreshStatsForEachActivityListsOnAdapter() {
-        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-        dailyStatsAdapter.notifyDataSetChanged();
+        setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
+
+        getActivity().runOnUiThread(()-> {
+            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+            dailyStatsAdapter.notifyDataSetChanged();
+        });
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
