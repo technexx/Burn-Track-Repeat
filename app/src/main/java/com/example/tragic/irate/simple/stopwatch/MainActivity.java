@@ -856,13 +856,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
-    sortRecent.setOnClickListener(cyclesSortOptionListener());
-    sortNotRecent.setOnClickListener(cyclesSortOptionListener());
-    sortAlphaStart.setOnClickListener(cyclesSortOptionListener());
-    sortAlphaEnd.setOnClickListener(cyclesSortOptionListener());
-    sortHigh.setOnClickListener(cyclesSortOptionListener());
-    sortLow.setOnClickListener(cyclesSortOptionListener());
-
     timerPopUpWindow.setOnDismissListener(() -> {
       timerPopUpDismissalLogic();
 
@@ -1188,6 +1181,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnerListeners();
     instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
+
+    setAllSortTextViewsOntoClickListeners();
   }
 
   private void instantiateGlobalClasses() {
@@ -1915,6 +1910,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         queryAndSortAllStatsFromDatabase(sortModeForStats);
         runOnUiThread(()-> {
           dailyStatsFragment.refreshStatsForEachActivityListsOnAdapter();
+          sortPopupWindow.dismiss();
         });
       });
     };
@@ -1950,6 +1946,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 6:
         cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(); break;
     }
+  }
+
+  private void setAllSortTextViewsOntoClickListeners() {
+    sortRecent.setOnClickListener(cyclesSortOptionListener());
+    sortNotRecent.setOnClickListener(cyclesSortOptionListener());
+    sortAlphaStart.setOnClickListener(cyclesSortOptionListener());
+    sortAlphaEnd.setOnClickListener(cyclesSortOptionListener());
+    sortHigh.setOnClickListener(cyclesSortOptionListener());
+    sortLow.setOnClickListener(cyclesSortOptionListener());
+
+    sortStatsAToZTextView.setOnClickListener(statsSortOptionListener());
+    sortStatsZToATextView.setOnClickListener(statsSortOptionListener());
+    sortStatsByMostTimeTextView.setOnClickListener(statsSortOptionListener());
+    sortStatsByLeastTimeTextView.setOnClickListener(statsSortOptionListener());
+    sortStatsByMostCaloriesTextView.setOnClickListener(statsSortOptionListener());
+    sortStatsByLeastCaloriesTextView.setOnClickListener(statsSortOptionListener());
   }
 
   private void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
