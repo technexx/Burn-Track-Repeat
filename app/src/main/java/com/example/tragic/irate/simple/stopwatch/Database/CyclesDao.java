@@ -54,6 +54,7 @@ CyclesDao {
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IS:yearID")
     List<StatsForEachActivity> loadFourDigitYearForStatsForEachActivity(long yearID);
 
+    //Todo: We just need to set our different sort calls on each of these two uniqueID queries.
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
 
@@ -63,23 +64,23 @@ CyclesDao {
     @Query("SELECT * from StatsForEachActivity")
     List<StatsForEachActivity> loadAllActivitiesForAllDays();
 
-    @Query("SELECT * from StatsForEachActivity ORDER by activity DESC")
-    List<StatsForEachActivity> loadActivitiesByAToZTitle();
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by activity DESC")
+    List<StatsForEachActivity> loadActivitiesByAToZTitle(List<Integer> yearIDs);
 
-    @Query("SELECT * from StatsForEachActivity ORDER by activity ASC")
-    List<StatsForEachActivity> loadActivitiesByZToATitle();
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by activity ASC")
+    List<StatsForEachActivity> loadActivitiesByZToATitle(List<Integer> yearIDs);
 
-    @Query("SELECT * from StatsForEachActivity ORDER by totalSetTimeForEachActivity DESC")
-    List<StatsForEachActivity> loadActivitiesByMostTimeElapsed();
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalSetTimeForEachActivity DESC")
+    List<StatsForEachActivity> loadActivitiesByMostTimeElapsed(List<Integer> yearIDs);
 
-    @Query("SELECT * from StatsForEachActivity ORDER by totalSetTimeForEachActivity ASC")
-    List<StatsForEachActivity> loadActivitiesByLeastTimeElapsed();
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalSetTimeForEachActivity ASC")
+    List<StatsForEachActivity> loadActivitiesByLeastTimeElapsed(List<Integer> yearIDs);
 
-    @Query("SELECT * from StatsForEachActivity ORDER by totalCaloriesBurnedForEachActivity DESC")
-    List<StatsForEachActivity> loadActivitiesByMostCaloriesBurned();
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalCaloriesBurnedForEachActivity DESC")
+    List<StatsForEachActivity> loadActivitiesByMostCaloriesBurned(List<Integer> yearIDs);
 
-    @Query("SELECT * from StatsForEachActivity ORDER by totalCaloriesBurnedForEachActivity ASC")
-    List<StatsForEachActivity> loadActivitiesByLeastCaloriesBurned();
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalCaloriesBurnedForEachActivity ASC")
+    List<StatsForEachActivity> loadActivitiesByLeastCaloriesBurned(List<Integer> yearIDs);
 
     @Query("DELETE from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:listID")
     void deleteActivityStatsForSingleDay (long listID);

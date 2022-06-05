@@ -1933,6 +1933,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortStatsByLeastCaloriesTextView.setBackgroundColor(noHighlight);
   }
 
+  //Todo: We need to replace the database calls in DailyStatsAccess with whichever one we're sorting on.
   private void queryAndSortAllStatsFromDatabase(int typeOfSort) {
     switch (typeOfSort) {
       case 1:
@@ -4860,13 +4861,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
       List<DayHolder> listOfDays = new ArrayList<>();
 
-      if (currentDayOnly) {
-        listOfActivities = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
-        listOfDays = cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear);
-      } else {
-        listOfActivities = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
-        listOfDays = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-      }
+//      if (currentDayOnly) {
+//        listOfActivities = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
+//        listOfDays = cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear);
+//      } else {
+//        listOfActivities = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+//        listOfDays = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+//      }
 
       for (int i=0; i<listOfActivities.size(); i++) {
         Log.i("testStatsDb", "entry position is " + i);
