@@ -201,6 +201,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView sortNotRecent;
   TextView sortHigh;
   TextView sortLow;
+
+  TextView sortStatsAToZTextView;
+  TextView sortStatsZToATextView;
+  TextView sortStatsByMostTimeTextView;
+  TextView sortStatsByLeastTimeTextView;
+  TextView sortStatsByMostCaloriesTextView;
+  TextView sortStatsByLeastCaloriesTextView;
+
   TextView delete_all_text;
   Button delete_all_confirm;
   Button delete_all_cancel;
@@ -215,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortMode = 1;
   int sortModePom = 1;
   int sortHolder = 1;
+  int sortModeForStats;
   int positionOfSelectedCycle = 0;
   String cycleTitle = "";
   List<Integer> receivedHighlightPositions;
@@ -847,12 +856,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
 
-    sortRecent.setOnClickListener(individualSortOptionButtonsListener());
-    sortNotRecent.setOnClickListener(individualSortOptionButtonsListener());
-    sortAlphaStart.setOnClickListener(individualSortOptionButtonsListener());
-    sortAlphaEnd.setOnClickListener(individualSortOptionButtonsListener());
-    sortHigh.setOnClickListener(individualSortOptionButtonsListener());
-    sortLow.setOnClickListener(individualSortOptionButtonsListener());
+    sortRecent.setOnClickListener(cyclesSortOptionListener());
+    sortNotRecent.setOnClickListener(cyclesSortOptionListener());
+    sortAlphaStart.setOnClickListener(cyclesSortOptionListener());
+    sortAlphaEnd.setOnClickListener(cyclesSortOptionListener());
+    sortHigh.setOnClickListener(cyclesSortOptionListener());
+    sortLow.setOnClickListener(cyclesSortOptionListener());
 
     timerPopUpWindow.setOnDismissListener(() -> {
       timerPopUpDismissalLogic();
@@ -1390,6 +1399,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
+
+    sortStatsAToZTextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_start);
+    sortStatsZToATextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_end);
+    sortStatsByMostTimeTextView = sortStatsPopupView.findViewById(R.id.sort_most_time);
+    sortStatsByLeastTimeTextView = sortStatsPopupView.findViewById(R.id.sort_least_time);
+    sortStatsByMostCaloriesTextView = sortStatsPopupView.findViewById(R.id.sort_calories_most);
+    sortStatsByLeastCaloriesTextView = sortStatsPopupView.findViewById(R.id.sort_calories_least);
   }
 
   private void assignDeletePopUpLayoutClassesToTheirIds() {
@@ -1777,7 +1793,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
-  private View.OnClickListener individualSortOptionButtonsListener() {
+  private View.OnClickListener cyclesSortOptionListener() {
     return view -> {
       TextView textButton = (TextView) view;
 
@@ -1848,6 +1864,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.notifyDataSetChanged();
       });
     }
+
     if (mode==3) {
       switch (sortModePom) {
         case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
@@ -1855,10 +1872,83 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
         case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
       }
+
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
         savedPomCycleAdapter.notifyDataSetChanged();
       });
+    }
+  }
+
+  private View.OnClickListener statsSortOptionListener() {
+    return view -> {
+      TextView textView = (TextView) view;
+
+      unHighlightAllSortTextViewsForStats();
+
+      if (textView.getText().toString().equals("Activity Name: A - Z")) {
+        sortModeForStats = 1;
+        highlightSelectedSortTextViewForStats(sortStatsAToZTextView);
+      }
+      if (textView.getText().toString().equals("Activity Name: Z - A")) {
+        sortModeForStats = 2;
+        highlightSelectedSortTextViewForStats(sortStatsZToATextView);
+      }
+      if (textView.getText().toString().equals("Time: Most")) {
+        sortModeForStats = 3;
+        highlightSelectedSortTextViewForStats(sortStatsByMostTimeTextView);
+      }
+      if (textView.getText().toString().equals("Time: Least")) {
+        sortModeForStats = 4;
+        highlightSelectedSortTextViewForStats(sortStatsByLeastTimeTextView);
+      }
+      if (textView.getText().toString().equals("Calories: Most")) {
+        sortModeForStats = 5;
+        highlightSelectedSortTextViewForStats(sortStatsByMostCaloriesTextView);
+      }
+      if (textView.getText().toString().equals("Calories: Least")) {
+        sortModeForStats = 6;
+        highlightSelectedSortTextViewForStats(sortStatsByLeastCaloriesTextView);
+      }
+
+      AsyncTask.execute(()-> {
+        queryAndSortAllStatsFromDatabase(sortModeForStats);
+        runOnUiThread(()-> {
+          dailyStatsFragment.refreshStatsForEachActivityListsOnAdapter();
+        });
+      });
+    };
+  }
+
+  private void highlightSelectedSortTextViewForStats(TextView textView) {
+    int colorToHighlight = getResources().getColor(R.color.test_highlight_2);
+    textView.setBackgroundColor(colorToHighlight);
+  }
+
+  private void unHighlightAllSortTextViewsForStats() {
+    int noHighlight = Color.TRANSPARENT;
+    sortStatsAToZTextView.setBackgroundColor(noHighlight);
+    sortStatsZToATextView.setBackgroundColor(noHighlight);
+    sortStatsByMostTimeTextView.setBackgroundColor(noHighlight);
+    sortStatsByLeastTimeTextView.setBackgroundColor(noHighlight);
+    sortStatsByMostCaloriesTextView.setBackgroundColor(noHighlight);
+    sortStatsByLeastCaloriesTextView.setBackgroundColor(noHighlight);
+  }
+
+  private void queryAndSortAllStatsFromDatabase(int typeOfSort) {
+    switch (typeOfSort) {
+      case 1:
+        cyclesDatabase.cyclesDao().loadActivitiesByAToZTitle(); break;
+      case 2:
+        cyclesDatabase.cyclesDao().loadActivitiesByZToATitle(); break;
+      case 3:
+        cyclesDatabase.cyclesDao().loadActivitiesByMostTimeElapsed(); break;
+      case 4:
+        cyclesDatabase.cyclesDao().loadActivitiesByLeastTimeElapsed(); break;
+      case 5:
+        cyclesDatabase.cyclesDao().loadActivitiesByMostCaloriesBurned(); break;
+      case 6:
+        cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(); break;
     }
   }
 
