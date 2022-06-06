@@ -3397,7 +3397,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
 
           if (cycleLaunchedFromEditPopUp) {
-            cycleTitle = cycleNameEdit.getText().toString();
+            if (cycleNameEdit.getText().toString().isEmpty()) {
+              cycleTitle = getCurrentDateString();
+            }
           }
           cycle_title_textView.setText(cycleTitle);
 
@@ -3405,6 +3407,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+  }
+
+  private String getCurrentDateString() {
+    calendar = Calendar.getInstance(Locale.getDefault());
+    return simpleDateFormat.format(calendar.getTime());
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {
@@ -3450,9 +3457,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundTypeString = "";
     pomString = "";
 
-    calendar = Calendar.getInstance(Locale.getDefault());
-    String date = simpleDateFormat.format(calendar.getTime());
-
     int cycleID;
     if (mode==1) {
       if (isNewCycle) {
@@ -3486,12 +3490,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTimeAccessed(System.currentTimeMillis());
         cycles.setItemCount(workoutTime.size());
         if (isNewCycle) {
-          if (cycleTitle.isEmpty()) {
-            cycleTitle = date;
-          }
           cycles.setTimeAdded(System.currentTimeMillis());;
           cycles.setTitle(cycleTitle);
-
           cyclesDatabase.cyclesDao().insertCycle(cycles);
         } else {
           cycles.setTitle(cycleTitle);
