@@ -525,6 +525,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: BUG: Activity/Calorie view and count up w/ out adding one (happened after launchign cycle a bunch and then app restart). Added as "Mountain Biking - General", listed as such in Stats, but iterating values from Timer do not transfer over.
+      //Todo: Its values save for DayHolder, though!
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.

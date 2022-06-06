@@ -13,6 +13,10 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="TimerTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="fontFamily">@font/roboto_medium</item>
+    </style>
+
     <style name="WindowAnimation">
         <item name="android:windowEnterAnimation">@anim/fade_in_short</item>
         <item name="android:windowExitAnimation">@anim/fade_out_short</item>
