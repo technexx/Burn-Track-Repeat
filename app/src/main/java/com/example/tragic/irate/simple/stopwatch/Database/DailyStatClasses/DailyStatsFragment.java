@@ -86,6 +86,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Animation slideOutToBottom;
     Animation slideInFromBottom;
 
+    int mSortMode;
     int currentStatDurationMode;
     int DAILY_STATS = 0;
     int WEEKLY_STATS = 1;
@@ -288,15 +289,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    public void refreshStatsForEachActivityListsOnAdapter() {
-        setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
-
-        getActivity().runOnUiThread(()-> {
-            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAdapter.notifyDataSetChanged();
-        });
-    }
-
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
@@ -322,10 +314,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    public void setSortMode(int sortMode) {
+        this.mSortMode = sortMode;
+    }
+
+    public void sortStatsAsACallFromMainActivity() {
+        dailyStatsAccess.setSortMode(mSortMode);
+        populateListsAndTextViewsFromEntityListsInDatabase();
+    }
+
     private void setListsOfDayHolderAndStatsPrimaryIds() {
         dayHolderList = dailyStatsAccess.getDayHolderList();
         statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess();
-        Log.i("testList", "stats list in Fragment setter is " + statsForEachActivityList.size());
     }
 
     public List<DayHolder> getDayHolderList() {
@@ -333,7 +333,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public List<StatsForEachActivity> getStatsForEachActivityList() {
-        Log.i("testList", "stats list in Fragment getter is " + statsForEachActivityList.size());
         return statsForEachActivityList;
     }
 

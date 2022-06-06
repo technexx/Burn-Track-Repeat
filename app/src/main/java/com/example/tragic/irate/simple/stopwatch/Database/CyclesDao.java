@@ -57,10 +57,10 @@ CyclesDao {
     @Query("SELECT * from StatsForEachActivity")
     List<StatsForEachActivity> loadAllActivitiesForAllDays();
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by activity DESC")
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by activity ASC")
     List<StatsForEachActivity> loadActivitiesByAToZTitle(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by activity ASC")
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by activity DESC")
     List<StatsForEachActivity> loadActivitiesByZToATitle(List<Integer> uniqueIDs);
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by totalSetTimeForEachActivity DESC")

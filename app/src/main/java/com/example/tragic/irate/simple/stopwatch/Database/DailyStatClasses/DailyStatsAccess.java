@@ -36,7 +36,6 @@ public class DailyStatsAccess {
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
 
-    boolean mQueryAndSortDays;
     int mSortMode = 1;
 
     String mSingleDayAsString;
@@ -114,14 +113,8 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: Again, different classes having different instances of this class!
     public void setSortMode(int sortMode) {
         this.mSortMode = sortMode;
-        Log.i("testSort", "sort mode is " + mSortMode);
-    }
-
-    public void setQueryAndSortBoolean(boolean queryDaysForSorting) {
-        this.mQueryAndSortDays = queryDaysForSorting;
     }
 
     public List<StatsForEachActivity> assignStatsForEachActivityListBySortMode(List<Integer> listOfDays) {
