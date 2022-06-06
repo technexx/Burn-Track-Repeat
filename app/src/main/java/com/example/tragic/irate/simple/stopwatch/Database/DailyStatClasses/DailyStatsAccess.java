@@ -114,8 +114,10 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: Again, different classes having different instances of this class!
     public void setSortMode(int sortMode) {
         this.mSortMode = sortMode;
+        Log.i("testSort", "sort mode is " + mSortMode);
     }
 
     public void setQueryAndSortBoolean(boolean queryDaysForSorting) {
