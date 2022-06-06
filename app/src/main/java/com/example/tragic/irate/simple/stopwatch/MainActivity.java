@@ -96,6 +96,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -119,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View actionBarView;
   Calendar calendar;
   SimpleDateFormat simpleDateFormat;
-  String date = "";
 
   ImageButton fab;
   ImageButton stopwatch;
@@ -525,13 +525,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Test dates from future years.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
+  //Todo: Test dates from future years.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Dot numbers a bit unaligned to the right.
@@ -3396,7 +3396,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
 
-          cycleTitle = cycleNameEdit.getText().toString();
+          if (cycleLaunchedFromEditPopUp) {
+            cycleTitle = cycleNameEdit.getText().toString();
+          }
+          cycle_title_textView.setText(cycleTitle);
+
           roundDownAllTotalTimeValuesToEnsureSyncing();
         }
       });
@@ -3417,8 +3421,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
 
-//      totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
-//      totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
+      totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
+      totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
     }
   }
 
@@ -3435,8 +3439,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
       totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
-//      totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-//      totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+      totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+      totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     }
   }
 
@@ -3447,7 +3451,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomString = "";
 
     calendar = Calendar.getInstance(Locale.getDefault());
-    date = simpleDateFormat.format(calendar.getTime());
+    String date = simpleDateFormat.format(calendar.getTime());
 
     int cycleID;
     if (mode==1) {
@@ -4488,10 +4492,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
     cycles_or_laps_completed_textView.setText(R.string.cycles_done);
-    if (cycleTitle.isEmpty()) {
-      cycleTitle = date;
-    }
-    cycle_title_textView.setText(cycleTitle);
+//    cycle_title_textView.setText(cycleTitle);
 
     dotDraws.resetDotAlpha();
     cycle_title_textView.setVisibility(View.VISIBLE);
