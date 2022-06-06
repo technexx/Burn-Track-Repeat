@@ -525,7 +525,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo:
   //Todo: Consider a centered popUp w/ dot selected sorting (like old notepad app) for Stats and possibly Cycles.
   //Todo: Test dates from future years.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
@@ -1906,10 +1905,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         highlightSelectedSortTextViewForStats(sortStatsByLeastCaloriesTextView);
       }
 
-      //Todo: setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase() database query OVERRIDES our sort. We need queries of each duration's uniqueID WITH the desired sort type.
       AsyncTask.execute(()-> {
-        queryAndSortAllStatsFromDatabase(sortModeForStats);
-        dailyStatsFragment.refreshStatsForEachActivityListsOnAdapter();
+        dailyStatsAccess.setSortMode(sortModeForStats);
+        dailyStatsAccess.setQueryAndSortBoolean(true);
 
         runOnUiThread(()-> {
           sortPopupWindow.dismiss();
@@ -1931,24 +1929,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortStatsByLeastTimeTextView.setBackgroundColor(noHighlight);
     sortStatsByMostCaloriesTextView.setBackgroundColor(noHighlight);
     sortStatsByLeastCaloriesTextView.setBackgroundColor(noHighlight);
-  }
-
-  //Todo: We need to replace the database calls in DailyStatsAccess with whichever one we're sorting on.
-  private void queryAndSortAllStatsFromDatabase(int typeOfSort) {
-    switch (typeOfSort) {
-      case 1:
-        cyclesDatabase.cyclesDao().loadActivitiesByAToZTitle(); break;
-      case 2:
-        cyclesDatabase.cyclesDao().loadActivitiesByZToATitle(); break;
-      case 3:
-        cyclesDatabase.cyclesDao().loadActivitiesByMostTimeElapsed(); break;
-      case 4:
-        cyclesDatabase.cyclesDao().loadActivitiesByLeastTimeElapsed(); break;
-      case 5:
-        cyclesDatabase.cyclesDao().loadActivitiesByMostCaloriesBurned(); break;
-      case 6:
-        cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(); break;
-    }
   }
 
   private void setAllSortTextViewsOntoClickListeners() {

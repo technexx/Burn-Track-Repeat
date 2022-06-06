@@ -11,7 +11,9 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +35,9 @@ public class DailyStatsAccess {
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
+
+    boolean mQueryAndSortDays;
+    int mSortMode;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -109,9 +114,43 @@ public class DailyStatsAccess {
         }
     }
 
+    public void setSortMode(int sortMode) {
+        this.mSortMode = sortMode;
+    }
+
+    public void setQueryAndSortBoolean(boolean queryDaysForSorting) {
+        this.mQueryAndSortDays = queryDaysForSorting;
+    }
+
+    //Todo: We only want to call this query when a sort option is selected.
+    public void sortStatsForEachActivityByMode(List<Integer> listOfDays) {
+        switch (mSortMode) {
+            case 1:
+                cyclesDatabase.cyclesDao().loadActivitiesByAToZTitle(listOfDays);
+                break;
+            case 2:
+                cyclesDatabase.cyclesDao().loadActivitiesByZToATitle(listOfDays);
+                break;
+            case 3:
+                cyclesDatabase.cyclesDao().loadActivitiesByMostTimeElapsed(listOfDays);
+                break;
+            case 4:
+                cyclesDatabase.cyclesDao().loadActivitiesByLeastTimeElapsed(listOfDays);
+                break;
+            case 5:
+                cyclesDatabase.cyclesDao().loadActivitiesByMostCaloriesBurned(listOfDays);
+                break;
+            case 6:
+                cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(listOfDays);
+                break;
+        }
+    }
+
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-        List<Integer> singleDayList = new ArrayList<>(dayToRetrieve);
+
+        List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
+        //Todo: We need to replace this DAO query with whichever sort mode query we have selected. We do a database query each time this is called by default, so we don't need a conditional to query/not query.
         statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
 
         convertToStringAndSetSingleDay(dayToRetrieve);
@@ -123,6 +162,11 @@ public class DailyStatsAccess {
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
             statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(integerListOfSelectedDays);
+
+            if (mQueryAndSortDays) {
+                sortStatsForEachActivityByMode(integerListOfSelectedDays);
+                setQueryAndSortBoolean(false);
+            }
         } else {
             mDayHolderList = new ArrayList<>();
             statsForEachActivityListForFragmentAccess = new ArrayList<>();
