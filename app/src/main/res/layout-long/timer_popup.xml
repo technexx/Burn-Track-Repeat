@@ -176,8 +176,8 @@
 
     <ImageView
         android:id="@+id/stopWatchView"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="330dp"
+        android:layout_height="330dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -187,8 +187,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pauseResumeButton"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
+        android:layout_width="310dp"
+        android:layout_height="310dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
