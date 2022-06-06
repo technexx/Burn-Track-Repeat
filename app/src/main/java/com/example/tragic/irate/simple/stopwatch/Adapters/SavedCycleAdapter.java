@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   ArrayList<String> mWorkoutList;
   ArrayList<String> mRoundType;
   ArrayList<String> mWorkoutTitle;
-  List<Boolean> mmTdeeActivityExistsInCycleList;
+  List<Boolean> mTdeeActivityExistsInCycleList;
   List<Boolean> mActiveTdeeModeBooleanList;
   ArrayList<String> mWorkoutActivityString;
 
@@ -114,7 +115,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
   public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> roundType, ArrayList<String> workoutTitle, ArrayList<Boolean> tdeeActivityExistsInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
-    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mmTdeeActivityExistsInCycleList = tdeeActivityExistsInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
+    this.mContext = context; mWorkoutList = workoutList; this.mRoundType = roundType; this.mWorkoutTitle = workoutTitle; this.mTdeeActivityExistsInCycleList = tdeeActivityExistsInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
     //Must be instantiated here so it does not loop and reset in onBindView.
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
@@ -149,7 +150,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public boolean getBooleanDeterminingIfCycleHasActivity(int position) {
-    return mmTdeeActivityExistsInCycleList.get(position);
+    return mTdeeActivityExistsInCycleList.get(position);
   }
 
   //This is accessed by Main when launching timer to determine whether we are tracking.
@@ -195,10 +196,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     }
 
-    if (mmTdeeActivityExistsInCycleList.get(position)) {
+    if (mTdeeActivityExistsInCycleList.get(position)) {
+      workoutHolder.tdeeToggle.setVisibility(View.VISIBLE);
       workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
+      workoutHolder.tdeeToggle.setEnabled(true);
     } else {
-      workoutHolder.tdeeToggle.setText("");
+      workoutHolder.tdeeToggle.setVisibility(View.INVISIBLE);
+      workoutHolder.tdeeToggle.setEnabled(false);
     }
 
     workoutHolder.fullView.setOnClickListener(v -> {

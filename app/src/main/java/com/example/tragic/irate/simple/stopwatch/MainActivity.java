@@ -525,8 +525,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: Activity/Calorie view and count up w/ out adding one (happens after some timer resets) Added as "Mountain Biking - General", listed as such in Stats, but iterating values from Timer do not transfer over.
-      //Todo: Its values save for DayHolder, though.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
@@ -713,8 +711,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     positionOfSelectedCycle = position;
 
     trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
-    //Todo: Seems to occur after resetting timer. We have two separate booleans we're fetching from our adapter.
-    Log.i("testAdd", "track activity boolean from cycle click is " + trackActivityWithinCycle + " within cycle position " + position);
 
     populateCycleAdapterArrayList();
     launchTimerCycle(false);
@@ -2692,7 +2688,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeft.setText(retrieveTimerValueString());
 
       trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
-      Log.i("testAdd", "track activity boolean from Adapter in cycle resume is " + trackActivityWithinCycle + " within cycle position " + positionOfSelectedCycle);
       toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
@@ -3359,8 +3354,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
-
-        Log.i("testAdd", "track activity boolean from adapter in cycle launch is " + trackActivityWithinCycle + " within cycle position " + positionOfSelectedCycle);
 
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 
