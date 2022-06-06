@@ -27,9 +27,6 @@ CyclesDao {
     @Query("SELECT * from DayHolder")
     List<DayHolder> loadAllDayHolderRows();
 
-    @Query("SELECT * from DayHolder WHERE uniqueIdTiedToYear IS:yearID")
-    List<DayHolder> loadFourDigitYearForDayHolder(long yearID);
-
     @Query("SELECT * from DayHolder WHERE daySelectedId IS:listID")
     List<DayHolder> loadSingleDay(long listID);
 
@@ -51,10 +48,6 @@ CyclesDao {
     @Delete
     void deleteStatsForEachActivity(StatsForEachActivity statsForEachActivity);
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IS:yearID")
-    List<StatsForEachActivity> loadFourDigitYearForStatsForEachActivity(long yearID);
-
-    //Todo: We just need to set our different sort calls on each of these two uniqueID queries.
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
 
@@ -64,23 +57,23 @@ CyclesDao {
     @Query("SELECT * from StatsForEachActivity")
     List<StatsForEachActivity> loadAllActivitiesForAllDays();
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by activity DESC")
-    List<StatsForEachActivity> loadActivitiesByAToZTitle(List<Integer> yearIDs);
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by activity DESC")
+    List<StatsForEachActivity> loadActivitiesByAToZTitle(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by activity ASC")
-    List<StatsForEachActivity> loadActivitiesByZToATitle(List<Integer> yearIDs);
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by activity ASC")
+    List<StatsForEachActivity> loadActivitiesByZToATitle(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalSetTimeForEachActivity DESC")
-    List<StatsForEachActivity> loadActivitiesByMostTimeElapsed(List<Integer> yearIDs);
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by totalSetTimeForEachActivity DESC")
+    List<StatsForEachActivity> loadActivitiesByMostTimeElapsed(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalSetTimeForEachActivity ASC")
-    List<StatsForEachActivity> loadActivitiesByLeastTimeElapsed(List<Integer> yearIDs);
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by totalSetTimeForEachActivity ASC")
+    List<StatsForEachActivity> loadActivitiesByLeastTimeElapsed(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalCaloriesBurnedForEachActivity DESC")
-    List<StatsForEachActivity> loadActivitiesByMostCaloriesBurned(List<Integer> yearIDs);
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by totalCaloriesBurnedForEachActivity DESC")
+    List<StatsForEachActivity> loadActivitiesByMostCaloriesBurned(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToYear IN (:yearIDs) ORDER by totalCaloriesBurnedForEachActivity ASC")
-    List<StatsForEachActivity> loadActivitiesByLeastCaloriesBurned(List<Integer> yearIDs);
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by totalCaloriesBurnedForEachActivity ASC")
+    List<StatsForEachActivity> loadActivitiesByLeastCaloriesBurned(List<Integer> uniqueIDs);
 
     @Query("DELETE from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:listID")
     void deleteActivityStatsForSingleDay (long listID);

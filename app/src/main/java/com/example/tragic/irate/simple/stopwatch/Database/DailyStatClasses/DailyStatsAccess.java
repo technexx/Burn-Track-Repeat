@@ -37,7 +37,7 @@ public class DailyStatsAccess {
     double totalCaloriesForSelectedDay;
 
     boolean mQueryAndSortDays;
-    int mSortMode;
+    int mSortMode = 1;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -122,36 +122,38 @@ public class DailyStatsAccess {
         this.mQueryAndSortDays = queryDaysForSorting;
     }
 
-    //Todo: We only want to call this query when a sort option is selected.
-    public void sortStatsForEachActivityByMode(List<Integer> listOfDays) {
+    public List<StatsForEachActivity> assignStatsForEachActivityListBySortMode(List<Integer> listOfDays) {
+        List<StatsForEachActivity> listToReturn = new ArrayList<>();
+
         switch (mSortMode) {
             case 1:
-                cyclesDatabase.cyclesDao().loadActivitiesByAToZTitle(listOfDays);
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByAToZTitle(listOfDays);
                 break;
             case 2:
-                cyclesDatabase.cyclesDao().loadActivitiesByZToATitle(listOfDays);
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByZToATitle(listOfDays);
                 break;
             case 3:
-                cyclesDatabase.cyclesDao().loadActivitiesByMostTimeElapsed(listOfDays);
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByMostTimeElapsed(listOfDays);
                 break;
             case 4:
-                cyclesDatabase.cyclesDao().loadActivitiesByLeastTimeElapsed(listOfDays);
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastTimeElapsed(listOfDays);
                 break;
             case 5:
-                cyclesDatabase.cyclesDao().loadActivitiesByMostCaloriesBurned(listOfDays);
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByMostCaloriesBurned(listOfDays);
                 break;
             case 6:
-                cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(listOfDays);
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(listOfDays);
                 break;
         }
+
+        return listToReturn;
     }
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
 
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
-        //Todo: We need to replace this DAO query with whichever sort mode query we have selected. We do a database query each time this is called by default, so we don't need a conditional to query/not query.
-        statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
+        statsForEachActivityListForFragmentAccess = assignStatsForEachActivityListBySortMode(singleDayList);
 
         convertToStringAndSetSingleDay(dayToRetrieve);
 
@@ -161,12 +163,7 @@ public class DailyStatsAccess {
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
-            statsForEachActivityListForFragmentAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(integerListOfSelectedDays);
-
-            if (mQueryAndSortDays) {
-                sortStatsForEachActivityByMode(integerListOfSelectedDays);
-                setQueryAndSortBoolean(false);
-            }
+            statsForEachActivityListForFragmentAccess = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
         } else {
             mDayHolderList = new ArrayList<>();
             statsForEachActivityListForFragmentAccess = new ArrayList<>();
