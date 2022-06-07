@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View mainView;
   View actionBarView;
   Calendar calendar;
-  SimpleDateFormat simpleDateFormat;
 
   ImageButton fab;
   ImageButton stopwatch;
@@ -529,10 +528,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: Date Header should list current date.
   //Todo: Color activity String in Timer, and possibly totals as well.
   //Todo: "Total activity time" in Timer class should be X:XX, not "X".
   //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
   //Todo: Color activity + calorie times in Timer class.
+  //Todo: BUG: Stats fragment needs a click on date to refresh updated timer values. Likely due to notify() only called on instantiation, and onBackPressed just removes visibility of its FrameLayout.
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
@@ -1215,8 +1216,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-    simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy - hh:mma", Locale.getDefault());
   }
 
   private void instantiateTabLayouts() {
@@ -1626,13 +1625,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setDefaultLayoutTexts() {
     confirmActivityAddition.setText(R.string.okay);
     timerValueInEditPopUpTextView.setText("00:00");
+    setTrackingDailyStatsHeaderTextView();
 
-    tracking_daily_stats_header_textView.setText(R.string.tracking_daily_stats);
     total_set_header.setText(R.string.total_sets);
     total_break_header.setText(R.string.total_breaks);
     total_set_time.setText("0");
     total_break_time.setText("0");
     cycles_or_laps_completed_textView.setText(R.string.cycles_done);
+  }
+
+  private void setTrackingDailyStatsHeaderTextView() {
+    tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDateString()));
   }
 
   private void retrieveAndImplementCycleSorting() {
@@ -3424,6 +3427,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String getCurrentDateString() {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
     calendar = Calendar.getInstance(Locale.getDefault());
     return simpleDateFormat.format(calendar.getTime());
   }
