@@ -15,8 +15,13 @@
     <string name="long_break">Rest</string>
 
     <string name="cycles_done">Cycles Completed: %1$s</string>
-    <string name="total_daily_time">Total activity time:</string>
-    <string name="total_daily_calories">Total calories burned:</string>
+
+    <string name="total_daily_time">Total Activity Time:</string>
+    <string name="total_daily_calories">Total Calories Burned:</string>
+
+    <string name="total_daily_time_for_single_activity">Time Elapsed:</string>
+    <string name="total_daily_calories_for_single_activity">Calories Burned:</string>
+
     <string name="overtime">- %1$s</string>
 
     <string name="confirm_cycle_reset">Confirm Reset</string>
@@ -152,7 +157,6 @@
     <string name="okay">Okay</string>
 
     <string name="no_activity">No Activity Selected</string>
-    <string name="tdee_activity_in_timer_stats">%1$s \n Time elapsed: %2$s \n Calories burned: %3$s </string>
 
     <string name="basic">Basic</string>
     <string name="tdee_button">TDEE</string>

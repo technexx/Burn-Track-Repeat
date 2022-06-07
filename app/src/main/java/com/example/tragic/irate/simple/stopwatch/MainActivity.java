@@ -323,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView cycle_title_textView;
   TextView cycles_or_laps_completed_textView;
 
+  TextView dailySingleActivityStringHeader;
   TextView dailyTotalTimeTextViewHeader;
   TextView dailyTotalTimeTextView;
   TextView dailyTotalCaloriesTextViewHeader;
@@ -1389,6 +1390,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
     total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
 
+    dailySingleActivityStringHeader = timerPopUpView.findViewById(R.id.daily_single_activity_string_header);;
     dailyTotalTimeTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_time_textView_header);
     dailyTotalTimeTextView = timerPopUpView.findViewById(R.id.daily_total_time_textView);
     dailyTotalCaloriesTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_calories_textView_header);
@@ -2735,7 +2737,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
          displayCycleOrDailyTotals();
          setCyclesCompletedTextView();
          toggleTdeeObjectSizes();
-         setTotalDailyTimeAndCaloriesTextView();
+         setTotalDailyTimeAndCaloriesValuesToTextViews();
+         setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
       });
@@ -3622,7 +3625,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setTotalCycleTimeTextView() {
+  private void setTotalCycleTimeValuesToTextView() {
     if (mode==1) {
       total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
       total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
@@ -3633,15 +3636,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setTotalDailyTimeAndCaloriesTextView() {
+  private void setTotalDailyTimeAndCaloriesValuesToTextViews() {
     dailyTotalTimeTextViewHeader.setText(R.string.total_daily_time);
     dailyTotalTimeTextView.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)));
+
     dailyTotalCaloriesTextViewHeader.setText(R.string.total_daily_calories);
     dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
-  private String currentTdeeStatStringForSpecificActivity() {
-    return getString(R.string.tdee_activity_in_timer_stats, getTdeeActivityStringFromArrayPosition(), convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)), formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+  private void setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews() {
+    dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
+
+    dailyTotalTimeForSingleActivityTextViewHeader.setText(R.string.total_daily_time_for_single_activity);
+    dailyTotalTimeForSingleActivityTextView.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)));
+
+    dailyTotalCaloriesForSingleActivityTextViewHeader.setText(R.string.total_daily_calories_for_single_activity);
+    dailyTotalCaloriesForSingleActivityTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
@@ -3797,16 +3807,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (hasTimerTextViewChanged()) {
       timerTextViewStringTwo = (String) timeLeft.getText();
       displayCycleOrDailyTotals();
-      setTotalDailyTimeAndCaloriesTextView();
+      setTotalDailyTimeAndCaloriesValuesToTextViews();
+      setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
     }
   }
 
   private void displayCycleOrDailyTotals() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-      setTotalCycleTimeTextView();
+      setTotalCycleTimeValuesToTextView();
       setCyclesCompletedTextView();
     } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      setTotalDailyTimeAndCaloriesTextView();
+      setTotalDailyTimeAndCaloriesValuesToTextViews();
+      setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
     }
   }
 
@@ -4721,7 +4733,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesTextViewHeader.setVisibility(View.INVISIBLE);
       dailyTotalCaloriesTextView.setVisibility(View.INVISIBLE);
 
-      setTotalCycleTimeTextView();
+      dailySingleActivityStringHeader.setVisibility(View.INVISIBLE);
+      dailyTotalTimeForSingleActivityTextViewHeader.setVisibility(View.INVISIBLE);
+      dailyTotalTimeForSingleActivityTextView.setVisibility(View.INVISIBLE);
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.INVISIBLE);
+      dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.INVISIBLE);
+
+      setTotalCycleTimeValuesToTextView();
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
@@ -4737,7 +4755,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesTextViewHeader.setVisibility(View.VISIBLE);
       dailyTotalCaloriesTextView.setVisibility(View.VISIBLE);
 
-      setTotalDailyTimeAndCaloriesTextView();
+      dailySingleActivityStringHeader.setVisibility(View.VISIBLE);
+      dailyTotalTimeForSingleActivityTextViewHeader.setVisibility(View.VISIBLE);
+      dailyTotalTimeForSingleActivityTextView.setVisibility(View.VISIBLE);
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.VISIBLE);
+      dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.VISIBLE);
+
+      setTotalDailyTimeAndCaloriesValuesToTextViews();
+      setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
     }
   }
 
