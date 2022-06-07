@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView daily_total_time_and_calories_textView;
   ImageButton new_lap;
   ImageButton next_round;
-  ImageButton reset_total_times;
+  ImageButton reset_total_cycle_times;
 
   int typeOfTotalTimeToDisplay;
   int TOTAL_CYCLE_TIMES = 0;
@@ -1094,7 +1094,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
     });
 
-    reset_total_times.setOnClickListener(v -> {
+    reset_total_cycle_times.setOnClickListener(v -> {
       delete_all_text.setText(R.string.delete_cycles_times_and_completed_cycles);
       deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER_HORIZONTAL, 0, -100);
     });
@@ -1379,7 +1379,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
     msTime = timerPopUpView.findViewById(R.id.msTime);
     lapRecycler = timerPopUpView.findViewById(R.id.lap_recycler);
-    reset_total_times = timerPopUpView.findViewById(R.id.reset_total_times);
+    reset_total_cycle_times = timerPopUpView.findViewById(R.id.reset_total_cycle_times);
 //    toggle_cycle_and_daily_display = timerPopUpView.findViewById(R.id.toggle_cycle_and_daily_display);
     empty_laps = timerPopUpView.findViewById(R.id.empty_laps_text);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
@@ -4276,7 +4276,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               reset.setVisibility(View.VISIBLE);
               if (timer != null) timer.cancel();
               if (objectAnimator != null) objectAnimator.pause();
-              reset_total_times.setEnabled(true);
+              reset_total_cycle_times.setEnabled(true);
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
@@ -4298,7 +4298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               activeCycle = true;
               timerIsPaused = false;
               reset.setVisibility(View.INVISIBLE);
-              reset_total_times.setEnabled(false);
+              reset_total_cycle_times.setEnabled(false);
 
               switch (typeOfRound.get(currentRound)) {
                 case 1:
@@ -4339,7 +4339,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               if (timer != null) timer.cancel();
 
               reset.setVisibility(View.VISIBLE);
-              reset_total_times.setEnabled(true);
+              reset_total_cycle_times.setEnabled(true);
             } else if (pausing == RESUMING_TIMER) {
               startObjectAnimatorAndTotalCycleTimeCounters();
               startPomTimer();
@@ -4347,7 +4347,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               activeCycle = true;
               timerIsPaused = false;
               reset.setVisibility(View.INVISIBLE);
-              reset_total_times.setEnabled(false);
+              reset_total_cycle_times.setEnabled(false);
             }
             AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
           } else {
@@ -4567,7 +4567,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         next_round.setVisibility(View.INVISIBLE);
         activityStatsInTimerTextView.setVisibility(View.INVISIBLE);
         daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
-        reset_total_times.setVisibility(View.GONE);
+        reset_total_cycle_times.setVisibility(View.GONE);
         cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
         new_lap.setVisibility(View.VISIBLE);
         msTime.setVisibility(View.VISIBLE);
@@ -4604,7 +4604,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
     reset.setVisibility(View.INVISIBLE);
-    reset_total_times.setEnabled(true);
+    reset_total_cycle_times.setEnabled(true);
 
     switch (mode) {
       case 1:
@@ -4695,12 +4695,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!trackingActivity) {
       typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
 
-      reset_total_times.setVisibility(View.VISIBLE);
+      reset_total_cycle_times.setVisibility(View.VISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.INVISIBLE);
     } else {
       typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
 
-      reset_total_times.setVisibility(View.INVISIBLE);
+      reset_total_cycle_times.setVisibility(View.INVISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
     }
 
