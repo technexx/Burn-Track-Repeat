@@ -3340,6 +3340,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
+    if (cycleLaunchedFromEditPopUp) {
+      if (cycleNameEdit.getText().toString().isEmpty()) {
+        cycleTitle = getCurrentDateString();
+      } else {
+        cycleTitle = cycleNameEdit.getText().toString();
+      }
+    }
+    cycle_title_textView.setText(cycleTitle);
+
     AsyncTask.execute(()-> {
       if (cycleLaunchedFromEditPopUp) {
         saveAddedOrEditedCycleASyncRunnable();
@@ -3395,13 +3404,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             editCyclesPopupWindow.dismiss();
           }
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-
-          if (cycleLaunchedFromEditPopUp) {
-            if (cycleNameEdit.getText().toString().isEmpty()) {
-              cycleTitle = getCurrentDateString();
-            }
-          }
-          cycle_title_textView.setText(cycleTitle);
 
           roundDownAllTotalTimeValuesToEnsureSyncing();
         }
