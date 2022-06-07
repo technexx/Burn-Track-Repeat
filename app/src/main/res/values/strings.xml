@@ -15,7 +15,8 @@
     <string name="long_break">Rest</string>
 
     <string name="cycles_done">Cycles Completed: %1$s</string>
-    <string name="total_daily_time_and_calories_burned">Total activity time: %1$s\nTotal calories burned: %2$s</string>
+    <string name="total_daily_time">Total activity time:</string>
+    <string name="total_daily_calories">Total calories burned:</string>
     <string name="overtime">- %1$s</string>
 
     <string name="confirm_cycle_reset">Confirm Reset</string>
