@@ -325,7 +325,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setListsOfDayHolderAndStatsPrimaryIds() {
         dayHolderList = dailyStatsAccess.getDayHolderList();
-        statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess();
+        statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
     }
 
     public List<DayHolder> getDayHolderList() {
@@ -466,14 +466,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
-            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityListForFragmentAccess());
+            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityList());
 
             if (!dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
                 dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
                 dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
 
                 populateListsAndTextViewsFromEntityListsInDatabase();
-                mPositionToEdit = dailyStatsAccess.getStatsForEachActivityListForFragmentAccess().size()-1;
+                mPositionToEdit = dailyStatsAccess.getStatsForEachActivityList().size()-1;
 
                 getActivity().runOnUiThread(()-> {
                     dailyStatsAdapter.notifyDataSetChanged();

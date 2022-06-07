@@ -25,18 +25,18 @@ public class DailyStatsAccess {
     DayHolder mDayHolder;
     StatsForEachActivity mStatsForEachActivity;
     List<DayHolder> mDayHolderList;
-    List<StatsForEachActivity> statsForEachActivityListForTimerAccess;
-    List<StatsForEachActivity> statsForEachActivityListForFragmentAccess;
+
+    List<StatsForEachActivity> mStatsForEachActivityList;
+
     int oldStatsForEachActivityListSize;
     int newStatsForEachActivityListSize;
 
     List<String> totalActivitiesListForSelectedDuration;
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
+
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
-
-    int mSortMode = 1;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -51,6 +51,7 @@ public class DailyStatsAccess {
 
     String mActivityString;
     double mMetScore;
+    int mSortMode = 1;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -148,30 +149,27 @@ public class DailyStatsAccess {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
 
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
-        statsForEachActivityListForFragmentAccess = assignStatsForEachActivityListBySortMode(singleDayList);
+        mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(singleDayList);
 
         convertToStringAndSetSingleDay(dayToRetrieve);
-
-        Log.i("testList", "stats list in single day query is " + statsForEachActivityListForFragmentAccess.size());
     }
 
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
-            statsForEachActivityListForFragmentAccess = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
+            mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
         } else {
             mDayHolderList = new ArrayList<>();
-            statsForEachActivityListForFragmentAccess = new ArrayList<>();
+            mStatsForEachActivityList = new ArrayList<>();
         }
-        Log.i("testList", "stats list in multiple day query is " + statsForEachActivityListForFragmentAccess.size());
     }
 
     public List<DayHolder> getDayHolderList() {
         return mDayHolderList;
     }
 
-    public List<StatsForEachActivity> getStatsForEachActivityListForFragmentAccess() {
-        return statsForEachActivityListForFragmentAccess;
+    public List<StatsForEachActivity> getStatsForEachActivityList() {
+        return mStatsForEachActivityList;
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -456,12 +454,12 @@ public class DailyStatsAccess {
         setStatForEachActivityListForForSingleDayFromDatabase(daySelected);
 
         if (activityExistsInDatabaseForSelectedDay) {
-            mStatsForEachActivity = statsForEachActivityListForTimerAccess.get(activityPositionInListForCurrentDay);
+            mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
             Log.i("testUpdate", "mStats instance from unique ID position " + activityPositionInListForCurrentDay);
-        } else if (statsForEachActivityListForTimerAccess.size()>0) {
+        } else if (mStatsForEachActivityList.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
-            int mostRecentEntryPosition = statsForEachActivityListForTimerAccess.size()-1;
-            mStatsForEachActivity = statsForEachActivityListForTimerAccess.get(mostRecentEntryPosition);
+            int mostRecentEntryPosition = mStatsForEachActivityList.size()-1;
+            mStatsForEachActivity = mStatsForEachActivityList.get(mostRecentEntryPosition);
             Log.i("testUpdate", "mStats instance at last accessed position of " + mostRecentEntryPosition);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
@@ -471,15 +469,11 @@ public class DailyStatsAccess {
 
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
-        statsForEachActivityListForTimerAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
-    }
-
-    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDayForTimerAccess() {
-        return statsForEachActivityListForTimerAccess;
+        mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
     }
 
     public void assignStatsForEachActivityEntityForEditing(int position) {
-        mStatsForEachActivity = statsForEachActivityListForFragmentAccess.get(position);
+        mStatsForEachActivity = mStatsForEachActivityList.get(position);
     }
 
     public int getActivityPosition() {
@@ -557,12 +551,12 @@ public class DailyStatsAccess {
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
-        for (int i=0; i<statsForEachActivityListForFragmentAccess.size(); i++) {
-            if (statsForEachActivityListForFragmentAccess.get(i).getActivity()!=null) {
-                if (!doesTotalActivitiesListContainSelectedString(statsForEachActivityListForFragmentAccess.get(i).getActivity())) {
-                    totalActivitiesListForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getActivity());
-                    totalSetTimeListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalSetTimeForEachActivity());
-                    totalCaloriesBurnedListForEachActivityForSelectedDuration.add(statsForEachActivityListForFragmentAccess.get(i).getTotalCaloriesBurnedForEachActivity());
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getActivity()!=null) {
+                if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
+                    totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
+                    totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+                    totalCaloriesBurnedListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
@@ -655,13 +649,13 @@ public class DailyStatsAccess {
     }
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
-        long iteratingValue = statsForEachActivityListForFragmentAccess.get(position).getTotalSetTimeForEachActivity();
+        long iteratingValue = mStatsForEachActivityList.get(position).getTotalSetTimeForEachActivity();
         long presentValue =  totalSetTimeListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
 
     private double combinedCaloriesFromExistingAndRepeatingPositions(int position) {
-        double iteratingValue = statsForEachActivityListForFragmentAccess.get(position).getTotalCaloriesBurnedForEachActivity();
+        double iteratingValue = mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity();
         double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
@@ -685,7 +679,7 @@ public class DailyStatsAccess {
         mDayHolder = new DayHolder();
         mStatsForEachActivity = new StatsForEachActivity();
         mDayHolderList = new ArrayList<>();
-        statsForEachActivityListForFragmentAccess = new ArrayList<>();
+        mStatsForEachActivityList = new ArrayList<>();
     }
 
     private void instantiateArrayListsOfTotalStatsForSelectedDurations() {

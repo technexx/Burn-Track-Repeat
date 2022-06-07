@@ -1718,7 +1718,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
   }
 
-  //Todo: May be issue of Main w/ an incorrect instance of StatsForEach in Access class.
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
     int currentActivityPosition = dailyStatsAccess.getActivityPosition();
     int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
@@ -3394,7 +3393,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setLocalMetScoreVariable(metScore);
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatForEachActivityListForForSingleDayForTimerAccess());
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityList());
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
