@@ -451,20 +451,31 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
-    //statsForEachActivityListForTimerAccess's size will contain all activities for that day (uniqueID). Retrieving a specific activity is based on its position within that list.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(int daySelected) {
         //New database pull to account for most recent insertion.
         setStatForEachActivityListForForSingleDayFromDatabase(daySelected);
 
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = statsForEachActivityListForTimerAccess.get(activityPositionInListForCurrentDay);
+            Log.i("testUpdate", "mStats instance from unique ID position " + activityPositionInListForCurrentDay);
         } else if (statsForEachActivityListForTimerAccess.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
-            int mostRecentEntry = statsForEachActivityListForTimerAccess.size()-1;
-            mStatsForEachActivity = statsForEachActivityListForTimerAccess.get(mostRecentEntry);
+            int mostRecentEntryPosition = statsForEachActivityListForTimerAccess.size()-1;
+            mStatsForEachActivity = statsForEachActivityListForTimerAccess.get(mostRecentEntryPosition);
+            Log.i("testUpdate", "mStats instance at last accessed position of " + mostRecentEntryPosition);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
+            Log.i("testUpdate", "new mStats created");
         }
+    }
+
+    public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
+        List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
+        statsForEachActivityListForTimerAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
+    }
+
+    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDayForTimerAccess() {
+        return statsForEachActivityListForTimerAccess;
     }
 
     public void assignStatsForEachActivityEntityForEditing(int position) {
@@ -481,15 +492,6 @@ public class DailyStatsAccess {
 
     public int getOldActivityPosition() {
         return mOldActivityPositionInListForCurrentDay;
-    }
-
-    public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
-        List<Integer> singleDayList = new ArrayList<>(dayToRetrieve);
-        statsForEachActivityListForTimerAccess = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
-    }
-
-    public List<StatsForEachActivity> getStatForEachActivityListForForSingleDayForTimerAccess() {
-        return statsForEachActivityListForTimerAccess;
     }
 
     public void setLocalActivityStringVariable(String activityString) {

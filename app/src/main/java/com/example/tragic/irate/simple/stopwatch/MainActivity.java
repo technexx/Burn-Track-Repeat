@@ -282,6 +282,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout.LayoutParams cycleTitleLayoutParams;
   ConstraintLayout.LayoutParams cyclesCompletedLayoutParams;
+  ConstraintLayout.LayoutParams totalSetTimeHeaderLayoutParams;
+  ConstraintLayout.LayoutParams totalBreakTimeHeaderLayoutParams;
+  ConstraintLayout.LayoutParams progressBarLayoutParams;
+  ConstraintLayout.LayoutParams timerTextViewLayoutParams;
 
   ConstraintLayout.LayoutParams roundRecyclerParentLayoutParams;
   ConstraintLayout.LayoutParams roundRecyclerOneLayoutParams;
@@ -525,11 +529,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Larger textViews w/ no activities will help fill empty space.
+  //Todo: Color activity String in Timer, and possibly totals as well.
   //Todo: "Total activity time" in Timer class should be X:XX, not "X".
   //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
   //Todo: Color activity + calorie times in Timer class.
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
+      //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
@@ -1585,6 +1590,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void instantiateLayoutParameterObjects() {
     cycleTitleLayoutParams = (ConstraintLayout.LayoutParams) cycle_title_textView.getLayoutParams();
     cyclesCompletedLayoutParams = (ConstraintLayout.LayoutParams) cycles_or_laps_completed_textView.getLayoutParams();
+    totalSetTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_set_header.getLayoutParams();
+    totalBreakTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_break_header.getLayoutParams();
+    progressBarLayoutParams = (ConstraintLayout.LayoutParams) progressBar.getLayoutParams();
+    timerTextViewLayoutParams = (ConstraintLayout.LayoutParams) timeLeft.getLayoutParams();
 
     roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
     roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
@@ -1709,6 +1718,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
   }
 
+  //Todo: May be issue of Main w/ an incorrect instance of StatsForEach in Access class.
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
     int currentActivityPosition = dailyStatsAccess.getActivityPosition();
     int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
@@ -1735,8 +1745,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
   }
-
-
 
   private void setTdeeSpinnerListeners() {
     tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -4584,16 +4592,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void toggleLayoutParamsForCyclesAndStopwatch() {
-    if (mode!=4) {
-      cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
-      cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
-    } else {
-      cyclesCompletedLayoutParams.topMargin = 0;
-      cycleTitleLayoutParams.topMargin = -25;
-    }
-  }
-
   private void resetTimer() {
     activeCycle = false;
     vibrator.cancel();
@@ -4689,6 +4687,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private void toggleLayoutParamsForCyclesAndStopwatch() {
+    if (mode!=4) {
+      cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
+      cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
+    } else {
+      cyclesCompletedLayoutParams.topMargin = 0;
+      cycleTitleLayoutParams.topMargin = -25;
+    }
+  }
+
   private void toggleEditPopUpViewsForAddingActivity(boolean activityExists) {
     if (activityExists) {
       String activity = (String) tdee_sub_category_spinner.getSelectedItem();
@@ -4773,7 +4781,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void toggleTdeeLayoutParams
+  private void toggleTdeeLayoutParams() {
+    if (mode!=4) {
+      if (!trackActivityWithinCycle) {
+
+      }
+    }
+  }
 
   public String getTdeeActivityStringFromArrayPosition() {
     ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
