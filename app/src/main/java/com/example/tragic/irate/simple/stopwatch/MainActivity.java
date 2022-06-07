@@ -525,9 +525,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: Larger textViews w/ no activities will help fill empty space.
   //Todo: "Total activity time" in Timer class should be X:XX, not "X".
   //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
   //Todo: Color activity + calorie times in Timer class.
+  //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
@@ -2704,7 +2706,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
          setCyclesCompletedTextView();
-         toggleTdeeTextViewSize();
+         toggleTdeeObjectSizes();
          setTotalDailyTimeAndCaloriesForSpecificActivityTextView();
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
@@ -4497,7 +4499,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapListCanvas.setMode(mode);
     beginTimerForNextRound = true;
     cycles_or_laps_completed_textView.setText(R.string.cycles_done);
-//    cycle_title_textView.setText(cycleTitle);
 
     dotDraws.resetDotAlpha();
     cycle_title_textView.setVisibility(View.VISIBLE);
@@ -4506,9 +4507,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setVisibility(View.INVISIBLE);
     msTime.setVisibility(View.INVISIBLE);
     addTDEEActivityTextView.setVisibility(View.VISIBLE);
-    cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
-    cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
 
+    toggleLayoutParamsForCyclesAndStopwatch();
     setCyclesCompletedTextView();
 
     switch (mode) {
@@ -4543,7 +4543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               setInitialTextSizeForRounds(0);
               break;
           }
-          toggleTdeeTextViewSize();
+          toggleTdeeObjectSizes();
         }
         break;
       case 3:
@@ -4575,14 +4575,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         new_lap.setVisibility(View.VISIBLE);
         msTime.setVisibility(View.VISIBLE);
         setInitialTextSizeForRounds(0);
-        cyclesCompletedLayoutParams.topMargin = 0;
-        cycleTitleLayoutParams.topMargin = -25;
 
         timerDisabled = false;
         cycle_title_textView.setVisibility(View.INVISIBLE);
         addTDEEActivityTextView.setVisibility(View.INVISIBLE);
         if (stopWatchIsPaused) reset.setVisibility(View.VISIBLE); else reset.setVisibility(View.INVISIBLE);
         break;
+    }
+  }
+
+  private void toggleLayoutParamsForCyclesAndStopwatch() {
+    if (mode!=4) {
+      cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
+      cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
+    } else {
+      cyclesCompletedLayoutParams.topMargin = 0;
+      cycleTitleLayoutParams.topMargin = -25;
     }
   }
 
@@ -4738,13 +4746,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
   }
-  private void toggleTdeeTextViewSize() {
-    if (!trackActivityWithinCycle) {
-      activityStatsInTimerTextView.setTextSize(24);
-    } else {
-      activityStatsInTimerTextView.setTextSize(20);
+  private void toggleTdeeObjectSizes() {
+    if (mode!=4) {
+      if (!trackActivityWithinCycle) {
+        cycle_title_textView.setTextSize(28);
+        cycles_or_laps_completed_textView.setTextSize(28);
+
+        total_set_header.setTextSize(28);
+        total_set_time.setTextSize(26);
+        total_break_header.setTextSize(28);
+        total_break_time.setTextSize(26);
+
+        activityStatsInTimerTextView.setTextSize(24);
+
+      } else {
+        cycle_title_textView.setTextSize(26);
+        cycles_or_laps_completed_textView.setTextSize(24);
+
+        total_set_header.setTextSize(22);
+        total_set_time.setTextSize(20);
+        total_break_header.setTextSize(22);
+        total_break_time.setTextSize(20);
+
+        activityStatsInTimerTextView.setTextSize(20);
+      }
     }
   }
+
+  private void toggleTdeeLayoutParams
 
   public String getTdeeActivityStringFromArrayPosition() {
     ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
@@ -4844,14 +4873,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
       List<DayHolder> listOfDays = new ArrayList<>();
-
-//      if (currentDayOnly) {
-//        listOfActivities = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayOfYear);
-//        listOfDays = cyclesDatabase.cyclesDao().loadSingleDay(dayOfYear);
-//      } else {
-//        listOfActivities = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
-//        listOfDays = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-//      }
 
       for (int i=0; i<listOfActivities.size(); i++) {
         Log.i("testStatsDb", "entry position is " + i);
