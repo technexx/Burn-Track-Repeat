@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ObjectAnimator objectAnimatorPom;
   Animation endAnimation;
 
-  TextView tracking_daily_stats_notification_textView;
+  TextView tracking_daily_stats_header_textView;
   TextView cycle_title_textView;
   TextView cycles_or_laps_completed_textView;
   TextView daily_total_time_and_calories_textView;
@@ -525,6 +525,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: "Total activity time" in Timer class should be X:XX, not "X".
+  //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
+  //Todo: Color activity + calorie times in Timer class.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
@@ -1361,7 +1364,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     lapListCanvas = timerPopUpView.findViewById(R.id.lapCanvas);
     reset = timerPopUpView.findViewById(R.id.reset);
-    tracking_daily_stats_notification_textView = timerPopUpView.findViewById(R.id.tracking_daily_stats_notification_textView);
+    tracking_daily_stats_header_textView = timerPopUpView.findViewById(R.id.tracking_daily_stats_header_textView);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
 
     cycles_or_laps_completed_textView = timerPopUpView.findViewById(R.id.cycles_or_laps_completed_textView);
@@ -1613,7 +1616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     confirmActivityAddition.setText(R.string.okay);
     timerValueInEditPopUpTextView.setText("00:00");
 
-    tracking_daily_stats_notification_textView.setText(R.string.tracking_daily_stats);
+    tracking_daily_stats_header_textView.setText(R.string.tracking_daily_stats);
     total_set_header.setText(R.string.total_sets);
     total_break_header.setText(R.string.total_breaks);
     total_set_time.setText("0");
@@ -4709,7 +4712,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-      tracking_daily_stats_notification_textView.setVisibility(View.INVISIBLE);
+      tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
@@ -4721,7 +4724,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       daily_total_time_and_calories_textView.setVisibility(View.INVISIBLE);
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      tracking_daily_stats_notification_textView.setVisibility(View.VISIBLE);
+      tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.INVISIBLE);
       total_set_header.setVisibility(View.INVISIBLE);
       total_set_time.setVisibility(View.INVISIBLE);

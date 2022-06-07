@@ -17,12 +17,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/teal_200"
-        android:textSize="28sp"
+        android:textSize="26sp"
         android:fontFamily="@font/open_sans">
     </TextView>
 
     <TextView
-        android:id="@+id/tracking_daily_stats_notification_textView"
+        android:id="@+id/tracking_daily_stats_header_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/cycle_title_textView"
@@ -32,18 +32,6 @@
         android:textColor="@color/off_white"
         android:textStyle="bold"
         android:textSize="22sp">
-    </TextView>
-
-    <TextView
-        android:id="@+id/daily_total_time_and_calories_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_notification_textView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"
-        android:textColor="@color/white"
-        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -66,7 +54,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reset_total_cycle_times"
         android:layout_marginTop="10dp"
-        android:textSize="24sp">
+        android:textSize="22sp">
     </TextView>
 
     <TextView
@@ -77,7 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/reset_total_cycle_times"
         android:layout_marginTop="10dp"
-        android:textSize="24sp">
+        android:textSize="22sp">
     </TextView>
 
     <TextView
@@ -88,7 +76,7 @@
         app:layout_constraintStart_toStartOf="@id/total_set_header"
         app:layout_constraintEnd_toEndOf="@id/total_set_header"
         android:layout_marginTop="2dp"
-        android:textSize="22sp">
+        android:textSize="20sp">
     </TextView>
 
     <TextView
@@ -99,7 +87,7 @@
         app:layout_constraintStart_toStartOf="@id/total_break_header"
         app:layout_constraintEnd_toEndOf="@id/total_break_header"
         android:layout_marginTop="2dp"
-        android:textSize="22sp">
+        android:textSize="20sp">
     </TextView>
 
     <ImageButton
@@ -115,14 +103,27 @@
     </ImageButton>
 
     <!--Constraint is to canvas class itself, not the width of the drawn borders-->
+
+    <TextView
+        android:id="@+id/daily_total_time_and_calories_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_header_textView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/white"
+        android:textSize="22sp">
+    </TextView>
+
     <TextView
         android:id="@+id/activity_stats_in_timer_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/dotdraws"
-        android:layout_marginBottom="0dp"
+        app:layout_constraintTop_toBottomOf="@id/daily_total_time_and_calories_textView"
+        android:layout_marginTop="8dp"
         android:textSize="20sp"
         android:gravity="center">
     </TextView>
@@ -132,8 +133,7 @@
         android:layout_width="match_parent"
         android:layout_height="175dp"
         app:layout_constraintBottom_toTopOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="20dp">
+        app:layout_constraintStart_toStartOf="parent">
     </com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws>
 
     <TextView
@@ -162,8 +162,8 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="330dp"
-        android:layout_height="330dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -176,8 +176,8 @@
 
     <ImageView
         android:id="@+id/stopWatchView"
-        android:layout_width="330dp"
-        android:layout_height="330dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -187,8 +187,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pauseResumeButton"
-        android:layout_width="310dp"
-        android:layout_height="310dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
