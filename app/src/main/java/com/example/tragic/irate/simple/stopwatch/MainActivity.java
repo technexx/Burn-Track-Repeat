@@ -539,10 +539,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: Cycle w/ no activity should indicate that so right column looks consistent.
+  //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
   //Todo: Color activity String in Timer, and possibly totals as well.
   //Todo: "Total activity time" in Timer class should be X:XX, not "X".
-  //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
   //Todo: Color activity + calorie times in Timer class.
+  //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: BUG: Stats fragment needs a click on date to refresh updated timer values. Likely due to notify() only called on instantiation, and onBackPressed just removes visibility of its FrameLayout.
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.

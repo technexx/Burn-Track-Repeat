@@ -48,6 +48,7 @@
     <string name="default_title">My Uber Workout</string>
 
     <string name="tdee_track"><b>Track\nCalories</b></string>
+    <string name="no_activity_assigned">No Activity</string>
 
     <string name="max_value_reached">Maximum value reached!</string>
     <string name="min_value_reached">Minimum value reached!</string>
