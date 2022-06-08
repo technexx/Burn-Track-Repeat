@@ -538,6 +538,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: BUG: Highlighting/editing position when on an active cycle brings up that cycle's position.
+  //Todo: BUG: Greyed out activity instead of removed when removing it via edit from Cycle.
+  //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: HH:MM:SS should be clearer both in Stats fragment and Timer.
   //Todo: Edited cycle title displays in recyclerView but not set to cycleTitle Timer textView.
   //Todo: We should align from the left instead of center.
@@ -3540,6 +3543,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
       }
+
+      AsyncTask.execute(()->{
+        logSelectedCyclePositionAndItsValues();
+        logAllCyclePositionsAndTheirValues();
+      });
+
     }
     if (mode==3) {
       if (isNewCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
@@ -4895,6 +4904,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
+  private void logSelectedCyclePositionAndItsValues() {
+    Log.i("testCycle", "position of selected cycle is " + positionOfSelectedCycle);
+    Log.i("testCycle", "activity string of selected cycle is " + cycles.getActivityString());
+    Log.i("testCycle", "time string of selected cycle is " + cycles.getWorkoutRounds());
+  }
+
+  private void logAllCyclePositionsAndTheirValues() {
+    List<Cycles> cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+    for (int i=0; i<cyclesList.size(); i++) {
+      Log.i("testCycle", "positions of cycle list are " + i);
+      Log.i("testCycle", "activity strings of cycle list are " + cyclesList.get(i).getActivityString());
+      Log.i("testCycle", "time strings of cycle list are " + cyclesList.get(i).getWorkoutRounds());
+    }
+  }
 
   private void testHighlightDeletion(int cycleId) {
     Log.i("testDelete", "cycle ID fetched is " + cycleId + " from cycle position " + positionOfSelectedCycle);
