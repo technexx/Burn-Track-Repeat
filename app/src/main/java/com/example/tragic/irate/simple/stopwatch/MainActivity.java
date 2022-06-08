@@ -538,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Cycle w/ no activity should indicate that so right column looks consistent.
+  //Todo: Maybe borders for some of our total time/calorie stats.
   //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
   //Todo: Color activity String in Timer, and possibly totals as well.
   //Todo: "Total activity time" in Timer class should be X:XX, not "X".
@@ -3434,7 +3434,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           displayCycleOrDailyTotals();
 
           resetTimer();
-          populateTimerUI();
 
           if (editCyclesPopupWindow.isShowing()) {
             editCyclesPopupWindow.dismiss();
@@ -3563,7 +3562,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()->{
       queryAndSortAllCyclesFromDatabase();
     });
-    runOnUiThread(()-> cycle_title_textView.setText(cycleTitle));
+    runOnUiThread(()-> {
+      cycle_title_textView.setText(cycleTitle);
+    });
   }
 
   private void getInstancesOfCyclesAndPomCyclesListsFromDatabase() {
@@ -4721,6 +4722,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
+//      cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
 
@@ -4743,6 +4745,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTotalCycleTimeValuesToTextView();
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
+//      cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.INVISIBLE);
 
@@ -4800,7 +4803,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void toggleTdeeObjectSizes() {
     if (mode!=4) {
       if (!trackActivityWithinCycle) {
-        cycle_title_textView.setTextSize(28);
+//        cycle_title_textView.setTextSize(28);
         cycles_or_laps_completed_textView.setTextSize(28);
 
         total_set_header.setTextSize(28);
@@ -4811,7 +4814,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyTotalCaloriesTextViewHeader.setTextSize(24);
 
       } else {
-        cycle_title_textView.setTextSize(26);
+//        cycle_title_textView.setTextSize(26);
         cycles_or_laps_completed_textView.setTextSize(24);
 
         total_set_header.setTextSize(22);

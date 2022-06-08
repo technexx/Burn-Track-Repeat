@@ -136,7 +136,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
         android:layout_marginTop="4dp"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:gravity="center">
     </TextView>
 
@@ -148,7 +148,7 @@
         app:layout_constraintStart_toEndOf="@id/daily_total_calories_textView_header"
         android:layout_marginTop="4dp"
         android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:gravity="center">
     </TextView>
 

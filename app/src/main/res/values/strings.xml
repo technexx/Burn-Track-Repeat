@@ -19,7 +19,7 @@
     <string name="total_daily_time">Total Activity Time:</string>
     <string name="total_daily_calories">Total Calories Burned:</string>
 
-    <string name="total_daily_time_for_single_activity">Time Elapsed:</string>
+    <string name="total_daily_time_for_single_activity">Activity Time:</string>
     <string name="total_daily_calories_for_single_activity">Calories Burned:</string>
 
     <string name="overtime">- %1$s</string>
