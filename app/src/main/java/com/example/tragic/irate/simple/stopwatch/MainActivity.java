@@ -538,8 +538,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: HH:MM:SS should be clearer both in Stats fragment and Timer.
+  //Todo: Edited cycle title displays in recyclerView but not set to cycleTitle Timer textView.
+  //Todo: We should align from the left instead of center.
   //Todo: Maybe borders for some of our total time/calorie stats.
   //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
+      //Todo: Eh, maybe not such a good idea. Extra views + not sleek.
   //Todo: Color activity String in Timer, and possibly totals as well.
   //Todo: "Total activity time" in Timer class should be X:XX, not "X".
   //Todo: Color activity + calorie times in Timer class.
@@ -4722,7 +4726,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes() {
     if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-//      cycle_title_textView.setVisibility(View.VISIBLE);
+      cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.VISIBLE);
 
@@ -4745,7 +4749,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTotalCycleTimeValuesToTextView();
     }
     if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-//      cycle_title_textView.setVisibility(View.GONE);
+      cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_or_laps_completed_textView.setVisibility(View.INVISIBLE);
 
@@ -4772,7 +4776,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleObjectVisibilityForTimerAndStopwatchModes() {
     if (mode!=4) {
-      cycle_title_textView.setVisibility(View.VISIBLE);
+      if (!trackActivityWithinCycle) {
+        cycle_title_textView.setVisibility(View.VISIBLE);
+      }
 
       lapRecycler.setVisibility(View.INVISIBLE);
       next_round.setVisibility(View.VISIBLE);
@@ -4803,26 +4809,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void toggleTdeeObjectSizes() {
     if (mode!=4) {
       if (!trackActivityWithinCycle) {
-//        cycle_title_textView.setTextSize(28);
         cycles_or_laps_completed_textView.setTextSize(28);
 
         total_set_header.setTextSize(28);
         total_set_time.setTextSize(26);
         total_break_header.setTextSize(28);
         total_break_time.setTextSize(26);
-
-        dailyTotalCaloriesTextViewHeader.setTextSize(24);
-
       } else {
-//        cycle_title_textView.setTextSize(26);
         cycles_or_laps_completed_textView.setTextSize(24);
 
         total_set_header.setTextSize(22);
         total_set_time.setTextSize(20);
         total_break_header.setTextSize(22);
         total_break_time.setTextSize(20);
-
-        dailyTotalCaloriesTextViewHeader.setTextSize(20);
       }
     }
   }
