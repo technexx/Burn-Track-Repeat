@@ -201,7 +201,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 //      workoutHolder.tdeeToggle.setAlpha(1.0f);
       workoutHolder.tdeeToggle.setEnabled(true);
     } else {
-//      workoutHolder.tdeeToggle.setText(R.string.no_activity_assigned);
+      workoutHolder.tdeeToggle.setText("");
 //      workoutHolder.tdeeToggle.setTypeface(Typeface.DEFAULT_BOLD);
 //      workoutHolder.tdeeToggle.setAlpha(0.3f);
       workoutHolder.tdeeToggle.setEnabled(false);

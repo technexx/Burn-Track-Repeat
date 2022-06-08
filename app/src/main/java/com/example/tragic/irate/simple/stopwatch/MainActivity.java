@@ -538,11 +538,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: Highlighting/editing position when on an active cycle brings up that cycle's position.
-  //Todo: BUG: Greyed out activity instead of removed when removing it via edit from Cycle.
+  //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: HH:MM:SS should be clearer both in Stats fragment and Timer.
-  //Todo: Edited cycle title displays in recyclerView but not set to cycleTitle Timer textView.
   //Todo: We should align from the left instead of center.
   //Todo: Maybe borders for some of our total time/calorie stats.
   //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
@@ -557,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
-  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
+  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.]
 
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Test dates from future years.
@@ -764,9 +762,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setAlpha(0.4f);
       edit_highlighted_cycle.setEnabled(false);
     }
-
-    logCycleHighlights();
-    logCycleHighlightsRoundValues();
   }
 
   //This callback method works for both round adapters.
@@ -903,28 +898,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     edit_highlighted_cycle.setOnClickListener(v-> {
       fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       setViewsAndColorsToPreventTearingInEditPopUp(true);
+      removeHighlightFromCycle();
+      highlightModeLogic();
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
       populateRoundAdapterArraysForHighlightedCycle();
 
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
-      removeHighlightFromCycle();
-
       assignOldCycleValuesToCheckForChanges();
-      cycleNameEdit.setText(cycleTitle);
 
-      editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
-      buttonToLaunchTimerFromEditPopUp.setEnabled(true);
-      currentlyEditingACycle = true;
-      isNewCycle = false;
-
-      positionOfSelectedCycle = (receivedHighlightPositions.get(0));
-      cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
-      toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
-
-      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
-      addTDEEActivityTextView.setText(tdeeString);
+      logCycleHighlights();
+      logCycleHighlightsRoundValues();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -2014,6 +1999,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTitleArray.add(pomCyclesList.get(i).getTitle());
       }
     }
+  }
+
+  private void highlightModeLogic() {
+    cycleNameEdit.setText(cycleTitle);
+
+    editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
+    buttonToLaunchTimerFromEditPopUp.setEnabled(true);
+    currentlyEditingACycle = true;
+    isNewCycle = false;
+
+    positionOfSelectedCycle = (receivedHighlightPositions.get(0));
+    cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
+    toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
+
+    String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
+    addTDEEActivityTextView.setText(tdeeString);
   }
 
   private void populateRoundAdapterArraysForHighlightedCycle() {
@@ -3543,12 +3544,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
       }
-
-      AsyncTask.execute(()->{
-        logSelectedCyclePositionAndItsValues();
-        logAllCyclePositionsAndTheirValues();
-      });
-
     }
     if (mode==3) {
       if (isNewCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
