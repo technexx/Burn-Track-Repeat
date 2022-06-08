@@ -168,74 +168,74 @@ public class DotDraws extends View {
     this.mCanvas = canvas;
 
     int paddedWidth = (int) mPhoneWidth-dpConv(11);
-    double definedCircumference = (double) paddedWidth/8;
-    int definedRadius = (int) dpConv((float) definedCircumference/2) - dpConv(1);
-    int definedXCircleMovement = (int) dpConv((float) definedCircumference) + dpConv(2);
+    double circleCircumference = (double) paddedWidth/8;
+    int circleRadius = (int) dpConv((float) circleCircumference/2) - dpConv(1);
 
-    int definedXTextMovement = definedXCircleMovement;
-    int definedXRoundNumberMovement = definedXCircleMovement;
+    int xMovementOfCirclePositionBetweenEachDrawing = (int) dpConv((float) circleCircumference) + dpConv(2);
+    int xMovementOfCircleTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
+    int xMovementOfRoundNumberTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
 
-    int encloseXStart = dpConv(2);
-    int encloseXEnd = dpConv(mPhoneWidth-2);
+    int xStartingEnclosurePositionForAllRows = dpConv(2);
+    int xEndingEnclosurePositionForAllRows = dpConv(mPhoneWidth-2);
 
-    int encloseYStartOneRow = dpConv(0);
-    int encloseYEndOneRow = dpConv(90);
-    int encloseYStartTwoRows = dpConv(0);
-    int encloseYEndTwoRows = dpConv(130);
+    int yStartingEnclosurePositionWithOneRow = dpConv(0);
+    int yEndingEnclosurePositionWithOneRow = dpConv(90);
+    int yStartingEnclosurePositionWithTwoRows = dpConv(0);
+    int yEndingEnclosurePositionWithTwoRows = dpConv(130);
 
-    int xCircleStart = dpConv(28);
-    int xTextStart = dpConv(11);
-    int xRoundNumberStart = dpConv(25);
+    int xStartingPositionOfCircleForAllRows = dpConv(28);
+    int xStartingPositionOfCircleTextForAllRows = dpConv(11);
+    int xStartingPositionOfRoundNumberTextForAllRows = dpConv(25);
 
-    int xCircleAllRows = dpConv(28);
-    int yCircleOneRow = dpConv(36);
-    int yCircleFirstOfTwoRows = dpConv(26);
-    int yCircleSecondOfTwoRows = dpConv(90);
+    int xCirclePositionForAllRows = dpConv(28);
+    int yCirclePositionForOneRow = dpConv(36);
+    int yCirclePositionForFirstOfTwoRows = dpConv(26);
+    int yCirclePositionForSecondOfTwoRows = dpConv(90);
 
-    int xCircleTextAllRows = dpConv(10);
-    int yCircleTextOneRow = dpConv(48);
-    int yCircleTextOneOfTwoRows= dpConv(38);
-    int yCircleTextSecondOfTwoRows = dpConv(102);
+    int xCircleTextPositionForAllRows = dpConv(10);
+    int yCircleTextPositionForOneRow = dpConv(48);
+    int yCircleTextPositionForOneOfTwoRows= dpConv(38);
+    int yCircleTextPositionForSecondOfTwoRows = dpConv(102);
 
-    int xRoundNumberTextAllRows = dpConv(25);
-    int yRoundNumberTextOneRow = dpConv(79);
-    int yRoundNumberTextOneOfTwoRows = dpConv(63);
-    int yRoundNumberTextTwoOfTwoRows = dpConv(126);
+    int xRoundNumberTextPositionForAllRows = dpConv(25);
+    int yRoundNumberTextPositionForOneRow = dpConv(79);
+    int yRoundNumberTextPositionForOneOfTwoRows = dpConv(63);
+    int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(126);
 
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-      definedRadius = (int) dpConv((float) definedCircumference/2);
-      definedXCircleMovement = (int) dpConv((float) definedCircumference) + dpConv(3);
-
-      definedXTextMovement = definedXCircleMovement;
-      definedXRoundNumberMovement = definedXCircleMovement;
-
-      encloseYStartOneRow = dpConv(40);
-      encloseYEndOneRow = dpConv(140);
-      encloseYStartTwoRows = dpConv(10);
-      encloseYEndTwoRows = dpConv(170);
-
-      xCircleAllRows = dpConv(28);
-      yCircleOneRow = dpConv(82);
-      yCircleFirstOfTwoRows = dpConv(48);
-      yCircleSecondOfTwoRows = dpConv(120);
-
-      xCircleTextAllRows = dpConv(11);
-      yCircleTextOneRow = dpConv(92);
-      yCircleTextOneOfTwoRows= dpConv(58);
-      yCircleTextSecondOfTwoRows = dpConv(130);
-
-      xRoundNumberTextAllRows = dpConv(25);
-      yRoundNumberTextOneRow = dpConv(125);
-      yRoundNumberTextOneOfTwoRows = dpConv(88);
-      yRoundNumberTextTwoOfTwoRows = dpConv(160);
-    }
+//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
+//      circleRadius = (int) dpConv((float) circleCircumference/2);
+//      xMovementOfCirclePositionBetweenEachDrawing = (int) dpConv((float) circleCircumference) + dpConv(3);
+//
+//      xMovementOfCircleTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
+//      xMovementOfRoundNumberTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
+//
+//      yStartingEnclosurePositionWithOneRow = dpConv(40);
+//      yEndingEnclosurePositionWithOneRow = dpConv(140);
+//      yStartingEnclosurePositionWithTwoRows = dpConv(10);
+//      yEndingEnclosurePositionWithTwoRows = dpConv(170);
+//
+//      xCirclePositionForAllRows = dpConv(28);
+//      yCirclePositionForOneRow = dpConv(82);
+//      yCirclePositionForFirstOfTwoRows = dpConv(48);
+//      yCirclePositionForSecondOfTwoRows = dpConv(120);
+//
+//      xCircleTextPositionForAllRows = dpConv(11);
+//      yCircleTextPositionForOneRow = dpConv(92);
+//      yCircleTextPositionForOneOfTwoRows= dpConv(58);
+//      yCircleTextPositionForSecondOfTwoRows = dpConv(130);
+//
+//      xRoundNumberTextPositionForAllRows = dpConv(25);
+//      yRoundNumberTextPositionForOneRow = dpConv(125);
+//      yRoundNumberTextPositionForOneOfTwoRows = dpConv(88);
+//      yRoundNumberTextPositionForSecondOfTwoRows = dpConv(160);
+//    }
 
     switch (mMode) {
       case 1:
         if (mRoundTimes.size()<=8) {
-          encloseDots(encloseXStart, encloseXEnd, encloseYStartOneRow, encloseYEndOneRow);
+          encloseDots(xStartingEnclosurePositionForAllRows, xEndingEnclosurePositionForAllRows, yStartingEnclosurePositionWithOneRow, yEndingEnclosurePositionWithOneRow);
         } else {
-          encloseDots(encloseXStart, encloseXEnd, encloseYStartTwoRows, encloseYEndTwoRows);
+          encloseDots(xStartingEnclosurePositionForAllRows, xEndingEnclosurePositionForAllRows, yStartingEnclosurePositionWithTwoRows, yEndingEnclosurePositionWithTwoRows);
         }
 
         for (int i=0; i<mRoundTimes.size(); i++) {
@@ -263,34 +263,34 @@ public class DotDraws extends View {
 
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
-            mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, definedRadius, mPaint);
-            drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneRow, i);
-            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextOneRow, mPaintRoundNumbers);
+            mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, circleRadius, mPaint);
+            drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneRow, i);
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForOneRow, mPaintRoundNumbers);
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
-              mCanvas.drawCircle(xCircleAllRows, yCircleFirstOfTwoRows, definedRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextAllRows, yCircleTextOneOfTwoRows, i);
-              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextOneOfTwoRows, mPaintRoundNumbers);
+              mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForFirstOfTwoRows, circleRadius, mPaint);
+              drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneOfTwoRows, i);
+              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForOneOfTwoRows, mPaintRoundNumbers);
               //Resetting mX after 8th round so the second row begins on top of first.
             } else {
               if (i==8) {
-                xCircleAllRows = xCircleStart;
-                xCircleTextAllRows = xTextStart;
-                xRoundNumberTextAllRows = xRoundNumberStart;
+                xCirclePositionForAllRows = xStartingPositionOfCircleForAllRows;
+                xCircleTextPositionForAllRows = xStartingPositionOfCircleTextForAllRows;
+                xRoundNumberTextPositionForAllRows = xStartingPositionOfRoundNumberTextForAllRows;
               }
-              mCanvas.drawCircle(xCircleAllRows, yCircleSecondOfTwoRows, definedRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextAllRows, yCircleTextSecondOfTwoRows, i);
+              mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForSecondOfTwoRows, circleRadius, mPaint);
+              drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForSecondOfTwoRows, i);
 
-              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextTwoOfTwoRows, mPaintRoundNumbers);
+              mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForSecondOfTwoRows, mPaintRoundNumbers);
               if (i==8) {
-                xRoundNumberTextAllRows -= dpConv(5);
+                xRoundNumberTextPositionForAllRows -= dpConv(5);
               }
             }
           }
-          xCircleAllRows += definedXCircleMovement;
-          xCircleTextAllRows += definedXTextMovement;
-          xRoundNumberTextAllRows += definedXRoundNumberMovement;
+          xCirclePositionForAllRows += xMovementOfCirclePositionBetweenEachDrawing;
+          xCircleTextPositionForAllRows += xMovementOfCircleTextBetweenEachDrawing;
+          xRoundNumberTextPositionForAllRows += xMovementOfRoundNumberTextBetweenEachDrawing;
         }
         break;
       case 3:
@@ -299,32 +299,32 @@ public class DotDraws extends View {
         int pomRadiusLarge = (int) ((double) dpConv((int) partsOfWidth) * 1.10);
         int pomRadiusSmall = (int) ((double) pomRadiusLarge/1.25);
 
-        definedXCircleMovement = (int) ((double)dpConv((float) definedCircumference) * 1.03);
-        int definedRectangleMovement = (int) ((double)dpConv((float) definedCircumference) * .98);
+        xMovementOfCirclePositionBetweenEachDrawing = (int) ((double)dpConv((float) circleCircumference) * 1.03);
+        int definedRectangleMovement = (int) ((double)dpConv((float) circleCircumference) * .98);
 
-        xCircleAllRows = dpConv(28);
-        yCircleOneRow = dpConv(36);
+        xCirclePositionForAllRows = dpConv(28);
+        yCirclePositionForOneRow = dpConv(36);
 
-        int dotTextDrawForX = xCircleAllRows - pomRadiusSmall + dpConv(6);
-        xRoundNumberTextAllRows = dpConv(25);
+        int dotTextDrawForX = xCirclePositionForAllRows - pomRadiusSmall + dpConv(6);
+        xRoundNumberTextPositionForAllRows = dpConv(25);
 
-        int xRectangleStart = xCircleAllRows - dpConv(2);
+        int xRectangleStart = xCirclePositionForAllRows - dpConv(2);
         int xRectangleEnd = xRectangleStart + dpConv(44);
         int yRectangleTop = dpConv(15);
         int yRectangleBottom = dpConv(59);
 
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-          xCircleAllRows = dpConv(30);
-          yCircleOneRow = dpConv(82);
+          xCirclePositionForAllRows = dpConv(30);
+          yCirclePositionForOneRow = dpConv(82);
 
-          xRectangleStart = xCircleAllRows;
+          xRectangleStart = xCirclePositionForAllRows;
           xRectangleEnd = xRectangleStart + (pomRadiusLarge*2) + dpConv(4);
           yRectangleTop = dpConv(58);
           yRectangleBottom = dpConv(106);
         }
 
         setDotStyle(false);
-        encloseDots(encloseXStart, encloseXEnd, encloseYStartOneRow , encloseYEndOneRow);
+        encloseDots(xStartingEnclosurePositionForAllRows, xEndingEnclosurePositionForAllRows, yStartingEnclosurePositionWithOneRow , yEndingEnclosurePositionWithOneRow);
         //Fading last object drawn. Setting previous ones to "greyed out"
         for (int i=0; i<8; i++) {
           int alphaValue = 255;
@@ -346,18 +346,18 @@ public class DotDraws extends View {
               mPaint.setColor(WORK_COLOR);
               //Must be called AFTER color is changed, otherwise alpha will reset to 255.
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
-              mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, pomRadiusLarge, mPaint);
+              mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, pomRadiusLarge, mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, dotTextDrawForX, yCircleTextOneRow, i);
+              drawText(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
               break;
             case 1: case 3: case 5:
               mPaint.setColor(MINI_BREAK_COLOR);
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
-              mCanvas.drawCircle(xCircleAllRows, yCircleOneRow, pomRadiusSmall , mPaint);
+              mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, pomRadiusSmall , mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, dotTextDrawForX, yCircleTextOneRow, i);
+              drawText(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
               break;
             case 7:
               mPaint.setColor(FULL_BREAK_COLOR);
@@ -365,21 +365,21 @@ public class DotDraws extends View {
               mCanvas.drawRect(xRectangleStart, yRectangleTop, xRectangleEnd, yRectangleBottom, mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, xRectangleStart + dpConv(8), yCircleTextOneRow, i);
+              drawText(mPomTime, xRectangleStart + dpConv(8), yCircleTextPositionForOneRow, i);
               break;
           }
           if (i==7) {
-            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows - dpConv(6), yRoundNumberTextOneRow, mPaintRoundNumbers);
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows - dpConv(6), yRoundNumberTextPositionForOneRow, mPaintRoundNumbers);
           } else {
-            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextAllRows, yRoundNumberTextOneRow, mPaintRoundNumbers);
+            mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForOneRow, mPaintRoundNumbers);
           }
 
-          xCircleAllRows += definedXCircleMovement;
-          dotTextDrawForX += definedXCircleMovement;
+          xCirclePositionForAllRows += xMovementOfCirclePositionBetweenEachDrawing;
+          dotTextDrawForX += xMovementOfCirclePositionBetweenEachDrawing;
           if (i==6) dotTextDrawForX += dpConv(6);
           xRectangleStart += definedRectangleMovement;
           xRectangleEnd += definedRectangleMovement;
-          xRoundNumberTextAllRows += definedXRoundNumberMovement;
+          xRoundNumberTextPositionForAllRows += xMovementOfRoundNumberTextBetweenEachDrawing;
         }
         break;
     }
