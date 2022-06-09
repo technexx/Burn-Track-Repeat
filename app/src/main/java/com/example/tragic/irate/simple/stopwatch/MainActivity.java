@@ -541,7 +541,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Creating new activity using previously created activity stats.
   //Todo: Accessing multiple activities from different cycles override one another in single row in Stats Fragment.
       //Todo: Their times/cals override as well.
-      //Todo: They are saved correctly in db though. It's an access issue w/ list.
+  //Todo: instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable() caught looping through handler without a running cycle.
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
@@ -1661,7 +1661,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTrackingDailyStatsHeaderTextView() {
-    tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDatAsFullTextString()));
+    tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
   }
 
   private void retrieveAndImplementCycleSorting() {
@@ -1716,7 +1716,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setAndUpdateStatsForEachActivityValuesInDatabase();
         }
 
-        if (!timerIsPaused) {
+        if (!isObjectAnimatorIsPaused()) {
           mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
         } else {
           mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
@@ -1724,6 +1724,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
   };
+
+  private boolean isObjectAnimatorIsPaused() {
+    boolean valueToReturn = false;
+
+    if (mode==1) {
+      valueToReturn = objectAnimator.isPaused();
+    }
+    if (mode==3) {
+      valueToReturn = objectAnimatorPom.isPaused();
+    }
+
+    Log.i("testSave", "status is " + objectAnimator.isPaused());
+
+    return valueToReturn;
+  }
 
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
@@ -3403,7 +3418,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (cycleLaunchedFromEditPopUp) {
       if (cycleNameEdit.getText().toString().isEmpty()) {
-        cycleTitle = getCurrentDatAsFullTextString();
+        cycleTitle = getCurrentDateAsFullTextString();
       } else {
         cycleTitle = cycleNameEdit.getText().toString();
       }
@@ -3474,13 +3489,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-//  private String getCurrentDatAsSlashFormattedString() {
-//    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-//    calendar = Calendar.getInstance(Locale.getDefault());
-//    return simpleDateFormat.format(calendar.getTime());
-//  }
+  private String getCurrentDateAsSlashFormattedString() {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+    calendar = Calendar.getInstance(Locale.getDefault());
+    return simpleDateFormat.format(calendar.getTime());
+  }
 
-  private String getCurrentDatAsFullTextString() {
+  private String getCurrentDateAsFullTextString() {
     calendar = Calendar.getInstance(Locale.getDefault());
     return (String.valueOf(calendar.getTime()));
   }

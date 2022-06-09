@@ -468,19 +468,25 @@ public class DailyStatsAccess {
     }
 
 
-
-    public boolean getActivityExistsInDatabaseForSelectedDay () {
-        return activityExistsInDatabaseForSelectedDay;
-    }
-
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
+
+        List<String> activityString = new ArrayList<>();
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            activityString.add(mStatsForEachActivityList.get(i).getActivity());
+        }
+
+        Log.i("testStats", "List size for day " + dayToRetrieve + " is " + mStatsForEachActivityList.size() + " and consists of " + activityString);
     }
 
-    public void assignStatsForEachActivityEntityForEditing(int position) {
+    public void assignStatsForEachActivityEntityForSinglePosition(int position) {
         Log.i("testStats", "Activity assigned for editing is " + mStatsForEachActivityList.get(position).getActivity());
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
+    }
+
+    public boolean getActivityExistsInDatabaseForSelectedDay () {
+        return activityExistsInDatabaseForSelectedDay;
     }
 
     public int getActivityPosition() {

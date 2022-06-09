@@ -508,7 +508,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void updateDatabaseWithStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            dailyStatsAccess.assignStatsForEachActivityEntityForEditing(mPositionToEdit);
+            dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(mPositionToEdit);
 
             long newStatValue = getMillisValueToSaveFromEditTextString();
             double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
@@ -541,7 +541,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void onDeletingActivity(int position) {
         AsyncTask.execute(() -> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            dailyStatsAccess.assignStatsForEachActivityEntityForEditing(position);
+            dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
             dailyStatsAccess.deleteStatsForEachActivityEntity();
 
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
