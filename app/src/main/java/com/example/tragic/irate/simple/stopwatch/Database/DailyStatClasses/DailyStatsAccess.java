@@ -438,6 +438,7 @@ public class DailyStatsAccess {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
 
+        //Todo: Likely an issue of insertion.
         //Todo: After creating new cycle+activity, this uses previous String to check against position, and thus returns the wrong (previous) position.
         Log.i("testStats", "checking if activity exists for day: String is " + mActivityString);
         //This only returns true once, when our activity matches one in the database.
@@ -447,8 +448,8 @@ public class DailyStatsAccess {
                 activityExistsInDatabaseForSelectedDay = true;
             }
             Log.i("testStats", "checking if activity exists for day: list is " + mStatsForEachActivityList.get(i).getActivity());
-
         }
+        Log.i("testStats", "activity exists boolean is " + activityExistsInDatabaseForSelectedDay);
     }
 
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
@@ -466,7 +467,6 @@ public class DailyStatsAccess {
             Log.i("testStats", "new mStats created");
         }
     }
-
 
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);

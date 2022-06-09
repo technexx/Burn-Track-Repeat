@@ -572,6 +572,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
+  //Todo: App Ideas:
+    //Todo: Mad Libs RPG/story (monkey's paw type interpretation of inserted adjectives).
+
   @Override
   public void onResume() {
     super.onResume();
@@ -1716,7 +1719,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setAndUpdateStatsForEachActivityValuesInDatabase();
         }
 
-        if (!isObjectAnimatorIsPaused()) {
+        if (!timerIsPaused) {
           mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
         } else {
           mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
@@ -1725,20 +1728,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   };
 
-  private boolean isObjectAnimatorIsPaused() {
-    boolean valueToReturn = false;
 
-    if (mode==1) {
-      valueToReturn = objectAnimator.isPaused();
-    }
-    if (mode==3) {
-      valueToReturn = objectAnimatorPom.isPaused();
-    }
-
-    Log.i("testSave", "status is " + objectAnimator.isPaused());
-
-    return valueToReturn;
-  }
+  ////Runnable above will trigger whenever a new round occurs, but since object animator isn't active yet, it ends without repeating.
+//  private boolean isObjectAnimatorActive() {
+//    boolean valueToReturn = false;
+//
+//    if (mode==1) {
+//
+//      if (objectAnimator.isStarted() && !objectAnimator.isPaused()) {
+//        valueToReturn = true;
+//      } else {
+//        valueToReturn = false;
+//      }
+//    }
+//
+//    if (mode==3) {
+//      if (objectAnimatorPom.isStarted() || !objectAnimatorPom.isPaused()) {
+//        valueToReturn = true;
+//      } else {
+//        valueToReturn = false;
+//      }
+//    }
+//
+//    return valueToReturn;
+//  }
 
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
@@ -2386,6 +2399,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void timerPopUpDismissalLogic() {
     timerDisabled = false;
+    timerIsPaused = true;
     makeCycleAdapterVisible = false;
     timerPopUpIsVisible = false;
     beginTimerForNextRound = false;
@@ -3452,15 +3466,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
 
+        //Todo: This is where we pass in the String that is incorrect.
+        dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
+
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
-        //Todo: This is where we pass in the String that is incorrect.
-        dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
-        Log.i("testStats", "activity string passed from Main is " + getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setLocalMetScoreVariable(metScore);
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
