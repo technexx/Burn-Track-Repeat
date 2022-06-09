@@ -538,7 +538,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: Stats fragment needs a click on date to refresh updated timer values. Likely due to notify() only called on instantiation, and onBackPressed just removes visibility of its FrameLayout.
   //Todo: BUG: Calorie count rounds up too much. If it's 3.1 and then cycle resets, next launch shows 4 (in Timer).
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
@@ -603,21 +602,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onBackPressed() {
     if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      moveTaskToBack(false);
+//      moveTaskToBack(false);
       return;
     }
 
     //Back to Main focus. Fragment dismissed and Frame Layout visibiltiy removed.
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
+
+      if (rootSettingsFragment.isVisible()) {
+        getSupportFragmentManager().beginTransaction()
+                .remove(rootSettingsFragment)
+                .commit();
+      }
+
+      if (dailyStatsFragment.isVisible()) {
+        getSupportFragmentManager().beginTransaction()
+                .remove(dailyStatsFragment)
+                .commit();
+      }
+    }
+
       mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
 
       setTypeOFMenu(DEFAULT_MENU);
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
 
-
-
-    }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
@@ -2253,7 +2263,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTypeOFMenu(DAILY_SETTINGS_MENU);
 
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
-//      dailyStatsFragment.refreshDailyStatsAdapter();
     }
   }
 

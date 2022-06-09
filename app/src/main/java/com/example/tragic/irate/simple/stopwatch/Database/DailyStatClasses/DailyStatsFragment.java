@@ -844,10 +844,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalStatsValuesTextViewsLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
     }
 
-    public void refreshDailyStatsAdapter() {
-        dailyStatsAdapter.notifyDataSetChanged();
-    }
-
     private void instantiateCalendarObjects() {
         calendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
