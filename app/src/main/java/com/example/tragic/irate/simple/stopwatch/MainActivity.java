@@ -538,7 +538,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Got some major saving bugs w/ stat activities.
+  //Todo: Creating new activity using previously created activity stats.
+  //Todo: Accessing multiple activities from different cycles override one another in single row in Stats Fragment.
+      //Todo: Their times/cals override as well.
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
@@ -1657,7 +1659,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTrackingDailyStatsHeaderTextView() {
-    tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDateString()));
+    tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDatAsFullTextString()));
   }
 
   private void retrieveAndImplementCycleSorting() {
@@ -3396,7 +3398,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (cycleLaunchedFromEditPopUp) {
       if (cycleNameEdit.getText().toString().isEmpty()) {
-        cycleTitle = getCurrentDateString();
+        cycleTitle = getCurrentDatAsFullTextString();
       } else {
         cycleTitle = cycleNameEdit.getText().toString();
       }
@@ -3435,7 +3437,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
 
+        //Todo: This is where we pass in the String that is incorrect.
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
+        Log.i("testStats", "activity string passed from Main is " + getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setLocalMetScoreVariable(metScore);
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
@@ -3464,10 +3468,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  private String getCurrentDateString() {
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+//  private String getCurrentDatAsSlashFormattedString() {
+//    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+//    calendar = Calendar.getInstance(Locale.getDefault());
+//    return simpleDateFormat.format(calendar.getTime());
+//  }
+
+  private String getCurrentDatAsFullTextString() {
     calendar = Calendar.getInstance(Locale.getDefault());
-    return simpleDateFormat.format(calendar.getTime());
+    return (String.valueOf(calendar.getTime()));
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {

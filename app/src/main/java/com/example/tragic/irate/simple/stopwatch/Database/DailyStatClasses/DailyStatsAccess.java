@@ -438,6 +438,7 @@ public class DailyStatsAccess {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
 
+        //Todo: After creating new cycle+activity, this uses previous String to check against position, and thus returns the wrong (previous) position.
         Log.i("testStats", "checking if activity exists for day: String is " + mActivityString);
         //This only returns true once, when our activity matches one in the database.
         for (int i=0; i<statsForEachActivityList.size(); i++) {
