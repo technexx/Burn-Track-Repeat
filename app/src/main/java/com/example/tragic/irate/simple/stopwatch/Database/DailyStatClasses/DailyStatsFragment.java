@@ -486,23 +486,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
                 });
             }
-
-            queryAndLogDayAndStatsDatabaseRows();
         });
-    }
-
-    private void queryAndLogDayAndStatsDatabaseRows() {
-        CyclesDatabase cyclesDatabase = CyclesDatabase.getDatabase(getContext().getApplicationContext());
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
-
-        for (int i=0; i<dayHolderList.size(); i++) {
-            Log.i("testRows", "DayHolder Id rows are " + dayHolderList.get(i).getDayId());
-        }
-
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            Log.i("testRows", "StatsForEachActivity Id rows are " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
-        }
     }
 
     @Override
@@ -860,6 +844,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalStatsValuesTextViewsLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
     }
 
+    public void refreshDailyStatsAdapter() {
+        dailyStatsAdapter.notifyDataSetChanged();
+    }
+
     private void instantiateCalendarObjects() {
         calendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
@@ -976,5 +964,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private int dpToPxConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+    }
+
+    private void queryAndLogDayAndStatsDatabaseRows() {
+        CyclesDatabase cyclesDatabase = CyclesDatabase.getDatabase(getContext().getApplicationContext());
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
+
+        for (int i=0; i<dayHolderList.size(); i++) {
+            Log.i("testRows", "DayHolder Id rows are " + dayHolderList.get(i).getDayId());
+        }
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            Log.i("testRows", "StatsForEachActivity Id rows are " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
+        }
     }
 }

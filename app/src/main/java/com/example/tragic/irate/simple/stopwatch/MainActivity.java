@@ -538,21 +538,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
-  //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
-  //Todo: HH:MM:SS should be clearer both in Stats fragment and Timer.
-  //Todo: We should align from the left instead of center.
-  //Todo: Maybe borders for some of our total time/calorie stats.
-  //Todo: May want a duration option for Timer class stats. "Daily Stats" header would cycle as the one in Stat Fragment does.
-      //Todo: Eh, maybe not such a good idea. Extra views + not sleek.
-  //Todo: Color activity String in Timer, and possibly totals as well.
-  //Todo: "Total activity time" in Timer class should be X:XX, not "X".
-  //Todo: Color activity + calorie times in Timer class.
-  //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: BUG: Stats fragment needs a click on date to refresh updated timer values. Likely due to notify() only called on instantiation, and onBackPressed just removes visibility of its FrameLayout.
+  //Todo: BUG: Calorie count rounds up too much. If it's 3.1 and then cycle resets, next launch shows 4 (in Timer).
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
+  //Todo: BUG: Possible discrepency in activity save times when re-launching app.
+
+  //Todo: Stats for Pom as well (Just total time/breaks)?
+  //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
+  //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.]
@@ -619,6 +614,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setTypeOFMenu(DEFAULT_MENU);
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
+
+
+
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
@@ -762,6 +760,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setAlpha(0.4f);
       edit_highlighted_cycle.setEnabled(false);
     }
+
+    logAllCyclePositionsAndTheirValues();
   }
 
   //This callback method works for both round adapters.
@@ -908,8 +908,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       assignOldCycleValuesToCheckForChanges();
 
-      logCycleHighlights();
-      logCycleHighlightsRoundValues();
+      logAllCyclePositionsAndTheirValues();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -2254,6 +2253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTypeOFMenu(DAILY_SETTINGS_MENU);
 
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
+//      dailyStatsFragment.refreshDailyStatsAdapter();
     }
   }
 
@@ -4900,18 +4900,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void logSelectedCyclePositionAndItsValues() {
-    Log.i("testCycle", "position of selected cycle is " + positionOfSelectedCycle);
-    Log.i("testCycle", "activity string of selected cycle is " + cycles.getActivityString());
-    Log.i("testCycle", "time string of selected cycle is " + cycles.getWorkoutRounds());
+    AsyncTask.execute(()-> {
+      Log.i("testCycle", "position of selected cycle is " + positionOfSelectedCycle);
+      Log.i("testCycle", "activity string of selected cycle is " + cycles.getActivityString());
+//    Log.i("testCycle", "time string of selected cycle is " + cycles.getWorkoutRounds());
+    });
   }
 
   private void logAllCyclePositionsAndTheirValues() {
-    List<Cycles> cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-    for (int i=0; i<cyclesList.size(); i++) {
-      Log.i("testCycle", "positions of cycle list are " + i);
-      Log.i("testCycle", "activity strings of cycle list are " + cyclesList.get(i).getActivityString());
-      Log.i("testCycle", "time strings of cycle list are " + cyclesList.get(i).getWorkoutRounds());
-    }
+    AsyncTask.execute(()-> {
+      List<Cycles> cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+      for (int i=0; i<cyclesList.size(); i++) {
+        Log.i("testCycle", "positions of cycle list are " + i);
+        Log.i("testCycle", "activity strings of cycle list are " + cyclesList.get(i).getActivityString());
+//      Log.i("testCycle", "time strings of cycle list are " + cyclesList.get(i).getWorkoutRounds());
+      }
+    });
   }
 
   private void testHighlightDeletion(int cycleId) {
