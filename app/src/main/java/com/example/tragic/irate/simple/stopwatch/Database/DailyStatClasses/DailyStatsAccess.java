@@ -434,13 +434,29 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
+    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(List<StatsForEachActivity> statsForEachActivityList) {
+        activityPositionInListForCurrentDay = 0;
+        activityExistsInDatabaseForSelectedDay = false;
+
+        Log.i("testStats", "checking if activity exists for day: String is " + mActivityString);
+        //This only returns true once, when our activity matches one in the database.
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
+                activityPositionInListForCurrentDay = i;
+                activityExistsInDatabaseForSelectedDay = true;
+            }
+            Log.i("testStats", "checking if activity exists for day: list is " + statsForEachActivityList.get(i).getActivity());
+
+        }
+    }
+
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(int daySelected) {
         //New database pull to account for most recent insertion.
         setStatForEachActivityListForForSingleDayFromDatabase(daySelected);
 
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
-            Log.i("testStats", "mStats instance from unique ID position " + activityPositionInListForCurrentDay);
+            Log.i("testStats", "activity position in day is " + activityPositionInListForCurrentDay);
         } else if (mStatsForEachActivityList.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
             int mostRecentEntryPosition = mStatsForEachActivityList.size()-1;
@@ -452,18 +468,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(List<StatsForEachActivity> statsForEachActivityList) {
-        activityPositionInListForCurrentDay = 0;
-        activityExistsInDatabaseForSelectedDay = false;
 
-        //This only returns true once, when our activity matches one in the database.
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
-                activityPositionInListForCurrentDay = i;
-                activityExistsInDatabaseForSelectedDay = true;
-            }
-        }
-    }
 
     public boolean getActivityExistsInDatabaseForSelectedDay () {
         return activityExistsInDatabaseForSelectedDay;

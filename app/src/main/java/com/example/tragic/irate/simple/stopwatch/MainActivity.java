@@ -539,7 +539,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: Got some major saving bugs w/ stat activities.
-  //Todo: BUG: Calorie count rounds up too much. If it's 3.1 and then cycle resets, next launch shows 4 (in Timer).
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
@@ -3431,7 +3430,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
 
-        //Todo: Changed order of these two. Watch it.
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityList());
 
@@ -3599,9 +3597,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCycleSetTimeInMillis = cycles.getTotalSetTime();
       totalCycleBreakTimeInMillis = cycles.getTotalBreakTime();
 
-//      totalCycleSetTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleSetTimeInMillis);
-//      totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleBreakTimeInMillis);
-
       cyclesCompleted = cycles.getCyclesCompleted();
     }
 
@@ -3610,9 +3605,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       totalCycleWorkTimeInMillis = pomCycles.getTotalWorkTime();
       totalCycleRestTimeInMillis = pomCycles.getTotalRestTime();
-
-//      totalCycleWorkTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleWorkTimeInMillis);
-//      totalCycleRestTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleSetTimeInMillis);
 
       cyclesCompleted = pomCycles.getCyclesCompleted();
     }
@@ -3785,11 +3777,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleBreakTimeInMillis);
     totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
     totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
-    totalCaloriesBurnedForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForCurrentDay);
+//    totalCaloriesBurnedForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForCurrentDay);
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-    totalCaloriesBurnedForSpecificActivityForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+//    totalCaloriesBurnedForSpecificActivityForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 
   private long roundDownMillisValuesToSyncTimers(long millisToRound) {
