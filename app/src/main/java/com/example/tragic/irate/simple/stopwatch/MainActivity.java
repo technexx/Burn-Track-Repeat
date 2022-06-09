@@ -541,13 +541,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Creating new activity using previously created activity stats.
   //Todo: Accessing multiple activities from different cycles override one another in single row in Stats Fragment.
       //Todo: Their times/cals override as well.
-  //Todo: instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable() caught looping through handler without a running cycle.
+  //Todo: Post-deletion index exception when launching cycles @ Line 3750.
+  //Todo: Dual timerTexts/countDownTimers running after adding a cycle while another one is in "reset/resume limbo."
+
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: BUG: Possible discrepency in activity save times when re-launching app.
+  //Todo: BUG: Long activity String on first cycle goes off screen on top.
 
-  //Todo: Consider
   //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
@@ -3389,6 +3391,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
           buttonToLaunchTimerFromEditPopUp.setEnabled(true);
         }
+
+        Log.i("testList", "position of cycle is " + positionOfSelectedCycle);
+        Log.i("testList", "type of round array is " + typeOfRoundArray);
+        Log.i("testList", "type of round integer list is " + typeOfRound);
+
         break;
       case 3:
         pomValuesTime.clear();
@@ -3749,6 +3756,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void iterateTotalTimesForSelectedDay(long millis) {
     if (mode==1) {
+      //Todo: index 0 and index 1, size 0 exceptions. List is returning 0.
       switch (typeOfRound.get(currentRound)) {
         case 1: case 2:
           totalSetTimeForCurrentDayInMillis += millis;
@@ -3758,7 +3766,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           break;
       };
     }
-    //We have daily totalWork and totalRest values that are iterating up for Pomodoro, but using PomCycles stats makes more sense for now.
   }
 
   private void iterateTotalTimesForSelectedActivity(long millis) {
