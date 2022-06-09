@@ -538,6 +538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: BUG: Increasing one activity time in cycle is also increase one next to it (position-wise)
   //Todo: BUG: Calorie count rounds up too much. If it's 3.1 and then cycle resets, next launch shows 4 (in Timer).
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
@@ -3431,6 +3432,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+        //Todo: 7/3 index exception. Clicked on last position (3rd) after 0 and 1.
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());

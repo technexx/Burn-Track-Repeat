@@ -409,24 +409,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-
-    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(List<StatsForEachActivity> statsForEachActivityList) {
-        activityPositionInListForCurrentDay = 0;
-        activityExistsInDatabaseForSelectedDay = false;
-
-        //This only returns true once, when our activity matches one in the database.
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
-                activityPositionInListForCurrentDay = i;
-                activityExistsInDatabaseForSelectedDay = true;
-            }
-        }
-    }
-
-    public boolean getActivityExistsInDatabaseForSelectedDay () {
-        return activityExistsInDatabaseForSelectedDay;
-    }
-
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
 
@@ -454,6 +436,7 @@ public class DailyStatsAccess {
         setStatForEachActivityListForForSingleDayFromDatabase(daySelected);
 
         if (activityExistsInDatabaseForSelectedDay) {
+            //Todo: This is where line 3435 from Main crashes.
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
             Log.i("testUpdate", "mStats instance from unique ID position " + activityPositionInListForCurrentDay);
         } else if (mStatsForEachActivityList.size()>0) {
@@ -465,6 +448,24 @@ public class DailyStatsAccess {
             mStatsForEachActivity = new StatsForEachActivity();
             Log.i("testUpdate", "new mStats created");
         }
+    }
+
+    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(List<StatsForEachActivity> statsForEachActivityList) {
+        activityPositionInListForCurrentDay = 0;
+        activityExistsInDatabaseForSelectedDay = false;
+
+        //Todo: Here it is. We deleted several rows of activities, but did not update this list, so when trying to access the stats using activityPositionInListForCurrentDay above, that number was still out of bounds.
+        //This only returns true once, when our activity matches one in the database.
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
+                activityPositionInListForCurrentDay = i;
+                activityExistsInDatabaseForSelectedDay = true;
+            }
+        }
+    }
+
+    public boolean getActivityExistsInDatabaseForSelectedDay () {
+        return activityExistsInDatabaseForSelectedDay;
     }
 
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
