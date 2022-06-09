@@ -49,7 +49,7 @@ public class DailyStatsAccess {
     int mOldActivityPositionInListForCurrentDay;
     int duplicateStringPosition;
 
-    String mActivityString;
+    String mActivityString = "";
     double mMetScore;
     int mSortMode = 1;
 
@@ -423,8 +423,11 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
+            //Todo: This is being executed when clicking on existing row w/ activity
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+            Log.i("testStats", "new activity with string " + mActivityString + " created");
         }
+        Log.i("testStats", "Activity exists - nothing created!");
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -436,17 +439,16 @@ public class DailyStatsAccess {
         setStatForEachActivityListForForSingleDayFromDatabase(daySelected);
 
         if (activityExistsInDatabaseForSelectedDay) {
-            //Todo: This is where line 3435 from Main crashes.
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
-            Log.i("testUpdate", "mStats instance from unique ID position " + activityPositionInListForCurrentDay);
+            Log.i("testStats", "mStats instance from unique ID position " + activityPositionInListForCurrentDay);
         } else if (mStatsForEachActivityList.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
             int mostRecentEntryPosition = mStatsForEachActivityList.size()-1;
             mStatsForEachActivity = mStatsForEachActivityList.get(mostRecentEntryPosition);
-            Log.i("testUpdate", "mStats instance at last accessed position of " + mostRecentEntryPosition);
+            Log.i("testStats", "mStats instance at last accessed position of " + mostRecentEntryPosition);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
-            Log.i("testUpdate", "new mStats created");
+            Log.i("testStats", "new mStats created");
         }
     }
 
@@ -454,7 +456,6 @@ public class DailyStatsAccess {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
 
-        //Todo: Here it is. We deleted several rows of activities, but did not update this list, so when trying to access the stats using activityPositionInListForCurrentDay above, that number was still out of bounds.
         //This only returns true once, when our activity matches one in the database.
         for (int i=0; i<statsForEachActivityList.size(); i++) {
             if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
@@ -474,6 +475,7 @@ public class DailyStatsAccess {
     }
 
     public void assignStatsForEachActivityEntityForEditing(int position) {
+        Log.i("testStats", "Activity assigned for editing is " + mStatsForEachActivityList.get(position).getActivity());
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
     }
 
@@ -534,6 +536,7 @@ public class DailyStatsAccess {
     }
 
     public void deleteStatsForEachActivityEntity() {
+        Log.i("testStats", "Activity being deleted is " + mStatsForEachActivity.getActivity());
         cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
     }
 

@@ -538,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: Increasing one activity time in cycle is also increase one next to it (position-wise)
+  //Todo: Got some major saving bugs w/ stat activities.
   //Todo: BUG: Calorie count rounds up too much. If it's 3.1 and then cycle resets, next launch shows 4 (in Timer).
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
@@ -3431,13 +3431,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
 
+        //Todo: Changed order of these two. Watch it.
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-        //Todo: 7/3 index exception. Clicked on last position (3rd) after 0 and 1.
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityList());
+
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
         dailyStatsAccess.setLocalMetScoreVariable(metScore);
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityList());
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
