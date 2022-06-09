@@ -431,7 +431,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public void colorDaysWithAtLeastOneActivity() {
-        List<Integer> daysWithAtLeastOneActivityList = dailyStatsAccess.getActivityListForCalendarColoring();
+        List<Integer> daysWithAtLeastOneActivityList = dailyStatsAccess.getListOfDaysWithAtLeastOneActivity();
         List<CalendarDay> calendarDayList = new ArrayList<>();
         Calendar calendarColoringObject = Calendar.getInstance(Locale.getDefault());
 
@@ -466,7 +466,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
-            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityList());
+            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
 
             if (!dailyStatsAccess.getActivityExistsInDatabaseForSelectedDay()) {
                 dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
@@ -960,19 +960,5 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private int dpToPxConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
-    }
-
-    private void queryAndLogDayAndStatsDatabaseRows() {
-        CyclesDatabase cyclesDatabase = CyclesDatabase.getDatabase(getContext().getApplicationContext());
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllActivitiesForAllDays();
-
-        for (int i=0; i<dayHolderList.size(); i++) {
-            Log.i("testRows", "DayHolder Id rows are " + dayHolderList.get(i).getDayId());
-        }
-
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            Log.i("testRows", "StatsForEachActivity Id rows are " + statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
-        }
     }
 }

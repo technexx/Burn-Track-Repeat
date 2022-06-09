@@ -321,7 +321,7 @@ public class DailyStatsAccess {
         return totalValueToReturn;
     }
 
-    public List<Integer> getActivityListForCalendarColoring() {
+    public List<Integer> getListOfDaysWithAtLeastOneActivity() {
         Calendar calendar = Calendar.getInstance();
         int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
         List<Integer> listToPopulate = new ArrayList<>();
@@ -434,27 +434,25 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
-    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(List<StatsForEachActivity> statsForEachActivityList) {
+    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
         activityPositionInListForCurrentDay = 0;
         activityExistsInDatabaseForSelectedDay = false;
 
         //Todo: After creating new cycle+activity, this uses previous String to check against position, and thus returns the wrong (previous) position.
         Log.i("testStats", "checking if activity exists for day: String is " + mActivityString);
         //This only returns true once, when our activity matches one in the database.
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            if (mActivityString.equals(statsForEachActivityList.get(i).getActivity())) {
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
                 activityPositionInListForCurrentDay = i;
                 activityExistsInDatabaseForSelectedDay = true;
             }
-            Log.i("testStats", "checking if activity exists for day: list is " + statsForEachActivityList.get(i).getActivity());
+            Log.i("testStats", "checking if activity exists for day: list is " + mStatsForEachActivityList.get(i).getActivity());
 
         }
     }
 
-    public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(int daySelected) {
+    public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //New database pull to account for most recent insertion.
-        setStatForEachActivityListForForSingleDayFromDatabase(daySelected);
-
         if (activityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
             Log.i("testStats", "activity position in day is " + activityPositionInListForCurrentDay);

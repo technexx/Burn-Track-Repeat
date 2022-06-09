@@ -541,11 +541,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Creating new activity using previously created activity stats.
   //Todo: Accessing multiple activities from different cycles override one another in single row in Stats Fragment.
       //Todo: Their times/cals override as well.
+      //Todo: They are saved correctly in db though. It's an access issue w/ list.
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: BUG: Possible discrepency in activity save times when re-launching app.
 
+  //Todo: Consider
   //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
@@ -1731,7 +1733,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-      dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
+      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+      dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
     }
   }
 
@@ -1753,7 +1756,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
     }
 
-    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
+    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
     dailyStatsAccess.setActivityStringForSelectedActivityInStatsForEachActivityEntity(dailyStatsAccess.getActivityStringFromSpinner());
     dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -2749,9 +2753,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
-       dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-       dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
-       assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+
+        assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
 
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
@@ -3433,9 +3438,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt(dailyStatsAccess.getStatsForEachActivityList());
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
 
-        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay(dayOfYear);
+        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
         //Todo: This is where we pass in the String that is incorrect.
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
