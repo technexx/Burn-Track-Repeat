@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -166,7 +165,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     Context context = parent.getContext();
-    View view = LayoutInflater.from(context).inflate(R.layout.mode_one_cycles, parent, false);
+    View view = LayoutInflater.from(context).inflate(R.layout.workout_cycles_recycler, parent, false);
     return new WorkoutHolder(view);
   }
 
@@ -198,12 +197,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     if (mTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
-//      workoutHolder.tdeeToggle.setAlpha(1.0f);
       workoutHolder.tdeeToggle.setEnabled(true);
     } else {
       workoutHolder.tdeeToggle.setText("");
-//      workoutHolder.tdeeToggle.setTypeface(Typeface.DEFAULT_BOLD);
-//      workoutHolder.tdeeToggle.setAlpha(0.3f);
       workoutHolder.tdeeToggle.setEnabled(false);
     }
 

@@ -111,7 +111,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.mode_three_cycles, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.pomodoro_cycles_recycler, parent, false);
         return new PomHolder(view);
     }
 

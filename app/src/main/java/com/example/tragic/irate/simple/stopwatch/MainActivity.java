@@ -542,7 +542,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: BUG: Dual timerTexts/countDownTimers running after adding a cycle while another one is in "reset/resume limbo."
 
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
-  //Todo: BUG: Possible discrepency in activity save times when re-launching app.
   //Todo: BUG: Long activity String on first cycle goes off screen on top.
   //Todo: "Reset" button gets pushed down as timer textView expands.
 
@@ -2398,7 +2397,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void timerPopUpDismissalLogic() {
     timerDisabled = false;
-    timerIsPaused = true;
     makeCycleAdapterVisible = false;
     timerPopUpIsVisible = false;
     beginTimerForNextRound = false;
