@@ -538,10 +538,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Default activity in edit mode should match the one assigned to activity (it defaults to last assigned/used in general, or first option if launching app).
-  //Todo: BUG: Post-deletion index exception when launching cycles @ Line 3750.
+  //Todo: Stats recyclerView overlaps total footer.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
-  //Todo: BUG: Long activity String on first cycle goes off screen on top.
   //Todo: "Reset" button gets pushed down as timer textView expands.
 
   //Todo: Stats for Pom as well (Just total time/breaks)?
@@ -913,7 +911,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       setViewsAndColorsToPreventTearingInEditPopUp(true);
       removeHighlightFromCycle();
-      highlightModeLogic();
+      editHighlightedCycleLogic();
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
@@ -1841,6 +1839,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editPopUpTimerArray.clear();
     timerValueInEditPopUpTextView.setText("00:00");
 
+    setTdeeSpinnersToDefaultValues();
     toggleEditPopUpViewsForAddingActivity(false);
   }
 
@@ -2041,7 +2040,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void highlightModeLogic() {
+  private void editHighlightedCycleLogic() {
     cycleNameEdit.setText(cycleTitle);
 
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
@@ -2054,6 +2053,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
 
     String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
+    setTdeeSpinnersToDefaultValues();
     addTDEEActivityTextView.setText(tdeeString);
   }
 
@@ -3747,7 +3747,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void iterateTotalTimesForSelectedDay(long millis) {
     if (mode==1) {
-      //Todo: index 0 and index 1, size 0 exceptions. List is returning 0.
       switch (typeOfRound.get(currentRound)) {
         case 1: case 2:
           totalSetTimeForCurrentDayInMillis += millis;
@@ -4909,6 +4908,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setCaloriesBurnedTextViewInAddTdeePopUp();
   }
 
+  private void setTdeeSpinnersToDefaultValues() {
+    tdee_category_spinner.setSelection(0);
+    tdee_sub_category_spinner.setSelection(0);
+  }
+
   private void setMetScoreTextViewInAddTdeePopUp() {
     metScore = retrieveMetScoreFromSubCategoryPosition();
     metScoreTextView.setText(getString(R.string.met_score, String.valueOf(metScore)));
@@ -4917,6 +4921,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private double retrieveMetScoreFromSubCategoryPosition() {
     String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
+
     return preRoundedMet;
   }
 
