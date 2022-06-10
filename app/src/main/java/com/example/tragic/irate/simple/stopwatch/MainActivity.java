@@ -538,10 +538,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Should adding cycle should remove any "reset/resume" limbo?
+  //Todo: Cycle overwrite bug when editing (likely due wrong position being called).
+      //Todo: It may only come on the heels of adding a new cycle. Just editing does not replicate.
+  //Todo: We have spinner positions saved in cycles db - should recall those when editing.
+  //Todo: Constrain "Daily Stats For XX" header to start of "Total Activity Time," and it will re-center itself when the views go to GONE as tracking mode is switched.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: "Reset" button gets pushed down as timer textView expands.
 
+  //Todo: May want to nix stat in db if time is 0 (less clutter).
   //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
@@ -773,7 +777,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setEnabled(false);
     }
 
-    logAllCyclePositionsAndTheirValues();
+    logAllCyclePositionsAndTheirValues("On Cycle Highlight");
   }
 
   //This callback method works for both round adapters.
@@ -919,8 +923,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       assignOldCycleValuesToCheckForChanges();
-
-      logAllCyclePositionsAndTheirValues();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -2055,6 +2057,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
     setTdeeSpinnersToDefaultValues();
     addTDEEActivityTextView.setText(tdeeString);
+
+    logSelectedCyclePositionAndItsValues("Edit Highlighted Cycle");
+    logAllCyclePositionsAndTheirValues("Edit Highlighted Cycle");
   }
 
   private void populateRoundAdapterArraysForHighlightedCycle() {
@@ -3499,6 +3504,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+
+    logSelectedCyclePositionAndItsValues("Timer Launch");
+    logAllCyclePositionsAndTheirValues("Timer Launch");
   }
 
   private String getCurrentDateAsSlashFormattedString() {
@@ -4873,14 +4881,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void toggleTdeeLayoutParams() {
-    if (mode!=4) {
-      if (!trackActivityWithinCycle) {
-
-      }
-    }
-  }
-
   public String getTdeeActivityStringFromArrayPosition() {
     ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
     String[] subCategoryList = subCategoryArray.get(selectedTdeeCategoryPosition);
@@ -4908,9 +4908,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setCaloriesBurnedTextViewInAddTdeePopUp();
   }
 
+  //Todo: Fetching 0. Cycles entity only retrieved on (A) Cycle launch (B) Cycle deletion or (C) Cycle save.
+      //Todo: Shouldn't it retrieve on edit click as well? What are we using then?
   private void setTdeeSpinnersToDefaultValues() {
-    tdee_category_spinner.setSelection(0);
-    tdee_sub_category_spinner.setSelection(0);
+    tdee_category_spinner.setSelection(cycles.getTdeeCatPosition());
+    tdee_sub_category_spinner.setSelection(cycles.getTdeeSubCatPosition());
   }
 
   private void setMetScoreTextViewInAddTdeePopUp() {
@@ -4948,23 +4950,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
-  private void logSelectedCyclePositionAndItsValues() {
+  private void logSelectedCyclePositionAndItsValues(String location) {
     AsyncTask.execute(()-> {
-      Log.i("testCycle", "position of selected cycle is " + positionOfSelectedCycle);
-      Log.i("testCycle", "activity string of selected cycle is " + cycles.getActivityString());
-//    Log.i("testCycle", "time string of selected cycle is " + cycles.getWorkoutRounds());
+      Log.i("testCycle", "position of selected cycle is " + positionOfSelectedCycle + " in " + location);
+      Log.i("testCycle", "activity string of selected cycle is " + cycles.getActivityString() + " in " + location);
     });
   }
 
-  private void logAllCyclePositionsAndTheirValues() {
+  private void logAllCyclePositionsAndTheirValues(String location) {
     AsyncTask.execute(()-> {
       List<Cycles> cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+
       for (int i=0; i<cyclesList.size(); i++) {
-        Log.i("testCycle", "positions of cycle list are " + i);
-        Log.i("testCycle", "activity strings of cycle list are " + cyclesList.get(i).getActivityString());
-//      Log.i("testCycle", "time strings of cycle list are " + cyclesList.get(i).getWorkoutRounds());
+        Log.i("testCycle", "positions of cycle list are " + i  + " in " + location);
+      }
+
+      for (int i=0; i<cyclesList.size(); i++) {
+        Log.i("testCycle", "activity strings of cycle list are " + cyclesList.get(i).getActivityString()  + " in " + location);
       }
     });
+  }
+
+  private void logCycleHighlights() {
+    Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
+  }
+
+  private void logCycleHighlightsRoundValues() {
+    for (int i=0; i<receivedHighlightPositions.size(); i++) {
+      Log.i("testHighlight", "workout rounds for highlighted cycles are " + workoutCyclesArray.get(receivedHighlightPositions.get(i)));
+    }
   }
 
   private void testHighlightDeletion(int cycleId) {
@@ -4976,16 +4990,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     Log.i("testDelete", "size of fetched cycleList is " + cyclesList.size() + " with entries " + tempSetList);
-  }
-
-  private void logCycleHighlights() {
-    Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
-  }
-
-  private void logCycleHighlightsRoundValues() {
-    for (int i=0; i<receivedHighlightPositions.size(); i++) {
-      Log.i("testHighlight", "workout rounds for highlighted cycles are " + workoutCyclesArray.get(receivedHighlightPositions.get(i)));
-    }
   }
 
   private void logCyclesDatabase() {
