@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/StatRecyclerHeaderTheme">
 
     <TextView
         android:id="@+id/activity_in_daily_stats_header"
@@ -12,8 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
         android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        android:textSize="20sp">
+        android:paddingEnd="6dp">
     </TextView>
 
     <TextView
@@ -23,8 +23,7 @@
         app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats_header"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="40dp"
-        android:gravity="center"
-        android:textSize="20sp">
+        android:gravity="center">
     </TextView>
 
     <TextView
@@ -34,8 +33,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="8dp"
-        android:gravity="center"
-        android:textSize="20sp">
+        android:gravity="center">
     </TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
