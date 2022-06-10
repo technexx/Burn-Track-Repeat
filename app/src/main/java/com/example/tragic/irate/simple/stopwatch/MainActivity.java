@@ -538,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Stats recyclerView overlaps total footer.
+  //Todo: Adding cycle should remove any "reset/resume" limbo.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: "Reset" button gets pushed down as timer textView expands.
 
