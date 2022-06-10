@@ -154,6 +154,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
             daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+            customCalendarDayList = Collections.singletonList(daySelectedAsACalendarDayObject);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
             colorDaysWithAtLeastOneActivity();

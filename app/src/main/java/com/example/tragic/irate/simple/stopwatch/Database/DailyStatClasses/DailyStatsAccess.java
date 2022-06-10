@@ -237,8 +237,6 @@ public class DailyStatsAccess {
             firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
             lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
             firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
-
-            convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
         }
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
