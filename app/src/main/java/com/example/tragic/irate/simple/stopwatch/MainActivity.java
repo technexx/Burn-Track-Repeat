@@ -541,18 +541,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: BUG: Post-deletion index exception when launching cycles @ Line 3750.
   //Todo: BUG: Dual timerTexts/countDownTimers running after adding a cycle while another one is in "reset/resume limbo."
 
-  //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
-      //Todo: "Reset" button also gets pushed down as timer textView expands.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: BUG: Possible discrepency in activity save times when re-launching app.
   //Todo: BUG: Long activity String on first cycle goes off screen on top.
+  //Todo: "Reset" button gets pushed down as timer textView expands.
 
   //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
-  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.]
+  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
   //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -4108,12 +4107,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public boolean checkIfRunningTextSizeChange(long startingMillis) {
     if (mode==1) {
       if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
-        return startingMillis<=60000;
-      } else {
         return startingMillis>60000;
+      } else {
+        return startingMillis<=60000;
       }
     } else if (mode==3) {
-      return startingMillis<=60000;
+      return startingMillis>60000;
     } else {
       return false;
     }
