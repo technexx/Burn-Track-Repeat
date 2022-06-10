@@ -538,8 +538,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Post-deletion index exception when launching cycles @ Line 3750.
-  //Todo: Dual timerTexts/countDownTimers running after adding a cycle while another one is in "reset/resume limbo."
+  //Todo: Custom not showing stats for single date.
+      //Todo: API calls onDateChanged, not onRangedSelected for single.
+  //Todo: BUG: Post-deletion index exception when launching cycles @ Line 3750.
+  //Todo: BUG: Dual timerTexts/countDownTimers running after adding a cycle while another one is in "reset/resume limbo."
 
   //Todo: BUG: <60 seconds in timer starts at correct size, but then runs small -> big animation.
       //Todo: "Reset" button also gets pushed down as timer textView expands.
@@ -554,6 +556,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.]
 
+  //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Test dates from future years.
   //Todo: Test all daily saves in fragment.
@@ -3822,11 +3825,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleBreakTimeInMillis);
     totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
     totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
-//    totalCaloriesBurnedForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForCurrentDay);
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-//    totalCaloriesBurnedForSpecificActivityForCurrentDay = roundDownDoubleValuesToSyncCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 
   private long roundDownMillisValuesToSyncTimers(long millisToRound) {

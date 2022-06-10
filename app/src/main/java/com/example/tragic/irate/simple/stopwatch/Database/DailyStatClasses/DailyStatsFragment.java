@@ -48,6 +48,7 @@ import com.prolificinteractive.materialcalendarview.OnRangeSelectedListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -168,6 +169,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 AsyncTask.execute(()->{
                     calendar = Calendar.getInstance(Locale.getDefault());
                     calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
+                    customCalendarDayList = Collections.singletonList(date);
 
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
                     daySelectedAsACalendarDayObject = date;
