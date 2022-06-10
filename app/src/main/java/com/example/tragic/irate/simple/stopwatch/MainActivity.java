@@ -538,9 +538,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Creating new activity using previously created activity stats.
-  //Todo: Accessing multiple activities from different cycles override one another in single row in Stats Fragment.
-      //Todo: Their times/cals override as well.
   //Todo: Post-deletion index exception when launching cycles @ Line 3750.
   //Todo: Dual timerTexts/countDownTimers running after adding a cycle while another one is in "reset/resume limbo."
 
@@ -3473,13 +3470,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
 
-        //Todo: This is where we pass in the String that is incorrect.
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
-
-        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
         dailyStatsAccess.setLocalMetScoreVariable(metScore);

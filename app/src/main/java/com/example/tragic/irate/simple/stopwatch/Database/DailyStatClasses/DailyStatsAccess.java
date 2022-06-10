@@ -43,7 +43,7 @@ public class DailyStatsAccess {
     String mLastDayInDurationAsString;
 
     long mOldDayHolderId;
-    boolean activityExistsInDatabaseForSelectedDay;
+    boolean doesActivityExistsInDatabaseForSelectedDay;
 
     int activityPositionInListForCurrentDay;
     int mOldActivityPositionInListForCurrentDay;
@@ -412,7 +412,7 @@ public class DailyStatsAccess {
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
 
-        if (!activityExistsInDatabaseForSelectedDay) {
+        if (!doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = new StatsForEachActivity();
 
             mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
@@ -423,7 +423,6 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
-            //Todo: This is being executed when clicking on existing row w/ activity
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
             Log.i("testStats", "new activity with string " + mActivityString + " created");
         }
@@ -434,27 +433,39 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
+    public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
+        List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
+        mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
+
+        //////////////////////////////
+        List<String> activityString = new ArrayList<>();
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            activityString.add(mStatsForEachActivityList.get(i).getActivity());
+        }
+        Log.i("testStats", "List size for day " + dayToRetrieve + " is " + mStatsForEachActivityList.size() + " and consists of " + activityString);
+        //////////////////////////////
+    }
+
     public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
         activityPositionInListForCurrentDay = 0;
-        activityExistsInDatabaseForSelectedDay = false;
+        doesActivityExistsInDatabaseForSelectedDay = false;
 
-        //Todo: Likely an issue of insertion.
-        //Todo: After creating new cycle+activity, this uses previous String to check against position, and thus returns the wrong (previous) position.
         Log.i("testStats", "checking if activity exists for day: String is " + mActivityString);
         //This only returns true once, when our activity matches one in the database.
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
                 activityPositionInListForCurrentDay = i;
-                activityExistsInDatabaseForSelectedDay = true;
+                doesActivityExistsInDatabaseForSelectedDay = true;
+                return;
             }
             Log.i("testStats", "checking if activity exists for day: list is " + mStatsForEachActivityList.get(i).getActivity());
         }
-        Log.i("testStats", "activity exists boolean is " + activityExistsInDatabaseForSelectedDay);
+        Log.i("testStats", "activity exists boolean is " + doesActivityExistsInDatabaseForSelectedDay);
     }
 
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //New database pull to account for most recent insertion.
-        if (activityExistsInDatabaseForSelectedDay) {
+        if (doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
             Log.i("testStats", "activity position in day is " + activityPositionInListForCurrentDay);
         } else if (mStatsForEachActivityList.size()>0) {
@@ -468,25 +479,13 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
-        List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
-        mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
-
-        List<String> activityString = new ArrayList<>();
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            activityString.add(mStatsForEachActivityList.get(i).getActivity());
-        }
-
-        Log.i("testStats", "List size for day " + dayToRetrieve + " is " + mStatsForEachActivityList.size() + " and consists of " + activityString);
-    }
-
     public void assignStatsForEachActivityEntityForSinglePosition(int position) {
         Log.i("testStats", "Activity assigned for editing is " + mStatsForEachActivityList.get(position).getActivity());
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
     }
 
-    public boolean getActivityExistsInDatabaseForSelectedDay () {
-        return activityExistsInDatabaseForSelectedDay;
+    public boolean getDoesActivityExistsInDatabaseForSelectedDay () {
+        return doesActivityExistsInDatabaseForSelectedDay;
     }
 
     public int getActivityPosition() {
