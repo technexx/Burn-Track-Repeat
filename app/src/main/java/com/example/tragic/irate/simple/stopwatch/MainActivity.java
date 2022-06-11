@@ -538,7 +538,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: Activity on new day (saved cycle) keeps resetting when we re-launch the cycle after exiting timer.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: BUG: After changing set/break colors, the header in edit popUp don't change until clicked on again.
   //Todo: BUG: "Reset" button gets pushed down as timer textView expands.
@@ -2753,6 +2752,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
+      launchTimerCycle(false);
       timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
       timeLeft.setText(retrieveTimerValueString());
@@ -2765,6 +2765,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+        dailyStatsAccess.setActivityPositionInListForCurrentDay();
+
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
@@ -3400,7 +3403,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Our list of daily activities DOES update here, the first time we launch a cycle w/ an activity on a given day. However, the reset/resume callback does not update our doesActivityExist boolean, so we'll keep assigning 0 to the activity times.
   private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
@@ -3467,6 +3469,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
         dailyStatsAccess.setActivityPositionInListForCurrentDay();
+
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
         dailyStatsAccess.setLocalMetScoreVariable(metScore);
@@ -3535,7 +3538,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-    //Todo: On first launch of activity for day, it does not yet exist for that day, so every time we launch timer its values are assigned 0 per this conditional.
     if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
