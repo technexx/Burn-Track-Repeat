@@ -919,6 +919,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       removeHighlightFromCycle();
       editHighlightedCycleLogic();
 
+      /////////////////////
+      if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
+      if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+      clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
+      /////////////////////
+
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
       populateRoundAdapterArraysForHighlightedCycle();
@@ -3362,8 +3368,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
-          for (int i=0; i<fetchedRounds.length; i++) workoutTime.add(Integer.parseInt(fetchedRounds[i]));
-          for (int j=0; j<fetchedRoundType.length; j++) typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
+
+          for (int i=0; i<fetchedRounds.length; i++) {
+            workoutTime.add(Integer.parseInt(fetchedRounds[i]));
+          }
+          for (int j=0; j<fetchedRoundType.length; j++) {
+            typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
+          }
+
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
           buttonToLaunchTimerFromEditPopUp.setEnabled(true);
         }
@@ -3382,7 +3394,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           /////---------Testing pom round iterations---------------/////////
 //          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
-          for (int i=0; i<fetchedPomCycle.length; i++) pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
+          for (int i=0; i<fetchedPomCycle.length; i++) {
+            pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
+          }
         }
         break;
     }
