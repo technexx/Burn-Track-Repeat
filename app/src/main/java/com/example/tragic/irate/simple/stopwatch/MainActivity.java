@@ -3465,7 +3465,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
+        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+        dailyStatsAccess.setActivityPositionInListForCurrentDay();
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
         dailyStatsAccess.setLocalMetScoreVariable(metScore);

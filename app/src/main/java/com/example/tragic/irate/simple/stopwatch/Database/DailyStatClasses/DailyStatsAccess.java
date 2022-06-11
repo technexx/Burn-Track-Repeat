@@ -440,15 +440,22 @@ public class DailyStatsAccess {
         //////////////////////////////
     }
 
-    public void checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt() {
-        activityPositionInListForCurrentDay = 0;
+    public void checkIfActivityExistsForSpecificDayAndSetBooleanForIt() {
         doesActivityExistsInDatabaseForSelectedDay = false;
 
         //This only returns true once, when our activity matches one in the database.
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
-                activityPositionInListForCurrentDay = i;
                 doesActivityExistsInDatabaseForSelectedDay = true;
+                return;
+            }
+        }
+    }
+
+    public void setActivityPositionInListForCurrentDay() {
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
+                activityPositionInListForCurrentDay = i;
                 return;
             }
         }

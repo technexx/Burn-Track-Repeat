@@ -469,7 +469,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
-            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanAndPositionForIt();
+            dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+            dailyStatsAccess.setActivityPositionInListForCurrentDay();
 
             if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
                 dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
