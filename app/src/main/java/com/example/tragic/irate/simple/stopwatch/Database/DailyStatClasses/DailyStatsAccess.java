@@ -422,9 +422,9 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
-            Log.i("testStats", "new activity with string " + mActivityString + " created");
+//            Log.i("testStats", "new activity with string " + mActivityString + " created");
         }
-        Log.i("testStats", "Activity exists - nothing created!");
+//        Log.i("testStats", "Activity exists - nothing created!");
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -440,7 +440,7 @@ public class DailyStatsAccess {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             activityString.add(mStatsForEachActivityList.get(i).getActivity());
         }
-        Log.i("testStats", "List size for day " + dayToRetrieve + " is " + mStatsForEachActivityList.size() + " and consists of " + activityString);
+//        Log.i("testStats", "List size for day " + dayToRetrieve + " is " + mStatsForEachActivityList.size() + " and consists of " + activityString);
         //////////////////////////////
     }
 

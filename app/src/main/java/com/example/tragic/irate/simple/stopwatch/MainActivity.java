@@ -538,11 +538,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: Cycle overwrite when editing (likely due wrong position being called - hard to replicate)
-  //Todo: BUG: Some newly added activities start @ 1 second/0.03 calories.
+  //Todo: BUG: Activity on new day (saved cycle) keeps resetting when we re-launch the cycle after exiting timer.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: BUG: After changing set/break colors, the header in edit popUp don't change until clicked on again.
   //Todo: BUG: "Reset" button gets pushed down as timer textView expands.
+  //Todo: BUG: Cycle overwrite when editing (likely due wrong position being called - hard to replicate)
 
   //Todo: Add Day/Night modes.
   //Todo: Stats for Pom as well (Just total time/breaks)?
@@ -3533,6 +3533,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
+    //Todo: On first launch of activity for day, it does not yet exist for that day, so every time we launch timer its values are assigned 0 per this conditional.
     if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
