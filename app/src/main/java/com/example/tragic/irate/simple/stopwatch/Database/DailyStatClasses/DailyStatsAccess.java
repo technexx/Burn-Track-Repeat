@@ -448,7 +448,6 @@ public class DailyStatsAccess {
         activityPositionInListForCurrentDay = 0;
         doesActivityExistsInDatabaseForSelectedDay = false;
 
-        Log.i("testStats", "checking if activity exists for day: String is " + mActivityString);
         //This only returns true once, when our activity matches one in the database.
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
@@ -456,9 +455,7 @@ public class DailyStatsAccess {
                 doesActivityExistsInDatabaseForSelectedDay = true;
                 return;
             }
-            Log.i("testStats", "checking if activity exists for day: list is " + mStatsForEachActivityList.get(i).getActivity());
         }
-        Log.i("testStats", "activity exists boolean is " + doesActivityExistsInDatabaseForSelectedDay);
     }
 
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {

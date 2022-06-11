@@ -539,13 +539,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: BUG: Cycle overwrite when editing (likely due wrong position being called - hard to replicate)
-  //Todo: We have spinner positions saved in cycles db - should recall those when editing.
   //Todo: BUG: Some newly added activities start @ 1 second/0.03 calories.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: BUG: After changing set/break colors, the header in edit popUp don't change until clicked on again.
   //Todo: BUG: "Reset" button gets pushed down as timer textView expands.
 
-  //Todo: Constrain "Daily Stats For XX" header to start of "Total Activity Time," and it will re-center itself when the views go to GONE as tracking mode is switched.
   //Todo: Add Day/Night modes.
   //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
@@ -3489,6 +3487,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (editCyclesPopupWindow.isShowing()) {
             editCyclesPopupWindow.dismiss();
           }
+
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
 
           roundDownAllTotalTimeValuesToEnsureSyncing();
@@ -3534,7 +3533,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-    if (!cycleHasActivityAssigned) {
+    if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
       totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
       totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
