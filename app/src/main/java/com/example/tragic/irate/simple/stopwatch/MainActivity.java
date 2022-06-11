@@ -538,20 +538,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Cycle overwrite bug when editing (likely due wrong position being called).
-      //Todo: It may only come on the heels of adding a new cycle. Just editing does not replicate.
+  //Todo: BUG: Cycle overwrite when editing (likely due wrong position being called - hard to replicate)
   //Todo: We have spinner positions saved in cycles db - should recall those when editing.
-  //Todo: Constrain "Daily Stats For XX" header to start of "Total Activity Time," and it will re-center itself when the views go to GONE as tracking mode is switched.
+  //Todo: BUG: Some newly added activities start @ 1 second/0.03 calories.
   //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
-  //Todo: "Reset" button gets pushed down as timer textView expands.
+  //Todo: BUG: After changing set/break colors, the header in edit popUp don't change until clicked on again.
+  //Todo: BUG: "Reset" button gets pushed down as timer textView expands.
 
-  //Todo: May want to nix stat in db if time is 0 (less clutter).
+  //Todo: Constrain "Daily Stats For XX" header to start of "Total Activity Time," and it will re-center itself when the views go to GONE as tracking mode is switched.
+  //Todo: Add Day/Night modes.
   //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
+  //Todo: Fix stopwatch views.
 
   //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -1724,31 +1726,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
   };
-
-
-  ////Runnable above will trigger whenever a new round occurs, but since object animator isn't active yet, it ends without repeating.
-//  private boolean isObjectAnimatorActive() {
-//    boolean valueToReturn = false;
-//
-//    if (mode==1) {
-//
-//      if (objectAnimator.isStarted() && !objectAnimator.isPaused()) {
-//        valueToReturn = true;
-//      } else {
-//        valueToReturn = false;
-//      }
-//    }
-//
-//    if (mode==3) {
-//      if (objectAnimatorPom.isStarted() || !objectAnimatorPom.isPaused()) {
-//        valueToReturn = true;
-//      } else {
-//        valueToReturn = false;
-//      }
-//    }
-//
-//    return valueToReturn;
-//  }
 
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
