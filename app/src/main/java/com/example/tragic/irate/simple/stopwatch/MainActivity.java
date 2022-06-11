@@ -3400,6 +3400,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Our list of daily activities DOES update here, the first time we launch a cycle w/ an activity on a given day. However, the reset/resume callback does not update our doesActivityExist boolean, so we'll keep assigning 0 to the activity times.
   private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();

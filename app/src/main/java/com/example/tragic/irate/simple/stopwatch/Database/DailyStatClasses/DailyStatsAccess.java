@@ -395,10 +395,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
 
-    public void deleteDayHolderEntity(int daySelected) {
-        cyclesDatabase.cyclesDao().deleteSingleDay(daySelected);
-    }
-
     public void deleteMultipleDayHolderEntries(List<Long> listOfEntries) {
         cyclesDatabase.cyclesDao().deleteMultipleDays(listOfEntries);
     }
@@ -436,10 +432,10 @@ public class DailyStatsAccess {
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
 
         //////////////////////////////
-        List<String> activityString = new ArrayList<>();
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            activityString.add(mStatsForEachActivityList.get(i).getActivity());
-        }
+//        List<String> activityString = new ArrayList<>();
+//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//            activityString.add(mStatsForEachActivityList.get(i).getActivity());
+//        }
 //        Log.i("testStats", "List size for day " + dayToRetrieve + " is " + mStatsForEachActivityList.size() + " and consists of " + activityString);
         //////////////////////////////
     }
