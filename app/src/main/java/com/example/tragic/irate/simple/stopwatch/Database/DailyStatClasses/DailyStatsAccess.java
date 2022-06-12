@@ -43,6 +43,7 @@ public class DailyStatsAccess {
     String mLastDayInDurationAsString;
 
     long mOldDayHolderId;
+    boolean doesDayExistInDatabase;
     boolean doesActivityExistsInDatabaseForSelectedDay;
 
     int activityPositionInListForCurrentDay;
@@ -66,8 +67,8 @@ public class DailyStatsAccess {
         });
     }
 
-    public boolean checkIfDayAlreadyExistsInDatabase(int daySelected) {
-        boolean dayExists = false;
+    public void checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(int daySelected) {
+        doesDayExistInDatabase = false;
 
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
         int dayHolderSize = dayHolderList.size();
@@ -75,14 +76,18 @@ public class DailyStatsAccess {
         for (int i=0; i<dayHolderSize; i++) {
             long dayThatExistsInDatabase = dayHolderList.get(i).getDayId();
             if (daySelected==dayThatExistsInDatabase) {
-                dayExists = true;
+                doesDayExistInDatabase = true;
+                return;
             }
         }
-        return dayExists;
+    }
+
+    public boolean getDoesDayExistInDatabase() {
+        return doesDayExistInDatabase;
     }
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
-        if (!checkIfDayAlreadyExistsInDatabase(daySelected)) {
+        if (doesDayExistInDatabase) {
             String date = getDateString();
 
             mDayHolder = new DayHolder();
@@ -96,12 +101,6 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         }
-    }
-
-    private String getDateString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        return simpleDateFormat.format(calendar.getTime());
     }
 
     public void assignDayHolderInstanceForSelectedDay(int daySelected) {
@@ -360,6 +359,8 @@ public class DailyStatsAccess {
     }
 
     public void setTotalSetTimeFromDayHolder(long totalSetTime) {
+//        Log.i("testTimes", "set time saved is " + totalSetTime);
+//        Log.i("testTimes", "DayHolder day is " + mDayHolder.getDate());
         mDayHolder.setTotalSetTime(totalSetTime);
     }
 
@@ -697,5 +698,11 @@ public class DailyStatsAccess {
         totalActivitiesListForSelectedDuration = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDuration = new ArrayList<>();
         totalCaloriesBurnedListForEachActivityForSelectedDuration = new ArrayList<>();
+    }
+
+    private String getDateString() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        return simpleDateFormat.format(calendar.getTime());
     }
 }

@@ -538,7 +538,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: First second tick of new activity + new cycle will not display, next tick displays "2".
   //Todo: BUG: After changing set/break colors, the header in edit popUp don't change until clicked on again.
   //Todo: BUG: "Reset" button gets pushed down as timer textView expands.
   //Todo: BUG: Cycle overwrite when editing (likely due wrong position being called - hard to replicate)
@@ -601,19 +600,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+
     super.onDestroy();
   }
 
   @Override
   public void onBackPressed() {
     if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-//      moveTaskToBack(false);
       return;
     }
 
-    //Back to Main focus. Fragment dismissed and Frame Layout visibiltiy removed.
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
-
       if (rootSettingsFragment.isVisible()) {
         getSupportFragmentManager().beginTransaction()
                 .remove(rootSettingsFragment)
@@ -901,6 +898,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setViewsAndColorsToPreventTearingInEditPopUp(false);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+
+      logTotalDailyStats();
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -1726,6 +1725,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
           mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
         }
+
+        logTotalDailyStats();
       }
     };
   };
@@ -2752,7 +2753,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
-      launchTimerCycle(false);
       timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
       timeLeft.setText(retrieveTimerValueString());
@@ -2762,22 +2762,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(()-> {
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-        assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
+        dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
 
         dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+
         dailyStatsAccess.setActivityPositionInListForCurrentDay();
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-
-        assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
 
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
          setCyclesCompletedTextView();
          toggleTdeeObjectSizes();
+
          setTotalDailyTimeAndCaloriesValuesToTextViews();
          setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
+
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
       });
@@ -3461,8 +3462,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (trackActivityWithinCycle) {
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-        assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(dailyStatsAccess.checkIfDayAlreadyExistsInDatabase(dayOfYear));
+        dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
+        assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());
 
@@ -3515,8 +3517,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (String.valueOf(calendar.getTime()));
   }
 
-  private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(boolean dayExists) {
-    if (!dayExists) {
+  private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
+    if (!dailyStatsAccess.getDoesDayExistInDatabase()) {
       totalSetTimeForCurrentDayInMillis = 0;
       totalBreakTimeForCurrentDayInMillis = 0;
       totalCaloriesBurnedForCurrentDay = 0;
@@ -3997,7 +3999,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
         dotDraws.reDraw();
-        setNotificationValues();
+        setNotificationValues();;
       }
 
       @Override
@@ -5026,7 +5028,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logTotalDailyStats() {
     Log.i("testTimes", "set time for DAY is " + totalSetTimeForCurrentDayInMillis);
-    Log.i("testTimes", "calories for DAY are" + totalCaloriesBurnedForCurrentDay);
+    Log.i("testTimes", "calories for DAY are " + totalCaloriesBurnedForCurrentDay);
   }
 
   private void logTotalActivityStats() {
