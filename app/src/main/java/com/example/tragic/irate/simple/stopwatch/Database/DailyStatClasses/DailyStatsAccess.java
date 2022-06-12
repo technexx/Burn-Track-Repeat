@@ -359,8 +359,6 @@ public class DailyStatsAccess {
     }
 
     public void setTotalSetTimeFromDayHolder(long totalSetTime) {
-//        Log.i("testTimes", "set time saved is " + totalSetTime);
-//        Log.i("testTimes", "DayHolder day is " + mDayHolder.getDate());
         mDayHolder.setTotalSetTime(totalSetTime);
     }
 
@@ -419,9 +417,7 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
-//            Log.i("testStats", "new activity with string " + mActivityString + " created");
         }
-//        Log.i("testStats", "Activity exists - nothing created!");
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -431,14 +427,6 @@ public class DailyStatsAccess {
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
-
-        //////////////////////////////
-//        List<String> activityString = new ArrayList<>();
-//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            activityString.add(mStatsForEachActivityList.get(i).getActivity());
-//        }
-//        Log.i("testStats", "List size for day " + dayToRetrieve + " is " + mStatsForEachActivityList.size() + " and consists of " + activityString);
-        //////////////////////////////
     }
 
     public void checkIfActivityExistsForSpecificDayAndSetBooleanForIt() {
