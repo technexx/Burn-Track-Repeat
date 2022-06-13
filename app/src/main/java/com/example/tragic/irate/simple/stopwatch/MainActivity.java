@@ -538,9 +538,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: "Reset" button gets pushed down as timer textView expands.
-  //Todo: BUG: Cycle overwrite when editing (likely due wrong position being called - hard to replicate)
-
   //Todo: Add Day/Night modes.
   //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
