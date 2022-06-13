@@ -538,7 +538,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: BUG: After changing set/break colors, the header in edit popUp don't change until clicked on again.
   //Todo: BUG: "Reset" button gets pushed down as timer textView expands.
   //Todo: BUG: Cycle overwrite when editing (likely due wrong position being called - hard to replicate)
 
@@ -622,20 +621,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 .remove(dailyStatsFragment)
                 .commit();
       }
-    }
 
       mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
       mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
 
       setTypeOFMenu(DEFAULT_MENU);
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
-
+    }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
+      setEditPopUpTimerHeaders(1);
     }
   }
 
