@@ -67,6 +67,27 @@ public class DailyStatsAccess {
         });
     }
 
+    public boolean getDoesDayExistInDatabase() {
+        return doesDayExistInDatabase;
+    }
+
+    public void assignDayHolderInstanceForSelectedDay(int daySelected) {
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
+
+        if (dayHolderList.size()>0) {
+            mDayHolder = dayHolderList.get(0);
+        } else {
+            mDayHolder = new DayHolder();
+        }
+
+        Log.i("testInsert", "dayHolder date used to create single object list is " + doesDayExistInDatabase);
+        Log.i("testInsert", "dayHolder date assigned in entity from list is " + mDayHolder.getDate());
+    }
+
+    public void setSortMode(int sortMode) {
+        this.mSortMode = sortMode;
+    }
+
     public void checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(int daySelected) {
         doesDayExistInDatabase = false;
 
@@ -77,17 +98,14 @@ public class DailyStatsAccess {
             long dayThatExistsInDatabase = dayHolderList.get(i).getDayId();
             if (daySelected==dayThatExistsInDatabase) {
                 doesDayExistInDatabase = true;
-                return;
+//                return;
             }
         }
-    }
-
-    public boolean getDoesDayExistInDatabase() {
-        return doesDayExistInDatabase;
+        Log.i("testInsert", "doesDayExist returned from check method is " + doesDayExistInDatabase);
     }
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
-        if (doesDayExistInDatabase) {
+        if (!doesDayExistInDatabase) {
             String date = getDateString();
 
             mDayHolder = new DayHolder();
@@ -101,21 +119,11 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         }
+
+        Log.i("testInsert", "doesDayExist in insert method for daily totals is " + doesDayExistInDatabase);
     }
 
-    public void assignDayHolderInstanceForSelectedDay(int daySelected) {
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
 
-        if (dayHolderList.size()>0) {
-            mDayHolder = dayHolderList.get(0);
-        } else {
-            mDayHolder = new DayHolder();
-        }
-    }
-
-    public void setSortMode(int sortMode) {
-        this.mSortMode = sortMode;
-    }
 
     public List<StatsForEachActivity> assignStatsForEachActivityListBySortMode(List<Integer> listOfDays) {
         List<StatsForEachActivity> listToReturn = new ArrayList<>();
@@ -454,20 +462,16 @@ public class DailyStatsAccess {
         //New database pull to account for most recent insertion.
         if (doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
-            Log.i("testStats", "activity position in day is " + activityPositionInListForCurrentDay);
         } else if (mStatsForEachActivityList.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
             int mostRecentEntryPosition = mStatsForEachActivityList.size()-1;
             mStatsForEachActivity = mStatsForEachActivityList.get(mostRecentEntryPosition);
-            Log.i("testStats", "mStats instance at last accessed position of " + mostRecentEntryPosition);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
-            Log.i("testStats", "new mStats created");
         }
     }
 
     public void assignStatsForEachActivityEntityForSinglePosition(int position) {
-        Log.i("testStats", "Activity assigned for editing is " + mStatsForEachActivityList.get(position).getActivity());
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
     }
 
@@ -532,7 +536,6 @@ public class DailyStatsAccess {
     }
 
     public void deleteStatsForEachActivityEntity() {
-        Log.i("testStats", "Activity being deleted is " + mStatsForEachActivity.getActivity());
         cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
     }
 

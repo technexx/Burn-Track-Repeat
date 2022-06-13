@@ -538,14 +538,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: Sep. popUp for stopwatch? Would help clean up Main, too. No mode 4.
+      //Todo: Could also just finally migrate Timer to a separate activity.
+  //Todo: Fix stopwatch views.
+  //Todo: Test Pom stuff.
+
   //Todo: Add Day/Night modes.
-  //Todo: Stats for Pom as well (Just total time/breaks)?
   //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
-  //Todo: Fix stopwatch views.
 
   //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -3324,7 +3327,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerTwo.setVisibility(View.GONE);
         roundListDivider.setVisibility(View.GONE);
 
-        //16:9 is ~1.7.
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
           roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(60);
@@ -3377,12 +3379,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
           buttonToLaunchTimerFromEditPopUp.setEnabled(true);
         }
-
-        Log.i("testList", "position of cycle is " + positionOfSelectedCycle);
-        Log.i("testList", "type of round array is " + typeOfRoundArray);
-        Log.i("testList", "type of round integer list is " + typeOfRound);
-
         break;
+
       case 3:
         pomValuesTime.clear();
         if (pomArray.size()-1>=positionOfSelectedCycle) {
@@ -4827,7 +4825,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!trackActivityWithinCycle) {
         cycle_title_textView.setVisibility(View.VISIBLE);
       }
-
       lapRecycler.setVisibility(View.INVISIBLE);
       next_round.setVisibility(View.VISIBLE);
       new_lap.setVisibility(View.INVISIBLE);
@@ -4846,6 +4843,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       cycle_title_textView.setVisibility(View.INVISIBLE);
       addTDEEActivityTextView.setVisibility(View.INVISIBLE);
+
       if (stopWatchIsPaused) {
         reset.setVisibility(View.VISIBLE);
       } else {
