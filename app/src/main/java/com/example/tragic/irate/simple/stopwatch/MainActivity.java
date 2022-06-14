@@ -1131,6 +1131,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
     });
 
+    stopwatchReset.setOnClickListener(v-> {
+      resetStopwatchTimer();
+    });
+
     new_lap.setOnClickListener(v -> {
       newLapLogic();
     });
@@ -1185,26 +1189,72 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
       stopWatchTotalTimeHolder = stopWatchTotalTime;
 
-      reset.setVisibility(View.VISIBLE);
-      mHandler.removeCallbacks(stopWatchRunnable);
-      stopWatchIsPaused = true;
+      stopwatchReset.setVisibility(View.VISIBLE);
+
       new_lap.setAlpha(0.3f);
       new_lap.setEnabled(false);
+
+      mHandler.removeCallbacks(stopWatchRunnable);
+
     } else if (pausing == RESUMING_TIMER) {
       stopWatchIsPaused = false;
-
       stopWatchstartTime = System.currentTimeMillis();
 
-      if (fadeInObj != null) fadeInObj.cancel();
-      reset.setVisibility(View.INVISIBLE);
-      stopWatchIsPaused = false;
       new_lap.setAlpha(1.0f);
       new_lap.setEnabled(true);
+
+      stopwatchReset.setVisibility(View.INVISIBLE);
+
       mHandler.post(stopWatchRunnable);
     }
   }
 
+  private void newLapLogic() {
+    if (lapAdapter.getItemCount()>98) {
+      return;
+    }
+
+    if (empty_laps.getVisibility()==View.VISIBLE) {
+      empty_laps.setVisibility(View.INVISIBLE);
+    }
+
+    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
+
+    if (savedLapList.size()>0) {
+      String retrievedLap = savedLapList.get(savedLapList.size()-1);
+      String[] splitLap = retrievedLap.split(":");
+      int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
+      int convertedMinute = pulledMinute * 60 * 1000;
+      int convertedSecond = Integer.parseInt(splitLap[1]) * 1000;
+      int convertedMs = Integer.parseInt(splitLap[2]) * 10;
+
+      int totalMs = convertedMinute + convertedSecond + convertedMs;
+
+      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
+
+      int newMinutes = (totalNewTime/1000) / 60;
+      int newSeconds = (totalNewTime/1000) % 60;
+      double newMS = ((double) totalNewTime%1000) / 10;
+
+      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
+    } else {
+      newEntries = savedEntries;
+    }
+
+    currentLapList.add(newEntries);
+    savedLapList.add(savedEntries);
+    lapRecyclerLayoutManager.scrollToPosition(savedLapList.size() - 1);
+
+    lapAdapter.notifyDataSetChanged();
+
+    lapsNumber++;
+    setCyclesCompletedTextView();
+    lapAdapter.resetLapAnimation();
+  }
+
   private void resetStopwatchTimer() {
+    stopWatchIsPaused = true;
+
     stopWatchstartTime = 0;
     stopWatchTotalTime = 0;
     stopWatchTotalTimeHolder = 0;
@@ -1216,11 +1266,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchTimeTextView.setAlpha(1);
     stopWatchTimeTextView.setText("0");
     msTimeTextView.setText("00");
+
     if (currentLapList.size() > 0) currentLapList.clear();
     if (savedLapList.size() > 0) savedLapList.clear();
+
     lapsNumber = 0;
-    setCyclesCompletedTextView();
-    stopWatchIsPaused = true;
+
     lapAdapter.notifyDataSetChanged();
     empty_laps.setVisibility(View.VISIBLE);
     setInitialTextSizeForRounds(0);
@@ -1492,6 +1543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap =  stopWatchPopUpView.findViewById(R.id.new_lap);
     msTimeTextView = stopWatchPopUpView.findViewById(R.id.msTimeTextView);
     empty_laps = stopWatchPopUpView.findViewById(R.id.empty_laps_text);
+    empty_laps.setText(R.string.empty_laps_list);
     stopwatchReset = stopWatchPopUpView.findViewById(R.id.stopwatch_reset);
 
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
@@ -3183,46 +3235,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     endAnimation.setRepeatCount(Animation.INFINITE);
     progressBar.startAnimation(endAnimation);
     timeLeft.startAnimation(endAnimation);
-  }
-
-  private void newLapLogic() {
-    if (lapAdapter.getItemCount()>98) {
-      return;
-    }
-    if (empty_laps.getVisibility()==View.VISIBLE) empty_laps.setVisibility(View.INVISIBLE);
-
-    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
-
-    if (savedLapList.size()>0) {
-      String retrievedLap = savedLapList.get(savedLapList.size()-1);
-      String[] splitLap = retrievedLap.split(":");
-      int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
-      int convertedMinute = pulledMinute * 60 * 1000;
-      int convertedSecond = Integer.parseInt(splitLap[1]) * 1000;
-      int convertedMs = Integer.parseInt(splitLap[2]) * 10;
-
-      int totalMs = convertedMinute + convertedSecond + convertedMs;
-
-      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
-
-      int newMinutes = (totalNewTime/1000) / 60;
-      int newSeconds = (totalNewTime/1000) % 60;
-      double newMS = ((double) totalNewTime%1000) / 10;
-
-      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
-    } else {
-      newEntries = savedEntries;
-    }
-
-    currentLapList.add(newEntries);
-    savedLapList.add(savedEntries);
-    lapRecyclerLayoutManager.scrollToPosition(savedLapList.size() - 1);
-
-    lapAdapter.notifyDataSetChanged();
-
-    lapsNumber++;
-    setCyclesCompletedTextView();
-    lapAdapter.resetLapAnimation();
   }
 
   private void adjustCustom(boolean adding) {
