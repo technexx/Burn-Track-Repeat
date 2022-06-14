@@ -1541,6 +1541,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapRecycler = stopWatchPopUpView.findViewById(R.id.lap_recycler);
     stopWatchPauseResumeButton = stopWatchPopUpView.findViewById(R.id.stopwatchPauseResumeButton);
     stopWatchTimeTextView = stopWatchPopUpView.findViewById(R.id.stopWatchTimeTextView);
+    stopWatchTimeTextView.setTextSize(120f);
     new_lap =  stopWatchPopUpView.findViewById(R.id.new_lap);
     msTimeTextView = stopWatchPopUpView.findViewById(R.id.msTimeTextView);
     empty_laps = stopWatchPopUpView.findViewById(R.id.empty_laps_text);
@@ -1778,7 +1779,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cancelHighlight.setVisibility(View.INVISIBLE);
 
     reset.setVisibility(View.INVISIBLE);
-    empty_laps.setVisibility(View.INVISIBLE);
 
     savedPomCycleRecycler.setVisibility(View.GONE);
     new_lap.setAlpha(0.3f);

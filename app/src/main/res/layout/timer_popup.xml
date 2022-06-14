@@ -194,7 +194,8 @@
         app:layout_constraintTop_toTopOf="@id/lap_recycler"
         app:layout_constraintBottom_toBottomOf="@id/lap_recycler"
         app:layout_constraintStart_toStartOf="@id/lap_recycler"
-        app:layout_constraintEnd_toEndOf="@id/lap_recycler">
+        app:layout_constraintEnd_toEndOf="@id/lap_recycler"
+        android:textColor="@color/white">
     </TextView>
 
     <TextView

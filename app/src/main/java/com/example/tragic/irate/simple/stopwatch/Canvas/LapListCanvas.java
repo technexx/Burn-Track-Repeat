@@ -32,11 +32,11 @@ public class LapListCanvas extends View {
     private void drawOutlineBox() {
         mPaint.setColor(Color.WHITE);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(2);
+        mPaint.setStrokeWidth(10);
 
         RectF rect = new RectF(0, 0, convertDensityPixelsToScalable(gradientWidthAndHeight), convertDensityPixelsToScalable(gradientWidthAndHeight));
 
-        mCanvas.drawRoundRect(rect, 50, 50, mPaint);
+        mCanvas.drawRoundRect(rect, 35, 35, mPaint);
     }
 
     private void drawGradientBox() {

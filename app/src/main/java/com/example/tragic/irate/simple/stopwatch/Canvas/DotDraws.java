@@ -69,6 +69,10 @@ public class DotDraws extends View {
 
     setupPaint();
     screenRatioLayoutChanger = new ScreenRatioLayoutChanger(mContext);
+
+    mRoundTimes = new ArrayList<>();
+    mRoundType = new ArrayList<>();
+    mPomTime = new ArrayList<>();
   }
 
   public void setAlpha(int alpha) {
