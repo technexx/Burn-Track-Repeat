@@ -1177,7 +1177,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     stopWatchTimeTextView.setText(displayTime);
     msTimeTextView.setText(displayMs);
-    laps_completed_textView.setText(R.string.laps_completed);
+    laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
 
     stopWatchPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
@@ -1248,8 +1248,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapAdapter.notifyDataSetChanged();
 
     lapsNumber++;
-    setCyclesCompletedTextView();
     lapAdapter.resetLapAnimation();
+
+    laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
   }
 
   private void resetStopwatchTimer() {
