@@ -16,7 +16,6 @@ import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayout
 public class LapListCanvas extends View {
     Canvas mCanvas;
     Paint mPaint;
-    int mMode;
 
     ScreenRatioLayoutChanger screenRatioLayoutChanger;
     int gradientWidthAndHeight;
@@ -71,17 +70,10 @@ public class LapListCanvas extends View {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
     }
 
-    public void setMode(int mode) {
-        mMode = mode;
-        invalidate();
-    }
-
     @Override
     public void onDraw(Canvas canvas) {
         this.mCanvas = canvas;
-        if (mMode==4) {
-            drawGradientBox();
-            drawOutlineBox();
-        } else mPaint.setColor(Color.BLACK);
+        drawGradientBox();
+        drawOutlineBox();
     }
 }
