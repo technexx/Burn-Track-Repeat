@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Calendar calendar;
 
   ImageButton fab;
-  ImageButton stopwatch;
+  ImageButton stopWatchLaunchButton;
   TextView emptyCycleList;
 
   CyclesDatabase cyclesDatabase;
@@ -328,10 +328,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RecyclerView lapRecycler;
   ImageButton new_lap;
   LapAdapter lapAdapter;
-  TextView msTime;
+  ImageButton stopWatchPauseResumeButton;
+  TextView stopWatchTimeTextView;
+  TextView msTimeTextView;
   TextView empty_laps;
   TextView stopwatchReset;
-
 
   TextView dailySingleActivityStringHeader;
   TextView dailyTotalTimeTextViewHeader;
@@ -884,10 +885,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fabLogic();
     });
 
-    stopwatch.setOnClickListener(v-> {
-      stopWatchButtonLogic();
-    });
-
     //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
@@ -1067,38 +1064,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
 
-    stopWatchRunnable = new Runnable() {
-      @Override
-      public void run() {
-        setNotificationValues();
-
-        DecimalFormat df2 = new DecimalFormat("00");
-
-        stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
-
-        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
-        stopWatchMinutes = (int) stopWatchSeconds/60;
-        stopWatchMs = (stopWatchTotalTime%1000) / 10;
-
-        displayTime = convertSeconds( (long)stopWatchSeconds);
-        displayMs = df2.format(stopWatchMs);
-
-        if (mode==4) {
-          timeLeft.setText(displayTime);
-          msTime.setText(displayMs);
-        }
-
-        if (!textSizeIncreased && mode==4) {
-          if (stopWatchSeconds > 59) {
-            changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-            textSizeIncreased = true;
-          }
-        }
-
-        mHandler.postDelayed(this, 10);
-      }
-    };
-
     next_round.setOnClickListener(v -> {
       nextRound(true);
     });
@@ -1115,13 +1080,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    new_lap.setOnClickListener(v -> {
-      newLap();
-    });
-
     pauseResumeButton.setOnClickListener(v -> {
-      if (mode!=4) if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
-      else if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER); else pauseAndResumeTimer(RESUMING_TIMER);
+      if (!timerIsPaused) {
+        pauseAndResumeTimer(PAUSING_TIMER);
+      } else {
+        pauseAndResumeTimer(RESUMING_TIMER);
+      }
     });
 
     reset_total_cycle_times.setOnClickListener(v -> {
@@ -1155,8 +1119,113 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
 
+    stopWatchLaunchButton.setOnClickListener(v-> {
+      stopWatchButtonLogic();
+    });
 
+    stopWatchPauseResumeButton.setOnClickListener(v-> {
+      if (!stopWatchIsPaused) {
+        pauseAndResumeStopwatch(PAUSING_TIMER);
+      } else {
+        pauseAndResumeStopwatch(RESUMING_TIMER);
+        }
+    });
 
+    new_lap.setOnClickListener(v -> {
+      newLapLogic();
+    });
+
+    stopWatchRunnable = new Runnable() {
+      @Override
+      public void run() {
+        setNotificationValues();
+
+        DecimalFormat df2 = new DecimalFormat("00");
+
+        stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
+
+        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
+        stopWatchMinutes = (int) stopWatchSeconds/60;
+        stopWatchMs = (stopWatchTotalTime%1000) / 10;
+
+        displayTime = convertSeconds( (long)stopWatchSeconds);
+        displayMs = df2.format(stopWatchMs);
+
+        stopWatchTimeTextView.setText(displayTime);
+        msTimeTextView.setText(displayMs);
+
+        if (!textSizeIncreased && mode==4) {
+          if (stopWatchSeconds > 59) {
+            changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
+            textSizeIncreased = true;
+          }
+        }
+
+        mHandler.postDelayed(this, 10);
+      }
+    };
+
+  }
+
+  private void stopWatchButtonLogic() {
+    setViewsAndColorsToPreventTearingInEditPopUp(true);
+    setInitialTextSizeForRounds(0);
+
+    stopWatchTimeTextView.setText(displayTime);
+    msTimeTextView.setText(displayMs);
+    laps_completed_textView.setText(R.string.laps_completed);
+
+    stopWatchPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
+  private void pauseAndResumeStopwatch (int pausing) {
+    if (pausing == PAUSING_TIMER) {
+      stopWatchIsPaused = true;
+
+      stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
+      stopWatchTotalTimeHolder = stopWatchTotalTime;
+
+      reset.setVisibility(View.VISIBLE);
+      mHandler.removeCallbacks(stopWatchRunnable);
+      stopWatchIsPaused = true;
+      new_lap.setAlpha(0.3f);
+      new_lap.setEnabled(false);
+    } else if (pausing == RESUMING_TIMER) {
+      stopWatchIsPaused = false;
+
+      stopWatchstartTime = System.currentTimeMillis();
+
+      if (fadeInObj != null) fadeInObj.cancel();
+      reset.setVisibility(View.INVISIBLE);
+      stopWatchIsPaused = false;
+      new_lap.setAlpha(1.0f);
+      new_lap.setEnabled(true);
+      mHandler.post(stopWatchRunnable);
+    }
+  }
+
+  private void resetStopwatchTimer() {
+    stopWatchstartTime = 0;
+    stopWatchTotalTime = 0;
+    stopWatchTotalTimeHolder = 0;
+
+    stopWatchMs = 0;
+    stopWatchSeconds = 0;
+    stopWatchMinutes = 0;
+
+    stopWatchTimeTextView.setAlpha(1);
+    stopWatchTimeTextView.setText("0");
+    msTimeTextView.setText("00");
+    if (currentLapList.size() > 0) currentLapList.clear();
+    if (savedLapList.size() > 0) savedLapList.clear();
+    lapsNumber = 0;
+    setCyclesCompletedTextView();
+    stopWatchIsPaused = true;
+    lapAdapter.notifyDataSetChanged();
+    empty_laps.setVisibility(View.VISIBLE);
+    setInitialTextSizeForRounds(0);
+
+    setNotificationValues();
   }
 
   private void toggleSortMenuViewBetweenCyclesAndStats(int typeOfSort) {
@@ -1311,7 +1380,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportActionBar().setCustomView(R.layout.custom_bar);
 
     fab = findViewById(R.id.fab);
-    stopwatch = findViewById(R.id.stopwatch_button);
+    stopWatchLaunchButton = findViewById(R.id.stopwatch_launch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
 
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
@@ -1414,10 +1483,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
     laps_completed_textView = stopWatchPopUpView.findViewById(R.id.laps_completed_textView);
+
     lapListCanvas = stopWatchPopUpView.findViewById(R.id.lapCanvas);
+
     lapRecycler = stopWatchPopUpView.findViewById(R.id.lap_recycler);
+    stopWatchPauseResumeButton = stopWatchPopUpView.findViewById(R.id.stopwatchPauseResumeButton);
+    stopWatchTimeTextView = stopWatchPopUpView.findViewById(R.id.stopWatchTimeTextView);
     new_lap =  stopWatchPopUpView.findViewById(R.id.new_lap);
-    msTime = stopWatchPopUpView.findViewById(R.id.msTime);
+    msTimeTextView = stopWatchPopUpView.findViewById(R.id.msTimeTextView);
     empty_laps = stopWatchPopUpView.findViewById(R.id.empty_laps_text);
     stopwatchReset = stopWatchPopUpView.findViewById(R.id.stopwatch_reset);
 
@@ -1655,8 +1728,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     empty_laps.setVisibility(View.INVISIBLE);
 
     savedPomCycleRecycler.setVisibility(View.GONE);
-    lapRecycler.setVisibility(View.GONE);
-    new_lap.setVisibility(View.INVISIBLE);
+    new_lap.setAlpha(0.3f);
 
     roundListDivider.setVisibility(View.GONE);
   }
@@ -1833,14 +1905,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setTdeeSpinnersToDefaultValues();
     toggleEditPopUpViewsForAddingActivity(false);
-  }
-
-  private void stopWatchButtonLogic() {
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
-    setInitialTextSizeForRounds(0);
-    populateTimerUI();
-
-    stopWatchPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
   private View.OnClickListener cyclesSortOptionListener() {
@@ -2888,32 +2952,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyOne = "";
       String bodyTwo = "";
 
-      if (timerPopUpIsVisible) {
-        if (mode==1) {
-          if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-            headerOne = setNotificationHeader("Workout", "Set");
-            bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-          } else {
-            headerOne = setNotificationHeader("Workout", "Break");
-            bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+      if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
+
+        if (timerPopUpWindow.isShowing()) {
+          if (mode==1) {
+            if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+              headerOne = setNotificationHeader("Workout", "Set");
+              bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+            } else {
+              headerOne = setNotificationHeader("Workout", "Break");
+              bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+            }
+          }
+
+          if (mode==3) {
+            int numberOfRoundsLeft = 8-pomDotCounter;
+            switch (pomDotCounter) {
+              case 0: case 2: case 4: case 6:
+                headerOne = setNotificationHeader("Pomodoro", "Work");
+                bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+                break;
+              case 1: case 3: case 5: case 7:
+                headerOne = setNotificationHeader("Pomodoro", "Break");
+                bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+                break;
+            }
           }
         }
 
-        if (mode==3) {
-          int numberOfRoundsLeft = 8-pomDotCounter;
-          switch (pomDotCounter) {
-            case 0: case 2: case 4: case 6:
-              headerOne = setNotificationHeader("Pomodoro", "Work");
-              bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-              break;
-            case 1: case 3: case 5: case 7:
-              headerOne = setNotificationHeader("Pomodoro", "Break");
-              bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-              break;
-          }
-        }
-
-        if (mode==4) {
+        if (stopWatchPopUpWindow.isShowing()) {
           headerOne = getString(R.string.notification_stopwatch_header);
           bodyOne = convertTimerValuesToString((long) stopWatchSeconds);
         }
@@ -3118,7 +3185,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.startAnimation(endAnimation);
   }
 
-  private void newLap() {
+  private void newLapLogic() {
     if (lapAdapter.getItemCount()>98) {
       return;
     }
@@ -4441,26 +4508,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           break;
         case 4:
-          if (pausing == RESUMING_TIMER) {
-            stopWatchstartTime = System.currentTimeMillis();
-
-            if (fadeInObj != null) fadeInObj.cancel();
-            reset.setVisibility(View.INVISIBLE);
-            stopWatchIsPaused = false;
-            new_lap.setAlpha(1.0f);
-            new_lap.setEnabled(true);
-            mHandler.post(stopWatchRunnable);
-          } else if (pausing == PAUSING_TIMER) {
-            stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
-            stopWatchTotalTimeHolder = stopWatchTotalTime;
-
-            reset.setVisibility(View.VISIBLE);
-            mHandler.removeCallbacks(stopWatchRunnable);
-            stopWatchIsPaused = true;
-            new_lap.setAlpha(0.3f);
-            new_lap.setEnabled(false);
-            break;
-          }
       }
     }
   }
@@ -4628,15 +4675,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setInitialTextSizeForRounds(pomMillis);
         }
         break;
-      case 4:
-        timerDisabled = false;
-        progressBar.setProgress(maxProgress);
-        timeLeft.setText(displayTime);
-        msTime.setText(displayMs);
-//        cycles_or_laps_completed_textView.setText(R.string.laps_completed);
-        setCyclesCompletedTextView();
-        setInitialTextSizeForRounds(0);
-        break;
     }
   }
 
@@ -4695,31 +4733,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleAdapter.notifyDataSetChanged();
         }
         break;
-      case 4:
-        stopWatchstartTime = 0;
-        stopWatchTotalTime = 0;
-        stopWatchTotalTimeHolder = 0;
-
-        stopWatchMs = 0;
-        stopWatchSeconds = 0;
-        stopWatchMinutes = 0;
-
-        timeLeft.setAlpha(1);
-        timeLeft.setText("0");
-        msTime.setText("00");
-        if (currentLapList.size() > 0) currentLapList.clear();
-        if (savedLapList.size() > 0) savedLapList.clear();
-        lapsNumber = 0;
-        setCyclesCompletedTextView();
-        stopWatchIsPaused = true;
-        lapAdapter.notifyDataSetChanged();
-        empty_laps.setVisibility(View.VISIBLE);
-        setInitialTextSizeForRounds(0);
-        break;
     }
-    if (mode!=4) {
-      populateTimerUI();
-    }
+
     setNotificationValues();
   }
 

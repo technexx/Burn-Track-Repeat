@@ -57,7 +57,7 @@
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/stopwatch_button"
+        android:id="@+id/stopwatch_launch_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
