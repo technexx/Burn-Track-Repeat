@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
+    android:background="@color/black"
     android:id="@+id/main_timer_layout"
     android:theme="@style/TimerTheme">
 
@@ -289,8 +290,5 @@
         android:src="@drawable/double_arrow_large"
         app:elevation="8dp">
     </ImageButton>
-
-    <!--Constraint is to canvas class itself, not the width of the drawn borders-->
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
