@@ -34,7 +34,7 @@ public class LapListCanvas extends View {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(2);
 
-        RectF rect = new RectF(0, convertDensityPixelsToScalable(10), convertDensityPixelsToScalable(gradientWidthAndHeight), convertDensityPixelsToScalable(gradientWidthAndHeight));
+        RectF rect = new RectF(0, 0, convertDensityPixelsToScalable(gradientWidthAndHeight), convertDensityPixelsToScalable(gradientWidthAndHeight));
 
         mCanvas.drawRoundRect(rect, 50, 50, mPaint);
     }
