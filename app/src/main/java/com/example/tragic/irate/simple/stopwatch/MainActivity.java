@@ -539,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: Sep. popUp for stopwatch? Would help clean up Main, too. No mode 4.
-      //Todo: Could also just finally migrate Timer to a separate activity.
+      //Todo: Can do progressBar like Google's.
   //Todo: Fix stopwatch views.
   //Todo: Test Pom stuff.
 
@@ -4561,6 +4561,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleRecycler.setVisibility(View.GONE);
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
         total_set_header.setText(R.string.total_work);
+
         currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
         timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
         positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
