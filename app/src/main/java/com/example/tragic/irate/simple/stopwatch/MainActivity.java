@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -34,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -908,8 +910,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     edit_highlighted_cycle.setOnClickListener(v-> {
-      fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       setViewsAndColorsToPreventTearingInEditPopUp(true);
+      fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       removeHighlightFromCycle();
       editHighlightedCycleLogic();
 
@@ -1118,7 +1120,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopWatchLaunchButton.setOnClickListener(v-> {
-      stopWatchButtonLogic();
+      stopWatchLaunchLogic();
     });
 
     stopWatchPauseResumeButton.setOnClickListener(v-> {
@@ -1135,6 +1137,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     new_lap.setOnClickListener(v -> {
       newLapLogic();
+    });
+
+    stopWatchPopUpWindow.setOnDismissListener(()-> {
+      getSupportActionBar().setCustomView(R.layout.custom_bar);
+      savedCycleRecycler.setVisibility(View.VISIBLE);
+      savedPomCycleRecycler.setVisibility(View.VISIBLE);
+      savedCyclesTabLayout.setVisibility(View.VISIBLE);
     });
 
     stopWatchRunnable = new Runnable() {
@@ -1166,11 +1175,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.postDelayed(this, 10);
       }
     };
-
   }
 
-  private void stopWatchButtonLogic() {
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
+  private void stopWatchLaunchLogic() {
+    getSupportActionBar().setCustomView(R.layout.empty_action_bar_view);
+    savedCycleRecycler.setVisibility(View.INVISIBLE);
+    savedPomCycleRecycler.setVisibility(View.INVISIBLE);
+    savedCyclesTabLayout.setVisibility(View.INVISIBLE);
+
     setInitialTextSizeForRounds(0);
 
     stopWatchTimeTextView.setText(displayTime);
@@ -2851,14 +2863,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setViewsAndColorsToPreventTearingInEditPopUp(boolean popUpIsActive) {
+    mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+
     if (popUpIsActive) {
-      //Prevents tearing when soft keyboard pushes up in editCycle popUp.
       if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
       if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
       emptyCycleList.setVisibility(View.GONE);
-      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.test_black));
     } else {
-      //Resets Main's recyclerView visibility if we are not launching timer for smoother transition between popups.
       if (!makeCycleAdapterVisible) {
         if (mode==1) {
           savedCycleAdapter.notifyDataSetChanged();
@@ -2869,7 +2880,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleRecycler.setVisibility(View.VISIBLE);
         }
       }
-      mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
     }
   }
 
