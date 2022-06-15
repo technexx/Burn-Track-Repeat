@@ -4758,7 +4758,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
     }
-
+    populateTimerUI();
     setNotificationValues();
   }
 
