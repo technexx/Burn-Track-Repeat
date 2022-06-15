@@ -1405,6 +1405,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         setDefaultEditRoundViews();
+        getTimerVariablesForEachMode();
       }
 
       @Override
@@ -1610,6 +1611,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setDefaultUserSettings();
         setDefaultEditRoundViews();
+        getTimerVariablesForEachMode();
         savedCycleAdapter.notifyDataSetChanged();
       });
     });
@@ -4486,6 +4488,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) (totalVar += singleVar) / 1000;
   }
 
+
+
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
       if (fadeInObj != null) fadeInObj.cancel();
@@ -4640,12 +4644,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         addTDEEActivityTextView.setVisibility(View.VISIBLE);
 
         total_set_header.setText(R.string.total_sets);
-        currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
-        timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
-        positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
-        timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
-        timerEnded = sharedPreferences.getBoolean("modeOneTimerEnded", false);
-        timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
         break;
       case 3:
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
@@ -4684,14 +4682,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         addTDEEActivityTextView.setVisibility(View.INVISIBLE);
 
         total_set_header.setText(R.string.total_work);
-
-        currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
-        timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
-        positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
-        timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);
-        timerEnded = sharedPreferences.getBoolean("modeThreeTimerEnded", false);
-        timerDisabled = sharedPreferences.getBoolean("modeThreeTimerDisabled", false);
         break;
+    }
+  }
+
+  private void getTimerVariablesForEachMode() {
+    if (mode==1) {
+      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
+      timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
+      positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
+      timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
+      timerEnded = sharedPreferences.getBoolean("modeOneTimerEnded", false);
+      timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
+    }
+
+    if (mode==3) {
+      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
+      timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
+      positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
+      timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);
+      timerEnded = sharedPreferences.getBoolean("modeThreeTimerEnded", false);
+      timerDisabled = sharedPreferences.getBoolean("modeThreeTimerDisabled", false);
     }
   }
 
