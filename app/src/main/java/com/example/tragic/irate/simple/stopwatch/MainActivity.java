@@ -2622,6 +2622,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       if (mode==3) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
+
+        pomTimerValueInEditPopUpTextViewOne.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
+        pomTimerValueInEditPopUpTextViewTwo.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        pomTimerValueInEditPopUpTextViewThree.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
       }
     }
 
@@ -2642,6 +2646,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       if (mode==3) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(miniBreakColor);
+
+        pomTimerValueInEditPopUpTextViewTwo.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
+        pomTimerValueInEditPopUpTextViewOne.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+        pomTimerValueInEditPopUpTextViewThree.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
       }
     }
 
@@ -2649,6 +2657,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       firstRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       secondRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       thirdRoundTypeHeaderInEditPopUp.setTextColor(fullBreakColor);
+
+      pomTimerValueInEditPopUpTextViewThree.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
+      pomTimerValueInEditPopUpTextViewOne.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+      pomTimerValueInEditPopUpTextViewTwo.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+
       editHeaderSelected = 3;
     }
 
