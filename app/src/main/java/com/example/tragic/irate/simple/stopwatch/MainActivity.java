@@ -3507,33 +3507,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-
-
-  private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
-    if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
-      Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
-      return;
-    }
+  private void setTimerLaunchViews(boolean cycleLaunchedFromEditPopUp) {
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
-
-    Calendar calendar = Calendar.getInstance(Locale.getDefault());
-    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
     setViewsAndColorsToPreventTearingInEditPopUp(true);
-
-    if (mode==1) {
-      if (savedCycleAdapter.isCycleActive()) {
-        savedCycleAdapter.removeActiveCycleLayout();
-        savedCycleAdapter.notifyDataSetChanged();
-      }
-    }
-    if (mode==3) {
-      if (savedPomCycleAdapter.isCycleActive()) {
-        savedPomCycleAdapter.removeActiveCycleLayout();
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
-    }
 
     if (cycleLaunchedFromEditPopUp) {
       if (cycleNameEdit.getText().toString().isEmpty()) {
@@ -3543,6 +3520,69 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     cycle_title_textView.setText(cycleTitle);
+
+    if (savedPomCycleAdapter.isCycleActive()) {
+      savedPomCycleAdapter.removeActiveCycleLayout();
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+  }
+
+  private void setTimerLaunchLogic(boolean trackingActivity) {
+    displayCycleOrDailyTotals();
+    toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
+
+    retrieveTotalDailySetAndBreakTimes();
+    displayCycleOrDailyTotals();
+    roundDownAllTotalTimeValuesToEnsureSyncing();
+
+    resetTimer();
+
+    if (editCyclesPopupWindow.isShowing()) {
+      editCyclesPopupWindow.dismiss();
+    }
+
+    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
+  private void launchPomTimer(boolean cycleLaunchedFromEditPopUp) {
+    if (pomValuesTime.size()==0) {
+      Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    setTimerLaunchViews(cycleLaunchedFromEditPopUp);
+
+    AsyncTask.execute(()-> {
+      if (cycleLaunchedFromEditPopUp) {
+        saveAddedOrEditedCycleASyncRunnable();
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+
+      }
+
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          setTimerLaunchLogic(false);
+        }
+      });
+    });
+  }
+
+  private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
+    if (workoutTime.size()==0) {
+      Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    setTimerLaunchViews(cycleLaunchedFromEditPopUp);
+
+    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
+    if (savedCycleAdapter.isCycleActive()) {
+      savedCycleAdapter.removeActiveCycleLayout();
+      savedCycleAdapter.notifyDataSetChanged();
+    }
 
     AsyncTask.execute(()-> {
       if (cycleLaunchedFromEditPopUp) {
@@ -3588,20 +3628,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          displayCycleOrDailyTotals();
-          toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
-
-          retrieveTotalDailySetAndBreakTimes();
-          displayCycleOrDailyTotals();
-          roundDownAllTotalTimeValuesToEnsureSyncing();
-
-          resetTimer();
-
-          if (editCyclesPopupWindow.isShowing()) {
-            editCyclesPopupWindow.dismiss();
-          }
-
-          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+          setTimerLaunchLogic(trackActivityWithinCycle);
         }
       });
     });
@@ -4815,7 +4842,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
-      reset_total_cycle_times.setVisibility(View.INVISIBLE);
+      reset_total_cycle_times.setVisibility(View.VISIBLE);
 
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
@@ -4838,6 +4865,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
+      reset_total_cycle_times.setVisibility(View.INVISIBLE);
 
       total_set_header.setVisibility(View.INVISIBLE);
       total_set_time.setVisibility(View.INVISIBLE);
