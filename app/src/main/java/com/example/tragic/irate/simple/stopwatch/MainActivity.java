@@ -547,9 +547,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: Test Pom stuff.
+  //Todo: Stopwatch should be sep. tab.
 
   //Todo: Add Day/Night modes.
-  //Todo: Consider moving onClicks into void methods and moving their executed methods closer to them to keep everything in order.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
@@ -2903,7 +2903,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeft.setText(retrieveTimerValueString());
 
       trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
-      toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
+      toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
@@ -3507,6 +3507,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+
+
   private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if ((mode==1 && workoutTime.size()==0) || (mode==3 && pomValuesTime.size()==0)) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
@@ -3545,6 +3547,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()-> {
       if (cycleLaunchedFromEditPopUp) {
         saveAddedOrEditedCycleASyncRunnable();
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 
         if (addTDEEActivityTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
@@ -3556,8 +3559,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
-
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 
         if (cycleHasActivityAssigned) {
           retrieveCycleActivityPositionAndMetScoreFromCycleList();
@@ -3588,10 +3589,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         @Override
         public void run() {
           displayCycleOrDailyTotals();
-          toggleTimerPopUpViewsForTrackingModeForCycles(trackActivityWithinCycle);
+          toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
           retrieveTotalDailySetAndBreakTimes();
           displayCycleOrDailyTotals();
+          roundDownAllTotalTimeValuesToEnsureSyncing();
 
           resetTimer();
 
@@ -3600,8 +3602,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-
-          roundDownAllTotalTimeValuesToEnsureSyncing();
         }
       });
     });
@@ -4810,27 +4810,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void toggleTimerPopUpViewsForTrackingModeForCycles(boolean trackingActivity) {
-    if (!trackingActivity) {
-      typeOfTotalTimeToDisplay = TOTAL_CYCLE_TIMES;
-
-      reset_total_cycle_times.setVisibility(View.VISIBLE);
-      cycles_completed_textView.setVisibility(View.INVISIBLE);
-    } else {
-      typeOfTotalTimeToDisplay = TOTAL_DAILY_TIMES;
-
-      reset_total_cycle_times.setVisibility(View.INVISIBLE);
-      cycles_completed_textView.setVisibility(View.VISIBLE);
-    }
-
-    toggleViewsForTotalDailyAndCycleTimes();
-  }
-
-  private void toggleViewsForTotalDailyAndCycleTimes() {
-    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
+  private void toggleViewsForTotalDailyAndCycleTimes(boolean trackingCycle) {
+    if (!trackingCycle) {
       cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
+      reset_total_cycle_times.setVisibility(View.INVISIBLE);
 
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
@@ -4849,8 +4834,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.INVISIBLE);
 
       setTotalCycleTimeValuesToTextView();
-    }
-    if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
+    } else {
       cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
