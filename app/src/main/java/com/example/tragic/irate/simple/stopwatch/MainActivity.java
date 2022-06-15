@@ -220,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView sortButton;
 
   int mode = 1;
-  int savedMode = 1;
   int sortMode = 1;
   int sortModePom = 1;
   int sortHolder = 1;
@@ -423,8 +422,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean timerIsPaused = true;
   boolean stopWatchIsPaused = true;
 
-  ObjectAnimator fadeInObj;
-  ObjectAnimator fadeOutObj;
   LinearLayoutManager lapRecyclerLayoutManager;
   ConstraintLayout roundRecyclerLayout;
 
@@ -1091,9 +1088,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     pauseResumeButton.setOnClickListener(v -> {
       if (!timerIsPaused) {
-        pauseAndResumeTimer(PAUSING_TIMER);
+        if (mode==1) {
+          pauseAndResumeTimer(PAUSING_TIMER);
+        }
+        if (mode==3) {
+          pauseAndResumePomodoroTimer(PAUSING_TIMER);
+        }
       } else {
-        pauseAndResumeTimer(RESUMING_TIMER);
+        if (mode==1) {
+          pauseAndResumeTimer(RESUMING_TIMER);
+        }
+        if (mode==3) {
+          pauseAndResumePomodoroTimer(RESUMING_TIMER);
+        }
       }
     });
 
@@ -2534,22 +2541,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
     dotDraws.setMode(mode);
 
-    if (mode!=4) {
-      if (!timerIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
-      mHandler.removeCallbacksAndMessages(null);
-
-      if (mode==1) {
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        savedCycleAdapter.notifyDataSetChanged();
-      } else if (mode==3){
-        savedPomCycleRecycler.setVisibility(View.VISIBLE);
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
-    } else {
-      if (!stopWatchIsPaused) pauseAndResumeTimer(PAUSING_TIMER);
-      //If dismissing stopwatch, switch to whichever non-stopwatch mode we were on before.
-      mode = savedMode;
+    //Todo: Removed conditional for pausing timer method.
+    if (mode==1) {
+      savedCycleRecycler.setVisibility(View.VISIBLE);
+      savedCycleAdapter.notifyDataSetChanged();
+      pauseAndResumeTimer(PAUSING_TIMER);
+    } else if (mode==3){
+      pauseAndResumePomodoroTimer(PAUSING_TIMER);
+      savedPomCycleRecycler.setVisibility(View.VISIBLE);
+      savedPomCycleAdapter.notifyDataSetChanged();
     }
+    mHandler.removeCallbacksAndMessages(null);
   }
 
   private void editCyclesPopUpDismissalLogic() {
@@ -4488,98 +4490,97 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) (totalVar += singleVar) / 1000;
   }
 
+  private void pauseAndResumePomodoroTimer(int pausing) {
+    if (!timerDisabled) {
+      if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
+        reset.setText(R.string.reset);
 
+      if (!timerEnded) {
+        if (pausing == PAUSING_TIMER) {
+          timerIsPaused = true;
+          pomMillisUntilFinished = pomMillis;
+
+          if (objectAnimatorPom != null) objectAnimatorPom.pause();
+          if (timer != null) timer.cancel();
+
+          reset.setVisibility(View.VISIBLE);
+          reset_total_cycle_times.setEnabled(true);
+        } else if (pausing == RESUMING_TIMER) {
+          startObjectAnimatorAndTotalCycleTimeCounters();
+          startPomTimer();
+
+          activeCycle = true;
+          timerIsPaused = false;
+          reset.setVisibility(View.INVISIBLE);
+          reset_total_cycle_times.setEnabled(false);
+        }
+        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+      }
+    } else {
+      resetTimer();
+    }
+  }
 
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
-      if (fadeInObj != null) fadeInObj.cancel();
-      if (fadeOutObj != null) fadeOutObj.cancel();
-      switch (mode) {
-        case 1:
-          if (!timerEnded) {
-            if (pausing == PAUSING_TIMER) {
-              timerIsPaused = true;
-              reset.setVisibility(View.VISIBLE);
-              if (timer != null) timer.cancel();
-              if (objectAnimator != null) objectAnimator.pause();
-              reset_total_cycle_times.setEnabled(true);
 
-              switch (typeOfRound.get(currentRound)) {
-                case 1:
-                  setMillisUntilFinished = setMillis;
-                  break;
-                case 2:
-                  countUpMillisHolder = setMillis;
-                  mHandler.removeCallbacks(infinityTimerForSets);
-                  break;
-                case 3:
-                  breakMillisUntilFinished = breakMillis;
-                  break;
-                case 4:
-                  countUpMillisHolder = breakMillis;
-                  mHandler.removeCallbacks(infinityTimerForBreaks);
-                  break;
-              }
-            } else if (pausing == RESUMING_TIMER) {
-              activeCycle = true;
-              timerIsPaused = false;
-              reset.setVisibility(View.INVISIBLE);
-              reset_total_cycle_times.setEnabled(false);
+      if (!timerEnded) {
+        if (pausing == PAUSING_TIMER) {
+          timerIsPaused = true;
+          reset.setVisibility(View.VISIBLE);
 
-              switch (typeOfRound.get(currentRound)) {
-                case 1:
-                  startObjectAnimatorAndTotalCycleTimeCounters();
-                  startSetTimer();
-                  break;
-                case 2:
-                  //Uses the current time as a base for our count-up rounds.
-                  defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  setMillis = countUpMillisHolder;
-                  mHandler.post(infinityTimerForSets);
-                  break;
-                case 3:
-                  startObjectAnimatorAndTotalCycleTimeCounters();
-                  startBreakTimer();
-                  break;
-                case 4:
-                  defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-                  breakMillis = countUpMillisHolder;
-                  mHandler.post(infinityTimerForBreaks);
-                  break;
-              }
-            }
-            AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-          } else {
-            resetTimer();
+          if (timer != null) timer.cancel();
+          if (objectAnimator != null) objectAnimator.pause();
+
+          reset_total_cycle_times.setEnabled(true);
+
+          switch (typeOfRound.get(currentRound)) {
+            case 1:
+              setMillisUntilFinished = setMillis;
+              break;
+            case 2:
+              countUpMillisHolder = setMillis;
+              mHandler.removeCallbacks(infinityTimerForSets);
+              break;
+            case 3:
+              breakMillisUntilFinished = breakMillis;
+              break;
+            case 4:
+              countUpMillisHolder = breakMillis;
+              mHandler.removeCallbacks(infinityTimerForBreaks);
+              break;
           }
-          break;
-        case 3:
-          if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
-            reset.setText(R.string.reset);
-          if (!timerEnded) {
-            if (pausing == PAUSING_TIMER) {
-              timerIsPaused = true;
-              pomMillisUntilFinished = pomMillis;
+        } else if (pausing == RESUMING_TIMER) {
+          activeCycle = true;
+          timerIsPaused = false;
+          reset.setVisibility(View.INVISIBLE);
+          reset_total_cycle_times.setEnabled(false);
 
-              if (objectAnimatorPom != null) objectAnimatorPom.pause();
-              if (timer != null) timer.cancel();
-
-              reset.setVisibility(View.VISIBLE);
-              reset_total_cycle_times.setEnabled(true);
-            } else if (pausing == RESUMING_TIMER) {
+          switch (typeOfRound.get(currentRound)) {
+            case 1:
               startObjectAnimatorAndTotalCycleTimeCounters();
-              startPomTimer();
-
-              activeCycle = true;
-              timerIsPaused = false;
-              reset.setVisibility(View.INVISIBLE);
-              reset_total_cycle_times.setEnabled(false);
-            }
-            AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-          } else {
-            resetTimer();
+              startSetTimer();
+              break;
+            case 2:
+              //Uses the current time as a base for our count-up rounds.
+              defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
+              setMillis = countUpMillisHolder;
+              mHandler.post(infinityTimerForSets);
+              break;
+            case 3:
+              startObjectAnimatorAndTotalCycleTimeCounters();
+              startBreakTimer();
+              break;
+            case 4:
+              defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
+              breakMillis = countUpMillisHolder;
+              mHandler.post(infinityTimerForBreaks);
+              break;
           }
-          break;
+        }
+        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+      } else {
+        resetTimer();
       }
     }
   }
