@@ -544,8 +544,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Sep. popUp for stopwatch? Would help clean up Main, too. No mode 4.
-  //Todo: Fix stopwatch views.
   //Todo: Test Pom stuff.
 
   //Todo: Add Day/Night modes.
@@ -4582,6 +4580,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTimerValueInEditPopUpTextViewOne.setVisibility(View.GONE);
         pomTimerValueInEditPopUpTextViewTwo.setVisibility(View.GONE);
         pomTimerValueInEditPopUpTextViewThree.setVisibility(View.GONE);
+        addTDEEActivityTextView.setVisibility(View.VISIBLE);
 
         total_set_header.setText(R.string.total_sets);
         currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
@@ -4625,6 +4624,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundListDivider.setVisibility(View.GONE);
         savedCycleRecycler.setVisibility(View.GONE);
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
+        addTDEEActivityTextView.setVisibility(View.INVISIBLE);
+
         total_set_header.setText(R.string.total_work);
 
         currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
