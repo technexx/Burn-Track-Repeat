@@ -745,16 +745,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onCycleClick(int position) {
-    //Active cycle option will automatically be removed if accessing new cycle.
-    if (mode==1) savedCycleAdapter.removeActiveCycleLayout();
-    if (mode==3) savedPomCycleAdapter.removeActiveCycleLayout();
     isNewCycle = false;
     positionOfSelectedCycle = position;
-
     trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
 
     populateCycleAdapterArrayList();
-    launchTimerCycle(false);
+
+    if (mode==1) {
+      savedCycleAdapter.removeActiveCycleLayout();
+      launchTimerCycle(false);
+    }
+    if (mode==3) {
+      savedPomCycleAdapter.removeActiveCycleLayout();
+      launchPomTimerCycle(false);
+    }
   }
 
   @Override
@@ -1028,7 +1032,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     buttonToLaunchTimerFromEditPopUp.setOnClickListener(v-> {
-      launchTimerCycle(true);
+      if (mode==1) {
+        launchTimerCycle(true);
+      }
+      if (mode==3) {
+        launchPomTimerCycle(true);
+      }
     });
 
     //Listens to our fadeOut animation, and runs fadeIn when it's done.
@@ -3544,7 +3553,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
-  private void launchPomTimer(boolean cycleLaunchedFromEditPopUp) {
+  private void launchPomTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if (pomValuesTime.size()==0) {
       Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
       return;
@@ -3556,7 +3565,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (cycleLaunchedFromEditPopUp) {
         saveAddedOrEditedCycleASyncRunnable();
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-
       }
 
       runOnUiThread(new Runnable() {
@@ -4568,7 +4576,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             resetTimer();
           }
           break;
-        case 4:
       }
     }
   }
