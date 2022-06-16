@@ -4190,9 +4190,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
+        iterateTotalTimesForSelectedCycle(timerRunnableDelay);
         updateStatsInSyncWithMainTimer(timerRunnableDelay);
 
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
+
         dotDraws.reDraw();
         setNotificationValues();
       }
