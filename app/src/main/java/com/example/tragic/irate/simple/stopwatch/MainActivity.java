@@ -543,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Calories iterate slightly (but not activity times) when manually doing "next round."
+  //Todo: Daily Stats show an empty row and total activity time behind sum of activities.
   //Todo: Transition from timer -> main could be smoother, especially when progressBar is blinking at end of cycle.
 
   //Todo: Add Day/Night modes.
@@ -2340,11 +2340,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  private void syncResetTotalCycleTimesToTimer() {
-    long remainder = setMillis % 1000;
-    totalCycleSetTimeInMillis += remainder;
-  }
-
   private void setDefaultUserSettings() {
     retrieveUserStats();
 
@@ -2553,7 +2548,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
     dotDraws.setMode(mode);
 
-    //Todo: Removed conditional for pausing timer method.
     if (mode==1) {
       savedCycleRecycler.setVisibility(View.VISIBLE);
       savedCycleAdapter.notifyDataSetChanged();
@@ -4001,10 +3995,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  private boolean hasTimerTextViewChanged() {
-    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
-  }
-
   private void updateStatsInSyncWithMainTimer(int millisTickValue) {
     if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
       delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
@@ -4015,12 +4005,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
+
     if (hasTimerTextViewChanged()) {
       timerTextViewStringTwo = (String) timeLeft.getText();
       displayCycleOrDailyTotals();
       setTotalDailyTimeAndCaloriesValuesToTextViews();
       setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
     }
+  }
+
+  private boolean hasTimerTextViewChanged() {
+    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
+  }
+
+  private void syncTimerTextViewStringsForBeginningOfRounds() {
+    timerTextViewStringOne = (String) timeLeft.getText();
+    timerTextViewStringTwo = (String) timeLeft.getText();
   }
 
   private void displayCycleOrDailyTotals() {
@@ -4135,9 +4135,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startSetTimer() {
-    setInitialTextSizeForRounds(setMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
     long initialMillisValue = setMillis;
+    setInitialTextSizeForRounds(setMillis);
+    syncTimerTextViewStringsForBeginningOfRounds();
 
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
@@ -4163,9 +4164,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startBreakTimer() {
-    setInitialTextSizeForRounds(breakMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
+    setInitialTextSizeForRounds(breakMillis);
     long initialMillisValue = breakMillis;
+    syncTimerTextViewStringsForBeginningOfRounds();
 
     timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
@@ -4191,9 +4193,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startPomTimer() {
-    setInitialTextSizeForRounds(pomMillis);
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
+    setInitialTextSizeForRounds(pomMillis);
     long initialMillisValue = pomMillis;
+    syncTimerTextViewStringsForBeginningOfRounds();
 
     timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
       @Override
@@ -4317,7 +4320,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentProgressBarValue = 10000;
     reset.setVisibility(View.INVISIBLE);
     next_round.setEnabled(false);
-    timerDisabled = true;
 
     roundDownAllTotalTimeValuesToEnsureSyncing();
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
@@ -4336,11 +4338,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (endingEarly) {
       if (timer != null) timer.cancel();
       if (objectAnimator != null) objectAnimator.cancel();
-      progressBar.setProgress(0);
       if (!activeCycle) activeCycle = true;
+      progressBar.setProgress(0);
     }
 
     boolean isAlertRepeating = false;
+
     switch (typeOfRound.get(currentRound)) {
       case 1:
         timeLeft.setText("0");
