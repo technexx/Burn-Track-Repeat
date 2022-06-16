@@ -177,7 +177,7 @@ public class DotDraws extends View {
 
     int xMovementOfCirclePositionBetweenEachDrawing = (int) dpConv((float) circleCircumference) + dpConv(2);
     int xMovementOfCircleTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
-    int xMovementOfRoundNumberTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
+    int xMovementOfRoundNumberTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing - dpConv(1);
 
     int xStartingEnclosurePositionForAllRows = dpConv(2);
     int xEndingEnclosurePositionForAllRows = dpConv(mPhoneWidth-2);
@@ -294,7 +294,7 @@ public class DotDraws extends View {
           }
           xCirclePositionForAllRows += xMovementOfCirclePositionBetweenEachDrawing;
           xCircleTextPositionForAllRows += xMovementOfCircleTextBetweenEachDrawing;
-          xRoundNumberTextPositionForAllRows += xMovementOfRoundNumberTextBetweenEachDrawing;
+          xRoundNumberTextPositionForAllRows += xMovementOfRoundNumberTextBetweenEachDrawing + dpConv(0.5f);
         }
         break;
       case 3:
@@ -310,7 +310,7 @@ public class DotDraws extends View {
         yCirclePositionForOneRow = dpConv(36);
 
         int dotTextDrawForX = xCirclePositionForAllRows - pomRadiusSmall + dpConv(6);
-        xRoundNumberTextPositionForAllRows = dpConv(25);
+        xRoundNumberTextPositionForAllRows = dpConv(24);
 
         int xRectangleStart = xCirclePositionForAllRows - dpConv(2);
         int xRectangleEnd = xRectangleStart + dpConv(44);
@@ -323,8 +323,8 @@ public class DotDraws extends View {
 
           dotTextDrawForX = xCirclePositionForAllRows - pomRadiusSmall + dpConv(4.5f);
 
-          xRectangleStart = xCirclePositionForAllRows;
-          xRectangleEnd = xRectangleStart + (pomRadiusLarge*2) + dpConv(4);
+          xRectangleStart = xCirclePositionForAllRows - dpConv(2);
+          xRectangleEnd = xRectangleStart + (pomRadiusLarge*2) + dpConv(2);
           yRectangleTop = dpConv(14);
           yRectangleBottom = dpConv(62);
         }
@@ -384,7 +384,10 @@ public class DotDraws extends View {
 
           dotTextDrawForX += xMovementOfCirclePositionBetweenEachDrawing;
 
-          if (i==6) dotTextDrawForX += dpConv(6);
+          if (i==6) {
+            dotTextDrawForX += dpConv(6);
+            xMovementOfRoundNumberTextBetweenEachDrawing += dpConv(13);
+          }
 
           xRectangleStart += definedRectangleMovement;
           xRectangleEnd += definedRectangleMovement;
