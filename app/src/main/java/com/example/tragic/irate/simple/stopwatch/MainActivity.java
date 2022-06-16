@@ -543,9 +543,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Custom action bar in highlight mode has title pushed off screen.
+  //Todo: Calories iterate slightly (but not activity times) when manually doing "next round."
   //Todo: Transition from timer -> main could be smoother, especially when progressBar is blinking at end of cycle.
-  //Todo: Stopwatch should be sep. tab.
 
   //Todo: Add Day/Night modes.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
@@ -3163,8 +3162,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.startAnimation(fadeIn);
       sortButton.startAnimation(fadeOut);
 
-//      sortButton.setVisibility(View.GONE);
-
       sortButton.setEnabled(false);
       edit_highlighted_cycle.setEnabled(true);
       delete_highlighted_cycle.setEnabled(true);
@@ -4309,7 +4306,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void nextRound(boolean endingEarly) {
+  private void globalNextRoundLogic() {
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
     currentProgressBarValue = 10000;
@@ -4319,98 +4316,103 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     roundDownAllTotalTimeValuesToEnsureSyncing();
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+  }
 
-    if (mode==1) {
-      if (numberOfRoundsLeft==0) {
-        mHandler.removeCallbacks(endFade);
-        resetTimer();
-        return;
-      }
-      mHandler.post(endFade);
+  private void nextRound(boolean endingEarly) {
+    globalNextRoundLogic();
 
-      if (endingEarly) {
-        if (timer != null) timer.cancel();
-        if (objectAnimator != null) objectAnimator.cancel();
-        progressBar.setProgress(0);
-        if (!activeCycle) activeCycle = true;
-      }
-
-      boolean isAlertRepeating = false;
-      switch (typeOfRound.get(currentRound)) {
-        case 1:
-          timeLeft.setText("0");
-          changeTextSizeWithoutAnimator(true);
-          total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
-
-          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
-          setEndOfRoundSounds(vibrationSettingForSets, false);
-          break;
-        case 2:
-          mHandler.removeCallbacks(infinityTimerForSets);
-          total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
-
-          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
-          setEndOfRoundSounds(vibrationSettingForSets, false);
-          break;
-        case 3:
-          timeLeft.setText("0");
-          changeTextSizeWithoutAnimator(true);
-          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
-
-          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
-          setEndOfRoundSounds(vibrationSettingForBreaks, false);
-          break;
-        case 4:
-          mHandler.removeCallbacks(infinityTimerForBreaks);
-          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
-
-          if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
-          setEndOfRoundSounds(vibrationSettingForBreaks, false);
-          break;
-      }
-
-      numberOfRoundsLeft--;
-      currentRound++;
-      mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
-
-      beginTimerForNextRound = true;
+    if (numberOfRoundsLeft==0) {
+      mHandler.removeCallbacks(endFade);
+      resetTimer();
+      return;
     }
-    if (mode==3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleWorkTimeInMillis)));
-          setEndOfRoundSounds(vibrationSettingForWork, false);
-          break;
-        case 1: case 3: case 5:
-          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
-          setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
-          break;
-        case 7:
-          total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
+    mHandler.post(endFade);
 
-          boolean isAlertRepeating = false;
-          if (isFullBreakSoundContinuous) isAlertRepeating = true;
-          setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
-      }
-      if (pomDotCounter==8) {
-        mHandler.removeCallbacks(endFade);
-        resetTimer();
-        return;
-      }
-
-      timeLeft.setText("0");
-      mHandler.post(endFade);
-      pomDotCounter++;
-
-      mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
-
-      if (endingEarly) {
-        if (timer != null) timer.cancel();
-        if (objectAnimatorPom != null) objectAnimatorPom.cancel();
-        progressBar.setProgress(0);
-      }
-
+    if (endingEarly) {
+      if (timer != null) timer.cancel();
+      if (objectAnimator != null) objectAnimator.cancel();
+      progressBar.setProgress(0);
+      if (!activeCycle) activeCycle = true;
     }
+
+    boolean isAlertRepeating = false;
+    switch (typeOfRound.get(currentRound)) {
+      case 1:
+        timeLeft.setText("0");
+        changeTextSizeWithoutAnimator(true);
+        total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
+
+        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
+        setEndOfRoundSounds(vibrationSettingForSets, false);
+        break;
+      case 2:
+        mHandler.removeCallbacks(infinityTimerForSets);
+        total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
+
+        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
+        setEndOfRoundSounds(vibrationSettingForSets, false);
+        break;
+      case 3:
+        timeLeft.setText("0");
+        changeTextSizeWithoutAnimator(true);
+        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
+
+        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
+        setEndOfRoundSounds(vibrationSettingForBreaks, false);
+        break;
+      case 4:
+        mHandler.removeCallbacks(infinityTimerForBreaks);
+        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
+
+        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
+        setEndOfRoundSounds(vibrationSettingForBreaks, false);
+        break;
+    }
+
+    numberOfRoundsLeft--;
+    currentRound++;
+    mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
+
+    beginTimerForNextRound = true;
+  }
+
+  private void nextPomRound(boolean endingEarly) {
+    globalNextRoundLogic();
+
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleWorkTimeInMillis)));
+        setEndOfRoundSounds(vibrationSettingForWork, false);
+        break;
+      case 1: case 3: case 5:
+        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
+        setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
+        break;
+      case 7:
+        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
+
+        boolean isAlertRepeating = false;
+        if (isFullBreakSoundContinuous) isAlertRepeating = true;
+        setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
+    }
+    if (pomDotCounter==8) {
+      mHandler.removeCallbacks(endFade);
+      resetTimer();
+      return;
+    }
+
+    timeLeft.setText("0");
+    mHandler.post(endFade);
+    pomDotCounter++;
+
+    mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
+
+    if (endingEarly) {
+      if (timer != null) timer.cancel();
+      if (objectAnimatorPom != null) objectAnimatorPom.cancel();
+      progressBar.setProgress(0);
+    }
+
     beginTimerForNextRound = true;
   }
 
