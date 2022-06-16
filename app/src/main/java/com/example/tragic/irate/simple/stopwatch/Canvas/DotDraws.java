@@ -182,29 +182,29 @@ public class DotDraws extends View {
     int xStartingEnclosurePositionForAllRows = dpConv(2);
     int xEndingEnclosurePositionForAllRows = dpConv(mPhoneWidth-2);
 
-    int yStartingEnclosurePositionWithOneRow = dpConv(0);
-    int yEndingEnclosurePositionWithOneRow = dpConv(90);
-    int yStartingEnclosurePositionWithTwoRows = dpConv(0);
-    int yEndingEnclosurePositionWithTwoRows = dpConv(130);
+    int yStartingEnclosurePositionWithOneRow = dpConv(40);
+    int yEndingEnclosurePositionWithOneRow = dpConv(130);
+    int yStartingEnclosurePositionWithTwoRows = dpConv(25);
+    int yEndingEnclosurePositionWithTwoRows = dpConv(155);
 
     int xStartingPositionOfCircleForAllRows = dpConv(28);
     int xStartingPositionOfCircleTextForAllRows = dpConv(11);
     int xStartingPositionOfRoundNumberTextForAllRows = dpConv(25);
 
     int xCirclePositionForAllRows = dpConv(28);
-    int yCirclePositionForOneRow = dpConv(36);
-    int yCirclePositionForFirstOfTwoRows = dpConv(26);
-    int yCirclePositionForSecondOfTwoRows = dpConv(90);
+    int yCirclePositionForOneRow = dpConv(76);
+    int yCirclePositionForFirstOfTwoRows = dpConv(51);
+    int yCirclePositionForSecondOfTwoRows = dpConv(115);
 
     int xCircleTextPositionForAllRows = dpConv(10);
-    int yCircleTextPositionForOneRow = dpConv(48);
-    int yCircleTextPositionForOneOfTwoRows= dpConv(38);
-    int yCircleTextPositionForSecondOfTwoRows = dpConv(102);
+    int yCircleTextPositionForOneRow = dpConv(88);
+    int yCircleTextPositionForOneOfTwoRows= dpConv(63);
+    int yCircleTextPositionForSecondOfTwoRows = dpConv(127);
 
     int xRoundNumberTextPositionForAllRows = dpConv(25);
-    int yRoundNumberTextPositionForOneRow = dpConv(79);
-    int yRoundNumberTextPositionForOneOfTwoRows = dpConv(63);
-    int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(126);
+    int yRoundNumberTextPositionForOneRow = dpConv(119);
+    int yRoundNumberTextPositionForOneOfTwoRows = dpConv(88);
+    int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(151);
 
 //    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
 //      circleRadius = (int) dpConv((float) circleCircumference/2);

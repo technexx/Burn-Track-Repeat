@@ -545,12 +545,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Daily Stats show an empty row and total activity time behind sum of activities.
 
-  //Todo: Add Day/Night modes.
-  //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
+  //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Test dates from future years.
