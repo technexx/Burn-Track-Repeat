@@ -2932,7 +2932,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
          setCyclesCompletedTextView();
-         toggleTdeeObjectSizes();
+         toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
 
          setTotalDailyTimeAndCaloriesValuesToTextViews();
          setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
@@ -4747,7 +4747,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               setInitialTextSizeForRounds(0);
               break;
           }
-          toggleTdeeObjectSizes();
+          toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
         }
         break;
       case 3:
@@ -4757,6 +4757,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotDraws.pomDraw(pomDotCounter,pomValuesTime);
           setInitialTextSizeForRounds(pomMillis);
         }
+        toggleCycleTimeTextViewSizes(false);
         break;
     }
   }
@@ -4907,8 +4908,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void toggleTdeeObjectSizes() {
-    if (!trackActivityWithinCycle) {
+  private void toggleCycleTimeTextViewSizes(boolean trackingActivity) {
+    if (!trackingActivity) {
       cycles_completed_textView.setTextSize(28);
 
       total_set_header.setTextSize(28);
