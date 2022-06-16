@@ -544,7 +544,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: Daily Stats show an empty row and total activity time behind sum of activities.
-  //Todo: Transition from timer -> main could be smoother, especially when progressBar is blinking at end of cycle.
 
   //Todo: Add Day/Night modes.
   //Todo: If we can limit the dotDraws canvas size to its wrapped content, it would be much easier to move it when switching between tracking/not tracking activities.
@@ -877,7 +876,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fabLogic();
     });
 
-    //Showing sort popup window.
     sortButton.setOnClickListener(v-> {
       sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
     });
@@ -907,11 +905,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       removeHighlightFromCycle();
       editHighlightedCycleLogic();
 
-      /////////////////////
       if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
       if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
       clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
-      /////////////////////
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
