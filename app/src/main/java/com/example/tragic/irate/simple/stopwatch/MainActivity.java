@@ -1062,7 +1062,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
 
     next_round.setOnClickListener(v -> {
-      nextRound(true);
+      if (mode==1) {
+        nextRound(true);
+      }
+      if (mode==3) {
+        nextPomRound(true);
+      }
     });
 
     reset.setOnClickListener(v -> {
@@ -4210,7 +4215,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onFinish() {
-        nextRound(false);
+        nextPomRound(false);
       }
     }.start();
   }
@@ -4395,6 +4400,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isFullBreakSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
     }
+
     if (pomDotCounter==8) {
       mHandler.removeCallbacks(endFade);
       resetTimer();
