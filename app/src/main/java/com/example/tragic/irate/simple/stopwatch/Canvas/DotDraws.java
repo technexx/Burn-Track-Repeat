@@ -182,8 +182,8 @@ public class DotDraws extends View {
     int xStartingEnclosurePositionForAllRows = dpConv(2);
     int xEndingEnclosurePositionForAllRows = dpConv(mPhoneWidth-2);
 
-    int yStartingEnclosurePositionWithOneRow = dpConv(40);
-    int yEndingEnclosurePositionWithOneRow = dpConv(130);
+    int yStartingEnclosurePositionWithOneRow = dpConv(30);
+    int yEndingEnclosurePositionWithOneRow = dpConv(140);
     int yStartingEnclosurePositionWithTwoRows = dpConv(25);
     int yEndingEnclosurePositionWithTwoRows = dpConv(155);
 
