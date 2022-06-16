@@ -182,10 +182,10 @@ public class DotDraws extends View {
     int xStartingEnclosurePositionForAllRows = dpConv(2);
     int xEndingEnclosurePositionForAllRows = dpConv(mPhoneWidth-2);
 
-    int yStartingEnclosurePositionWithOneRow = dpConv(30);
-    int yEndingEnclosurePositionWithOneRow = dpConv(140);
-    int yStartingEnclosurePositionWithTwoRows = dpConv(25);
-    int yEndingEnclosurePositionWithTwoRows = dpConv(155);
+    int yStartingEnclosurePositionWithOneRow = dpConv(40);
+    int yEndingEnclosurePositionWithOneRow = dpConv(130);
+    int yStartingEnclosurePositionWithTwoRows = dpConv(10);
+    int yEndingEnclosurePositionWithTwoRows = dpConv(165);
 
     int xStartingPositionOfCircleForAllRows = dpConv(28);
     int xStartingPositionOfCircleTextForAllRows = dpConv(11);
@@ -193,18 +193,18 @@ public class DotDraws extends View {
 
     int xCirclePositionForAllRows = dpConv(28);
     int yCirclePositionForOneRow = dpConv(76);
-    int yCirclePositionForFirstOfTwoRows = dpConv(51);
+    int yCirclePositionForFirstOfTwoRows = dpConv(41);
     int yCirclePositionForSecondOfTwoRows = dpConv(115);
 
     int xCircleTextPositionForAllRows = dpConv(10);
     int yCircleTextPositionForOneRow = dpConv(88);
-    int yCircleTextPositionForOneOfTwoRows= dpConv(63);
+    int yCircleTextPositionForOneOfTwoRows= dpConv(53);
     int yCircleTextPositionForSecondOfTwoRows = dpConv(127);
 
     int xRoundNumberTextPositionForAllRows = dpConv(25);
     int yRoundNumberTextPositionForOneRow = dpConv(119);
-    int yRoundNumberTextPositionForOneOfTwoRows = dpConv(88);
-    int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(151);
+    int yRoundNumberTextPositionForOneOfTwoRows = dpConv(82);
+    int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(157);
 
 //    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
 //      circleRadius = (int) dpConv((float) circleCircumference/2);
@@ -420,7 +420,7 @@ public class DotDraws extends View {
     int xSquareMod = dpConv(7);
     int ySquareMod = dpConv(3);
 
-    mPaintRoundNumbers.setTextSize(dpConvFloat(15f));
+    mPaintRoundNumbers.setTextSize(dpConvFloat(18f));
 
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
       modeOneTextSizeForLowDigits = dpConvFloat(30f);
@@ -442,7 +442,7 @@ public class DotDraws extends View {
       xSquareMod = dpConv(7);
       ySquareMod = dpConv(3);
 
-      mPaintRoundNumbers.setTextSize(dpConvFloat(17f));
+      mPaintRoundNumbers.setTextSize(dpConvFloat(20f));
     }
 
     if (list.size() >0) {
