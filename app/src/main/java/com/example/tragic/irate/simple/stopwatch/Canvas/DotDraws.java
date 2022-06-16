@@ -318,13 +318,15 @@ public class DotDraws extends View {
         int yRectangleBottom = dpConv(59);
 
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-          xCirclePositionForAllRows = dpConv(30);
-          yCirclePositionForOneRow = dpConv(82);
+          xCirclePositionForAllRows = dpConv(28);
+          yCirclePositionForOneRow = dpConv(38);
+
+          dotTextDrawForX = xCirclePositionForAllRows - pomRadiusSmall + dpConv(4.5f);
 
           xRectangleStart = xCirclePositionForAllRows;
           xRectangleEnd = xRectangleStart + (pomRadiusLarge*2) + dpConv(4);
-          yRectangleTop = dpConv(58);
-          yRectangleBottom = dpConv(106);
+          yRectangleTop = dpConv(14);
+          yRectangleBottom = dpConv(62);
         }
 
         setDotStyle(false);
@@ -379,8 +381,11 @@ public class DotDraws extends View {
           }
 
           xCirclePositionForAllRows += xMovementOfCirclePositionBetweenEachDrawing;
+
           dotTextDrawForX += xMovementOfCirclePositionBetweenEachDrawing;
+
           if (i==6) dotTextDrawForX += dpConv(6);
+
           xRectangleStart += definedRectangleMovement;
           xRectangleEnd += definedRectangleMovement;
           xRoundNumberTextPositionForAllRows += xMovementOfRoundNumberTextBetweenEachDrawing;
