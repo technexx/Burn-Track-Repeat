@@ -543,6 +543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: Custom action bar in highlight mode has title pushed off screen.
   //Todo: Transition from timer -> main could be smoother, especially when progressBar is blinking at end of cycle.
   //Todo: Stopwatch should be sep. tab.
 
@@ -760,16 +761,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onCycleHighlight(List<Integer> listOfPositions, boolean addButtons) {
-    //Receives list of cycle positions highlighted.
     receivedHighlightPositions = listOfPositions;
-    //Sets "highlight mode" actionBar buttons to Visible if entering mode (i.e. selecting first item).
     if (addButtons) {
-      //If at least one item in our cycle list, enable the edit button.
-      edit_highlighted_cycle.setEnabled(listOfPositions.size() <= 1);
-      //Fading app name text + sort button out, edit and delete buttons in.
       fadeEditCycleButtonsInAndOut(FADE_IN_HIGHLIGHT_MODE);
     }
-    //Enables edit cycle button if we have exactly 1 row selected, disables otherwise.
     if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
       edit_highlighted_cycle.setAlpha(1.0f);
       edit_highlighted_cycle.setEnabled(true);
@@ -777,11 +772,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setAlpha(0.4f);
       edit_highlighted_cycle.setEnabled(false);
     }
-
-    logAllCyclePositionsAndTheirValues("On Cycle Highlight");
   }
 
-  //This callback method works for both round adapters.
   @Override
   public void subtractionFadeHasFinished() {
     //When adapter fade on round has finished, execute method to remove the round from adapter list/holders and refresh the adapter display. If we click to remove another round before fade is done, fade gets cancelled, restarted on next position, and this method is also called to remove previous round.
@@ -1157,8 +1149,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     stopWatchPopUpWindow.setOnDismissListener(()-> {
       getSupportActionBar().setCustomView(R.layout.custom_bar);
-      savedCycleRecycler.setVisibility(View.VISIBLE);
-      savedPomCycleRecycler.setVisibility(View.VISIBLE);
+      setCustomActionBarEditButtonLayoutIdsAndDefaultViews();
+      removeCycleHighlights();
+
+      if (mode==1) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+      }
+      if (mode==3) {
+        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+      }
+
       savedCyclesTabLayout.setVisibility(View.VISIBLE);
     });
 
@@ -1391,6 +1391,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclesTabLayout = findViewById(R.id.savedCyclesTabLayout);
     savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Workouts"));
     savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Pomodoro"));
+//    savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Stopwatch"));
   }
 
   private void instantiateTabSelectionListeners() {
@@ -1801,16 +1802,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
   }
 
+  private void setCustomActionBarEditButtonLayoutIdsAndDefaultViews() {
+    edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
+    delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
+    cancelHighlight = findViewById(R.id.cancel_highlight);
+
+    edit_highlighted_cycle.setVisibility(View.INVISIBLE);
+    delete_highlighted_cycle.setVisibility(View.INVISIBLE);
+    cancelHighlight.setVisibility(View.INVISIBLE);
+  }
+
   private void setDefaultLayoutVisibilities() {
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
-
     reset.setVisibility(View.INVISIBLE);
-
     savedPomCycleRecycler.setVisibility(View.GONE);
     new_lap.setAlpha(0.3f);
-
     roundListDivider.setVisibility(View.GONE);
   }
 
