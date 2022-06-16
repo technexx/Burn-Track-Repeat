@@ -3157,18 +3157,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.setEnabled(true);
     }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
+      appHeader.startAnimation(fadeOut);
       edit_highlighted_cycle.startAnimation(fadeIn);
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
-//      appHeader.startAnimation(fadeOut);
       sortButton.startAnimation(fadeOut);
+
+//      sortButton.setVisibility(View.GONE);
+
       sortButton.setEnabled(false);
-      sortButton.setVisibility(View.GONE);
       edit_highlighted_cycle.setEnabled(true);
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
     }
     if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
+      appHeader.startAnimation(fadeIn);
       edit_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
       appHeader.startAnimation(fadeIn);
