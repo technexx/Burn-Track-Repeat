@@ -543,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Test Pom stuff.
+  //Todo: Transition from timer -> main could be smoother, especially when progressBar is blinking at end of cycle.
   //Todo: Stopwatch should be sep. tab.
 
   //Todo: Add Day/Night modes.
@@ -4494,32 +4494,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void pauseAndResumePomodoroTimer(int pausing) {
     if (!timerDisabled) {
-      if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
-        reset.setText(R.string.reset);
-
       if (!timerEnded) {
-        if (pausing == PAUSING_TIMER) {
-          timerIsPaused = true;
-          pomMillisUntilFinished = pomMillis;
+        if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
+          reset.setText(R.string.reset);
 
-          if (objectAnimatorPom != null) objectAnimatorPom.pause();
-          if (timer != null) timer.cancel();
+        if (!timerEnded) {
+          if (pausing == PAUSING_TIMER) {
+            timerIsPaused = true;
+            pomMillisUntilFinished = pomMillis;
 
-          reset.setVisibility(View.VISIBLE);
-          reset_total_cycle_times.setEnabled(true);
-        } else if (pausing == RESUMING_TIMER) {
-          startObjectAnimatorAndTotalCycleTimeCounters();
-          startPomTimer();
+            if (objectAnimatorPom != null) objectAnimatorPom.pause();
+            if (timer != null) timer.cancel();
 
-          activeCycle = true;
-          timerIsPaused = false;
-          reset.setVisibility(View.INVISIBLE);
-          reset_total_cycle_times.setEnabled(false);
+            reset.setVisibility(View.VISIBLE);
+            reset_total_cycle_times.setEnabled(true);
+          } else if (pausing == RESUMING_TIMER) {
+            startObjectAnimatorAndTotalCycleTimeCounters();
+            startPomTimer();
+
+            activeCycle = true;
+            timerIsPaused = false;
+            reset.setVisibility(View.INVISIBLE);
+            reset_total_cycle_times.setEnabled(false);
+          }
+          AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
         }
-        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+      } else {
+        resetTimer();
       }
-    } else {
-      resetTimer();
     }
   }
 
