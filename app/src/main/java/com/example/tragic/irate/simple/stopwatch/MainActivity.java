@@ -3160,9 +3160,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.startAnimation(fadeIn);
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
-      appHeader.startAnimation(fadeOut);
+//      appHeader.startAnimation(fadeOut);
       sortButton.startAnimation(fadeOut);
       sortButton.setEnabled(false);
+      sortButton.setVisibility(View.GONE);
       edit_highlighted_cycle.setEnabled(true);
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
