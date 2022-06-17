@@ -544,11 +544,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: Daily Stats show an empty row and total activity time behind sum of activities.
+      //Todo: Definite errors with this.
 
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
+  //Todo: Add padding to sort layout width + change highlight color.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -2024,7 +2026,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void highlightSortTextView() {
-    int colorToHighlight = getResources().getColor(R.color.test_highlight_2);
+    int colorToHighlight = getResources().getColor(R.color.test_highlight);
     switch (sortHolder) {
       case 1:
         sortRecent.setBackgroundColor(colorToHighlight); break;
@@ -2124,7 +2126,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void highlightSelectedSortTextViewForStats(TextView textView) {
-    int colorToHighlight = getResources().getColor(R.color.test_highlight_2);
+    int colorToHighlight = getResources().getColor(R.color.test_highlight);
     textView.setBackgroundColor(colorToHighlight);
   }
 
