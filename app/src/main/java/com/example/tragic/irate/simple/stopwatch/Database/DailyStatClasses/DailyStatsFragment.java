@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -932,13 +934,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         totalStatsDurationLayout = mRoot.findViewById(R.id.stats_total_header_layout);
-        durationRangeTextView = mRoot.findViewById(R.id.duration_range_textView);
+        durationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
 
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-        totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
+        totalStatsHeaderTextView = mRoot.findViewById(R.id.duration_header_textView);
 
         totalStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
@@ -976,6 +978,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
+        dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 

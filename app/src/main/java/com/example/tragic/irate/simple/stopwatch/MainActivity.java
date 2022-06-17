@@ -565,7 +565,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
-  //Todo: Test everything 10x.
+  //Todo: Test everything 10x. Incl. round selection/replacement.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
