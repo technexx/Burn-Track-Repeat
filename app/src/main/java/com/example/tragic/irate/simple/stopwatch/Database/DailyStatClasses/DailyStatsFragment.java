@@ -77,11 +77,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     View recyclerAndTotalStatsDivider;
 
+    TextView totalStatsHeaderTextView;
     TextView durationRangeTextView;
-    ConstraintLayout totalStatsDurationLayout;
     ImageButton statDurationSwitcherButtonLeft;
     ImageButton statDurationSwitcherButtonRight;
-    TextView totalStatsHeaderTextView;
 
     ConstraintLayout totalStatsValuesTextViewLayout;
     TextView statsTotalSetTimeTextView;
@@ -821,11 +820,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void toggleCalendarMinimizationLayouts() {
         ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
-        View recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-        ConstraintLayout.LayoutParams recyclerAndTotalStatsDividerLayoutParams = (ConstraintLayout.LayoutParams) recyclerAndTotalStatsDivider.getLayoutParams();
-
-        ConstraintLayout totalStatsHeaderLayout = mRoot.findViewById(R.id.stats_total_header_layout);
-        ConstraintLayout.LayoutParams totalStatsHeaderLayoutParams = (ConstraintLayout.LayoutParams) totalStatsHeaderLayout.getLayoutParams();
+        recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
 
         ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
 
@@ -834,19 +829,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
-            recyclerAndTotalStatsDividerLayoutParams.bottomToTop = R.id.daily_stats_total_calories_burned_textView;
-            recyclerAndTotalStatsDividerLayoutParams.topMargin = dpToPxConv(16);
-
-            totalStatsHeaderLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsHeaderLayoutParams.topToTop = R.id.daily_stats_fragment_parent_layout;
-            totalStatsHeaderLayoutParams.startToStart = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsHeaderLayoutParams.startToStart = R.id.daily_stats_fragment_parent_layout;
-
             totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
             totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
             totalStatsValuesTextViewLayout.startAnimation(slideInFromBottom);
+
+            toggleThreeTotalStatRowsVisibility(false);
         } else {
             dailyStatsRecyclerViewLayoutParams.height = 0;
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
@@ -858,9 +847,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
-        recyclerAndTotalStatsDivider.setLayoutParams(recyclerAndTotalStatsDividerLayoutParams);
-        totalStatsHeaderLayout.setLayoutParams(totalStatsHeaderLayoutParams);
         totalStatsValuesTextViewLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
+
+        toggleThreeTotalStatRowsVisibility(true);
+    }
+
+    private void toggleThreeTotalStatRowsVisibility(boolean allRowsAreVisible) {
+        if (!allRowsAreVisible) {
+            totalUnassignedStatsLayout.setVisibility(View.GONE);
+            totalAggregateStatsLayout.setVisibility(View.GONE);
+        } else {
+            totalUnassignedStatsLayout.setVisibility(View.VISIBLE);
+            totalAggregateStatsLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     private void instantiateCalendarObjects() {
@@ -933,7 +932,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         longToStringConverters = new LongToStringConverters();
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        totalStatsDurationLayout = mRoot.findViewById(R.id.stats_total_header_layout);
         durationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
 
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
@@ -947,14 +945,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
         totalUnassignedStatsLayout = mRoot.findViewById(R.id.total_remaining_in_day_values_textView_layout);
-        totalUnassignedStatsLayout.setVisibility(View.GONE);
         statsTotalUnassignedSetTimeTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_set_time_textView);
         statsTotalUnassignedCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_total_calories_burned_textView);
 
         totalAggregateStatsLayout = mRoot.findViewById(R.id.total_aggregate_values_textView_layout);
-        totalAggregateStatsLayout.setVisibility(View.GONE);
         statsTotalAggregateSetTimeTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_set_time_textView);
         statsTotalAggregateCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_calories_burned_textView);
+
+        totalUnassignedStatsLayout.setVisibility(View.GONE);
+        totalAggregateStatsLayout.setVisibility(View.GONE);
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
