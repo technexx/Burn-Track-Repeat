@@ -339,25 +339,6 @@ public class DailyStatsAccess {
         return listToPopulate;
     }
 
-    public long getTotalSetTimeFromDayHolderList() {
-        long valueToReturn = 0;
-
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            valueToReturn += mDayHolderList.get(i).getTotalSetTime();
-        }
-        return valueToReturn;
-    }
-
-    public double getTotalCaloriesBurnedFromDayHolderList() {
-        double valueToReturn = 0;
-
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            valueToReturn += mDayHolderList.get(i).getTotalCaloriesBurned();
-        }
-
-        return valueToReturn;
-    }
-
     public long getOldDayHolderId() {
         return mOldDayHolderId;
     }
@@ -640,6 +621,25 @@ public class DailyStatsAccess {
 
         totalCaloriesForSelectedDay = valueToReturn;
     }
+
+    public long getTotalSetTimeFromDayHolderList() {
+        long valueToReturn = 0;
+
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            valueToReturn += mDayHolderList.get(i).getTotalSetTime();
+        }
+        return valueToReturn;
+    }
+
+    public double getTotalCaloriesBurnedFromDayHolderList() {
+        double valueToReturn = 0;
+
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            valueToReturn += mDayHolderList.get(i).getTotalCaloriesBurned();
+        }
+        return valueToReturn;
+    }
+
 
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
         for (int i=0; i<totalActivitiesListForSelectedDuration.size(); i++) {

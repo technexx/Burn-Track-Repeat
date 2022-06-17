@@ -45,6 +45,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnRangeSelectedListener;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -758,6 +759,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private String formatCalorieStringWithoutDecimals(double calories) {
         DecimalFormat df = new DecimalFormat("#");
+        df.setRoundingMode(RoundingMode.DOWN);
         return df.format(calories);
     }
 

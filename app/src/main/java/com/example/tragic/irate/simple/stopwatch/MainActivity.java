@@ -544,7 +544,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_STATS = 1;
 
   //Todo: Some errors w/ daily stats totals. Can't immediately replicate.
-  //Todo: Aggrefate single activity calories may be one less than total calories.
 
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
