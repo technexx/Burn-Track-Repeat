@@ -543,8 +543,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Daily Stats show an empty row and total activity time behind sum of activities.
-      //Todo: Definite errors with this.
+  //Todo: Some errors w/ daily stats totals. Can't immediately replicate.
+  //Todo: Aggrefate single activity calories may be one less than total calories.
 
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
@@ -1071,12 +1071,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundDownAllTotalTimeValuesToEnsureSyncing();
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
-      if (reset.getText().equals(getString(R.string.reset))) {
-        reset.setText(R.string.confirm_cycle_reset);
-      } else {
-        reset.setText(R.string.reset);
+      if (mode==1) {
         resetTimer();
       }
+      if (mode==3) {
+        reset.setText(R.string.confirm_cycle_reset);
+      }
+
     });
 
     pauseResumeButton.setOnClickListener(v -> {
@@ -4515,8 +4516,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void pauseAndResumePomodoroTimer(int pausing) {
     if (!timerDisabled) {
       if (!timerEnded) {
-        if (reset.getText().equals(getString(R.string.confirm_cycle_reset)))
-          reset.setText(R.string.reset);
+        reset.setText(R.string.reset);
 
         if (!timerEnded) {
           if (pausing == PAUSING_TIMER) {
