@@ -146,7 +146,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/total_remaining_in_day_values_textView_layout"
+        android:id="@+id/total_unassigned_in_day_values_textView_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/total_stats_values_textView_layout"
@@ -215,7 +215,7 @@
         android:id="@+id/total_aggregate_values_textView_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/total_remaining_in_day_values_textView_layout"
+        app:layout_constraintTop_toBottomOf="@id/total_unassigned_in_day_values_textView_layout"
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView

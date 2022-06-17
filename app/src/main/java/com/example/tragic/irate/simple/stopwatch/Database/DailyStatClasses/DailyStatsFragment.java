@@ -82,15 +82,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ImageButton statDurationSwitcherButtonLeft;
     ImageButton statDurationSwitcherButtonRight;
 
+    ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams;
+
     ConstraintLayout totalStatsValuesTextViewLayout;
+    ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams;
     TextView statsTotalSetTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
 
     ConstraintLayout totalUnassignedStatsLayout;
+    ConstraintLayout.LayoutParams totalUnassignedStatsLayoutParams;
     TextView statsTotalUnassignedSetTimeTextView;
     TextView statsTotalUnassignedCaloriesBurnedTextView;
 
     ConstraintLayout totalAggregateStatsLayout;
+    ConstraintLayout.LayoutParams totalAggregateStatsLayoutParams;
     TextView statsTotalAggregateSetTimeTextView;
     TextView statsTotalAggregateCaloriesBurnedTextView;
 
@@ -816,15 +821,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: Should we make layoutParams global so they don't get reassigned every call?
     private void toggleCalendarMinimizationLayouts() {
-        ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
+        dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
-        recyclerAndTotalStatsDivider = mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-
-        ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
-
-        //Todo: Visibility of our three total rows.
         if (!calendarIsMinimized) {
             dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
@@ -941,19 +940,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalStatsHeaderTextView = mRoot.findViewById(R.id.duration_header_textView);
 
         totalStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
+        totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
-        totalUnassignedStatsLayout = mRoot.findViewById(R.id.total_remaining_in_day_values_textView_layout);
+        totalUnassignedStatsLayout = mRoot.findViewById(R.id.total_unassigned_in_day_values_textView_layout);
+        totalUnassignedStatsLayoutParams = (ConstraintLayout.LayoutParams) totalUnassignedStatsLayout.getLayoutParams();
         statsTotalUnassignedSetTimeTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_set_time_textView);
         statsTotalUnassignedCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_total_calories_burned_textView);
 
         totalAggregateStatsLayout = mRoot.findViewById(R.id.total_aggregate_values_textView_layout);
+        totalAggregateStatsLayoutParams = (ConstraintLayout.LayoutParams) totalAggregateStatsLayout.getLayoutParams();
         statsTotalAggregateSetTimeTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_set_time_textView);
         statsTotalAggregateCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_calories_burned_textView);
 
         totalUnassignedStatsLayout.setVisibility(View.GONE);
         totalAggregateStatsLayout.setVisibility(View.GONE);
+
+//        dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
