@@ -74,14 +74,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     View recyclerAndTotalStatsDivider;
 
+    TextView durationRangeTextView;
     ConstraintLayout totalStatsDurationLayout;
+    ImageButton statDurationSwitcherButtonLeft;
+    ImageButton statDurationSwitcherButtonRight;
+
     TextView totalStatsHeaderTextView;
     TextView statsTotalSetTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
-    TextView durationRangeTextView;
 
-    ImageButton statDurationSwitcherButtonLeft;
-    ImageButton statDurationSwitcherButtonRight;
+    TextView totalStatsUnassignedHeaderTextView;
+    TextView statsTotalUnassignedSetTimeTextView;
+    TextView statsTotalUnassignedCaloriesBurnedTextView;
+
+    TextView totalStatsAggregateHeaderTextView;
+    TextView statsTotalAggregateSetTimeTextView;
+    TextView statsTotalAggregateCaloriesBurnedTextView;
 
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
@@ -95,6 +103,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int MONTHLY_STATS = 2;
     int YEARLY_STATS = 3;
     int CUSTOM_STATS = 4;
+
     List<CalendarDay> customCalendarDayList;
     List<DayHolder> dayHolderList;
     List<StatsForEachActivity> statsForEachActivityList;
@@ -921,14 +930,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         totalStatsDurationLayout = mRoot.findViewById(R.id.stats_total_header_layout);
-        totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
         durationRangeTextView = mRoot.findViewById(R.id.duration_range_textView);
-        statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
-        statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+
         statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+
+        totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
+        statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
+        statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+
+        totalStatsUnassignedHeaderTextView = mRoot.findViewById(R.id.total_unassigned_in_day_textView);
+        statsTotalUnassignedSetTimeTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_set_time_textView);
+        statsTotalUnassignedCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_total_calories_burned_textView);
+
+        totalStatsAggregateHeaderTextView = mRoot.findViewById(R.id.total_aggregate_stats_textView);
+        statsTotalAggregateSetTimeTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_set_time_textView);
+        statsTotalAggregateCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_calories_burned_textView);
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());

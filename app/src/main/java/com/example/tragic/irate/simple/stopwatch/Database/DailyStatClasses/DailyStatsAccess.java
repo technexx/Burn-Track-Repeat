@@ -37,6 +37,8 @@ public class DailyStatsAccess {
 
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
+    long totalUnassignedSetTimeForSelectedDay;
+    double totalUnassignedCaloriesForSelectedDay;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -606,6 +608,9 @@ public class DailyStatsAccess {
         }
 
         totalSetTimeForSelectedDay = valueToReturn;
+
+        setUnassignedDailyTotalTime(totalSetTimeForSelectedDay);
+        Log.i("testAdd", "remaining time is " + totalUnassignedSetTimeForSelectedDay);
     }
 
     public double getTotalCaloriesVariableForDayHolder() {
@@ -640,6 +645,11 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
+    private void setUnassignedDailyTotalTime(long assignedTime) {
+        long twoHours = 7200000;
+        long fullDay = twoHours * 12;
+        totalUnassignedSetTimeForSelectedDay = fullDay - assignedTime;
+    }
 
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
         for (int i=0; i<totalActivitiesListForSelectedDuration.size(); i++) {
@@ -670,7 +680,6 @@ public class DailyStatsAccess {
     public List<Long> getTotalSetTimeListForEachActivityForSelectedDuration() {
         return totalSetTimeListForEachActivityForSelectedDuration;
     }
-
 
     public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDuration.clear();
