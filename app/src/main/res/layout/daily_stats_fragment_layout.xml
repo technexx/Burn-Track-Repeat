@@ -90,7 +90,7 @@
 
         <TextView
             android:id="@+id/total_stats_textView"
-            android:text="@string/total"
+            android:text="@string/total_assigned_stats"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
@@ -156,7 +156,7 @@
 
         <TextView
             android:id="@+id/total_unassigned_in_day_textView"
-            android:text="@string/total"
+            android:text="@string/total_unassigned_stats"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
@@ -222,7 +222,7 @@
 
         <TextView
             android:id="@+id/total_aggregate_stats_textView"
-            android:text="@string/total"
+            android:text="@string/total_aggregate_stats"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"

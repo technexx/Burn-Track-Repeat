@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -78,16 +79,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ConstraintLayout totalStatsDurationLayout;
     ImageButton statDurationSwitcherButtonLeft;
     ImageButton statDurationSwitcherButtonRight;
-
     TextView totalStatsHeaderTextView;
+
+    ConstraintLayout totalStatsLayout;
     TextView statsTotalSetTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
 
-    TextView totalStatsUnassignedHeaderTextView;
+    ConstraintLayout totalUnassignedStatsLayout;
     TextView statsTotalUnassignedSetTimeTextView;
     TextView statsTotalUnassignedCaloriesBurnedTextView;
 
-    TextView totalStatsAggregateHeaderTextView;
+    ConstraintLayout totalAggregateStatsLayout;
     TextView statsTotalAggregateSetTimeTextView;
     TextView statsTotalAggregateCaloriesBurnedTextView;
 
@@ -936,16 +938,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-
         totalStatsHeaderTextView = mRoot.findViewById(R.id.total_stats_header);
+
+        totalStatsLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
-        totalStatsUnassignedHeaderTextView = mRoot.findViewById(R.id.total_unassigned_in_day_textView);
+        totalUnassignedStatsLayout = mRoot.findViewById(R.id.total_remaining_in_day_values_textView_layout);
         statsTotalUnassignedSetTimeTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_set_time_textView);
         statsTotalUnassignedCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_total_calories_burned_textView);
 
-        totalStatsAggregateHeaderTextView = mRoot.findViewById(R.id.total_aggregate_stats_textView);
+        totalAggregateStatsLayout = mRoot.findViewById(R.id.total_aggregate_values_textView_layout);
         statsTotalAggregateSetTimeTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_set_time_textView);
         statsTotalAggregateCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_calories_burned_textView);
 
