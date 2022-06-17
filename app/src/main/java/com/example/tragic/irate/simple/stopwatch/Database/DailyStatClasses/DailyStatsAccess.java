@@ -651,6 +651,19 @@ public class DailyStatsAccess {
         totalUnassignedSetTimeForSelectedDay = fullDay - assignedTime;
     }
 
+    public long getUnassignedDailyTotalTime() {
+        return totalUnassignedSetTimeForSelectedDay;
+    }
+
+    //Todo: Setter for calories, which requires TDEE from Settings.
+    private void setTotalUnassignedCaloriesForSelectedDay() {
+
+    }
+
+    public double getTotalUnassignedDailyCalories() {
+        return totalUnassignedCaloriesForSelectedDay;
+    }
+
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
         for (int i=0; i<totalActivitiesListForSelectedDuration.size(); i++) {
             if (totalActivitiesListForSelectedDuration.get(i).equalsIgnoreCase(stringToCheck)) {

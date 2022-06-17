@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:theme="@style/StatFragmentTheme">
+    android:theme="@style/StatFragmentThemeDark">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stats_total_header_layout"
@@ -33,8 +33,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/total_stats_header"
             android:layout_marginEnd="12dp"
-            android:src="@drawable/double_arrow_left"
-            android:backgroundTint="@color/dark_grey">
+            android:src="@drawable/double_arrow_left">
         </ImageButton>
 
         <ImageButton
@@ -44,8 +43,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/total_stats_header"
             android:layout_marginStart="12dp"
-            android:src="@drawable/double_arrow_right"
-            android:backgroundTint="@color/dark_grey">
+            android:src="@drawable/double_arrow_right">
         </ImageButton>
 
         <ImageButton
@@ -54,8 +52,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/edit_icon"
-            android:backgroundTint="@color/dark_grey">
+            android:src="@drawable/edit_icon">
         </ImageButton>
 
         <TextView
@@ -303,8 +300,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/arrow_down_2"
-        android:background="@color/dark_grey">
+        android:src="@drawable/arrow_down_2">
     </ImageButton>
 
     <View
