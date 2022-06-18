@@ -821,34 +821,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //Todo: Calendar isn't moved, it's just set as a 0 alpha via animation.
+    //Todo: Keep first row constrained to calendar when it's visible, and then constrain it to top of second row when we're minimizing.
     private void toggleCalendarMinimizationLayouts() {
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
         if (!calendarIsMinimized) {
-            dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
-            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
             totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
-            totalStatsValuesTextViewLayout.startAnimation(slideInFromBottom);
-
             toggleThreeTotalStatRowsVisibility(false);
         } else {
-            dailyStatsRecyclerViewLayoutParams.height = 0;
-            dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
-
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            totalStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
+            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.total_unassigned_in_day_values_textView_layout;
+            toggleThreeTotalStatRowsVisibility(true);
         }
 
-        dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
-        totalStatsValuesTextViewLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
-
-        toggleThreeTotalStatRowsVisibility(true);
     }
 
     private void toggleThreeTotalStatRowsVisibility(boolean allRowsAreVisible) {
