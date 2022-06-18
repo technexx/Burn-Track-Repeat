@@ -36,6 +36,10 @@ public class DailyStatsAccess {
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
 
+    int numberOfDaysInSelectedWeek;
+    int numberOfDaysInSelectedMonth;
+    int numberOfDaysInSelectedYear;
+
     long totalSetTimeForSelectedDay;
     double totalCaloriesForSelectedDay;
     long totalUnassignedSetTimeForSelectedDay;
@@ -199,7 +203,10 @@ public class DailyStatsAccess {
 
         for (int i=0; i<7; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
-                populatedDaysOfWeekList.add(firstAggregatedDayOfYearToUse + i);
+                //If we have day 1 of year, but days 7 of week (when years cross over), value of firstAggregatedDay can be <0. This will ensure only days of week of current year are added. Done for month below as well.
+                if (firstAggregatedDayOfYearToUse+i > 0) {
+                    populatedDaysOfWeekList.add(firstAggregatedDayOfYearToUse + i);
+                }
             }
         }
 
@@ -217,7 +224,9 @@ public class DailyStatsAccess {
 
         for (int i=0; i<numberOfDaysInMonth; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
-                populatedDaysOfMonthList.add(firstAggregatedDayOfYearToUse + i);
+                if (firstAggregatedDayOfYearToUse + i >0 ) {
+                    populatedDaysOfMonthList.add(firstAggregatedDayOfYearToUse + i);
+                }
             }
         }
 
@@ -655,7 +664,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    private void setUnassignedDailyTotalTime(long assignedTime) {
+    private void setUnassignedDailyTotalTime(long assignedTime, int duration) {
         totalUnassignedSetTimeForSelectedDay = totalAggregateTimeForSelectedDay - assignedTime;
     }
 
@@ -663,10 +672,8 @@ public class DailyStatsAccess {
         return totalUnassignedSetTimeForSelectedDay;
     }
 
-    //Todo: Should we limit this to single day duration, or expand to week/month/year?
-        //Todo: If we do all durations, we need to account for previous dates from app installation. Base bmr would not be accurate.
     //Todo: We should set a default bmr in settings, and use that here if settings is not accessed, OR simply prompt before user begins.
-    private void setTotalUnassignedCaloriesForSelectedDay() {
+    private void setTotalUnassignedCaloriesForSelectedDay(int duration) {
 //        totalAggregateCaloriesForSelectedDay -
     }
 
@@ -674,7 +681,8 @@ public class DailyStatsAccess {
         return totalUnassignedCaloriesForSelectedDay;
     }
 
-    private void setTotalAggregateDailyTime() {
+    //Todo: Get number of days in week/month/year. This is the only value we need to set variably. The rest can just use our entity lists which correspond to the selected duration.
+    private void setTotalAggregateDailyTime(int duration) {
         long twoHours = 7200000;
         totalAggregateTimeForSelectedDay = twoHours * 12;
     }
@@ -683,7 +691,7 @@ public class DailyStatsAccess {
         return totalAggregateTimeForSelectedDay;
     }
 
-    private void setAggregateDailyCalories() {
+    private void setAggregateDailyCalories(int duration) {
         totalAggregateCaloriesForSelectedDay = sharedPreferences.getInt("savedBmr", 0);
     }
 
