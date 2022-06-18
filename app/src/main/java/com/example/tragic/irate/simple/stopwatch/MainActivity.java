@@ -545,6 +545,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Some errors w/ daily stats totals. Can't immediately replicate.
 
+  //Todo: Black background on stats frag may be b0rking date selection highlight.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.

@@ -664,8 +664,10 @@ public class DailyStatsAccess {
     }
 
     //Todo: Should we limit this to single day duration, or expand to week/month/year?
+        //Todo: If we do all durations, we need to account for previous dates from app installation. Base bmr would not be accurate.
+    //Todo: We should set a default bmr in settings, and use that here if settings is not accessed, OR simply prompt before user begins.
     private void setTotalUnassignedCaloriesForSelectedDay() {
-        totalAggregateCaloriesForSelectedDay -
+//        totalAggregateCaloriesForSelectedDay -
     }
 
     public double getTotalUnassignedDailyCalories() {
