@@ -158,6 +158,7 @@ public class tdeeSettingsFragment extends Fragment {
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
         }
 
+        prefEdit.putInt("savedBmr", calculateBMR());
         prefEdit.putBoolean("metricMode", metricMode);
 
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));

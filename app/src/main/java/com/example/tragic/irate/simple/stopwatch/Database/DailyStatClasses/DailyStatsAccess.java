@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -58,11 +59,15 @@ public class DailyStatsAccess {
     double mMetScore;
     int mSortMode = 1;
 
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor prefEdit;
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
         instantiateEntitiesAndTheirLists();
         instantiateArrayListsOfTotalStatsForSelectedDurations();
+        instantiateMiscellaneousClasses();
     }
 
     private void instantiateDailyStatsDatabase() {
@@ -658,9 +663,9 @@ public class DailyStatsAccess {
         return totalUnassignedSetTimeForSelectedDay;
     }
 
-    //Todo: Setter for calories, which requires TDEE from Settings.
+    //Todo: Should we limit this to single day duration, or expand to week/month/year?
     private void setTotalUnassignedCaloriesForSelectedDay() {
-
+        totalAggregateCaloriesForSelectedDay -
     }
 
     public double getTotalUnassignedDailyCalories() {
@@ -677,7 +682,7 @@ public class DailyStatsAccess {
     }
 
     private void setAggregateDailyCalories() {
-
+        totalAggregateCaloriesForSelectedDay = sharedPreferences.getInt("savedBmr", 0);
     }
 
     private double getTotalAggregateDailyCalories() {
@@ -721,6 +726,11 @@ public class DailyStatsAccess {
         totalActivitiesListForSelectedDuration = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDuration = new ArrayList<>();
         totalCaloriesBurnedListForEachActivityForSelectedDuration = new ArrayList<>();
+    }
+
+    private void instantiateMiscellaneousClasses() {
+        sharedPreferences = mContext.getApplicationContext().getSharedPreferences("pref", 0);
+        prefEdit = sharedPreferences.edit();
     }
 
     private String getDateString() {
