@@ -468,6 +468,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    //Todo: Set all three rows here.
     private void setDayHolderStatsTextViews() {
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
@@ -813,10 +814,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         if (!calendarIsMinimized) {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
+            slideInFromBottom.setFillAfter(true);
             calendarView.startAnimation(slideInFromBottom);
 
         } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
+            slideOutToBottom.setFillAfter(true);
             calendarView.startAnimation(slideOutToBottom);
         }
     }
@@ -827,9 +830,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
         if (!calendarIsMinimized) {
+//            slideInFromBottom.setFillAfter(true);
+//            totalStatsValuesTextViewLayout.startAnimation(slideInFromBottom);
             totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
             toggleThreeTotalStatRowsVisibility(false);
         } else {
+//            slideOutToBottom.setFillAfter(false);
+//            totalStatsValuesTextViewLayout.startAnimation(slideOutToBottom);
             totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.total_unassigned_in_day_values_textView_layout;
             toggleThreeTotalStatRowsVisibility(true);
         }

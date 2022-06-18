@@ -39,6 +39,8 @@ public class DailyStatsAccess {
     double totalCaloriesForSelectedDay;
     long totalUnassignedSetTimeForSelectedDay;
     double totalUnassignedCaloriesForSelectedDay;
+    long totalAggregateTimeForSelectedDay;
+    double totalAggregateCaloriesForSelectedDay;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -522,10 +524,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
     }
 
-    public void deleteStatForEachActivityEntityForSelectedDay(long dayToDelete) {
-        cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(dayToDelete);
-    }
-
     public void deleteMultipleStatsForEachActivityEntries(List<Long> listOfEntries) {
         cyclesDatabase.cyclesDao().deleteActivityStatsForMultipleDays(listOfEntries);
     }
@@ -555,6 +553,16 @@ public class DailyStatsAccess {
         totalActivitiesListForSelectedDuration.clear();
         totalSetTimeListForEachActivityForSelectedDuration.clear();
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
+    }
+
+    private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
+        for (int i=0; i<totalActivitiesListForSelectedDuration.size(); i++) {
+            if (totalActivitiesListForSelectedDuration.get(i).equalsIgnoreCase(stringToCheck)) {
+                duplicateStringPosition = i;
+                return true;
+            }
+        }
+        return false;
     }
 
     public int returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
@@ -608,9 +616,6 @@ public class DailyStatsAccess {
         }
 
         totalSetTimeForSelectedDay = valueToReturn;
-
-        setUnassignedDailyTotalTime(totalSetTimeForSelectedDay);
-        Log.i("testAdd", "remaining time is " + totalUnassignedSetTimeForSelectedDay);
     }
 
     public double getTotalCaloriesVariableForDayHolder() {
@@ -646,9 +651,7 @@ public class DailyStatsAccess {
     }
 
     private void setUnassignedDailyTotalTime(long assignedTime) {
-        long twoHours = 7200000;
-        long fullDay = twoHours * 12;
-        totalUnassignedSetTimeForSelectedDay = fullDay - assignedTime;
+        totalUnassignedSetTimeForSelectedDay = totalAggregateTimeForSelectedDay - assignedTime;
     }
 
     public long getUnassignedDailyTotalTime() {
@@ -664,14 +667,21 @@ public class DailyStatsAccess {
         return totalUnassignedCaloriesForSelectedDay;
     }
 
-    private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
-        for (int i=0; i<totalActivitiesListForSelectedDuration.size(); i++) {
-            if (totalActivitiesListForSelectedDuration.get(i).equalsIgnoreCase(stringToCheck)) {
-                duplicateStringPosition = i;
-                return true;
-            }
-        }
-        return false;
+    private void setTotalAggregateDailyTime() {
+        long twoHours = 7200000;
+        totalAggregateTimeForSelectedDay = twoHours * 12;
+    }
+
+    private long getTotalAggregateTimeForSelectedDay() {
+        return totalAggregateTimeForSelectedDay;
+    }
+
+    private void setAggregateDailyCalories() {
+
+    }
+
+    private double getTotalAggregateDailyCalories() {
+        return totalAggregateCaloriesForSelectedDay;
     }
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
