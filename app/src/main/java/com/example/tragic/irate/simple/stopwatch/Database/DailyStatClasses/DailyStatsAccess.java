@@ -36,13 +36,10 @@ public class DailyStatsAccess {
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
 
-    int numberOfDaysInSelectedWeek;
-    int numberOfDaysInSelectedMonth;
-    int numberOfDaysInSelectedYear;
     int numberOfDaysInSelectedDuration;
 
-    long totalSetTimeForSelectedDay;
-    double totalCaloriesForSelectedDay;
+    long totalSetTimeForSelectedDuration;
+    double totalCaloriesForSelectedDuration;
     long totalUnassignedSetTimeForSelectedDuration;
     double totalUnassignedCaloriesForSelectedDuration;
     long totalAggregateTimeForSelectedDuration;
@@ -624,7 +621,7 @@ public class DailyStatsAccess {
     }
 
     public long getTotalSetTimeVariableForDayHolder() {
-        return totalSetTimeForSelectedDay;
+        return totalSetTimeForSelectedDuration;
     }
 
     public void setTotalSetTimeVariableForDayHolder() {
@@ -634,11 +631,11 @@ public class DailyStatsAccess {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
         }
 
-        totalSetTimeForSelectedDay = valueToReturn;
+        totalSetTimeForSelectedDuration = valueToReturn;
     }
 
     public double getTotalCaloriesVariableForDayHolder() {
-        return totalCaloriesForSelectedDay;
+        return totalCaloriesForSelectedDuration;
     }
 
     public void setTotalCaloriesVariableForDayHolder() {
@@ -648,7 +645,7 @@ public class DailyStatsAccess {
             valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
         }
 
-        totalCaloriesForSelectedDay = valueToReturn;
+        totalCaloriesForSelectedDuration = valueToReturn;
     }
 
     public long getTotalSetTimeFromDayHolderList() {
@@ -669,8 +666,9 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    private void setUnassignedDailyTotalTime(long assignedTime, int duration) {
-        totalUnassignedSetTimeForSelectedDuration = totalAggregateTimeForSelectedDuration - assignedTime;
+    //Todo: assignedTime should be set from this class, as a DayHolder retrieval for whichever duration we've chosen in our fragment.
+    private void setUnassignedDailyTotalTime() {
+        totalUnassignedSetTimeForSelectedDuration = totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration;
     }
 
     public long getUnassignedDailyTotalTime() {
@@ -678,14 +676,13 @@ public class DailyStatsAccess {
     }
 
     private void setTotalUnassignedCaloriesForSelectedDuration() {
-        totalUnassignedCaloriesForSelectedDuration = totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDay;
+        totalUnassignedCaloriesForSelectedDuration = totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration;
     }
 
     public double getTotalUnassignedDailyCalories() {
         return totalUnassignedCaloriesForSelectedDuration;
     }
 
-    //Todo: Get number of days in week/month/year for aggregate variables These are the only variables we need to set. The rest can just use our entity lists which correspond to the selected duration.
     private void setTotalAggregateDailyTime() {
         long twoHours = 7200000;
         long fullDay = twoHours * 12;

@@ -3865,7 +3865,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       iterateTotalTimesForSelectedDay(timerRunnableDelay);
       iterateTotalTimesForSelectedActivity(timerRunnableDelay);
 
-      iterateTotalCaloriesForSelectedDay(timerRunnableDelay);
+      iteratetotalCaloriesForSelectedDuration(timerRunnableDelay);
       iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
     } else {
       iterateTotalTimesForSelectedCycle(timerRunnableDelay);
@@ -3919,7 +3919,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void iterateTotalCaloriesForSelectedDay(long millis) {
+  private void iteratetotalCaloriesForSelectedDuration(long millis) {
     totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
   }
 
