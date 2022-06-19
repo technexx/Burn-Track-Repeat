@@ -543,8 +543,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Some errors w/ daily stats totals. Can't immediately replicate.
+  //Todo: Unassigned calories/time should have 0 as lower limit.
+  //Todo: Limit edits to 24 hours total for both single and combined activities.
+  //Todo: Longer total time/calorie values exceed width allowances.
 
+  //Todo: Some errors w/ daily stats totals. Can't immediately replicate.
   //Todo: Black background on stats frag may be b0rking date selection highlight.
   //Todo: Add optional calories (bmr) burned for "all other time" not spent on specified activities (for a complete daily total)?
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
