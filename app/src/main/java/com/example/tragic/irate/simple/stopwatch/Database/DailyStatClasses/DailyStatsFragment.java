@@ -824,19 +824,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: Calendar isn't moved, it's just set as a 0 alpha via animation.
-    //Todo: Keep first row constrained to calendar when it's visible, and then constrain it to top of second row when we're minimizing.
     private void toggleCalendarMinimizationLayouts() {
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
         if (!calendarIsMinimized) {
-//            slideInFromBottom.setFillAfter(true);
-//            totalStatsValuesTextViewLayout.startAnimation(slideInFromBottom);
             totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
             toggleThreeTotalStatRowsVisibility(false);
         } else {
-//            slideOutToBottom.setFillAfter(false);
-//            totalStatsValuesTextViewLayout.startAnimation(slideOutToBottom);
             totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.total_unassigned_in_day_values_textView_layout;
             toggleThreeTotalStatRowsVisibility(true);
         }

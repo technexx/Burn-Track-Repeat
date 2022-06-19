@@ -145,6 +145,7 @@ public class tdeeSettingsFragment extends Fragment {
         }
     }
 
+    //Todo: We should set a default bmr in settings, and use that in DailyStatsAccess if settings is not accessed, OR simply prompt before user begins.
     private void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
         if (savingMetric) {
             prefEdit.putInt("genderPositionMetric", gender_spinner.getSelectedItemPosition());
