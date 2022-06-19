@@ -295,6 +295,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
+        //Todo: Here we retrieve our total stats row variables before they are set below.
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
         getActivity().runOnUiThread(()-> {

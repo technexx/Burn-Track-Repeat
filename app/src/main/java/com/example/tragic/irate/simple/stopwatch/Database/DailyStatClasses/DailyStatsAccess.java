@@ -673,7 +673,7 @@ public class DailyStatsAccess {
     }
 
     private void setUnassignedDailyTotalTime() {
-        totalUnassignedSetTimeForSelectedDuration = totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration;
+        totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
     }
 
     public long getUnassignedDailyTotalTime() {
@@ -681,7 +681,7 @@ public class DailyStatsAccess {
     }
 
     private void setUnassignedTotalCalories() {
-        totalUnassignedCaloriesForSelectedDuration = totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration;
+        totalUnassignedCaloriesForSelectedDuration = (totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration);
     }
 
     public double getUnassignedDailyCalories() {
@@ -738,6 +738,22 @@ public class DailyStatsAccess {
         totalActivitiesListForSelectedDuration.clear();
         totalSetTimeListForEachActivityForSelectedDuration.clear();
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
+    }
+
+    private long setZeroLowerBoundsOnLongValue(long value) {
+        if (value<0) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
+    private double setZeroLowerBoundsOnDoubleValue(double value) {
+        if (value<0) {
+            return 0;
+        } else {
+            return value;
+        }
     }
 
     private void instantiateEntitiesAndTheirLists() {
