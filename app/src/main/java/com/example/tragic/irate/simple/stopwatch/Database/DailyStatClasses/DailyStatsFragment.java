@@ -295,7 +295,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
-        //Todo: Here we retrieve our total stats row variables before they are set below.
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
         getActivity().runOnUiThread(()-> {
@@ -304,6 +303,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
             dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
+
+            dailyStatsAccess.setUnassignedDailyTotalTime();
+            dailyStatsAccess.setUnassignedTotalCalories();
+
+            logTotalStatRows();
 
             dailyStatsAdapter.notifyDataSetChanged();
 
@@ -335,14 +339,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (hasNumberOfDaysWithAtLeastOneActivityChanged()) {
             colorDaysWithAtLeastOneActivity();
         }
-
-        Log.i("testTotal", "assigned time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
-        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime()));
-        Log.i("testTotal", "aggregate time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getAggregateDailyTime()));
-
-        Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
-        Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
-        Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
     }
 
     public void setSortMode(int sortMode) {
@@ -992,5 +988,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private int dpToPxConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+    }
+
+    private void logTotalStatRows() {
+        Log.i("testTotal", "assigned time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
+        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime()));
+        Log.i("testTotal", "aggregate time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getAggregateDailyTime()));
+
+        Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
+        Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
+        Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
     }
 }

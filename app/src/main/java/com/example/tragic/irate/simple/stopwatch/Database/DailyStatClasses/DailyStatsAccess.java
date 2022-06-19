@@ -43,6 +43,8 @@ public class DailyStatsAccess {
     long totalAggregateTimeForSelectedDuration;
     double totalAggregateCaloriesForSelectedDuration;
 
+    int numberOfDaysSelected;
+
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
     String mLastDayInDurationAsString;
@@ -107,7 +109,7 @@ public class DailyStatsAccess {
             long dayThatExistsInDatabase = dayHolderList.get(i).getDayId();
             if (daySelected==dayThatExistsInDatabase) {
                 doesDayExistInDatabase = true;
-//                return;
+                return;
             }
         }
         Log.i("testInsert", "doesDayExist returned from check method is " + doesDayExistInDatabase);
@@ -189,7 +191,9 @@ public class DailyStatsAccess {
 
         convertToStringAndSetSingleDay(dayToRetrieve);
 
-        setAllTotalStatsRowValues(1);
+        numberOfDaysSelected = 1;
+        setAggregateDailyTime();
+        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -212,7 +216,9 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfWeekList);
 
-        setAllTotalStatsRowValues(populatedDaysOfWeekList.size());
+        numberOfDaysSelected = populatedDaysOfWeekList.size();
+        setAggregateDailyTime();
+        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -234,7 +240,9 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfMonthList);
 
-        setAllTotalStatsRowValues(populatedDaysOfMonthList.size());
+        numberOfDaysSelected = populatedDaysOfMonthList.size();
+        setAggregateDailyTime();
+        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
@@ -255,7 +263,9 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfYearList);
 
-        setAllTotalStatsRowValues(populatedDaysOfYearList.size());
+        numberOfDaysSelected = populatedDaysOfYearList.size();
+        setAggregateDailyTime();
+        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
@@ -282,7 +292,9 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(populatedCustomDayList);
 
-        setAllTotalStatsRowValues(populatedCustomDayList.size());
+        numberOfDaysSelected = populatedCustomDayList.size();
+        setAggregateDailyTime();
+        setAggregateDailyCalories();
     }
 
     private void convertToStringAndSetSingleDay(int day) {
@@ -672,7 +684,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    private void setUnassignedDailyTotalTime() {
+    public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
     }
 
@@ -680,38 +692,31 @@ public class DailyStatsAccess {
         return totalUnassignedSetTimeForSelectedDuration;
     }
 
-    private void setUnassignedTotalCalories() {
-        totalUnassignedCaloriesForSelectedDuration = (totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration);
+    public void setUnassignedTotalCalories() {
+        totalUnassignedCaloriesForSelectedDuration = setZeroLowerBoundsOnDoubleValue(totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration);
     }
 
     public double getUnassignedDailyCalories() {
         return totalUnassignedCaloriesForSelectedDuration;
     }
 
-    private void setAggregateDailyTime(int numberOfDaysInDuration) {
+    private void setAggregateDailyTime() {
         long twoHours = 7200000;
         long fullDay = twoHours * 12;
-        totalAggregateTimeForSelectedDuration = fullDay * numberOfDaysInDuration;
+        totalAggregateTimeForSelectedDuration = fullDay * numberOfDaysSelected;
     }
 
     public long getAggregateDailyTime() {
         return totalAggregateTimeForSelectedDuration;
     }
 
-    private void setAggregateDailyCalories(int numberOfDaysInDuration) {
+    private void setAggregateDailyCalories() {
         int savedBmr = sharedPreferences.getInt("savedBmr", 0);
-        totalAggregateCaloriesForSelectedDuration = savedBmr * numberOfDaysInDuration;
+        totalAggregateCaloriesForSelectedDuration = savedBmr * numberOfDaysSelected;
     }
 
     public double getAggregateDailyCalories() {
         return totalAggregateCaloriesForSelectedDuration;
-    }
-
-    private void setAllTotalStatsRowValues(int numberOfDaysInDuration) {
-        setAggregateDailyTime(numberOfDaysInDuration);
-        setAggregateDailyCalories(numberOfDaysInDuration);
-        setUnassignedDailyTotalTime();
-        setUnassignedTotalCalories();
     }
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
