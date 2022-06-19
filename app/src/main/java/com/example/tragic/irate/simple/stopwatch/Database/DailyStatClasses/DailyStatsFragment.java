@@ -474,13 +474,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    //Todo: Set all three rows here.
     private void setDayHolderStatsTextViews() {
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         statsTotalSetTimeTextView.setText(totalSetTime);
         statsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
+
+        statsTotalUnassignedSetTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime()));
+        statsTotalUnassignedCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getUnassignedDailyCalories()));
+
+        statsTotalAggregateSetTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getAggregateDailyTime()));
+        statsTotalAggregateCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getAggregateDailyCalories()));
     }
 
     @Override
