@@ -328,11 +328,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         setListsOfDayHolderAndStatsPrimaryIds();
+
         dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
 
         if (hasNumberOfDaysWithAtLeastOneActivityChanged()) {
             colorDaysWithAtLeastOneActivity();
         }
+
+        Log.i("testTotal", "assigned time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
+        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime()));
+        Log.i("testTotal", "aggregate time is " + longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getAggregateDailyTime()));
+
+        Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
+        Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
+        Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
     }
 
     public void setSortMode(int sortMode) {
@@ -548,8 +557,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
 
-            dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
-            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
+            dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
+            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -573,8 +582,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
 
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAccess.setTotalSetTimeFromDayHolder(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
-            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
+            dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
+            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 

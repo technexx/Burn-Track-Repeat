@@ -1919,9 +1919,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
 
-    dailyStatsAccess.setTotalSetTimeFromDayHolder(totalSetTimeForCurrentDayInMillis);
-    dailyStatsAccess.setTotalBreakTimeFromDayHolder(totalBreakTimeForCurrentDayInMillis);
-    dailyStatsAccess.setTotalCaloriesBurnedFromDayHolder(totalCaloriesBurnedForCurrentDay);
+    dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(totalSetTimeForCurrentDayInMillis);
+    dailyStatsAccess.setTotalBreakTimeFromDayHolderEntity(totalBreakTimeForCurrentDayInMillis);
+    dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(totalCaloriesBurnedForCurrentDay);
 
     dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
   }
@@ -3676,9 +3676,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
 
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
-      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
-      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolder();
+      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
+      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
+      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderEntity();
 
       totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
       totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
@@ -3817,13 +3817,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void retrieveTotalDailySetAndBreakTimes() {
     if (mode == 1) {
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolder();
-      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolder();
+      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
+      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
     }
 
     if (mode == 3) {
-      totalWorkTimeForCurrentDayInMillis = dailyStatsAccess.getTotalWorkTimeFromDayHolder();
-      totalRestTimeForCurrentDayInMillis = dailyStatsAccess.getTotalRestTimeFromDayHolder();
+      totalWorkTimeForCurrentDayInMillis = dailyStatsAccess.getTotalWorkTimeFromDayHolderEntity();
+      totalRestTimeForCurrentDayInMillis = dailyStatsAccess.getTotalRestTimeFromDayHolderEntity();
     }
   }
 
