@@ -95,6 +95,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     boolean calendarIsMinimized;
     Animation slideOutToBottom;
     Animation slideInFromBottom;
+    Animation slideOutToBottomNoAlphaChange;
+    Animation slideInFromBottomNoAlphaChange;
 
     int mSortMode;
     int currentStatDurationMode;
@@ -828,12 +830,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         if (!calendarIsMinimized) {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
-            slideInFromBottom.setFillAfter(true);
             calendarView.startAnimation(slideInFromBottom);
+            totalStatsValuesTextViewLayout.startAnimation(slideInFromBottomNoAlphaChange);
         } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
-            slideOutToBottom.setFillAfter(true);
             calendarView.startAnimation(slideOutToBottom);
+            totalStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
         }
     }
 
@@ -982,11 +984,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateAnimations() {
         slideOutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom);
-        slideOutToBottom.setDuration(200);
+        slideOutToBottom.setDuration(250);
         slideOutToBottom.setFillAfter(true);
         slideInFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
-        slideInFromBottom.setDuration(200);
+        slideInFromBottom.setDuration(250);
         slideInFromBottom.setFillAfter(true);
+
+        slideOutToBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_untouched_alpha);
+        slideOutToBottomNoAlphaChange.setDuration(250);
+        slideOutToBottomNoAlphaChange.setFillAfter(true);
+        slideInFromBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom_untouched_alpha);
+        slideInFromBottomNoAlphaChange.setDuration(250);
+        slideInFromBottomNoAlphaChange.setFillAfter(true);
+
     }
 
     private int dpToPxConv(float pixels) {
