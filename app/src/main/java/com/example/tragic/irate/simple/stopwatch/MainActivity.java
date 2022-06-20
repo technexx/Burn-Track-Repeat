@@ -543,7 +543,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Unassigned calories/time should have 0 as lower limit.
   //Todo: Limit edits to 24 hours total for both single and combined activities.
   //Todo: Longer total time/calorie values exceed width allowances.
 

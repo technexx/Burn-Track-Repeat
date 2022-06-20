@@ -474,6 +474,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    //Todo: Monthly/yearly aggregate of future calories would not make sense because they haven't occurred yet.
+    //Todo: Also bear in mind we don't have DayHolder rows for days not yet accessed, so any aggregate values won't include those (this is why week/month/year can have the same aggregates).
+
+    //Todo: May want to eliminate yearly.
     private void setDayHolderStatsTextViews() {
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();

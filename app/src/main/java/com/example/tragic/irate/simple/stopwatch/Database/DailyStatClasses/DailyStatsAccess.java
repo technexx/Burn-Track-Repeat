@@ -201,6 +201,7 @@ public class DailyStatsAccess {
 
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
+        //Aggregated is used for database IDs only. Anything fetched from calendar should still fall w/ in standard year.
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
@@ -216,7 +217,7 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfWeekList);
 
-        numberOfDaysSelected = populatedDaysOfWeekList.size();
+        numberOfDaysSelected = 7;
         setAggregateDailyTime();
         setAggregateDailyCalories();
     }
@@ -240,7 +241,7 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfMonthList);
 
-        numberOfDaysSelected = populatedDaysOfMonthList.size();
+        numberOfDaysSelected = numberOfDaysInMonth;
         setAggregateDailyTime();
         setAggregateDailyCalories();
     }
@@ -263,7 +264,7 @@ public class DailyStatsAccess {
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfYearList);
 
-        numberOfDaysSelected = populatedDaysOfYearList.size();
+        numberOfDaysSelected = daysInYear;
         setAggregateDailyTime();
         setAggregateDailyCalories();
     }
