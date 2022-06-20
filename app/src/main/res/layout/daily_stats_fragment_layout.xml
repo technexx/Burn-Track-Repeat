@@ -98,7 +98,7 @@
         <TextView
             android:id="@+id/total_stats_textView"
             android:text="@string/total_assigned_stats"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
@@ -108,28 +108,41 @@
             android:textColor="@color/red">
         </TextView>
 
+        <View
+            android:id="@+id/total_set_time_anchor"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            app:layout_constraintEnd_toStartOf="@id/daily_stats_total_calories_burned_textView"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="40dp"
+            android:gravity="center">
+        </View>
+
         <TextView
             android:id="@+id/daily_stats_total_set_time_textView"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-            app:layout_constraintStart_toEndOf="@id/total_stats_textView"
-            android:layout_marginEnd="40dp"
+            app:layout_constraintEnd_toStartOf="@id/daily_stats_total_calories_burned_textView"
             android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/green">
+            android:textColor="@color/green"
+            android:minWidth="100dp"
+            android:maxWidth="150dp">
         </TextView>
 
         <TextView
             android:id="@+id/daily_stats_total_calories_burned_textView"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
             android:gravity="center"
             android:layout_marginEnd="8dp"
             android:textStyle="bold"
-            android:textColor="@color/purple_200">
+            android:textColor="@color/purple_200"
+            android:minWidth="100dp"
+            android:maxWidth="150dp">
         </TextView>
 
         <View

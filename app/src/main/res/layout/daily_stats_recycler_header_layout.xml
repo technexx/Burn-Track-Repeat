@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/activity_in_daily_stats_header"
-        android:layout_width="200dp"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -18,21 +18,24 @@
 
     <TextView
         android:id="@+id/set_time_in_daily_stats_header"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/activity_in_daily_stats_header"
+        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_header"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="40dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:minWidth="100dp"
+        android:maxWidth="150dp">
     </TextView>
 
     <TextView
         android:id="@+id/calories_burned_in_daily_stats_header"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="8dp"
+        android:minWidth="100dp"
+        android:maxWidth="150dp"
         android:gravity="center">
     </TextView>
 
