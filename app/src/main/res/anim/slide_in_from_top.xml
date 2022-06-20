@@ -5,7 +5,7 @@
         android:fromYDelta="-20%" android:toYDelta="0%"
         android:duration="250"/>
     <alpha
-        android:duration="500"
+        android:duration="250"
         android:fromAlpha="0.3"
         android:toAlpha="1.0">
     </alpha>

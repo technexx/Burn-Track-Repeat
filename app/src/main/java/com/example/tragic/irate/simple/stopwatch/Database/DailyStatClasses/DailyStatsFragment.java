@@ -227,7 +227,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
-            dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
+            if (!dailyStatsExpandedPopUpWindow.isShowing()) {
+                dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
+            } else {
+                dailyStatsExpandedPopUpWindow.dismiss();
+            }
             calendarMinimizationLogic(true);
         });
 
@@ -911,7 +915,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateExpansionPopUpViews() {
         dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
-        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(315), true);
+        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(315), false);
         dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideTopAnimation);
 
 

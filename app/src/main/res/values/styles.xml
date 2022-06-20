@@ -39,6 +39,11 @@
 
     <style name="SlideTopAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in_from_top</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_from_top</item>
+    </style>
+
+    <style name="SlideTopAnimationWithoutAnimatedExit">
+        <item name="android:windowEnterAnimation">@anim/slide_in_from_top</item>
         <item name="android:windowExitAnimation">@anim/slide_out_from_top_without_exit</item>
     </style>
 
