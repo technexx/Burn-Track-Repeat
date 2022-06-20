@@ -47,6 +47,15 @@
         </ImageButton>
 
         <ImageButton
+            android:id="@+id/daily_stats_expanded_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/chart_icon_2">
+        </ImageButton>
+
+        <ImageButton
             android:id="@+id/edit_tdee_stats_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -147,138 +156,6 @@
         </View>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/total_unassigned_in_day_values_textView_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/total_aggregate_values_textView_layout"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:id="@+id/total_unassigned_in_day_textView"
-            android:text="@string/total_unassigned_stats"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider_2"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:textStyle="bold"
-            android:textColor="@color/red">
-        </TextView>
-
-        <TextView
-            android:id="@+id/daily_stats_unassigned_in_day_set_time_textView"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider_2"
-            app:layout_constraintStart_toEndOf="@id/total_unassigned_in_day_textView"
-            android:layout_marginEnd="40dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/green">
-        </TextView>
-
-        <TextView
-            android:id="@+id/daily_stats_unassigned_in_day_total_calories_burned_textView"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider_2"
-            android:gravity="center"
-            android:layout_marginEnd="8dp"
-            android:textStyle="bold"
-            android:textColor="@color/purple_200">
-        </TextView>
-
-        <View
-            android:id="@+id/recycler_and_total_stats_divider_2"
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/daily_stats_unassigned_in_day_total_calories_burned_textView"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/black">
-        </View>
-
-        <View
-            android:id="@+id/recycler_and_calendar_divider_2"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/daily_stats_unassigned_in_day_total_calories_burned_textView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="0dp"
-            android:background="@color/black">
-        </View>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/total_aggregate_values_textView_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:id="@+id/total_aggregate_stats_textView"
-            android:text="@string/total_aggregate_stats"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider_3"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:textStyle="bold"
-            android:textColor="@color/red">
-        </TextView>
-
-        <TextView
-            android:id="@+id/daily_aggregate_stats_total_set_time_textView"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider_3"
-            app:layout_constraintStart_toEndOf="@id/total_aggregate_stats_textView"
-            android:layout_marginEnd="40dp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/green">
-        </TextView>
-
-        <TextView
-            android:id="@+id/daily_aggregate_stats_total_calories_burned_textView"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider_3"
-            android:gravity="center"
-            android:layout_marginEnd="8dp"
-            android:textStyle="bold"
-            android:textColor="@color/purple_200">
-        </TextView>
-
-        <View
-            android:id="@+id/recycler_and_total_stats_divider_3"
-            android:layout_width="match_parent"
-            android:layout_height="1.5dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/daily_aggregate_stats_total_calories_burned_textView"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/black">
-        </View>
-
-        <View
-            android:id="@+id/recycler_and_calendar_divider_3"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/daily_aggregate_stats_total_calories_burned_textView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="0dp"
-            android:background="@color/black">
-        </View>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/stats_calendar"
         android:layout_width="wrap_content"
@@ -303,7 +180,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/arrow_down_2">
+        android:src="@drawable/arrow_down_2"
+        android:background="#08000000">
     </ImageButton>
 
     <View

@@ -77,6 +77,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     View recyclerAndTotalStatsDivider;
 
+    ImageButton dailyStatsExpandedButton;
+    ImageButton editTdeeStatsButton;
     TextView totalStatsHeaderTextView;
     TextView durationRangeTextView;
     ImageButton statDurationSwitcherButtonLeft;
@@ -88,16 +90,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams;
     TextView statsTotalSetTimeTextView;
     TextView statsTotalCaloriesBurnedTextView;
-
-    ConstraintLayout totalUnassignedStatsLayout;
-    ConstraintLayout.LayoutParams totalUnassignedStatsLayoutParams;
-    TextView statsTotalUnassignedSetTimeTextView;
-    TextView statsTotalUnassignedCaloriesBurnedTextView;
-
-    ConstraintLayout totalAggregateStatsLayout;
-    ConstraintLayout.LayoutParams totalAggregateStatsLayoutParams;
-    TextView statsTotalAggregateSetTimeTextView;
-    TextView statsTotalAggregateCaloriesBurnedTextView;
 
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
@@ -119,10 +111,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int ITERATING_STATS_UP = 0;
     int ITERATING_STATS_DOWN = 1;
 
+    View dailyStatsExpandedView ;
+    PopupWindow dailyStatsExpandedPopUpWindow;
+
     View tdeeEditView;
     View popUpAnchorBottom;
-
-    ImageButton editTdeeStatsButton;
     PopupWindow tdeeEditPopUpWindow;
     TextView tdeeEditPopUpActivityTextView;
     EditText tdeeEditTextHours;
@@ -154,6 +147,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         mRoot = root;
 
         dailyStatsAccess = new DailyStatsAccess(getContext().getApplicationContext());
+        dailyStatsExpandedButton = mRoot.findViewById(R.id.daily_stats_expanded_button);
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
         instantiateCalendarObjects();
@@ -161,6 +155,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateRecyclerViewAndItsAdapter();
         instantiateAnimations();
 
+        instantiateExpansionPopUpViews();
         instantiateEditPopUpViews();
         instantiateAddPopUpViews();
         instantiateActivityAdditionSpinnersAndAdapters();
@@ -227,6 +222,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 });
                 Log.i("testCall", "onRangeSelected called!");
             }
+        });
+
+        dailyStatsExpandedButton.setOnClickListener(v-> {
+            dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
         });
 
         statDurationSwitcherButtonLeft.setOnClickListener(v-> {
@@ -477,19 +476,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     //Todo: Monthly/yearly aggregate of future calories would not make sense because they haven't occurred yet.
     //Todo: Also bear in mind we don't have DayHolder rows for days not yet accessed, so any aggregate values won't include those (this is why week/month/year can have the same aggregates).
 
-    //Todo: May want to eliminate yearly.
     private void setDayHolderStatsTextViews() {
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         statsTotalSetTimeTextView.setText(totalSetTime);
         statsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
-
-        statsTotalUnassignedSetTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime()));
-        statsTotalUnassignedCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getUnassignedDailyCalories()));
-
-        statsTotalAggregateSetTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getAggregateDailyTime()));
-        statsTotalAggregateCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getAggregateDailyCalories()));
     }
 
     @Override
@@ -842,24 +834,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void toggleCalendarMinimizationLayouts() {
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
-        if (!calendarIsMinimized) {
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
-            toggleThreeTotalStatRowsVisibility(false);
-        } else {
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.total_unassigned_in_day_values_textView_layout;
-            toggleThreeTotalStatRowsVisibility(true);
-        }
+//        if (!calendarIsMinimized) {
+//            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
+//            toggleThreeTotalStatRowsVisibility(false);
+//        } else {
+//            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.total_unassigned_in_day_values_textView_layout;
+//            toggleThreeTotalStatRowsVisibility(true);
+//        }
 
-    }
-
-    private void toggleThreeTotalStatRowsVisibility(boolean allRowsAreVisible) {
-        if (!allRowsAreVisible) {
-            totalUnassignedStatsLayout.setVisibility(View.GONE);
-            totalAggregateStatsLayout.setVisibility(View.GONE);
-        } else {
-            totalUnassignedStatsLayout.setVisibility(View.VISIBLE);
-            totalAggregateStatsLayout.setVisibility(View.VISIBLE);
-        }
     }
 
     private void instantiateCalendarObjects() {
@@ -908,6 +890,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
     }
 
+    private void instantiateExpansionPopUpViews() {
+        dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
+        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(315), true);
+        dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideTopAnimation);
+
+
+    }
+
     private void instantiateEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(100), true);
@@ -944,21 +934,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
         statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
-
-        totalUnassignedStatsLayout = mRoot.findViewById(R.id.total_unassigned_in_day_values_textView_layout);
-        totalUnassignedStatsLayoutParams = (ConstraintLayout.LayoutParams) totalUnassignedStatsLayout.getLayoutParams();
-        statsTotalUnassignedSetTimeTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_set_time_textView);
-        statsTotalUnassignedCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_unassigned_in_day_total_calories_burned_textView);
-
-        totalAggregateStatsLayout = mRoot.findViewById(R.id.total_aggregate_values_textView_layout);
-        totalAggregateStatsLayoutParams = (ConstraintLayout.LayoutParams) totalAggregateStatsLayout.getLayoutParams();
-        statsTotalAggregateSetTimeTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_set_time_textView);
-        statsTotalAggregateCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_aggregate_stats_total_calories_burned_textView);
-
-        totalUnassignedStatsLayout.setVisibility(View.GONE);
-        totalAggregateStatsLayout.setVisibility(View.GONE);
-
-//        dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
