@@ -226,6 +226,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
             dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
+            calendarMinimizationLogic(true);
         });
 
         statDurationSwitcherButtonLeft.setOnClickListener(v-> {
@@ -254,7 +255,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         minimizeCalendarButton.setOnClickListener(v-> {
-            calendarMinimizationLogic();
+            calendarMinimizationLogic(false);
         });
 
         return root;
@@ -815,7 +816,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calendarIsMinimized = !calendarIsMinimized;
     }
 
-    private void calendarMinimizationLogic() {
+    private void calendarMinimizationLogic(boolean restoreOnly) {
+        if (restoreOnly) {
+            if (!calendarIsMinimized) {
+                return;
+            }
+        }
+
         toggleCalendarMinimizationState();
         toggleCalendarMinimizationLayouts();
 
@@ -823,7 +830,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
             slideInFromBottom.setFillAfter(true);
             calendarView.startAnimation(slideInFromBottom);
-
         } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
             slideOutToBottom.setFillAfter(true);
@@ -832,8 +838,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void toggleCalendarMinimizationLayouts() {
-        dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
-
         if (!calendarIsMinimized) {
             dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
