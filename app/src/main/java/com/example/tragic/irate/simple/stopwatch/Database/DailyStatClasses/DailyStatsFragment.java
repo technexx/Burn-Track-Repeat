@@ -834,13 +834,26 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void toggleCalendarMinimizationLayouts() {
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
-//        if (!calendarIsMinimized) {
-//            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
-//            toggleThreeTotalStatRowsVisibility(false);
-//        } else {
-//            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.total_unassigned_in_day_values_textView_layout;
-//            toggleThreeTotalStatRowsVisibility(true);
-//        }
+        if (!calendarIsMinimized) {
+            dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
+            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
+        } else {
+            dailyStatsRecyclerViewLayoutParams.height = 0;
+            dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            totalStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
+        }
+
+        totalStatsValuesTextViewLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
+        dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
 
     }
 
@@ -955,6 +968,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
         dailyStatsRecyclerView.setLayoutManager(lm);
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
+
+        dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
         dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
