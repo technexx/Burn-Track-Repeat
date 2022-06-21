@@ -144,6 +144,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int selectedTdeeSubCategoryPosition;
     double metScore;
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (dailyStatsExpandedPopUpWindow.isShowing()) {
+            dailyStatsExpandedPopUpWindow.dismiss();
+        }
+    }
+
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
