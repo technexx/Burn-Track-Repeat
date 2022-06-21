@@ -144,6 +144,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int selectedTdeeSubCategoryPosition;
     double metScore;
 
+    TextView expansionAssignedHeader;
+    TextView expansionUnassignedHeader;
+    TextView expansionAggregateHeader;
+    TextView expansionAssignedSetTime;
+    TextView expansionUnassignedSetTime;
+    TextView expansionAggregateSetTime;
+    TextView expansionAssignedCalories;
+    TextView expansionUnassignedCalories;
+    TextView expansionAggregateCalories;
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -926,7 +936,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(315), false);
         dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
+        expansionAssignedHeader = dailyStatsExpandedView.findViewById(R.id.expansion_assigned_header);
+        expansionUnassignedHeader = dailyStatsExpandedView.findViewById(R.id.expansion_unassigned_header);
+        expansionAggregateHeader = dailyStatsExpandedView.findViewById(R.id.expansion_aggregate_header);
 
+        expansionAssignedSetTime = dailyStatsExpandedView.findViewById(R.id.expansion_set_time_assigned);
+        expansionUnassignedSetTime = dailyStatsExpandedView.findViewById(R.id.expansion_set_time_unassigned);
+        expansionAggregateSetTime = dailyStatsExpandedView.findViewById(R.id.expansion_set_time_aggregate);
+
+        expansionAssignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_assigned);
+        expansionUnassignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_unassigned);
+        expansionAggregateCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_aggregate);
     }
 
     private void instantiateEditPopUpViews() {
