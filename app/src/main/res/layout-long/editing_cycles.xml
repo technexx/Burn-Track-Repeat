@@ -121,7 +121,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/number_pad_layout"
-        android:src="@drawable/cancel_x"
+        android:src="@drawable/cancel_x_black"
         android:backgroundTint="@color/light_grey"
         android:layout_marginBottom="22dp"
         android:background="@drawable/ripple_effect_2">

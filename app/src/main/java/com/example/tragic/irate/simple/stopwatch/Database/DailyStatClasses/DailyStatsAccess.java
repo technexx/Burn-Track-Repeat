@@ -695,6 +695,8 @@ public class DailyStatsAccess {
         return totalUnassignedSetTimeForSelectedDuration;
     }
 
+    //Todo: Remainder should only be for time elapsed until present moment.
+    //Todo: First 3 rows can be daily, and a second section below can be year-to-date.
     public void setUnassignedTotalCalories() {
         totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
     }

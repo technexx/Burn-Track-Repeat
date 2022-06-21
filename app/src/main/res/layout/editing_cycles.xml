@@ -136,7 +136,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:src="@drawable/cancel_x"
+        android:src="@drawable/cancel_x_black"
         android:background="@drawable/ripple_effect_2">
     </ImageButton>
 

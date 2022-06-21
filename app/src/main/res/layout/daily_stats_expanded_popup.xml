@@ -114,5 +114,13 @@
         android:maxWidth="150dp">
     </TextView>
 
+    <ImageButton
+        android:id="@+id/exit_expansion_popUp_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/cancel_x_white">
+    </ImageButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

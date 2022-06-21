@@ -154,6 +154,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView expansionUnassignedCalories;
     TextView expansionAggregateCalories;
 
+    ImageButton exitExpansionImageButton;
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -253,6 +255,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendarMinimizationLogic(true);
         });
 
+        exitExpansionImageButton.setOnClickListener(v-> {
+            dailyStatsExpandedPopUpWindow.dismiss();
+        });
+
         statDurationSwitcherButtonLeft.setOnClickListener(v-> {
             statDurationSwitchModeLogic(ITERATING_STATS_DOWN);
         });
@@ -332,9 +338,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             setDayHolderStatsTextViews();
 
-            //Todo: Order we need to call our four aggregate methods in is tenuous.
-            setExpansionTextViewValues();
-
             dailyStatsAccess.setAggregateDailyTime();
             dailyStatsAccess.setUnassignedTotalCalories();
 
@@ -342,10 +345,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setUnassignedDailyTotalTime();
 
             setExpansionTextViewValues();
-
-            if (dailyStatsExpandedPopUpWindow.isShowing()) {
-
-            }
         });
     }
 
@@ -507,9 +506,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendarView.addDecorator(calendarDayDecorator);
         });
     }
-
-    //Todo: Monthly/yearly aggregate of future calories would not make sense because they haven't occurred yet.
-    //Todo: Also bear in mind we don't have DayHolder rows for days not yet accessed, so any aggregate values won't include those (this is why week/month/year can have the same aggregates).
 
     private void setDayHolderStatsTextViews() {
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
@@ -943,7 +939,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateExpansionPopUpViews() {
         dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
-        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(325), false);
+        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(420), false);
         dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         expansionAssignedHeader = dailyStatsExpandedView.findViewById(R.id.expansion_assigned_header);
@@ -957,6 +953,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         expansionAssignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_assigned);
         expansionUnassignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_unassigned);
         expansionAggregateCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_aggregate);
+
+        exitExpansionImageButton = dailyStatsExpandedView.findViewById(R.id.exit_expansion_popUp_button);
     }
 
     private void setExpansionTextViewValues() {
