@@ -192,8 +192,10 @@ public class DailyStatsAccess {
         convertToStringAndSetSingleDay(dayToRetrieve);
 
         numberOfDaysSelected = 1;
-        setAggregateDailyTime();
-        setAggregateDailyCalories();
+
+        //Todo: These get set via setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(...) from populateListsAndTextViewsFromEntityListsInDatabase, before our duration set/calories are set.
+//        setAggregateDailyTime();
+//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -218,8 +220,8 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfWeekList);
 
         numberOfDaysSelected = 7;
-        setAggregateDailyTime();
-        setAggregateDailyCalories();
+//        setAggregateDailyTime();
+//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -242,8 +244,8 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfMonthList);
 
         numberOfDaysSelected = numberOfDaysInMonth;
-        setAggregateDailyTime();
-        setAggregateDailyCalories();
+//        setAggregateDailyTime();
+//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
@@ -265,8 +267,8 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfYearList);
 
         numberOfDaysSelected = daysInYear;
-        setAggregateDailyTime();
-        setAggregateDailyCalories();
+//        setAggregateDailyTime();
+//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
@@ -294,8 +296,8 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedCustomDayList);
 
         numberOfDaysSelected = populatedCustomDayList.size();
-        setAggregateDailyTime();
-        setAggregateDailyCalories();
+//        setAggregateDailyTime();
+//        setAggregateDailyCalories();
     }
 
     private void convertToStringAndSetSingleDay(int day) {
@@ -697,16 +699,11 @@ public class DailyStatsAccess {
         totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
     }
 
-    private double decimalPercentageOfUnAssignedTime() {
-        double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
-        return 1 - remainingTime;
-    }
-
     public double getUnassignedDailyCalories() {
         return totalUnassignedCaloriesForSelectedDuration;
     }
 
-    private void setAggregateDailyTime() {
+    public void setAggregateDailyTime() {
         long twoHours = 7200000;
         long fullDay = twoHours * 12;
         totalAggregateTimeForSelectedDuration = fullDay * numberOfDaysSelected;
@@ -716,7 +713,7 @@ public class DailyStatsAccess {
         return totalAggregateTimeForSelectedDuration;
     }
 
-    private void setAggregateDailyCalories() {
+    public void setAggregateDailyCalories() {
         totalAggregateCaloriesForSelectedDuration = totalCaloriesForSelectedDuration + getUnassignedDailyCalories();
     }
 
@@ -727,6 +724,12 @@ public class DailyStatsAccess {
     private int bmrCaloriesBurned() {
         int savedBmr = sharedPreferences.getInt("savedBmr", 0);
         return savedBmr * numberOfDaysSelected;
+    }
+
+    //Todo: Order we need to call our four aggregate methods in is tenuous.
+    private double decimalPercentageOfUnAssignedTime() {
+        double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
+        return 1 - remainingTime;
     }
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {

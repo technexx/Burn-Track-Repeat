@@ -329,14 +329,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
 
-            dailyStatsAccess.setUnassignedDailyTotalTime();
-            dailyStatsAccess.setUnassignedTotalCalories();
-
             dailyStatsAdapter.notifyDataSetChanged();
 
             setDayHolderStatsTextViews();
 
             if (dailyStatsExpandedPopUpWindow.isShowing()) {
+                dailyStatsAccess.setUnassignedDailyTotalTime();
+                dailyStatsAccess.setUnassignedTotalCalories();
+
+                dailyStatsAccess.setAggregateDailyTime();
+                dailyStatsAccess.setAggregateDailyCalories();
+
                 setExpansionTextViewValues();
             }
         });
