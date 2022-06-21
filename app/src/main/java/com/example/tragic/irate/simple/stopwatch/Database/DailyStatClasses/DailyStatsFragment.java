@@ -247,6 +247,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsExpandedButton.setOnClickListener(v-> {
             if (!dailyStatsExpandedPopUpWindow.isShowing()) {
                 dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
+                setExpansionTextViewValues();
             } else {
                 dailyStatsExpandedPopUpWindow.dismiss();
             }
@@ -331,11 +332,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setUnassignedDailyTotalTime();
             dailyStatsAccess.setUnassignedTotalCalories();
 
-            logTotalStatRows();
-
             dailyStatsAdapter.notifyDataSetChanged();
 
             setDayHolderStatsTextViews();
+
+            if (dailyStatsExpandedPopUpWindow.isShowing()) {
+                setExpansionTextViewValues();
+            }
         });
     }
 
@@ -947,6 +950,26 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         expansionAssignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_assigned);
         expansionUnassignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_unassigned);
         expansionAggregateCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_aggregate);
+    }
+
+    private void setExpansionTextViewValues() {
+        long totalAssignedSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolderList();
+        double totalAssignedCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
+
+        expansionAssignedSetTime.setText(longToStringConverters.convertSecondsForStatDisplay(totalAssignedSetTime));
+        expansionAssignedCalories.setText((formatCalorieStringWithoutDecimals(totalAssignedCaloriesBurned)));
+
+        long totalUnassignedSetTime = dailyStatsAccess.getUnassignedDailyTotalTime();
+        double totalUnassignedCalories = dailyStatsAccess.getUnassignedDailyCalories();
+
+        expansionUnassignedSetTime.setText(longToStringConverters.convertSecondsForStatDisplay(totalUnassignedSetTime));
+        expansionUnassignedCalories.setText(formatCalorieStringWithoutDecimals(totalUnassignedCalories));
+
+        long totalAggregateSetTime = dailyStatsAccess.getAggregateDailyTime();
+        double totalAggregateCalories = dailyStatsAccess.getAggregateDailyCalories();
+
+        expansionAggregateSetTime.setText(longToStringConverters.convertSecondsForStatDisplay(totalAggregateSetTime));
+        expansionAggregateCalories.setText(formatCalorieStringWithoutDecimals(totalAggregateCalories));
     }
 
     private void instantiateEditPopUpViews() {
