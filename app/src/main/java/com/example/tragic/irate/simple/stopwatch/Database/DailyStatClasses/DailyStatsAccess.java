@@ -693,8 +693,22 @@ public class DailyStatsAccess {
         return totalUnassignedSetTimeForSelectedDuration;
     }
 
+    //Todo: Unassigned calories need to take the remaining set time as a decimal percentage and multiply that with the bmr value.
     public void setUnassignedTotalCalories() {
-        totalUnassignedCaloriesForSelectedDuration = setZeroLowerBoundsOnDoubleValue(totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration);
+        Log.i("testCals", "total aggregate calories are " + totalAggregateCaloriesForSelectedDuration);
+        Log.i("testCals", "total unassigned calories are " + totalUnassignedCaloriesForSelectedDuration);
+        Log.i("testCals", "decimal pct is " + decimalPercentageOfUnAssignedTime());
+        totalUnassignedCaloriesForSelectedDuration = totalAggregateCaloriesForSelectedDuration * decimalPercentageOfUnAssignedTime();
+
+//        totalUnassignedCaloriesForSelectedDuration = setZeroLowerBoundsOnDoubleValue(totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration);
+    }
+
+    private double decimalPercentageOfUnAssignedTime() {
+        Log.i("testCals", "total aggregate set is " + totalAggregateTimeForSelectedDuration);
+        Log.i("testCals", "total assigned set is " + totalSetTimeForSelectedDuration);
+
+        double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
+        return 1 - remainingTime;
     }
 
     public double getUnassignedDailyCalories() {

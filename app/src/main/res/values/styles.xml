@@ -92,7 +92,7 @@
     <style name="StatsExpansionPopUpTheme">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/off_white</item>
-
+        <item name="fontFamily">@font/roboto_medium</item>
     </style>
 
 </resources>
