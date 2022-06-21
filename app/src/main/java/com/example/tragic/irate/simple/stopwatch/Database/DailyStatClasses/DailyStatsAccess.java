@@ -693,20 +693,11 @@ public class DailyStatsAccess {
         return totalUnassignedSetTimeForSelectedDuration;
     }
 
-    //Todo: Unassigned calories need to take the remaining set time as a decimal percentage and multiply that with the bmr value.
     public void setUnassignedTotalCalories() {
-        Log.i("testCals", "total aggregate calories are " + totalAggregateCaloriesForSelectedDuration);
-        Log.i("testCals", "total unassigned calories are " + totalUnassignedCaloriesForSelectedDuration);
-        Log.i("testCals", "decimal pct is " + decimalPercentageOfUnAssignedTime());
-        totalUnassignedCaloriesForSelectedDuration = totalAggregateCaloriesForSelectedDuration * decimalPercentageOfUnAssignedTime();
-
-//        totalUnassignedCaloriesForSelectedDuration = setZeroLowerBoundsOnDoubleValue(totalAggregateCaloriesForSelectedDuration - totalCaloriesForSelectedDuration);
+        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
     }
 
     private double decimalPercentageOfUnAssignedTime() {
-        Log.i("testCals", "total aggregate set is " + totalAggregateTimeForSelectedDuration);
-        Log.i("testCals", "total assigned set is " + totalSetTimeForSelectedDuration);
-
         double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
         return 1 - remainingTime;
     }
@@ -726,12 +717,16 @@ public class DailyStatsAccess {
     }
 
     private void setAggregateDailyCalories() {
-        int savedBmr = sharedPreferences.getInt("savedBmr", 0);
-        totalAggregateCaloriesForSelectedDuration = savedBmr * numberOfDaysSelected;
+        totalAggregateCaloriesForSelectedDuration = totalCaloriesForSelectedDuration + getUnassignedDailyCalories();
     }
 
     public double getAggregateDailyCalories() {
         return totalAggregateCaloriesForSelectedDuration;
+    }
+
+    private int bmrCaloriesBurned() {
+        int savedBmr = sharedPreferences.getInt("savedBmr", 0);
+        return savedBmr * numberOfDaysSelected;
     }
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
@@ -798,5 +793,18 @@ public class DailyStatsAccess {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         return simpleDateFormat.format(calendar.getTime());
+    }
+
+    private void logSetTimeValues() {
+        Log.i("testCals", "total assigned set is " + totalSetTimeForSelectedDuration);
+        Log.i("testCals", "total aggregate set is " + totalAggregateTimeForSelectedDuration);
+    }
+
+    private void logCalorieValues() {
+        Log.i("testCals", "total assigned calories are " + totalCaloriesForSelectedDuration);
+        Log.i("testCals", "total unassigned calories are " + totalUnassignedCaloriesForSelectedDuration);
+        Log.i("testCals", "total aggregate calories are " + totalAggregateCaloriesForSelectedDuration);
+        Log.i("testCals", "decimal pct is " + decimalPercentageOfUnAssignedTime());
+
     }
 }
