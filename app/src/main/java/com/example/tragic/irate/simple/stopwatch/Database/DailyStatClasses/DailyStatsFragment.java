@@ -933,7 +933,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateExpansionPopUpViews() {
         dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
-        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(315), false);
+        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(325), false);
         dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         expansionAssignedHeader = dailyStatsExpandedView.findViewById(R.id.expansion_assigned_header);
