@@ -6,7 +6,7 @@
     android:background="@drawable/daily_stats_expansion_popup_border">
 
     <TextView
-        android:id="@+id/expansion_set_time_assigned_header"
+        android:id="@+id/expansion_assigned_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -14,21 +14,74 @@
     </TextView>
 
     <TextView
-        android:id="@+id/expansion_set_time_unassigned_header"
+        android:id="@+id/expansion_unassigned_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/expansion_set_time_assigned_header"
+        app:layout_constraintTop_toBottomOf="@id/expansion_assigned_header"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="12dp">
     </TextView>
 
     <TextView
-        android:id="@+id/expansion_set_time_aggregate_header"
+        android:id="@+id/expansion_aggregate_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/expansion_set_time_unassigned_header"
+        app:layout_constraintTop_toBottomOf="@id/expansion_assigned_header"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="12dp">
     </TextView>
+
+    <TextView
+        android:id="@+id/expansion_set_time_assigned"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+    </TextView>
+
+    <TextView
+        android:id="@+id/expansion_set_time_unassigned"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/expansion_set_time_assigned"
+        app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_unassigned"
+        android:layout_marginTop="12dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/expansion_set_time_aggregate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/expansion_set_time_unassigned"
+        app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_aggregate"
+        android:layout_marginTop="12dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/expansion_calories_burned_assigned"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_aggregate">
+    </TextView>
+
+    <TextView
+        android:id="@+id/expansion_calories_burned_unassigned"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/expansion_calories_burned_assigned"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/expansion_calories_burned_aggregate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/expansion_calories_burned_unassigned"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp">
+    </TextView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
