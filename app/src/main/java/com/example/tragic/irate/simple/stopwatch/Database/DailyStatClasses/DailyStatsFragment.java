@@ -247,7 +247,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsExpandedButton.setOnClickListener(v-> {
             if (!dailyStatsExpandedPopUpWindow.isShowing()) {
                 dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
-                setExpansionTextViewValues();
             } else {
                 dailyStatsExpandedPopUpWindow.dismiss();
             }
@@ -333,14 +332,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             setDayHolderStatsTextViews();
 
+            //Todo: Order we need to call our four aggregate methods in is tenuous.
+            setExpansionTextViewValues();
+
+            dailyStatsAccess.setAggregateDailyTime();
+            dailyStatsAccess.setUnassignedTotalCalories();
+
+            dailyStatsAccess.setAggregateDailyCalories();
+            dailyStatsAccess.setUnassignedDailyTotalTime();
+
+            setExpansionTextViewValues();
+
             if (dailyStatsExpandedPopUpWindow.isShowing()) {
-                dailyStatsAccess.setUnassignedDailyTotalTime();
-                dailyStatsAccess.setUnassignedTotalCalories();
 
-                dailyStatsAccess.setAggregateDailyTime();
-                dailyStatsAccess.setAggregateDailyCalories();
-
-                setExpansionTextViewValues();
             }
         });
     }

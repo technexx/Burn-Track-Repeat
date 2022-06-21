@@ -713,6 +713,7 @@ public class DailyStatsAccess {
         return totalAggregateTimeForSelectedDuration;
     }
 
+    //Todo: Does not add until second click.
     public void setAggregateDailyCalories() {
         totalAggregateCaloriesForSelectedDuration = totalCaloriesForSelectedDuration + getUnassignedDailyCalories();
     }
@@ -726,7 +727,6 @@ public class DailyStatsAccess {
         return savedBmr * numberOfDaysSelected;
     }
 
-    //Todo: Order we need to call our four aggregate methods in is tenuous.
     private double decimalPercentageOfUnAssignedTime() {
         double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
         return 1 - remainingTime;
