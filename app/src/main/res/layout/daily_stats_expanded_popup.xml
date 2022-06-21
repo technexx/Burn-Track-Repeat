@@ -46,7 +46,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_unassigned"
+        android:gravity="center"
+        android:minWidth="100dp"
+        android:maxWidth="150dp">
     </TextView>
 
     <TextView
@@ -55,7 +58,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/expansion_set_time_assigned"
         app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_unassigned"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:minWidth="100dp"
+        android:maxWidth="150dp">
     </TextView>
 
     <TextView
@@ -64,7 +70,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/expansion_set_time_unassigned"
         app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_aggregate"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:minWidth="100dp"
+        android:maxWidth="150dp">
     </TextView>
 
     <TextView
@@ -72,7 +81,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_aggregate">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:layout_marginEnd="8dp"
+        android:minWidth="100dp"
+        android:maxWidth="150dp">
     </TextView>
 
     <TextView
@@ -81,7 +94,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/expansion_calories_burned_assigned"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp">
+        android:gravity="center"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        android:minWidth="100dp"
+        android:maxWidth="150dp">
     </TextView>
 
     <TextView
@@ -90,7 +107,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/expansion_calories_burned_unassigned"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:layout_marginEnd="8dp"
+        android:minWidth="100dp"
+        android:maxWidth="150dp">
     </TextView>
 
 
