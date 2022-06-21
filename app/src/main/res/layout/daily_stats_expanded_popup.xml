@@ -3,32 +3,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/daily_stats_expansion_popup_border">
+    android:background="@drawable/daily_stats_expansion_popup_border"
+    android:theme="@style/StatsExpansionPopUpTheme">
 
     <TextView
         android:id="@+id/expansion_assigned_header"
+        android:text="@string/total_assigned_stats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="6dp"
+        android:textStyle="bold">
     </TextView>
 
     <TextView
         android:id="@+id/expansion_unassigned_header"
+        android:text="@string/total_unassigned_stats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/expansion_assigned_header"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="6dp"
+        android:textStyle="bold">
     </TextView>
 
     <TextView
         android:id="@+id/expansion_aggregate_header"
+        android:text="@string/total_aggregate_stats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/expansion_assigned_header"
+        app:layout_constraintTop_toBottomOf="@id/expansion_unassigned_header"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="6dp"
+        android:textStyle="bold">
     </TextView>
 
     <TextView

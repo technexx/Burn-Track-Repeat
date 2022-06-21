@@ -89,4 +89,10 @@
         <item name="android:textSize">15sp</item>
     </style>
 
+    <style name="StatsExpansionPopUpTheme">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/off_white</item>
+
+    </style>
+
 </resources>
