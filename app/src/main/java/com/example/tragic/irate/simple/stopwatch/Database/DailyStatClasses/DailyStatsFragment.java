@@ -154,6 +154,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView expansionUnassignedCalories;
     TextView expansionAggregateCalories;
 
+    TextView expansionDateSelectedTextView;
     ImageButton exitExpansionImageButton;
 
     @Override
@@ -247,11 +248,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
-            if (!dailyStatsExpandedPopUpWindow.isShowing()) {
-                dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
-            } else {
-                dailyStatsExpandedPopUpWindow.dismiss();
-            }
+            dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
+            currentStatDurationMode = 0;
+
+            AsyncTask.execute(()->{
+                populateListsAndTextViewsFromEntityListsInDatabase();
+            });
+
             calendarMinimizationLogic(true);
         });
 
@@ -955,9 +958,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         expansionAggregateCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_aggregate);
 
         exitExpansionImageButton = dailyStatsExpandedView.findViewById(R.id.exit_expansion_popUp_button);
+        expansionDateSelectedTextView = dailyStatsExpandedView.findViewById(R.id.expansion_date_selected_textView);
     }
 
     private void setExpansionTextViewValues() {
+        //Todo: This getter's setter method is only set when in Daily duration mode.
+        String dayToSet = dailyStatsAccess.getSingleDayAsString();
+        expansionDateSelectedTextView.setText(dayToSet);
+
         long totalAssignedSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolderList();
         double totalAssignedCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 

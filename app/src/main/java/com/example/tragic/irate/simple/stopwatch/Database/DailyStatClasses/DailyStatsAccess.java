@@ -192,10 +192,6 @@ public class DailyStatsAccess {
         convertToStringAndSetSingleDay(dayToRetrieve);
 
         numberOfDaysSelected = 1;
-
-        //Todo: These get set via setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(...) from populateListsAndTextViewsFromEntityListsInDatabase, before our duration set/calories are set.
-//        setAggregateDailyTime();
-//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -220,8 +216,6 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfWeekList);
 
         numberOfDaysSelected = 7;
-//        setAggregateDailyTime();
-//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -244,8 +238,6 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfMonthList);
 
         numberOfDaysSelected = numberOfDaysInMonth;
-//        setAggregateDailyTime();
-//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
@@ -267,8 +259,6 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfYearList);
 
         numberOfDaysSelected = daysInYear;
-//        setAggregateDailyTime();
-//        setAggregateDailyCalories();
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
@@ -296,8 +286,6 @@ public class DailyStatsAccess {
         populateDayHolderAndStatsForEachActivityLists(populatedCustomDayList);
 
         numberOfDaysSelected = populatedCustomDayList.size();
-//        setAggregateDailyTime();
-//        setAggregateDailyCalories();
     }
 
     private void convertToStringAndSetSingleDay(int day) {

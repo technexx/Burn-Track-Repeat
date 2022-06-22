@@ -7,11 +7,20 @@
     android:theme="@style/StatsExpansionPopUpTheme">
 
     <TextView
+        android:id="@+id/expansion_date_selected_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+    </TextView>
+
+    <TextView
         android:id="@+id/expansion_assigned_header"
         android:text="@string/total_assigned_stats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/expansion_date_selected_textView"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"
         android:textStyle="bold">
@@ -45,7 +54,7 @@
         android:id="@+id/expansion_set_time_assigned"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/expansion_date_selected_textView"
         app:layout_constraintEnd_toStartOf="@id/expansion_calories_burned_unassigned"
         android:gravity="center"
         android:minWidth="100dp"
@@ -80,7 +89,7 @@
         android:id="@+id/expansion_calories_burned_assigned"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/expansion_date_selected_textView"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
         android:layout_marginEnd="8dp"
