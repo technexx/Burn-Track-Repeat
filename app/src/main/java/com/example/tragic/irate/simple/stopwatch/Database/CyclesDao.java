@@ -33,9 +33,6 @@ CyclesDao {
     @Query("SELECT * from DayHolder WHERE daySelectedId IN (:listIDs)")
     List<DayHolder> loadMultipleDays(List<Integer> listIDs);
 
-    @Query("DELETE from DayHolder WHERE daySelectedId IS:listID")
-    void deleteSingleDay (long listID);
-
     @Query("DELETE from DayHolder WHERE daySelectedId IN (:listIDs)")
     void deleteMultipleDays(List<Long> listIDs);
 

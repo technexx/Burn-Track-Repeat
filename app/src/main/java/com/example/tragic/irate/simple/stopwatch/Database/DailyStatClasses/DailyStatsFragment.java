@@ -74,17 +74,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     DailyStatsAccess dailyStatsAccess;
     DailyStatsAdapter dailyStatsAdapter;
     RecyclerView dailyStatsRecyclerView;
+    ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams;
 
     View recyclerAndTotalStatsDivider;
 
+    TextView burnedAndConsumedCaloriesSwitcherTextView;
+    ImageButton burnedAndConsumedCaloriesSwitcherButtonLeft;
+    ImageButton burnedAndConsumedCaloriesSwitcherButtonRight;
+
+    TextView totalStatsHeaderTextView;
+    ImageButton activityStatsDurationSwitcherButtonLeft;
+    ImageButton activityStatsDurationSwitcherButtonRight;
+    TextView activityStatsDurationRangeTextView;
+
     ImageButton dailyStatsExpandedButton;
     ImageButton editTdeeStatsButton;
-    TextView totalStatsHeaderTextView;
-    TextView durationRangeTextView;
-    ImageButton statDurationSwitcherButtonLeft;
-    ImageButton statDurationSwitcherButtonRight;
-
-    ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams;
 
     ConstraintLayout totalStatsValuesTextViewLayout;
     ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams;
@@ -98,8 +102,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Animation slideOutToBottomNoAlphaChange;
     Animation slideInFromBottomNoAlphaChange;
 
-    int mSortMode;
+    int currentCalorieMode;
+    int ITERATING_CALORIES_STATS_UP = 0;
+    int ITERATING_CALORIE_STATS_DOWN = 1;
+
+    int EXPENDED_CALORIES_MODE = 0;
+    int CONSUMED_CALORIES_MODE = 1;
+    int COMPARING_CALORIES_MODE = 2;
+
     int currentStatDurationMode;
+    int ITERATING_ACTIVITY_STATS_UP = 0;
+    int ITERATING_ACTIVITY_STATS_DOWN = 1;
+
     int DAILY_STATS = 0;
     int WEEKLY_STATS = 1;
     int MONTHLY_STATS = 2;
@@ -109,9 +123,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     List<CalendarDay> customCalendarDayList;
     List<DayHolder> dayHolderList;
     List<StatsForEachActivity> statsForEachActivityList;
-
-    int ITERATING_STATS_UP = 0;
-    int ITERATING_STATS_DOWN = 1;
 
     View dailyStatsExpandedView ;
     PopupWindow dailyStatsExpandedPopUpWindow;
@@ -126,6 +137,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ImageButton confirmEditWithinPopUpButton;
     ImageButton confirmDeletionWithinEditPopUpButton;
 
+    int mSortMode;
     int mPositionToEdit;
 
     PopupWindow tdeeAddPopUpWindow;
@@ -187,6 +199,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnEditTexts();
 
+        calorieModeIterationLogic(0);
+
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
             daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
@@ -215,7 +229,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
                     getActivity().runOnUiThread(()-> {
-                        setDurationRangeTextView();
+                        setActivityStatsDurationRangeTextView();
                         setSelectionDayIfSelectingSingleDayFromCustomDuration();
                         enableEditButtonIfDisabled();
                     });
@@ -262,12 +276,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsExpandedPopUpWindow.dismiss();
         });
 
-        statDurationSwitcherButtonLeft.setOnClickListener(v-> {
-            statDurationSwitchModeLogic(ITERATING_STATS_DOWN);
+        burnedAndConsumedCaloriesSwitcherButtonLeft.setOnClickListener(v-> {
+            calorieModeIterationLogic(ITERATING_CALORIE_STATS_DOWN);
         });
 
-        statDurationSwitcherButtonRight.setOnClickListener(v-> {
-            statDurationSwitchModeLogic(ITERATING_STATS_UP);
+        burnedAndConsumedCaloriesSwitcherButtonRight.setOnClickListener(v-> {
+            calorieModeIterationLogic(ITERATING_CALORIES_STATS_UP);
+        });
+
+        activityStatsDurationSwitcherButtonLeft.setOnClickListener(v-> {
+            statDurationSwitchModeLogic(ITERATING_ACTIVITY_STATS_DOWN);
+        });
+
+        activityStatsDurationSwitcherButtonRight.setOnClickListener(v-> {
+            statDurationSwitchModeLogic(ITERATING_ACTIVITY_STATS_UP);
         });
 
         confirmActivityAddition.setOnClickListener(v-> {
@@ -294,7 +316,40 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    private void setDurationRangeTextView() {
+    private void iterateThroughCalorieModeVariables(int directionOfIteration) {
+        if (directionOfIteration==ITERATING_CALORIES_STATS_UP) {
+            if (currentCalorieMode<2) {
+                currentCalorieMode++;
+            } else {
+                currentCalorieMode=0;
+            }
+        } else if (directionOfIteration==ITERATING_CALORIE_STATS_DOWN) {
+            if (currentCalorieMode>0) {
+                currentCalorieMode--;
+            } else {
+                currentCalorieMode=2;
+            }
+        }
+    }
+
+    private void setCalorieModeTextViews(int mode) {
+        if (mode==EXPENDED_CALORIES_MODE) {
+            burnedAndConsumedCaloriesSwitcherTextView.setText(R.string.expended_calories_header);
+        }
+        if (mode==CONSUMED_CALORIES_MODE) {
+            burnedAndConsumedCaloriesSwitcherTextView.setText(R.string.consumed_calories_header);
+        }
+        if (mode==COMPARING_CALORIES_MODE) {
+            burnedAndConsumedCaloriesSwitcherTextView.setText(R.string.compared_calories_header);
+        }
+    }
+
+    private void calorieModeIterationLogic(int directionOfIteration) {
+        iterateThroughCalorieModeVariables(directionOfIteration);
+        setCalorieModeTextViews(currentCalorieMode);
+    }
+
+    private void setActivityStatsDurationRangeTextView() {
         if (currentStatDurationMode==DAILY_STATS) {
             setSingleDateStringOnTextView();
         } else {
@@ -451,23 +506,23 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setSingleDateStringOnTextView() {
         String dayToSet = dailyStatsAccess.getSingleDayAsString();
-        durationRangeTextView.setText(dayToSet);
+        activityStatsDurationRangeTextView.setText(dayToSet);
     }
 
     private void convertAndSetDateRangeStringOnTextView() {
         String firstDay = dailyStatsAccess.getFirstDayInDurationAsString();
         String lastDay = String.valueOf(dailyStatsAccess.getLastDayInDurationAsString());
-        durationRangeTextView.setText(getString(R.string.date_duration_textView, firstDay, lastDay));
+        activityStatsDurationRangeTextView.setText(getString(R.string.date_duration_textView, firstDay, lastDay));
     }
 
     public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
-        if (directionOfIteration==ITERATING_STATS_UP) {
+        if (directionOfIteration==ITERATING_ACTIVITY_STATS_UP) {
             if (currentStatDurationMode<4) {
                 currentStatDurationMode++;
             } else {
                 currentStatDurationMode=0;
             }
-        } else if (directionOfIteration==ITERATING_STATS_DOWN) {
+        } else if (directionOfIteration==ITERATING_ACTIVITY_STATS_DOWN) {
             if (currentStatDurationMode>0) {
                 currentStatDurationMode--;
             } else {
@@ -962,7 +1017,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setExpansionTextViewValues() {
-        //Todo: This getter's setter method is only set when in Daily duration mode.
         String dayToSet = dailyStatsAccess.getSingleDayAsString();
         expansionDateSelectedTextView.setText(dayToSet);
 
@@ -1009,13 +1063,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         longToStringConverters = new LongToStringConverters();
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        durationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
+        burnedAndConsumedCaloriesSwitcherTextView = mRoot.findViewById(R.id.burned_and_consumed_calories_switcher_textView);
+        burnedAndConsumedCaloriesSwitcherButtonLeft = mRoot.findViewById(R.id.burned_and_consumed_calories_switcher_button_left);
+        burnedAndConsumedCaloriesSwitcherButtonRight = mRoot.findViewById(R.id.burned_and_consumed_calories_switcher_button_right);
 
-        statDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
-        statDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
+        activityStatsDurationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
+        activityStatsDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
+        activityStatsDurationSwitcherButtonRight = mRoot.findViewById(R.id.stat_duration_switcher_button_right);
+
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
-        totalStatsHeaderTextView = mRoot.findViewById(R.id.duration_header_textView);
+        totalStatsHeaderTextView = mRoot.findViewById(R.id.activity_stats_duration_header_textView);
 
         totalStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
         totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
