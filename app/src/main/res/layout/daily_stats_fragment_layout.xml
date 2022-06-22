@@ -8,11 +8,13 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/consumed_calories_total_header_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/daily_total_stats_border">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/daily_total_stats_border"
+        android:theme="@style/StatsFragmentHeaderTheme">
 
         <TextView
             android:id="@+id/burned_and_consumed_calories_switcher_textView"
@@ -32,7 +34,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/burned_and_consumed_calories_switcher_textView"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="4dp"
             android:src="@drawable/double_arrow_left">
         </ImageButton>
 
@@ -42,7 +44,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/burned_and_consumed_calories_switcher_textView"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="4dp"
             android:src="@drawable/double_arrow_right">
         </ImageButton>
 
@@ -55,7 +57,8 @@
         app:layout_constraintTop_toBottomOf="@id/consumed_calories_total_header_layout"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="0dp"
-        android:background="@drawable/daily_total_stats_border">
+        android:background="@drawable/daily_total_stats_border"
+        android:theme="@style/StatsFragmentHeaderTheme">
 
         <TextView
             android:id="@+id/activity_stats_duration_header_textView"
@@ -89,24 +92,6 @@
             android:src="@drawable/double_arrow_right">
         </ImageButton>
 
-        <ImageButton
-            android:id="@+id/daily_stats_expanded_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:src="@drawable/chart_icon_2">
-        </ImageButton>
-
-        <ImageButton
-            android:id="@+id/edit_tdee_stats_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/edit_icon">
-        </ImageButton>
-
         <TextView
             android:id="@+id/duration_date_range_textView"
             android:layout_width="wrap_content"
@@ -121,6 +106,26 @@
         </TextView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageButton
+        android:id="@+id/daily_stats_expanded_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/consumed_calories_total_header_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/chart_icon_2"
+        android:theme="@style/StatsFragmentHeaderTheme">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/edit_tdee_stats_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/consumed_calories_total_header_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/edit_icon"
+        android:theme="@style/StatsFragmentHeaderTheme">
+    </ImageButton>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
