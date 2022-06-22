@@ -46,6 +46,34 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     boolean animateButtonSliding;
 
+    caloriesConsumedItemSelected mCaloriesConsumedItemSelected;
+    caloriesConsumedAddition mCaloriesConsumedAddition;
+    caloriesConsumedDeletion mCaloriesConsumedDeletion;
+
+    public interface caloriesConsumedItemSelected {
+        void calorieRowIsSelected(int position);
+    }
+
+    public void getSelectedCaloriesItemPosition(caloriesConsumedItemSelected xCaloriesConsumedItemSelected) {
+        this.mCaloriesConsumedItemSelected = xCaloriesConsumedItemSelected;
+    }
+
+    public interface caloriesConsumedAddition {
+        void onAddingCalories(int position);
+    }
+
+    public void addCaloriesToStats(caloriesConsumedAddition xCaloriesConsumedAddition) {
+        this.mCaloriesConsumedAddition = xCaloriesConsumedAddition;
+    }
+
+    public interface caloriesConsumedDeletion {
+        void onDeletingCalories (int position);
+    }
+
+    public void deleteCaloriesFromStats(caloriesConsumedDeletion xCaloriesConsumedDeletion) {
+        this.mCaloriesConsumedDeletion = xCaloriesConsumedDeletion;
+    }
+
     public CalorieTrackingAdapter(Context context, List<String> foodEaten, List<Double> foodPortion, List<Double> caloriesConsumed) {
         this.mContext = context; this.mFoodEaten = foodEaten; this.mFoodPortion = foodPortion; this.mCaloriesConsumed = caloriesConsumed;
         setAnimations();
@@ -89,7 +117,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 mMainViewHolder = (MainViewHolder) holder;
 
                 if (mEditModeIsActive) {
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(position-1);
+                    mCaloriesConsumedItemSelected.calorieRowIsSelected(position-1);
                     toggleRowSelectionForEditing();
                 }
             });
@@ -100,7 +128,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
-                mTdeeActivityAddition.onAddingActivity(position);
+                mCaloriesConsumedAddition.onAddingCalories(position);
             });
         }
     }
