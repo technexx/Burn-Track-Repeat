@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tragic.irate.simple.stopwatch.Adapters.CalorieTrackingAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorator;
@@ -56,7 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion {
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion, CalorieTrackingAdapter.caloriesConsumedItemSelected, CalorieTrackingAdapter.caloriesConsumedAddition, CalorieTrackingAdapter.caloriesConsumedDeletion {
 
     View mRoot;
     Calendar calendar;
@@ -72,9 +73,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     LayoutInflater inflater;
 
     DailyStatsAccess dailyStatsAccess;
+
     DailyStatsAdapter dailyStatsAdapter;
     RecyclerView dailyStatsRecyclerView;
     ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams;
+
+    CalorieTrackingAdapter calorieTrackingAdapter;
+    RecyclerView caloriesTrackingRecyclerView;
+    ViewGroup.LayoutParams caloriesTrackingRecyclerViewLayoutParams;
 
     View recyclerAndTotalStatsDivider;
 
@@ -92,8 +98,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     ConstraintLayout totalStatsValuesTextViewLayout;
     ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams;
-    TextView statsTotalsecondMainTextView;
-    TextView statsTotalthirdMainTextView;
+    TextView dailyStatsTotalSetTimeTextView;
+    TextView dailyStatsTotalCaloriesBurnedTextView;
 
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
@@ -187,7 +193,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         instantiateCalendarObjects();
         instantiateTextViewsAndMiscClasses();
-        instantiateRecyclerViewAndItsAdapter();
+        instantiateActivityRecyclerViewAndItsAdapter();
+        instantiateCalorieConsumptionRecyclerAndItsAdapter();
         instantiateAnimations();
 
         instantiateExpansionPopUpViews();
@@ -569,8 +576,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
-        statsTotalsecondMainTextView.setText(totalSetTime);
-        statsTotalthirdMainTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
+        dailyStatsTotalSetTimeTextView.setText(totalSetTime);
+        dailyStatsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
     }
 
     @Override
@@ -1077,8 +1084,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         totalStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
         totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
-        statsTotalsecondMainTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
-        statsTotalthirdMainTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+        dailyStatsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
+        dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
@@ -1089,7 +1096,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         statsForEachActivityList = new ArrayList<>();
     }
 
-    private void instantiateRecyclerViewAndItsAdapter() {
+    private void instantiateActivityRecyclerViewAndItsAdapter() {
         dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDuration, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration);
 
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
@@ -1104,6 +1111,25 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
+        dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
+        dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
+        calorieTrackingAdapter = new CalorieTrackingAdapter();
+
+        calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
+        calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);
+        calorieTrackingAdapter.deleteCaloriesFromStats(DailyStatsFragment.this);
+
+        caloriesTrackingRecyclerView = mRoot.findViewById(R.id.calories_consumed_recyclerView);
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        caloriesTrackingRecyclerView.setLayoutManager(lm);
+        caloriesTrackingRecyclerView.setAdapter(calorieTrackingAdapter);
+
+        caloriesTrackingRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) caloriesTrackingRecyclerView.getLayoutParams();
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesTrackingRecyclerView.getContext(), lm.getOrientation());
         dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
         dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
     }
@@ -1137,5 +1163,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
         Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
         Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
+    }
+
+    @Override
+    public void calorieRowIsSelected(int position) {
+
+    }
+
+    @Override
+    public void onAddingCalories(int position) {
+
+    }
+
+    @Override
+    public void onDeletingCalories(int position) {
+
     }
 }
