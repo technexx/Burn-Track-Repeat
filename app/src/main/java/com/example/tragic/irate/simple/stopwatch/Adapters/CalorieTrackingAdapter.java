@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +11,20 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     Context mContext;
+
+    HeaderViewHolder mHeaderViewHolder;
+    MainViewHolder mMainViewHolder;
 
     List<String> mFoodEaten;
     List<Double> mFoodPortion;
@@ -65,7 +71,53 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof DailyStatsAdapter.HeaderViewHolder) {
+            mHeaderViewHolder = (HeaderViewHolder) holder;
 
+            populateHeaderRowViews();
+            setHolderViewTextStyles(BOLD_TEXT);
+        } else if (holder instanceof DailyStatsAdapter.MainViewHolder) {
+            mMainViewHolder = (MainViewHolder) holder;
+
+            populateMainRowViews(position);
+            setDefaultMainHolderViewsAndBackgrounds();
+            setMainHolderEditModeViews();
+            setHolderViewTextStyles(REGULAR_TEXT);
+
+            //mMainViewHolder instance set on onClick is set on first adapter population. It does NOT get refreshed with views in adapter, which is why we need new instances if we're going to use it as a global.
+            mMainViewHolder.fullView.setOnClickListener(v-> {
+                mMainViewHolder = (MainViewHolder) holder;
+
+                if (mEditModeIsActive) {
+                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(position-1);
+                    toggleRowSelectionForEditing();
+                }
+            });
+
+        } else if (holder instanceof DailyStatsAdapter.FootViewHolder) {
+            DailyStatsAdapter.FootViewHolder footViewHolder = (DailyStatsAdapter.FootViewHolder) holder;
+
+            footViewHolder.addActivity.startAnimation(slideInFromLeft);
+
+            footViewHolder.addActivity.setOnClickListener(v-> {
+                mTdeeActivityAddition.onAddingActivity(position);
+            });
+        }
+    }
+
+
+    private void toggleRowSelectionForEditing() {
+        mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
+    }
+
+    private void setDefaultMainHolderViewsAndBackgrounds() {
+        mMainViewHolder.fullView.setBackground(null);
+    }
+
+    private void setMainHolderEditModeViews() {
+        if (mEditModeIsActive) {
+            mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+        }
     }
 
     @Override
@@ -86,6 +138,46 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             return MAIN_VIEW;
         } else {
             return FOOTER_VIEW;
+        }
+    }
+
+    public void turnOffEditMode() {
+        mEditModeIsActive = false;
+        animateButtonSliding = false;
+    }
+
+    public void toggleEditMode() {
+        mEditModeIsActive = !mEditModeIsActive;
+        animateButtonSliding= true;
+        notifyDataSetChanged();
+    }
+
+    private void populateHeaderRowViews() {
+        mHeaderViewHolder.foodEatenTextView.setText(R.string.activity_text_header);
+        mHeaderViewHolder.foodPortionTextView.setText(R.string.set_time_text_header);
+        mHeaderViewHolder.caloriesConsumedTextView.setText(R.string.calories_burned_text_header);
+    }
+
+    private void populateMainRowViews(int position) {
+        //Returns on last row in edit mode so we don't try to pull textViews from footer.
+        if (position==mItemCount-1 && mEditModeIsActive) {
+            return;
+        }
+        mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
+        mMainViewHolder.foodPortionTextView.setText(formatCalorieString(mFoodPortion.get(position-1)));
+        mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
+    }
+
+    private void setHolderViewTextStyles(int textStyle) {
+        if (textStyle==BOLD_TEXT) {
+            mHeaderViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHeaderViewHolder.foodPortionTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mHeaderViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+
+        } else if (textStyle==REGULAR_TEXT){
+            mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT);
+            mMainViewHolder.foodPortionTextView.setTypeface(Typeface.DEFAULT);
+            mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT);
         }
     }
 
@@ -136,5 +228,10 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             super(itemView);
             addActivity = itemView.findViewById(R.id.add_activity_in_edit_stats);
         }
+    }
+
+    private String formatCalorieString(double calories) {
+        DecimalFormat df = new DecimalFormat("#");
+        return df.format(calories);
     }
 }
