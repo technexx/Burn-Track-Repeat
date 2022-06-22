@@ -92,8 +92,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     ConstraintLayout totalStatsValuesTextViewLayout;
     ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams;
-    TextView statsTotalSetTimeTextView;
-    TextView statsTotalCaloriesBurnedTextView;
+    TextView statsTotalsecondMainTextView;
+    TextView statsTotalthirdMainTextView;
 
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
@@ -130,7 +130,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View tdeeEditView;
     View popUpAnchorBottom;
     PopupWindow tdeeEditPopUpWindow;
-    TextView tdeeEditPopUpActivityTextView;
+    TextView tdeeEditPopUpfirstMainTextView;
     EditText tdeeEditTextHours;
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
@@ -569,8 +569,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
-        statsTotalSetTimeTextView.setText(totalSetTime);
-        statsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
+        statsTotalsecondMainTextView.setText(totalSetTime);
+        statsTotalthirdMainTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
     }
 
     @Override
@@ -618,7 +618,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 
-        tdeeEditPopUpActivityTextView.setText(activityString);
+        tdeeEditPopUpfirstMainTextView.setText(activityString);
         setTdeeEditTexts(timeToEditLongValue);
 
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
@@ -800,7 +800,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
-        tdeeEditPopUpActivityTextView.setText(activityToAdd);
+        tdeeEditPopUpfirstMainTextView.setText(activityToAdd);
         setTdeeEditTexts(0);
     }
     private void setTdeeSpinnerListeners() {
@@ -837,7 +837,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         selectedTdeeSubCategoryPosition = 0;
 
         setMetScoreTextViewInAddTdeePopUp();
-        setCaloriesBurnedTextViewInAddTdeePopUp();
+        setthirdMainTextViewInAddTdeePopUp();
     }
 
     private void tdeeSubCategorySpinnerTouchActions() {
@@ -845,7 +845,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
 
         setMetScoreTextViewInAddTdeePopUp();
-        setCaloriesBurnedTextViewInAddTdeePopUp();
+        setthirdMainTextViewInAddTdeePopUp();
     }
 
     private void setMetScoreTextViewInAddTdeePopUp() {
@@ -859,7 +859,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return preRoundedMet;
     }
 
-    private void setCaloriesBurnedTextViewInAddTdeePopUp() {
+    private void setthirdMainTextViewInAddTdeePopUp() {
         String caloriesBurnedPerMinute = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore));
         String caloriesBurnedPerHour = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore) * 60);
 
@@ -1045,7 +1045,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
-        tdeeEditPopUpActivityTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
+        tdeeEditPopUpfirstMainTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
@@ -1077,8 +1077,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         totalStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
         totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
-        statsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
-        statsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+        statsTotalsecondMainTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
+        statsTotalthirdMainTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());

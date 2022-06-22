@@ -47,10 +47,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     Animation slideInFromLeft;
     Animation slideOutFromLeft;
-    Animation slideInFromRight;
-    Animation slideOutFromRight;
-    Animation fadeIn;
-    Animation fadeOut;
 
     boolean animateButtonSliding;
 
@@ -213,14 +209,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void setAnimations() {
-        slideInFromRight = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_right);
-        slideInFromRight.setDuration(200);
-        slideInFromRight.setFillAfter(true);
-
-        slideOutFromRight = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_right);
-        slideOutFromRight.setDuration(200);
-        slideOutFromRight.setFillAfter(true);
-
         slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
         slideInFromLeft.setDuration(200);
         slideInFromLeft.setFillAfter(true);
@@ -228,11 +216,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
         slideOutFromLeft.setDuration(200);
         slideOutFromLeft.setFillAfter(true);
-
-        fadeIn =  AnimationUtils.loadAnimation(mContext, R.anim.fade_in_anim);
-        fadeIn.setDuration(400);
-        fadeOut =  AnimationUtils.loadAnimation(mContext, R.anim.fade_out_anim);
-        fadeOut.setDuration(400);
     }
 
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
