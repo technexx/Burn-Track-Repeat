@@ -72,12 +72,6 @@ public class DailyStatsAccess {
         instantiateMiscellaneousClasses();
     }
 
-    private void instantiateDailyStatsDatabase() {
-        AsyncTask.execute(()->{
-            cyclesDatabase = CyclesDatabase.getDatabase(mContext);
-        });
-    }
-
     public boolean getDoesDayExistInDatabase() {
         return doesDayExistInDatabase;
     }
@@ -98,6 +92,34 @@ public class DailyStatsAccess {
     public void setSortMode(int sortMode) {
         this.mSortMode = sortMode;
     }
+
+    public List<StatsForEachActivity> assignStatsForEachActivityListBySortMode(List<Integer> listOfDays) {
+        List<StatsForEachActivity> listToReturn = new ArrayList<>();
+
+        switch (mSortMode) {
+            case 1:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByAToZTitle(listOfDays);
+                break;
+            case 2:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByZToATitle(listOfDays);
+                break;
+            case 3:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByMostTimeElapsed(listOfDays);
+                break;
+            case 4:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastTimeElapsed(listOfDays);
+                break;
+            case 5:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByMostCaloriesBurned(listOfDays);
+                break;
+            case 6:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(listOfDays);
+                break;
+        }
+
+        return listToReturn;
+    }
+
 
     public void checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(int daySelected) {
         doesDayExistInDatabase = false;
@@ -133,37 +155,6 @@ public class DailyStatsAccess {
 
         Log.i("testInsert", "doesDayExist in insert method for daily totals is " + doesDayExistInDatabase);
     }
-
-
-
-    public List<StatsForEachActivity> assignStatsForEachActivityListBySortMode(List<Integer> listOfDays) {
-        List<StatsForEachActivity> listToReturn = new ArrayList<>();
-
-        switch (mSortMode) {
-            case 1:
-                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByAToZTitle(listOfDays);
-                break;
-            case 2:
-                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByZToATitle(listOfDays);
-                break;
-            case 3:
-                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByMostTimeElapsed(listOfDays);
-                break;
-            case 4:
-                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastTimeElapsed(listOfDays);
-                break;
-            case 5:
-                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByMostCaloriesBurned(listOfDays);
-                break;
-            case 6:
-                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(listOfDays);
-                break;
-        }
-
-        return listToReturn;
-    }
-
-
 
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
         if (integerListOfSelectedDays.size()>0) {
@@ -753,12 +744,10 @@ public class DailyStatsAccess {
         }
     }
 
-    private double setZeroLowerBoundsOnDoubleValue(double value) {
-        if (value<0) {
-            return 0;
-        } else {
-            return value;
-        }
+    private void instantiateDailyStatsDatabase() {
+        AsyncTask.execute(()->{
+            cyclesDatabase = CyclesDatabase.getDatabase(mContext);
+        });
     }
 
     private void instantiateEntitiesAndTheirLists() {
