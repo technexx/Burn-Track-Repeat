@@ -53,7 +53,6 @@ public class DailyStatsAccess {
     long totalAggregateTimeForSelectedDuration;
     double totalAggregateCaloriesForSelectedDuration;
 
-    double totalCaloriesConsumedForSelectedDuration;
     int typeOfFoodPositionInListForCurrentDay;
 
     int numberOfDaysSelected;
@@ -227,37 +226,35 @@ public class DailyStatsAccess {
         return mCaloriesForEachFoodList;
     }
 
-    public void setTotalCaloriesConsumed(double calories) {
-        mCalorieDayHolder.setCaloriesConsumed(calories);
-    }
-
-    public double getTotalCaloriesConsumed() {
-        return totalCaloriesConsumedForSelectedDuration;
-    }
-
-    public void setFoodStringForSelectedFood(String food) {
-        mCaloriesForEachFood.setTypeOfFood(food);
-    }
-
+    ///////////////////////////////////////////////////////////
     public List<String> getTotalFoodStringListForSelectedDuration() {
         return totalFoodStringListForSelectedDuration;
-    }
-
-    public void setFoodPortionForSelectedFood(double portionSize) {
-        mCaloriesForEachFood.setPortionForEachFoodType(portionSize);
     }
 
     public List<Double> getTotalFoodPortionListForSelectedDuration() {
         return totalFoodPortionListForSelectedDuration;
     }
 
-    public void setCaloriesConsumedForSelectedFood(double calories) {
-        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(calories);
-    }
 
     public List<Double> getTotalCaloriesConsumedForSelectedDuration() {
        return totalCaloriesConsumedListForSelectedDuration;
     }
+
+    public void setTotalCaloriesConsumedStatsForSelectedDayToArrayLists() {
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
+            totalFoodPortionListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getPortionForEachFoodType());
+            totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
+        }
+    }
+
+    public void clearCaloriesForEachFoodListArrayLists() {
+        totalFoodStringListForSelectedDuration.clear();
+        totalFoodPortionListForSelectedDuration.clear();
+        totalCaloriesConsumedListForSelectedDuration.clear();
+    }
+
+    ////////////////////////////////////////////////////////////////////
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
         mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
@@ -647,7 +644,7 @@ public class DailyStatsAccess {
         }
     }
 
-    private void clearStatValueAdapterArrayLists() {
+    public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDuration.clear();
         totalSetTimeListForEachActivityForSelectedDuration.clear();
         totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
@@ -814,12 +811,6 @@ public class DailyStatsAccess {
 
     public List<Double> getTotalCaloriesBurnedListForEachActivityForSelectedDuration() {
         return totalCaloriesBurnedListForEachActivityForSelectedDuration;
-    }
-
-    public void clearStatsForEachActivityArrayLists() {
-        totalActivitiesListForSelectedDuration.clear();
-        totalSetTimeListForEachActivityForSelectedDuration.clear();
-        totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
     private long setZeroLowerBoundsOnLongValue(long value) {
