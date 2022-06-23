@@ -107,6 +107,10 @@
     <string name="set_time_text_header">Time</string>
     <string name="calories_burned_text_header">Calories</string>
 
+    <string name="food_name_header">Food/Drink</string>
+    <string name="food_portion_header">Portion</string>
+    <string name="calories_consumed_header">Calories</string>
+
     <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s </string>
     <string name="bunch_of_spaces">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>
     <string name="bunch_of_spaces_2">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>

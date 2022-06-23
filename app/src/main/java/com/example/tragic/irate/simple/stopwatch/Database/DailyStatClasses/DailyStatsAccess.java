@@ -254,6 +254,8 @@ public class DailyStatsAccess {
         totalCaloriesConsumedListForSelectedDuration.clear();
     }
 
+    //Todo: Add insert/update/delete methods from DAO and call those in our fragment.
+
     ////////////////////////////////////////////////////////////////////
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
