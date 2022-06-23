@@ -1116,7 +1116,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
-        calorieTrackingAdapter = new CalorieTrackingAdapter();
+        //Todo: Fetch from Access class.
+//        calorieTrackingAdapter = new CalorieTrackingAdapter();
 
         calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
         calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);

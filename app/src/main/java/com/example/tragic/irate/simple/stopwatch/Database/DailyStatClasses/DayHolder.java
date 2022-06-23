@@ -77,22 +77,6 @@ public class DayHolder {
         this.cyclesCompletedForModeOne = cyclesCompleted;
     }
 
-    public long getTotalWorkTime() {
-        return totalWorkTime;
-    }
-
-    public void setTotalWorkTime(long totalWorkTime) {
-        this.totalWorkTime = totalWorkTime;
-    }
-
-    public long getTotalRestTime() {
-        return totalRestTime;
-    }
-
-    public void setTotalRestTime(long totalRestTime) {
-        this.totalRestTime = totalRestTime;
-    }
-
     public int getCyclesCompletedForModeThree() {
         return cyclesCompletedForModeThree;
     }

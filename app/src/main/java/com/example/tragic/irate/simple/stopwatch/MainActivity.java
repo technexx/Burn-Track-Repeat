@@ -549,6 +549,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Limit edits to 24 hours total for both single and combined activities.
   //Todo: Longer total time/calorie values exceed width allowances.
 
+  //Todo: Cycles Completed needs to be saved in sharedPref or database - will reset on app close.
   //Todo: Black background on stats frag may be b0rking date selection highlight.
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
