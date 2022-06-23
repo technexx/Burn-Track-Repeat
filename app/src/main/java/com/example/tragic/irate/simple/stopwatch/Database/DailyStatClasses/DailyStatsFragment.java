@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tragic.irate.simple.stopwatch.Adapters.CalorieTrackingAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
+import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.DailyCalorieAccess;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDurationSelectedDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
@@ -73,6 +74,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     LayoutInflater inflater;
 
     DailyStatsAccess dailyStatsAccess;
+    DailyCalorieAccess dailyCalorieAccess;
 
     DailyStatsAdapter dailyStatsAdapter;
     RecyclerView dailyStatsRecyclerView;
@@ -143,7 +145,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ImageButton confirmEditWithinPopUpButton;
     ImageButton confirmDeletionWithinEditPopUpButton;
 
-    int mSortMode;
+    int mActivitySortMode;
     int mPositionToEdit;
 
     PopupWindow tdeeAddPopUpWindow;
@@ -187,7 +189,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
-        dailyStatsAccess = new DailyStatsAccess(getContext().getApplicationContext());
+        dailyStatsAccess = new DailyStatsAccess(getContext());
+        dailyCalorieAccess = new DailyCalorieAccess(getContext());
+
         dailyStatsExpandedButton = mRoot.findViewById(R.id.daily_stats_expanded_button);
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
@@ -440,11 +444,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public void setSortMode(int sortMode) {
-        this.mSortMode = sortMode;
+        this.mActivitySortMode = sortMode;
     }
 
     public void sortStatsAsACallFromMainActivity() {
-        dailyStatsAccess.setSortMode(mSortMode);
+        dailyStatsAccess.setSortMode(mActivitySortMode);
         populateListsAndTextViewsFromEntityListsInDatabase();
     }
 

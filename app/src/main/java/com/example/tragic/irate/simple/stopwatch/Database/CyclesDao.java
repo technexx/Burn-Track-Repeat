@@ -101,7 +101,7 @@ CyclesDao {
     List<CalorieDayHolder> loadSingleCalorieDay(long listID);
 
     @Query("SELECT * from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
-    List<CalorieDayHolder> loadMultiplCalorieeDays(List<Integer> listIDs);
+    List<CalorieDayHolder> loadMultiplCalorieDays(List<Integer> listIDs);
 
     @Query("DELETE from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
     void deleteMultipleCalorieDays(List<Long> listIDs);

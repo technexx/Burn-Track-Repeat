@@ -3828,10 +3828,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
     }
 
-    if (mode == 3) {
-      totalWorkTimeForCurrentDayInMillis = dailyStatsAccess.getTotalWorkTimeFromDayHolderEntity();
-      totalRestTimeForCurrentDayInMillis = dailyStatsAccess.getTotalRestTimeFromDayHolderEntity();
-    }
+//    if (mode == 3) {
+//      totalWorkTimeForCurrentDayInMillis = dailyStatsAccess.getTotalWorkTimeFromDayHolderEntity();
+//      totalRestTimeForCurrentDayInMillis = dailyStatsAccess.getTotalRestTimeFromDayHolderEntity();
+//    }
   }
 
   private void setCyclesCompletedTextView() {
