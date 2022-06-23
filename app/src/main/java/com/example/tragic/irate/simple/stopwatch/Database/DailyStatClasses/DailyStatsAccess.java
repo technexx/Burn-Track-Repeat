@@ -42,6 +42,10 @@ public class DailyStatsAccess {
     List<Long> totalSetTimeListForEachActivityForSelectedDuration;
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
 
+    List<String> totalFoodStringListForSelectedDuration;
+    List<Double> totalFoodPortionListForSelectedDuration;
+    List<Double> totalCaloriesConsumedListForSelectedDuration;
+
     long totalSetTimeForSelectedDuration;
     double totalCaloriesForSelectedDuration;
     long totalUnassignedSetTimeForSelectedDuration;
@@ -235,24 +239,24 @@ public class DailyStatsAccess {
         mCaloriesForEachFood.setTypeOfFood(food);
     }
 
-    private String getFoodStringForSelectedFood() {
-        return mCaloriesForEachFood.getTypeOfFood();
+    public List<String> getTotalFoodStringListForSelectedDuration() {
+        return totalFoodStringListForSelectedDuration;
     }
 
     public void setFoodPortionForSelectedFood(double portionSize) {
         mCaloriesForEachFood.setPortionForEachFoodType(portionSize);
     }
 
-    public double getFoodPortionForSelectedFood() {
-        return mCaloriesForEachFood.getPortionForEachFoodType();
+    public List<Double> getTotalFoodPortionListForSelectedDuration() {
+        return totalFoodPortionListForSelectedDuration;
     }
 
     public void setCaloriesConsumedForSelectedFood(double calories) {
         mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(calories);
     }
 
-    public double getCaloriesConsumedForEachFoodType() {
-       return mCaloriesForEachFood.getCaloriesConsumedForEachFoodType();
+    public List<Double> getTotalCaloriesConsumedForSelectedDuration() {
+       return totalCaloriesConsumedListForSelectedDuration;
     }
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
@@ -808,6 +812,10 @@ public class DailyStatsAccess {
         return totalSetTimeListForEachActivityForSelectedDuration;
     }
 
+    public List<Double> getTotalCaloriesBurnedListForEachActivityForSelectedDuration() {
+        return totalCaloriesBurnedListForEachActivityForSelectedDuration;
+    }
+
     public void clearStatsForEachActivityArrayLists() {
         totalActivitiesListForSelectedDuration.clear();
         totalSetTimeListForEachActivityForSelectedDuration.clear();
@@ -844,6 +852,10 @@ public class DailyStatsAccess {
         totalActivitiesListForSelectedDuration = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDuration = new ArrayList<>();
         totalCaloriesBurnedListForEachActivityForSelectedDuration = new ArrayList<>();
+
+        totalFoodStringListForSelectedDuration = new ArrayList<>();
+        totalFoodPortionListForSelectedDuration = new ArrayList<>();
+        totalCaloriesConsumedListForSelectedDuration = new ArrayList<>();
     }
 
     private void instantiateMiscellaneousClasses() {

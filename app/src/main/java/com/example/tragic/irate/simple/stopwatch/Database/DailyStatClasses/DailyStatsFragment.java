@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -29,7 +28,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,8 +35,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CalorieTrackingAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
-import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
-import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.DailyCalorieAccess;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDurationSelectedDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
@@ -74,7 +70,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     LayoutInflater inflater;
 
     DailyStatsAccess dailyStatsAccess;
-    DailyCalorieAccess dailyCalorieAccess;
 
     DailyStatsAdapter dailyStatsAdapter;
     RecyclerView dailyStatsRecyclerView;
@@ -190,7 +185,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         mRoot = root;
 
         dailyStatsAccess = new DailyStatsAccess(getContext());
-        dailyCalorieAccess = new DailyCalorieAccess(getContext());
 
         dailyStatsExpandedButton = mRoot.findViewById(R.id.daily_stats_expanded_button);
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
@@ -1101,7 +1095,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateActivityRecyclerViewAndItsAdapter() {
-        dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.totalActivitiesListForSelectedDuration, dailyStatsAccess.totalSetTimeListForEachActivityForSelectedDuration, dailyStatsAccess.totalCaloriesBurnedListForEachActivityForSelectedDuration);
+        dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.getTotalActivitiesListForSelectedDuration(), dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration(), dailyStatsAccess.getTotalCaloriesBurnedListForEachActivityForSelectedDuration());
 
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
         dailyStatsAdapter.addActivityToDailyStats(DailyStatsFragment.this);
@@ -1120,8 +1114,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
-        //Todo: Fetch from Access class.
-//        calorieTrackingAdapter = new CalorieTrackingAdapter();
+        calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalFoodPortionListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration());
 
         calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
         calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);
@@ -1132,7 +1125,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesTrackingRecyclerView.setLayoutManager(lm);
         caloriesTrackingRecyclerView.setAdapter(calorieTrackingAdapter);
 
-        caloriesTrackingRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) caloriesTrackingRecyclerView.getLayoutParams();
+        caloriesTrackingRecyclerViewLayoutParams = caloriesTrackingRecyclerView.getLayoutParams();
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesTrackingRecyclerView.getContext(), lm.getOrientation());
         dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
