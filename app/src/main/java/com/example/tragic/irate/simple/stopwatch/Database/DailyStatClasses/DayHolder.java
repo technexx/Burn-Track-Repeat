@@ -61,6 +61,22 @@ public class DayHolder {
         this.totalBreakTime = totalBreakTime;
     }
 
+    public long getTotalWorkTime() {
+        return totalWorkTime;
+    }
+
+    public void setTotalWorkTime(long totalWorkTime) {
+        this.totalWorkTime = totalWorkTime;
+    }
+
+    public long getTotalRestTime() {
+        return totalRestTime;
+    }
+
+    public void setTotalRestTime(long totalRestTime) {
+        this.totalRestTime = totalRestTime;
+    }
+
     public double getTotalCaloriesBurned() {
         return totalCaloriesBurned;
     }

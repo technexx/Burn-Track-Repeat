@@ -1,7 +1,9 @@
 package com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses;
 
+import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+@Entity(tableName = "CaloriesForEachFood")
 public class CaloriesForEachFood {
     @PrimaryKey(autoGenerate = true)
 

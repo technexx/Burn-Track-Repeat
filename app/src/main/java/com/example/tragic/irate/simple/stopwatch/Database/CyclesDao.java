@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CalorieDayHolder;
+import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 
@@ -80,6 +82,77 @@ CyclesDao {
 
     @Query("DELETE from StatsForEachActivity")
     void deleteAllStatsForEachActivityEntries();
+
+    ///////////////////////////////////////////////////////////
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertCalorieDay(CalorieDayHolder calorieDayHolder);
+
+    @Update
+    void updateCalorieDay(CalorieDayHolder calorieDayHolder);
+
+    @Query("DELETE from CalorieDayHolder")
+    void deleteAllCalorieDayEntries();
+
+    @Query("SELECT * from CalorieDayHolder")
+    List<CalorieDayHolder> loadAllCalorieDayRows();
+
+    @Query("SELECT * from CalorieDayHolder WHERE calorieDaySelectedId IS:listID")
+    List<CalorieDayHolder> loadSingleCalorieDay(long listID);
+
+    @Query("SELECT * from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
+    List<CalorieDayHolder> loadMultiplCalorieeDays(List<Integer> listIDs);
+
+    @Query("DELETE from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
+    void deleteMultipleCalorieDays(List<Long> listIDs);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertCaloriesForEachFoodRow(CaloriesForEachFood caloriesForEachFood);
+
+    @Update
+    void updateCaloriesForEachFoodRow(CaloriesForEachFood caloriesForEachFood);
+
+    @Delete
+    void deleteCaloriesForEachFoodRow(CaloriesForEachFood caloriesForEachFood);
+
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IS:uniqueId")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodForSpecificDay(long uniqueId);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs)")
+    List<CalorieDayHolder> loadCaloriesForEachFoodForMultipleDaysy(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood")
+    List<CalorieDayHolder> loadCaloriesForEachFoodForAllDays();
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by typeOfFood ASC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodByAToZName(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by typeOfFood DESC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodByZToAName(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by portionForEachFoodType DESC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodByLargestPortion(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by portionForEachFoodType ASC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodBySmallestPortion(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType DESC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodByMostCaloriesBurned(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType ASC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodByLeastCaloriesBurned(List<Integer> uniqueIDs);
+
+    @Query("DELETE from CaloriesForEachFood WHERE caloriesForEachFoodId IS:listID")
+    void deleteCaloriesForEachFoodForSingleDay (long listID);
+
+    @Query("DELETE from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:listIDs)")
+    void deleteCaloriesForEachFoodForMultipleDays (List<Long> listIDs);
+
+    @Query("DELETE from CaloriesForEachFood")
+    void deleteAllCaloriesForEachFoodEntries();
+
+    ////////////////////////////////////////////////////////////////////
 
     @Query("SELECT * from Cycles")
     List<Cycles> loadAllCycles();
