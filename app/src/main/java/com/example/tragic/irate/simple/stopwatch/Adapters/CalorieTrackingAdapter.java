@@ -27,7 +27,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     MainViewHolder mMainViewHolder;
 
     List<String> mFoodEaten;
-    List<Double> mFoodPortion;
+//    List<Double> mFoodPortion;
     List<Double> mCaloriesConsumed;
     int mItemCount;
 
@@ -74,8 +74,8 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         this.mCaloriesConsumedDeletion = xCaloriesConsumedDeletion;
     }
 
-    public CalorieTrackingAdapter(Context context, List<String> foodEaten, List<Double> foodPortion, List<Double> caloriesConsumed) {
-        this.mContext = context; this.mFoodEaten = foodEaten; this.mFoodPortion = foodPortion; this.mCaloriesConsumed = caloriesConsumed;
+    public CalorieTrackingAdapter(Context context, List<String> foodEaten, List<Double> caloriesConsumed) {
+        this.mContext = context; this.mFoodEaten = foodEaten; this.mCaloriesConsumed = caloriesConsumed;
         setAnimations();
     }
 
@@ -86,25 +86,25 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         View view;
 
         if (viewType==HEADER_VIEW) {
-            view = inflater.inflate(R.layout.daily_stats_recycler_header_layout, parent, false);
+            view = inflater.inflate(R.layout.calories_consumed_recycler_header_layout, parent, false);
             return new HeaderViewHolder(view);
         } else if (viewType==FOOTER_VIEW) {
-            view = inflater.inflate(R.layout.daily_stats_recycler_footer_layout, parent, false);
+            view = inflater.inflate(R.layout.calories_consumed_footer_layout, parent, false);
             return new FootViewHolder(view);
         }
 
-        view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
+        view = inflater.inflate(R.layout.calories_consumed_recycler_layout, parent, false);
         return new MainViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof DailyStatsAdapter.HeaderViewHolder) {
+        if (holder instanceof CalorieTrackingAdapter.HeaderViewHolder) {
             mHeaderViewHolder = (HeaderViewHolder) holder;
 
             populateHeaderRowViews();
             setHolderViewTextStyles(BOLD_TEXT);
-        } else if (holder instanceof DailyStatsAdapter.MainViewHolder) {
+        } else if (holder instanceof CalorieTrackingAdapter.MainViewHolder) {
             mMainViewHolder = (MainViewHolder) holder;
 
             populateMainRowViews(position);
@@ -122,7 +122,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 }
             });
 
-        } else if (holder instanceof DailyStatsAdapter.FootViewHolder) {
+        } else if (holder instanceof CalorieTrackingAdapter.FootViewHolder) {
             DailyStatsAdapter.FootViewHolder footViewHolder = (DailyStatsAdapter.FootViewHolder) holder;
 
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
@@ -181,8 +181,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     private void populateHeaderRowViews() {
-        mHeaderViewHolder.foodEatenTextView.setText(R.string.activity_text_header);
-        mHeaderViewHolder.foodPortionTextView.setText(R.string.set_time_text_header);
+        mHeaderViewHolder.foodEatenTextView.setText(R.string.food_name_header);
         mHeaderViewHolder.caloriesConsumedTextView.setText(R.string.calories_burned_text_header);
     }
 
@@ -192,19 +191,16 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             return;
         }
         mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
-        mMainViewHolder.foodPortionTextView.setText(formatCalorieString(mFoodPortion.get(position-1)));
         mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
     }
 
     private void setHolderViewTextStyles(int textStyle) {
         if (textStyle==BOLD_TEXT) {
             mHeaderViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mHeaderViewHolder.foodPortionTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mHeaderViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
         } else if (textStyle==REGULAR_TEXT){
             mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.foodPortionTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT);
         }
     }
@@ -221,20 +217,17 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView foodEatenTextView;
-        TextView foodPortionTextView;;
         TextView caloriesConsumedTextView;
 
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);
             foodEatenTextView =  itemView.findViewById(R.id.food_eaten_header);
-            foodPortionTextView =  itemView.findViewById(R.id.food_portion_header);
             caloriesConsumedTextView =  itemView.findViewById(R.id.calories_consumed_by_food_header);
         }
     }
 
     public class MainViewHolder extends RecyclerView.ViewHolder {
         TextView foodEatenTextView;
-        TextView foodPortionTextView;;
         TextView caloriesConsumedTextView;
 
         View fullView;
@@ -242,7 +235,6 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         public MainViewHolder (@NonNull View itemView) {
             super(itemView);
             foodEatenTextView =  itemView.findViewById(R.id.food_eaten_textView);
-            foodPortionTextView =  itemView.findViewById(R.id.food_portion_textView);
             caloriesConsumedTextView =  itemView.findViewById(R.id.calories_consumed_textView);
 
             fullView = itemView;

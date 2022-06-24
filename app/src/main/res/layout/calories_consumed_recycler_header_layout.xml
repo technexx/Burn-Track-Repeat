@@ -16,16 +16,16 @@
         android:paddingEnd="6dp">
     </TextView>
 
-    <TextView
-        android:id="@+id/food_portion_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/calories_consumed_by_food_header"
-        app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center"
-        android:minWidth="100dp"
-        android:maxWidth="150dp">
-    </TextView>
+<!--    <TextView-->
+<!--        android:id="@+id/food_portion_header"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintEnd_toStartOf="@id/calories_consumed_by_food_header"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        android:gravity="center"-->
+<!--        android:minWidth="100dp"-->
+<!--        android:maxWidth="150dp">-->
+<!--    </TextView>-->
 
     <TextView
         android:id="@+id/calories_consumed_by_food_header"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="32dp"
         android:minWidth="100dp"
         android:maxWidth="150dp"
         android:gravity="center">

@@ -216,7 +216,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnEditTexts();
 
-        calorieModeIterationLogic(0);
+        setCalorieModeTextViews(0);
+        setCalorieModeRecyclerViews(0);
 
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
@@ -1156,7 +1157,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
-        calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalFoodPortionListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration());
+        calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration());
 
         calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
         calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);
@@ -1171,7 +1172,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesTrackingRecyclerView.getContext(), lm.getOrientation());
         dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-        dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
+        caloriesTrackingRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
     private void instantiateAnimations() {
