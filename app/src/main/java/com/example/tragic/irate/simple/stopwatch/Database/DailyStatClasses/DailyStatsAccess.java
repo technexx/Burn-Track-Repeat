@@ -53,8 +53,6 @@ public class DailyStatsAccess {
     long totalAggregateTimeForSelectedDuration;
     double totalAggregateCaloriesForSelectedDuration;
 
-    int typeOfFoodPositionInListForCurrentDay;
-
     int numberOfDaysSelected;
 
     String mSingleDayAsString;
@@ -227,34 +225,6 @@ public class DailyStatsAccess {
 
     public List<CaloriesForEachFood> getCaloriesForEachFoodList() {
         return mCaloriesForEachFoodList;
-    }
-
-    ///////////////////////////////////////////////////////////
-    public List<String> getTotalFoodStringListForSelectedDuration() {
-        return totalFoodStringListForSelectedDuration;
-    }
-
-    public List<Double> getTotalFoodPortionListForSelectedDuration() {
-        return totalFoodPortionListForSelectedDuration;
-    }
-
-
-    public List<Double> getTotalCaloriesConsumedForSelectedDuration() {
-       return totalCaloriesConsumedListForSelectedDuration;
-    }
-
-    public void setTotalCaloriesConsumedStatsForSelectedDayToArrayLists() {
-        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
-            totalFoodPortionListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getPortionForEachFoodType());
-            totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
-        }
-    }
-
-    public void clearCaloriesForEachFoodListArrayLists() {
-        totalFoodStringListForSelectedDuration.clear();
-        totalFoodPortionListForSelectedDuration.clear();
-        totalCaloriesConsumedListForSelectedDuration.clear();
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -496,7 +466,7 @@ public class DailyStatsAccess {
     //Todo: Add insert/update/delete methods from DAO and call those in our fragment.
     //Todo: We may not even need DayHolder or CalorieDayHolder since we're getting all our total values from their sibling classes. Their IDs are represented by uniqueIDs and their dates can be fetched as a String from that ID.
 
-    public void insertFoodAndItsCaloriesIntoDatabase(int daySelected) {
+    public void insertCaloriesAndEachFoodIntoDatabase(int daySelected) {
         mCaloriesForEachFood = new CaloriesForEachFood();
 
         mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
@@ -512,6 +482,42 @@ public class DailyStatsAccess {
 
     public void setCaloriesInFoodItem(double calories) {
         this.mCaloriesInFoodItem = calories;
+    }
+
+    public void assignCaloriesForEachFoodItemEntityForSinglePosition(int position) {
+        mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
+    }
+
+    public void updateCaloriesAndEachFoodInDatabase() {
+        cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
+    }
+
+    public List<String> getTotalFoodStringListForSelectedDuration() {
+        return totalFoodStringListForSelectedDuration;
+    }
+
+    public List<Double> getTotalFoodPortionListForSelectedDuration() {
+        return totalFoodPortionListForSelectedDuration;
+    }
+
+    public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
+        return totalCaloriesConsumedListForSelectedDuration;
+    }
+
+    public void setTotalCaloriesConsumedStatsForSelectedDayToArrayLists() {
+        clearCaloriesForEachFoodListArrayLists();
+
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
+            totalFoodPortionListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getPortionForEachFoodType());
+            totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
+        }
+    }
+
+    public void clearCaloriesForEachFoodListArrayLists() {
+        totalFoodStringListForSelectedDuration.clear();
+        totalFoodPortionListForSelectedDuration.clear();
+        totalCaloriesConsumedListForSelectedDuration.clear();
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -650,6 +656,8 @@ public class DailyStatsAccess {
     public void deleteAllStatsForEachActivityEntries() {
         cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
     }
+
+
 
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();

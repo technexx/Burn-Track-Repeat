@@ -649,13 +649,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addFoodPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
-    //Todo: Set food string + calories pulled from editTexts to Access class, then call its insertion method.
     private void addFoodToStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.setFoodString(getFoodStringFromEditText());
             dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
 
-            dailyStatsAccess.insertFoodAndItsCaloriesIntoDatabase(daySelectedFromCalendar);
+            dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase(daySelectedFromCalendar);
 
             getActivity().runOnUiThread(()-> {
                 calorieTrackingAdapter.notifyDataSetChanged();
@@ -675,6 +674,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void calorieRowIsSelected(int position) {
+        this.mPositionToEdit = position;
+        launchFoodEditPopUpWithEditTextValuesSet(position);
+    }
+
+    private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
+        String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
+        double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
+
+        typeOfFoodEditText.setText(foodString);
+        caloriesConsumedEditText.setText(String.valueOf(caloriesInFood));
+
+        addFoodPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
+    }
+
+    private void updateFoodInStats(int position) {
 
     }
 
@@ -686,10 +700,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     @Override
     public void activityEditItemSelected(int position) {
         this.mPositionToEdit = position;
-        launchActivityEditPopUp(position);
+        launchActivityEditPopUpWithEditTextValuesSet(position);
     }
 
-    private void launchActivityEditPopUp(int position) {
+    private void launchActivityEditPopUpWithEditTextValuesSet(int position) {
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 
@@ -1195,7 +1209,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
-        calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration());
+        calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration());
 
         calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
         calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);
