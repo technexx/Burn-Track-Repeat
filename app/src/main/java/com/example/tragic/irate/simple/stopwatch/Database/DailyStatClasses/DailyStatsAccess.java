@@ -72,6 +72,9 @@ public class DailyStatsAccess {
     String mActivityString = "";
     double mMetScore;
     int mActivitySortMode = 1;
+
+    String mFoodString = "";
+    Double mCaloriesInFoodItem;
     int mCalorieSortMode = 1;
 
     SharedPreferences sharedPreferences;
@@ -253,8 +256,6 @@ public class DailyStatsAccess {
         totalFoodPortionListForSelectedDuration.clear();
         totalCaloriesConsumedListForSelectedDuration.clear();
     }
-
-    //Todo: Add insert/update/delete methods from DAO and call those in our fragment.
 
     ////////////////////////////////////////////////////////////////////
 
@@ -490,6 +491,28 @@ public class DailyStatsAccess {
 
     public void deleteAllDayHolderEntries() {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
+    }
+
+
+    //Todo: Add insert/update/delete methods from DAO and call those in our fragment.
+    //Todo: We may not even need DayHolder or CalorieDayHolder since we're getting all our total values from their sibling classes. Their IDs are represented by uniqueIDs and their dates can be fetched as a String from that ID.
+
+    public void insertFoodAndItsCaloriesIntoDatabase(int daySelected) {
+        mCaloriesForEachFood = new CaloriesForEachFood();
+
+        mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
+        mCaloriesForEachFood.setTypeOfFood(mFoodString);
+        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
+
+        cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
+    }
+
+    public void setFoodString(String food) {
+        this.mFoodString = food;
+    }
+
+    public void setCaloriesInFoodItem(double calories) {
+        this.mCaloriesInFoodItem = calories;
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
