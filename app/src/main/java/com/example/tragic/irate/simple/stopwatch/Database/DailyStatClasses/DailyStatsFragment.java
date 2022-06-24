@@ -29,6 +29,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -157,8 +158,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView metScoreTextView;
     Button confirmActivityAddition;
 
-    View caloriesConsumedEditView;
-    PopupWindow caloriesConsumedPopUpWindow;
+    View addFoodView;
+    PopupWindow addFoodPopUpWindow;
     EditText typeOfFoodEditText;
     EditText caloriesConsumedEditText;
     ImageButton confirmCaloriesConsumedEditWithinPopUpButton;
@@ -636,8 +637,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAdapter.notifyDataSetChanged();
                     populateActivityEditPopUpWithNewRow();
                 });
-
-
             } else {
                 getActivity().runOnUiThread(()->{
                     Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
@@ -647,7 +646,28 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void tdeeEditItemSelected(int position) {
+    public void onAddingFood(int position) {
+        addFoodPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
+    }
+
+    private void addFoodToStats() {
+        AsyncTask.execute(()-> {
+
+        });
+    }
+
+    @Override
+    public void calorieRowIsSelected(int position) {
+
+    }
+
+    @Override
+    public void onDeletingCalories(int position) {
+
+    }
+
+    @Override
+    public void activityEditItemSelected(int position) {
         this.mPositionToEdit = position;
         launchActivityEditPopUp(position);
     }
@@ -1097,13 +1117,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCaloriesConsumedEditPopUpViews() {
-        caloriesConsumedEditView = inflater.inflate(R.layout.add_calories_consumed_popup, null);
-        caloriesConsumedPopUpWindow = new PopupWindow(caloriesConsumedEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(100), true);
+        addFoodView = inflater.inflate(R.layout.add_calories_consumed_popup, null);
+        addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(100), true);
 
-        typeOfFoodEditText = caloriesConsumedEditView.findViewById(R.id.food_name_edit_text);
-        caloriesConsumedEditText = caloriesConsumedEditView.findViewById(R.id.calories_consumed_editText);
-        confirmCaloriesConsumedEditWithinPopUpButton = caloriesConsumedEditView.findViewById(R.id.confirm_calories_consumed_edit);
-        confirmCaloriesConsumedDeletionWithinEditPopUpButton = caloriesConsumedEditView.findViewById(R.id.confirm_calories_consumed_delete_button);
+        typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_edit_text);
+        caloriesConsumedEditText = addFoodView.findViewById(R.id.calories_consumed_editText);
+        confirmCaloriesConsumedEditWithinPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_edit);
+        confirmCaloriesConsumedDeletionWithinEditPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_delete_button);
     }
 
     private void instantiateTextViewsAndMiscClasses() {
@@ -1204,20 +1224,5 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
         Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
         Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
-    }
-
-    @Override
-    public void calorieRowIsSelected(int position) {
-
-    }
-
-    @Override
-    public void onEditingCalories(int position) {
-        caloriesConsumedPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
-    }
-
-    @Override
-    public void onDeletingCalories(int position) {
-
     }
 }

@@ -51,7 +51,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     boolean animateButtonSliding;
 
     public interface tdeeEditedItemIsSelected {
-        void tdeeEditItemSelected (int position);
+        void activityEditItemSelected (int position);
     }
 
     public void getSelectedTdeeItemPosition(tdeeEditedItemIsSelected xTdeeEditedItemIsSelected) {
@@ -117,7 +117,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mMainViewHolder = (MainViewHolder) holder;
 
                 if (mEditModeIsActive) {
-                    mTdeeEditedItemIsSelected.tdeeEditItemSelected(position-1);
+                    mTdeeEditedItemIsSelected.activityEditItemSelected(position-1);
                     toggleRowSelectionForEditing();
                 }
             });
