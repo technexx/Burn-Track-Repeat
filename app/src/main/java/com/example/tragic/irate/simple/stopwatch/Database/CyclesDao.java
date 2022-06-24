@@ -120,10 +120,10 @@ CyclesDao {
     List<CaloriesForEachFood> loadCaloriesForEachFoodForSpecificDay(long uniqueId);
 
     @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs)")
-    List<CalorieDayHolder> loadCaloriesForEachFoodForMultipleDaysy(List<Integer> uniqueIDs);
+    List<CaloriesForEachFood> loadCaloriesForEachFoodForMultipleDays(List<Integer> uniqueIDs);
 
     @Query("SELECT * from CaloriesForEachFood")
-    List<CalorieDayHolder> loadCaloriesForEachFoodForAllDays();
+    List<CaloriesForEachFood> loadCaloriesForEachFoodForAllDays();
 
     @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by typeOfFood ASC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByAToZName(List<Integer> uniqueIDs);

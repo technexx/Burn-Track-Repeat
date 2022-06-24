@@ -209,6 +209,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateExpansionPopUpViews();
         instantiateActivityEditPopUpViews();
         instantiateAddPopUpViews();
+        instantiateCaloriesConsumedEditPopUpViews();
         instantiateActivityAdditionSpinnersAndAdapters();
         setTdeeSpinnerListeners();
 
@@ -247,7 +248,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     getActivity().runOnUiThread(()-> {
                         setActivityStatsDurationRangeTextView();
                         setSelectionDayIfSelectingSingleDayFromCustomDuration();
-                        enableEditButtonIfDisabled();
+                        enableActivityEditButtonIfDisabled();
                     });
                 });
                 Log.i("testCall", "onDateSelected called!");
@@ -269,7 +270,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
                     getActivity().runOnUiThread(()-> {
-                        disableEditButtonIfMoreThanOneDateSelected(dates);
+                        disableActivityEditButtonIfMoreThanOneDateSelected(dates);
                         convertAndSetDateRangeStringOnTextView();
                     });
                 });
@@ -333,7 +334,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    private void iterateThroughCalorieModeVariables(int directionOfIteration) {
+
+    private void calorieModeIterationLogic(int directionOfIteration) {
+        iterateThroughCalorieModes(directionOfIteration);
+        setCalorieModeTextViews(currentCalorieMode);
+        setCalorieModeRecyclerViews(currentCalorieMode);
+    }
+
+    private void iterateThroughCalorieModes(int directionOfIteration) {
         if (directionOfIteration==ITERATING_CALORIES_STATS_UP) {
             if (currentCalorieMode<2) {
                 currentCalorieMode++;
@@ -361,9 +369,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void calorieModeIterationLogic(int directionOfIteration) {
-        iterateThroughCalorieModeVariables(directionOfIteration);
-        setCalorieModeTextViews(currentCalorieMode);
+    private void setCalorieModeRecyclerViews(int mode) {
+        dailyStatsRecyclerView.setVisibility(View.GONE);
+        caloriesTrackingRecyclerView.setVisibility(View.GONE);
+
+        if (mode==EXPENDED_CALORIES_MODE) {
+            dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+        }
+        if (mode==CONSUMED_CALORIES_MODE) {
+            caloriesTrackingRecyclerView.setVisibility(View.VISIBLE);
+        }
+        if (mode==COMPARING_CALORIES_MODE) {
+
+        }
     }
 
     private void setActivityStatsDurationRangeTextView() {
@@ -381,13 +399,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
     }
 
-    private void disableEditButtonIfMoreThanOneDateSelected(List<CalendarDay> calendarDayList) {
+    private void disableActivityEditButtonIfMoreThanOneDateSelected(List<CalendarDay> calendarDayList) {
         if (calendarDayList.size()>1) {
             toggleEditStatsButton(false);
         }
     }
 
-    private void enableEditButtonIfDisabled() {
+    private void enableActivityEditButtonIfDisabled() {
         if (!editTdeeStatsButton.isEnabled()) {
             toggleEditStatsButton(true);
         }
@@ -1193,8 +1211,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void onAddingCalories(int position) {
-
+    public void onEditingCalories(int position) {
+        caloriesConsumedPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
     @Override

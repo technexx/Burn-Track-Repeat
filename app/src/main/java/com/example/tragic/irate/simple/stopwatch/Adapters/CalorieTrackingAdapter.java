@@ -59,7 +59,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     public interface caloriesConsumedAddition {
-        void onAddingCalories(int position);
+        void onEditingCalories(int position);
     }
 
     public void addCaloriesToStats(caloriesConsumedAddition xCaloriesConsumedAddition) {
@@ -128,7 +128,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
-                mCaloriesConsumedAddition.onAddingCalories(position);
+                mCaloriesConsumedAddition.onEditingCalories(position);
             });
         }
     }
