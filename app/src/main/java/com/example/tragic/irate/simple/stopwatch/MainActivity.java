@@ -4973,7 +4973,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     selectedTdeeSubCategoryPosition = 0;
 
     setMetScoreTextViewInAddTdeePopUp();
-    setthirdMainTextViewInAddTdeePopUp();
+    setThirdMainTextViewInAddTdeePopUp();
   }
 
   private void tdeeSubCategorySpinnerTouchActions() {
@@ -4981,7 +4981,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
 
     setMetScoreTextViewInAddTdeePopUp();
-    setthirdMainTextViewInAddTdeePopUp();
+    setThirdMainTextViewInAddTdeePopUp();
   }
 
   private void setTdeeSpinnersToDefaultValues() {
@@ -5001,7 +5001,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return preRoundedMet;
   }
 
-  private void setthirdMainTextViewInAddTdeePopUp() {
+  private void setThirdMainTextViewInAddTdeePopUp() {
     String caloriesBurnedPerMinute = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore));
     String caloriesBurnedPerHour = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore) * 60);
 

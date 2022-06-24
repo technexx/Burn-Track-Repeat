@@ -214,7 +214,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setTdeeSpinnerListeners();
 
         setValueCappingTextWatcherOnEditTexts();
-        setTextWatchersOnEditTexts();
+        setTextWatchersOnActivityEditTexts();
 
         setCalorieModeTextViews(0);
         setCalorieModeRecyclerViews(0);
@@ -320,7 +320,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
-            updateDatabaseWithStats();
+            updateActivityStatsInDatabase();
             tdeeEditPopUpWindow.dismiss();
         });
 
@@ -634,7 +634,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 getActivity().runOnUiThread(()-> {
                     dailyStatsAdapter.notifyDataSetChanged();
-                    populateEditPopUpWithNewRow();
+                    populateActivityEditPopUpWithNewRow();
                 });
 
 
@@ -649,20 +649,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     @Override
     public void tdeeEditItemSelected(int position) {
         this.mPositionToEdit = position;
-        launchEditPopUp(position);
+        launchActivityEditPopUp(position);
     }
 
-    private void launchEditPopUp(int position) {
+    private void launchActivityEditPopUp(int position) {
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 
         tdeeEditPopUpFirstMainTextView.setText(activityString);
-        setTdeeEditTexts(timeToEditLongValue);
+        setActivityEditTexts(timeToEditLongValue);
 
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
-    private void updateDatabaseWithStats() {
+    private void updateActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(mPositionToEdit);
@@ -719,7 +719,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private void setTdeeEditTexts(long valueToSet) {
+    private void setActivityEditTexts(long valueToSet) {
         String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
         String[] splitString = stringToSet.split(":");
 
@@ -801,13 +801,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         };
     }
 
-    private void setTextWatchersOnEditTexts() {
-        tdeeEditTextHours.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextHours));
-        tdeeEditTextMinutes.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextMinutes));
-        tdeeEditTextSeconds.addTextChangedListener(alphaChangeIfEditTextValueIsZeroTextWatcher(tdeeEditTextSeconds));
+    private void setTextWatchersOnActivityEditTexts() {
+        tdeeEditTextHours.addTextChangedListener(alphaChangeIfActivityEditTextValueIsZeroTextWatcher(tdeeEditTextHours));
+        tdeeEditTextMinutes.addTextChangedListener(alphaChangeIfActivityEditTextValueIsZeroTextWatcher(tdeeEditTextMinutes));
+        tdeeEditTextSeconds.addTextChangedListener(alphaChangeIfActivityEditTextValueIsZeroTextWatcher(tdeeEditTextSeconds));
     }
 
-    private TextWatcher alphaChangeIfEditTextValueIsZeroTextWatcher(EditText editText) {
+    private TextWatcher alphaChangeIfActivityEditTextValueIsZeroTextWatcher(EditText editText) {
         return new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -828,18 +828,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         };
     }
 
-    private void replaceAddPopUpWithEditPopUp() {
+    private void replaceActivityAddPopUpWithEditPopUp() {
         tdeeAddPopUpWindow.dismiss();
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
-    private void populateEditPopUpWithNewRow() {
-        replaceAddPopUpWithEditPopUp();
+    private void populateActivityEditPopUpWithNewRow() {
+        replaceActivityAddPopUpWithEditPopUp();
 
         String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
         tdeeEditPopUpFirstMainTextView.setText(activityToAdd);
-        setTdeeEditTexts(0);
+        setActivityEditTexts(0);
     }
     private void setTdeeSpinnerListeners() {
         tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -875,7 +875,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         selectedTdeeSubCategoryPosition = 0;
 
         setMetScoreTextViewInAddTdeePopUp();
-        setthirdMainTextViewInAddTdeePopUp();
+        setThirdMainTextViewInAddTdeePopUp();
     }
 
     private void tdeeSubCategorySpinnerTouchActions() {
@@ -883,7 +883,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         selectedTdeeSubCategoryPosition = tdee_sub_category_spinner.getSelectedItemPosition();
 
         setMetScoreTextViewInAddTdeePopUp();
-        setthirdMainTextViewInAddTdeePopUp();
+        setThirdMainTextViewInAddTdeePopUp();
     }
 
     private void setMetScoreTextViewInAddTdeePopUp() {
@@ -897,7 +897,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return preRoundedMet;
     }
 
-    private void setthirdMainTextViewInAddTdeePopUp() {
+    private void setThirdMainTextViewInAddTdeePopUp() {
         String caloriesBurnedPerMinute = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore));
         String caloriesBurnedPerHour = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore) * 60);
 
