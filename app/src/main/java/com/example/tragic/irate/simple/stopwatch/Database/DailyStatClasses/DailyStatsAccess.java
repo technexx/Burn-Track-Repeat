@@ -493,7 +493,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-
     //Todo: Add insert/update/delete methods from DAO and call those in our fragment.
     //Todo: We may not even need DayHolder or CalorieDayHolder since we're getting all our total values from their sibling classes. Their IDs are represented by uniqueIDs and their dates can be fetched as a String from that ID.
 

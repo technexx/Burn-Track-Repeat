@@ -99,8 +99,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView dailyStatsTotalSetTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
 
-
-
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
     Animation slideOutToBottom;
@@ -168,8 +166,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int selectedTdeeCategoryPosition;
     int selectedTdeeSubCategoryPosition;
     double metScore;
-
-
 
     TextView expansionAssignedHeader;
     TextView expansionUnassignedHeader;
@@ -311,7 +307,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             statDurationSwitchModeLogic(ITERATING_ACTIVITY_STATS_UP);
         });
 
-        //Todo: We can keep these buttons and change their methods depending on which type of stat we're on.
         confirmActivityAddition.setOnClickListener(v-> {
             addActivityToStats();
         });
@@ -327,6 +322,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityDeletionWithinEditPopUpButton.setOnClickListener(v-> {
             onDeletingActivity(mPositionToEdit);
+        });
+
+        confirmCaloriesConsumedEditWithinPopUpButton.setOnClickListener(v-> {
+            addFoodToStats();
         });
 
         minimizeCalendarButton.setOnClickListener(v-> {
@@ -650,10 +649,28 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addFoodPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
+    //Todo: Set food string + calories pulled from editTexts to Access class, then call its insertion method.
     private void addFoodToStats() {
         AsyncTask.execute(()-> {
+            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
 
+            dailyStatsAccess.insertFoodAndItsCaloriesIntoDatabase(daySelectedFromCalendar);
+
+            getActivity().runOnUiThread(()-> {
+                calorieTrackingAdapter.notifyDataSetChanged();
+                addFoodPopUpWindow.dismiss();
+                Toast.makeText(getContext(), "Added!", Toast.LENGTH_SHORT).show();
+            });
         });
+    }
+
+    private String getFoodStringFromEditText() {
+        return typeOfFoodEditText.getText().toString();
+    }
+
+    private double getCaloriesForFoodItemFromEditText() {
+        return Double.parseDouble(caloriesConsumedEditText.getText().toString());
     }
 
     @Override
@@ -861,6 +878,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpFirstMainTextView.setText(activityToAdd);
         setActivityEditTexts(0);
     }
+
     private void setTdeeSpinnerListeners() {
         tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
