@@ -496,10 +496,6 @@ public class DailyStatsAccess {
         return totalFoodStringListForSelectedDuration;
     }
 
-    public List<Double> getTotalFoodPortionListForSelectedDuration() {
-        return totalFoodPortionListForSelectedDuration;
-    }
-
     public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
         return totalCaloriesConsumedListForSelectedDuration;
     }

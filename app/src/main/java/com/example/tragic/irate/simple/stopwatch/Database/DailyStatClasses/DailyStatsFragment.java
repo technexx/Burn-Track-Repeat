@@ -392,7 +392,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (mode==CONSUMED_CALORIES_MODE) {
             caloriesTrackingRecyclerView.setVisibility(View.VISIBLE);
-            totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+            totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
         }
         if (mode==COMPARING_CALORIES_MODE) {
 
@@ -456,6 +456,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setAggregateDailyCalories();
             dailyStatsAccess.setUnassignedDailyTotalTime();
+
+            setTotalFoodStatsFooterTextViews();
 
             setExpansionTextViewValues();
         });
@@ -699,6 +701,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
+        //Todo: These need aggregate values of list.
         String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
         double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
 
@@ -712,7 +715,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
 
-            //Todo: We do need to display a total at the bottom. This can be done separately.
             dailyStatsAccess.setFoodString(getFoodStringFromEditText());
             dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
             dailyStatsAccess.updateCaloriesAndEachFoodInDatabase();
@@ -731,6 +733,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalFoodStatsFooterTextViews() {
+        //Todo: We're returning a list here.
         foodStatsTotalCaloriesConsumedTextView.setText(String.valueOf(dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration()));
     }
 
@@ -1224,7 +1227,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         totalFoodStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_food_stats_values_textView_layout);
         totalFoodStatsValuesTextViewLayoutParams = (ConstraintLayout.LayoutParams) totalFoodStatsValuesTextViewLayout.getLayoutParams();
-        foodStatsTotalCaloriesConsumedTextView = mRoot.findViewById(R.id.calories_consumed_textView);
+        foodStatsTotalCaloriesConsumedTextView = mRoot.findViewById(R.id.total_food_stats_calories_consumed);
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
