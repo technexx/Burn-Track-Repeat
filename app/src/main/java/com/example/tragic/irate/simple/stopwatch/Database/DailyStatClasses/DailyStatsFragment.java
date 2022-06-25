@@ -311,8 +311,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             addActivityToStats();
         });
 
+        //Todo: isShown may need to be replaced w/ getVisibility
         editTdeeStatsButton.setOnClickListener(v-> {
-            dailyStatsAdapter.toggleEditMode();
+            if (dailyStatsRecyclerView.isShown()) {
+                dailyStatsAdapter.toggleEditMode();
+            }
+            if (caloriesTrackingRecyclerView.isShown()) {
+                calorieTrackingAdapter.toggleEditMode();
+            }
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
@@ -396,6 +402,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void calendarDateChangeLogic() {
         dailyStatsAdapter.turnOffEditMode();
         dailyStatsAdapter.getItemCount();
+
+        calorieTrackingAdapter.turnOffEditMode();
+        calorieTrackingAdapter.getItemCount();
 
         dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
     }
@@ -508,6 +517,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 dailyStatsAdapter.turnOffEditMode();
                 dailyStatsAdapter.getItemCount();
+
+                calorieTrackingAdapter.turnOffEditMode();
+                calorieTrackingAdapter.getItemCount();
             });
         });
     }
@@ -688,8 +700,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addFoodPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
-    private void updateFoodInStats(int position) {
+    private void updateFoodInStats() {
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
 
+            //Todo: We do need to display a total at the bottom. This can be done separately.
+            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
+            dailyStatsAccess.updateCaloriesAndEachFoodInDatabase();
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+            });
+        });
     }
 
     @Override
@@ -1156,6 +1181,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedEditText = addFoodView.findViewById(R.id.calories_consumed_editText);
         confirmCaloriesConsumedEditWithinPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_edit);
         confirmCaloriesConsumedDeletionWithinEditPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_delete_button);
+
+        addFoodPopUpWindow.setOnDismissListener(()-> {
+            calorieTrackingAdapter.turnOffEditMode();
+            calorieTrackingAdapter.getItemCount();
+        });
     }
 
     private void instantiateTextViewsAndMiscClasses() {

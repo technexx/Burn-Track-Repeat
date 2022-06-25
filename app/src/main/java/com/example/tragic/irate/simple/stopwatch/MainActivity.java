@@ -543,7 +543,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Add/Access list of foods/cals + option for custom?
   //Todo: Add custom for MET score?
   //Todo: For Consumed: Food/Portion/Calories. For Comparison: Expended/Consumed/Difference.
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
