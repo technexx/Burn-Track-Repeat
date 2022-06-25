@@ -123,7 +123,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             });
 
         } else if (holder instanceof CalorieTrackingAdapter.FootViewHolder) {
-            DailyStatsAdapter.FootViewHolder footViewHolder = (DailyStatsAdapter.FootViewHolder) holder;
+            FootViewHolder footViewHolder = (FootViewHolder) holder;
 
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
@@ -246,7 +246,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public FootViewHolder(@NonNull View itemView) {
             super(itemView);
-            addActivity = itemView.findViewById(R.id.add_activity_in_edit_stats);
+            addActivity = itemView.findViewById(R.id.add_food_in_edit_stats);
         }
     }
 

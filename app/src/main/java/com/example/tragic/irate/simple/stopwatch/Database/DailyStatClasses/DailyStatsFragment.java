@@ -77,9 +77,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams;
 
     CalorieTrackingAdapter calorieTrackingAdapter;
-    RecyclerView caloriesTrackingRecyclerView;
-    ViewGroup.LayoutParams caloriesTrackingRecyclerViewLayoutParams;
+    RecyclerView caloriesConsumedRecyclerView;
+    ViewGroup.LayoutParams caloriesConsumedRecyclerViewLayoutParams;
 
+    View topOfRecyclerViewAnchor;
     View recyclerAndTotalStatsDivider;
 
     TextView burnedAndConsumedCaloriesSwitcherTextView;
@@ -320,7 +321,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (dailyStatsRecyclerView.isShown()) {
                 dailyStatsAdapter.toggleEditMode();
             }
-            if (caloriesTrackingRecyclerView.isShown()) {
+            if (caloriesConsumedRecyclerView.isShown()) {
                 calorieTrackingAdapter.toggleEditMode();
             }
         });
@@ -382,7 +383,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setCalorieModeRecyclerViewsAndFooters(int mode) {
         dailyStatsRecyclerView.setVisibility(View.GONE);
-        caloriesTrackingRecyclerView.setVisibility(View.GONE);
+        caloriesConsumedRecyclerView.setVisibility(View.GONE);
         totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
         totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
 
@@ -391,7 +392,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
         }
         if (mode==CONSUMED_CALORIES_MODE) {
-            caloriesTrackingRecyclerView.setVisibility(View.VISIBLE);
+            caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
             totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
         }
         if (mode==COMPARING_CALORIES_MODE) {
@@ -668,7 +669,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingFood(int position) {
-        addFoodPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
+        addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
     private void addFoodToStats() {
@@ -1169,7 +1170,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateActivityEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(100), true);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(135), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
@@ -1188,7 +1189,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateCaloriesConsumedEditPopUpViews() {
         addFoodView = inflater.inflate(R.layout.add_calories_consumed_popup, null);
-        addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(100), true);
+        addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(150), true);
+        addFoodPopUpWindow.setAnimationStyle(R.style.SlideTopAnimation);
 
         typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_edit_text);
         caloriesConsumedEditText = addFoodView.findViewById(R.id.calories_consumed_editText);
@@ -1216,6 +1218,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
+        topOfRecyclerViewAnchor = mRoot.findViewById(R.id.top_of_recyclerView_anchor);
         totalStatsHeaderTextView = mRoot.findViewById(R.id.activity_stats_duration_header_textView);
 
         totalActivityStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_activity_stats_values_textView_layout);
@@ -1262,16 +1265,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);
         calorieTrackingAdapter.deleteCaloriesFromStats(DailyStatsFragment.this);
 
-        caloriesTrackingRecyclerView = mRoot.findViewById(R.id.calories_consumed_recyclerView);
+        caloriesConsumedRecyclerView = mRoot.findViewById(R.id.calories_consumed_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
-        caloriesTrackingRecyclerView.setLayoutManager(lm);
-        caloriesTrackingRecyclerView.setAdapter(calorieTrackingAdapter);
+        caloriesConsumedRecyclerView.setLayoutManager(lm);
+        caloriesConsumedRecyclerView.setAdapter(calorieTrackingAdapter);
 
-        caloriesTrackingRecyclerViewLayoutParams = caloriesTrackingRecyclerView.getLayoutParams();
+        caloriesConsumedRecyclerViewLayoutParams = caloriesConsumedRecyclerView.getLayoutParams();
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesTrackingRecyclerView.getContext(), lm.getOrientation());
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesConsumedRecyclerView.getContext(), lm.getOrientation());
         dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-        caloriesTrackingRecyclerView.addItemDecoration(dividerItemDecoration);
+        caloriesConsumedRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
     private void instantiateAnimations() {
