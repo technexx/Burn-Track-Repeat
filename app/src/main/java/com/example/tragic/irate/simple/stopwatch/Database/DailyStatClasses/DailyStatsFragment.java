@@ -701,7 +701,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
-        //Todo: These need aggregate values of list.
         String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
         double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
 
@@ -733,8 +732,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalFoodStatsFooterTextViews() {
-        //Todo: We're returning a list here.
-        foodStatsTotalCaloriesConsumedTextView.setText(String.valueOf(dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration()));
+        foodStatsTotalCaloriesConsumedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
     }
 
     @Override

@@ -43,7 +43,6 @@ public class DailyStatsAccess {
     List<Double> totalCaloriesBurnedListForEachActivityForSelectedDuration;
 
     List<String> totalFoodStringListForSelectedDuration;
-    List<Double> totalFoodPortionListForSelectedDuration;
     List<Double> totalCaloriesConsumedListForSelectedDuration;
 
     long totalSetTimeForSelectedDuration;
@@ -505,15 +504,21 @@ public class DailyStatsAccess {
 
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
             totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
-            totalFoodPortionListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getPortionForEachFoodType());
             totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
         }
     }
 
     public void clearCaloriesForEachFoodListArrayLists() {
         totalFoodStringListForSelectedDuration.clear();
-        totalFoodPortionListForSelectedDuration.clear();
         totalCaloriesConsumedListForSelectedDuration.clear();
+    }
+
+    public double getTotalCaloriesConsumedForSelectedDuration() {
+        double valueToReturn = 0;
+        for (int i=0; i<totalCaloriesConsumedListForSelectedDuration.size(); i++) {
+            valueToReturn += totalCaloriesConsumedListForSelectedDuration.get(i);
+        }
+        return valueToReturn;
     }
 
     //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
@@ -873,7 +878,6 @@ public class DailyStatsAccess {
         totalCaloriesBurnedListForEachActivityForSelectedDuration = new ArrayList<>();
 
         totalFoodStringListForSelectedDuration = new ArrayList<>();
-        totalFoodPortionListForSelectedDuration = new ArrayList<>();
         totalCaloriesConsumedListForSelectedDuration = new ArrayList<>();
     }
 
