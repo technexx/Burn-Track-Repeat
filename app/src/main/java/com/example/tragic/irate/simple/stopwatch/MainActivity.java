@@ -2123,7 +2123,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       AsyncTask.execute(()-> {
-        dailyStatsFragment.setSortMode(sortModeForStats);
+        dailyStatsFragment.setActivitySortMode(sortModeForStats);
         dailyStatsFragment.sortStatsAsACallFromMainActivity();
         runOnUiThread(()-> {
           sortPopupWindow.dismiss();

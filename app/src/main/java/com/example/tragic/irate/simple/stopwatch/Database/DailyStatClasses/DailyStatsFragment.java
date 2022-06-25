@@ -94,10 +94,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ImageButton dailyStatsExpandedButton;
     ImageButton editTdeeStatsButton;
 
-    ConstraintLayout totalStatsValuesTextViewLayout;
-    ConstraintLayout.LayoutParams totalStatsValuesTextViewsLayoutParams;
+    ConstraintLayout totalActivityStatsValuesTextViewLayout;
+    ConstraintLayout.LayoutParams totalActivityStatsValuesTextViewsLayoutParams;
     TextView dailyStatsTotalSetTimeTextView;
     TextView dailyStatsTotalCaloriesBurnedTextView;
+
+    ConstraintLayout totalFoodStatsValuesTextViewLayout;
+    ConstraintLayout.LayoutParams totalFoodStatsValuesTextViewLayoutParams;
 
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
@@ -214,7 +217,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setTextWatchersOnActivityEditTexts();
 
         setCalorieModeTextViews(0);
-        setCalorieModeRecyclerViews(0);
+        setCalorieModeRecyclerViewsAndFooters(0);
 
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
@@ -345,7 +348,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void calorieModeIterationLogic(int directionOfIteration) {
         iterateThroughCalorieModes(directionOfIteration);
         setCalorieModeTextViews(currentCalorieMode);
-        setCalorieModeRecyclerViews(currentCalorieMode);
+        setCalorieModeRecyclerViewsAndFooters(currentCalorieMode);
     }
 
     private void iterateThroughCalorieModes(int directionOfIteration) {
@@ -376,15 +379,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setCalorieModeRecyclerViews(int mode) {
+    private void setCalorieModeRecyclerViewsAndFooters(int mode) {
         dailyStatsRecyclerView.setVisibility(View.GONE);
         caloriesTrackingRecyclerView.setVisibility(View.GONE);
+        totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+        totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
 
         if (mode==EXPENDED_CALORIES_MODE) {
             dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+            totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
         }
         if (mode==CONSUMED_CALORIES_MODE) {
             caloriesTrackingRecyclerView.setVisibility(View.VISIBLE);
+            totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
         }
         if (mode==COMPARING_CALORIES_MODE) {
 
@@ -479,12 +486,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    public void setSortMode(int sortMode) {
+    public void setActivitySortMode(int sortMode) {
         this.mActivitySortMode = sortMode;
     }
 
     public void sortStatsAsACallFromMainActivity() {
-        dailyStatsAccess.setSortMode(mActivitySortMode);
+        dailyStatsAccess.setActivitySortMode(mActivitySortMode);
         populateListsAndTextViewsFromEntityListsInDatabase();
     }
 
@@ -1032,11 +1039,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (!calendarIsMinimized) {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
             calendarView.startAnimation(slideInFromBottom);
-            totalStatsValuesTextViewLayout.startAnimation(slideInFromBottomNoAlphaChange);
+            totalActivityStatsValuesTextViewLayout.startAnimation(slideInFromBottomNoAlphaChange);
         } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
             calendarView.startAnimation(slideOutToBottom);
-            totalStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
+            totalActivityStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
         }
     }
 
@@ -1045,21 +1052,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalActivityStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
+            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
         } else {
             dailyStatsRecyclerViewLayoutParams.height = 0;
             dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
 
-            totalStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            totalActivityStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
-            totalStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
+            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
         }
 
-        totalStatsValuesTextViewLayout.setLayoutParams(totalStatsValuesTextViewsLayoutParams);
+        totalActivityStatsValuesTextViewLayout.setLayoutParams(totalActivityStatsValuesTextViewsLayoutParams);
         dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
 
     }
@@ -1205,10 +1212,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
         totalStatsHeaderTextView = mRoot.findViewById(R.id.activity_stats_duration_header_textView);
 
-        totalStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_stats_values_textView_layout);
-        totalStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalStatsValuesTextViewLayout.getLayoutParams();
+        totalActivityStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_activity_stats_values_textView_layout);
+        totalActivityStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalActivityStatsValuesTextViewLayout.getLayoutParams();
         dailyStatsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
         dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+
+        totalFoodStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_food_stats_values_textView_layout);
+        totalFoodStatsValuesTextViewLayoutParams = (ConstraintLayout.LayoutParams) totalFoodStatsValuesTextViewLayout.getLayoutParams();
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());

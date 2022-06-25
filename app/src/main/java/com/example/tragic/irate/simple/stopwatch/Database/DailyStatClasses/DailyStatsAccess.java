@@ -90,7 +90,7 @@ public class DailyStatsAccess {
         return doesDayExistInDatabase;
     }
 
-    public void setSortMode(int sortMode) {
+    public void setActivitySortMode(int sortMode) {
         this.mActivitySortMode = sortMode;
     }
 

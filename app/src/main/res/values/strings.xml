@@ -81,7 +81,7 @@
     <string name="workout_mode">Workout Mode</string>
     <string name="pomodoro_mode">Pomodoro Mode</string>
 
-    <string name="total_assigned_stats">Activity Time:</string>
+    <string name="total_assigned_stats">Time:</string>
     <string name="total_unassigned_stats">Non-Activity:</string>
     <string name="total_aggregate_stats">Combined:</string>
 
