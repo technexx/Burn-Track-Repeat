@@ -101,6 +101,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     ConstraintLayout totalFoodStatsValuesTextViewLayout;
     ConstraintLayout.LayoutParams totalFoodStatsValuesTextViewLayoutParams;
+    TextView foodStatsTotalCaloriesConsumedTextView;
 
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
@@ -448,7 +449,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalCaloriesConsumedStatsForSelectedDayToArrayLists();
             calorieTrackingAdapter.notifyDataSetChanged();
 
-            setDayHolderStatsTextViews();
+            setTotalActivityStatsFooterTextViews();
 
             dailyStatsAccess.setAggregateDailyTime();
             dailyStatsAccess.setUnassignedTotalCalories();
@@ -572,6 +573,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         activityStatsDurationRangeTextView.setText(getString(R.string.date_duration_textView, firstDay, lastDay));
     }
 
+    private void setTotalActivityStatsFooterTextViews() {
+        String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
+        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
+
+        dailyStatsTotalSetTimeTextView.setText(totalSetTime);
+        dailyStatsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
+    }
+
     public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
         if (directionOfIteration==ITERATING_ACTIVITY_STATS_UP) {
             if (currentStatDurationMode<4) {
@@ -620,14 +629,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendarDayDecorator.setCalendarDayList(calendarDayList);
             calendarView.addDecorator(calendarDayDecorator);
         });
-    }
-
-    private void setDayHolderStatsTextViews() {
-        String totalSetTime = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
-        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
-
-        dailyStatsTotalSetTimeTextView.setText(totalSetTime);
-        dailyStatsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
     }
 
     @Override
@@ -727,6 +728,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     @Override
     public void onDeletingCalories(int position) {
 
+    }
+
+    private void setTotalFoodStatsFooterTextViews() {
+        foodStatsTotalCaloriesConsumedTextView.setText(String.valueOf(dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration()));
     }
 
     @Override
@@ -1219,6 +1224,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         totalFoodStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_food_stats_values_textView_layout);
         totalFoodStatsValuesTextViewLayoutParams = (ConstraintLayout.LayoutParams) totalFoodStatsValuesTextViewLayout.getLayoutParams();
+        foodStatsTotalCaloriesConsumedTextView = mRoot.findViewById(R.id.calories_consumed_textView);
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
