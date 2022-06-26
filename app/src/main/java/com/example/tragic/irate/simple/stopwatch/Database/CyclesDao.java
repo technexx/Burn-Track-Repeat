@@ -101,7 +101,7 @@ CyclesDao {
     List<CalorieDayHolder> loadSingleCalorieDay(long listID);
 
     @Query("SELECT * from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
-    List<CalorieDayHolder> loadMultiplCalorieDays(List<Integer> listIDs);
+    List<CalorieDayHolder> loadMultipleCalorieDays(List<Integer> listIDs);
 
     @Query("DELETE from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
     void deleteMultipleCalorieDays(List<Long> listIDs);
@@ -116,37 +116,37 @@ CyclesDao {
     void deleteCaloriesForEachFoodRow(CaloriesForEachFood caloriesForEachFood);
 
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IS:uniqueId")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IS:uniqueId")
     List<CaloriesForEachFood> loadCaloriesForEachFoodForSpecificDay(long uniqueId);
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs)")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs)")
     List<CaloriesForEachFood> loadCaloriesForEachFoodForMultipleDays(List<Integer> uniqueIDs);
 
     @Query("SELECT * from CaloriesForEachFood")
     List<CaloriesForEachFood> loadCaloriesForEachFoodForAllDays();
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by typeOfFood ASC")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by typeOfFood ASC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByAToZName(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by typeOfFood DESC")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by typeOfFood DESC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByZToAName(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by portionForEachFoodType DESC")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by portionForEachFoodType DESC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByLargestPortion(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by portionForEachFoodType ASC")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by portionForEachFoodType ASC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodBySmallestPortion(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType DESC")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType DESC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByMostCaloriesBurned(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType ASC")
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType ASC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByLeastCaloriesBurned(List<Integer> uniqueIDs);
 
-    @Query("DELETE from CaloriesForEachFood WHERE caloriesForEachFoodId IS:listID")
+    @Query("DELETE from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IS:listID")
     void deleteCaloriesForEachFoodForSingleDay (long listID);
 
-    @Query("DELETE from CaloriesForEachFood WHERE caloriesForEachFoodId IN (:listIDs)")
+    @Query("DELETE from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:listIDs)")
     void deleteCaloriesForEachFoodForMultipleDays (List<Long> listIDs);
 
     @Query("DELETE from CaloriesForEachFood")

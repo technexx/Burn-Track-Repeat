@@ -198,13 +198,14 @@ public class DailyStatsAccess {
 
     //Todo: Right now we're using the size of DayHolder to check if our list of days is >0. This will b0rk if we're only adding to the consumed calories class.
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
+
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
-            mCalorieDayHolderList = cyclesDatabase.cyclesDao().loadMultiplCalorieDays(integerListOfSelectedDays);
+            mCalorieDayHolderList = cyclesDatabase.cyclesDao().loadMultipleCalorieDays(integerListOfSelectedDays);
             mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
 
-            Log.i("testCals", "entity list size retrieved from db is " + mCalorieDayHolderList.size());
+            Log.i("testCals", "entity list size retrieved from db for duration iteration is " + mCaloriesForEachFoodList.size());
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
@@ -241,6 +242,8 @@ public class DailyStatsAccess {
 
         List<Integer> singleDayListForCaloriesConsumed = Collections.singletonList(dayToRetrieve);
         mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(singleDayListForCaloriesConsumed);
+
+        Log.i("testCals", "entity list retrieved from from db for single day selection is " + mCaloriesForEachFoodList.size());
 
         convertToStringAndSetSingleDay(dayToRetrieve);
 
