@@ -55,7 +55,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, DailyStatsAdapter.tdeeActivityDeletion, CalorieTrackingAdapter.caloriesConsumedItemSelected, CalorieTrackingAdapter.caloriesConsumedAddition, CalorieTrackingAdapter.caloriesConsumedDeletion {
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, CalorieTrackingAdapter.caloriesConsumedItemSelected, CalorieTrackingAdapter.caloriesConsumedAddition {
 
     View mRoot;
     Calendar calendar;
@@ -336,7 +336,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityDeletionWithinEditPopUpButton.setOnClickListener(v-> {
-            onDeletingActivity(mPositionToEdit);
+            deleteActivity(mPositionToEdit);
             tdeeEditPopUpWindow.dismiss();
         });
 
@@ -368,7 +368,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void deleteFoodInStatsIfInEditMode() {
         if (calorieTrackingAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
-            onDeletingCalories(mPositionToEdit);
+            deleteConsumedCalories(mPositionToEdit);
         }
     }
 
@@ -760,9 +760,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    //Todo: Deletion methods don't need callbacks. We just use the position from editItemSelected.
-    @Override
-    public void onDeletingCalories(int position) {
+    private void deleteConsumedCalories(int position) {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
             dailyStatsAccess.deleteCaloriesAndEachFoodInDatabase();
@@ -826,8 +824,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    @Override
-    public void onDeletingActivity(int position) {
+
+    private void deleteActivity(int position) {
         AsyncTask.execute(() -> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
@@ -1283,7 +1281,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
         dailyStatsAdapter.addActivityToDailyStats(DailyStatsFragment.this);
-        dailyStatsAdapter.deleteActivityFromDailyStats(DailyStatsFragment.this);
 
         dailyStatsRecyclerView = mRoot.findViewById(R.id.daily_stats_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
@@ -1298,12 +1295,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
-        //Todo: Check list receipt in adapter.
         calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration());
 
         calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
         calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);
-        calorieTrackingAdapter.deleteCaloriesFromStats(DailyStatsFragment.this);
 
         caloriesConsumedRecyclerView = mRoot.findViewById(R.id.calories_consumed_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());

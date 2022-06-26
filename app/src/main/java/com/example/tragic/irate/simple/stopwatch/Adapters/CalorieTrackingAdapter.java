@@ -51,7 +51,6 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     caloriesConsumedItemSelected mCaloriesConsumedItemSelected;
     caloriesConsumedAddition mCaloriesConsumedAddition;
-    caloriesConsumedDeletion mCaloriesConsumedDeletion;
 
     public interface caloriesConsumedItemSelected {
         void calorieRowIsSelected(int position);
@@ -67,14 +66,6 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public void addCaloriesToStats(caloriesConsumedAddition xCaloriesConsumedAddition) {
         this.mCaloriesConsumedAddition = xCaloriesConsumedAddition;
-    }
-
-    public interface caloriesConsumedDeletion {
-        void onDeletingCalories (int position);
-    }
-
-    public void deleteCaloriesFromStats(caloriesConsumedDeletion xCaloriesConsumedDeletion) {
-        this.mCaloriesConsumedDeletion = xCaloriesConsumedDeletion;
     }
 
     public CalorieTrackingAdapter(Context context, List<String> foodEaten, List<Double> caloriesConsumed) {
