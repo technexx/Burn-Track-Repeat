@@ -119,10 +119,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int CONSUMED_CALORIES_MODE = 1;
     int COMPARING_CALORIES_MODE = 2;
 
-    int addOrEditModeForFoodAndCalories;
-    int ADDING_FOOD_AND_CALORIES = 0;
-    int EDITING_FOOD_AND_CALORIES = 1;
-
     int currentStatDurationMode;
     int ITERATING_ACTIVITY_STATS_UP = 0;
     int ITERATING_ACTIVITY_STATS_DOWN = 1;
@@ -171,7 +167,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     PopupWindow editFoodPopUpWindow;
     EditText typeOfFoodEditText;
     EditText caloriesConsumedEditText;
-    ImageButton confirmCaloriesConsumedEditWithinPopUpButton;
+
+    ImageButton confirmCaloriesConsumedAdditionWithinAdditionPopUpButton;
+    ImageButton confirmCaloriesConsumedDeletionWithinAdditionPopUpButton;
+    ImageButton confirmCaloriesConsumedEditWithinEditPopUpButton;
     ImageButton confirmCaloriesConsumedDeletionWithinEditPopUpButton;
 
     int selectedTdeeCategoryPosition;
@@ -338,10 +337,26 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityDeletionWithinEditPopUpButton.setOnClickListener(v-> {
             onDeletingActivity(mPositionToEdit);
+            tdeeEditPopUpWindow.dismiss();
         });
 
-        confirmCaloriesConsumedEditWithinPopUpButton.setOnClickListener(v-> {
+        confirmCaloriesConsumedAdditionWithinAdditionPopUpButton.setOnClickListener(v-> {
             addFoodToStats();
+            addFoodPopUpWindow.dismiss();
+        });
+
+        confirmCaloriesConsumedDeletionWithinAdditionPopUpButton.setOnClickListener(v-> {
+            addFoodPopUpWindow.dismiss();
+        });
+
+        confirmCaloriesConsumedEditWithinEditPopUpButton.setOnClickListener(v-> {
+            updateFoodInStats();
+            editFoodPopUpWindow.dismiss();
+        });
+
+        confirmCaloriesConsumedDeletionWithinEditPopUpButton.setOnClickListener(v-> {
+
+            editFoodPopUpWindow.dismiss();
         });
 
         minimizeCalendarButton.setOnClickListener(v-> {
@@ -349,15 +364,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
-    }
-
-    private void addOrEditFoodAndCalories(int addingOrEditing) {
-        if (addingOrEditing==ADDING_FOOD_AND_CALORIES) {
-            addFoodToStats();
-        }
-        if (addingOrEditing==EDITING_FOOD_AND_CALORIES) {
-            updateFoodInStats();
-        }
     }
 
     private void calorieModeIterationLogic(int directionOfIteration) {
@@ -750,7 +756,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onDeletingCalories(int position) {
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
+            populateListsAndTextViewsFromEntityListsInDatabase();
 
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+            });
+        });
     }
 
     private void setTotalFoodStatsFooterTextViews() {
@@ -824,7 +837,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
-                tdeeEditPopUpWindow.dismiss();
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
             });
         });
@@ -1219,8 +1231,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_add_text);
         caloriesConsumedEditText = addFoodView.findViewById(R.id.add_calories_consumed_editText);
-        confirmCaloriesConsumedEditWithinPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_edit);
-        confirmCaloriesConsumedDeletionWithinEditPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_delete_button);
+
+        confirmCaloriesConsumedAdditionWithinAdditionPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_edit);
+        confirmCaloriesConsumedDeletionWithinAdditionPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_delete_button);
+        confirmCaloriesConsumedEditWithinEditPopUpButton = editFoodView.findViewById(R.id.confirm_calories_consumed_edit);
+        confirmCaloriesConsumedDeletionWithinEditPopUpButton = editFoodView.findViewById(R.id.confirm_calories_consumed_delete_button);
 
         addFoodPopUpWindow.setOnDismissListener(()-> {
             calorieTrackingAdapter.turnOffEditMode();

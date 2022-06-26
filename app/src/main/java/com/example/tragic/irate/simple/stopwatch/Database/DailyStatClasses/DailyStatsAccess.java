@@ -478,6 +478,14 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
     }
 
+    public void updateCaloriesAndEachFoodInDatabase() {
+        cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
+    }
+
+    public void deleteCaloriesAndEachFoodInDatabase() {
+        cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
+    }
+
     public void setFoodString(String food) {
         this.mFoodString = food;
     }
@@ -488,10 +496,6 @@ public class DailyStatsAccess {
 
     public void assignCaloriesForEachFoodItemEntityForSinglePosition(int position) {
         mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
-    }
-
-    public void updateCaloriesAndEachFoodInDatabase() {
-        cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
     }
 
     public List<String> getTotalFoodStringListForSelectedDuration() {
@@ -524,7 +528,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Since DayHolder's dayId and CycleStat's setUniqueDayIdPossessedByEachOfItsActivities are identical, we simply tie StatsForEachActivityWithinCycle's unique ID to that as well.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
 
         if (!doesActivityExistsInDatabaseForSelectedDay) {
