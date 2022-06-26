@@ -196,12 +196,15 @@ public class DailyStatsAccess {
         Log.i("testInsert", "doesDayExist in insert method for daily totals is " + doesDayExistInDatabase);
     }
 
+    //Todo: Right now we're using the size of DayHolder to check if our list of days is >0. This will b0rk if we're only adding to the consumed calories class.
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
             mCalorieDayHolderList = cyclesDatabase.cyclesDao().loadMultiplCalorieDays(integerListOfSelectedDays);
             mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
+
+            Log.i("testCals", "entity list size retrieved from db is " + mCalorieDayHolderList.size());
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
@@ -462,9 +465,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-    //Todo: Add insert/update/delete methods from DAO and call those in our fragment.
-    //Todo: We may not even need DayHolder or CalorieDayHolder since we're getting all our total values from their sibling classes. Their IDs are represented by uniqueIDs and their dates can be fetched as a String from that ID.
-
     public void insertCaloriesAndEachFoodIntoDatabase(int daySelected) {
         mCaloriesForEachFood = new CaloriesForEachFood();
 
@@ -496,6 +496,7 @@ public class DailyStatsAccess {
     }
 
     public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
+        Log.i("testCals", "cal consumed list is " + totalCaloriesConsumedListForSelectedDuration);
         return totalCaloriesConsumedListForSelectedDuration;
     }
 
@@ -505,7 +506,9 @@ public class DailyStatsAccess {
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
             totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
             totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
+            Log.i("testCals", "entity list cals retrieved are " + mCalorieDayHolderList.get(i).getCaloriesConsumed());
         }
+
     }
 
     public void clearCaloriesForEachFoodListArrayLists() {

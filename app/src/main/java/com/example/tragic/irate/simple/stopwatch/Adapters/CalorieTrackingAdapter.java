@@ -104,6 +104,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
             populateHeaderRowViews();
             setHolderViewTextStyles(BOLD_TEXT);
+
         } else if (holder instanceof CalorieTrackingAdapter.MainViewHolder) {
             mMainViewHolder = (MainViewHolder) holder;
 

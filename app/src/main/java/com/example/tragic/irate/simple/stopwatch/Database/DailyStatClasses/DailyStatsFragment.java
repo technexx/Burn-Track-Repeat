@@ -316,7 +316,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             addActivityToStats();
         });
 
-        //Todo: isShown may need to be replaced w/ getVisibility
         editTdeeStatsButton.setOnClickListener(v-> {
             if (dailyStatsRecyclerView.isShown()) {
                 dailyStatsAdapter.toggleEditMode();
@@ -680,9 +679,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase(daySelectedFromCalendar);
 
             getActivity().runOnUiThread(()-> {
-                calorieTrackingAdapter.notifyDataSetChanged();
-                addFoodPopUpWindow.dismiss();
-                Toast.makeText(getContext(), "Added!", Toast.LENGTH_SHORT).show();
+                if (!isFoodNameEditTextEmpty(getFoodStringFromEditText())) {
+                    calorieTrackingAdapter.notifyDataSetChanged();
+                    addFoodPopUpWindow.dismiss();
+                    Toast.makeText(getContext(), "Added!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Must enter a food!", Toast.LENGTH_SHORT).show();
+                }
             });
         });
     }
@@ -693,6 +696,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private double getCaloriesForFoodItemFromEditText() {
         return Double.parseDouble(caloriesConsumedEditText.getText().toString());
+    }
+
+    private boolean isFoodNameEditTextEmpty(String editTextString) {
+        return editTextString.isEmpty();
     }
 
     @Override
@@ -1259,6 +1266,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
+        //Todo: Check list receipt in adapter.
         calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration());
 
         calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
