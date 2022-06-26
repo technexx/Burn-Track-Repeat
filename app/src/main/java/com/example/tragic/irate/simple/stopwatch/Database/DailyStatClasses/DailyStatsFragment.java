@@ -340,13 +340,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             tdeeEditPopUpWindow.dismiss();
         });
 
-        //Todo: Need conditionals in both confirm + delete.
         confirmCaloriesConsumedAdditionWithinPopUpButton.setOnClickListener(v-> {
-            addFoodToStats();
+            addOrEditFoodInStats();
             addFoodPopUpWindow.dismiss();
         });
 
         confirmCaloriesConsumedDeletionWithinPopUpButton.setOnClickListener(v-> {
+            deleteFoodInStatsIfInEditMode();
             addFoodPopUpWindow.dismiss();
         });
 
@@ -355,6 +355,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    private void addOrEditFoodInStats() {
+        if (calorieTrackingAdapter.getAddingOrEditingFoodVariable()==ADDING_FOOD) {
+            addFoodToStats();
+        }
+        if (calorieTrackingAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
+            updateFoodInStats();
+        }
+    }
+
+    private void deleteFoodInStatsIfInEditMode() {
+        if (calorieTrackingAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
+            onDeletingCalories(mPositionToEdit);
+        }
     }
 
     private void calorieModeIterationLogic(int directionOfIteration) {
@@ -745,6 +760,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    //Todo: Deletion methods don't need callbacks. We just use the position from editItemSelected.
     @Override
     public void onDeletingCalories(int position) {
         AsyncTask.execute(()-> {
