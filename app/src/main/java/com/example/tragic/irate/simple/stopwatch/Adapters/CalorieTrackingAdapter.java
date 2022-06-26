@@ -27,7 +27,6 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     MainViewHolder mMainViewHolder;
 
     List<String> mFoodEaten;
-//    List<Double> mFoodPortion;
     List<Double> mCaloriesConsumed;
     int mItemCount;
 
@@ -40,6 +39,10 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     boolean mEditModeIsActive;
     boolean mRowIsSelectedForEditing;
+
+    int mAddingOrEditing;
+    int ADDING_FOOD = 0;
+    int EDITING_FOOD = 1;
 
     Animation slideInFromLeft;
     Animation slideOutFromLeft;
@@ -118,6 +121,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 mMainViewHolder = (MainViewHolder) holder;
 
                 if (mEditModeIsActive) {
+                    setAddingOrEditingFoodVariable(EDITING_FOOD);
                     mCaloriesConsumedItemSelected.calorieRowIsSelected(position-1);
                     toggleRowSelectionForEditing();
                 }
@@ -129,19 +133,24 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
+                setAddingOrEditingFoodVariable(ADDING_FOOD);
                 mCaloriesConsumedAddition.onAddingFood(position);
+
             });
         }
     }
 
+    private void setAddingOrEditingFoodVariable(int addingOrEditing) {
+        this.mAddingOrEditing = addingOrEditing;
+    }
+
+    public int getAddingOrEditingFoodVariable() {
+        return mAddingOrEditing;
+    }
 
     private void toggleRowSelectionForEditing() {
         mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
     }
-
-//    public boolean getIsRowSelectedForEditingBoolean() {
-//        return mRowIsSelectedForEditing;
-//    }
 
     private void setDefaultMainHolderViewsAndBackgrounds() {
         mMainViewHolder.fullView.setBackground(null);
