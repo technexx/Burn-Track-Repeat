@@ -139,6 +139,10 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
     }
 
+//    public boolean getIsRowSelectedForEditingBoolean() {
+//        return mRowIsSelectedForEditing;
+//    }
+
     private void setDefaultMainHolderViewsAndBackgrounds() {
         mMainViewHolder.fullView.setBackground(null);
     }

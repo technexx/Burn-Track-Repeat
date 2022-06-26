@@ -119,6 +119,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int CONSUMED_CALORIES_MODE = 1;
     int COMPARING_CALORIES_MODE = 2;
 
+    int addOrEditModeForFoodAndCalories;
+    int ADDING_FOOD_AND_CALORIES = 0;
+    int EDITING_FOOD_AND_CALORIES = 1;
+
     int currentStatDurationMode;
     int ITERATING_ACTIVITY_STATS_UP = 0;
     int ITERATING_ACTIVITY_STATS_DOWN = 1;
@@ -163,6 +167,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     View addFoodView;
     PopupWindow addFoodPopUpWindow;
+    View editFoodView;
+    PopupWindow editFoodPopUpWindow;
     EditText typeOfFoodEditText;
     EditText caloriesConsumedEditText;
     ImageButton confirmCaloriesConsumedEditWithinPopUpButton;
@@ -345,6 +351,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
+    private void addOrEditFoodAndCalories(int addingOrEditing) {
+        if (addingOrEditing==ADDING_FOOD_AND_CALORIES) {
+            addFoodToStats();
+        }
+        if (addingOrEditing==EDITING_FOOD_AND_CALORIES) {
+            updateFoodInStats();
+        }
+    }
 
     private void calorieModeIterationLogic(int directionOfIteration) {
         iterateThroughCalorieModes(directionOfIteration);
@@ -715,7 +729,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         typeOfFoodEditText.setText(foodString);
         caloriesConsumedEditText.setText(String.valueOf(caloriesInFood));
 
-        addFoodPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
+        editFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
     private void updateFoodInStats() {
@@ -1199,10 +1213,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(150), true);
         addFoodPopUpWindow.setAnimationStyle(R.style.SlideTopAnimation);
 
-        typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_edit_text);
-        caloriesConsumedEditText = addFoodView.findViewById(R.id.calories_consumed_editText);
-        confirmCaloriesConsumedEditWithinPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_edit);
-        confirmCaloriesConsumedDeletionWithinEditPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_delete_button);
+        editFoodView = inflater.inflate(R.layout.edit_calories_consumed_popup, null);
+        editFoodPopUpWindow = new PopupWindow(editFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(150), true);
+        addFoodPopUpWindow.setAnimationStyle(R.style.SlideTopAnimation);
+
+        typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_add_text);
+        caloriesConsumedEditText = addFoodView.findViewById(R.id.add_calories_consumed_editText);
+        confirmCaloriesConsumedEditWithinPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_edit);
+        confirmCaloriesConsumedDeletionWithinEditPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_delete_button);
 
         addFoodPopUpWindow.setOnDismissListener(()-> {
             calorieTrackingAdapter.turnOffEditMode();

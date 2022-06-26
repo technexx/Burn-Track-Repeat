@@ -499,7 +499,6 @@ public class DailyStatsAccess {
     }
 
     public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
-        Log.i("testCals", "cal consumed list is " + totalCaloriesConsumedListForSelectedDuration);
         return totalCaloriesConsumedListForSelectedDuration;
     }
 
@@ -509,9 +508,7 @@ public class DailyStatsAccess {
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
             totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
             totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
-            Log.i("testCals", "entity list cals retrieved are " + mCalorieDayHolderList.get(i).getCaloriesConsumed());
         }
-
     }
 
     public void clearCaloriesForEachFoodListArrayLists() {
