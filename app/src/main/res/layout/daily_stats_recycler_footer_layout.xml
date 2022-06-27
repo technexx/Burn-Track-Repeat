@@ -11,7 +11,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:backgroundTint="@color/dark_grey"
+        android:backgroundTint="@color/black"
         android:src="@drawable/add_40">
     </ImageButton>
 

@@ -281,6 +281,47 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/calories_compared_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/stats_calendar"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/total_consumed_calories_compared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="2dp"
+            android:textSize="28sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_expended_calories_compared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="2dp"
+            android:textSize="28sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_calories_difference_compared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="24dp"
+            android:textSize="28sp">
+        </TextView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/stats_calendar"
         android:layout_width="wrap_content"
