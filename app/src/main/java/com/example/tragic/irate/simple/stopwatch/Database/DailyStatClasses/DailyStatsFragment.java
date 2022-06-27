@@ -694,6 +694,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingFood(int position) {
+        typeOfFoodEditText.requestFocus();
         addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
@@ -741,6 +742,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         typeOfFoodEditText.setText(foodString);
         caloriesConsumedEditText.setText(String.valueOf(caloriesInFood));
 
+        typeOfFoodEditText.requestFocus();
         addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
@@ -789,6 +791,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpFirstMainTextView.setText(activityString);
         setActivityEditTexts(timeToEditLongValue);
 
+        tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
@@ -959,6 +962,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void replaceActivityAddPopUpWithEditPopUp() {
         tdeeAddPopUpWindow.dismiss();
+        tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
@@ -1218,7 +1222,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
-        tdeeEditTextHours.requestFocus();
 
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit);
         confirmActivityDeletionWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
