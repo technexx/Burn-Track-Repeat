@@ -1214,9 +1214,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
         tdeeEditPopUpFirstMainTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
+
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
+        tdeeEditTextHours.requestFocus();
+
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit);
         confirmActivityDeletionWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
 
@@ -1230,6 +1233,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addFoodView = inflater.inflate(R.layout.add_calories_consumed_popup, null);
         addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(150), true);
         addFoodPopUpWindow.setAnimationStyle(R.style.SlideTopAnimation);
+
+        typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_add_text);
+        caloriesConsumedEditText = addFoodView.findViewById(R.id.add_calories_consumed_editText);
 
         confirmCaloriesConsumedAdditionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_edit);
         confirmCaloriesConsumedDeletionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_delete_button);

@@ -543,8 +543,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Add custom for MET score?
-  //Todo: For Consumed: Food/Portion/Calories. For Comparison: Expended/Consumed/Difference.
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: First 3 rows of expansion can be daily w/ calories consumed vs. burned, and a second section below can be year-to-date.
   //Todo: Limit edits to 24 hours total for both single and combined activities.
@@ -577,6 +575,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
   //Todo: App Ideas:
+    //Todo: Mental illness onset game. Java/web based? Can convert from Android.
+    //Todo: "A Day in the Life" - pick an age and get assigned random stats/locations/events.
     //Todo: Mad Libs RPG/story (monkey's paw type interpretation of inserted adjectives).
 
   @Override
