@@ -21,16 +21,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/add_food_name_header"
-        app:layout_constraintStart_toStartOf="@id/add_food_name_header"
-        app:layout_constraintEnd_toEndOf="@id/add_food_name_header"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="12dp"
         android:textSize="20sp"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
-        android:maxLength="50"
-        android:maxWidth="120dp"
-        android:inputType="textCapSentences|textAutoCorrect"
+        android:maxLength="35"
+        android:maxLines="2"
+        android:minWidth="50dp"
+        android:maxWidth="175dp"
+        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:textColorHint="@color/light_grey">
     </EditText>
 

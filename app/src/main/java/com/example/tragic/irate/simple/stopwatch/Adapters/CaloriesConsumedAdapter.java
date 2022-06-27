@@ -19,7 +19,7 @@ import com.example.tragic.irate.simple.stopwatch.R;
 import java.text.DecimalFormat;
 import java.util.List;
 
-public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     Context mContext;
 
@@ -68,7 +68,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         this.mCaloriesConsumedAddition = xCaloriesConsumedAddition;
     }
 
-    public CalorieTrackingAdapter(Context context, List<String> foodEaten, List<Double> caloriesConsumed) {
+    public CaloriesConsumedAdapter(Context context, List<String> foodEaten, List<Double> caloriesConsumed) {
         this.mContext = context; this.mFoodEaten = foodEaten; this.mCaloriesConsumed = caloriesConsumed;
         setAnimations();
     }
@@ -93,13 +93,13 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof CalorieTrackingAdapter.HeaderViewHolder) {
+        if (holder instanceof CaloriesConsumedAdapter.HeaderViewHolder) {
             mHeaderViewHolder = (HeaderViewHolder) holder;
 
             populateHeaderRowViews();
             setHolderViewTextStyles(BOLD_TEXT);
 
-        } else if (holder instanceof CalorieTrackingAdapter.MainViewHolder) {
+        } else if (holder instanceof CaloriesConsumedAdapter.MainViewHolder) {
             mMainViewHolder = (MainViewHolder) holder;
 
             populateMainRowViews(position);
@@ -118,7 +118,7 @@ public class CalorieTrackingAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 }
             });
 
-        } else if (holder instanceof CalorieTrackingAdapter.FootViewHolder) {
+        } else if (holder instanceof CaloriesConsumedAdapter.FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
 
             footViewHolder.addActivity.startAnimation(slideInFromLeft);

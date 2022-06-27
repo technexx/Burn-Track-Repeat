@@ -29,12 +29,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tragic.irate.simple.stopwatch.Adapters.CalorieTrackingAdapter;
+import com.example.tragic.irate.simple.stopwatch.Adapters.CaloriesConsumedAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDurationSelectedDecorator;
@@ -55,7 +54,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, CalorieTrackingAdapter.caloriesConsumedItemSelected, CalorieTrackingAdapter.caloriesConsumedAddition {
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, CaloriesConsumedAdapter.caloriesConsumedItemSelected, CaloriesConsumedAdapter.caloriesConsumedAddition {
 
     View mRoot;
     Calendar calendar;
@@ -76,7 +75,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     RecyclerView dailyStatsRecyclerView;
     ConstraintLayout.LayoutParams dailyStatsRecyclerViewLayoutParams;
 
-    CalorieTrackingAdapter calorieTrackingAdapter;
+    CaloriesConsumedAdapter caloriesConsumedAdapter;
     RecyclerView caloriesConsumedRecyclerView;
     ViewGroup.LayoutParams caloriesConsumedRecyclerViewLayoutParams;
 
@@ -326,7 +325,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAdapter.toggleEditMode();
             }
             if (caloriesConsumedRecyclerView.isShown()) {
-                calorieTrackingAdapter.toggleEditMode();
+                caloriesConsumedAdapter.toggleEditMode();
             }
         });
 
@@ -358,16 +357,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void addOrEditFoodInStats() {
-        if (calorieTrackingAdapter.getAddingOrEditingFoodVariable()==ADDING_FOOD) {
+        if (caloriesConsumedAdapter.getAddingOrEditingFoodVariable()==ADDING_FOOD) {
             addFoodToStats();
         }
-        if (calorieTrackingAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
+        if (caloriesConsumedAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
             updateFoodInStats();
         }
     }
 
     private void deleteFoodInStatsIfInEditMode() {
-        if (calorieTrackingAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
+        if (caloriesConsumedAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
             deleteConsumedCalories(mPositionToEdit);
         }
     }
@@ -437,8 +436,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAdapter.turnOffEditMode();
         dailyStatsAdapter.getItemCount();
 
-        calorieTrackingAdapter.turnOffEditMode();
-        calorieTrackingAdapter.getItemCount();
+        caloriesConsumedAdapter.turnOffEditMode();
+        caloriesConsumedAdapter.getItemCount();
 
         dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
     }
@@ -473,7 +472,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAdapter.notifyDataSetChanged();
 
             dailyStatsAccess.setTotalCaloriesConsumedStatsForSelectedDayToArrayLists();
-            calorieTrackingAdapter.notifyDataSetChanged();
+            caloriesConsumedAdapter.notifyDataSetChanged();
 
             setTotalActivityStatsFooterTextViews();
 
@@ -554,8 +553,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAdapter.turnOffEditMode();
                 dailyStatsAdapter.getItemCount();
 
-                calorieTrackingAdapter.turnOffEditMode();
-                calorieTrackingAdapter.getItemCount();
+                caloriesConsumedAdapter.turnOffEditMode();
+                caloriesConsumedAdapter.getItemCount();
             });
         });
     }
@@ -708,7 +707,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             getActivity().runOnUiThread(()-> {
                 if (!isFoodNameEditTextEmpty(getFoodStringFromEditText())) {
-                    calorieTrackingAdapter.notifyDataSetChanged();
+                    caloriesConsumedAdapter.notifyDataSetChanged();
                     addFoodPopUpWindow.dismiss();
                     Toast.makeText(getContext(), "Added!", Toast.LENGTH_SHORT).show();
                 } else {
@@ -1246,9 +1245,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmCaloriesConsumedDeletionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_delete_button);
 
         addFoodPopUpWindow.setOnDismissListener(()-> {
-            calorieTrackingAdapter.turnOffEditMode();
-            calorieTrackingAdapter.getItemCount();
-            calorieTrackingAdapter.notifyDataSetChanged();
+            caloriesConsumedAdapter.turnOffEditMode();
+            caloriesConsumedAdapter.getItemCount();
+            caloriesConsumedAdapter.notifyDataSetChanged();
         });
     }
 
@@ -1307,15 +1306,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
-        calorieTrackingAdapter = new CalorieTrackingAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration());
+        caloriesConsumedAdapter = new CaloriesConsumedAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration());
 
-        calorieTrackingAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
-        calorieTrackingAdapter.addCaloriesToStats(DailyStatsFragment.this);
+        caloriesConsumedAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
+        caloriesConsumedAdapter.addCaloriesToStats(DailyStatsFragment.this);
 
         caloriesConsumedRecyclerView = mRoot.findViewById(R.id.calories_consumed_recyclerView);
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
         caloriesConsumedRecyclerView.setLayoutManager(lm);
-        caloriesConsumedRecyclerView.setAdapter(calorieTrackingAdapter);
+        caloriesConsumedRecyclerView.setAdapter(caloriesConsumedAdapter);
 
         caloriesConsumedRecyclerViewLayoutParams = caloriesConsumedRecyclerView.getLayoutParams();
 
