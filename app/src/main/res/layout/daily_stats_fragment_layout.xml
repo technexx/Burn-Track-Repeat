@@ -289,7 +289,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:text="@string/consumed_calories_header"
+            android:text="@string/consumed_calories"
             android:id="@+id/total_consumed_calories_compared_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -301,7 +301,7 @@
         </TextView>
 
         <TextView
-            android:text="@string/expended_calories_header"
+            android:text="@string/expended_calories"
             android:id="@+id/total_expended_calories_compared_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -313,7 +313,7 @@
         </TextView>
 
         <TextView
-            android:text="@string/difference_calories_header"
+            android:text="@string/difference_calories"
             android:id="@+id/total_calories_difference_compared_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -332,7 +332,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
-            android:textSize="28sp">
+            android:textSize="24sp">
         </TextView>
 
         <TextView
@@ -343,7 +343,7 @@
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="2dp"
-            android:textSize="28sp">
+            android:textSize="24sp">
         </TextView>
 
         <TextView
@@ -354,7 +354,7 @@
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared"
             android:layout_marginEnd="2dp"
             android:layout_marginTop="24dp"
-            android:textSize="28sp">
+            android:textSize="24sp">
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

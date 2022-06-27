@@ -492,6 +492,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             setTotalCaloriesConsumedFooterTextViews();
 
+            setTotalCaloriesComparedTextViews();
+
             setExpansionTextViewValues();
         });
     }
@@ -1050,7 +1052,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setTotalCaloriesComparedTextViews() {
         double caloriesConsumed = dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration();
         double caloriesExpended = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
-        double caloriesDifference = caloriesExpended - caloriesConsumed;
+        double caloriesDifference = Math.abs(caloriesExpended - caloriesConsumed);
 
         totalConsumedCaloriesCompared.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
         totalExpendedCaloriesCompared.setText(formatCalorieStringWithoutDecimals(caloriesExpended));

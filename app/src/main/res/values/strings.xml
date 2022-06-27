@@ -85,10 +85,13 @@
     <string name="total_unassigned_stats">Non-Activity:</string>
     <string name="total_aggregate_stats">Combined:</string>
 
-    <string name="consumed_calories_header">Calories Consumed:</string>
-    <string name="expended_calories_header">Calories Expended:</string>
-    <string name="difference_calories_header">Difference:</string>
+    <string name="consumed_calories_header">Calories Consumed</string>
+    <string name="expended_calories_header">Calories Expended</string>
     <string name="compared_calories_header">Calories Compared</string>
+
+    <string name="consumed_calories">Calories Consumed:</string>
+    <string name="expended_calories">Calories Expended:</string>
+    <string name="difference_calories">Difference:</string>
 
     <string name="daily_stats_string">%1$s\n%2$s</string>
     <string name="day_total_header">Daily</string>
