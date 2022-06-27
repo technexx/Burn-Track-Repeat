@@ -479,6 +479,9 @@ public class DailyStatsAccess {
     }
 
     public void updateCaloriesAndEachFoodInDatabase() {
+        mCaloriesForEachFood.setTypeOfFood(mFoodString);
+        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
+
         cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
     }
 
@@ -903,11 +906,10 @@ public class DailyStatsAccess {
         Log.i("testCals", "total aggregate set is " + totalAggregateTimeForSelectedDuration);
     }
 
-    private void logCalorieValues() {
+    private void logActivityCalorieValues() {
         Log.i("testCals", "total assigned calories are " + totalCaloriesForSelectedDuration);
         Log.i("testCals", "total unassigned calories are " + totalUnassignedCaloriesForSelectedDuration);
         Log.i("testCals", "total aggregate calories are " + totalAggregateCaloriesForSelectedDuration);
         Log.i("testCals", "decimal pct is " + decimalPercentageOfUnAssignedTime());
-
     }
 }
