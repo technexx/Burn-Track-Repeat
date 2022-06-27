@@ -543,6 +543,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: DayHolder conditional issue.
+  //Todo: Have calorie consumption layout mimic calendar minimization of other recyclerView.
   //Todo: Duration switching blips day selected on calendar.
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: First 3 rows of expansion can be daily w/ calories consumed vs. burned, and a second section below can be year-to-date.

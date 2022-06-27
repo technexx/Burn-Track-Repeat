@@ -168,7 +168,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ImageButton confirmCaloriesConsumedAdditionWithinPopUpButton;
     ImageButton confirmCaloriesConsumedDeletionWithinPopUpButton;
 
-    int addingOrEditingFood;
+    TextView totalConsumedCaloriesCompared;
+    TextView totalExpendedCaloriesCompared;
+    TextView totalCaloriesDifferenceCompared;
+
     int ADDING_FOOD = 0;
     int EDITING_FOOD = 1;
 
@@ -215,9 +218,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateExpansionPopUpViews();
         instantiateActivityEditPopUpViews();
         instantiateAddPopUpViews();
-        instantiateCaloriesConsumedEditPopUpViews();
         instantiateActivityAdditionSpinnersAndAdapters();
         setTdeeSpinnerListeners();
+
+        instantiateCaloriesConsumedEditPopUpViews();
+        instantiateCaloriesComparedViews();
 
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnActivityEditTexts();
@@ -1249,6 +1254,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             caloriesConsumedAdapter.getItemCount();
             caloriesConsumedAdapter.notifyDataSetChanged();
         });
+    }
+
+    private void instantiateCaloriesComparedViews() {
+        totalConsumedCaloriesCompared = mRoot.findViewById(R.id.total_consumed_calories_compared);
+        totalExpendedCaloriesCompared = mRoot.findViewById(R.id.total_expended_calories_compared);
+        totalCaloriesDifferenceCompared = mRoot.findViewById(R.id.total_calories_difference_compared);
     }
 
     private void instantiateTextViewsAndMiscClasses() {
