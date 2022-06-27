@@ -704,6 +704,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
 
             dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase(daySelectedFromCalendar);
+            populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
                 if (!isFoodNameEditTextEmpty(getFoodStringFromEditText())) {
@@ -738,9 +739,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
         String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
         double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
+        String caloriesAsString = formatCalorieStringWithoutDecimals(caloriesInFood);
 
         typeOfFoodEditText.setText(foodString);
-        caloriesConsumedEditText.setText(String.valueOf(caloriesInFood));
+        caloriesConsumedEditText.setText(caloriesAsString);
 
         typeOfFoodEditText.requestFocus();
         addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);

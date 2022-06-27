@@ -13,7 +13,8 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
         android:paddingStart="6dp"
-        android:paddingEnd="6dp">
+        android:paddingEnd="6dp"
+        android:gravity="center">
     </TextView>
 
     <TextView
