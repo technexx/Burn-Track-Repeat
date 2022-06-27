@@ -24,14 +24,13 @@
         app:layout_constraintStart_toStartOf="@id/add_food_name_header"
         app:layout_constraintEnd_toEndOf="@id/add_food_name_header"
         android:layout_marginTop="12dp"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
-        android:maxLength="100"
-        android:minWidth="100dp"
-        android:maxWidth="150dp"
-        android:inputType="textAutoCorrect"
+        android:maxLength="50"
+        android:maxWidth="120dp"
+        android:inputType="textCapSentences|textAutoCorrect"
         android:textColorHint="@color/light_grey">
     </EditText>
 

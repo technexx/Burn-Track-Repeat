@@ -1248,6 +1248,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addFoodPopUpWindow.setOnDismissListener(()-> {
             calorieTrackingAdapter.turnOffEditMode();
             calorieTrackingAdapter.getItemCount();
+            calorieTrackingAdapter.notifyDataSetChanged();
         });
     }
 
