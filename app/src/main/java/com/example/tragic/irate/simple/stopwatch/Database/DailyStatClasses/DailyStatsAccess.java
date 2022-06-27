@@ -468,69 +468,6 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-    public void insertCaloriesAndEachFoodIntoDatabase(int daySelected) {
-        mCaloriesForEachFood = new CaloriesForEachFood();
-
-        mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
-        mCaloriesForEachFood.setTypeOfFood(mFoodString);
-        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
-
-        cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
-    }
-
-    public void updateCaloriesAndEachFoodInDatabase() {
-        mCaloriesForEachFood.setTypeOfFood(mFoodString);
-        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
-
-        cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
-    }
-
-    public void deleteCaloriesAndEachFoodInDatabase() {
-        cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
-    }
-
-    public void setFoodString(String food) {
-        this.mFoodString = food;
-    }
-
-    public void setCaloriesInFoodItem(double calories) {
-        this.mCaloriesInFoodItem = calories;
-    }
-
-    public void assignCaloriesForEachFoodItemEntityForSinglePosition(int position) {
-        mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
-    }
-
-    public List<String> getTotalFoodStringListForSelectedDuration() {
-        return totalFoodStringListForSelectedDuration;
-    }
-
-    public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
-        return totalCaloriesConsumedListForSelectedDuration;
-    }
-
-    public void setTotalCaloriesConsumedStatsForSelectedDayToArrayLists() {
-        clearCaloriesForEachFoodListArrayLists();
-
-        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
-            totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
-        }
-    }
-
-    public void clearCaloriesForEachFoodListArrayLists() {
-        totalFoodStringListForSelectedDuration.clear();
-        totalCaloriesConsumedListForSelectedDuration.clear();
-    }
-
-    public double getTotalCaloriesConsumedForSelectedDuration() {
-        double valueToReturn = 0;
-        for (int i=0; i<totalCaloriesConsumedListForSelectedDuration.size(); i++) {
-            valueToReturn += totalCaloriesConsumedListForSelectedDuration.get(i);
-        }
-        return valueToReturn;
-    }
-
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
 
         if (!doesActivityExistsInDatabaseForSelectedDay) {
@@ -851,6 +788,69 @@ public class DailyStatsAccess {
 
     public List<Double> getTotalCaloriesBurnedListForEachActivityForSelectedDuration() {
         return totalCaloriesBurnedListForEachActivityForSelectedDuration;
+    }
+
+    public void insertCaloriesAndEachFoodIntoDatabase(int daySelected) {
+        mCaloriesForEachFood = new CaloriesForEachFood();
+
+        mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
+        mCaloriesForEachFood.setTypeOfFood(mFoodString);
+        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
+
+        cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
+    }
+
+    public void updateCaloriesAndEachFoodInDatabase() {
+        mCaloriesForEachFood.setTypeOfFood(mFoodString);
+        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
+
+        cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
+    }
+
+    public void deleteCaloriesAndEachFoodInDatabase() {
+        cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
+    }
+
+    public void setFoodString(String food) {
+        this.mFoodString = food;
+    }
+
+    public void setCaloriesInFoodItem(double calories) {
+        this.mCaloriesInFoodItem = calories;
+    }
+
+    public void assignCaloriesForEachFoodItemEntityForSinglePosition(int position) {
+        mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
+    }
+
+    public List<String> getTotalFoodStringListForSelectedDuration() {
+        return totalFoodStringListForSelectedDuration;
+    }
+
+    public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
+        return totalCaloriesConsumedListForSelectedDuration;
+    }
+
+    public void setTotalCaloriesConsumedStatsForSelectedDayToArrayLists() {
+        clearCaloriesForEachFoodListArrayLists();
+
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
+            totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
+        }
+    }
+
+    public void clearCaloriesForEachFoodListArrayLists() {
+        totalFoodStringListForSelectedDuration.clear();
+        totalCaloriesConsumedListForSelectedDuration.clear();
+    }
+
+    public double getTotalCaloriesConsumedForSelectedDuration() {
+        double valueToReturn = 0;
+        for (int i=0; i<totalCaloriesConsumedListForSelectedDuration.size(); i++) {
+            valueToReturn += totalCaloriesConsumedListForSelectedDuration.get(i);
+        }
+        return valueToReturn;
     }
 
     private long setZeroLowerBoundsOnLongValue(long value) {

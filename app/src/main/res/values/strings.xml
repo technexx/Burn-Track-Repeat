@@ -85,8 +85,9 @@
     <string name="total_unassigned_stats">Non-Activity:</string>
     <string name="total_aggregate_stats">Combined:</string>
 
-    <string name="consumed_calories_header">Calories Consumed</string>
-    <string name="expended_calories_header">Calories Expended</string>
+    <string name="consumed_calories_header">Calories Consumed:</string>
+    <string name="expended_calories_header">Calories Expended:</string>
+    <string name="difference_calories_header">Difference:</string>
     <string name="compared_calories_header">Calories Compared</string>
 
     <string name="daily_stats_string">%1$s\n%2$s</string>
@@ -110,6 +111,8 @@
     <string name="food_name_header">Food/Drink</string>
     <string name="food_portion_header">Portion</string>
     <string name="calories_header">Calories</string>
+
+    <string name="double_placeholder">%1$s %2$s</string>
 
     <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s </string>
     <string name="bunch_of_spaces">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</string>

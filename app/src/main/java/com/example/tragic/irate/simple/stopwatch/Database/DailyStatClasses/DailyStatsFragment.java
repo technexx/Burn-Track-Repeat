@@ -175,6 +175,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int ADDING_FOOD = 0;
     int EDITING_FOOD = 1;
 
+    ConstraintLayout caloriesComparedLayout;
+
     int selectedTdeeCategoryPosition;
     int selectedTdeeSubCategoryPosition;
     double metScore;
@@ -415,6 +417,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedRecyclerView.setVisibility(View.GONE);
         totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
         totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+        caloriesComparedLayout.setVisibility(View.GONE);
 
         if (mode==EXPENDED_CALORIES_MODE) {
             dailyStatsRecyclerView.setVisibility(View.VISIBLE);
@@ -425,7 +428,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
         }
         if (mode==COMPARING_CALORIES_MODE) {
-
+            caloriesComparedLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -487,7 +490,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setAggregateDailyCalories();
             dailyStatsAccess.setUnassignedDailyTotalTime();
 
-            setTotalFoodStatsFooterTextViews();
+            setTotalCaloriesConsumedFooterTextViews();
 
             setExpansionTextViewValues();
         });
@@ -694,94 +697,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 });
             }
         });
-    }
-
-    @Override
-    public void onAddingFood(int position) {
-        typeOfFoodEditText.requestFocus();
-        addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
-    }
-
-    private void addFoodToStats() {
-        AsyncTask.execute(()-> {
-            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
-
-            dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase(daySelectedFromCalendar);
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            getActivity().runOnUiThread(()-> {
-                if (!isFoodNameEditTextEmpty(getFoodStringFromEditText())) {
-                    caloriesConsumedAdapter.notifyDataSetChanged();
-                    addFoodPopUpWindow.dismiss();
-                    Toast.makeText(getContext(), "Added!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Must enter a food!", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-    }
-
-    private String getFoodStringFromEditText() {
-        return typeOfFoodEditText.getText().toString();
-    }
-
-    private double getCaloriesForFoodItemFromEditText() {
-        return Double.parseDouble(caloriesConsumedEditText.getText().toString());
-    }
-
-    private boolean isFoodNameEditTextEmpty(String editTextString) {
-        return editTextString.isEmpty();
-    }
-
-    @Override
-    public void calorieRowIsSelected(int position) {
-        this.mPositionToEdit = position;
-        launchFoodEditPopUpWithEditTextValuesSet(position);
-    }
-
-    private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
-        String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
-        double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
-        String caloriesAsString = formatCalorieStringWithoutDecimals(caloriesInFood);
-
-        typeOfFoodEditText.setText(foodString);
-        caloriesConsumedEditText.setText(caloriesAsString);
-
-        typeOfFoodEditText.requestFocus();
-        addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
-    }
-
-    private void updateFoodInStats() {
-        AsyncTask.execute(()-> {
-            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
-
-            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
-            dailyStatsAccess.updateCaloriesAndEachFoodInDatabase();
-
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            getActivity().runOnUiThread(()-> {
-                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
-            });
-        });
-    }
-
-    private void deleteConsumedCalories(int position) {
-        AsyncTask.execute(()-> {
-            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
-            dailyStatsAccess.deleteCaloriesAndEachFoodInDatabase();
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            getActivity().runOnUiThread(()-> {
-                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-            });
-        });
-    }
-
-    private void setTotalFoodStatsFooterTextViews() {
-        foodStatsTotalCaloriesConsumedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
     }
 
     @Override
@@ -1044,6 +959,116 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.two_line_concat, getString(R.string.calories_burned_per_minute, caloriesBurnedPerMinute), getString(R.string.calories_burned_per_hour, caloriesBurnedPerHour)));
     }
 
+    @Override
+    public void onAddingFood(int position) {
+        typeOfFoodEditText.requestFocus();
+        addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+    }
+
+    private void addFoodToStats() {
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
+
+            dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase(daySelectedFromCalendar);
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                if (!isFoodNameEditTextEmpty(getFoodStringFromEditText())) {
+                    caloriesConsumedAdapter.notifyDataSetChanged();
+                    addFoodPopUpWindow.dismiss();
+                    Toast.makeText(getContext(), "Added!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Must enter a food!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+    private String getFoodStringFromEditText() {
+        return typeOfFoodEditText.getText().toString();
+    }
+
+    private double getCaloriesForFoodItemFromEditText() {
+        return Double.parseDouble(caloriesConsumedEditText.getText().toString());
+    }
+
+    private boolean isFoodNameEditTextEmpty(String editTextString) {
+        return editTextString.isEmpty();
+    }
+
+    @Override
+    public void calorieRowIsSelected(int position) {
+        this.mPositionToEdit = position;
+        launchFoodEditPopUpWithEditTextValuesSet(position);
+    }
+
+    private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
+        String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
+        double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
+        String caloriesAsString = formatCalorieStringWithoutDecimals(caloriesInFood);
+
+        typeOfFoodEditText.setText(foodString);
+        caloriesConsumedEditText.setText(caloriesAsString);
+
+        typeOfFoodEditText.requestFocus();
+        addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+    }
+
+    private void updateFoodInStats() {
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
+
+            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
+            dailyStatsAccess.updateCaloriesAndEachFoodInDatabase();
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
+    private void deleteConsumedCalories(int position) {
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
+            dailyStatsAccess.deleteCaloriesAndEachFoodInDatabase();
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
+    private void setTotalCaloriesConsumedFooterTextViews() {
+        foodStatsTotalCaloriesConsumedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
+    }
+
+    private void setTotalCaloriesComparedTextViews() {
+        double caloriesConsumed = dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration();
+        double caloriesExpended = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
+        double caloriesDifference = caloriesExpended - caloriesConsumed;
+
+        totalConsumedCaloriesCompared.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
+        totalExpendedCaloriesCompared.setText(formatCalorieStringWithoutDecimals(caloriesExpended));
+
+        String signToUse = getPlusOrMinusSignForDoubleDifference(caloriesConsumed, caloriesExpended);
+        totalCaloriesDifferenceCompared.setText(getString(R.string.double_placeholder, signToUse, formatCalorieStringWithoutDecimals(caloriesDifference)));
+    }
+
+    private String getPlusOrMinusSignForDoubleDifference(double firstValue, double secondValue) {
+        if (firstValue > secondValue) {
+            return "+";
+        } else if (firstValue < secondValue) {
+            return "-";
+        } else {
+            return "";
+        }
+    }
+
     private String formatCalorieString(double calories) {
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(calories);
@@ -1257,6 +1282,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCaloriesComparedViews() {
+        caloriesComparedLayout = mRoot.findViewById(R.id.calories_compared_layout);
         totalConsumedCaloriesCompared = mRoot.findViewById(R.id.total_consumed_calories_compared);
         totalExpendedCaloriesCompared = mRoot.findViewById(R.id.total_expended_calories_compared);
         totalCaloriesDifferenceCompared = mRoot.findViewById(R.id.total_calories_difference_compared);
