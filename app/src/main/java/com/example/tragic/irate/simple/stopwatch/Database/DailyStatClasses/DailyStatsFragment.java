@@ -80,7 +80,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     CaloriesConsumedAdapter caloriesConsumedAdapter;
     RecyclerView caloriesConsumedRecyclerView;
-    ViewGroup.LayoutParams caloriesConsumedRecyclerViewLayoutParams;
+    ConstraintLayout.LayoutParams caloriesConsumedRecyclerViewLayoutParams;
 
     View topOfRecyclerViewAnchor;
     View recyclerAndTotalStatsDivider;
@@ -1034,10 +1034,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return Double.parseDouble(truncatedCalorieString);
     }
 
-    private void toggleCalendarMinimizationState() {
-        calendarIsMinimized = !calendarIsMinimized;
-    }
-
     private void calendarMinimizationLogic(boolean restoreOnly) {
         if (restoreOnly) {
             if (!calendarIsMinimized) {
@@ -1047,42 +1043,59 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         toggleCalendarMinimizationState();
         toggleCalendarMinimizationLayouts();
+    }
 
-        if (!calendarIsMinimized) {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
-            calendarView.startAnimation(slideInFromBottom);
-            totalActivityStatsValuesTextViewLayout.startAnimation(slideInFromBottomNoAlphaChange);
-        } else {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
-            calendarView.startAnimation(slideOutToBottom);
-            totalActivityStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
-        }
+    private void toggleCalendarMinimizationState() {
+        calendarIsMinimized = !calendarIsMinimized;
     }
 
     private void toggleCalendarMinimizationLayouts() {
-        if (!calendarIsMinimized) {
-            dailyStatsRecyclerViewLayoutParams.height = dpToPxConv(280);
-            dailyStatsRecyclerViewLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+        if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
+            setCalendarMinimizationLayoutParams(dailyStatsRecyclerViewLayoutParams, totalActivityStatsValuesTextViewsLayoutParams);
 
-            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalActivityStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
+            totalActivityStatsValuesTextViewLayout.setLayoutParams(totalActivityStatsValuesTextViewsLayoutParams);
+            totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
 
-            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop = R.id.stats_calendar;
-        } else {
-            dailyStatsRecyclerViewLayoutParams.height = 0;
-            dailyStatsRecyclerViewLayoutParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
-
-            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            totalActivityStatsValuesTextViewsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            totalActivityStatsValuesTextViewsLayoutParams.bottomToTop= R.id.minimize_calendarView_button;
+            totalActivityStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
         }
 
-        totalActivityStatsValuesTextViewLayout.setLayoutParams(totalActivityStatsValuesTextViewsLayoutParams);
-        dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
+        if (caloriesComparisonTabLayout.getSelectedTabPosition()==1) {
+            setCalendarMinimizationLayoutParams(caloriesConsumedRecyclerViewLayoutParams, totalFoodStatsValuesTextViewLayoutParams);
 
+            caloriesConsumedRecyclerView.setLayoutParams(caloriesConsumedRecyclerViewLayoutParams);
+            totalFoodStatsValuesTextViewLayout.setLayoutParams(totalFoodStatsValuesTextViewLayoutParams);
+            totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+
+            totalFoodStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
+        }
     }
 
+    private void setCalendarMinimizationLayoutParams(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
+        if (!calendarIsMinimized) {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
+            calendarView.startAnimation(slideInFromBottom);
+
+            recyclerParams.height = dpToPxConv(280);
+            recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            textViewParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            textViewParams.bottomToTop = R.id.stats_calendar;
+        } else {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
+            calendarView.startAnimation(slideOutToBottom);
+
+            recyclerParams.height = 0;
+            recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
+
+            textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            textViewParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+            textViewParams.bottomToTop= R.id.minimize_calendarView_button;
+        }
+    }
     private void instantiateCalendarObjects() {
         calendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
@@ -1286,7 +1299,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedRecyclerView.setLayoutManager(lm);
         caloriesConsumedRecyclerView.setAdapter(caloriesConsumedAdapter);
 
-        caloriesConsumedRecyclerViewLayoutParams = caloriesConsumedRecyclerView.getLayoutParams();
+        caloriesConsumedRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) caloriesConsumedRecyclerView.getLayoutParams();
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesConsumedRecyclerView.getContext(), lm.getOrientation());
         dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
