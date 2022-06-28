@@ -111,14 +111,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Animation slideOutToBottomNoAlphaChange;
     Animation slideInFromBottomNoAlphaChange;
 
-    int currentCalorieMode;
-    int ITERATING_CALORIES_STATS_UP = 0;
-    int ITERATING_CALORIE_STATS_DOWN = 1;
-
-    int EXPENDED_CALORIES_MODE = 0;
-    int CONSUMED_CALORIES_MODE = 1;
-    int COMPARING_CALORIES_MODE = 2;
-
     int currentStatDurationMode;
     int ITERATING_ACTIVITY_STATS_UP = 0;
     int ITERATING_ACTIVITY_STATS_DOWN = 1;
@@ -184,17 +176,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int selectedTdeeSubCategoryPosition;
     double metScore;
 
-    TextView expansionAssignedHeader;
-    TextView expansionUnassignedHeader;
-    TextView expansionAggregateHeader;
-    TextView expansionAssignedSetTime;
-    TextView expansionUnassignedSetTime;
-    TextView expansionAggregateSetTime;
-    TextView expansionAssignedCalories;
-    TextView expansionUnassignedCalories;
-    TextView expansionAggregateCalories;
-
-    TextView expansionDateSelectedTextView;
     ImageButton exitExpansionImageButton;
 
     @Override
@@ -220,7 +201,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateCalorieConsumptionRecyclerAndItsAdapter();
         instantiateAnimations();
 
-        instantiateExpansionPopUpViews();
         instantiateActivityEditPopUpViews();
         instantiateAddPopUpViews();
         instantiateActivityAdditionSpinnersAndAdapters();
@@ -228,7 +208,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         instantiateCaloriesConsumedEditPopUpViews();
         instantiateCaloriesComparedViews();
+        instantiateCalorieTabLayoutListenerAndViews();
 
+        instantiateExpansionPopUpViews();
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnActivityEditTexts();
 
@@ -294,52 +276,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
             dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
-            currentStatDurationMode = 0;
-
-            AsyncTask.execute(()->{
-                populateListsAndTextViewsFromEntityListsInDatabase();
-            });
 
             calendarMinimizationLogic(true);
         });
 
         exitExpansionImageButton.setOnClickListener(v-> {
             dailyStatsExpandedPopUpWindow.dismiss();
-        });
-
-        caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                dailyStatsRecyclerView.setVisibility(View.GONE);
-                caloriesConsumedRecyclerView.setVisibility(View.GONE);
-                totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
-                totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
-                caloriesComparedLayout.setVisibility(View.GONE);
-
-                switch (tab.getPosition()) {
-                    case 0:
-                        dailyStatsRecyclerView.setVisibility(View.VISIBLE);
-                        totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-                        break;
-                    case 1:
-                        caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
-                        totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-                        break;
-                    case 2:
-                        caloriesComparedLayout.setVisibility(View.VISIBLE);
-                        break;
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
         });
 
         activityStatsDurationSwitcherButtonLeft.setOnClickListener(v-> {
@@ -466,8 +408,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setTotalCaloriesConsumedFooterTextViews();
 
             setTotalCaloriesComparedTextViews();
-
-            setExpansionTextViewValues();
         });
     }
 
@@ -1189,50 +1129,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
     }
 
-    private void instantiateExpansionPopUpViews() {
-        dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
-        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(420), false);
-        dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
-
-        expansionAssignedHeader = dailyStatsExpandedView.findViewById(R.id.expansion_assigned_header);
-        expansionUnassignedHeader = dailyStatsExpandedView.findViewById(R.id.expansion_unassigned_header);
-        expansionAggregateHeader = dailyStatsExpandedView.findViewById(R.id.expansion_aggregate_header);
-
-        expansionAssignedSetTime = dailyStatsExpandedView.findViewById(R.id.expansion_set_time_assigned);
-        expansionUnassignedSetTime = dailyStatsExpandedView.findViewById(R.id.expansion_set_time_unassigned);
-        expansionAggregateSetTime = dailyStatsExpandedView.findViewById(R.id.expansion_set_time_aggregate);
-
-        expansionAssignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_assigned);
-        expansionUnassignedCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_unassigned);
-        expansionAggregateCalories = dailyStatsExpandedView.findViewById(R.id.expansion_calories_burned_aggregate);
-
-        exitExpansionImageButton = dailyStatsExpandedView.findViewById(R.id.exit_expansion_popUp_button);
-        expansionDateSelectedTextView = dailyStatsExpandedView.findViewById(R.id.expansion_date_selected_textView);
-    }
-
-    private void setExpansionTextViewValues() {
-        String dayToSet = dailyStatsAccess.getSingleDayAsString();
-        expansionDateSelectedTextView.setText(dayToSet);
-
-        long totalAssignedSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolderList();
-        double totalAssignedCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
-
-        expansionAssignedSetTime.setText(longToStringConverters.convertSecondsForStatDisplay(totalAssignedSetTime));
-        expansionAssignedCalories.setText((formatCalorieStringWithoutDecimals(totalAssignedCaloriesBurned)));
-
-        long totalUnassignedSetTime = dailyStatsAccess.getUnassignedDailyTotalTime();
-        double totalUnassignedCalories = dailyStatsAccess.getUnassignedDailyCalories();
-
-        expansionUnassignedSetTime.setText(longToStringConverters.convertSecondsForStatDisplay(totalUnassignedSetTime));
-        expansionUnassignedCalories.setText(formatCalorieStringWithoutDecimals(totalUnassignedCalories));
-
-        long totalAggregateSetTime = dailyStatsAccess.getAggregateDailyTime();
-        double totalAggregateCalories = dailyStatsAccess.getAggregateDailyCalories();
-
-        expansionAggregateSetTime.setText(longToStringConverters.convertSecondsForStatDisplay(totalAggregateSetTime));
-        expansionAggregateCalories.setText(formatCalorieStringWithoutDecimals(totalAggregateCalories));
-    }
-
     private void instantiateActivityEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(135), true);
@@ -1279,6 +1175,49 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalExpendedCaloriesComparedBmr = mRoot.findViewById(R.id.total_expended_calories_compared_bmr);
         totalExpendedCaloriesComparedActivities = mRoot.findViewById(R.id.total_expended_calories_compared_activities);
         totalCaloriesDifferenceCompared = mRoot.findViewById(R.id.total_calories_difference_compared);
+    }
+
+    private void instantiateCalorieTabLayoutListenerAndViews() {
+        setDefaultCalorieTabViewsForFirstTab();
+
+        caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+                        totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        break;
+                    case 1:
+                        caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
+                        totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        break;
+                    case 2:
+                        caloriesComparedLayout.setVisibility(View.VISIBLE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                dailyStatsRecyclerView.setVisibility(View.GONE);
+                caloriesConsumedRecyclerView.setVisibility(View.GONE);
+                totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+                totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+                caloriesComparedLayout.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+    }
+
+    private void setDefaultCalorieTabViewsForFirstTab() {
+        caloriesConsumedRecyclerView.setVisibility(View.GONE);
+        totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+        caloriesComparedLayout.setVisibility(View.GONE);
     }
 
     private void instantiateTextViewsAndMiscClasses() {
@@ -1352,6 +1291,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesConsumedRecyclerView.getContext(), lm.getOrientation());
         dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
         caloriesConsumedRecyclerView.addItemDecoration(dividerItemDecoration);
+    }
+
+    private void instantiateExpansionPopUpViews() {
+        exitExpansionImageButton = mRoot.findViewById(R.id.daily_stats_expanded_button);
+        dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
+        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(420), false);
+        dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     }
 
     private void instantiateAnimations() {
