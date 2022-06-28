@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:theme="@style/StatFragmentThemeDark">
+    android:theme="@style/StatFragmentThemeDark"
+    android:background="@color/black">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
@@ -14,9 +15,9 @@
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/black"
         app:tabTextColor="@color/white"
-        app:tabIndicatorColor="@color/purple_200"
+        app:tabIndicatorColor="@color/white"
         app:tabTextAppearance="@style/tabText"
-        app:tabIndicatorFullWidth="true" />
+        app:tabIndicatorFullWidth="false" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_stats_total_header_layout"
@@ -324,7 +325,8 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
-            android:textSize="24sp">
+            android:textSize="24sp"
+            android:textColor="@color/red">
         </TextView>
 
         <TextView
@@ -335,7 +337,8 @@
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="2dp"
-            android:textSize="24sp">
+            android:textSize="24sp"
+            android:textColor="@color/green">
         </TextView>
 
         <TextView
@@ -346,7 +349,8 @@
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
-            android:textSize="18sp">
+            android:textSize="18sp"
+            android:textColor="@color/yellow_1">
         </TextView>
 
         <TextView
@@ -357,7 +361,8 @@
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_bmr"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
-            android:textSize="18sp">
+            android:textSize="18sp"
+            android:textColor="@color/yellow_1">
         </TextView>
 
         <TextView
@@ -368,7 +373,8 @@
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities"
             android:layout_marginEnd="2dp"
             android:layout_marginTop="30dp"
-            android:textSize="24sp">
+            android:textSize="24sp"
+            android:textStyle="bold">
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

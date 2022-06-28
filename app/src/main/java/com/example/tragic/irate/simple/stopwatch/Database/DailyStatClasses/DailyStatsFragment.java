@@ -405,26 +405,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-//    private void setCalorieModeRecyclerViewsAndFooters(int mode) {
-//        dailyStatsRecyclerView.setVisibility(View.GONE);
-//        caloriesConsumedRecyclerView.setVisibility(View.GONE);
-//        totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
-//        totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
-//        caloriesComparedLayout.setVisibility(View.GONE);
-//
-//        if (mode==EXPENDED_CALORIES_MODE) {
-//            dailyStatsRecyclerView.setVisibility(View.VISIBLE);
-//            totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-//        }
-//        if (mode==CONSUMED_CALORIES_MODE) {
-//            caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
-//            totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-//        }
-//        if (mode==COMPARING_CALORIES_MODE) {
-//            caloriesComparedLayout.setVisibility(View.VISIBLE);
-//        }
-//    }
-
     private void setActivityStatsDurationRangeTextView() {
         if (currentStatDurationMode==DAILY_STATS) {
             setSingleDateStringOnTextView();
