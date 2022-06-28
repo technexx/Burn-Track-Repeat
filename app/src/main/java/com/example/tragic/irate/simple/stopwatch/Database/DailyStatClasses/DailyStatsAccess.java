@@ -292,7 +292,7 @@ public class DailyStatsAccess {
         List<Integer> populatedDaysOfYearList = new ArrayList<>();
 
         int firstDayOfDuration = 1;
-        int lastDayOfDuration = daysInYear;
+        int lastDayOfDuration = getCurrentDayOfYear();
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
@@ -883,6 +883,11 @@ public class DailyStatsAccess {
     private void instantiateMiscellaneousClasses() {
         sharedPreferences = mContext.getApplicationContext().getSharedPreferences("pref", 0);
         prefEdit = sharedPreferences.edit();
+    }
+
+    private int getCurrentDayOfYear() {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 
     private String getDateString() {

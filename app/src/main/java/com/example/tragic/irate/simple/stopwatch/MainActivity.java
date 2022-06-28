@@ -542,7 +542,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Calories expend/consume switcher should be tabs.
   //Todo: DayHolder conditional issue.
   //Todo: Have calorie consumption layout mimic calendar minimization of other recyclerView.
   //Todo: Duration switching blips day selected on calendar.
