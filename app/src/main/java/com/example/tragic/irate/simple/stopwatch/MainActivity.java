@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FragmentManager fragmentManager;
   TabLayout savedCyclesTabLayout;
   TabLayout.Tab savedCyclesTab;
-  View savedCyclesTabView;
   View mainView;
   View actionBarView;
   Calendar calendar;
@@ -543,9 +542,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Should calories be optional?
-  //Todo: Should expend default to base BMR, with addition of activity calories?
-      //Todo: Can have sub-categories under "Consumed" w/ BMR and Activities
+  //Todo: Calories expend/consume switcher should be tabs.
   //Todo: DayHolder conditional issue.
   //Todo: Have calorie consumption layout mimic calendar minimization of other recyclerView.
   //Todo: Duration switching blips day selected on calendar.
@@ -1405,7 +1402,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclesTabLayout = findViewById(R.id.savedCyclesTabLayout);
     savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Workouts"));
     savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Pomodoro"));
-//    savedCyclesTabLayout.addTab(savedCyclesTabLayout.newTab().setText("Stopwatch"));
   }
 
   private void instantiateTabSelectionListeners() {
@@ -1466,7 +1462,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignMainLayoutClassesToIds() {
     mainView = findViewById(R.id.main_layout);
-    savedCyclesTabView = findViewById(R.id.savedCyclesTabLayout);
     actionBarView = findViewById(R.id.custom_action_bar);
 
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);

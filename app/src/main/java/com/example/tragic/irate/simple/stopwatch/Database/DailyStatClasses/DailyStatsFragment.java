@@ -23,11 +23,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,6 +43,7 @@ import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConve
 
 import com.example.tragic.irate.simple.stopwatch.R;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
+import com.google.android.material.tabs.TabLayout;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
@@ -82,9 +85,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View topOfRecyclerViewAnchor;
     View recyclerAndTotalStatsDivider;
 
-    TextView burnedAndConsumedCaloriesSwitcherTextView;
-    ImageButton burnedAndConsumedCaloriesSwitcherButtonLeft;
-    ImageButton burnedAndConsumedCaloriesSwitcherButtonRight;
+    TabLayout caloriesComparisonTabLayout;
 
     TextView totalStatsHeaderTextView;
     ImageButton activityStatsDurationSwitcherButtonLeft;
@@ -231,9 +232,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnActivityEditTexts();
 
-        setCalorieModeTextViews(0);
-        setCalorieModeRecyclerViewsAndFooters(0);
-
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
             daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
@@ -309,12 +307,39 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsExpandedPopUpWindow.dismiss();
         });
 
-        burnedAndConsumedCaloriesSwitcherButtonLeft.setOnClickListener(v-> {
-            calorieModeIterationLogic(ITERATING_CALORIE_STATS_DOWN);
-        });
+        caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                dailyStatsRecyclerView.setVisibility(View.GONE);
+                caloriesConsumedRecyclerView.setVisibility(View.GONE);
+                totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+                totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+                caloriesComparedLayout.setVisibility(View.GONE);
 
-        burnedAndConsumedCaloriesSwitcherButtonRight.setOnClickListener(v-> {
-            calorieModeIterationLogic(ITERATING_CALORIES_STATS_UP);
+                switch (tab.getPosition()) {
+                    case 0:
+                        dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+                        totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        break;
+                    case 1:
+                        caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
+                        totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        break;
+                    case 2:
+                        caloriesComparedLayout.setVisibility(View.VISIBLE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
         });
 
         activityStatsDurationSwitcherButtonLeft.setOnClickListener(v-> {
@@ -380,59 +405,25 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void calorieModeIterationLogic(int directionOfIteration) {
-        iterateThroughCalorieModes(directionOfIteration);
-        setCalorieModeTextViews(currentCalorieMode);
-        setCalorieModeRecyclerViewsAndFooters(currentCalorieMode);
-    }
-
-    private void iterateThroughCalorieModes(int directionOfIteration) {
-        if (directionOfIteration==ITERATING_CALORIES_STATS_UP) {
-            if (currentCalorieMode<2) {
-                currentCalorieMode++;
-            } else {
-                currentCalorieMode=0;
-            }
-        } else if (directionOfIteration==ITERATING_CALORIE_STATS_DOWN) {
-            if (currentCalorieMode>0) {
-                currentCalorieMode--;
-            } else {
-                currentCalorieMode=2;
-            }
-        }
-    }
-
-    private void setCalorieModeTextViews(int mode) {
-        if (mode==EXPENDED_CALORIES_MODE) {
-            burnedAndConsumedCaloriesSwitcherTextView.setText(R.string.expended_calories_header);
-        }
-        if (mode==CONSUMED_CALORIES_MODE) {
-            burnedAndConsumedCaloriesSwitcherTextView.setText(R.string.consumed_calories_header);
-        }
-        if (mode==COMPARING_CALORIES_MODE) {
-            burnedAndConsumedCaloriesSwitcherTextView.setText(R.string.compared_calories_header);
-        }
-    }
-
-    private void setCalorieModeRecyclerViewsAndFooters(int mode) {
-        dailyStatsRecyclerView.setVisibility(View.GONE);
-        caloriesConsumedRecyclerView.setVisibility(View.GONE);
-        totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
-        totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
-        caloriesComparedLayout.setVisibility(View.GONE);
-
-        if (mode==EXPENDED_CALORIES_MODE) {
-            dailyStatsRecyclerView.setVisibility(View.VISIBLE);
-            totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-        }
-        if (mode==CONSUMED_CALORIES_MODE) {
-            caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
-            totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-        }
-        if (mode==COMPARING_CALORIES_MODE) {
-            caloriesComparedLayout.setVisibility(View.VISIBLE);
-        }
-    }
+//    private void setCalorieModeRecyclerViewsAndFooters(int mode) {
+//        dailyStatsRecyclerView.setVisibility(View.GONE);
+//        caloriesConsumedRecyclerView.setVisibility(View.GONE);
+//        totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+//        totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+//        caloriesComparedLayout.setVisibility(View.GONE);
+//
+//        if (mode==EXPENDED_CALORIES_MODE) {
+//            dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+//            totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+//        }
+//        if (mode==CONSUMED_CALORIES_MODE) {
+//            caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
+//            totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+//        }
+//        if (mode==COMPARING_CALORIES_MODE) {
+//            caloriesComparedLayout.setVisibility(View.VISIBLE);
+//        }
+//    }
 
     private void setActivityStatsDurationRangeTextView() {
         if (currentStatDurationMode==DAILY_STATS) {
@@ -1065,7 +1056,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalExpendedCaloriesComparedActivities.setText(formatCalorieStringWithoutDecimals(caloriesExpendedFromActivities));
 
         String signToUse = getPlusOrMinusSignForDoubleDifference(caloriesConsumed, totalCaloriesExpended);
+        int colorToUse = getTextColorForDoubleDifference(signToUse);
+
         totalCaloriesDifferenceCompared.setText(getString(R.string.double_placeholder, signToUse, formatCalorieStringWithoutDecimals(caloriesDifference)));
+        totalCaloriesDifferenceCompared.setTextColor(ContextCompat.getColor(getContext(), colorToUse));
     }
 
     private String getPlusOrMinusSignForDoubleDifference(double firstValue, double secondValue) {
@@ -1075,6 +1069,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return "-";
         } else {
             return "";
+        }
+    }
+
+    private int getTextColorForDoubleDifference(String plusOrMinus) {
+        if (plusOrMinus.equals("+")) {
+            return R.color.greyed_red;
+        } else {
+            return R.color.green;
         }
     }
 
@@ -1304,9 +1306,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         longToStringConverters = new LongToStringConverters();
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        burnedAndConsumedCaloriesSwitcherTextView = mRoot.findViewById(R.id.burned_and_consumed_calories_switcher_textView);
-        burnedAndConsumedCaloriesSwitcherButtonLeft = mRoot.findViewById(R.id.burned_and_consumed_calories_switcher_button_left);
-        burnedAndConsumedCaloriesSwitcherButtonRight = mRoot.findViewById(R.id.burned_and_consumed_calories_switcher_button_right);
+        caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
+        caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Expended"));
+        caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
+        caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
 
         activityStatsDurationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
         activityStatsDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);

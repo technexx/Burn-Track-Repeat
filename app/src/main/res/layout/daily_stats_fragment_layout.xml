@@ -6,55 +6,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/StatFragmentThemeDark">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/calorie_display_mode_header"
-        android:layout_width="wrap_content"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/calorie_comparison_tab_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/daily_total_stats_border"
-        android:theme="@style/StatsFragmentHeaderTheme">
-
-        <TextView
-            android:id="@+id/burned_and_consumed_calories_switcher_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/day_total_header"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@+id/burned_and_consumed_calories_switcher_button_left"
-            app:layout_constraintBottom_toBottomOf="@+id/burned_and_consumed_calories_switcher_button_left"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-        </TextView>
-
-        <ImageButton
-            android:id="@+id/burned_and_consumed_calories_switcher_button_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/burned_and_consumed_calories_switcher_textView"
-            android:layout_marginEnd="4dp"
-            android:src="@drawable/double_arrow_left">
-        </ImageButton>
-
-        <ImageButton
-            android:id="@+id/burned_and_consumed_calories_switcher_button_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/burned_and_consumed_calories_switcher_textView"
-            android:layout_marginStart="4dp"
-            android:src="@drawable/double_arrow_right">
-        </ImageButton>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/black"
+        app:tabTextColor="@color/white"
+        app:tabIndicatorColor="@color/purple_200"
+        app:tabTextAppearance="@style/tabText"
+        app:tabIndicatorFullWidth="true" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_stats_total_header_layout"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        app:layout_constraintTop_toBottomOf="@id/calorie_display_mode_header"
+        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="0dp"
         android:background="@drawable/daily_total_stats_border"
@@ -111,7 +79,7 @@
         android:id="@+id/daily_stats_expanded_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/calorie_display_mode_header"
+        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintStart_toStartOf="parent"
         android:src="@drawable/chart_icon_2"
         android:theme="@style/StatsFragmentHeaderTheme">
@@ -121,7 +89,7 @@
         android:id="@+id/edit_tdee_stats_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/calorie_display_mode_header"
+        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/edit_icon"
         android:theme="@style/StatsFragmentHeaderTheme">
