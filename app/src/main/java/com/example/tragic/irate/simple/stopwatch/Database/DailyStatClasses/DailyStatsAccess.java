@@ -222,14 +222,6 @@ public class DailyStatsAccess {
         return mStatsForEachActivityList;
     }
 
-    public List<CalorieDayHolder> getCalorieDayHolderList() {
-        return mCalorieDayHolderList;
-    }
-
-    public List<CaloriesForEachFood> getCaloriesForEachFoodList() {
-        return mCaloriesForEachFoodList;
-    }
-
     ////////////////////////////////////////////////////////////////////
 
     public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {

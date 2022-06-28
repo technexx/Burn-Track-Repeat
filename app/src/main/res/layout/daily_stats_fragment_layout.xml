@@ -284,13 +284,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/calories_compared_layout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout"
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:text="@string/consumed_calories"
             android:id="@+id/total_consumed_calories_compared_header"
+            android:text="@string/consumed_calories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
@@ -301,26 +301,50 @@
         </TextView>
 
         <TextView
-            android:text="@string/expended_calories"
             android:id="@+id/total_expended_calories_compared_header"
+            android:text="@string/expended_calories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="30dp"
             android:layout_marginStart="2dp"
             android:textSize="24sp">
         </TextView>
 
         <TextView
-            android:text="@string/difference_calories"
-            android:id="@+id/total_calories_difference_compared_header"
+            android:id="@+id/total_expended_calories_compared_bmr_header"
+            android:text="@string/expended_calories_bmr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_header"
+            android:layout_marginTop="6dp"
             android:layout_marginStart="2dp"
-            android:layout_marginTop="24dp"
+            android:textSize="18sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_expended_calories_compared_activities_header"
+            android:text="@string/expended_calories_activities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_bmr_header"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="2dp"
+            android:textSize="18sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_calories_difference_compared_header"
+            android:text="@string/difference_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities_header"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="30dp"
             android:textSize="24sp">
         </TextView>
 
@@ -341,9 +365,31 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="30dp"
             android:layout_marginEnd="2dp"
             android:textSize="24sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_expended_calories_compared_bmr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="2dp"
+            android:textSize="18sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_expended_calories_compared_activities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_bmr"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="2dp"
+            android:textSize="18sp">
         </TextView>
 
         <TextView
@@ -351,9 +397,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities"
             android:layout_marginEnd="2dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="30dp"
             android:textSize="24sp">
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>

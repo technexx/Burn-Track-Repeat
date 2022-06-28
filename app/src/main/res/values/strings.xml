@@ -91,6 +91,8 @@
 
     <string name="consumed_calories">Calories Consumed:</string>
     <string name="expended_calories">Calories Expended:</string>
+    <string name="expended_calories_bmr">Base Metabolic Rate:</string>
+    <string name="expended_calories_activities">Activities:</string>
     <string name="difference_calories">Difference:</string>
 
     <string name="daily_stats_string">%1$s\n%2$s</string>
