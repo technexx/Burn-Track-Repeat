@@ -596,8 +596,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
 
                 populateListsAndTextViewsFromEntityListsInDatabase();
-                mPositionToEdit = dailyStatsAccess.getStatsForEachActivityList().size()-1;
 
+                mPositionToEdit = dailyStatsAccess.getStatsForEachActivityList().size()-1;
+                Log.i("testAdd", "position to edit is " + mPositionToEdit);
 
                 getActivity().runOnUiThread(()-> {
                     dailyStatsAdapter.notifyDataSetChanged();
@@ -632,6 +633,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void activityEditItemSelected(int position) {
         this.mPositionToEdit = position;
         launchActivityEditPopUpWithEditTextValuesSet(position);
+        logEditPopUpTimes();
     }
 
     private void launchActivityEditPopUpWithEditTextValuesSet(int position) {
@@ -659,7 +661,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             long newActivityTime = getMillisValueToSaveFromEditTextString();
             long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
-            newActivityTime = capActivityTimeMillisToRemainingDailyTime(newActivityTime, remainingDailyTime);
+            long timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
+
+            remainingDailyTime += timeInEditedRow;
+            newActivityTime = cappedActivityTimeInMillis(newActivityTime, remainingDailyTime);
+
+            logEditPopUpTimes();
 
             double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
@@ -687,7 +694,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private long capActivityTimeMillisToRemainingDailyTime(long activityTime, long remainingTime) {
+    private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {
         if (activityTime>remainingTime) {
             activityTime = remainingTime;
         }
@@ -1367,5 +1374,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
         Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
         Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
+    }
+
+    private void logEditPopUpTimes() {
+        long newActivityTime = getMillisValueToSaveFromEditTextString();
+        long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
+        long timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
+
+        newActivityTime = cappedActivityTimeInMillis(newActivityTime, remainingDailyTime);
+
+        Log.i("testTime", "new time is " + longToStringConverters.convertSecondsForStatDisplay(newActivityTime));
+        Log.i("testTime", "remaining time is " + longToStringConverters.convertSecondsForStatDisplay(remainingDailyTime));
+        Log.i("testTime", "time in edited row is " + longToStringConverters.convertSecondsForStatDisplay(timeInEditedRow));
     }
 }

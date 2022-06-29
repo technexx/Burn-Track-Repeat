@@ -542,12 +542,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Adding new activity/time adds 0 and replaces previous w/ input.
+  //Todo: Empty activity editText times when pulled as an edited row should have "00" text, and not "00" hint.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
-  //Todo: Limit edits to 24 hours total for both single and combined activities.
   //Todo: Longer total time/calorie values exceed width allowances.
   //Todo: Fix calendar minimization issue.
+  //Todo: Some harder to replicate errors w/ wrong rows being added.
 
   //Todo: Cycles Completed needs to be saved in sharedPref or database - will reset on app close.
   //Todo: Black background on stats frag may be b0rking date selection highlight.
