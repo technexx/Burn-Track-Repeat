@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/Gray">
+    android:background="@drawable/black_gradient_background">
 
     <TextView
         android:id="@+id/add_food_name_header"
@@ -66,25 +66,40 @@
         android:textColorHint="@color/light_grey">
     </EditText>
 
-
-    <ImageButton
-        android:id="@+id/confirm_add_calories_consumed_edit"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/confirm_calories_consumed_add_button"
+        android:text="@string/save"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/edit_confirm_checkmark"
-        android:backgroundTint="@color/Gray">
-    </ImageButton>
+        android:layout_marginBottom="6dp"
+        android:layout_marginEnd="6dp"
+        android:backgroundTint="@color/Gray"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
 
-    <ImageButton
-        android:id="@+id/confirm_add_calories_consumed_delete_button"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/confirm_calories_consumed_delete_button"
+        android:text="@string/delete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/trash_can_two"
-        android:backgroundTint="@color/Gray">
-    </ImageButton>
+        android:layout_marginBottom="6dp"
+        android:layout_marginStart="6dp"
+        android:backgroundTint="@color/Gray"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -159,8 +159,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText typeOfFoodEditText;
     EditText caloriesConsumedEditText;
 
-    ImageButton confirmCaloriesConsumedAdditionWithinPopUpButton;
-    ImageButton confirmCaloriesConsumedDeletionWithinPopUpButton;
+    Button confirmCaloriesConsumedAdditionWithinPopUpButton;
+    Button confirmCaloriesConsumedDeletionWithinPopUpButton;
 
     TextView totalConsumedCaloriesCompared;
     TextView totalExpendedCaloriesCompared;
@@ -1162,7 +1162,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
         caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
 
-        confirmActivityAddition.setText(R.string.okay);
+        confirmActivityAddition.setText(R.string.save);
         metScoreTextView.setTextSize(22);
 
         tdeeAddPopUpWindow.setOnDismissListener(()-> {
@@ -1212,8 +1212,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_add_text);
         caloriesConsumedEditText = addFoodView.findViewById(R.id.add_calories_consumed_editText);
 
-        confirmCaloriesConsumedAdditionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_edit);
-        confirmCaloriesConsumedDeletionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_add_calories_consumed_delete_button);
+        confirmCaloriesConsumedAdditionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_add_button);
+        confirmCaloriesConsumedDeletionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_delete_button);
 
         addFoodPopUpWindow.setOnDismissListener(()-> {
             caloriesConsumedAdapter.turnOffEditMode();
