@@ -196,20 +196,25 @@ public class DailyStatsAccess {
         Log.i("testInsert", "doesDayExist in insert method for daily totals is " + doesDayExistInDatabase);
     }
 
-    //Todo: Right now we're using the size of DayHolder to check if our list of days is >0. This will b0rk if we're only adding to the consumed calories class.
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
 
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
-            mCalorieDayHolderList = cyclesDatabase.cyclesDao().loadMultipleCalorieDays(integerListOfSelectedDays);
-            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
 
             Log.i("testCals", "entity list size retrieved from db for duration iteration is " + mCaloriesForEachFoodList.size());
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
-            mCalorieDayHolderList = new ArrayList<>();
+        }
+    }
+
+    private void populateCaloriesForEachFoodList(List<Integer> integerListOfSelectedDays) {
+        if (integerListOfSelectedDays.size()>0) { ;
+            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
+
+            Log.i("testCals", "entity list size retrieved from db for duration iteration is " + mCaloriesForEachFoodList.size());
+        } else {
             mCaloriesForEachFoodList = new ArrayList<>();
         }
     }
@@ -262,6 +267,7 @@ public class DailyStatsAccess {
         }
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfWeekList);
+        populateCaloriesForEachFoodList(populatedDaysOfWeekList);
 
         numberOfDaysSelected = 7;
     }
@@ -284,6 +290,7 @@ public class DailyStatsAccess {
         }
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfMonthList);
+        populateCaloriesForEachFoodList(populatedDaysOfMonthList);
 
         numberOfDaysSelected = numberOfDaysInMonth;
     }
@@ -305,6 +312,7 @@ public class DailyStatsAccess {
         }
 
         populateDayHolderAndStatsForEachActivityLists(populatedDaysOfYearList);
+        populateCaloriesForEachFoodList(populatedDaysOfYearList);
 
         numberOfDaysSelected = daysInYear;
     }
@@ -332,6 +340,7 @@ public class DailyStatsAccess {
         }
 
         populateDayHolderAndStatsForEachActivityLists(populatedCustomDayList);
+        populateCaloriesForEachFoodList(populatedCustomDayList);
 
         numberOfDaysSelected = populatedCustomDayList.size();
     }

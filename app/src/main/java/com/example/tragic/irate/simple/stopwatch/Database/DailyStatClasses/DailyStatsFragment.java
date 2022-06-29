@@ -23,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -1057,7 +1056,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalActivityStatsValuesTextViewLayout.setLayoutParams(totalActivityStatsValuesTextViewsLayoutParams);
             totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
 
-            totalActivityStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
+            setCalendarMinimizationAnimations(totalActivityStatsValuesTextViewLayout);
         }
 
         if (caloriesComparisonTabLayout.getSelectedTabPosition()==1) {
@@ -1067,7 +1066,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalFoodStatsValuesTextViewLayout.setLayoutParams(totalFoodStatsValuesTextViewLayoutParams);
             totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
 
-            totalFoodStatsValuesTextViewLayout.startAnimation(slideOutToBottomNoAlphaChange);
+            setCalendarMinimizationAnimations(totalFoodStatsValuesTextViewLayout);
+        }
+    }
+
+    private void setCalendarMinimizationAnimations(ConstraintLayout layout) {
+        if (!calendarIsMinimized) {
+            layout.startAnimation(slideInFromBottomNoAlphaChange);
+        } else {
+            layout.startAnimation(slideOutToBottomNoAlphaChange);
         }
     }
 
@@ -1093,7 +1100,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
             textViewParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
-            textViewParams.bottomToTop= R.id.minimize_calendarView_button;
+            textViewParams.bottomToTop = R.id.minimize_calendarView_button;
         }
     }
     private void instantiateCalendarObjects() {
@@ -1321,12 +1328,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         slideInFromBottom.setDuration(250);
         slideInFromBottom.setFillAfter(true);
 
-        slideOutToBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_untouched_alpha);
+        slideOutToBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_no_alpha_change);
         slideOutToBottomNoAlphaChange.setDuration(250);
-        slideOutToBottomNoAlphaChange.setFillAfter(true);
+//        slideOutToBottomNoAlphaChange.setFillAfter(true);
         slideInFromBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom_untouched_alpha);
         slideInFromBottomNoAlphaChange.setDuration(250);
-        slideInFromBottomNoAlphaChange.setFillAfter(true);
+//        slideInFromBottomNoAlphaChange.setFillAfter(true);
 
     }
 
