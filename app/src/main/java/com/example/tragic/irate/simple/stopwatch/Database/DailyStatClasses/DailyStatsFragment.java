@@ -308,7 +308,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
-            updateActivityStatsInDatabase();
+            editActivityStatsInDatabase();
             tdeeEditPopUpWindow.dismiss();
         });
 
@@ -611,6 +611,23 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    private void populateActivityEditPopUpWithNewRow() {
+        replaceActivityAddPopUpWithEditPopUp();
+
+        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+
+        activityTextViewInEditPopUp.setText(activityToAdd);
+        setActivityEditPopUpTexts(0);
+    }
+
+    private void replaceActivityAddPopUpWithEditPopUp() {
+        tdeeAddPopUpWindow.dismiss();
+
+        setActivityEditPopUpTimeRemainingTextView();
+        tdeeEditTextHours.requestFocus();
+        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
+    }
+
     @Override
     public void activityEditItemSelected(int position) {
         this.mPositionToEdit = position;
@@ -622,29 +639,34 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 
         activityTextViewInEditPopUp.setText(activityString);
-        setActivityEditTexts(timeToEditLongValue);
-
-        String timeLeftInDay = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime());
-        String timeLeftInDayConcatString = getString(R.string.day_time_remaining, timeLeftInDay);
-        unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
+        setActivityEditPopUpTexts(timeToEditLongValue);
+        setActivityEditPopUpTimeRemainingTextView();
 
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
     }
 
-    private void updateActivityStatsInDatabase() {
+    private void setActivityEditPopUpTimeRemainingTextView() {
+        String timeLeftInDay = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime());
+        String timeLeftInDayConcatString = getString(R.string.day_time_remaining, timeLeftInDay);
+        unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
+    }
+
+    private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(mPositionToEdit);
 
-            long newStatValue = getMillisValueToSaveFromEditTextString();
+            long newActivityTime = getMillisValueToSaveFromEditTextString();
+            long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
+            newActivityTime = capActivityTimeMillisToRemainingDailyTime(newActivityTime, remainingDailyTime);
 
             double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-            double newCaloriesForActivity = ((double) (newStatValue/1000) * caloriesBurnedPerSecond);
+            double newCaloriesForActivity = ((double) (newActivityTime/1000) * caloriesBurnedPerSecond);
             newCaloriesForActivity = roundDownDoubleValuesToSyncCalories(newCaloriesForActivity);
 
-            dailyStatsAccess.setTotalSetTimeForSelectedActivity(newStatValue);
+            dailyStatsAccess.setTotalSetTimeForSelectedActivity(newActivityTime);
             dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
             dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
 
@@ -663,6 +685,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
             });
         });
+    }
+
+    private long capActivityTimeMillisToRemainingDailyTime(long activityTime, long remainingTime) {
+        if (activityTime>remainingTime) {
+            activityTime = remainingTime;
+        }
+        return activityTime;
     }
 
     private void deleteActivity(int position) {
@@ -691,7 +720,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private void setActivityEditTexts(long valueToSet) {
+    private void setActivityEditPopUpTexts(long valueToSet) {
         String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
         String[] splitString = stringToSet.split(":");
 
@@ -798,21 +827,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             public void afterTextChanged(Editable s) {
             }
         };
-    }
-
-    private void replaceActivityAddPopUpWithEditPopUp() {
-        tdeeAddPopUpWindow.dismiss();
-        tdeeEditTextHours.requestFocus();
-        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
-    }
-
-    private void populateActivityEditPopUpWithNewRow() {
-        replaceActivityAddPopUpWithEditPopUp();
-
-        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
-
-        activityTextViewInEditPopUp.setText(activityToAdd);
-        setActivityEditTexts(0);
     }
 
     private void setTdeeSpinnerListeners() {

@@ -542,6 +542,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: Adding new activity/time adds 0 and replaces previous w/ input.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: Limit edits to 24 hours total for both single and combined activities.
