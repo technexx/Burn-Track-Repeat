@@ -11,8 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
         android:textSize="22sp">
     </TextView>
 
@@ -22,6 +23,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/add_food_name_header"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="20dp"
         android:layout_marginTop="12dp"
         android:textSize="20sp"
@@ -41,9 +43,10 @@
         android:text="@string/calories_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/food_name_add_text"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="40dp"
+        android:layout_marginTop="28dp"
         android:textSize="22sp">
     </TextView>
 
@@ -51,9 +54,9 @@
         android:id="@+id/add_calories_consumed_editText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_calories_consumed_header"
-        app:layout_constraintStart_toStartOf="@id/add_calories_consumed_header"
-        app:layout_constraintEnd_toEndOf="@id/add_calories_consumed_header"
         android:layout_marginTop="12dp"
         android:textSize="24sp"
         android:textColor="@color/white"
