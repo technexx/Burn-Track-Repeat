@@ -626,44 +626,6 @@ public class DailyStatsAccess {
         return false;
     }
 
-    public int returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
-        int daysInYearToDate = getCurrentDayOfYear();
-        int numberOfDaysWithAtLeastOneActivity = 0;
-
-        List<Integer> daysOfYearList = new ArrayList<>();
-
-        for (int i=0; i<daysInYearToDate; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
-                daysOfYearList.add(i+1);
-            }
-        }
-
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(daysOfYearList);
-        for (int i=0; i<statsForEachActivityList.size(); i++) {
-            if (statsForEachActivityList.get(i).getActivity()!=null) {
-                numberOfDaysWithAtLeastOneActivity++;
-            }
-        }
-
-        return numberOfDaysWithAtLeastOneActivity;
-    }
-
-    public void setOldStatsForEachActivityListSizeVariable(int valueToSet) {
-        oldStatsForEachActivityListSize = valueToSet;
-    }
-
-    public int getOldStatsForEachActivityListSizeVariable() {
-        return oldStatsForEachActivityListSize;
-    }
-
-    public void setNewStatsForEachActivityListSizeVariable(int valueToSet) {
-        newStatsForEachActivityListSize = valueToSet;
-    }
-
-    public int getNewStatsForEachActivityListSizeVariable() {
-        return newStatsForEachActivityListSize;
-    }
-
     public long getTotalSetTimeVariableForDayHolder() {
         return totalSetTimeForSelectedDuration;
     }

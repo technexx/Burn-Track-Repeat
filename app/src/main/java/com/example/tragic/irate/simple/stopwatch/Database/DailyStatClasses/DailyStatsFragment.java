@@ -119,6 +119,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int MONTHLY_STATS = 2;
     int YEARLY_STATS = 3;
     int CUSTOM_STATS = 4;
+    boolean numberOfDaysWithActivitiesHasChanged;
 
     List<CalendarDay> customCalendarDayList;
     List<DayHolder> dayHolderList;
@@ -362,7 +363,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedAdapter.turnOffEditMode();
         caloriesConsumedAdapter.getItemCount();
 
-        dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
+//        dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
     }
 
     private void disableActivityEditButtonIfMoreThanOneDateSelected(List<CalendarDay> calendarDayList) {
@@ -429,17 +430,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
 
-
-        if (hasNumberOfDaysWithAtLeastOneActivityChanged()) {
+        if (numberOfDaysWithActivitiesHasChanged) {
             colorDaysWithAtLeastOneActivity();
+            numberOfDaysWithActivitiesHasChanged = false;
             Log.i("testchange", "called!");
         }
 
         setListsOfDayHolderAndStatsPrimaryIds();
-
-        //Todo: This assigns a new value right away, so if list size is 1, we begin and stay at 1/0 until something changes.
-        //Todo: Old is set in dateChangeLogic().
-        dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
     }
 
     public void setActivitySortMode(int sortMode) {
@@ -462,14 +459,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public List<StatsForEachActivity> getStatsForEachActivityList() {
         return statsForEachActivityList;
-    }
-
-    private boolean hasNumberOfDaysWithAtLeastOneActivityChanged() {
-        int oldValue = dailyStatsAccess.getOldStatsForEachActivityListSizeVariable();
-        int newValue = dailyStatsAccess.getNewStatsForEachActivityListSizeVariable();
-        Log.i("testchange", "old value is " + oldValue);
-        Log.i("testchange", "new values is " + newValue);
-        return (oldValue != newValue);
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
@@ -593,6 +582,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void addActivityToStats() {
+        numberOfDaysWithActivitiesHasChanged = true;
+
         AsyncTask.execute(()-> {
             String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
@@ -607,6 +598,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 populateListsAndTextViewsFromEntityListsInDatabase();
                 mPositionToEdit = dailyStatsAccess.getStatsForEachActivityList().size()-1;
+
 
                 getActivity().runOnUiThread(()-> {
                     dailyStatsAdapter.notifyDataSetChanged();
@@ -669,8 +661,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-
     private void deleteActivity(int position) {
+        numberOfDaysWithActivitiesHasChanged = true;
+
         AsyncTask.execute(() -> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
@@ -686,6 +679,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
 
             populateListsAndTextViewsFromEntityListsInDatabase();
+
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
