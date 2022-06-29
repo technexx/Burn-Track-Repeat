@@ -131,10 +131,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View tdeeEditView;
     View popUpAnchorBottom;
     PopupWindow tdeeEditPopUpWindow;
-    TextView tdeeEditPopUpFirstMainTextView;
+    TextView activityTextViewInEditPopUp;
     EditText tdeeEditTextHours;
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
+    TextView unassignedTimeInEditPopUpTextView;
     ImageButton confirmActivityEditWithinPopUpButton;
     ImageButton confirmActivityDeletionWithinEditPopUpButton;
 
@@ -362,8 +363,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         caloriesConsumedAdapter.turnOffEditMode();
         caloriesConsumedAdapter.getItemCount();
-
-//        dailyStatsAccess.setOldStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
     }
 
     private void disableActivityEditButtonIfMoreThanOneDateSelected(List<CalendarDay> calendarDayList) {
@@ -622,8 +621,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 
-        tdeeEditPopUpFirstMainTextView.setText(activityString);
+        activityTextViewInEditPopUp.setText(activityString);
         setActivityEditTexts(timeToEditLongValue);
+
+        String timeLeftInDay = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime());
+        String timeLeftInDayConcatString = getString(R.string.day_time_remaining, timeLeftInDay);
+        unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
 
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
@@ -635,6 +638,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(mPositionToEdit);
 
             long newStatValue = getMillisValueToSaveFromEditTextString();
+
             double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
             double newCaloriesForActivity = ((double) (newStatValue/1000) * caloriesBurnedPerSecond);
@@ -807,7 +811,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
-        tdeeEditPopUpFirstMainTextView.setText(activityToAdd);
+        activityTextViewInEditPopUp.setText(activityToAdd);
         setActivityEditTexts(0);
     }
 
@@ -1114,8 +1118,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 .setMinimumDate(CalendarDay.from(2022, 1, 1))
                 .setMaximumDate(calendarDay)
                 .commit();
-
-//        calendarView.setSelectedDate(calendarDay);
     }
 
     private void instantiateAddPopUpViews() {
@@ -1155,15 +1157,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(135), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
-        popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
-        tdeeEditPopUpFirstMainTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
-
+        activityTextViewInEditPopUp = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
+        unassignedTimeInEditPopUpTextView = tdeeEditView.findViewById(R.id.unassigned_time_textView);
 
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit);
         confirmActivityDeletionWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
+
+        popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();

@@ -113,6 +113,17 @@
         </EditText>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/unassigned_time_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="4dp"
+        android:textSize="18sp">
+    </TextView>
+
     <ImageButton
         android:id="@+id/confirm_activity_edit"
         android:layout_width="wrap_content"

@@ -544,9 +544,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
-  //Todo: First 3 rows of expansion can be daily w/ calories consumed vs. burned, and a second section below can be year-to-date.
   //Todo: Limit edits to 24 hours total for both single and combined activities.
   //Todo: Longer total time/calorie values exceed width allowances.
+  //Todo: Fix calendar minimization issue.
 
   //Todo: Cycles Completed needs to be saved in sharedPref or database - will reset on app close.
   //Todo: Black background on stats frag may be b0rking date selection highlight.
