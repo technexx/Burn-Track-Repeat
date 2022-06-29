@@ -136,8 +136,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
     TextView unassignedTimeInEditPopUpTextView;
-    ImageButton confirmActivityEditWithinPopUpButton;
-    ImageButton confirmActivityDeletionWithinEditPopUpButton;
+    Button confirmActivityEditWithinPopUpButton;
+    Button confirmActivityDeletionWithinEditPopUpButton;
 
     int mActivitySortMode;
     int mPositionToEdit;
