@@ -542,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Duration switching blips day selected on calendar.
+  //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: First 3 rows of expansion can be daily w/ calories consumed vs. burned, and a second section below can be year-to-date.
   //Todo: Limit edits to 24 hours total for both single and combined activities.

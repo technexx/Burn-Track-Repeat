@@ -245,6 +245,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         setSelectionDayIfSelectingSingleDayFromCustomDuration();
                         enableActivityEditButtonIfDisabled();
                     });
+
                 });
                 Log.i("testCall", "onDateSelected called!");
             }
@@ -427,13 +428,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
         }
 
-        setListsOfDayHolderAndStatsPrimaryIds();
 
-        dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
 
         if (hasNumberOfDaysWithAtLeastOneActivityChanged()) {
             colorDaysWithAtLeastOneActivity();
+            Log.i("testchange", "called!");
         }
+
+        setListsOfDayHolderAndStatsPrimaryIds();
+
+        //Todo: This assigns a new value right away, so if list size is 1, we begin and stay at 1/0 until something changes.
+        //Todo: Old is set in dateChangeLogic().
+        dailyStatsAccess.setNewStatsForEachActivityListSizeVariable(dailyStatsAccess.returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities());
     }
 
     public void setActivitySortMode(int sortMode) {
@@ -461,6 +467,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private boolean hasNumberOfDaysWithAtLeastOneActivityChanged() {
         int oldValue = dailyStatsAccess.getOldStatsForEachActivityListSizeVariable();
         int newValue = dailyStatsAccess.getNewStatsForEachActivityListSizeVariable();
+        Log.i("testchange", "old value is " + oldValue);
+        Log.i("testchange", "new values is " + newValue);
         return (oldValue != newValue);
     }
 
@@ -481,9 +489,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
+        if (directionOfIteration==ITERATING_ACTIVITY_STATS_UP) {
+            if (currentStatDurationMode<4) {
+                currentStatDurationMode++;
+            } else {
+                currentStatDurationMode=0;
+            }
+        } else if (directionOfIteration==ITERATING_ACTIVITY_STATS_DOWN) {
+            if (currentStatDurationMode>0) {
+                currentStatDurationMode--;
+            } else {
+                currentStatDurationMode=4;
+            }
+        }
+    }
+
     private void setStatDurationViews(int mode) {
         toggleEditStatsButton(true);
-
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
 
         if (mode==DAILY_STATS) {
@@ -528,22 +551,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsTotalSetTimeTextView.setText(totalSetTime);
         dailyStatsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
-    }
-
-    public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
-        if (directionOfIteration==ITERATING_ACTIVITY_STATS_UP) {
-            if (currentStatDurationMode<4) {
-                currentStatDurationMode++;
-            } else {
-                currentStatDurationMode=0;
-            }
-        } else if (directionOfIteration==ITERATING_ACTIVITY_STATS_DOWN) {
-            if (currentStatDurationMode>0) {
-                currentStatDurationMode--;
-            } else {
-                currentStatDurationMode=4;
-            }
-        }
     }
 
     private void toggleEditStatsButton(boolean buttonIsEnabled) {
@@ -1114,7 +1121,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 .setMaximumDate(calendarDay)
                 .commit();
 
-        calendarView.setSelectedDate(calendarDay);
+//        calendarView.setSelectedDate(calendarDay);
     }
 
     private void instantiateAddPopUpViews() {

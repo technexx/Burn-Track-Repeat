@@ -156,9 +156,6 @@ public class DailyStatsAccess {
         } else {
             mDayHolder = new DayHolder();
         }
-
-        Log.i("testInsert", "dayHolder date used to create single object list is " + doesDayExistInDatabase);
-        Log.i("testInsert", "dayHolder date assigned in entity from list is " + mDayHolder.getDate());
     }
 
     public void checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(int daySelected) {
@@ -174,7 +171,6 @@ public class DailyStatsAccess {
                 return;
             }
         }
-        Log.i("testInsert", "doesDayExist returned from check method is " + doesDayExistInDatabase);
     }
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
@@ -192,8 +188,6 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         }
-
-        Log.i("testInsert", "doesDayExist in insert method for daily totals is " + doesDayExistInDatabase);
     }
 
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
@@ -201,8 +195,6 @@ public class DailyStatsAccess {
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
-
-            Log.i("testCals", "entity list size retrieved from db for duration iteration is " + mCaloriesForEachFoodList.size());
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
@@ -212,8 +204,6 @@ public class DailyStatsAccess {
     private void populateCaloriesForEachFoodList(List<Integer> integerListOfSelectedDays) {
         if (integerListOfSelectedDays.size()>0) { ;
             mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
-
-            Log.i("testCals", "entity list size retrieved from db for duration iteration is " + mCaloriesForEachFoodList.size());
         } else {
             mCaloriesForEachFoodList = new ArrayList<>();
         }
@@ -239,8 +229,6 @@ public class DailyStatsAccess {
 
         List<Integer> singleDayListForCaloriesConsumed = Collections.singletonList(dayToRetrieve);
         mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(singleDayListForCaloriesConsumed);
-
-        Log.i("testCals", "entity list retrieved from from db for single day selection is " + mCaloriesForEachFoodList.size());
 
         convertToStringAndSetSingleDay(dayToRetrieve);
 
@@ -639,13 +627,12 @@ public class DailyStatsAccess {
     }
 
     public int returnStatsForEachActivitySizeVariableByQueryingYearlyListOfActivities() {
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+        int daysInYearToDate = getCurrentDayOfYear();
         int numberOfDaysWithAtLeastOneActivity = 0;
 
         List<Integer> daysOfYearList = new ArrayList<>();
 
-        for (int i=0; i<daysInYear; i++) {
+        for (int i=0; i<daysInYearToDate; i++) {
             if (cyclesDatabase.cyclesDao().loadSingleDay(i+1).size()!=0) {
                 daysOfYearList.add(i+1);
             }
