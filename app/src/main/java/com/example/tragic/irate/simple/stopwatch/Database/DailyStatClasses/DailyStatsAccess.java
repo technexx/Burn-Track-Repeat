@@ -672,7 +672,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Todo: This should be setting in populateListsAndTextViewsFromEntityListsInDatabase(), which also executes after every insert/update/delete.
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
     }

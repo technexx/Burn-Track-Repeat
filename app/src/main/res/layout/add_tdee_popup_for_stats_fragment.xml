@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/black_gradient_background">
+
+    <Spinner
+        android:id="@+id/activity_category_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="6dp"
+        android:textSize="16sp"
+        android:popupBackground="@color/black">
+    </Spinner>
+
+    <Spinner
+        android:id="@+id/activity_sub_category_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_category_spinner"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="6dp"
+        android:textSize="16sp"
+        android:popupBackground="@color/black">
+    </Spinner>
+
+    <TextView
+        android:id="@+id/calories_burned_in_tdee_addition_popUp_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/met_score_textView"
+        android:layout_marginTop="20dp"
+        android:textSize="18sp"
+        android:textColor="@color/white">
+    </TextView>
+
+    <TextView
+        android:id="@+id/met_score_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_sub_category_spinner"
+        android:layout_marginTop="16dp"
+        android:textSize="23sp"
+        android:textColor="@color/white"
+        android:gravity="center_horizontal">
+    </TextView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/add_activity_confirm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calories_burned_in_tdee_addition_popUp_textView"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/Gray"
+        android:textColor="@color/white"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

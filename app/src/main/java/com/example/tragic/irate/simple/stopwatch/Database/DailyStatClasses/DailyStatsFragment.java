@@ -577,7 +577,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingActivity(int position) {
-        tdeeAddPopUpWindow.showAsDropDown(popUpAnchorBottom, 0, 0);
+        tdeeAddPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
     private void addActivityToStats() {
@@ -618,7 +618,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
         activityTextViewInEditPopUp.setText(activityToAdd);
-        setActivityEditPopUpTexts(0);
+        zeroOutActivityEditPopUpEditTexts();
     }
 
     private void replaceActivityAddPopUpWithEditPopUp() {
@@ -626,14 +626,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         setActivityEditPopUpTimeRemainingTextView();
         tdeeEditTextHours.requestFocus();
-        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
+        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
     @Override
     public void activityEditItemSelected(int position) {
         this.mPositionToEdit = position;
         launchActivityEditPopUpWithEditTextValuesSet(position);
-        logEditPopUpTimes();
     }
 
     private void launchActivityEditPopUpWithEditTextValuesSet(int position) {
@@ -641,11 +640,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
 
         activityTextViewInEditPopUp.setText(activityString);
-        setActivityEditPopUpTexts(timeToEditLongValue);
+        setActivityEditPopUpEditTexts(timeToEditLongValue);
         setActivityEditPopUpTimeRemainingTextView();
 
         tdeeEditTextHours.requestFocus();
-        tdeeEditPopUpWindow.showAsDropDown(recyclerAndTotalStatsDivider, 0, 0, Gravity.TOP);
+        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
     private void setActivityEditPopUpTimeRemainingTextView() {
@@ -665,8 +664,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             remainingDailyTime += timeInEditedRow;
             newActivityTime = cappedActivityTimeInMillis(newActivityTime, remainingDailyTime);
-
-            logEditPopUpTimes();
 
             double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
             double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
@@ -720,14 +717,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
             });
         });
     }
 
-    private void setActivityEditPopUpTexts(long valueToSet) {
+    private void zeroOutActivityEditPopUpEditTexts() {
+        tdeeEditTextHours.setText("");
+        tdeeEditTextMinutes.setText("");
+        tdeeEditTextSeconds.setText("");
+    }
+
+    private void setActivityEditPopUpEditTexts(long valueToSet) {
         String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
         String[] splitString = stringToSet.split(":");
 
@@ -741,14 +743,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             tdeeEditTextSeconds.setText(splitString[1]);
         }
 
-        setEditTextsToEmptyIfAtZero(tdeeEditTextHours);
-        setEditTextsToEmptyIfAtZero(tdeeEditTextMinutes);
-        setEditTextsToEmptyIfAtZero(tdeeEditTextSeconds);
+        //Todo: Should be set to setEditTextsToZeroIfEmpty() instead if being edited, not added.
+        setEditTextsToZeroIfEmpty(tdeeEditTextHours);
+        setEditTextsToZeroIfEmpty(tdeeEditTextMinutes);
+        setEditTextsToZeroIfEmpty(tdeeEditTextSeconds);
     }
 
     private void setEditTextsToEmptyIfAtZero(EditText editText) {
         if (editText.getText().toString().equals("00")) {
             editText.setText("");
+        }
+    }
+
+    private void setEditTextsToZeroIfEmpty(EditText editText) {
+        if (editText.getText().toString().equals("")) {
+            editText.setText("00");
         }
     }
 
@@ -1142,9 +1151,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateAddPopUpViews() {
-        addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
-        tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(340), true);
-        tdeeAddPopUpWindow.setAnimationStyle(R.style.SlideBottomAnimation);
+        addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup_for_stats_fragment, null);
+        tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
+        tdeeAddPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
         tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
@@ -1175,7 +1184,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateActivityEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(135), true);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         activityTextViewInEditPopUp = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
@@ -1197,8 +1206,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateCaloriesConsumedEditPopUpViews() {
         addFoodView = inflater.inflate(R.layout.add_calories_consumed_popup, null);
-        addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(150), true);
-        addFoodPopUpWindow.setAnimationStyle(R.style.SlideTopAnimation);
+        addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
+        addFoodPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_add_text);
         caloriesConsumedEditText = addFoodView.findViewById(R.id.add_calories_consumed_editText);

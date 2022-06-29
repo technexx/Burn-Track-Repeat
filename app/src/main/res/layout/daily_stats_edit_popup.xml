@@ -10,12 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/activity_delete_button"
+        app:layout_constraintEnd_toEndOf="@id/confirm_activity_edit"
         android:layout_marginTop="2dp"
-        android:textSize="26sp"
+        android:textSize="22sp"
         android:textColor="@color/white"
-        android:maxWidth="300dp">
+        android:maxWidth="250dp">
     </TextView>
 
     <androidx.constraintlayout.widget.ConstraintLayout

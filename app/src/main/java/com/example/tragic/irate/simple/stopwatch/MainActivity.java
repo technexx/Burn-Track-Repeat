@@ -3,7 +3,6 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -35,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -98,7 +96,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -542,7 +539,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Empty activity editText times when pulled as an edited row should have "00" text, and not "00" hint.
+  //Todo: edit stats popUps needs to be changed/consistent.
+  //Todo: First addition on app launch overwrites another row w/ its values, and adds the actual activity w/ zero.
+  //Todo: Sometimes adding a new activity defaults to "1" calories.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: Longer total time/calorie values exceed width allowances.
@@ -1725,7 +1724,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortCyclePopupView = inflater.inflate(R.layout.cycles_sort_popup, null);
     sortStatsPopupView = inflater.inflate(R.layout.stats_sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
-    addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup, null);
+    addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup_for_main_activity, null);
 
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
     stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
