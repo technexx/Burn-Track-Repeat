@@ -174,7 +174,7 @@ public class DailyStatsAccess {
         if (!doesDayExistInDatabase) {
             String date = getDateString();
 
-            //Todo: New DayHolder instance overwrites the values set beforehand in Fragment.
+            //Todo: New DayHolder instance overwrites the values set beforehand in Fragment. Same w/ DayHolder.
             mDayHolder = new DayHolder();
 
             mDayHolder.setDayId(daySelected);
