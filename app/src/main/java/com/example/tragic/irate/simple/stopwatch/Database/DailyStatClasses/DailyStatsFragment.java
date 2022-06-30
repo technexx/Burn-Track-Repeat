@@ -142,7 +142,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int mActivitySortMode;
     int mPositionToEdit;
 
-    PopupWindow tdeeAddPopUpWindow;
+    PopupWindow addTdeePopUpWindow;
     View addTDEEPopUpView;
 
     Spinner tdee_category_spinner;
@@ -153,6 +153,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView caloriesBurnedInTdeeAdditionTextView;
     TextView metScoreTextView;
     Button confirmActivityAddition;
+
+    int ADDING_ACTIVITY = 0;
+    int EDITING_ACTIVITY = 1;
 
     View caloriesConsumedAddAndEditView;
     PopupWindow caloriesConsumedAddAndEditPopUpWindow;
@@ -295,7 +298,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityAddition.setOnClickListener(v-> {
-            addActivityToStats();
+            setNewActivityVariablesAndCheckIfActivityExists();
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
@@ -308,7 +311,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
-            editActivityStatsInDatabase();
+            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
+                addActivityToStatsInDatabase();
+            } else {
+                editActivityStatsInDatabase();
+            }
             tdeeEditPopUpWindow.dismiss();
         });
 
@@ -577,12 +584,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingActivity(int position) {
-        tdeeAddPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+        addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
-    private void addActivityToStats() {
-        numberOfDaysWithActivitiesHasChanged = true;
-
+    private void setNewActivityVariablesAndCheckIfActivityExists() {
         AsyncTask.execute(()-> {
             String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
@@ -592,23 +597,41 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setActivityPositionInListForCurrentDay();
 
             if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
-                dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
-                dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
-
-                populateListsAndTextViewsFromEntityListsInDatabase();
-
-                mPositionToEdit = dailyStatsAccess.getStatsForEachActivityList().size()-1;
-                Log.i("testAdd", "position to edit is " + mPositionToEdit);
-
                 getActivity().runOnUiThread(()-> {
-                    dailyStatsAdapter.notifyDataSetChanged();
                     populateActivityEditPopUpWithNewRow();
+                    addTdeePopUpWindow.dismiss();
                 });
             } else {
                 getActivity().runOnUiThread(()->{
                     Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
                 });
             }
+        });
+    }
+
+    private void addActivityToStatsInDatabase() {
+        numberOfDaysWithActivitiesHasChanged = true;
+
+        AsyncTask.execute(()-> {
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
+
+            long timeToAdd = getMillisValueToSaveFromEditTextString();
+            double metScore = dailyStatsAccess.getMetScoreForSelectedActivity();
+
+            double caloriesPerSecond = calculateCaloriesBurnedPerSecond(metScore);
+            double caloriesToAdd = (double) (caloriesPerSecond * (timeToAdd/1000));
+
+            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, timeToAdd, caloriesToAdd);
+
+            Log.i("testAdd", "time added is " + timeToAdd);
+            Log.i("testAdd", "calories added are " + caloriesToAdd);
+        });
+
+        getActivity().runOnUiThread(()-> {
+            dailyStatsAdapter.notifyDataSetChanged();
+            Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -622,7 +645,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void replaceActivityAddPopUpWithEditPopUp() {
-        tdeeAddPopUpWindow.dismiss();
+        addTdeePopUpWindow.dismiss();
 
         setActivityEditPopUpTimeRemainingTextView();
         tdeeEditTextHours.requestFocus();
@@ -1153,8 +1176,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateAddPopUpViews() {
         addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_stats_fragment, null);
-        tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
-        tdeeAddPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+        addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
+        addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
         tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
@@ -1166,7 +1189,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmActivityAddition.setText(R.string.save);
         metScoreTextView.setTextSize(22);
 
-        tdeeAddPopUpWindow.setOnDismissListener(()-> {
+        addTdeePopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
             dailyStatsAdapter.notifyDataSetChanged();
         });

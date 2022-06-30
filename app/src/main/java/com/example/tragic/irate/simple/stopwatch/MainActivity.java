@@ -503,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TDEEChosenActivitySpinnerValues tDEEChosenActivitySpinnerValues;
   TextView addTDEEfirstMainTextView;
   ImageView removeTdeeActivityImageView;
-  PopupWindow tdeeAddPopUpWindow;
+  PopupWindow addTdeePopUpWindow;
   View addTDEEPopUpView;
 
   Spinner tdee_category_spinner;
@@ -539,7 +539,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: edit stats popUps needs to be changed/consistent.
   //Todo: First addition on app launch overwrites another row w/ its values, and adds the actual activity w/ zero.
   //Todo: Sometimes adding a new activity defaults to "1" calories.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
@@ -867,11 +866,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEfirstMainTextView.setOnClickListener(v-> {
       View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
 
-      tdeeAddPopUpWindow.showAsDropDown(testView);
+      addTdeePopUpWindow.showAsDropDown(testView);
     });
 
     confirmActivityAddition.setOnClickListener(v-> {
-      tdeeAddPopUpWindow.dismiss();
+      addTdeePopUpWindow.dismiss();
       toggleEditPopUpViewsForAddingActivity(true);
     });
 
@@ -1734,7 +1733,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+    addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
 
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
@@ -1746,7 +1745,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
     stopWatchPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-    tdeeAddPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    addTdeePopUpWindow.setAnimationStyle(R.style.WindowAnimation);
   }
 
   private void instantiateArrayLists() {
@@ -3630,7 +3629,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (trackActivityWithinCycle) {
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
         dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
-        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(dayOfYear);
+        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabaseWithZeroedOutTimesAndCalories(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());

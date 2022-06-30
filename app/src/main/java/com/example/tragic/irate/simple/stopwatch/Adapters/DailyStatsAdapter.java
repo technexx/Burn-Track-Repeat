@@ -41,6 +41,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     boolean mEditModeIsActive;
     boolean mRowIsSelectedForEditing;
 
+    int mAddingOrEditingActivity;
+    int ADDING_ACTIVITY = 0;
+    int EDITING_ACTIVITY = 1;
+
     tdeeEditedItemIsSelected mTdeeEditedItemIsSelected;
     tdeeActivityAddition mTdeeActivityAddition;
 
@@ -108,6 +112,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mMainViewHolder = (MainViewHolder) holder;
 
                 if (mEditModeIsActive) {
+                    setAddingOrEditingActivityVariable(EDITING_ACTIVITY);
                     mTdeeEditedItemIsSelected.activityEditItemSelected(position-1);
                     toggleRowSelectionForEditing();
                 }
@@ -119,9 +124,18 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
+                setAddingOrEditingActivityVariable(ADDING_ACTIVITY);
                 mTdeeActivityAddition.onAddingActivity(position);
             });
         }
+    }
+
+    private void setAddingOrEditingActivityVariable(int addingOrEditing) {
+        this.mAddingOrEditingActivity = addingOrEditing;
+    }
+
+    public int getAddingOrEditingActivityVariable() {
+        return mAddingOrEditingActivity;
     }
 
     private void toggleRowSelectionForEditing() {

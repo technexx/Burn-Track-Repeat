@@ -40,7 +40,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
     boolean mEditModeIsActive;
     boolean mRowIsSelectedForEditing;
 
-    int mAddingOrEditing;
+    int mAddingOrEditingFood;
     int ADDING_FOOD = 0;
     int EDITING_FOOD = 1;
 
@@ -130,11 +130,11 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     private void setAddingOrEditingFoodVariable(int addingOrEditing) {
-        this.mAddingOrEditing = addingOrEditing;
+        this.mAddingOrEditingFood = addingOrEditing;
     }
 
     public int getAddingOrEditingFoodVariable() {
-        return mAddingOrEditing;
+        return mAddingOrEditingFood;
     }
 
     private void toggleRowSelectionForEditing() {
