@@ -187,7 +187,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected, long setTime, double calories) {
+    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
         String date = getDateString();
 
         mDayHolder = new DayHolder();
@@ -195,14 +195,9 @@ public class DailyStatsAccess {
         mDayHolder.setDayId(daySelected);
         mDayHolder.setDate(date);
 
-        mDayHolder.setTotalSetTime(setTime);
-        mDayHolder.setTotalBreakTime(0);
-        mDayHolder.setTotalCaloriesBurned(calories);
-
+        //Times and calories set in fragment.
         cyclesDatabase.cyclesDao().insertDay(mDayHolder);
     }
-
-
 
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
 
@@ -471,7 +466,7 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
-    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
+    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
 
         if (!doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = new StatsForEachActivity();
@@ -486,6 +481,16 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
         }
+    }
+
+    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
+        mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+        mStatsForEachActivity.setActivity(mActivityString);
+        mStatsForEachActivity.setMetScore(mMetScore);
+
+        //Time and calorie values are set in Fragment.
+
+        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -517,6 +522,7 @@ public class DailyStatsAccess {
             }
         }
     }
+
     //Todo: Since we add a blank row and THEN edit, it's likely an issue of sort/row positioning.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //New database pull to account for most recent insertion.

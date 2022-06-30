@@ -311,11 +311,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
-            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
-                addActivityToStatsInDatabase();
-            } else {
-                editActivityStatsInDatabase();
-            }
+            addOrEditActivityStatsInDatabase();
             tdeeEditPopUpWindow.dismiss();
         });
 
@@ -609,32 +605,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private void addActivityToStatsInDatabase() {
-        numberOfDaysWithActivitiesHasChanged = true;
-
-        AsyncTask.execute(()-> {
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
-
-            long timeToAdd = getMillisValueToSaveFromEditTextString();
-            double metScore = dailyStatsAccess.getMetScoreForSelectedActivity();
-
-            double caloriesPerSecond = calculateCaloriesBurnedPerSecond(metScore);
-            double caloriesToAdd = (double) (caloriesPerSecond * (timeToAdd/1000));
-
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, timeToAdd, caloriesToAdd);
-
-            Log.i("testAdd", "time added is " + timeToAdd);
-            Log.i("testAdd", "calories added are " + caloriesToAdd);
-        });
-
-        getActivity().runOnUiThread(()-> {
-            dailyStatsAdapter.notifyDataSetChanged();
-            Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
-        });
-    }
-
     private void populateActivityEditPopUpWithNewRow() {
         replaceActivityAddPopUpWithEditPopUp();
 
@@ -676,7 +646,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
     }
 
-    private void editActivityStatsInDatabase() {
+    private void addOrEditActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(mPositionToEdit);
@@ -695,7 +665,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setTotalSetTimeForSelectedActivity(newActivityTime);
             dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
-            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
 
             dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
@@ -704,7 +673,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
             dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
-            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+
+            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
+                dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
+                dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
+            }
+
+            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
+                dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
+                dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+            }
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
