@@ -174,6 +174,7 @@ public class DailyStatsAccess {
         if (!doesDayExistInDatabase) {
             String date = getDateString();
 
+            //Todo: New DayHolder instance overwrites the values set beforehand in Fragment.
             mDayHolder = new DayHolder();
 
             mDayHolder.setDayId(daySelected);
@@ -188,9 +189,9 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
-        String date = getDateString();
-
         mDayHolder = new DayHolder();
+
+        String date = getDateString();
 
         mDayHolder.setDayId(daySelected);
         mDayHolder.setDate(date);
@@ -484,6 +485,8 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
+        mStatsForEachActivity = new StatsForEachActivity();
+
         mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
         mStatsForEachActivity.setActivity(mActivityString);
         mStatsForEachActivity.setMetScore(mMetScore);
