@@ -917,7 +917,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             Toast.makeText(getContext(), "Must enter a food!", Toast.LENGTH_SHORT).show();
             return;
         }
-        //Todo: Must be positive.
         if (getCaloriesForFoodItemFromEditText().isEmpty()) {
             Toast.makeText(getContext(), "Must enter a caloric value!", Toast.LENGTH_SHORT).show();
             return;
@@ -929,8 +928,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase(daySelectedFromCalendar);
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            caloriesConsumedAdapter.notifyDataSetChanged();
-            addFoodPopUpWindow.dismiss();
+            getActivity().runOnUiThread(()-> {
+                caloriesConsumedAdapter.notifyDataSetChanged();
+                addFoodPopUpWindow.dismiss();
+            });
         });
     }
 
