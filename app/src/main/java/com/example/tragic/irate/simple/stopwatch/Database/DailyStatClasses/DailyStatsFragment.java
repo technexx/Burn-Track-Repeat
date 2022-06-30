@@ -319,12 +319,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmCaloriesConsumedAdditionWithinPopUpButton.setOnClickListener(v-> {
             addOrEditFoodInStats();
-            addFoodPopUpWindow.dismiss();
         });
 
         confirmCaloriesConsumedDeletionWithinPopUpButton.setOnClickListener(v-> {
             deleteFoodInStatsIfInEditMode();
-            addFoodPopUpWindow.dismiss();
         });
 
         minimizeCalendarButton.setOnClickListener(v-> {
@@ -915,22 +913,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void addFoodToStats() {
-        AsyncTask.execute(()-> {
+        if (getFoodStringFromEditText().isEmpty()) {
+            Toast.makeText(getContext(), "Must enter a food!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //Todo: Must be positive.
+        if (getCaloriesForFoodItemFromEditText().isEmpty()) {
+            Toast.makeText(getContext(), "Must enter a caloric value!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+            AsyncTask.execute(()-> {
             dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
+            dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
 
             dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase(daySelectedFromCalendar);
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            getActivity().runOnUiThread(()-> {
-                if (!isFoodNameEditTextEmpty(getFoodStringFromEditText())) {
-                    caloriesConsumedAdapter.notifyDataSetChanged();
-                    addFoodPopUpWindow.dismiss();
-                    Toast.makeText(getContext(), "Added!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Must enter a food!", Toast.LENGTH_SHORT).show();
-                }
-            });
+            caloriesConsumedAdapter.notifyDataSetChanged();
+            addFoodPopUpWindow.dismiss();
         });
     }
 
@@ -938,12 +938,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return typeOfFoodEditText.getText().toString();
     }
 
-    private double getCaloriesForFoodItemFromEditText() {
-        return Double.parseDouble(caloriesConsumedEditText.getText().toString());
-    }
-
-    private boolean isFoodNameEditTextEmpty(String editTextString) {
-        return editTextString.isEmpty();
+    private String getCaloriesForFoodItemFromEditText() {
+        return caloriesConsumedEditText.getText().toString();
     }
 
     @Override
@@ -969,7 +965,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
 
             dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-            dailyStatsAccess.setCaloriesInFoodItem(getCaloriesForFoodItemFromEditText());
+            dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
             dailyStatsAccess.updateCaloriesAndEachFoodInDatabase();
 
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -988,6 +984,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+                addFoodPopUpWindow.dismiss();
             });
         });
     }
