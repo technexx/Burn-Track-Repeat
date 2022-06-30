@@ -56,7 +56,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, CaloriesConsumedAdapter.caloriesConsumedItemSelected, CaloriesConsumedAdapter.caloriesConsumedAddition {
+public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, CaloriesConsumedAdapter.caloriesConsumedEdit, CaloriesConsumedAdapter.caloriesConsumedAddition {
 
     View mRoot;
     Calendar calendar;
@@ -154,8 +154,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView metScoreTextView;
     Button confirmActivityAddition;
 
-    View addFoodView;
-    PopupWindow addFoodPopUpWindow;
+    View caloriesConsumedAddAndEditView;
+    PopupWindow caloriesConsumedAddAndEditPopUpWindow;
     EditText typeOfFoodEditText;
     EditText caloriesConsumedEditText;
 
@@ -344,6 +344,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void deleteFoodInStatsIfInEditMode() {
         if (caloriesConsumedAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
             deleteConsumedCalories(mPositionToEdit);
+        } else {
+            caloriesConsumedAddAndEditPopUpWindow.dismiss();
         }
     }
 
@@ -741,7 +743,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             tdeeEditTextSeconds.setText(splitString[1]);
         }
 
-        //Todo: Should be set to setEditTextsToZeroIfEmpty() instead if being edited, not added.
         setEditTextsToZeroIfEmpty(tdeeEditTextHours);
         setEditTextsToZeroIfEmpty(tdeeEditTextMinutes);
         setEditTextsToZeroIfEmpty(tdeeEditTextSeconds);
@@ -907,9 +908,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void onAddingFood(int position) {
+    public void onAddingFood() {
         typeOfFoodEditText.requestFocus();
-        addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+        confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
+        caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
     private void addFoodToStats() {
@@ -930,7 +932,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             getActivity().runOnUiThread(()-> {
                 caloriesConsumedAdapter.notifyDataSetChanged();
-                addFoodPopUpWindow.dismiss();
+                caloriesConsumedAddAndEditPopUpWindow.dismiss();
             });
         });
     }
@@ -944,8 +946,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     @Override
-    public void calorieRowIsSelected(int position) {
+    public void editCaloriesConsumedRowSelected(int position) {
         this.mPositionToEdit = position;
+        confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.delete);
         launchFoodEditPopUpWithEditTextValuesSet(position);
     }
 
@@ -958,7 +961,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedEditText.setText(caloriesAsString);
 
         typeOfFoodEditText.requestFocus();
-        addFoodPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+        caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
     private void updateFoodInStats() {
@@ -985,7 +988,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-                addFoodPopUpWindow.dismiss();
+                caloriesConsumedAddAndEditPopUpWindow.dismiss();
             });
         });
     }
@@ -1149,7 +1152,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateAddPopUpViews() {
-        addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup_for_stats_fragment, null);
+        addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_stats_fragment, null);
         tdeeAddPopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
         tdeeAddPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
@@ -1203,17 +1206,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCaloriesConsumedEditPopUpViews() {
-        addFoodView = inflater.inflate(R.layout.add_calories_consumed_popup, null);
-        addFoodPopUpWindow = new PopupWindow(addFoodView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
-        addFoodPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+        caloriesConsumedAddAndEditView = inflater.inflate(R.layout.calories_consumed_add_and_edit_popup, null);
+        caloriesConsumedAddAndEditPopUpWindow = new PopupWindow(caloriesConsumedAddAndEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
+        caloriesConsumedAddAndEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
-        typeOfFoodEditText = addFoodView.findViewById(R.id.food_name_add_text);
-        caloriesConsumedEditText = addFoodView.findViewById(R.id.add_calories_consumed_editText);
+        typeOfFoodEditText = caloriesConsumedAddAndEditView.findViewById(R.id.food_name_add_text);
+        caloriesConsumedEditText = caloriesConsumedAddAndEditView.findViewById(R.id.add_calories_consumed_editText);
 
-        confirmCaloriesConsumedAdditionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_add_button);
-        confirmCaloriesConsumedDeletionWithinPopUpButton = addFoodView.findViewById(R.id.confirm_calories_consumed_delete_button);
+        confirmCaloriesConsumedAdditionWithinPopUpButton = caloriesConsumedAddAndEditView.findViewById(R.id.confirm_calories_consumed_add_button);
+        confirmCaloriesConsumedDeletionWithinPopUpButton = caloriesConsumedAddAndEditView.findViewById(R.id.confirm_calories_consumed_delete_button);
 
-        addFoodPopUpWindow.setOnDismissListener(()-> {
+        caloriesConsumedAddAndEditPopUpWindow.setOnDismissListener(()-> {
             caloriesConsumedAdapter.turnOffEditMode();
             caloriesConsumedAdapter.getItemCount();
             caloriesConsumedAdapter.notifyDataSetChanged();
@@ -1330,7 +1333,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
         caloriesConsumedAdapter = new CaloriesConsumedAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration());
 
-        caloriesConsumedAdapter.getSelectedCaloriesItemPosition(DailyStatsFragment.this);
+        caloriesConsumedAdapter.editConsumedCalories(DailyStatsFragment.this);
         caloriesConsumedAdapter.addCaloriesToStats(DailyStatsFragment.this);
 
         caloriesConsumedRecyclerView = mRoot.findViewById(R.id.calories_consumed_recyclerView);

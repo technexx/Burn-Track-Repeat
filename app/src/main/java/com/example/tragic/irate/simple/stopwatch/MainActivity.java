@@ -1724,7 +1724,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortCyclePopupView = inflater.inflate(R.layout.cycles_sort_popup, null);
     sortStatsPopupView = inflater.inflate(R.layout.stats_sort_popup, null);
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
-    addTDEEPopUpView = inflater.inflate(R.layout.add_tdee_popup_for_main_activity, null);
+    addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
 
     timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
     stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);

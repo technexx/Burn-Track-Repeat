@@ -49,19 +49,19 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     boolean animateButtonSliding;
 
-    caloriesConsumedItemSelected mCaloriesConsumedItemSelected;
+    caloriesConsumedEdit mCaloriesConsumedEdit;
     caloriesConsumedAddition mCaloriesConsumedAddition;
 
-    public interface caloriesConsumedItemSelected {
-        void calorieRowIsSelected(int position);
+    public interface caloriesConsumedEdit {
+        void editCaloriesConsumedRowSelected(int position);
     }
 
-    public void getSelectedCaloriesItemPosition(caloriesConsumedItemSelected xCaloriesConsumedItemSelected) {
-        this.mCaloriesConsumedItemSelected = xCaloriesConsumedItemSelected;
+    public void editConsumedCalories(caloriesConsumedEdit xCaloriesConsumedEdit) {
+        this.mCaloriesConsumedEdit = xCaloriesConsumedEdit;
     }
 
     public interface caloriesConsumedAddition {
-        void onAddingFood(int position);
+        void onAddingFood();
     }
 
     public void addCaloriesToStats(caloriesConsumedAddition xCaloriesConsumedAddition) {
@@ -107,13 +107,12 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
             setMainHolderEditModeViews();
             setHolderViewTextStyles(REGULAR_TEXT);
 
-            //mMainViewHolder instance set on onClick is set on first adapter population. It does NOT get refreshed with views in adapter, which is why we need new instances if we're going to use it as a global.
             mMainViewHolder.fullView.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
 
                 if (mEditModeIsActive) {
                     setAddingOrEditingFoodVariable(EDITING_FOOD);
-                    mCaloriesConsumedItemSelected.calorieRowIsSelected(position-1);
+                    mCaloriesConsumedEdit.editCaloriesConsumedRowSelected(position-1);
                     toggleRowSelectionForEditing();
                 }
             });
@@ -125,8 +124,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             footViewHolder.addActivity.setOnClickListener(v-> {
                 setAddingOrEditingFoodVariable(ADDING_FOOD);
-                mCaloriesConsumedAddition.onAddingFood(position);
-
+                mCaloriesConsumedAddition.onAddingFood();
             });
         }
     }
